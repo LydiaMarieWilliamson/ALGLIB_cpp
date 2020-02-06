@@ -1,0 +1,18 @@
+Supplements:
+∙	Copyright notices
+∙	Supplement: Link listed up front.
+∙	A1. Extra module for C++ - IDW and KNN.
+∙	A2. Demo File: In 4.4.1, 4.4.2, 4.4.3.
+∙	A3. DefClass/DecClass: In 5.3.
+∙	A4. Subpackage Dependencies: In 2.2.
+∙	A5. Commerical Notifications: In 2.3. (If you want to use the Commercial version...)
+∙	A6. Change Log: At the end of 1.1 link to it.
+
+<a name=supp_CppDemoModule class=sheader></a><h2>A1. C++ Demo Module</h2>
+<a name=supp_DemoFile class=sheader></a><h2>A2. ALGLIB++ Demo</h2>
+<a name=supp_Classes class=sheader></a><h2>A3. ALGLIB++ Object Classes</h2>
+<a name=supp_Links class=sheader></a><h2>A4. ALGLIB++ Package Dependencies</h2>
+<a name=supp_Commercial class=sheader></a><h2>A5. ALGLIB Commercial Version: Notes</h2>
+<a name=supp_Commercial1 class=sheader></a><h2>A5.1. ALGLIB Commercial Notifications</h2>
+<a name=supp_Commercial2 class=sheader></a><h2>A5.2. ALGLIB Commercial Support by Routine</h2>
+<a name=supp_History class=sheader></a><h2>A6. ALGLIB &rArr; ALGLIB++ Revision Sequence</h2>

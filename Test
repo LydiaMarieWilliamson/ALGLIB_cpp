@@ -1,0 +1,207 @@
+<p>
+<b>Revision Notes:</b>
+<pre class=narration>
+*	Corrected ASCII, #alglib_packages (should be #alglib_main).
+*	The files were moved to a single top-level directory and the names normalized.
+*	References to Commercial ALGLIB in the comments and functions were removed.
+	A separate file was compiled collating all of the Commercial ALGLIB comments of the original package.
+*	The reprogramming, itself, will be entirely under GPL.
+	Additions made, particularly in DSP, file {en/de}-coding, video/music/sound processing, time-frequency analysis, will be made available for the commercial version to use.
+*	GMP will be added; LaPack will be integrated; DSP and Time-Frequency analysis; file-transfer; voice generation/recognition, computer vision, sound and video production
+*	You assume primary responsibility for maintenance; no support will be provided, but corrections or fixes reported will be noted, tested (where possible) and added.
+*	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16 manual.
+*	C99 compiler would be needed for alglib_impl -- not tested or verified.
+*	TestC works with alglib_impl and is C.
+*	Support for C is not moved away from in favor of nativizing the C++ code.
+	The Idw.c file is a demonstration of where I'm going with this.
+	The ALGLIB library's infrastructure is naturally tailored for C++; laden with idioms that practically scream out "C++!".
+	Trying to make this suitable for C (and to then put a C++ wrapper on top of this)
+	would be much like trying to rewrite a Russian classic, like Alexander Pushkin's "Eugene Onegin" in English,
+	to frame it in contemporary US American life, and then translate the result back into Russian.
+	(It qualifies as 19th century Russian Hip Hop or rap that could actually be put into a contemporary hip hop DJ loop, but that's a major reworking.)
+	The two languages are over 5000 years removed from their common ancestor, with deep incongruities that are material to any translation project.
+*	Test{I,X,Y,Z} work with alglib and are C++.
+*	The Makefile and revisions have only been tried with GCC:Linux:x86.
+*	The revision to handle the rounding on the FP unit was only added in for GCC:Linux:x86.
+*	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
+	Included in the "structural" changes was a normalization of the ordering (determined automatically with the aid of the compiler) of the routines and extraction of a dependency list.
+*	The God-objects in alglib_impl (ae_state) and RCOMM routines were removed.
+	This means that some of the static or global variables they are replaced by would need to be made thread_local (as indicated).
+	Only the commercial version has support for multi-processors or multi-threading;
+	but a small amount of it has crept into the GPL version in test_x and inherited, from this, in ALGLIB++'s TestX file.
+*	The partial compilation dependency includes are not present; instead, the modules are collated and the minimal dependency network is sorted out and documented separately.
+	Intra-module and extra-module dependencies are distinguished.
+	There's enough information here to separate out the modules and create a suitable Makefile.
+*	No non-commercial support for multi-threading, my recommendation is to keep it out of the GPL code (and out of TestX);
+	except maybe to provide a version of the GPL with it suitable for 2011 C or C++,
+	with the native support provided for threading using the thread-local attribute.
+	But if you continue to phase in multi-threaded support in the GPL code (with or without C/C++-11)
+	you'll lose the market to sell it to in the commercial version.
+*	The order of
+		minlm_lmprepare(...), minlmsetacctype(...), minlmsetcond(...)
+	is switched to:
+		minlmsetacctype(...), minlmsetcond(...), minlm_lmprepare(...)
+	In the namespace alglib_impl in:
+		minlmcreatevj(), minlmcreatev(), minlmcreatefgh(), minlmcreatefj()
+*	The calculation of refavgce in:
+		testdforestunit_basictestallsame()
+		testdforestunit_basictestrandom()
+	is rewritten to match that used by dfavgce().
+	These tests produce false positives: NAN's may be produced, which pass, because the comparison condition is stated negatively.
+*	2 C-incompatibilities: ByteOrder and CurCPU are defined at start-up time.
+	In C, it'll have to be replaced by a "startup" routine in Ap.cpp and called in up front main().
+	SSE2 intrinsics are not present in all GCC installations on Intel, so the automatic definition of AE_HAS_SSE2_INTRINSICS has been removed.
+	It must be explicitly #defined, instead (preferrably in Ap.h, where indicated).
+*	The replacement of ae_cpuid() by CurCPU excludes the 1-compiler/loader - heterogeneous-CPU configurations;
+	which is not supported in the GPL version.
+*	_clear should be _destroy in ~VectorQ(), ~MatrixQ() (as well as in AttachTo()).
+	That is
+	vector_clear	⇒	vector_destroy in ae_vector_wrapper::~ae_vector_wrapper() and ae_vector_wrapper::attach_to()
+	matrix_clear	⇒	matrix_destroy in ae_matrix_wrapper::~ae_matrix_wrapper() and ae_matrix_wrapper::attach_to()
+	Under the revision that I described, they each become *_free(..., ae_false), while *_clear(...) would have been written as *_free(..., ae_true).
+	Both are equivalent in the GPL version, because *_clear() and *_destroy() are the same in that version;
+	but this is only an incidental equivalence that should not be relied on.
+*	To better and more directly implement the assignment operator, a move constructor should be added;
+		Type_move(T *A, const T *B),
+	which has the effect of
+		(Type_free(A), Type_copy(A, B)),
+	except for optimizing out any (free + malloc) sequences.
+	Then, under the revision, there would be:
+	-	Type_init(Type *A),
+	-	Type_copy(Type *A, const Type *B),
+	-	Type_free(Type *A),
+	-	Type_move(Type *A, const Type *B).
+*	Different/expanded version of the testing routines for the SpecialFunctions modules.
+*	A possible redefinition of the SpecialFunctions module using the interpolation methods in ALGLIB itself.
+*	Full integration of GMP (as part of the expanded FastTransforms / DSP module) and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules).
+</pre>
+</p>
+<p>
+Revision &amp; Testing Stages:
+<pre class=narration>
+*	Comment-layout was redone to make comments conspicuous to "grep" and other search utilities.
+*	Indent was used to normalize the layout.
+a	The original version.
+b	The allocation counters were fully turned on.
+c	The rcomm-related structures removed and replaced by an integer "stage" variable; the AutoS macro added (should be static thread_local).
+d	The FP operations removed, except for the FP comparison operations.
+e	The FP comparison operations replaced by macros that directly invoke the floating point operators {==,!=,<,<=,>,>=} and the optimization bug fixed; this requires repairing a flaw in GCC on x86/x64 platforms and possibly elsewhere.
+f	*_clear(), *_destroy() merged into *_free(); and *_init_copy() renamed *_copy().
+g	The state structure removed, except the frame pointers -- to regain thread-safety will require making TopFr, CurMsg, CurFlags, CurBreakAt thread-local; (but multi-threadedness is not officially part of the non-commercial distribution).
+h	The frame base removed from the state structure; it is block-level static and compile-time fixed and does not need to be made thread-safe.
+	The relevant parts of the Ap.cpp and Ap.h files were rewritten.
+i	The state structure has been emptied.
+j	The state structure has been removed.
+k	The extra xparams are removed. They are only relevant for the commercial version.
+l	The object classes were partially reduced: DiffEquations.{cpp,h} only.
+m	The object classes were fully reduced (which invalidates TestZ).
+n	TestZ was changed to reflect the update.
+o	Normalized the "This"/"Obj" entries in the object class definitions.
+p	Wrapped the ConstT, TryCatch() and TryX code; and redid the reinterpret_cast and const_cast items in the alglib namespace code.
+q	Wrapped up the New{Obj,Vector,Matrix,Block}/RefObj/Dup{Vector,Matrix} code; _Type_{init,copy,free}() renamed Type_{init,copy,free}().
+r	The FP comparison macros were removed.
+s	Normalized the rcomm routines, and [logit_]mcsrch and logic_mcsrch, into this form.
+	Remade [logit_]mcsrch(...,&stage) into a boolean that returns the condition stage != 0.
+	The state variable is made to revert to -1 upon exit.
+	Removed the ae_len_v function.
+	Normalized comparison operators in loops and &X[0] to X (except in 1 place in Ap.cpp).
+t	Normalized other routines that have the same form as RCOMM
+	LinAlg.cpp: rcond_rmatrixestimatenorm, rcond_cmatrixestimatenorm
+	Remade rcond_rmatrixestimatenorm(n,v,x,isgn,&est,&kase) into a boolean that returns the condition kase != 0.
+	Remade rcond_cmatrixestimatenorm(n,v,x,&est,&kase,isave,rsave) into booleans that return the condition kase != 0.
+	Removed the thread_local variables from v, isgn (which were originally both expanded inside the routine to hold them)
+	Removed isave and rsave, rcond_internalcomplexrcond{save,load}all and removed the need for them.
+u	Added in the SetVector(), SetMatrix and SetObj() macros.
+v	Recoded {r,c}matrixgemm[rec] in LinAlg.cpp to increase efficiency
+	Removed the pexec (parallelism) stubs and replaced the in-line dead code by comments "[wW]as activated if:"
+	They are only relevant for the commercial version.
+	Reformatted TestC and changed the error-reporting conditions from !silent to !silent || errors.
+	Reformatted the layout to combine the type/object section with function section in each namespace.
+	CurErr made file-scope local with suitable redefinitions of set_error_flag() and ap_error().
+	Reformatted TestC.cpp
+w	Restored the 1D layer RBF test ... but with the delta-threshold raised from 0.35 to 0.45.
+	A low probability of failure exists; error ratios as high as 0.42 have been seen.
+x	Reordered minlm_lmprepare() to follow minlmsetcond() in the minlmcreate*() routines.
+	Rewrote parts of:
+	-	testdforestunit_basictestallsame() and testdforestunit_basictestrandom() in TestC.cpp.
+	-	dforest_processvotingresults() in DataAnalysis.cpp
+	to make them consistent with dfavgce() in DataAnalysis.cpp.
+	Remade ae_cpuid() as an initialization routine and replaced it by CurCPU.
+y	Separated the subpackages
+z	3.16 upgrade
+</pre>
+</p>
+<p>
+<b>Test Results</b>
+The following are the read-outs from TestX, following by the time stamp and total testing time from TestC.
+The times, themselves are meaningful only for comparisons on a single host, rather than across different hosts.
+The values cited for TestX are for MFLOPS counts for the RGEMM BLAS routine for N&times;N matrixs for N = 16, 32, 64 and 1024.
+<pre class=narration>
+a	1555 1946 1958 1875 1552948070 232
+a	1550 1946 1946 1856
+b	1580 1934 1939 1868 1552948674 248
+b	1577 1931 1946 1839 1552949228 250 // First-restructured version.
+b	1550 1938 1946 1861
+b	1536 1934 1950 1864
+b	1582 1942 1946 1865
+b	1563 1938 1935 1864
+b	1548 1934 1946 1860
+d	1553 1938 1946 1849
+d	1558 1949 1954 1874
+d	1587 1931 1924 1878
+b	1572 1938 1942 1867 1553095988 245 // Started over
+b	1529 1938 1946 1872
+b	1567 1931 1916 1859
+c	1580 1949 1950 1873 1553098036 233
+c	1560 1949 1950 1861
+c	1548 1946 1950 1858
+d	1538 1934 1946 1874 1553099012 225
+d	1531 1938 1942 1865
+d	1572 1934 1946 1868
+e	1565 1938 1939 1856 1553309815 211
+f	1587 1949 1946 1873
+f	1590 1949 1942 1855 1553329021 204
+g	1590 1946 1942 1846 1553357985 206
+h	1473 1916 1931 1853
+h	1522 1934 1946 1853
+h	1575 1938 1942 1846
+i	1582 1942 1946 1834
+j	1582 1949 1958 1882 1553372412 205
+k	1541 1869 1950 1865 1553382833 208 // Run with the network active.
+k	1560 1942 1942 1855 // Run with the network active.
+l	1590 1931 1954 1855
+m	1558 1938 1958 1881 // TestZ "fails" because the conditions underlying a part of it have changed.
+m	1585 1946 1939 1847 1553450728 203 // Skipped TestZ.
+m	1590 1953 1958 1876 1553454094 200 // Skipped TestZ.
+n	1563 1931 1946 1867 1553457101 197 // TestZ was changed to reflect the new conditions.
+n	1590 1953 1958 1853 1553460998 208
+n	1560 1946 1950 1859 // Added the ConstT() and TryX macros.
+o	1590 1949 1954 1876 1553475423 204 // Run with the network active.
+p	1553 1934 1942 1861 1553501003 201 // Added the TryCatch macro.
+q	1575 1934 1946 1844 1553510964 203 // Added the New*, Ref*, Dup* macros.
+r	1572 1931 1946 1867 1553517390 205 // Removed the FP comparison macros.
+r	1543 1942 1950 1868 15535????? 205 // Regularized the layout of the modules.
+s	1527 1923 1942 1842 // Reformatted the RCOMM routines and [logit_]mcsrch.
+s	1543 1905 1939 1865 1553672842 200 // 11 TestC tests fail with the revisions.
+s	1541 1942 1950 1867 1553681461 201 // Corrected.
+s	1565 1923 1939 1849
+t	1541 1939 1942 1867 1553708554 200
+u	1575 1942 1913 1866 1553731148 220
+v	1595 1916 1954 1879
+v	1548 1942 1946 1895 1553905444 199
+v	1577 1946 1946 1897 // Minor correction in TestX.cpp.
+w	1585 1949 1946 1890 1553932849 199
+x	2268 3585 3510 3278 // With -mtune=core2 and -msse2. The machine's cooling fan was activated during the test.
+x	2227 3497 3323 3264 // Dropped -mtune=core2 but kept -msse2.
+x	2208 3472 3461 3238 1554065184 207
+x	2208 3485 3461 3307 1554066501 203 // The bugs in the dforest module and tester were repaired.
+x	2242 3485 3473 3277 1555921305 205
+y	2283 3559 3498 3279 1557611349 203
+y	2283 3534 3510 3235 1580240643 212 // Final fixes in preparation for upgrade to 3.16.
+y	2299 3559 3510 3243 1580249792 204 // Final fixes in preparation for upgrade to 3.16.
+y	2268 3521 3498 3287 1580340998 200 // Final test of Version 3.15.
+z	2146 3402 3486 3230 1580248905 220 // Version 3.16.
+z	2294 3449 3522 3247 1580273645 212
+z	2273 3534 3461 2865 1580343048 213
+z	2299 3472 3486 3252 1580940186 225
+</pre>
