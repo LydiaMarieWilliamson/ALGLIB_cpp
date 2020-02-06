@@ -1,4 +1,0 @@
-Add further notes on future revisions.
-Add in the DSP routines and modified statistics testing routines.
-Add in time-frequence routines onto FastTransforms.
-Other changes pending, to be later listed here.
