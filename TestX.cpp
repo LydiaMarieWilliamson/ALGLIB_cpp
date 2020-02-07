@@ -3,6 +3,7 @@
 #include "DiffEquations.h"
 #include "FastTransforms.h"
 #include "Interpolation.h"
+
 #if AE_OS == AE_POSIX
 #   include <pthread.h>
 #elif AE_OS == AE_WINDOWS
@@ -32,11 +33,13 @@ typedef struct {
    bool bval;
    alglib_impl::ae_vector i1val;
 } innerrec;
+
 void innerrec_init(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, make_automatic);
 }
+
 void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
    innerrec *dst = (innerrec *) _dst;
    innerrec *src = (innerrec *) _src;
@@ -46,6 +49,7 @@ void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
    dst->bval = src->bval;
    alglib_impl::ae_vector_copy(&dst->i1val, &src->i1val, make_automatic);
 }
+
 void innerrec_free(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
@@ -57,12 +61,14 @@ typedef struct {
    innerrec recval;
    alglib_impl::ae_shared_pool pool;
 } seedrec;
+
 void seedrec_init(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
    innerrec_init(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, make_automatic);
 }
+
 void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
    seedrec *dst = (seedrec *) _dst;
    seedrec *src = (seedrec *) _src;
@@ -70,6 +76,7 @@ void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
    innerrec_copy(&dst->recval, &src->recval, make_automatic);
    alglib_impl::ae_shared_pool_copy(&dst->pool, &src->pool, make_automatic);
 }
+
 void seedrec_free(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
@@ -119,7 +126,6 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
    }
    catch(...) {
    }
-
 //
 // This block actually calculates function/gradient
 //
@@ -135,7 +141,6 @@ void func505_vec(const real_1d_array &x, real_1d_array &fi, void *ptr) {
 
 void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr) {
    double x0 = *((double *)ptr);
-
 //
 // This block assigns zero matrix to Jacobian. Because Jacobian is a proxy matrix
 // (matrix which uses another object as storage), sizes of Jacobian and matrix being
@@ -148,7 +153,6 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
    real_2d_array z = "[[0],[0]]";
    jac = "[[0],[0]]";
    jac = z;
-
 //
 // This block tries to perform operations which are forbidden for proxy vector:
 // * assign vector of non-matching size
@@ -187,7 +191,6 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
    }
    catch(...) {
    }
-
 //
 // This block actually calculates function/gradient
 //
@@ -218,7 +221,20 @@ void file_put_contents(const char *filename, const char *contents) {
    fclose(f);
 }
 
-#if AE_OS == AE_WINDOWS
+#if AE_OS == AE_POSIX
+struct async_rbf_record {
+   rbfmodel * p_model;
+   rbfreport * p_report;
+   bool thread_finished;
+};
+
+void *async_build_rbf_model(void *T) {
+   async_rbf_record *p = (async_rbf_record *) T;
+   rbfbuildmodel(*(p->p_model), *(p->p_report));
+   p->thread_finished = true;
+   return NULL;
+}
+#elif AE_OS == AE_WINDOWS
 struct async_rbf_record {
    rbfmodel * p_model;
    rbfreport * p_report;
@@ -229,18 +245,6 @@ DWORD WINAPI async_build_rbf_model(LPVOID T) {
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return 0;
-}
-#elif AE_OS == AE_POSIX
-struct async_rbf_record {
-   rbfmodel * p_model;
-   rbfreport * p_report;
-   bool thread_finished;
-};
-void *async_build_rbf_model(void *T) {
-   async_rbf_record *p = (async_rbf_record *) T;
-   rbfbuildmodel(*(p->p_model), *(p->p_report));
-   p->thread_finished = true;
-   return NULL;
 }
 #endif
 
@@ -274,7 +278,6 @@ int main() {
 #else
    printf("* cores count                %3ld\n", (long)1);
 #endif
-
 // Check status of allocation counter
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter activated...\n");
@@ -296,7 +299,6 @@ int main() {
 #else
    printf("No alloc counter.\nSome tests are skipped.\n");
 #endif
-
 // Testing basic functionality
    printf("Basic functions:\n");
    {
@@ -336,7 +338,6 @@ int main() {
          passed = passed && !arr_2[0] && arr_3[0] && arr_4[0];
          arr_5.setlength(99);
          passed = passed && (arr_5.length() == 99);
-
       // setcontent/getcontent
          bool a0[] = { true, false, true, false, false };
          bool a0_mod = false;
@@ -351,7 +352,6 @@ int main() {
          a0[0] = a0_mod;
          passed = passed && (arr_6[0] != a0[0]);
          a0[0] = a0_orig;
-
       // operations on constant arrays
          {
             const boolean_1d_array & ac = arr_6;
@@ -360,7 +360,6 @@ int main() {
             const bool *p = ac.getcontent();
             passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
          }
-
       //
       // Operations with proxy arrays:
       // * changes in target are propagated to proxy and vice versa
@@ -377,12 +376,10 @@ int main() {
          passed = passed && targt[0] && !targt[1] && !targt[2] && targt[3];
          passed = passed && proxy[0] && !proxy[1] && !proxy[2] && proxy[3];
          passed = passed && acopy[0] && !acopy[1] && !acopy[2] && acopy[3];
-
          targt[0] = false;
          passed = passed && !targt[0] && !proxy[0] && acopy[0];
          proxy[0] = true;
          passed = passed && targt[0] && proxy[0] && acopy[0];
-
          acopy = "[false,true,true,true]";
          proxy = acopy;
          passed = passed && !targt[0] && targt[1] && targt[2] && targt[3];
@@ -390,7 +387,6 @@ int main() {
          proxy = "[true,false,true,true]";
          passed = passed && targt[0] && !targt[1] && targt[2] && targt[3];
          passed = passed && proxy[0] && !proxy[1] && proxy[2] && proxy[3];
-
          try {
             acopy = "[false,true,true]";
             proxy = acopy;
@@ -401,7 +397,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy = "[true,true,true]";
             passed = false;
@@ -411,7 +406,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(100);
             passed = false;
@@ -421,7 +415,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(proxy.length());
             passed = false;
@@ -457,7 +450,6 @@ int main() {
          int v30 = 6, v31 = 7, v32 = 3, v33 = -4, v30_mod = -6;
          int v40 = 9, v41 = 5, v42 = -12, v43 = 0;
          int v50 = 1, v51 = 7, v52 = 2, v53 = 1;
-
          integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
@@ -478,7 +470,6 @@ int main() {
          passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
          arr_5.setlength(99);
          passed = passed && (arr_5.length() == 99);
-
       // setcontent/getcontent
          ae_int_t a0[] = {
          2, 3, 1, 9, 2};
@@ -494,7 +485,6 @@ int main() {
          a0[0] = a0_mod;
          passed = passed && (arr_6[0] != a0[0]);
          a0[0] = a0_orig;
-
       // operations on constant arrays
          {
             const integer_1d_array & ac = arr_6;
@@ -503,7 +493,6 @@ int main() {
             const ae_int_t *p = ac.getcontent();
             passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
          }
-
       //
       // Operations with proxy arrays:
       // * changes in target are propagated to proxy and vice versa
@@ -520,12 +509,10 @@ int main() {
          passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
          passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
          passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
-
          targt[0] = v30_mod;
          passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
          proxy[0] = v30;
          passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
-
          acopy = s4;
          proxy = acopy;
          passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
@@ -533,7 +520,6 @@ int main() {
          proxy = s5;
          passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
          passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
-
          try {
             acopy = s6;
             proxy = acopy;
@@ -544,7 +530,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy = s6;
             passed = false;
@@ -554,7 +539,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(100);
             passed = false;
@@ -564,7 +548,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(proxy.length());
             passed = false;
@@ -603,7 +586,6 @@ int main() {
          const double v30 = 6.0, v31 = 7.0, v32 = 3.0, v33 = -400.0, v30_mod = -6.0;
          const double v40 = 9.0, v41 = 5.0, v42 = -12.0, v43 = -0.01;
          const double v50 = 1.0, v51 = 7.0, v52 = 2.0, v53 = 1.0;
-
          real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
@@ -624,7 +606,6 @@ int main() {
          passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
          arr_5.setlength(99);
          passed = passed && (arr_5.length() == 99);
-
       // setcontent/getcontent
          double a0[] = { 2, 3.5, 1, 9.125, 2 };
          double a0_mod = 7.0;
@@ -639,7 +620,6 @@ int main() {
          a0[0] = a0_mod;
          passed = passed && (arr_6[0] != a0[0]);
          a0[0] = a0_orig;
-
       // operations on constant arrays
          {
             const real_1d_array & ac = arr_6;
@@ -648,7 +628,6 @@ int main() {
             const double *p = ac.getcontent();
             passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
          }
-
       //
       // Operations with proxy arrays attached via attach_to(ae_vector*):
       // * changes in target are propagated to proxy and vice versa
@@ -666,12 +645,10 @@ int main() {
             passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
             passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
             passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
-
             targt[0] = v30_mod;
             passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
             proxy[0] = v30;
             passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
-
             acopy = s4;
             proxy = acopy;
             passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
@@ -679,7 +656,6 @@ int main() {
             proxy = s5;
             passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
             passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
-
             try {
                acopy = s6;
                proxy = acopy;
@@ -690,7 +666,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy = s6;
                passed = false;
@@ -700,7 +675,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy.setlength(100);
                passed = false;
@@ -710,7 +684,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy.setlength(proxy.length());
                passed = false;
@@ -721,7 +694,6 @@ int main() {
                passed = false;
             }
          }
-
       //
       // >>> Unique for real_1d_array >>>
       //
@@ -741,12 +713,10 @@ int main() {
             passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
             passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
             passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
-
             targt[0] = v30_mod;
             passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
             proxy[0] = v30;
             passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
-
             acopy = s4;
             proxy = acopy;
             passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
@@ -754,7 +724,6 @@ int main() {
             proxy = s5;
             passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
             passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
-
             try {
                acopy = s6;
                proxy = acopy;
@@ -765,7 +734,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy = s6;
                passed = false;
@@ -775,7 +743,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy.setlength(100);
                passed = false;
@@ -785,7 +752,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
             try {
                proxy.setlength(proxy.length());
                passed = false;
@@ -825,7 +791,6 @@ int main() {
          complex v30 = 6, v31 = 7, v32 = 3, v33 = -400, v30_mod = -6;
          complex v40 = 9, v41 = 5, v42 = -12, v43 = -0.01;
          complex v50 = 1, v51 = 7, v52 = 2, v53 = 1;
-
          complex_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
@@ -846,7 +811,6 @@ int main() {
          passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
          arr_5.setlength(99);
          passed = passed && (arr_5.length() == 99);
-
       // setcontent/getcontent
          complex a0[] = {
          2, 3.5, 1, 9.125, 2};
@@ -862,7 +826,6 @@ int main() {
          a0[0] = a0_mod;
          passed = passed && (arr_6[0] != a0[0]);
          a0[0] = a0_orig;
-
       // operations on constant arrays
          {
             const complex_1d_array & ac = arr_6;
@@ -871,7 +834,6 @@ int main() {
             const complex *p = ac.getcontent();
             passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
          }
-
       //
       // Operations with proxy arrays:
       // * changes in target are propagated to proxy and vice versa
@@ -888,12 +850,10 @@ int main() {
          passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
          passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
          passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
-
          targt[0] = v30_mod;
          passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
          proxy[0] = v30;
          passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
-
          acopy = s4;
          proxy = acopy;
          passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
@@ -901,7 +861,6 @@ int main() {
          proxy = s5;
          passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
          passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
-
          try {
             acopy = s6;
             proxy = acopy;
@@ -912,7 +871,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy = s6;
             passed = false;
@@ -922,7 +880,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(100);
             passed = false;
@@ -932,7 +889,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
          try {
             proxy.setlength(proxy.length());
             passed = false;
@@ -946,7 +902,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
    //
    // Report
    //
@@ -955,7 +910,6 @@ int main() {
       if (!passed)
          return 1;
    }
-
    {
    //
    // Testing 2D array functionality
@@ -990,7 +944,6 @@ int main() {
          double v50 = 1.0, v51 = 7.0, v52 = 2.0, v53 = 1.0;
 #endif
          double r;
-
          real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
@@ -1017,7 +970,6 @@ int main() {
          passed = passed && (arr_2[0][0] == v10_mod) && (arr_3[0][0] == v10) && (arr_4[0][0] == v10);
          arr_5.setlength(99, 97);
          passed = passed && (arr_5.rows() == 99) && (arr_5.cols() == 97);
-
       //
       // setcontent/elementwise access/constant arrays
       //
@@ -1026,7 +978,6 @@ int main() {
             for (m = 1; m <= 10; m++) {
                real_2d_array arr_6;
                double a0[100];
-
             // fill array by random values, test setcontent(0
                for (i = 0; i < m * n; i++)
                   a0[i] = randomreal();
@@ -1036,13 +987,11 @@ int main() {
                      passed = passed && (arr_6[i][j] == a0[i * n + j]);
                      passed = passed && (arr_6(i, j) == a0[i * n + j]);
                   }
-
             // test that setcontent() actually copies data instead of creating just reference
                r = a0[0];
                a0[0]++;
                passed = passed && (arr_6[0][0] != a0[0]);
                a0[0] = r;
-
             // operations on constant arrays
                {
                   const real_2d_array & ac = arr_6;
@@ -1053,7 +1002,6 @@ int main() {
                      }
                }
             }
-
       //
       // Operations with proxy arrays:
       // * changes in target are propagated to proxy and vice versa
@@ -1079,7 +1027,6 @@ int main() {
             passed = passed && (targt[0][0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
             passed = passed && (targt[0][0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
-
          // subtest 1
             acopy = s4;
             proxy = acopy;
@@ -1093,7 +1040,6 @@ int main() {
             passed = passed && (targt[0][0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
             passed = passed && (targt[0][0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
-
          // subtest 2
             acopy2 = s5;
             proxy = s5;
@@ -1102,7 +1048,6 @@ int main() {
                   passed = passed && (proxy[i][j] == acopy2[i][j]);
                   passed = passed && (targt[i][j] == acopy2[i][j]);
                }
-
          // error handling test 0
             try {
                acopy = s60;
@@ -1114,7 +1059,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 1
             try {
                acopy = s61;
@@ -1126,7 +1070,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 2
             try {
                proxy = s60;
@@ -1137,7 +1080,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 3
             try {
                proxy = s61;
@@ -1148,7 +1090,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 4
             try {
                proxy.setlength(100, 99);
@@ -1159,7 +1100,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 5
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
@@ -1188,7 +1128,6 @@ int main() {
             passed = passed && (targt[0 * NCOLS + 0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
             passed = passed && (targt[0 * NCOLS + 0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
-
          // subtest 1
             acopy = s4;
             proxy = acopy;
@@ -1202,7 +1141,6 @@ int main() {
             passed = passed && (targt[0 * NCOLS + 0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
             passed = passed && (targt[0 * NCOLS + 0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
-
          // subtest 2
             acopy2 = s5;
             proxy = s5;
@@ -1211,7 +1149,6 @@ int main() {
                   passed = passed && (proxy[i][j] == acopy2[i][j]);
                   passed = passed && (targt[i * NCOLS + j] == acopy2[i][j]);
                }
-
          // error handling test 0
             try {
                acopy = s60;
@@ -1223,7 +1160,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 1
             try {
                acopy = s61;
@@ -1235,7 +1171,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 2
             try {
                proxy = s60;
@@ -1246,7 +1181,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 3
             try {
                proxy = s61;
@@ -1257,7 +1191,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 4
             try {
                proxy.setlength(100, 99);
@@ -1268,7 +1201,6 @@ int main() {
             catch(...) {
                passed = false;
             }
-
          // error handling test 5
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
@@ -1284,7 +1216,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
    //
    // Report
    //
@@ -1293,7 +1224,6 @@ int main() {
       if (!passed)
          return 1;
    }
-
    {
    //
    // Testing CSV functionality
@@ -1303,7 +1233,6 @@ int main() {
       try {
       // CSV_DEFAULT must be zero
          passed = passed && CSV_DEFAULT == 0;
-
       // absent file - must fail
          try {
             real_2d_array arr;
@@ -1315,7 +1244,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // non-rectangular file - must fail
          try {
             real_2d_array arr;
@@ -1353,7 +1281,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // empty file
          try {
             real_2d_array arr;
@@ -1365,7 +1292,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // one row with header, tab separator
          try {
             real_2d_array arr;
@@ -1377,7 +1303,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // no header, comma-separated, full stop as decimal point
          try {
             real_2d_array arr;
@@ -1389,7 +1314,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // header, tab-separated, mixed use of comma and full stop as decimal points
          try {
             real_2d_array arr;
@@ -1401,7 +1325,6 @@ int main() {
          catch(...) {
             passed = false;
          }
-
       // header, tab-separated, fixed/exponential, spaces, mixed use of comma and full stop as decimal points
          try {
             real_2d_array arr;
@@ -1417,7 +1340,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
    //
    // Report
    //
@@ -1426,7 +1348,6 @@ int main() {
       if (!passed)
          return 1;
    }
-
 //
 // Serialization properties
 //
@@ -1450,7 +1371,6 @@ int main() {
             xy[i][j] = hqrndnormal(rs);
       kdtreebuild(xy, npts, nx, ny, 2, tree0);
       qx.setlength(nx);
-
       try {
       // test string serialization/unserialization
          kdtree tree1;
@@ -1462,7 +1382,7 @@ int main() {
                qx[j] = hqrndnormal(rs);
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
-            if ((cnt0 != 1) || (cnt1 != 1)) {
+            if (cnt0 != 1 || cnt1 != 1) {
                passed = false;
                break;
             }
@@ -1475,7 +1395,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
       try {
       // test stream serialization/unserialization
       //
@@ -1503,7 +1422,7 @@ int main() {
                qx[j] = hqrndnormal(rs);
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
-            if ((cnt0 != 1) || (cnt1 != 1)) {
+            if (cnt0 != 1 || cnt1 != 1) {
                passed = false;
                break;
             }
@@ -1516,7 +1435,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
       try {
       // test string-to-stream serialization/unserialization
          kdtree tree1;
@@ -1529,7 +1447,7 @@ int main() {
                qx[j] = hqrndnormal(rs);
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
-            if ((cnt0 != 1) || (cnt1 != 1)) {
+            if (cnt0 != 1 || cnt1 != 1) {
                passed = false;
                break;
             }
@@ -1542,7 +1460,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
       try {
       // test stream-to-string serialization/unserialization
          kdtree tree1;
@@ -1555,7 +1472,7 @@ int main() {
                qx[j] = hqrndnormal(rs);
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
-            if ((cnt0 != 1) || (cnt1 != 1)) {
+            if (cnt0 != 1 || cnt1 != 1) {
                passed = false;
                break;
             }
@@ -1568,7 +1485,6 @@ int main() {
       catch(...) {
          passed = false;
       }
-
    //
    // Report
    //
@@ -1647,7 +1563,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 6qTG7Ae-1_3\n";
       real_1d_array ref_val("[-0.042560546916643, 0.942523544654062, 0.875197036560778, 0.0656948997826632, -0.743065973803404, -0.8903682039297, -0.26994815318748, 0.602248517290195, 0.980011992233124, 0.436594293214176]");
       bool passed = true;
-
       try {
       // test unserialization from string without trailing end-of-stream symbol (dot)
       // this test is necessary for backward compatibility
@@ -1660,7 +1575,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       catch(...) {
          passed = false;
       }
-
       try {
       // test unserialization from string with trailing end-of-stream symbol (dot)
       // this test is necessary for forward compatibility
@@ -1673,7 +1587,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       catch(...) {
          passed = false;
       }
-
       try {
       // test unserialization from stream WITHOUT trailing end-of-stream symbol (dot)
       // this test MUST fail
@@ -1686,7 +1599,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       }
       catch(...) {
       } // Do nothing, it is expected to fail.
-
       try {
       // test unserialization from stream WITH trailing end-of-stream symbol (dot)
       // this test must succeed
@@ -1701,7 +1613,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       catch(...) {
          passed = false;
       }
-
       try {
       // test that we can read from the stream after unserialization
          double eps = 0.0000000001;
@@ -1719,7 +1630,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       catch(...) {
          passed = false;
       }
-
    //
    // Report
    //
@@ -1751,16 +1661,16 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
-#   if AE_OS == AE_WINDOWS
-      if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
+#   if AE_OS == AE_POSIX
+      pthread_t thread;
+      if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
          printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
          return 1;
       }
-#   elif AE_OS == AE_POSIX
-      pthread_t thread;
-      if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
+#   elif AE_OS == AE_WINDOWS
+      if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
          printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
@@ -1808,7 +1718,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       // Select moment when we generate exception in the constructor
       //
          alglib_impl::_malloc_failure_after = alglib_impl::_alloc_counter_total + eidx;
-
       //
       // Perform many activities with ALGLIB, catch exceptions.
       // It is survival test, it checks that we survive exceptions.
@@ -1900,7 +1809,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rbfbuildmodel(model1, rep);
                v = rbfcalc2(model1, 0.0, 0.0);
             }
-
          //
          // We survived all tests, next iteration will bring no changed, terminate loop!
          //
@@ -1947,7 +1855,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                   b[i][j] = randomreal() - 0.5;
                   c[i][j] = 0.0;
                }
-
          // measure time; interleave measurements with different settings in order to
          // reduce variance of results
             while (time_default < mintime) {
@@ -1956,21 +1863,18 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_default += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global serial
                t0 = tickcount();
                setglobalthreading(serial);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global parallel
                t0 = tickcount();
                setglobalthreading(parallel);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global serial, local serial
                t0 = tickcount();
                setglobalthreading(serial);
@@ -1978,7 +1882,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global serial, local parallel
                t0 = tickcount();
                setglobalthreading(serial);
@@ -1986,7 +1889,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global parallel, local serial
                t0 = tickcount();
                setglobalthreading(parallel);
@@ -1994,7 +1896,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global parallel, local parallel
                t0 = tickcount();
                setglobalthreading(parallel);
@@ -2002,7 +1903,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
-
             // global parallel, nworkers=1
                t0 = tickcount();
                setglobalthreading(parallel);
@@ -2043,7 +1943,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          fflush(stdout);
       }
    }
-
 //
 // Testing issues which must be fixed
 //
@@ -2093,7 +1992,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       fflush(stdout);
       if (!issue505_passed)
          return 1;
-
    // Testing issue #478 (http://bugs.alglib.net/view.php?id=478)
    // in high-quality RNG. It have to correctly handle random numbers
    // larger than 2^31.
@@ -2116,7 +2014,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             ae_int_t ncnt = 3, nidx;
             double n0, n1;
             hqrndrandomize(rs);
-
          //
          // nmax:
          // * first nmax is just large value to test basic uniformity of generator
@@ -2127,7 +2024,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             nmax[1] *= 1.5;
             nmax[2] = 2147483562;
             nmax[2] *= 3;
-
             for (nidx = 0; nidx < ncnt; nidx++) {
                n0 = 0;
                n1 = 0;
@@ -2159,7 +2055,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          printf(fmt_str, "* issue 478", "OK (skipped in 32-bit mode)");
          fflush(stdout);
       }
-
    // Testing issue #528 (http://bugs.alglib.net/view.php?id=528)
    // in shared pool and smart pointer which leak memory.
    //
@@ -2171,7 +2066,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       try {
          int alloc_cnt;
          alglib_impl::ae_frame _frame_block;
-
       // case #0: just seeding the pool
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2181,7 +2075,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
          alglib_impl::ae_state_clear();
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
-
       // case #1: seeding and retrieving, not recycling
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2194,7 +2087,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_state_clear();
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
-
       // case #2: seeding and retrieving twice to different pointers, recycling both
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2224,7 +2116,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       printf(fmt_str, "* issue 528", "??");
       fflush(stdout);
 #endif
-
    // Testing issue #591 (http://bugs.alglib.net/view.php?id=591)
    // in copying of object containing shared pool as one of its
    // fields.
@@ -2237,14 +2128,12 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
          mlpcreate0(2, 2, net0);
          mlpprocess(net0, x, y0);
-
       //
       // Test assignment constructor
       //
          net1 = net0;
          mlpprocess(net1, x, y1);
          issue591_passed = issue591_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
-
       //
       // Test copy constructor
       //
@@ -2259,7 +2148,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       fflush(stdout);
       if (!issue591_passed)
          return 1;
-
    //
    // Task #594 (http://bugs.alglib.net/view.php?id=594) - additional
    // test for correctness of copying of objects. When we copy ALGLIB
@@ -2273,7 +2161,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
          mlpcreate0(2, 2, net0);
          mlpprocess(net0, x, y0);
-
       //
       // Test assignment and copy constructors:
       // * copy object with one of the constructors
@@ -2296,7 +2183,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       fflush(stdout);
       if (!issue594_passed)
          return 1;
-
    //
    // Issue 764#, potential memory leak in the smart pointer
    //
@@ -2304,7 +2190,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       try {
          int alloc_cnt;
          alglib_impl::ae_frame _frame_block;
-
       // seeding shared pool and retrieving twice to same pointer, no recycling
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2329,7 +2214,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       printf(fmt_str, "* issue 764", "??");
       fflush(stdout);
 #endif
-
    //
    // Issue 813: MSVC is unable to handle longjmp() from catch() block; the code
    //            cycles forever.
@@ -2352,7 +2236,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          if (!issue813_passed)
             return 1;
       }
-
    //
    // Issue 824: pre-3.16 versions of ALGLIB hide exceptions generated in user callbacks
    //
@@ -2363,7 +2246,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          x[0] = 0;
          mincgcreatef(1, x, 1e-5, state);
          issue824_passed = true;
-
       // throw int*
          try {
             mincgoptimize(state, &issue824_callback_i);
@@ -2376,7 +2258,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          catch(...) {
             issue824_passed = false;
          }
-
       // throw double*
          try {
             mincgoptimize(state, &issue824_callback_d);
@@ -2389,7 +2270,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          catch(...) {
             issue824_passed = false;
          }
-
       // done
          printf(fmt_str, "* issue 824", issue824_passed ? "OK" : "FAILED");
          fflush(stdout);
@@ -2397,7 +2277,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             return 1;
       }
    }
-
 //
 // Performance testing
 //
@@ -2416,7 +2295,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             double desiredflops = n > 64 ? 1.0E10 : 1.0E9;
             int nrepeat = (int)(desiredflops / (2 * pow((double)n, 3.0)));
             nrepeat = 4 * (nrepeat / 4 + 1);
-
          //
          // Actual processing
          //
@@ -2431,14 +2309,12 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                   b[i][j] = randomreal() - 0.5;
                   c[i][j] = 0.0;
                }
-
             t = tickcount();
             for (k = 0; k < nrepeat; k++)
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0);
             t = tickcount() - t;
             perf0 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, (double)perf0);
-
             setnworkers(0);
             t = tickcount();
             for (k = 0; k < nrepeat; k++)
@@ -2449,11 +2325,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2 / perf0));
             setnworkers(1);
-
          }
       }
    }
-
 // Check allocation counter on exit
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter checked... ");
@@ -2467,7 +2341,6 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    } else
       printf("OK\n");
 #endif
-
 // Return
    return 0;
 }

@@ -44,16 +44,13 @@ void samplemoments(RVector x, ae_int_t n, double *mean, double *variance, double
    double v1;
    double v2;
    double stddev;
-
    *mean = 0;
    *variance = 0;
    *skewness = 0;
    *kurtosis = 0;
-
    ae_assert(n >= 0, "SampleMoments: N<0");
    ae_assert(x->cnt >= n, "SampleMoments: Length(X)<N!");
    ae_assert(isfinitevector(x, n), "SampleMoments: X is not finite vector");
-
 // Init, special case 'N=0'
    *mean = 0.0;
    *variance = 0.0;
@@ -68,7 +65,6 @@ void samplemoments(RVector x, ae_int_t n, double *mean, double *variance, double
       *mean += x->ptr.p_double[i];
    }
    *mean /= n;
-
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
@@ -120,7 +116,6 @@ double samplemean(RVector x, ae_int_t n) {
    double tmp1;
    double tmp2;
    double result;
-
    samplemoments(x, n, &mean, &tmp0, &tmp1, &tmp2);
    result = mean;
    return result;
@@ -147,7 +142,6 @@ double samplevariance(RVector x, ae_int_t n) {
    double tmp1;
    double tmp2;
    double result;
-
    samplemoments(x, n, &tmp0, &variance, &tmp1, &tmp2);
    result = variance;
    return result;
@@ -174,7 +168,6 @@ double sampleskewness(RVector x, ae_int_t n) {
    double tmp1;
    double tmp2;
    double result;
-
    samplemoments(x, n, &tmp0, &tmp1, &skewness, &tmp2);
    result = skewness;
    return result;
@@ -201,7 +194,6 @@ double samplekurtosis(RVector x, ae_int_t n) {
    double tmp1;
    double tmp2;
    double result;
-
    samplemoments(x, n, &tmp0, &tmp1, &tmp2, &kurtosis);
    result = kurtosis;
    return result;
@@ -222,13 +214,10 @@ double samplekurtosis(RVector x, ae_int_t n) {
 void sampleadev(RVector x, ae_int_t n, double *adev) {
    ae_int_t i;
    double mean;
-
    *adev = 0;
-
    ae_assert(n >= 0, "SampleADev: N<0");
    ae_assert(x->cnt >= n, "SampleADev: Length(X)<N!");
    ae_assert(isfinitevector(x, n), "SampleADev: X is not finite vector");
-
 // Init, handle N=0
    mean = 0.0;
    *adev = 0.0;
@@ -240,7 +229,6 @@ void sampleadev(RVector x, ae_int_t n, double *adev) {
       mean += x->ptr.p_double[i];
    }
    mean /= n;
-
 // ADev
    for (i = 0; i < n; i++) {
       *adev += fabs(x->ptr.p_double[i] - mean);
@@ -270,15 +258,12 @@ void samplemedian(RVector x, ae_int_t n, double *median) {
    ae_int_t k;
    double a;
    double tval;
-
    ae_frame_make(&_frame_block);
    DupVector(x);
    *median = 0;
-
    ae_assert(n >= 0, "SampleMedian: N<0");
    ae_assert(x->cnt >= n, "SampleMedian: Length(X)<N!");
    ae_assert(isfinitevector(x, n), "SampleMedian: X is not finite vector");
-
 // Some degenerate cases
    *median = 0.0;
    if (n <= 0) {
@@ -302,7 +287,6 @@ void samplemedian(RVector x, ae_int_t n, double *median) {
    k = (n - 1) / 2;
    while (true) {
       if (ir <= l + 1) {
-
       // 1 or 2 elements in partition
          if (ir == l + 1 && x->ptr.p_double[ir] < x->ptr.p_double[l]) {
             tval = x->ptr.p_double[l];
@@ -359,7 +343,6 @@ void samplemedian(RVector x, ae_int_t n, double *median) {
          }
       }
    }
-
 // If N is odd, return result
    if (n % 2 == 1) {
       *median = x->ptr.p_double[k];
@@ -393,12 +376,10 @@ void samplepercentile(RVector x, ae_int_t n, double p, double *v) {
    ae_frame _frame_block;
    ae_int_t i1;
    double t;
-
    ae_frame_make(&_frame_block);
    DupVector(x);
    *v = 0;
    NewVector(rbuf, 0, DT_REAL);
-
    ae_assert(n >= 0, "SamplePercentile: N<0");
    ae_assert(x->cnt >= n, "SamplePercentile: Length(X)<N!");
    ae_assert(isfinitevector(x, n), "SamplePercentile: X is not finite vector");
@@ -446,13 +427,11 @@ double cov2(RVector x, RVector y, ae_int_t n) {
    bool samex;
    bool samey;
    double result;
-
    ae_assert(n >= 0, "Cov2: N<0");
    ae_assert(x->cnt >= n, "Cov2: Length(X)<N!");
    ae_assert(y->cnt >= n, "Cov2: Length(Y)<N!");
    ae_assert(isfinitevector(x, n), "Cov2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "Cov2: Y is not finite vector");
-
 // Special case
    if (n <= 1) {
       result = 0.0;
@@ -525,13 +504,11 @@ double pearsoncorr2(RVector x, RVector y, ae_int_t n) {
    double t1;
    double t2;
    double result;
-
    ae_assert(n >= 0, "PearsonCorr2: N<0");
    ae_assert(x->cnt >= n, "PearsonCorr2: Length(X)<N!");
    ae_assert(y->cnt >= n, "PearsonCorr2: Length(Y)<N!");
    ae_assert(isfinitevector(x, n), "PearsonCorr2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "PearsonCorr2: Y is not finite vector");
-
 // Special case
    if (n <= 1) {
       result = 0.0;
@@ -602,18 +579,15 @@ double pearsoncorr2(RVector x, RVector y, ae_int_t n) {
 double spearmancorr2(RVector x, RVector y, ae_int_t n) {
    ae_frame _frame_block;
    double result;
-
    ae_frame_make(&_frame_block);
    DupVector(x);
    DupVector(y);
    NewObj(apbuffers, buf);
-
    ae_assert(n >= 0, "SpearmanCorr2: N<0");
    ae_assert(x->cnt >= n, "SpearmanCorr2: Length(X)<N!");
    ae_assert(y->cnt >= n, "SpearmanCorr2: Length(Y)<N!");
    ae_assert(isfinitevector(x, n), "SpearmanCorr2: X is not finite vector");
    ae_assert(isfinitevector(y, n), "SpearmanCorr2: Y is not finite vector");
-
 // Special case
    if (n <= 1) {
       result = 0.0;
@@ -649,20 +623,17 @@ void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    ae_int_t i;
    ae_int_t j;
    double v;
-
    ae_frame_make(&_frame_block);
    DupMatrix(x);
    SetMatrix(c);
    NewVector(t, 0, DT_REAL);
    NewVector(x0, 0, DT_REAL);
    NewVector(same, 0, DT_BOOL);
-
    ae_assert(n >= 0, "CovM: N<0");
    ae_assert(m >= 1, "CovM: M<1");
    ae_assert(x->rows >= n, "CovM: Rows(X)<N!");
    ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!");
    ae_assert(apservisfinitematrix(x, n, m), "CovM: X contains infinite/NAN elements");
-
 // N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m, m);
@@ -692,7 +663,6 @@ void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
          same.ptr.p_bool[j] = same.ptr.p_bool[j] && x->ptr.pp_double[i][j] == x0.ptr.p_double[j];
       }
    }
-
 // * center variables;
 // * if we have constant columns, these columns are
 //   artificially zeroed (they must be zero in exact arithmetics,
@@ -733,11 +703,9 @@ void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    ae_int_t i;
    ae_int_t j;
    double v;
-
    ae_frame_make(&_frame_block);
    SetMatrix(c);
    NewVector(t, 0, DT_REAL);
-
    ae_assert(n >= 0, "PearsonCorrM: N<0");
    ae_assert(m >= 1, "PearsonCorrM: M<1");
    ae_assert(x->rows >= n, "PearsonCorrM: Rows(X)<N!");
@@ -786,19 +754,16 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    double vv;
    double x0;
    bool b;
-
    ae_frame_make(&_frame_block);
    SetMatrix(c);
    NewObj(apbuffers, buf);
    NewMatrix(xc, 0, 0, DT_REAL);
    NewVector(t, 0, DT_REAL);
-
    ae_assert(n >= 0, "SpearmanCorrM: N<0");
    ae_assert(m >= 1, "SpearmanCorrM: M<1");
    ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X)<N!");
    ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!");
    ae_assert(apservisfinitematrix(x, n, m), "SpearmanCorrM: X contains infinite/NAN elements");
-
 // N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m, m);
@@ -813,18 +778,15 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 // Allocate
    ae_vector_set_length(&t, ae_maxint(n, m));
    ae_matrix_set_length(c, m, m);
-
 // Replace data with ranks
    ae_matrix_set_length(&xc, m, n);
    rmatrixtranspose(n, m, x, 0, 0, &xc, 0, 0);
    rankdata(&xc, m, n);
-
 // 1. Calculate means, check for constant columns
 // 2. Center variables, constant  columns are
 //   artificialy zeroed (they must be zero in exact arithmetics,
 //   but unfortunately floating point is not exact).
    for (i = 0; i < m; i++) {
-
    // Calculate:
    // * V - mean value of I-th variable
    // * B - True in case all variable values are same
@@ -837,26 +799,21 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
          b = b && vv == x0;
       }
       v /= n;
-
    // Center/zero I-th variable
       if (b) {
-
       // Zero
          for (j = 0; j < n; j++) {
             xc.ptr.pp_double[i][j] = 0.0;
          }
       } else {
-
       // Center
          for (j = 0; j < n; j++) {
             xc.ptr.pp_double[i][j] -= v;
          }
       }
    }
-
 // Calculate upper half of symmetric covariance matrix
    rmatrixsyrk(m, n, 1.0 / (double)(n - 1), &xc, 0, 0, 0, 0.0, c, 0, 0, true);
-
 // Calculate Pearson coefficients (upper triangle)
    for (i = 0; i < m; i++) {
       if (c->ptr.pp_double[i][i] > 0.0) {
@@ -871,7 +828,6 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
          c->ptr.pp_double[i][j] *= v * t.ptr.p_double[j];
       }
    }
-
 // force symmetricity
    rmatrixenforcesymmetricity(c, m, true);
    ae_frame_leave();
@@ -905,7 +861,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
    ae_int_t i;
    ae_int_t j;
    double v;
-
    ae_frame_make(&_frame_block);
    DupMatrix(x);
    DupMatrix(y);
@@ -915,7 +870,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
    NewVector(y0, 0, DT_REAL);
    NewVector(samex, 0, DT_BOOL);
    NewVector(samey, 0, DT_BOOL);
-
    ae_assert(n >= 0, "CovM2: N<0");
    ae_assert(m1 >= 1, "CovM2: M1<1");
    ae_assert(m2 >= 1, "CovM2: M2<1");
@@ -925,7 +879,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
    ae_assert(y->rows >= n, "CovM2: Rows(Y)<N!");
    ae_assert(y->cols >= m2 || n == 0, "CovM2: Cols(Y)<M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "CovM2: X contains infinite/NAN elements");
-
 // N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2);
@@ -944,7 +897,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
    ae_vector_set_length(&samex, m1);
    ae_vector_set_length(&samey, m2);
    ae_matrix_set_length(c, m1, m2);
-
 // * calculate means of X
 // * center X
 // * if we have constant columns, these columns are
@@ -970,7 +922,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
          }
       }
    }
-
 // Repeat same steps for Y
    for (i = 0; i < m2; i++) {
       t.ptr.p_double[i] = 0.0;
@@ -992,7 +943,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
          }
       }
    }
-
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
    ae_frame_leave();
@@ -1026,7 +976,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    ae_int_t i;
    ae_int_t j;
    double v;
-
    ae_frame_make(&_frame_block);
    DupMatrix(x);
    DupMatrix(y);
@@ -1038,7 +987,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    NewVector(sy, 0, DT_REAL);
    NewVector(samex, 0, DT_BOOL);
    NewVector(samey, 0, DT_BOOL);
-
    ae_assert(n >= 0, "PearsonCorrM2: N<0");
    ae_assert(m1 >= 1, "PearsonCorrM2: M1<1");
    ae_assert(m2 >= 1, "PearsonCorrM2: M2<1");
@@ -1048,7 +996,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    ae_assert(y->rows >= n, "PearsonCorrM2: Rows(Y)<N!");
    ae_assert(y->cols >= m2 || n == 0, "PearsonCorrM2: Cols(Y)<M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "PearsonCorrM2: X contains infinite/NAN elements");
-
 // N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2);
@@ -1069,7 +1016,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    ae_vector_set_length(&samex, m1);
    ae_vector_set_length(&samey, m2);
    ae_matrix_set_length(c, m1, m2);
-
 // * calculate means of X
 // * center X
 // * if we have constant columns, these columns are
@@ -1101,7 +1047,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    for (j = 0; j < m1; j++) {
       sx.ptr.p_double[j] = sqrt(sx.ptr.p_double[j] / (n - 1));
    }
-
 // Repeat same steps for Y
    for (i = 0; i < m2; i++) {
       t.ptr.p_double[i] = 0.0;
@@ -1128,10 +1073,8 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
    for (j = 0; j < m2; j++) {
       sy.ptr.p_double[j] = sqrt(sy.ptr.p_double[j] / (n - 1));
    }
-
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0);
-
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.ptr.p_double[i] != 0.0) {
@@ -1189,7 +1132,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    bool b;
    double x0;
    double y0;
-
    ae_frame_make(&_frame_block);
    SetMatrix(c);
    NewVector(t, 0, DT_REAL);
@@ -1198,7 +1140,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    NewMatrix(xc, 0, 0, DT_REAL);
    NewMatrix(yc, 0, 0, DT_REAL);
    NewObj(apbuffers, buf);
-
    ae_assert(n >= 0, "SpearmanCorrM2: N<0");
    ae_assert(m1 >= 1, "SpearmanCorrM2: M1<1");
    ae_assert(m2 >= 1, "SpearmanCorrM2: M2<1");
@@ -1208,7 +1149,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    ae_assert(y->rows >= n, "SpearmanCorrM2: Rows(Y)<N!");
    ae_assert(y->cols >= m2 || n == 0, "SpearmanCorrM2: Cols(Y)<M2!");
    ae_assert(apservisfinitematrix(y, n, m2), "SpearmanCorrM2: X contains infinite/NAN elements");
-
 // N <= 1, return zero
    if (n <= 1) {
       ae_matrix_set_length(c, m1, m2);
@@ -1225,7 +1165,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    ae_vector_set_length(&sx, m1);
    ae_vector_set_length(&sy, m2);
    ae_matrix_set_length(c, m1, m2);
-
 // Replace data with ranks
    ae_matrix_set_length(&xc, m1, n);
    ae_matrix_set_length(&yc, m2, n);
@@ -1233,7 +1172,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    rmatrixtranspose(n, m2, y, 0, 0, &yc, 0, 0);
    rankdata(&xc, m1, n);
    rankdata(&yc, m2, n);
-
 // 1. Calculate means, variances, check for constant columns
 // 2. Center variables, constant  columns are
 //   artificialy zeroed (they must be zero in exact arithmetics,
@@ -1292,10 +1230,8 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
       }
       sy.ptr.p_double[i] = sqrt(v2 / (n - 1));
    }
-
 // calculate cross-covariance matrix
    rmatrixgemm(m1, m2, n, 1.0 / (double)(n - 1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0);
-
 // Divide by standard deviations
    for (i = 0; i < m1; i++) {
       if (sx.ptr.p_double[i] != 0.0) {
@@ -1340,18 +1276,15 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
 void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
-
    ae_frame_make(&_frame_block);
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-
    ae_assert(npoints >= 0, "RankData: NPoints<0");
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
    ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
    ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
-
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
 //
@@ -1394,18 +1327,15 @@ void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
 void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
-
    ae_frame_make(&_frame_block);
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-
    ae_assert(npoints >= 0, "RankData: NPoints<0");
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
    ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
    ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
    ae_assert(apservisfinitematrix(xy, npoints, nfeatures), "RankData: XY contains infinite/NAN elements");
-
 // Basecase cost is a maximum cost of basecase problems.
 // Problems harded than that cost will be split.
 //
@@ -1431,7 +1361,6 @@ void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double pearsoncorrelation(RVector x, RVector y, ae_int_t n) {
    double result;
-
    result = pearsoncorr2(x, y, n);
    return result;
 }
@@ -1441,7 +1370,6 @@ double pearsoncorrelation(RVector x, RVector y, ae_int_t n) {
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double spearmanrankcorrelation(RVector x, RVector y, ae_int_t n) {
    double result;
-
    result = spearmancorr2(x, y, n);
    return result;
 }
@@ -1472,16 +1400,12 @@ static void basestat_rankdatarec(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t 
    ae_frame _frame_block;
    double problemcost;
    ae_int_t im;
-
    ae_frame_make(&_frame_block);
    RefObj(apbuffers, buf0);
    RefObj(apbuffers, buf1);
-
    ae_assert(i1 >= i0, "RankDataRec: internal error");
-
 // Try to activate parallelism
 // Parallelism was activated if: i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures)) >= smpactivationlevel()
-
 // Recursively split problem, if it is too large
    problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures));
    if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
@@ -1525,7 +1449,6 @@ static void basestat_rankdatarec(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t 
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 static void basestat_rankdatabasecase(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
    ae_int_t i;
-
    ae_assert(i1 >= i0, "RankDataBasecase: internal error");
    if (buf1->ra0.cnt < nfeatures) {
       ae_vector_set_length(&buf1->ra0, nfeatures);
@@ -2635,7 +2558,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
    double s;
    double sigma;
    double mu;
-
    ae_frame_make(&_frame_block);
    DupVector(x);
    *bothtails = 0;
@@ -2643,7 +2565,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
    *righttail = 0;
    NewVector(r, 0, DT_REAL);
    NewVector(c, 0, DT_INT);
-
 // Prepare
    if (n < 5) {
       *bothtails = 1.0;
@@ -2673,7 +2594,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
       r.ptr.p_double[i] = fabs(x->ptr.p_double[i] - e);
       c.ptr.p_int[i] = i;
    }
-
 // sort {R, C}
    if (ns != 1) {
       i = 2;
@@ -2747,7 +2667,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
       }
       i = j;
    }
-
 // Compute W+
    w = 0.0;
    for (i = 0; i < ns; i++) {
@@ -2755,7 +2674,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
          w += r.ptr.p_double[i];
       }
    }
-
 // Result
    mu = rmul2((double)ns, (double)(ns + 1)) / 4;
    sigma = sqrt(mu * (2 * ns + 1) / 6);
@@ -2776,7 +2694,6 @@ void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, 
 // Sequential Chebyshev interpolation.
 static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
-
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
@@ -2788,7 +2705,6 @@ static double wsr_w5(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-3.708099e+00 * s + 7.500000e+00);
    if (w >= 7) {
@@ -2824,7 +2740,6 @@ static double wsr_w6(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-4.769696e+00 * s + 1.050000e+01);
    if (w >= 10) {
@@ -2869,7 +2784,6 @@ static double wsr_w7(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-5.916080e+00 * s + 1.400000e+01);
    if (w >= 14) {
@@ -2926,7 +2840,6 @@ static double wsr_w8(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-7.141428e+00 * s + 1.800000e+01);
    if (w >= 18) {
@@ -2995,7 +2908,6 @@ static double wsr_w9(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-8.440972e+00 * s + 2.250000e+01);
    if (w >= 22) {
@@ -3076,7 +2988,6 @@ static double wsr_w10(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-9.810708e+00 * s + 2.750000e+01);
    if (w >= 27) {
@@ -3172,7 +3083,6 @@ static double wsr_w11(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.124722e+01 * s + 3.300000e+01);
    if (w >= 33) {
@@ -3286,7 +3196,6 @@ static double wsr_w12(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.274755e+01 * s + 3.900000e+01);
    if (w >= 39) {
@@ -3418,7 +3327,6 @@ static double wsr_w13(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.430909e+01 * s + 4.550000e+01);
    if (w >= 45) {
@@ -3568,7 +3476,6 @@ static double wsr_w14(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.592953e+01 * s + 5.250000e+01);
    if (w >= 52) {
@@ -3739,7 +3646,6 @@ static double wsr_w15(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.760682e+01 * s + 6.000000e+01);
    if (w >= 60) {
@@ -3934,7 +3840,6 @@ static double wsr_w16(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-1.933908e+01 * s + 6.800000e+01);
    if (w >= 68) {
@@ -4153,7 +4058,6 @@ static double wsr_w17(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-2.112463e+01 * s + 7.650000e+01);
    if (w >= 76) {
@@ -4396,7 +4300,6 @@ static double wsr_w18(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-2.296193e+01 * s + 8.550000e+01);
    if (w >= 85) {
@@ -4666,7 +4569,6 @@ static double wsr_w19(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-2.484955e+01 * s + 9.500000e+01);
    if (w >= 95) {
@@ -4966,7 +4868,6 @@ static double wsr_w20(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-2.678619e+01 * s + 1.050000e+02);
    if (w >= 105) {
@@ -5296,7 +5197,6 @@ static double wsr_w21(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-2.877064e+01 * s + 1.155000e+02);
    if (w >= 115) {
@@ -5656,7 +5556,6 @@ static double wsr_w22(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-3.080179e+01 * s + 1.265000e+02);
    if (w >= 126) {
@@ -6049,7 +5948,6 @@ static double wsr_w23(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-3.287856e+01 * s + 1.380000e+02);
    if (w >= 138) {
@@ -6478,7 +6376,6 @@ static double wsr_w24(double s) {
    ae_int_t w;
    double r;
    double result;
-
    r = 0.0;
    w = RoundZ(-3.500000e+01 * s + 1.500000e+02);
    if (w >= 150) {
@@ -6944,7 +6841,6 @@ static double wsr_w25(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -6969,7 +6865,6 @@ static double wsr_w26(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -6994,7 +6889,6 @@ static double wsr_w27(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7019,7 +6913,6 @@ static double wsr_w28(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7044,7 +6937,6 @@ static double wsr_w29(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7069,7 +6961,6 @@ static double wsr_w30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7094,7 +6985,6 @@ static double wsr_w40(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7119,7 +7009,6 @@ static double wsr_w60(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7144,7 +7033,6 @@ static double wsr_w120(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7169,7 +7057,6 @@ static double wsr_w200(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -7202,7 +7089,6 @@ static double wsr_wsigma(double s, ae_int_t n) {
    double x4;
    double x;
    double result;
-
    result = 0.0;
    if (n == 5) {
       result = wsr_w5(s);
@@ -7409,11 +7295,9 @@ void onesamplesigntest(RVector x, ae_int_t n, double median, double *bothtails, 
    ae_int_t i;
    ae_int_t gtcnt;
    ae_int_t necnt;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 1) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -7434,7 +7318,6 @@ void onesamplesigntest(RVector x, ae_int_t n, double median, double *bothtails, 
       }
    }
    if (necnt == 0) {
-
    // all x[i] are equal to Median.
    // So we can conclude that Median is a true median :)
       *bothtails = 1.0;
@@ -7541,11 +7424,9 @@ static double correlationtests_spearmantail(double t, ae_int_t n);
 void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
 // Some special cases
    if (r >= 1.0) {
       *bothtails = 0.0;
@@ -7611,11 +7492,9 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
 void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
 // Special case
    if (n < 5) {
       *bothtails = 1.0;
@@ -7649,7 +7528,6 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 // Tail(S, 5)
 static double correlationtests_spearmantail5(double s) {
    double result;
-
    if (s < 0.000e+00) {
       result = studenttdistribution(3, -s);
       return result;
@@ -7705,7 +7583,6 @@ static double correlationtests_spearmantail5(double s) {
 // Tail(S, 6)
 static double correlationtests_spearmantail6(double s) {
    double result;
-
    if (s < 1.001e+00) {
       result = studenttdistribution(4, -s);
       return result;
@@ -7757,7 +7634,6 @@ static double correlationtests_spearmantail6(double s) {
 // Tail(S, 7)
 static double correlationtests_spearmantail7(double s) {
    double result;
-
    if (s < 1.001e+00) {
       result = studenttdistribution(5, -s);
       return result;
@@ -7837,7 +7713,6 @@ static double correlationtests_spearmantail7(double s) {
 // Tail(S, 8)
 static double correlationtests_spearmantail8(double s) {
    double result;
-
    if (s < 2.001e+00) {
       result = studenttdistribution(6, -s);
       return result;
@@ -7913,7 +7788,6 @@ static double correlationtests_spearmantail8(double s) {
 // Tail(S, 9)
 static double correlationtests_spearmantail9(double s) {
    double result;
-
    if (s < 2.001e+00) {
       result = studenttdistribution(7, -s);
       return result;
@@ -8017,7 +7891,6 @@ static double correlationtests_spearmantail9(double s) {
 // Tail(T,N), accepts T<0
 static double correlationtests_spearmantail(double t, ae_int_t n) {
    double result;
-
    if (n == 5) {
       result = correlationtests_spearmantail5(-t);
       return result;
@@ -8181,11 +8054,9 @@ void studentttest1(RVector x, ae_int_t n, double mean, double *bothtails, double
    double v2;
    double stat;
    double s;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -8206,7 +8077,6 @@ void studentttest1(RVector x, ae_int_t n, double mean, double *bothtails, double
    } else {
       xmean /= n;
    }
-
 // Variance (using corrected two-pass algorithm)
    xvariance = 0.0;
    xstddev = 0.0;
@@ -8302,11 +8172,9 @@ void studentttest2(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtai
    double stat;
    double s;
    double p;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 0 || m <= 0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -8340,7 +8208,6 @@ void studentttest2(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtai
    } else {
       ymean /= m;
    }
-
 // S
    s = 0.0;
    if (n + m > 2) {
@@ -8433,11 +8300,9 @@ void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *
    double p;
    double stat;
    double c;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 0 || m <= 0) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -8471,7 +8336,6 @@ void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *
    } else {
       ymean /= m;
    }
-
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    if (n >= 2 && !samex) {
@@ -8508,7 +8372,6 @@ void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *
       return;
    }
    if (xvar == 0.0) {
-
    // X is constant, unpooled 2-sample test reduces to 1-sample test.
    //
    // NOTE: right-tail and left-tail must be passed to 1-sample
@@ -8518,7 +8381,6 @@ void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *
       return;
    }
    if (yvar == 0.0) {
-
    // Y is constant, unpooled 2-sample test reduces to 1-sample test.
       studentttest1(x, n, ymean, bothtails, lefttail, righttail);
       return;
@@ -8873,7 +8735,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
    double sigma;
    double mu;
    ae_int_t tiecount;
-
    ae_frame_make(&_frame_block);
    *bothtails = 0;
    *lefttail = 0;
@@ -8881,7 +8742,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
    NewVector(r, 0, DT_REAL);
    NewVector(c, 0, DT_INT);
    NewVector(tiesize, 0, DT_INT);
-
 // Prepare
    if (n <= 4 || m <= 4) {
       *bothtails = 1.0;
@@ -8901,7 +8761,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
       r.ptr.p_double[n + i] = y->ptr.p_double[i];
       c.ptr.p_int[n + i] = 1;
    }
-
 // sort {R, C}
    if (ns != 1) {
       i = 2;
@@ -8979,7 +8838,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
       tiecount++;
       i = j;
    }
-
 // Compute U
    u = 0.0;
    for (i = 0; i < ns; i++) {
@@ -8988,7 +8846,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
       }
    }
    u = rmul2((double)n, (double)m) + rmul2((double)n, (double)(n + 1)) * 0.5 - u;
-
 // Result
    mu = rmul2((double)n, (double)m) / 2;
    tmp = ns * (ae_sqr((double)ns) - 1) / 12;
@@ -9013,7 +8870,6 @@ void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *both
 // Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
-
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
@@ -9029,7 +8885,6 @@ static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int
    double p12;
    double p23;
    double result;
-
    t1 = 1.0 / 15.0;
    t2 = 1.0 / 30.0;
    t3 = 1.0 / 100.0;
@@ -9046,7 +8901,6 @@ static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2);
    p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2);
    p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2);
@@ -9060,7 +8914,6 @@ static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2);
@@ -9074,7 +8927,6 @@ static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2);
@@ -9088,7 +8940,6 @@ static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2);
@@ -9102,7 +8953,6 @@ static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2);
@@ -9116,7 +8966,6 @@ static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2);
@@ -9130,7 +8979,6 @@ static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2);
    p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2);
    p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2);
@@ -9144,7 +8992,6 @@ static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2) {
    double p2;
    double p3;
    double result;
-
    p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2);
    p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2);
    p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2);
@@ -9158,7 +9005,6 @@ static double mannwhitneyu_utbln5n5(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 2.611165e+00 - 1, 1.0);
    tj = 1.0;
@@ -9188,7 +9034,6 @@ static double mannwhitneyu_utbln5n6(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 2.738613e+00 - 1, 1.0);
    tj = 1.0;
@@ -9218,7 +9063,6 @@ static double mannwhitneyu_utbln5n7(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 2.841993e+00 - 1, 1.0);
    tj = 1.0;
@@ -9248,7 +9092,6 @@ static double mannwhitneyu_utbln5n8(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 2.927700e+00 - 1, 1.0);
    tj = 1.0;
@@ -9278,7 +9121,6 @@ static double mannwhitneyu_utbln5n9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9308,7 +9150,6 @@ static double mannwhitneyu_utbln5n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.061862e+00 - 1, 1.0);
    tj = 1.0;
@@ -9338,7 +9179,6 @@ static double mannwhitneyu_utbln5n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.115427e+00 - 1, 1.0);
    tj = 1.0;
@@ -9368,7 +9208,6 @@ static double mannwhitneyu_utbln5n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.162278e+00 - 1, 1.0);
    tj = 1.0;
@@ -9398,7 +9237,6 @@ static double mannwhitneyu_utbln5n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.203616e+00 - 1, 1.0);
    tj = 1.0;
@@ -9428,7 +9266,6 @@ static double mannwhitneyu_utbln5n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0);
    tj = 1.0;
@@ -9458,7 +9295,6 @@ static double mannwhitneyu_utbln5n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9488,7 +9324,6 @@ static double mannwhitneyu_utbln5n16(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9518,7 +9353,6 @@ static double mannwhitneyu_utbln5n17(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9548,7 +9382,6 @@ static double mannwhitneyu_utbln5n18(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9578,7 +9411,6 @@ static double mannwhitneyu_utbln5n19(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9608,7 +9440,6 @@ static double mannwhitneyu_utbln5n20(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9638,7 +9469,6 @@ static double mannwhitneyu_utbln5n21(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9668,7 +9498,6 @@ static double mannwhitneyu_utbln5n22(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9698,7 +9527,6 @@ static double mannwhitneyu_utbln5n23(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9728,7 +9556,6 @@ static double mannwhitneyu_utbln5n24(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9758,7 +9585,6 @@ static double mannwhitneyu_utbln5n25(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9788,7 +9614,6 @@ static double mannwhitneyu_utbln5n26(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9818,7 +9643,6 @@ static double mannwhitneyu_utbln5n27(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9848,7 +9672,6 @@ static double mannwhitneyu_utbln5n28(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9878,7 +9701,6 @@ static double mannwhitneyu_utbln5n29(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9908,7 +9730,6 @@ static double mannwhitneyu_utbln5n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9938,7 +9759,6 @@ static double mannwhitneyu_utbln5n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.250000e+00 - 1, 1.0);
    tj = 1.0;
@@ -9968,7 +9788,6 @@ static double mannwhitneyu_utbln6n6(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 2.882307e+00 - 1, 1.0);
    tj = 1.0;
@@ -9998,7 +9817,6 @@ static double mannwhitneyu_utbln6n7(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.000000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10028,7 +9846,6 @@ static double mannwhitneyu_utbln6n8(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.098387e+00 - 1, 1.0);
    tj = 1.0;
@@ -10058,7 +9875,6 @@ static double mannwhitneyu_utbln6n9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.181981e+00 - 1, 1.0);
    tj = 1.0;
@@ -10088,7 +9904,6 @@ static double mannwhitneyu_utbln6n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.253957e+00 - 1, 1.0);
    tj = 1.0;
@@ -10118,7 +9933,6 @@ static double mannwhitneyu_utbln6n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.316625e+00 - 1, 1.0);
    tj = 1.0;
@@ -10148,7 +9962,6 @@ static double mannwhitneyu_utbln6n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.371709e+00 - 1, 1.0);
    tj = 1.0;
@@ -10178,7 +9991,6 @@ static double mannwhitneyu_utbln6n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.420526e+00 - 1, 1.0);
    tj = 1.0;
@@ -10208,7 +10020,6 @@ static double mannwhitneyu_utbln6n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10238,7 +10049,6 @@ static double mannwhitneyu_utbln6n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10268,7 +10078,6 @@ static double mannwhitneyu_utbln6n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10298,7 +10107,6 @@ static double mannwhitneyu_utbln6n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.450000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10328,7 +10136,6 @@ static double mannwhitneyu_utbln7n7(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.130495e+00 - 1, 1.0);
    tj = 1.0;
@@ -10358,7 +10165,6 @@ static double mannwhitneyu_utbln7n8(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.240370e+00 - 1, 1.0);
    tj = 1.0;
@@ -10388,7 +10194,6 @@ static double mannwhitneyu_utbln7n9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.334314e+00 - 1, 1.0);
    tj = 1.0;
@@ -10418,7 +10223,6 @@ static double mannwhitneyu_utbln7n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.415650e+00 - 1, 1.0);
    tj = 1.0;
@@ -10448,7 +10252,6 @@ static double mannwhitneyu_utbln7n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.486817e+00 - 1, 1.0);
    tj = 1.0;
@@ -10478,7 +10281,6 @@ static double mannwhitneyu_utbln7n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10508,7 +10310,6 @@ static double mannwhitneyu_utbln7n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10538,7 +10339,6 @@ static double mannwhitneyu_utbln7n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10568,7 +10368,6 @@ static double mannwhitneyu_utbln7n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10598,7 +10397,6 @@ static double mannwhitneyu_utbln7n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10628,7 +10426,6 @@ static double mannwhitneyu_utbln7n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.500000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10658,7 +10455,6 @@ static double mannwhitneyu_utbln8n8(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.360672e+00 - 1, 1.0);
    tj = 1.0;
@@ -10688,7 +10484,6 @@ static double mannwhitneyu_utbln8n9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.464102e+00 - 1, 1.0);
    tj = 1.0;
@@ -10718,7 +10513,6 @@ static double mannwhitneyu_utbln8n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.554093e+00 - 1, 1.0);
    tj = 1.0;
@@ -10748,7 +10542,6 @@ static double mannwhitneyu_utbln8n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10778,7 +10571,6 @@ static double mannwhitneyu_utbln8n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10808,7 +10600,6 @@ static double mannwhitneyu_utbln8n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10838,7 +10629,6 @@ static double mannwhitneyu_utbln8n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10868,7 +10658,6 @@ static double mannwhitneyu_utbln8n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10898,7 +10687,6 @@ static double mannwhitneyu_utbln8n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10928,7 +10716,6 @@ static double mannwhitneyu_utbln8n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.600000e+00 - 1, 1.0);
    tj = 1.0;
@@ -10958,7 +10745,6 @@ static double mannwhitneyu_utbln9n9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.576237e+00 - 1, 1.0);
    tj = 1.0;
@@ -10988,7 +10774,6 @@ static double mannwhitneyu_utbln9n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11018,7 +10803,6 @@ static double mannwhitneyu_utbln9n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11048,7 +10832,6 @@ static double mannwhitneyu_utbln9n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11078,7 +10861,6 @@ static double mannwhitneyu_utbln9n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11108,7 +10890,6 @@ static double mannwhitneyu_utbln9n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11138,7 +10919,6 @@ static double mannwhitneyu_utbln9n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11168,7 +10948,6 @@ static double mannwhitneyu_utbln9n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11198,7 +10977,6 @@ static double mannwhitneyu_utbln9n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11228,7 +11006,6 @@ static double mannwhitneyu_utbln10n10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11258,7 +11035,6 @@ static double mannwhitneyu_utbln10n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11288,7 +11064,6 @@ static double mannwhitneyu_utbln10n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11318,7 +11093,6 @@ static double mannwhitneyu_utbln10n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11348,7 +11122,6 @@ static double mannwhitneyu_utbln10n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11378,7 +11151,6 @@ static double mannwhitneyu_utbln10n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11408,7 +11180,6 @@ static double mannwhitneyu_utbln10n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11438,7 +11209,6 @@ static double mannwhitneyu_utbln10n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.650000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11468,7 +11238,6 @@ static double mannwhitneyu_utbln11n11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11498,7 +11267,6 @@ static double mannwhitneyu_utbln11n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11528,7 +11296,6 @@ static double mannwhitneyu_utbln11n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11558,7 +11325,6 @@ static double mannwhitneyu_utbln11n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11588,7 +11354,6 @@ static double mannwhitneyu_utbln11n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11618,7 +11383,6 @@ static double mannwhitneyu_utbln11n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11648,7 +11412,6 @@ static double mannwhitneyu_utbln11n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11678,7 +11441,6 @@ static double mannwhitneyu_utbln12n12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11708,7 +11470,6 @@ static double mannwhitneyu_utbln12n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11738,7 +11499,6 @@ static double mannwhitneyu_utbln12n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11768,7 +11528,6 @@ static double mannwhitneyu_utbln12n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11798,7 +11557,6 @@ static double mannwhitneyu_utbln12n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11828,7 +11586,6 @@ static double mannwhitneyu_utbln12n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.700000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11858,7 +11615,6 @@ static double mannwhitneyu_utbln13n13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11888,7 +11644,6 @@ static double mannwhitneyu_utbln13n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11918,7 +11673,6 @@ static double mannwhitneyu_utbln13n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11948,7 +11702,6 @@ static double mannwhitneyu_utbln13n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -11978,7 +11731,6 @@ static double mannwhitneyu_utbln13n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -12008,7 +11760,6 @@ static double mannwhitneyu_utbln14n14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -12038,7 +11789,6 @@ static double mannwhitneyu_utbln14n15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -12068,7 +11818,6 @@ static double mannwhitneyu_utbln14n30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -12098,7 +11847,6 @@ static double mannwhitneyu_utbln14n100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    x = ae_minreal(2 * (s - 0.000000e+00) / 3.750000e+00 - 1, 1.0);
    tj = 1.0;
@@ -12135,9 +11883,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
    double s3;
    double s4;
    double result;
-
    result = 0.0;
-
 // N1=5, N2 = 5, 6, 7, ...
    if (ae_minint(n1, n2) == 5) {
       if (ae_maxint(n1, n2) == 5) {
@@ -12657,9 +12403,7 @@ static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, doubl
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(RVector x, ae_int_t n, double *p) {
    double s;
-
    *p = 0;
-
 // N is too small
    if (n < 5) {
       *p = 1.0;
@@ -12680,22 +12424,18 @@ static void jarquebera_jarqueberastatistic(RVector x, ae_int_t n, double *s) {
    double variance;
    double skewness;
    double kurtosis;
-
    *s = 0;
-
    mean = 0.0;
    variance = 0.0;
    skewness = 0.0;
    kurtosis = 0.0;
    stddev = 0.0;
    ae_assert(n > 1, "Assertion failed");
-
 // Mean
    for (i = 0; i < n; i++) {
       mean += x->ptr.p_double[i];
    }
    mean /= n;
-
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
@@ -12741,12 +12481,10 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
    double f23;
    double x;
    double result;
-
    ae_frame_make(&_frame_block);
    NewVector(vx, 0, DT_REAL);
    NewVector(vy, 0, DT_REAL);
    NewMatrix(ctbl, 0, 0, DT_REAL);
-
    result = 1.0;
    x = s;
    if (n < 5) {
@@ -12930,7 +12668,6 @@ static double jarquebera_jbtbl5(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 0.4000) {
       x = 2 * (s - 0.000000) / 0.400000 - 1;
@@ -12978,7 +12715,6 @@ static double jarquebera_jbtbl6(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 0.2500) {
       x = 2 * (s - 0.000000) / 0.250000 - 1;
@@ -13043,7 +12779,6 @@ static double jarquebera_jbtbl7(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.4000) {
       x = 2 * (s - 0.000000) / 1.400000 - 1;
@@ -13116,7 +12851,6 @@ static double jarquebera_jbtbl8(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.3000) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
@@ -13183,7 +12917,6 @@ static double jarquebera_jbtbl9(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.3000) {
       x = 2 * (s - 0.000000) / 1.300000 - 1;
@@ -13250,7 +12983,6 @@ static double jarquebera_jbtbl10(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.2000) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
@@ -13312,7 +13044,6 @@ static double jarquebera_jbtbl11(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.2000) {
       x = 2 * (s - 0.000000) / 1.200000 - 1;
@@ -13374,7 +13105,6 @@ static double jarquebera_jbtbl12(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
@@ -13443,7 +13173,6 @@ static double jarquebera_jbtbl13(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
@@ -13512,7 +13241,6 @@ static double jarquebera_jbtbl14(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 1.0000) {
       x = 2 * (s - 0.000000) / 1.000000 - 1;
@@ -13581,7 +13309,6 @@ static double jarquebera_jbtbl15(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 2.0000) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
@@ -13644,7 +13371,6 @@ static double jarquebera_jbtbl16(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 2.0000) {
       x = 2 * (s - 0.000000) / 2.000000 - 1;
@@ -13707,7 +13433,6 @@ static double jarquebera_jbtbl17(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
@@ -13774,7 +13499,6 @@ static double jarquebera_jbtbl18(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
@@ -13841,7 +13565,6 @@ static double jarquebera_jbtbl19(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 3.0000) {
       x = 2 * (s - 0.000000) / 3.000000 - 1;
@@ -13908,7 +13631,6 @@ static double jarquebera_jbtbl20(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -13981,7 +13703,6 @@ static double jarquebera_jbtbl30(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14049,7 +13770,6 @@ static double jarquebera_jbtbl50(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14112,7 +13832,6 @@ static double jarquebera_jbtbl65(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14171,7 +13890,6 @@ static double jarquebera_jbtbl100(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14226,7 +13944,6 @@ static double jarquebera_jbtbl130(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14281,7 +13998,6 @@ static double jarquebera_jbtbl200(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14336,7 +14052,6 @@ static double jarquebera_jbtbl301(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14391,7 +14106,6 @@ static double jarquebera_jbtbl501(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14442,7 +14156,6 @@ static double jarquebera_jbtbl701(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14493,7 +14206,6 @@ static double jarquebera_jbtbl1401(double s) {
    double tj;
    double tj1;
    double result;
-
    result = 0.0;
    if (s <= 4.0000) {
       x = 2 * (s - 0.000000) / 4.000000 - 1;
@@ -14541,7 +14253,6 @@ static double jarquebera_jbtbl1401(double s) {
 
 static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
-
    *r += c * (*tj);
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
@@ -14631,11 +14342,9 @@ void ftest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, doub
    ae_int_t df1;
    ae_int_t df2;
    double stat;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 2 || m <= 2) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -14653,7 +14362,6 @@ void ftest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, doub
       ymean += y->ptr.p_double[i];
    }
    ymean /= m;
-
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    for (i = 0; i < n; i++) {
@@ -14717,11 +14425,9 @@ void onesamplevariancetest(RVector x, ae_int_t n, double variance, double *botht
    double xvar;
    double s;
    double stat;
-
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
-
    if (n <= 1) {
       *bothtails = 1.0;
       *lefttail = 1.0;
@@ -14734,7 +14440,6 @@ void onesamplevariancetest(RVector x, ae_int_t n, double variance, double *botht
       xmean += x->ptr.p_double[i];
    }
    xmean /= n;
-
 // Variance
    xvar = 0.0;
    for (i = 0; i < n; i++) {

@@ -65,9 +65,9 @@ This is a supplement to the <a href="Manual.htm">ALGLIB++ Reference Manual</a>.
 </p>
 <p>
 <a name=supp_CppDemoModule class=sheader></a><h2>A1. C++ Demo Module</h2>
-ALGLIB++ is an intermediate stage between ALGLIB and the future library undergoing development, with only minimal coding.
+ALGLIB++ is an intermediate stage between ALGLIB and the future library undergoing development, with only minimal recoding (but this will change, soon).
 A reengineered, refactored, re-commented version is currently undergoing testing, but has not yet been released.
-We intent to roll back much of the Version 3 infrastructure, to something similar to Version 2, and move upwards from there.
+We intend to roll back much of the Version 3 infrastructure, to something similar to Version 2, and move upwards from there.
 We are still experimenting with different methods for re-encapsulating the ALGLIB/ALGLIB++ classes.
 A demonstration may be found under the <a href="New/">New/</a> directory.
 If running under the configuration Linux:X86:GCC, run "make test" in the New/ directory.
@@ -291,7 +291,7 @@ A vestige of the earlier configuration was later reintroduced, as a compromise.
 This compromise is retained in ALGLIB++, except that the subpackages have each been segregated within their respective package modules.
 A dependency list has not been included in the Makefiles distributed with ALGLIB++, except for the package modules themselves.
 Subpackage dependencies are listed within the module files, themselves.
-For reference, the following is the dependency hierarchy, listed roughly in order of dependence.
+For reference, the following is the minimal spanning tree of the dependency hierarchy, listed roughly in order of dependence.
 Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} files.
 <ul>
 <li>AlgLibInternal:<ul>
@@ -396,7 +396,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>STUDENTTTESTS: (SpecialFunctions) STUDENTTDISTR</li>
    <li>MANNWHITNEYU: (AlgLibMisc) HQRND</li>
    <li>JARQUEBERA:</li>
-   <li>VARIANCETESTS: (SpecialFunctions) FDISTR │ (SpecialFunctions) CHISQUAREDISTR</li>
+   <li>VARIANCETESTS: (SpecialFunctions) FDISTR, CHISQUAREDISTR</li>
 </ul></li>
 <li>Optimization: Solvers [AlgLibInternal LinAlg]<ul>
    <li>CQMODELS: (LinAlg) TRFAC, FBLS</li>
@@ -590,15 +590,16 @@ The routines are listed by subpackage module:
 <p>
 <a name=supp_History1 class=sheader></a><h3>A6.1. Revision Notes</h3>
 <pre class=narration>
-∙	Corrected ASCII, #alglib_packages (should be #alglib_main).
+∙	Corrected "ASCI" to "ASCII" and "#alglib_packages" to "#alglib_main" (mistakes inherited from the original ALGLIB manual).
 ∙	The files were moved to a single top-level directory and the names normalized.
 ∙	References to Commercial ALGLIB in the comments and functions were removed.
 	A separate file was compiled collating all of the Commercial ALGLIB comments of the original package.
-∙	The reprogramming, itself, will be entirely under GPL.
-	Additions made, particularly in DSP, file {en/de}-coding, video/music/sound processing, time-frequency analysis,
-	will be made available for the commercial version to use.
-∙	GMP will be added; LaPack will be integrated; DSP and Time-Frequency analysis; file-transfer;
-	voice generation/recognition, computer vision, sound and video production
+∙	The reprogramming, itself, will be under GPL, except that recoding, repairs, and other additions made,
+	particularly in DSP, file {en/de}-coding, video/music/sound processing, time-frequency analysis,
+	will be made available for the commercial version to use, except those derived from other GPL-sources.
+∙	Full integration of GMP (as part of the expanded FastTransforms / DSP module)
+	and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules).
+∙	DSP and Time-Frequency analysis; file-transfer; voice generation/recognition, computer vision, sound and video production
 ∙	For POSIX non-compliant configurations, the user assumes primary responsibility for maintenance.
 	No support will be provided, but corrections or fixes reported will be noted, tested (where possible) and added.
 ∙	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16 manual.
@@ -617,7 +618,7 @@ The routines are listed by subpackage module:
 ∙	The revision to handle the rounding on the FP unit was only added in for Linux:x86:GCC.
 ∙	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
 	Included in the "structural" changes was a normalization of the ordering (determined automatically with the aid of the compiler)
-	of the routines and extraction of a dependency list.
+	of the routines and extraction of a dependency list; and various equivalence transforms. 
 ∙	The God-objects in alglib_impl (ae_state) and RCOMM routines were removed.
 	This means that some of the static or global variables they are replaced by would need to be made thread-local (as indicated).
 	Only the commercial version has support for multi-processors or multi-threading;
@@ -667,8 +668,6 @@ The routines are listed by subpackage module:
 	―	Type_move(Type *A, const Type *B).
 ∙	Different/expanded version of the testing routines for the SpecialFunctions modules, including forward/inverse pair testing.
 ∙	A possible redefinition of the SpecialFunctions module using the interpolation methods in ALGLIB itself.
-∙	Full integration of GMP (as part of the expanded FastTransforms / DSP module)
-	and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules).
 ∙	Full integration of the Time Frequency Toolkit (currently in MATLAB) or the equivalent into FastTransforms.
 ∙	Expansion of serialization/deserialization routines to include I/O for different file formats.
 </pre>
@@ -733,6 +732,7 @@ The routines are listed by subpackage module:
 27	Normalized the Makefile
 	Minor change in Ap.cpp.
 28	Conversions of assignment expressions to update operators (++X, --X, X++, X--, X op= Y), where applicable.
+29	Normalization of conditionals and layout.
 </pre>
 </p>
 <p>
@@ -810,9 +810,11 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 26	2273 3534 3461 2865 1580343048 213
 26	2299 3472 3486 3252 1580940186 225
 27	2257 3509 3449 3262 1581001359 218
-28	2278 3497 3510 3253 1581027835 // 5 TestC tests fail with the revisions.
+28	2278 3497 3510 3253 1581027835 // 5 TestC tests failed.
 28	2268 3497 3498 3205 1581032293 222 // Corrected.
-28	2294 3485 3498 3271 1581033702 228
+28	2294 3485 3498 3271 1581033702 228 // Modifications, following validation against local version.
+29	2268 3460 3461 3193 1581111823 230 // 1 TestC test failed.
+29	2294 3472 3498 3237 1581112921 215 // Corrected.
 </pre>
 </p>
 </div>

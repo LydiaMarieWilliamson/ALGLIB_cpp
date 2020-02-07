@@ -26,6 +26,7 @@ int main() {
    x.setlength(1);
    if (alglib_impl::_alloc_counter == 0) printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\\n");
 }
+
    if (alglib_impl::_alloc_counter != 0) {
       printf("FAILURE: alloc_counter does not decrease!\n");
       return 1;
@@ -88,7 +89,6 @@ int main() {
    r3 = r2;
    passed = passed && !get_error_flag() && r3.length() == 1 && r3[0] == 345;
    alglib_impl::_force_malloc_failure = false;
-
    printf(fmt_str, "* 1D arrays", passed ? "OK" : "FAILED");
    fflush(stdout);
    if (!passed) return 1;

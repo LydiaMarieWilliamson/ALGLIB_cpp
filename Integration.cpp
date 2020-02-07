@@ -54,7 +54,6 @@ namespace alglib_impl {
 void gqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t *info, RVector x, RVector w) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
@@ -62,14 +61,12 @@ void gqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t
    NewVector(d, 0, DT_REAL);
    NewVector(e, 0, DT_REAL);
    NewMatrix(z, 0, 0, DT_REAL);
-
    if (n < 1) {
       *info = -1;
       ae_frame_leave();
       return;
    }
    *info = 1;
-
 // Initialize
    ae_vector_set_length(&d, n);
    ae_vector_set_length(&e, n);
@@ -83,7 +80,6 @@ void gqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t
       e.ptr.p_double[i - 1] = sqrt(beta->ptr.p_double[i]);
    }
    d.ptr.p_double[n - 1] = alpha->ptr.p_double[n - 1];
-
 // EVD
    if (!smatrixtdevd(&d, &e, n, 3, &z)) {
       *info = -3;
@@ -152,7 +148,6 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    double b2;
    double alph;
    double bet;
-
    ae_frame_make(&_frame_block);
    DupVector(alpha);
    DupVector(beta);
@@ -162,14 +157,12 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    NewVector(d, 0, DT_REAL);
    NewVector(e, 0, DT_REAL);
    NewMatrix(z, 0, 0, DT_REAL);
-
    if (n <= 2) {
       *info = -1;
       ae_frame_leave();
       return;
    }
    *info = 1;
-
 // Initialize, D[1:N+1], E[1:N]
    n -= 2;
    ae_vector_set_length(&d, n + 2);
@@ -185,7 +178,6 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
       }
       e.ptr.p_double[i - 1] = sqrt(beta->ptr.p_double[i]);
    }
-
 // Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
    beta->ptr.p_double[0] = 0.0;
    pim1a = 0.0;
@@ -193,18 +185,15 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    pim1b = 0.0;
    pib = 1.0;
    for (i = 1; i <= n + 1; i++) {
-
    // Pi(a)
       t = (a - alpha->ptr.p_double[i - 1]) * pia - beta->ptr.p_double[i - 1] * pim1a;
       pim1a = pia;
       pia = t;
-
    // Pi(b)
       t = (b - alpha->ptr.p_double[i - 1]) * pib - beta->ptr.p_double[i - 1] * pim1b;
       pim1b = pib;
       pib = t;
    }
-
 // Calculate alpha'(n+1), beta'(n+1)
    a11 = pia;
    a12 = pim1a;
@@ -230,7 +219,6 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    }
    d.ptr.p_double[n + 1] = alph;
    e.ptr.p_double[n] = sqrt(bet);
-
 // EVD
    if (!smatrixtdevd(&d, &e, n + 2, 3, &z)) {
       *info = -3;
@@ -289,7 +277,6 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
    double polim1;
    double poli;
    double t;
-
    ae_frame_make(&_frame_block);
    DupVector(alpha);
    DupVector(beta);
@@ -299,14 +286,12 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
    NewVector(d, 0, DT_REAL);
    NewVector(e, 0, DT_REAL);
    NewMatrix(z, 0, 0, DT_REAL);
-
    if (n < 2) {
       *info = -1;
       ae_frame_leave();
       return;
    }
    *info = 1;
-
 // Initialize, D[1:N], E[1:N]
    n--;
    ae_vector_set_length(&d, n + 1);
@@ -320,7 +305,6 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
       }
       e.ptr.p_double[i - 1] = sqrt(beta->ptr.p_double[i]);
    }
-
 // Caclulate Pn(a), Pn-1(a), and D[N+1]
    beta->ptr.p_double[0] = 0.0;
    polim1 = 0.0;
@@ -331,7 +315,6 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
       poli = t;
    }
    d.ptr.p_double[n] = a - beta->ptr.p_double[n] * polim1 / poli;
-
 // EVD
    if (!smatrixtdevd(&d, &e, n + 1, 3, &z)) {
       *info = -3;
@@ -372,14 +355,12 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
 void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector w) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
    NewVector(alpha, 0, DT_REAL);
    NewVector(beta, 0, DT_REAL);
-
    if (n < 1) {
       *info = -1;
       ae_frame_leave();
@@ -395,7 +376,6 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector w) {
       beta.ptr.p_double[i] = 1 / (4 - 1 / ae_sqr((double)i));
    }
    gqgeneraterec(&alpha, &beta, beta.ptr.p_double[0], n, info, x, w);
-
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->ptr.p_double[0] < -1.0 || x->ptr.p_double[n - 1] > 1.0) {
@@ -442,15 +422,13 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    double t;
    ae_int_t i;
    double s;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
    NewVector(a, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-
-   if ((n < 1 || alpha <= -1.0) || beta <= -1.0) {
+   if (n < 1 || alpha <= -1.0 || beta <= -1.0) {
       *info = -1;
       ae_frame_leave();
       return;
@@ -477,7 +455,6 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
       }
    }
    gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w);
-
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->ptr.p_double[0] < -1.0 || x->ptr.p_double[n - 1] > 1.0) {
@@ -520,14 +497,12 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector x
    double t;
    ae_int_t i;
    double s;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
    NewVector(a, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-
    if (n < 1 || alpha <= -1.0) {
       *info = -1;
       ae_frame_leave();
@@ -550,7 +525,6 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector x
       }
    }
    gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w);
-
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->ptr.p_double[0] < 0.0) {
@@ -588,14 +562,12 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector x
 void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector x, RVector w) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
    SetVector(w);
    NewVector(a, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-
    if (n < 1) {
       *info = -1;
       ae_frame_leave();
@@ -613,7 +585,6 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector x, RVector w) {
       }
    }
    gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w);
-
 // test basic properties to detect errors
    if (*info > 0) {
       for (i = 0; i < n - 1; i++) {
@@ -926,7 +897,6 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
    ae_int_t m;
    ae_int_t l;
    ae_int_t k;
-
    ae_frame_make(&_frame_block);
    DupVector(alpha);
    DupVector(beta);
@@ -939,7 +909,6 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
    NewVector(s, 0, DT_REAL);
    NewVector(xgtmp, 0, DT_REAL);
    NewVector(wgtmp, 0, DT_REAL);
-
    if (n % 2 != 1 || n < 3) {
       *info = -1;
       ae_frame_leave();
@@ -953,11 +922,9 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
       }
    }
    *info = 1;
-
 // from external conventions about N/Beta/Mu0 to internal
    n /= 2;
    beta->ptr.p_double[0] = mu0;
-
 // Calculate Gauss nodes/weights, save them for later processing
    gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp);
    if (*info < 0) {
@@ -981,7 +948,6 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
    for (i = CeilZ((double)(3 * n) / 2.0) + 1; i <= 2 * n; i++) {
       beta->ptr.p_double[i] = 0.0;
    }
-
 // Initialize T, S
    wlen = 2 + n / 2;
    ae_vector_set_length(&t, wlen);
@@ -992,7 +958,6 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
       t.ptr.p_double[i] = 0.0;
       s.ptr.p_double[i] = 0.0;
    }
-
 // Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
    t.ptr.p_double[woffs + 0] = beta->ptr.p_double[n + 1];
    for (m = 0; m < n - 1; m++) {
@@ -1029,7 +994,6 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
       ae_v_move(s.ptr.p_double, 1, ta.ptr.p_double, 1, wlen);
    }
    alpha->ptr.p_double[2 * n] = alpha->ptr.p_double[n - 1] - beta->ptr.p_double[2 * n] * s.ptr.p_double[woffs + 0] / t.ptr.p_double[woffs + 0];
-
 // calculation of Kronrod nodes and weights, unpacking of Gauss weights
    gqgeneraterec(alpha, beta, mu0, 2 * n + 1, info, x, wkronrod);
    if (*info == -2) {
@@ -1086,13 +1050,11 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RVector wgauss) {
    double eps;
-
    *info = 0;
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-
-   if (ae_machineepsilon > 1.0E-32 && (((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61)) {
+   if (ae_machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
       *info = 1;
       gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
    } else {
@@ -1142,7 +1104,6 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    double t;
    ae_int_t i;
    double s;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
@@ -1150,7 +1111,6 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    SetVector(wgauss);
    NewVector(a, 0, DT_REAL);
    NewVector(b, 0, DT_REAL);
-
    if (n % 2 != 1 || n < 3) {
       *info = -1;
       ae_frame_leave();
@@ -1187,7 +1147,6 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
       }
    }
    gkqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, wkronrod, wgauss);
-
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->ptr.p_double[0] < -1.0 || x->ptr.p_double[n - 1] > 1.0) {
@@ -1232,7 +1191,6 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RV
    double mu0;
    ae_int_t k;
    ae_int_t i;
-
    ae_frame_make(&_frame_block);
    *info = 0;
    SetVector(x);
@@ -1240,7 +1198,6 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RV
    SetVector(wgauss);
    NewVector(alpha, 0, DT_REAL);
    NewVector(beta, 0, DT_REAL);
-
    if (n % 2 != 1 || n < 3) {
       *info = -1;
       ae_frame_leave();
@@ -1259,7 +1216,6 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RV
       beta.ptr.p_double[k] = 1 / (4 - 1 / ae_sqr((double)k));
    }
    gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss);
-
 // test basic properties to detect errors
    if (*info > 0) {
       if (x->ptr.p_double[0] < -1.0 || x->ptr.p_double[n - 1] > 1.0) {
@@ -1298,7 +1254,6 @@ void gkqlegendretbl(ae_int_t n, RVector x, RVector wkronrod, RVector wgauss, dou
    ae_int_t i;
    ae_int_t ng;
    double tmp;
-
    ae_frame_make(&_frame_block);
    SetVector(x);
    SetVector(wkronrod);
@@ -1306,11 +1261,9 @@ void gkqlegendretbl(ae_int_t n, RVector x, RVector wkronrod, RVector wgauss, dou
    *eps = 0;
    NewVector(p1, 0, DT_INT);
    NewVector(p2, 0, DT_INT);
-
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
    ng = 0;
-
 // Process
    ae_assert(((((n == 15 || n == 21) || n == 31) || n == 41) || n == 51) || n == 61, "GKQNodesTbl: incorrect N!");
    ae_vector_set_length(x, n);
@@ -1625,12 +1578,10 @@ void gkqlegendretbl(ae_int_t n, RVector x, RVector wkronrod, RVector wgauss, dou
    for (i = n - 1; i >= n / 2; i--) {
       x->ptr.p_double[i] = -x->ptr.p_double[n - 1 - i];
    }
-
 // copy Kronrod weights
    for (i = n - 1; i >= n / 2; i--) {
       wkronrod->ptr.p_double[i] = wkronrod->ptr.p_double[n - 1 - i];
    }
-
 // copy Gauss weights
    for (i = ng - 1; i >= 0; i--) {
       wgauss->ptr.p_double[n - 2 - 2 * i] = wgauss->ptr.p_double[i];
@@ -1639,7 +1590,6 @@ void gkqlegendretbl(ae_int_t n, RVector x, RVector wkronrod, RVector wgauss, dou
    for (i = 0; i <= n / 2; i++) {
       wgauss->ptr.p_double[2 * i] = 0.0;
    }
-
 // reorder
    tagsort(x, n, &p1, &p2);
    for (i = 0; i < n; i++) {
@@ -1869,9 +1819,7 @@ static void autogk_mheapresize(RMatrix heap, ae_int_t *heapsize, ae_int_t newhea
 //
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksmooth(double a, double b, autogkstate *state) {
-
    SetObj(autogkstate, state);
-
    ae_assert(isfinite(a), "AutoGKSmooth: A is not finite!");
    ae_assert(isfinite(b), "AutoGKSmooth: B is not finite!");
    autogksmoothw(a, b, 0.0, state);
@@ -1898,9 +1846,7 @@ void autogksmooth(double a, double b, autogkstate *state) {
 //
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
-
    SetObj(autogkstate, state);
-
    ae_assert(isfinite(a), "AutoGKSmoothW: A is not finite!");
    ae_assert(isfinite(b), "AutoGKSmoothW: B is not finite!");
    ae_assert(isfinite(xwidth), "AutoGKSmoothW: XWidth is not finite!");
@@ -1942,9 +1888,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
 //
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state) {
-
    SetObj(autogkstate, state);
-
    ae_assert(isfinite(a), "AutoGKSingular: A is not finite!");
    ae_assert(isfinite(b), "AutoGKSingular: B is not finite!");
    ae_assert(isfinite(alpha), "AutoGKSingular: Alpha is not finite!");
@@ -1989,7 +1933,6 @@ Spawn:
    t = 74;
    v1 = 205;
    v2 = -838;
-
    eps = 0.0;
    a = state->a;
    b = state->b;
@@ -1998,7 +1941,6 @@ Spawn:
    state->terminationtype = -1;
    state->nfev = 0;
    state->nintervals = 0;
-
 // smooth function  at a finite interval
    if (state->wrappermode == 0) {
    // special case
@@ -2025,7 +1967,6 @@ Spawn:
       state->nintervals = state->internalstate.heapused;
       goto Exit;
    }
-
 // function with Power-law singularities at the ends of a finite interval
    if (state->wrappermode == 1) {
    // test coefficients
@@ -2054,7 +1995,6 @@ Spawn:
       }
       alpha = ae_minreal(alpha, 0.0);
       beta = ae_minreal(beta, 0.0);
-
    // first, integrate left half of [a,b]:
    //     integral(f(x)dx, a, (b+a)/2) =
    //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
@@ -2084,7 +2024,6 @@ Spawn:
       }
       v1 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;
-
    // then, integrate right half of [a,b]:
    //     integral(f(x)dx, (b+a)/2, b) =
    //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
@@ -2114,14 +2053,12 @@ Spawn:
       }
       v2 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;
-
    // final result
       state->v = s * (v1 + v2);
       state->terminationtype = 1;
       goto Exit;
    }
    goto Exit;
-
 Pause:
    return true;
 Exit:
@@ -2142,10 +2079,8 @@ Exit:
 //
 // ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
 void autogkresults(autogkstate *state, double *v, autogkreport *rep) {
-
    *v = 0;
    SetObj(autogkreport, rep);
-
    *v = state->v;
    rep->terminationtype = state->terminationtype;
    rep->nfev = state->nfev;
@@ -2159,13 +2094,11 @@ void autogkresults(autogkstate *state, double *v, autogkreport *rep) {
 // width<0 -   error
 // width=0 -   no width requirements
 static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state) {
-
 // Save settings
    state->a = a;
    state->b = b;
    state->eps = eps;
    state->xwidth = xwidth;
-
 // Prepare RComm structure
    state->PQ = -1;
 }
@@ -2208,7 +2141,6 @@ Spawn:
    ta = -536;
    tb = 487;
    qeps = -115;
-
 // initialize quadratures.
 // use 15-point Gauss-Kronrod formula.
    state->n = 15;
@@ -2230,7 +2162,6 @@ Spawn:
       }
       state->wr.ptr.p_double[i] = 0.5 * fabs(state->qn.ptr.p_double[i - 1] - state->qn.ptr.p_double[i + 1]);
    }
-
 // special case
    if (state->a == state->b) {
       state->info = 1;
@@ -2270,7 +2201,6 @@ Spawn:
          state->x = c1 * state->qn.ptr.p_double[i] + c2;
          state->PQ = 0; goto Pause; Resume0:
          v = state->f;
-
       // Gauss-Kronrod formula
          intk += v * state->wk.ptr.p_double[i];
          if (i % 2 == 1) {
@@ -2313,7 +2243,6 @@ Spawn:
             state->x = c1 * state->qn.ptr.p_double[i] + c2;
             state->PQ = 1; goto Pause; Resume1:
             v = state->f;
-
          // Gauss-Kronrod formula
             intk += v * state->wk.ptr.p_double[i];
             if (i % 2 == 1) {
@@ -2335,7 +2264,6 @@ Spawn:
          state->sumabs += fabs(inta);
       }
    }
-
 // method iterations
    while (true) {
    // additional memory if needed
@@ -2354,7 +2282,6 @@ Spawn:
       autogk_mheappop(&state->heap, state->heapused, state->heapwidth);
       state->sumerr -= state->heap.ptr.pp_double[state->heapused - 1][0];
       state->sumabs -= state->heap.ptr.pp_double[state->heapused - 1][2];
-
    // Divide interval, create subintervals
       ta = state->heap.ptr.pp_double[state->heapused - 1][3];
       tb = state->heap.ptr.pp_double[state->heapused - 1][4];
@@ -2373,7 +2300,6 @@ Spawn:
             state->x = c1 * state->qn.ptr.p_double[i] + c2;
             state->PQ = 2; goto Pause; Resume2:
             v = state->f;
-
          // Gauss-Kronrod formula
             intk += v * state->wk.ptr.p_double[i];
             if (i % 2 == 1) {
@@ -2397,7 +2323,6 @@ Spawn:
       state->heapused++;
    }
    goto Exit;
-
 Pause:
    return true;
 Exit:
@@ -2410,7 +2335,6 @@ static void autogk_mheappop(RMatrix heap, ae_int_t heapsize, ae_int_t heapwidth)
    ae_int_t p;
    double t;
    ae_int_t maxcp;
-
    if (heapsize == 1) {
       return;
    }
@@ -2445,7 +2369,6 @@ static void autogk_mheappush(RMatrix heap, ae_int_t heapsize, ae_int_t heapwidth
    ae_int_t p;
    double t;
    ae_int_t parent;
-
    if (heapsize == 0) {
       return;
    }
@@ -2468,10 +2391,8 @@ static void autogk_mheappush(RMatrix heap, ae_int_t heapsize, ae_int_t heapwidth
 static void autogk_mheapresize(RMatrix heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth) {
    ae_frame _frame_block;
    ae_int_t i;
-
    ae_frame_make(&_frame_block);
    NewMatrix(tmp, 0, 0, DT_REAL);
-
    ae_matrix_set_length(&tmp, *heapsize, heapwidth);
    for (i = 0; i < *heapsize; i++) {
       ae_v_move(tmp.ptr.pp_double[i], 1, heap->ptr.pp_double[i], 1, heapwidth);

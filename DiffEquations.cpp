@@ -66,9 +66,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
-
    SetObj(odesolverstate, state);
-
    ae_assert(n >= 1, "ODESolverRKCK: N<1!");
    ae_assert(m >= 1, "ODESolverRKCK: M<1!");
    ae_assert(y->cnt >= n, "ODESolverRKCK: Length(Y)<N!");
@@ -120,7 +118,6 @@ Spawn:
    h2 = -838;
    err = 939;
    maxgrowpow = -526;
-
 // prepare
    if (state->repterminationtype != 0) {
       goto Exit;
@@ -130,12 +127,10 @@ Spawn:
    h = state->h;
    maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
    state->repnfev = 0;
-
 // some preliminary checks for internal errors
 // after this we assume that H>0 and M>1
    ae_assert(state->h > 0.0, "ODESolver: internal error");
    ae_assert(m > 1, "ODESolverIteration: internal error");
-
 // choose solver
    if (state->solvertype == 0) {
    // Cask-Karp solver
@@ -179,7 +174,6 @@ Spawn:
       state->rkcs.ptr.p_double[4] = 277.0 / 14336.0;
       state->rkcs.ptr.p_double[5] = 1.0 / 4.0;
       ae_matrix_set_length(&state->rkk, 6, n);
-
    // Main cycle consists of two iterations:
    // * outer where we travel from X[i-1] to X[i]
    // * inner where we travel inside [X[i-1],X[i]]
@@ -203,7 +197,6 @@ Spawn:
             } else {
                gridpoint = false;
             }
-
          // Update error scale maximums
          //
          // These maximums are initialized by zeros,
@@ -211,7 +204,6 @@ Spawn:
             for (j = 0; j < n; j++) {
                state->escale.ptr.p_double[j] = ae_maxreal(state->escale.ptr.p_double[j], fabs(state->yc.ptr.p_double[j]));
             }
-
          // make one step:
          // 1. calculate all info needed to do step
          // 2. update errors scale maximums using values/derivatives
@@ -237,23 +229,19 @@ Spawn:
                state->repnfev++;
                v = h * state->xscale;
                ae_v_moved(state->rkk.ptr.pp_double[k], 1, state->dy.ptr.p_double, 1, n, v);
-
             // update YN/YNS
                v = state->rkc.ptr.p_double[k];
                ae_v_addd(state->yn.ptr.p_double, 1, state->rkk.ptr.pp_double[k], 1, n, v);
                v = state->rkcs.ptr.p_double[k];
                ae_v_addd(state->yns.ptr.p_double, 1, state->rkk.ptr.pp_double[k], 1, n, v);
             }
-
          // estimate error
             err = 0.0;
             for (j = 0; j < n; j++) {
                if (!state->fraceps) {
-
                // absolute error is estimated
                   err = ae_maxreal(err, fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j]));
                } else {
-
                // Relative error is estimated
                   v = state->escale.ptr.p_double[j];
                   if (v == 0.0) {
@@ -262,7 +250,6 @@ Spawn:
                   err = ae_maxreal(err, fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j]) / v);
                }
             }
-
          // calculate new step, restart if necessary
             if (maxgrowpow * err <= state->eps) {
                h2 = odesolver_odesolvermaxgrow * h;
@@ -279,10 +266,8 @@ Spawn:
          // advance position
             xc += h;
             ae_v_move(state->yc.ptr.p_double, 1, state->yn.ptr.p_double, 1, n);
-
          // update H
             h = h2;
-
          // break on grid point
             if (gridpoint) {
                break;
@@ -295,7 +280,6 @@ Spawn:
       goto Exit;
    }
    goto Exit;
-
 Pause:
    return true;
 Exit:
@@ -326,12 +310,10 @@ Exit:
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix ytbl, odesolverreport *rep) {
    double v;
    ae_int_t i;
-
    *m = 0;
    SetVector(xtbl);
    SetMatrix(ytbl);
    SetObj(odesolverreport, rep);
-
    rep->terminationtype = state->repterminationtype;
    if (rep->terminationtype > 0) {
       *m = state->m;
@@ -352,15 +334,12 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix 
 static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
    ae_int_t i;
    double v;
-
    SetObj(odesolverstate, state);
-
 // Prepare RComm
    state->PQ = -1;
    state->needdy = false;
-
 // check parameters.
-   if ((n <= 0 || m < 1) || eps == 0.0) {
+   if (n <= 0 || m < 1 || eps == 0.0) {
       state->repterminationtype = -1;
       return;
    }
@@ -384,12 +363,11 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
       return;
    }
    for (i = 1; i < m; i++) {
-      if ((x->ptr.p_double[1] > x->ptr.p_double[0] && x->ptr.p_double[i] <= x->ptr.p_double[i - 1]) || (x->ptr.p_double[1] < x->ptr.p_double[0] && x->ptr.p_double[i] >= x->ptr.p_double[i - 1])) {
+      if (x->ptr.p_double[1] > x->ptr.p_double[0] && x->ptr.p_double[i] <= x->ptr.p_double[i - 1] || x->ptr.p_double[1] < x->ptr.p_double[0] && x->ptr.p_double[i] >= x->ptr.p_double[i - 1]) {
          state->repterminationtype = -2;
          return;
       }
    }
-
 // auto-select H if necessary
    if (h == 0.0) {
       v = fabs(x->ptr.p_double[1] - x->ptr.p_double[0]);
@@ -416,7 +394,6 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
    ae_v_move(state->yc.ptr.p_double, 1, y->ptr.p_double, 1, n);
    state->solvertype = solvertype;
    state->repterminationtype = 0;
-
 // Allocate arrays
    ae_vector_set_length(&state->y, n);
    ae_vector_set_length(&state->dy, n);
