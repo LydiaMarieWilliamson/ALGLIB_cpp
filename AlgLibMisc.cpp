@@ -1494,7 +1494,7 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
 
       // XY[ILeft] is on its place.
       // Advance ILeft.
-         ileft = ileft + 1;
+         ileft++;
       } else {
 
       // XY[ILeft,..] must be at IRight.
@@ -1507,13 +1507,13 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
          j = kdt->tags.ptr.p_int[ileft];
          kdt->tags.ptr.p_int[ileft] = kdt->tags.ptr.p_int[iright];
          kdt->tags.ptr.p_int[iright] = j;
-         iright = iright - 1;
+         iright--;
       }
    }
    if (kdt->xy.ptr.pp_double[ileft][d] <= s) {
-      ileft = ileft + 1;
+      ileft++;
    } else {
-      iright = iright - 1;
+      iright--;
    }
    *i3 = ileft;
 }
@@ -1557,7 +1557,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    if (i2 - i1 <= maxleafsize) {
       kdt->nodes.ptr.p_int[*nodesoffs + 0] = i2 - i1;
       kdt->nodes.ptr.p_int[*nodesoffs + 1] = i1;
-      *nodesoffs = *nodesoffs + 2;
+      *nodesoffs += 2;
       return;
    }
 // Load values for easier access
@@ -1579,7 +1579,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    if (ds == 0.0) {
       kdt->nodes.ptr.p_int[*nodesoffs + 0] = i2 - i1;
       kdt->nodes.ptr.p_int[*nodesoffs + 1] = i1;
-      *nodesoffs = *nodesoffs + 2;
+      *nodesoffs += 2;
       return;
    }
 // Select split position S using sliding midpoint rule,
@@ -1608,10 +1608,10 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          maxidx = i1 + i;
       }
       if (v < s) {
-         cntless = cntless + 1;
+         cntless++;
       }
       if (v > s) {
-         cntgreater = cntgreater + 1;
+         cntgreater++;
       }
    }
    if (minv == maxv) {
@@ -1678,8 +1678,8 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    kdt->nodes.ptr.p_int[*nodesoffs + 2] = *splitsoffs;
    kdt->splits.ptr.p_double[*splitsoffs + 0] = s;
    oldoffs = *nodesoffs;
-   *nodesoffs = *nodesoffs + nearestneighbor_splitnodesize;
-   *splitsoffs = *splitsoffs + 1;
+   *nodesoffs += nearestneighbor_splitnodesize;
+   ++*splitsoffs;
 
 // Recursive generation:
 // * update CurBox
@@ -1743,12 +1743,12 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          }
          if (kdt->normtype == 1) {
             for (j = 0; j < nx; j++) {
-               ptdist = ptdist + fabs(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
+               ptdist += fabs(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
             }
          }
          if (kdt->normtype == 2) {
             for (j = 0; j < nx; j++) {
-               ptdist = ptdist + ae_sqr(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
+               ptdist += ae_sqr(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
             }
          }
       // Skip points with zero distance if self-matches are turned off
@@ -1831,10 +1831,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist = ae_maxreal(buf->curdist, s - t1);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist = buf->curdist - ae_maxreal(v - t1, 0.0) + s - t1;
+                  buf->curdist -= ae_maxreal(v - t1, 0.0) - s + t1;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist = buf->curdist - ae_sqr(ae_maxreal(v - t1, 0.0)) + ae_sqr(s - t1);
+                  buf->curdist -= ae_sqr(ae_maxreal(v - t1, 0.0)) - ae_sqr(s - t1);
                }
             }
             buf->curboxmin.ptr.p_double[d] = s;
@@ -1847,10 +1847,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist = ae_maxreal(buf->curdist, t1 - s);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist = buf->curdist - ae_maxreal(t1 - v, 0.0) + t1 - s;
+                  buf->curdist -= ae_maxreal(t1 - v, 0.0) - t1 + s;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist = buf->curdist - ae_sqr(ae_maxreal(t1 - v, 0.0)) + ae_sqr(t1 - s);
+                  buf->curdist -= ae_sqr(ae_maxreal(t1 - v, 0.0)) - ae_sqr(t1 - s);
                }
             }
             buf->curboxmax.ptr.p_double[d] = s;
@@ -1934,7 +1934,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
       // Add point to unordered list
          buf->r.ptr.p_double[buf->kcur] = 0.0;
          buf->idx.ptr.p_int[buf->kcur] = i;
-         buf->kcur = buf->kcur + 1;
+         buf->kcur++;
       }
       return;
    }
@@ -2006,10 +2006,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector x, kdtreerequestb
          buf->curboxmin.ptr.p_double[i] = vmin;
          buf->curboxmax.ptr.p_double[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = buf->curdist + vmin - vx;
+            buf->curdist += vmin - vx;
          } else {
             if (vx > vmax) {
-               buf->curdist = buf->curdist + vx - vmax;
+               buf->curdist += vx - vmax;
             }
          }
       }
@@ -2023,10 +2023,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector x, kdtreerequestb
          buf->curboxmin.ptr.p_double[i] = vmin;
          buf->curboxmax.ptr.p_double[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = buf->curdist + ae_sqr(vmin - vx);
+            buf->curdist += ae_sqr(vmin - vx);
          } else {
             if (vx > vmax) {
-               buf->curdist = buf->curdist + ae_sqr(vx - vmax);
+               buf->curdist += ae_sqr(vx - vmax);
             }
          }
       }
@@ -3837,7 +3837,7 @@ ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
          result = hqrnd_hqrndintegerbase(state);
       }
       while (result >= mx);
-      result = result % n;
+      result %= n;
    }
    return result;
 }
@@ -3880,8 +3880,8 @@ void hqrndunit2(hqrndstate *state, double *x, double *y) {
    mx = ae_maxreal(fabs(*x), fabs(*y));
    mn = ae_minreal(fabs(*x), fabs(*y));
    v = mx * sqrt(1 + ae_sqr(mn / mx));
-   *x = *x / v;
-   *y = *y / v;
+   *x /= v;
+   *y /= v;
 }
 
 // Random number generator: normal numbers
@@ -4002,19 +4002,19 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state) {
    k = state->s1 / 53668;
    state->s1 = 40014 * (state->s1 - k * 53668) - k * 12211;
    if (state->s1 < 0) {
-      state->s1 = state->s1 + 2147483563;
+      state->s1 += 2147483563;
    }
    k = state->s2 / 52774;
    state->s2 = 40692 * (state->s2 - k * 52774) - k * 3791;
    if (state->s2 < 0) {
-      state->s2 = state->s2 + 2147483399;
+      state->s2 += 2147483399;
    }
 // Result
    result = state->s1 - state->s2;
    if (result < 1) {
-      result = result + 2147483562;
+      result += 2147483562;
    }
-   result = result - 1;
+   result--;
    return result;
 }
 
@@ -4237,7 +4237,7 @@ ae_int_t xdebugb1count(BVector a) {
    result = 0;
    for (i = 0; i < a->cnt; i++) {
       if (a->ptr.p_bool[i]) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -4313,7 +4313,7 @@ ae_int_t xdebugi1sum(ZVector a) {
 
    result = 0;
    for (i = 0; i < a->cnt; i++) {
-      result = result + a->ptr.p_int[i];
+      result += a->ptr.p_int[i];
    }
    return result;
 }
@@ -4394,7 +4394,7 @@ double xdebugr1sum(RVector a) {
 
    result = 0.0;
    for (i = 0; i < a->cnt; i++) {
-      result = result + a->ptr.p_double[i];
+      result += a->ptr.p_double[i];
    }
    return result;
 }
@@ -4560,7 +4560,7 @@ ae_int_t xdebugb2count(BMatrix a) {
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
          if (a->ptr.pp_bool[i][j]) {
-            result = result + 1;
+            result++;
          }
       }
    }
@@ -4650,7 +4650,7 @@ ae_int_t xdebugi2sum(ZMatrix a) {
    result = 0;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         result = result + a->ptr.pp_int[i][j];
+         result += a->ptr.pp_int[i][j];
       }
    }
    return result;
@@ -4739,7 +4739,7 @@ double xdebugr2sum(RMatrix a) {
    result = 0.0;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         result = result + a->ptr.pp_double[i][j];
+         result += a->ptr.pp_double[i][j];
       }
    }
    return result;
@@ -4925,7 +4925,7 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix a, RMatrix b
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (c->ptr.pp_bool[i][j]) {
-            result = result + a->ptr.pp_double[i][j] * (1 + b->ptr.pp_double[i][j]);
+            result += a->ptr.pp_double[i][j] * (1 + b->ptr.pp_double[i][j]);
          }
       }
    }

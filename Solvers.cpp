@@ -3046,9 +3046,9 @@ static void directdensesolvers_rbasiclusolve(RMatrix lua, ZVector p, ae_int_t n,
    }
    for (i = 1; i < n; i++) {
       v = ae_v_dotproduct(lua->ptr.pp_double[i], 1, xb->ptr.p_double, 1, i);
-      xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+      xb->ptr.p_double[i] -= v;
    }
-   xb->ptr.p_double[n - 1] = xb->ptr.p_double[n - 1] / lua->ptr.pp_double[n - 1][n - 1];
+   xb->ptr.p_double[n - 1] /= lua->ptr.pp_double[n - 1][n - 1];
    for (i = n - 2; i >= 0; i--) {
       v = ae_v_dotproduct(&lua->ptr.pp_double[i][i + 1], 1, &xb->ptr.p_double[i + 1], 1, n - i - 1);
       xb->ptr.p_double[i] = (xb->ptr.p_double[i] - v) / lua->ptr.pp_double[i][i];
@@ -3071,7 +3071,7 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix cha, ae_int_t n, bo
 
    // Solve U'*y=b first.
       for (i = 0; i < n; i++) {
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->ptr.p_double[i] /= cha->ptr.pp_double[i][i];
          if (i < n - 1) {
             v = xb->ptr.p_double[i];
             ae_v_subd(&xb->ptr.p_double[i + 1], 1, &cha->ptr.pp_double[i][i + 1], 1, n - i - 1, v);
@@ -3082,9 +3082,9 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix cha, ae_int_t n, bo
       for (i = n - 1; i >= 0; i--) {
          if (i < n - 1) {
             v = ae_v_dotproduct(&cha->ptr.pp_double[i][i + 1], 1, &xb->ptr.p_double[i + 1], 1, n - i - 1);
-            xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+            xb->ptr.p_double[i] -= v;
          }
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->ptr.p_double[i] /= cha->ptr.pp_double[i][i];
       }
    } else {
 
@@ -3092,14 +3092,14 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix cha, ae_int_t n, bo
       for (i = 0; i < n; i++) {
          if (i > 0) {
             v = ae_v_dotproduct(cha->ptr.pp_double[i], 1, xb->ptr.p_double, 1, i);
-            xb->ptr.p_double[i] = xb->ptr.p_double[i] - v;
+            xb->ptr.p_double[i] -= v;
          }
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->ptr.p_double[i] /= cha->ptr.pp_double[i][i];
       }
 
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->ptr.p_double[i] = xb->ptr.p_double[i] / cha->ptr.pp_double[i][i];
+         xb->ptr.p_double[i] /= cha->ptr.pp_double[i][i];
          if (i > 0) {
             v = xb->ptr.p_double[i];
             ae_v_subd(xb->ptr.p_double, 1, cha->ptr.pp_double[i], 1, i, v);
@@ -5020,7 +5020,7 @@ void linlsqrsetb(linlsqrstate *state, RVector b) {
    state->bnorm2 = 0.0;
    for (i = 0; i < state->m; i++) {
       state->b.ptr.p_double[i] = b->ptr.p_double[i];
-      state->bnorm2 = state->bnorm2 + b->ptr.p_double[i] * b->ptr.p_double[i];
+      state->bnorm2 += b->ptr.p_double[i] * b->ptr.p_double[i];
    }
 }
 
@@ -5106,7 +5106,7 @@ Spawn:
    while (normestimatoriteration(&state->nes)) {
       if (state->nes.needmv) {
          ae_v_move(state->x.ptr.p_double, 1, state->nes.x.ptr.p_double, 1, state->n);
-         state->repnmv = state->repnmv + 1;
+         state->repnmv++;
          linlsqr_clearrfields(state);
          state->needmv = true;
          state->PQ = 0; goto Pause; Resume0:
@@ -5116,7 +5116,7 @@ Spawn:
          ae_v_move(state->x.ptr.p_double, 1, state->nes.x.ptr.p_double, 1, state->m);
 
       // matrix-vector multiplication
-         state->repnmv = state->repnmv + 1;
+         state->repnmv++;
          linlsqr_clearrfields(state);
          state->needmtv = true;
          state->PQ = 1; goto Pause; Resume1:
@@ -5183,17 +5183,17 @@ Spawn:
       }
       state->x.ptr.p_double[i] = state->ui.ptr.p_double[i];
    }
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    linlsqr_clearrfields(state);
    state->needmtv = true;
    state->PQ = 3; goto Pause; Resume3:
    state->needmtv = false;
    for (i = 0; i < state->n; i++) {
-      state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->ui.ptr.p_double[state->m + i];
+      state->mtv.ptr.p_double[i] += state->lambdai * state->ui.ptr.p_double[state->m + i];
    }
    state->alphai = 0.0;
    for (i = 0; i < state->n; i++) {
-      state->alphai = state->alphai + state->mtv.ptr.p_double[i] * state->mtv.ptr.p_double[i];
+      state->alphai += state->mtv.ptr.p_double[i] * state->mtv.ptr.p_double[i];
    }
    state->alphai = sqrt(state->alphai);
    if (state->alphai == 0.0) {
@@ -5217,7 +5217,7 @@ Spawn:
 // Steps I=1, 2, ...
    while (true) {
    // At I-th step State.RepIterationsCount=I.
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repiterationscount++;
 
    // Bidiagonalization part:
    //     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
@@ -5231,7 +5231,7 @@ Spawn:
    //        and, although no division by zero will happen, orthogonality
    //        in U and V will be lost.
       ae_v_move(state->x.ptr.p_double, 1, state->vi.ptr.p_double, 1, state->n);
-      state->repnmv = state->repnmv + 1;
+      state->repnmv++;
       linlsqr_clearrfields(state);
       state->needmv = true;
       state->PQ = 4; goto Pause; Resume4:
@@ -5242,32 +5242,32 @@ Spawn:
       state->betaip1 = 0.0;
       for (i = 0; i < summn; i++) {
          state->uip1.ptr.p_double[i] = state->mv.ptr.p_double[i] - state->alphai * state->ui.ptr.p_double[i];
-         state->betaip1 = state->betaip1 + state->uip1.ptr.p_double[i] * state->uip1.ptr.p_double[i];
+         state->betaip1 += state->uip1.ptr.p_double[i] * state->uip1.ptr.p_double[i];
       }
       if (state->betaip1 != 0.0) {
          state->betaip1 = sqrt(state->betaip1);
          for (i = 0; i < summn; i++) {
-            state->uip1.ptr.p_double[i] = state->uip1.ptr.p_double[i] / state->betaip1;
+            state->uip1.ptr.p_double[i] /= state->betaip1;
          }
       }
       ae_v_move(state->x.ptr.p_double, 1, state->uip1.ptr.p_double, 1, state->m);
-      state->repnmv = state->repnmv + 1;
+      state->repnmv++;
       linlsqr_clearrfields(state);
       state->needmtv = true;
       state->PQ = 5; goto Pause; Resume5:
       state->needmtv = false;
       for (i = 0; i < state->n; i++) {
-         state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->uip1.ptr.p_double[state->m + i];
+         state->mtv.ptr.p_double[i] += state->lambdai * state->uip1.ptr.p_double[state->m + i];
       }
       state->alphaip1 = 0.0;
       for (i = 0; i < state->n; i++) {
          state->vip1.ptr.p_double[i] = state->mtv.ptr.p_double[i] - state->betaip1 * state->vi.ptr.p_double[i];
-         state->alphaip1 = state->alphaip1 + state->vip1.ptr.p_double[i] * state->vip1.ptr.p_double[i];
+         state->alphaip1 += state->vip1.ptr.p_double[i] * state->vip1.ptr.p_double[i];
       }
       if (state->alphaip1 != 0.0) {
          state->alphaip1 = sqrt(state->alphaip1);
          for (i = 0; i < state->n; i++) {
-            state->vip1.ptr.p_double[i] = state->vip1.ptr.p_double[i] / state->alphaip1;
+            state->vip1.ptr.p_double[i] /= state->alphaip1;
          }
       }
    // Build next orthogonal transformation
@@ -5292,7 +5292,7 @@ Spawn:
    // Update d and DNorm, check condition-related stopping criteria
       for (i = 0; i < state->n; i++) {
          state->d.ptr.p_double[i] = 1 / state->rhoi * (state->vi.ptr.p_double[i] - state->theta * state->d.ptr.p_double[i]);
-         state->dnorm = state->dnorm + state->d.ptr.p_double[i] * state->d.ptr.p_double[i];
+         state->dnorm += state->d.ptr.p_double[i] * state->d.ptr.p_double[i];
       }
       if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
          state->running = false;
@@ -5301,7 +5301,7 @@ Spawn:
       }
    // Update x, output report
       for (i = 0; i < state->n; i++) {
-         state->rx.ptr.p_double[i] = state->rx.ptr.p_double[i] + state->phii / state->rhoi * state->omegai.ptr.p_double[i];
+         state->rx.ptr.p_double[i] += state->phii / state->rhoi * state->omegai.ptr.p_double[i];
       }
       if (state->xrep) {
          ae_v_move(state->x.ptr.p_double, 1, state->rx.ptr.p_double, 1, state->n);
@@ -5417,7 +5417,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector b) {
       t0 = 0;
       t1 = 0;
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
-         state->tmpd.ptr.p_double[j] = state->tmpd.ptr.p_double[j] + ae_sqr(v);
+         state->tmpd.ptr.p_double[j] += ae_sqr(v);
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.ptr.p_double[i] > 0.0) {
@@ -5452,12 +5452,12 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector b) {
       if (state->needmtv) {
          sparsemtv(a, &state->x, &state->mtv);
          for (i = 0; i < n; i++) {
-            state->mtv.ptr.p_double[i] = state->tmpd.ptr.p_double[i] * state->mtv.ptr.p_double[i];
+            state->mtv.ptr.p_double[i] *= state->tmpd.ptr.p_double[i];
          }
       }
    }
    for (i = 0; i < n; i++) {
-      state->rx.ptr.p_double[i] = state->tmpd.ptr.p_double[i] * state->rx.ptr.p_double[i];
+      state->rx.ptr.p_double[i] *= state->tmpd.ptr.p_double[i];
    }
 }
 
@@ -6056,7 +6056,7 @@ void polynomialsolve(RVector a, ae_int_t n, CVector x, polynomialsolverreport *r
 //   (here NE=N-NZ)
    nz = 0;
    while (nz < n && a->ptr.p_double[nz] == 0.0) {
-      nz = nz + 1;
+      nz++;
    }
    ne = n - nz;
    for (i = nz; i <= n; i++) {
@@ -6375,7 +6375,7 @@ Spawn:
    state->needf = true;
    state->PQ = 0; goto Pause; Resume0:
    state->needf = false;
-   state->repnfunc = state->repnfunc + 1;
+   state->repnfunc++;
    ae_v_move(state->xbase.ptr.p_double, 1, state->x.ptr.p_double, 1, n);
    state->fbase = state->f;
    state->fprev = ae_maxrealnumber;
@@ -6405,8 +6405,8 @@ Spawn:
       ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
       state->PQ = 2; goto Pause; Resume2:
       state->needfij = false;
-      state->repnfunc = state->repnfunc + 1;
-      state->repnjac = state->repnjac + 1;
+      state->repnfunc++;
+      state->repnjac++;
       rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
       ae_v_muld(state->rightpart.ptr.p_double, 1, n, -1);
 
@@ -6462,7 +6462,7 @@ Spawn:
          state->needf = true;
          state->PQ = 3; goto Pause; Resume3:
          state->needf = false;
-         state->repnfunc = state->repnfunc + 1;
+         state->repnfunc++;
          if (state->f < state->fbase) {
 
          // function value decreased, move on
@@ -6484,7 +6484,7 @@ Spawn:
    // * new function value
       state->fbase = state->f;
       ae_v_addd(state->xbase.ptr.p_double, 1, state->candstep.ptr.p_double, 1, n, stepnorm);
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repiterationscount++;
 
    // Report new iteration
       if (state->xrep) {
@@ -6618,8 +6618,8 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
    if (lnnu + log(2.0) > lnmax) {
       return result;
    }
-   *lambdav = *lambdav * lambdaup * (*nu);
-   *nu = *nu * 2;
+   *lambdav *= lambdaup * (*nu);
+   *nu *= 2;
    result = true;
    return result;
 }
@@ -6631,7 +6631,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown) 
    if (log(*lambdav) + log(lambdadown) < log(ae_minrealnumber)) {
       *lambdav = ae_minrealnumber;
    } else {
-      *lambdav = *lambdav * lambdadown;
+      *lambdav *= lambdadown;
    }
 }
 
@@ -7635,7 +7635,7 @@ Spawn:
 // Start 0-th iteration
    ae_v_move(state->rx.ptr.p_double, 1, state->startx.ptr.p_double, 1, state->n);
    ae_v_move(state->x.ptr.p_double, 1, state->rx.ptr.p_double, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state);
    state->needvmv = true;
    state->PQ = 0; goto Pause; Resume0:
@@ -7645,9 +7645,9 @@ Spawn:
    state->meritfunction = 0.0;
    for (i = 0; i < state->n; i++) {
       state->r.ptr.p_double[i] = state->b.ptr.p_double[i] - state->mv.ptr.p_double[i];
-      state->r2 = state->r2 + state->r.ptr.p_double[i] * state->r.ptr.p_double[i];
-      state->meritfunction = state->meritfunction + state->mv.ptr.p_double[i] * state->rx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->rx.ptr.p_double[i];
-      bnorm = bnorm + state->b.ptr.p_double[i] * state->b.ptr.p_double[i];
+      state->r2 += state->r.ptr.p_double[i] * state->r.ptr.p_double[i];
+      state->meritfunction += state->mv.ptr.p_double[i] * state->rx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->rx.ptr.p_double[i];
+      bnorm += state->b.ptr.p_double[i] * state->b.ptr.p_double[i];
    }
    bnorm = sqrt(bnorm);
 
@@ -7672,7 +7672,7 @@ Spawn:
    }
 // Calculate Z and P
    ae_v_move(state->x.ptr.p_double, 1, state->r.ptr.p_double, 1, state->n);
-   state->repnmv = state->repnmv + 1;
+   state->repnmv++;
    lincg_clearrfields(state);
    state->needprec = true;
    state->PQ = 2; goto Pause; Resume2:
@@ -7685,11 +7685,11 @@ Spawn:
 // Other iterations(1..N)
    state->repiterationscount = 0;
    while (true) {
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repiterationscount++;
 
    // Calculate Alpha
       ae_v_move(state->x.ptr.p_double, 1, state->p.ptr.p_double, 1, state->n);
-      state->repnmv = state->repnmv + 1;
+      state->repnmv++;
       lincg_clearrfields(state);
       state->needvmv = true;
       state->PQ = 3; goto Pause; Resume3:
@@ -7708,9 +7708,9 @@ Spawn:
       }
       state->alpha = 0.0;
       for (i = 0; i < state->n; i++) {
-         state->alpha = state->alpha + state->r.ptr.p_double[i] * state->z.ptr.p_double[i];
+         state->alpha += state->r.ptr.p_double[i] * state->z.ptr.p_double[i];
       }
-      state->alpha = state->alpha / state->vmv;
+      state->alpha /= state->vmv;
       if (!isfinite(state->alpha)) {
 
       // Overflow when calculating Alpha
@@ -7736,7 +7736,7 @@ Spawn:
       } else {
       // Calculate R using matrix-vector multiplication
          ae_v_move(state->x.ptr.p_double, 1, state->cx.ptr.p_double, 1, state->n);
-         state->repnmv = state->repnmv + 1;
+         state->repnmv++;
          lincg_clearrfields(state);
          state->needmv = true;
          state->PQ = 4; goto Pause; Resume4:
@@ -7750,7 +7750,7 @@ Spawn:
       // Check emergency stopping criterion
          v = 0.0;
          for (i = 0; i < state->n; i++) {
-            v = v + state->mv.ptr.p_double[i] * state->cx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->cx.ptr.p_double[i];
+            v += state->mv.ptr.p_double[i] * state->cx.ptr.p_double[i] - 2 * state->b.ptr.p_double[i] * state->cx.ptr.p_double[i];
          }
          if (v >= state->meritfunction) {
             for (i = 0; i < state->n; i++) {
@@ -7782,7 +7782,7 @@ Spawn:
    // NOTE: monotonic decrease of R2 is not guaranteed by algorithm.
       state->r2 = 0.0;
       for (i = 0; i < state->n; i++) {
-         state->r2 = state->r2 + state->cr.ptr.p_double[i] * state->cr.ptr.p_double[i];
+         state->r2 += state->cr.ptr.p_double[i] * state->cr.ptr.p_double[i];
       }
 
    // output report
@@ -7822,7 +7822,7 @@ Spawn:
       ae_v_move(state->x.ptr.p_double, 1, state->cr.ptr.p_double, 1, state->n);
 
    // prepere of parameters for next iteration
-      state->repnmv = state->repnmv + 1;
+      state->repnmv++;
       lincg_clearrfields(state);
       state->needprec = true;
       state->PQ = 7; goto Pause; Resume7:
@@ -7832,8 +7832,8 @@ Spawn:
          state->beta = 0.0;
          uvar = 0.0;
          for (i = 0; i < state->n; i++) {
-            state->beta = state->beta + state->cz.ptr.p_double[i] * state->cr.ptr.p_double[i];
-            uvar = uvar + state->z.ptr.p_double[i] * state->r.ptr.p_double[i];
+            state->beta += state->cz.ptr.p_double[i] * state->cr.ptr.p_double[i];
+            uvar += state->z.ptr.p_double[i] * state->r.ptr.p_double[i];
          }
 
       // check that UVar is't INF or is't zero
@@ -7843,7 +7843,7 @@ Spawn:
             goto Exit;
          }
       // calculate .BETA
-         state->beta = state->beta / uvar;
+         state->beta /= uvar;
 
       // check that .BETA neither INF nor NaN
          if (!isfinite(state->beta)) {

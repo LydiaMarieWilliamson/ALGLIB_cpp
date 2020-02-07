@@ -58,7 +58,7 @@ double gammafunction(double x) {
          }
          z = q - p;
          if (z > 0.5) {
-            p = p + 1;
+            p++;
             z = q - p;
          }
          z = q * sin(ae_pi * z);
@@ -72,30 +72,30 @@ double gammafunction(double x) {
    }
    z = 1.0;
    while (x >= 3.0) {
-      x = x - 1;
-      z = z * x;
+      x--;
+      z *= x;
    }
    while (x < 0.0) {
       if (x > -0.000000001) {
          result = z / ((1 + 0.5772156649015329 * x) * x);
          return result;
       }
-      z = z / x;
-      x = x + 1;
+      z /= x;
+      x++;
    }
    while (x < 2.0) {
       if (x < 0.000000001) {
          result = z / ((1 + 0.5772156649015329 * x) * x);
          return result;
       }
-      z = z / x;
-      x = x + 1.0;
+      z /= x;
+      x++;
    }
    if (x == 2.0) {
       result = z;
       return result;
    }
-   x = x - 2.0;
+   x -= 2.0;
    pp = 1.60119522476751861407E-4;
    pp = 1.19135147006586384913E-3 + x * pp;
    pp = 1.04213797561761569935E-2 + x * pp;
@@ -181,7 +181,7 @@ double lngamma(double x, double *sgngam) {
       }
       z = q - p;
       if (z > 0.5) {
-         p = p + 1;
+         p++;
          z = p - q;
       }
       z = q * sin(ae_pi * z);
@@ -193,13 +193,13 @@ double lngamma(double x, double *sgngam) {
       p = 0.0;
       u = x;
       while (u >= 3.0) {
-         p = p - 1;
+         p--;
          u = x + p;
-         z = z * u;
+         z *= u;
       }
       while (u < 2.0) {
-         z = z / u;
-         p = p + 1;
+         z /= u;
+         p++;
          u = x + p;
       }
       if (z < 0.0) {
@@ -212,8 +212,8 @@ double lngamma(double x, double *sgngam) {
          result = log(z);
          return result;
       }
-      p = p - 2;
-      x = x + p;
+      p -= 2;
+      x += p;
       b = -1378.25152569120859100;
       b = -38801.6315134637840924 + x * b;
       b = -331612.992738871184744 + x * b;
@@ -238,14 +238,14 @@ double lngamma(double x, double *sgngam) {
    }
    p = 1 / (x * x);
    if (x >= 1000.0) {
-      q = q + ((7.9365079365079365079365 * 0.0001 * p - 2.7777777777777777777778 * 0.001) * p + 0.0833333333333333333333) / x;
+      q += ((7.9365079365079365079365 * 0.0001 * p - 2.7777777777777777777778 * 0.001) * p + 0.0833333333333333333333) / x;
    } else {
       a = 8.11614167470508450300 * 0.0001;
       a = -5.95061904284301438324 * 0.0001 + p * a;
       a = 7.93650340457716943945 * 0.0001 + p * a;
       a = -2.77777777730099687205 * 0.001 + p * a;
       a = 8.33333333333331927722 * 0.01 + p * a;
-      q = q + a / x;
+      q += a / x;
    }
    result = q;
    return result;
@@ -614,7 +614,7 @@ double invnormalcdf(double y0) {
       code = 0;
    }
    if (y > expm2) {
-      y = y - 0.5;
+      y -= 0.5;
       y2 = y * y;
       p0 = -59.9633501014107895267;
       p0 = 98.0010754185999661536 + y2 * p0;
@@ -631,7 +631,7 @@ double invnormalcdf(double y0) {
       q0 = 15.9056225126211695515 + y2 * q0;
       q0 = -1.18331621121330003142 + y2 * q0;
       x = y + y * y2 * p0 / q0;
-      x = x * s2pi;
+      x *= s2pi;
       result = x;
       return result;
    }
@@ -775,18 +775,18 @@ double bivariatenormalcdf(double x, double y, double rho) {
       rangea = 0.0;
       rangeb = asin(rho);
       v = 0.0;
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, -0.1252334085114689);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, 0.1252334085114689);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, -0.3678314989981802);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, 0.3678314989981802);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, -0.5873179542866175);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, 0.5873179542866175);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, -0.7699026741943047);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, 0.7699026741943047);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, -0.9041172563704749);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192);
-      v = v + normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, -0.1252334085114689);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2491470458134028, 0.1252334085114689);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, -0.3678314989981802);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2334925365383548, 0.3678314989981802);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, -0.5873179542866175);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.2031674267230659, 0.5873179542866175);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, -0.7699026741943047);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1600783285433462, 0.7699026741943047);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, -0.9041172563704749);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192);
+      v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192);
       v = v * 0.5 * (rangeb - rangea) / (2 * ae_pi);
       result = normalcdf(x) * normalcdf(y) + v;
    } else {
@@ -813,26 +813,26 @@ double bivariatenormalcdf(double x, double y, double rho) {
 
    // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
       v1 = 0.0;
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, 0.0765265211334973);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, -0.2277858511416451);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, 0.2277858511416451);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, -0.3737060887154195);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, 0.3737060887154195);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, -0.5108670019508271);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, 0.5108670019508271);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, -0.6360536807265150);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, 0.6360536807265150);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, -0.7463319064601508);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, 0.7463319064601508);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, -0.8391169718222188);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, 0.8391169718222188);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, -0.9122344282513259);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, 0.9122344282513259);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, -0.9639719272779138);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949);
-      v1 = v1 + normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, 0.0765265211334973);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, -0.2277858511416451);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1491729864726037, 0.2277858511416451);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, -0.3737060887154195);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1420961093183820, 0.3737060887154195);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, -0.5108670019508271);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1316886384491766, 0.5108670019508271);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, -0.6360536807265150);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1181945319615184, 0.6360536807265150);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, -0.7463319064601508);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1019301198172404, 0.7463319064601508);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, -0.8391169718222188);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0832767415767048, 0.8391169718222188);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, -0.9122344282513259);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0626720483341091, 0.9122344282513259);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, -0.9639719272779138);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949);
+      v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949);
       v1 = v1 * 0.5 * (rangeb - rangea) / (2 * ae_pi);
       result = fxys - s * (v0 + v1);
    }
@@ -1187,9 +1187,9 @@ double incompletegamma(double a, double x) {
    c = 1.0;
    ans = 1.0;
    do {
-      r = r + 1;
+      r++;
       c = c * x / r;
-      ans = ans + c;
+      ans += c;
    }
    while (c / ans > igammaepsilon);
    result = ans * ax / a;
@@ -1274,9 +1274,9 @@ double incompletegammac(double a, double x) {
    qkm1 = z * x;
    ans = pkm1 / qkm1;
    do {
-      c = c + 1;
-      y = y + 1;
-      z = z + 2;
+      c++;
+      y++;
+      z += 2;
       yc = y * c;
       pk = pkm1 * z - pkm2 * yc;
       qk = qkm1 * z - qkm2 * yc;
@@ -1292,10 +1292,10 @@ double incompletegammac(double a, double x) {
       qkm2 = qkm1;
       qkm1 = qk;
       if (fabs(pk) > igammabignumber) {
-         pkm2 = pkm2 * igammabignumberinv;
-         pkm1 = pkm1 * igammabignumberinv;
-         qkm2 = qkm2 * igammabignumberinv;
-         qkm1 = qkm1 * igammabignumberinv;
+         pkm2 *= igammabignumberinv;
+         pkm1 *= igammabignumberinv;
+         qkm2 *= igammabignumberinv;
+         qkm1 *= igammabignumberinv;
       }
    }
    while (t > igammaepsilon);
@@ -1394,22 +1394,22 @@ double invincompletegammac(double a, double y0) {
          result = x;
          return result;
       }
-      x = x - d;
-      i = i + 1;
+      x -= d;
+      i++;
    }
    if (x0 == iinvgammabignumber) {
       if (x <= 0.0) {
          x = 1.0;
       }
       while (x0 == iinvgammabignumber) {
-         x = (1 + d) * x;
+         x *= (1 + d);
          y = incompletegammac(a, x);
          if (y < y0) {
             x0 = x;
             yl = y;
             break;
          }
-         d = d + d;
+         d += d;
       }
    }
    d = 0.5;
@@ -1442,7 +1442,7 @@ double invincompletegammac(double a, double y0) {
                d = (y0 - yl) / (yh - yl);
             }
          }
-         dir = dir + 1;
+         dir++;
       } else {
          x0 = x;
          yl = y;
@@ -1451,14 +1451,14 @@ double invincompletegammac(double a, double y0) {
             d = 0.5;
          } else {
             if (dir < -1) {
-               d = 0.5 * d;
+               d *= 0.5;
             } else {
                d = (y0 - yl) / (yh - yl);
             }
          }
-         dir = dir - 1;
+         dir--;
       }
-      i = i + 1;
+      i++;
    }
    result = x;
    return result;
@@ -1748,11 +1748,11 @@ double incompleteellipticintegralk(double phi, double m) {
    }
    npio2 = FloorZ(phi / pio2);
    if (npio2 % 2 != 0) {
-      npio2 = npio2 + 1;
+      npio2++;
    }
    if (npio2 != 0) {
       k = ellipticintegralk(1 - a);
-      phi = phi - npio2 * pio2;
+      phi -= npio2 * pio2;
    } else {
       k = 0.0;
    }
@@ -1785,14 +1785,14 @@ double incompleteellipticintegralk(double phi, double m) {
    md = 0;
    while (fabs(c / a) > ae_machineepsilon) {
       temp = b / a;
-      phi = phi + atan(t * temp) + md * ae_pi;
+      phi += atan(t * temp) + md * ae_pi;
       md = TruncZ((phi + pio2) / ae_pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
       a = 0.5 * (a + b);
       b = temp;
-      d = d + d;
+      d += d;
    }
    temp = (atan(t) + md * ae_pi) / (d * a);
    if (s < 0) {
@@ -1915,9 +1915,9 @@ double incompleteellipticintegrale(double phi, double m) {
    lphi = phi;
    npio2 = FloorZ(lphi / pio2);
    if (npio2 % 2 != 0) {
-      npio2 = npio2 + 1;
+      npio2++;
    }
-   lphi = lphi - npio2 * pio2;
+   lphi -= npio2 * pio2;
    if (lphi < 0.0) {
       lphi = -lphi;
       s = -1;
@@ -1962,19 +1962,19 @@ double incompleteellipticintegrale(double phi, double m) {
    md = 0;
    while (fabs(c / a) > ae_machineepsilon) {
       temp = b / a;
-      lphi = lphi + atan(t * temp) + md * ae_pi;
+      lphi += atan(t * temp) + md * ae_pi;
       md = TruncZ((lphi + pio2) / ae_pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
       a = 0.5 * (a + b);
       b = temp;
-      d = d + d;
-      e = e + c * sin(lphi);
+      d += d;
+      e += c * sin(lphi);
    }
    temp = ebig / ellipticintegralk(m);
-   temp = temp * ((atan(t) + md * ae_pi) / (d * a));
-   temp = temp + e;
+   temp *= (atan(t) + md * ae_pi) / (d * a);
+   temp += e;
    if (s < 0) {
       temp = -temp;
    }
@@ -2732,14 +2732,14 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
       k = 2.0;
       do {
          a = a * z / k;
-         c = c + a / k;
-         k = k + 1.0;
-         a = a / k;
-         s = s + a / k;
-         k = k + 1.0;
+         c += a / k;
+         k++;
+         a /= k;
+         s += a / k;
+         k++;
       }
       while (fabs(a / s) >= ae_machineepsilon);
-      s = s * x;
+      s *= x;
    } else {
       if (x < 18.0) {
          a = (576.0 / x - 52.0) / 10.0;
@@ -3366,9 +3366,9 @@ double besseljn(ae_int_t n, double x) {
    ans = pk;
    xk = x * x;
    do {
-      pk = pk - 2.0;
+      pk -= 2.0;
       ans = pk - xk / ans;
-      k = k - 1;
+      k--;
    }
    while (k != 0);
    ans = x / ans;
@@ -3380,8 +3380,8 @@ double besseljn(ae_int_t n, double x) {
       pkm2 = (pkm1 * r - pk * x) / x;
       pk = pkm1;
       pkm1 = pkm2;
-      r = r - 2.0;
-      k = k - 1;
+      r -= 2.0;
+      k--;
    }
    while (k != 0);
    if (fabs(pk) > fabs(pkm1)) {
@@ -3728,7 +3728,7 @@ double besseli1(double x) {
       bessel_besselm1nextcheb(y, -1.76416518357834055153E-1, &b0, &b1, &b2);
       bessel_besselm1nextcheb(y, 2.52587186443633654823E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
-      z = v * z * exp(z);
+      z *= v * exp(z);
    } else {
       y = 32.0 / z - 2.0;
       bessel_besselm1firstcheb(7.51729631084210481353E-18, &b0, &b1, &b2);
@@ -3808,7 +3808,7 @@ double besselk0(double x) {
       bessel_besselmnextcheb(y, 3.44289899924628486886E-1, &b0, &b1, &b2);
       bessel_besselmnextcheb(y, -5.35327393233902768720E-1, &b0, &b1, &b2);
       v = 0.5 * (b0 - b2);
-      v = v - log(0.5 * x) * besseli0(x);
+      v -= log(0.5 * x) * besseli0(x);
    } else {
       z = 8.0 / x - 2.0;
       bessel_besselmfirstcheb(5.30043377268626276149E-18, &b0, &b1, &b2);
@@ -3980,9 +3980,9 @@ double besselkn(ae_int_t nn, double x) {
          pn = -eul;
          k = 1.0;
          for (i = 1; i < n; i++) {
-            pn = pn + 1.0 / k;
-            k = k + 1.0;
-            fn = fn * k;
+            pn += 1.0 / k;
+            k++;
+            fn *= k;
          }
          zmn = tox;
          if (n == 1) {
@@ -3994,16 +3994,16 @@ double besselkn(ae_int_t nn, double x) {
             z = -z0;
             zn = 1.0;
             for (i = 1; i < n; i++) {
-               nk1f = nk1f / (n - i);
-               kf = kf * i;
-               zn = zn * z;
+               nk1f /= n - i;
+               kf *= i;
+               zn *= z;
                t = nk1f * zn / kf;
-               s = s + t;
+               s += t;
                ae_assert(ae_maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN");
                ae_assert(!(tox > 1.0 && ae_maxrealnumber / tox < zmn), "Overflow in BesselKN");
-               zmn = zmn * tox;
+               zmn *= tox;
             }
-            s = s * 0.5;
+            s *= 0.5;
             t = fabs(s);
             ae_assert(!(zmn > 1.0 && ae_maxrealnumber / zmn < t), "Overflow in BesselKN");
             ae_assert(!(t > 1.0 && ae_maxrealnumber / t < zmn), "Overflow in BesselKN");
@@ -4016,24 +4016,24 @@ double besselkn(ae_int_t nn, double x) {
          pn = pk;
          t = 1.0;
       } else {
-         pn = pn + 1.0 / n;
+         pn += 1.0 / n;
          t = 1.0 / fn;
       }
       s = (pk + pn - tlg) * t;
       k = 1.0;
       do {
-         t = t * (z0 / (k * (k + n)));
-         pk = pk + 1.0 / k;
-         pn = pn + 1.0 / (k + n);
-         s = s + (pk + pn - tlg) * t;
-         k = k + 1.0;
+         t *= z0 / (k * (k + n));
+         pk += 1.0 / k;
+         pn += 1.0 / (k + n);
+         s += (pk + pn - tlg) * t;
+         k++;
       }
       while (fabs(t / s) > ae_machineepsilon);
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
          s = -s;
       }
-      ans = ans + s;
+      ans += s;
       result = ans;
       return result;
    }
@@ -4058,10 +4058,10 @@ double besselkn(ae_int_t nn, double x) {
          break;
       }
       nkf = nk1f;
-      s = s + t;
-      fn = fn + 1.0;
-      pk = pk + 2.0;
-      i = i + 1;
+      s += t;
+      fn++;
+      pk += 2.0;
+      i++;
    }
    while (fabs(t / s) > ae_machineepsilon);
    result = exp(-x) * sqrt(ae_pi / (2.0 * x)) * s;
@@ -4627,10 +4627,10 @@ double incompletebeta(double a, double b, double x) {
    t = b * log(xc);
    if ((a + b < maxgam && fabs(y) < maxlog) && fabs(t) < maxlog) {
       t = pow(xc, b);
-      t = t * pow(x, a);
-      t = t / a;
-      t = t * w;
-      t = t * (gammafunction(a + b) / (gammafunction(a) * gammafunction(b)));
+      t *= pow(x, a);
+      t /= a;
+      t *= w;
+      t *= gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       if (flag == 1) {
          if (t <= ae_machineepsilon) {
             result = 1.0 - ae_machineepsilon;
@@ -4642,8 +4642,8 @@ double incompletebeta(double a, double b, double x) {
       }
       return result;
    }
-   y = y + t + lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg);
-   y = y + log(w / a);
+   y += t + lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg);
+   y += log(w / a);
    if (y < minlog) {
       t = 0.0;
    } else {
@@ -4789,7 +4789,7 @@ double invincompletebeta(double a, double b, double y) {
          lgm = (yp * yp - 3.0) / 6.0;
          x = 2.0 / (1.0 / (2.0 * aaa - 1.0) + 1.0 / (2.0 * bbb - 1.0));
          d = yp * sqrt(x + lgm) / x - (1.0 / (2.0 * bbb - 1.0) - 1.0 / (2.0 * aaa - 1.0)) * (lgm + 5.0 / 6.0 - 2.0 / (3.0 * x));
-         d = 2.0 * d;
+         d *= 2.0;
          if (d < log(ae_minrealnumber)) {
             x = 0.0;
             break;
@@ -4856,7 +4856,7 @@ double invincompletebeta(double a, double b, double y) {
                      }
                   }
                }
-               dir = dir + 1;
+               dir++;
                if (x0 > 0.75) {
                   if (rflg == 1) {
                      rflg = 0;
@@ -4890,18 +4890,18 @@ double invincompletebeta(double a, double b, double y) {
                   di = 0.5;
                } else {
                   if (dir < -3) {
-                     di = di * di;
+                     di *= di;
                   } else {
                      if (dir < -1) {
-                        di = 0.5 * di;
+                        di *= 0.5;
                      } else {
                         di = (yyy - y0) / (yh - yl);
                      }
                   }
                }
-               dir = dir - 1;
+               dir--;
             }
-            i = i + 1;
+            i++;
             mainlooppos = ihalvecycle;
             continue;
          } else {
@@ -4991,7 +4991,7 @@ double invincompletebeta(double a, double b, double y) {
             if (fabs(d / x) < 128.0 * ae_machineepsilon) {
                break;
             }
-            i = i + 1;
+            i++;
             mainlooppos = newtcycle;
             continue;
          } else {
@@ -5089,27 +5089,27 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
       if (t < thresh) {
          break;
       }
-      k1 = k1 + 1.0;
-      k2 = k2 + 1.0;
-      k3 = k3 + 2.0;
-      k4 = k4 + 2.0;
-      k5 = k5 + 1.0;
-      k6 = k6 - 1.0;
-      k7 = k7 + 2.0;
-      k8 = k8 + 2.0;
+      k1++;
+      k2++;
+      k3 += 2.0;
+      k4 += 2.0;
+      k5++;
+      k6--;
+      k7 += 2.0;
+      k8 += 2.0;
       if (fabs(qk) + fabs(pk) > big) {
-         pkm2 = pkm2 * biginv;
-         pkm1 = pkm1 * biginv;
-         qkm2 = qkm2 * biginv;
-         qkm1 = qkm1 * biginv;
+         pkm2 *= biginv;
+         pkm1 *= biginv;
+         qkm2 *= biginv;
+         qkm1 *= biginv;
       }
       if (fabs(qk) < biginv || fabs(pk) < biginv) {
-         pkm2 = pkm2 * big;
-         pkm1 = pkm1 * big;
-         qkm2 = qkm2 * big;
-         qkm1 = qkm1 * big;
+         pkm2 *= big;
+         pkm1 *= big;
+         qkm2 *= big;
+         qkm1 *= big;
       }
-      n = n + 1;
+      n++;
    }
    while (n != 300);
    result = ans;
@@ -5189,27 +5189,27 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
       if (t < thresh) {
          break;
       }
-      k1 = k1 + 1.0;
-      k2 = k2 - 1.0;
-      k3 = k3 + 2.0;
-      k4 = k4 + 2.0;
-      k5 = k5 + 1.0;
-      k6 = k6 + 1.0;
-      k7 = k7 + 2.0;
-      k8 = k8 + 2.0;
+      k1++;
+      k2--;
+      k3 += 2.0;
+      k4 += 2.0;
+      k5++;
+      k6++;
+      k7 += 2.0;
+      k8 += 2.0;
       if (fabs(qk) + fabs(pk) > big) {
-         pkm2 = pkm2 * biginv;
-         pkm1 = pkm1 * biginv;
-         qkm2 = qkm2 * biginv;
-         qkm1 = qkm1 * biginv;
+         pkm2 *= biginv;
+         pkm1 *= biginv;
+         qkm2 *= biginv;
+         qkm1 *= biginv;
       }
       if (fabs(qk) < biginv || fabs(pk) < biginv) {
-         pkm2 = pkm2 * big;
-         pkm1 = pkm1 * big;
-         qkm2 = qkm2 * big;
-         qkm1 = qkm1 * big;
+         pkm2 *= big;
+         pkm1 *= big;
+         qkm2 *= big;
+         qkm1 *= big;
       }
-      n = n + 1;
+      n++;
    }
    while (n != 300);
    result = ans;
@@ -5243,17 +5243,17 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    z = ae_machineepsilon * ai;
    while (fabs(v) > z) {
       u = (n - b) * x / n;
-      t = t * u;
+      t *= u;
       v = t / (a + n);
-      s = s + v;
-      n = n + 1.0;
+      s += v;
+      n++;
    }
-   s = s + t1;
-   s = s + ai;
+   s += t1;
+   s += ai;
    u = a * log(x);
    if (a + b < maxgam && fabs(u) < log(ae_maxrealnumber)) {
       t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
-      s = s * t * pow(x, a);
+      s *= t * pow(x, a);
    } else {
       t = lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg) + u + log(s);
       if (t < log(ae_minrealnumber)) {
@@ -5389,7 +5389,7 @@ double fdistribution(ae_int_t a, ae_int_t b, double x) {
 
    ae_assert((a >= 1 && b >= 1) && x >= 0.0, "Domain error in FDistribution");
    w = a * x;
-   w = w / (b + w);
+   w /= b + w;
    result = incompletebeta(0.5 * a, 0.5 * b, w);
    return result;
 }
@@ -5776,8 +5776,8 @@ void fresnelintegral(double x, double *c, double *s) {
    t = mpi * x;
    *c = 0.5 + (f * ss - g * cc) / t;
    *s = 0.5 - (f * cc + g * ss) / t;
-   *c = *c * ae_sign(xxa);
-   *s = *s * ae_sign(xxa);
+   *c *= ae_sign(xxa);
+   *s *= ae_sign(xxa);
 }
 } // end of namespace alglib_impl
 
@@ -5909,7 +5909,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       twon = b * sinh(u);
       *sn = t + ai * (twon - u) / (b * b);
       *ph = 2.0 * atan(exp(u)) - 1.57079632679489661923 + ai * (twon - u) / b;
-      ai = ai * t * phi;
+      ai *= t * phi;
       *cn = phi - ai * (twon - u);
       *dn = phi + ai * (twon + u);
       ae_frame_leave();
@@ -5926,19 +5926,19 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
          break;
       }
       ai = a.ptr.p_double[i];
-      i = i + 1;
+      i++;
       c.ptr.p_double[i] = 0.5 * (ai - b);
       t = sqrt(ai * b);
       a.ptr.p_double[i] = 0.5 * (ai + b);
       b = t;
-      twon = twon * 2.0;
+      twon *= 2.0;
    }
    phi = twon * a.ptr.p_double[i] * u;
    do {
       t = c.ptr.p_double[i] * sin(phi) / a.ptr.p_double[i];
       b = phi;
       phi = (asin(t) + phi) / 2.0;
-      i = i - 1;
+      i--;
    }
    while (i != 0);
    *sn = sin(phi);
@@ -6064,7 +6064,7 @@ double psi(double x) {
       nz = q - p;
       if (nz != 0.5) {
          if (nz > 0.5) {
-            p = p + 1.0;
+            p++;
             nz = q - p;
          }
          nz = ae_pi / tan(ae_pi * nz);
@@ -6078,15 +6078,15 @@ double psi(double x) {
       n = FloorZ(x);
       for (i = 1; i < n; i++) {
          w = (double)i;
-         y = y + 1.0 / w;
+         y += 1.0 / w;
       }
-      y = y - 0.57721566490153286061;
+      y -= 0.57721566490153286061;
    } else {
       s = x;
       w = 0.0;
       while (s < 10.0) {
-         w = w + 1.0 / s;
-         s = s + 1.0;
+         w += 1.0 / s;
+         s++;
       }
       if (s < 1.0E17) {
          z = 1.0 / (s * s);
@@ -6104,7 +6104,7 @@ double psi(double x) {
       y = log(s) - 0.5 / s - y - w;
    }
    if (negative != 0) {
-      y = y - nz;
+      y -= nz;
    }
    result = y;
    return result;
@@ -6426,7 +6426,7 @@ double exponentialintegralen(double x, ae_int_t n) {
    if (x <= 1.0) {
       psi = -eul - log(x);
       for (i = 1; i < n; i++) {
-         psi = psi + 1.0 / (double)i;
+         psi += 1.0 / (double)i;
       }
       z = -x;
       xk = 0.0;
@@ -6438,11 +6438,11 @@ double exponentialintegralen(double x, ae_int_t n) {
          result = 1.0 / pk;
       }
       do {
-         xk = xk + 1;
+         xk++;
          yk = yk * z / xk;
-         pk = pk + 1;
+         pk++;
          if (pk != 0.0) {
-            result = result + yk / pk;
+            result += yk / pk;
          }
          if (result != 0.0) {
             t = fabs(yk / result);
@@ -6465,7 +6465,7 @@ double exponentialintegralen(double x, ae_int_t n) {
       qkm1 = x + n;
       result = pkm1 / qkm1;
       do {
-         k = k + 1;
+         k++;
          if (k % 2 == 1) {
             yk = 1.0;
             xk = n + (double)(k - 1) / 2.0;
@@ -6487,14 +6487,14 @@ double exponentialintegralen(double x, ae_int_t n) {
          qkm2 = qkm1;
          qkm1 = qk;
          if (fabs(pk) > big) {
-            pkm2 = pkm2 / big;
-            pkm1 = pkm1 / big;
-            qkm2 = qkm2 / big;
-            qkm1 = qkm1 / big;
+            pkm2 /= big;
+            pkm1 /= big;
+            qkm2 /= big;
+            qkm1 /= big;
          }
       }
       while (t >= ae_machineepsilon);
-      result = result * exp(-x);
+      result *= exp(-x);
    }
    return result;
 }
@@ -6597,7 +6597,7 @@ double laguerrecalculate(ae_int_t n, double x) {
       result = ((2 * i - 1 - x) * b - (i - 1) * a) / i;
       a = b;
       b = result;
-      i = i + 1;
+      i++;
    }
    return result;
 }
@@ -7084,11 +7084,11 @@ double beta(double a, double b) {
    y = a + b;
    if (fabs(y) > 171.624376956302725) {
       y = lngamma(y, &s);
-      sg = sg * s;
+      sg *= s;
       y = lngamma(b, &s) - y;
-      sg = sg * s;
-      y = lngamma(a, &s) + y;
-      sg = sg * s;
+      sg *= s;
+      y += lngamma(a, &s);
+      sg *= s;
       ae_assert(y <= log(ae_maxrealnumber), "Overflow in Beta");
       result = sg * exp(y);
       return result;
@@ -7097,10 +7097,10 @@ double beta(double a, double b) {
    ae_assert(y != 0.0, "Overflow in Beta");
    if (a > b) {
       y = gammafunction(a) / y;
-      y = y * gammafunction(b);
+      y *= gammafunction(b);
    } else {
       y = gammafunction(b) / y;
-      y = y * gammafunction(a);
+      y *= gammafunction(a);
    }
    result = y;
    return result;
@@ -7283,22 +7283,22 @@ void fromchebyshev(RVector a, ae_int_t n, RVector b) {
                b->ptr.p_double[k] = 2 * d;
             }
             if (k > i + 1) {
-               b->ptr.p_double[k] = b->ptr.p_double[k] - b->ptr.p_double[k - 2];
+               b->ptr.p_double[k] -= b->ptr.p_double[k - 2];
             }
          }
          d = e;
-         k = k + 1;
+         k++;
       }
       while (k <= n);
       d = b->ptr.p_double[i];
       e = 0.0;
       k = i;
       while (k <= n) {
-         e = e + b->ptr.p_double[k] * a->ptr.p_double[k];
-         k = k + 2;
+         e += b->ptr.p_double[k] * a->ptr.p_double[k];
+         k += 2;
       }
       b->ptr.p_double[i] = e;
-      i = i + 1;
+      i++;
    }
    while (i <= n);
 }
@@ -7458,11 +7458,11 @@ double studenttdistribution(ae_int_t k, double t) {
          tz = 1.0;
          j = 3;
          while (j < k - 1 && tz / f > ae_machineepsilon) {
-            tz = tz * ((j - 1) / (z * j));
-            f = f + tz;
-            j = j + 2;
+            tz *= (j - 1) / (z * j);
+            f += tz;
+            j += 2;
          }
-         p = p + f * xsqk / z;
+         p += f * xsqk / z;
       }
       p = p * 2.0 / ae_pi;
    } else {
@@ -7470,9 +7470,9 @@ double studenttdistribution(ae_int_t k, double t) {
       tz = 1.0;
       j = 2;
       while (j < k - 1 && tz / f > ae_machineepsilon) {
-         tz = tz * ((j - 1) / (z * j));
-         f = f + tz;
-         j = j + 2;
+         tz *= (j - 1) / (z * j);
+         f += tz;
+         j += 2;
       }
       p = f * x / sqrt(z * rk);
    }
@@ -8165,17 +8165,17 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    k = 1.0;
    z = x * x * x;
    while (t > ae_machineepsilon) {
-      uf = uf * z;
-      k = k + 1.0;
-      uf = uf / k;
-      ug = ug * z;
-      k = k + 1.0;
-      ug = ug / k;
-      uf = uf / k;
-      f = f + uf;
-      k = k + 1.0;
-      ug = ug / k;
-      g = g + ug;
+      uf *= z;
+      k++;
+      uf /= k;
+      ug *= z;
+      k++;
+      ug /= k;
+      uf /= k;
+      f += uf;
+      k++;
+      ug /= k;
+      g += ug;
       t = fabs(uf / f);
    }
    uf = c1 * f;
@@ -8191,20 +8191,20 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    ug = z / 3.0;
    f = uf;
    g = 1.0 + ug;
-   uf = uf / 3.0;
+   uf /= 3.0;
    t = 1.0;
    while (t > ae_machineepsilon) {
-      uf = uf * z;
-      ug = ug / k;
-      k = k + 1.0;
-      ug = ug * z;
-      uf = uf / k;
-      f = f + uf;
-      k = k + 1.0;
-      ug = ug / k;
-      uf = uf / k;
-      g = g + ug;
-      k = k + 1.0;
+      uf *= z;
+      ug /= k;
+      k++;
+      ug *= z;
+      uf /= k;
+      f += uf;
+      k++;
+      ug /= k;
+      uf /= k;
+      g += ug;
+      k++;
       t = fabs(ug / g);
    }
    uf = c1 * f;

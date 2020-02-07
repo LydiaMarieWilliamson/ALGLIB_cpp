@@ -234,7 +234,7 @@ Spawn:
                state->needdy = true;
                state->PQ = 0; goto Pause; Resume0:
                state->needdy = false;
-               state->repnfev = state->repnfev + 1;
+               state->repnfev++;
                v = h * state->xscale;
                ae_v_moved(state->rkk.ptr.pp_double[k], 1, state->dy.ptr.p_double, 1, n, v);
 
@@ -277,7 +277,7 @@ Spawn:
                continue;
             }
          // advance position
-            xc = xc + h;
+            xc += h;
             ae_v_move(state->yc.ptr.p_double, 1, state->yn.ptr.p_double, 1, n);
 
          // update H

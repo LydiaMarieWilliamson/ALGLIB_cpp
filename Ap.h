@@ -1089,7 +1089,7 @@ protected:
 //   Obj is assumed to be uninitialized.
    alglib_impl::ae_vector *This;
 // Inner ae_vector record.
-// Ignored for This != &inner_rec.
+// Ignored for This != &Obj.
    alglib_impl::ae_vector Obj;
 // Whether this wrapper object is frozen proxy (you may read array, may
 // modify its value, but can not deallocate its memory or resize it) or not.

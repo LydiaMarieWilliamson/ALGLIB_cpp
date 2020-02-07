@@ -282,7 +282,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id) {
 // * multithreading, if cores_to_use allows it
 //
 void ae_set_global_threading(ae_uint64_t flg_value) {
-   flg_value = flg_value & _ALGLIB_FLG_THREADING_MASK;
+   flg_value &= _ALGLIB_FLG_THREADING_MASK;
    AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
    _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
 }
@@ -552,7 +552,7 @@ void ae_static_free(void *block) {
    page_idx = (unsigned char *)block - sm_mem;
    AE_CRITICAL_ASSERT(page_idx >= 0);
    AE_CRITICAL_ASSERT((page_idx % sm_page_size) == 0);
-   page_idx = page_idx / sm_page_size;
+   page_idx /= sm_page_size;
    AE_CRITICAL_ASSERT(page_idx < sm_page_cnt);
    page_cnt = sm_page_tbl[page_idx];
    AE_CRITICAL_ASSERT(page_cnt >= 1);
@@ -1701,8 +1701,8 @@ static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) 
             return;
          }
          r = nb - *n1 % nb;
-         *n1 = *n1 + r;
-         *n2 = *n2 - r;
+         *n1 += r;
+         *n2 -= r;
       }
    }
 }
@@ -8375,7 +8375,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
          }
    // advance row start
       rows_count++;
-      row_start = row_start + row_length + 1;
+      row_start += row_length + 1;
    }
    AE_CRITICAL_ASSERT(rows_count >= 1);
    AE_CRITICAL_ASSERT(cols_count >= 1);

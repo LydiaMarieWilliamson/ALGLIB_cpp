@@ -1,0 +1,34 @@
+ALGLIB++, like its predecessor ALGLIB, is a source-code library meant for direct inclusion in application projects.
+
+There are no static libraries or executables to compile.
+A Makefile has been provided to implement the equivalent of "make test" or "make check" for the Linux:x86:GCC configuration.
+If compiling out of the box for this, or other configurations on POSIX, use this first, and experiment with different settings.
+If testing for the first time, it's recommended to run each test separately:
+	make TestI && ./TestI
+	make TestY && ./TestY
+	make TestZ && ./TestZ
+	make TestX && ./TestX
+	make TestC && ./TestC
+Note that TestZ compiles under a different configuration and has, therefore, been set up to compile directly without object files.
+Otherwise
+	make
+or
+	make test
+will run the tests in the order: TestI, TestY, TestZ, TestX, TestC.
+
+Further details on integrating ALGLIB++ into applications may be found in the ALGLIB++ Reference Manual (Manual.htm).
+
+ALGLIB++ is based on ALGLIB and tracks its upgrades which were, themselves, automatically translated from an internal codebase.
+The most recent upgrades are the following:
+∙	ALGLIB 3.16.0 (source code generated 2019-12-19)
+∙	ALGLIB 3.15.0 (source code generated 2019-02-20)
+∙	ALGLIB 3.14.0 (source code generated 2018-06-16)
+∙	ALGLIB 3.13.0 (source code generated 2017-12-29)
+∙	ALGLIB 3.12.0 (source code generated 2017-08-22)
+∙	ALGLIB 3.11.0 (source code generated 2017-05-11)
+∙	ALGLIB 3.10.0 (source code generated 2015-08-19)
+ALGLIB++ is licensed under the same GPL restrictions as the GPL version of ALGLIB, with a special exception made to allow the improvements, repairs or other changes made in ALGLIB++ to be used by the original developers of ALGLIB in both their GPL and commercial versions.
+
+ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
+It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
+The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).

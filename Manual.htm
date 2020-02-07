@@ -1,5 +1,7 @@
 <html>
 <head>
+<title>ALGLIB++ User Reference Manual</title>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
 <style type="text/css">
 h1		{ font-family: Arial, Helvetica, sans-serif; color: #000000; font-size: 36pt; margin-top: 0; margin-bottom: 0; }
 h2		{ font-family: Arial, Helvetica, sans-serif; color: #003300; font-size: 20pt; margin-bottom: 0; }
@@ -612,7 +614,7 @@ using namespace alglib;
    v = now.tv_sec;
    r = v*1000;
    v = now.tv_usec/1000;
-   r = r + v;
+   r += v;
    return 0.001*r;
 }
 
@@ -787,7 +789,6 @@ The object-like classes are declared using the <code>DecClass</code> and defined
 Notes on the implementation of the object classes, which differs from that used in ALGLIB, have been provided in the supplement
 <a href="Notes.htm#supp_Classes">A3. ALGLIB++ Object Classes</a>.
 </p>
-<a name=supp_Classes class=sheader></a><h2>A3. ALGLIB++ Object Classes</h2>
 <p>
 <a name=gs_constants class=sheader></a><h3>5.4. Constants</h3>
 The most important constants (defined in the <code>Ap.h</code> header) from ALGLIB++ namespace are:
@@ -1106,7 +1107,6 @@ ALGLIB++ (<code>Ap.h</code> header) includes following Level 1 BLAS functions:
 <li><code>vadd()</code> and <code>vsub()</code> families, which allows to add or subtract two real/complex vectors with optimal multiplication by real/complex value</li>
 <li><code>vmul()</code> family, which implements in-place multiplication of real/complex vector by real/complex value</li>
 </ul>
-with plans to later integrate a C++ version of the LAPACK package for Levels 1,2,3 BLAS functions.
 Both ALGLIB++ and the ALGLIB code it inherited contain several routines adapted from earlier versions of LAPACK.
 A more complete implementation of the latest version of LAPACK is being prepared for inclusion with ALGLIB++ &mdash; in fact, a C++ translation of the entire package: LAPACK++.
 </p>

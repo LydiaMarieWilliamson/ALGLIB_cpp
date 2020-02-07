@@ -171,7 +171,7 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    *info = 1;
 
 // Initialize, D[1:N+1], E[1:N]
-   n = n - 2;
+   n -= 2;
    ae_vector_set_length(&d, n + 2);
    ae_vector_set_length(&e, n + 1);
    for (i = 1; i <= n + 1; i++) {
@@ -213,13 +213,13 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
    b1 = a * pia;
    b2 = b * pib;
    if (fabs(a11) > fabs(a21)) {
-      a22 = a22 - a12 * a21 / a11;
-      b2 = b2 - b1 * a21 / a11;
+      a22 -= a12 * a21 / a11;
+      b2 -= b1 * a21 / a11;
       bet = b2 / a22;
       alph = (b1 - bet * a12) / a11;
    } else {
-      a12 = a12 - a22 * a11 / a21;
-      b1 = b1 - b2 * a11 / a21;
+      a12 -= a22 * a11 / a21;
+      b1 -= b2 * a11 / a21;
       bet = b1 / a12;
       alph = (b2 - bet * a22) / a21;
    }
@@ -308,7 +308,7 @@ void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, 
    *info = 1;
 
 // Initialize, D[1:N], E[1:N]
-   n = n - 1;
+   n--;
    ae_vector_set_length(&d, n + 1);
    ae_vector_set_length(&e, n);
    for (i = 1; i <= n; i++) {
@@ -955,7 +955,7 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
    *info = 1;
 
 // from external conventions about N/Beta/Mu0 to internal
-   n = n / 2;
+   n /= 2;
    beta->ptr.p_double[0] = mu0;
 
 // Calculate Gauss nodes/weights, save them for later processing
@@ -999,7 +999,7 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
       u = 0.0;
       for (k = (m + 1) / 2; k >= 0; k--) {
          l = m - k;
-         u = u + (alpha->ptr.p_double[k + n + 1] - alpha->ptr.p_double[l]) * t.ptr.p_double[woffs + k] + beta->ptr.p_double[k + n + 1] * s.ptr.p_double[woffs + k - 1] - beta->ptr.p_double[l] * s.ptr.p_double[woffs + k];
+         u += (alpha->ptr.p_double[k + n + 1] - alpha->ptr.p_double[l]) * t.ptr.p_double[woffs + k] + beta->ptr.p_double[k + n + 1] * s.ptr.p_double[woffs + k - 1] - beta->ptr.p_double[l] * s.ptr.p_double[woffs + k];
          s.ptr.p_double[woffs + k] = u;
       }
       ae_v_move(ta.ptr.p_double, 1, t.ptr.p_double, 1, wlen);
@@ -1014,7 +1014,7 @@ void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_
       for (k = m + 1 - n; k <= (m - 1) / 2; k++) {
          l = m - k;
          j = n - 1 - l;
-         u = u - (alpha->ptr.p_double[k + n + 1] - alpha->ptr.p_double[l]) * t.ptr.p_double[woffs + j] - beta->ptr.p_double[k + n + 1] * s.ptr.p_double[woffs + j] + beta->ptr.p_double[l] * s.ptr.p_double[woffs + j + 1];
+         u -= (alpha->ptr.p_double[k + n + 1] - alpha->ptr.p_double[l]) * t.ptr.p_double[woffs + j] + beta->ptr.p_double[k + n + 1] * s.ptr.p_double[woffs + j] - beta->ptr.p_double[l] * s.ptr.p_double[woffs + j + 1];
          s.ptr.p_double[woffs + j] = u;
       }
       if (m % 2 == 0) {
@@ -2017,7 +2017,7 @@ Spawn:
          state->needf = true;
          state->PQ = 0; goto Pause; Resume0:
          state->needf = false;
-         state->nfev = state->nfev + 1;
+         state->nfev++;
          state->internalstate.f = state->f;
       }
       state->v = state->internalstate.r;
@@ -2080,10 +2080,10 @@ Spawn:
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev = state->nfev + 1;
+         state->nfev++;
       }
       v1 = state->internalstate.r;
-      state->nintervals = state->nintervals + state->internalstate.heapused;
+      state->nintervals += state->internalstate.heapused;
 
    // then, integrate right half of [a,b]:
    //     integral(f(x)dx, (b+a)/2, b) =
@@ -2110,10 +2110,10 @@ Spawn:
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev = state->nfev + 1;
+         state->nfev++;
       }
       v2 = state->internalstate.r;
-      state->nintervals = state->nintervals + state->internalstate.heapused;
+      state->nintervals += state->internalstate.heapused;
 
    // final result
       state->v = s * (v1 + v2);
@@ -2272,17 +2272,17 @@ Spawn:
          v = state->f;
 
       // Gauss-Kronrod formula
-         intk = intk + v * state->wk.ptr.p_double[i];
+         intk += v * state->wk.ptr.p_double[i];
          if (i % 2 == 1) {
-            intg = intg + v * state->wg.ptr.p_double[i];
+            intg += v * state->wg.ptr.p_double[i];
          }
       // Integral |F(x)|
       // Use rectangles method
-         inta = inta + fabs(v) * state->wr.ptr.p_double[i];
+         inta += fabs(v) * state->wr.ptr.p_double[i];
       }
-      intk = intk * (state->b - state->a) * 0.5;
-      intg = intg * (state->b - state->a) * 0.5;
-      inta = inta * (state->b - state->a) * 0.5;
+      intk *= 0.5*(state->b - state->a);
+      intg *= 0.5*(state->b - state->a);
+      inta *= 0.5*(state->b - state->a);
       state->heap.ptr.pp_double[0][0] = fabs(intg - intk);
       state->heap.ptr.pp_double[0][1] = intk;
       state->heap.ptr.pp_double[0][2] = inta;
@@ -2315,24 +2315,24 @@ Spawn:
             v = state->f;
 
          // Gauss-Kronrod formula
-            intk = intk + v * state->wk.ptr.p_double[i];
+            intk += v * state->wk.ptr.p_double[i];
             if (i % 2 == 1) {
-               intg = intg + v * state->wg.ptr.p_double[i];
+               intg += v * state->wg.ptr.p_double[i];
             }
          // Integral |F(x)|
          // Use rectangles method
-            inta = inta + fabs(v) * state->wr.ptr.p_double[i];
+            inta += fabs(v) * state->wr.ptr.p_double[i];
          }
-         intk = intk * (tb - ta) * 0.5;
-         intg = intg * (tb - ta) * 0.5;
-         inta = inta * (tb - ta) * 0.5;
+         intk *= 0.5*(tb - ta);
+         intg *= 0.5*(tb - ta);
+         inta *= 0.5*(tb - ta);
          state->heap.ptr.pp_double[j][0] = fabs(intg - intk);
          state->heap.ptr.pp_double[j][1] = intk;
          state->heap.ptr.pp_double[j][2] = inta;
          state->heap.ptr.pp_double[j][3] = ta;
          state->heap.ptr.pp_double[j][4] = tb;
-         state->sumerr = state->sumerr + state->heap.ptr.pp_double[j][0];
-         state->sumabs = state->sumabs + fabs(inta);
+         state->sumerr += state->heap.ptr.pp_double[j][0];
+         state->sumabs += fabs(inta);
       }
    }
 
@@ -2346,14 +2346,14 @@ Spawn:
       if (state->sumerr <= state->eps * state->sumabs || state->heapused >= autogk_maxsubintervals) {
          state->r = 0.0;
          for (j = 0; j < state->heapused; j++) {
-            state->r = state->r + state->heap.ptr.pp_double[j][1];
+            state->r += state->heap.ptr.pp_double[j][1];
          }
          goto Exit;
       }
    // Exclude interval with maximum absolute error
       autogk_mheappop(&state->heap, state->heapused, state->heapwidth);
-      state->sumerr = state->sumerr - state->heap.ptr.pp_double[state->heapused - 1][0];
-      state->sumabs = state->sumabs - state->heap.ptr.pp_double[state->heapused - 1][2];
+      state->sumerr -= state->heap.ptr.pp_double[state->heapused - 1][0];
+      state->sumabs -= state->heap.ptr.pp_double[state->heapused - 1][2];
 
    // Divide interval, create subintervals
       ta = state->heap.ptr.pp_double[state->heapused - 1][3];
@@ -2375,26 +2375,26 @@ Spawn:
             v = state->f;
 
          // Gauss-Kronrod formula
-            intk = intk + v * state->wk.ptr.p_double[i];
+            intk += v * state->wk.ptr.p_double[i];
             if (i % 2 == 1) {
-               intg = intg + v * state->wg.ptr.p_double[i];
+               intg += v * state->wg.ptr.p_double[i];
             }
          // Integral |F(x)|
          // Use rectangles method
-            inta = inta + fabs(v) * state->wr.ptr.p_double[i];
+            inta += fabs(v) * state->wr.ptr.p_double[i];
          }
-         intk = intk * (state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]) * 0.5;
-         intg = intg * (state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]) * 0.5;
-         inta = inta * (state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]) * 0.5;
+         intk *= 0.5*(state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]);
+         intg *= 0.5*(state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]);
+         inta *= 0.5*(state->heap.ptr.pp_double[j][4] - state->heap.ptr.pp_double[j][3]);
          state->heap.ptr.pp_double[j][0] = fabs(intg - intk);
          state->heap.ptr.pp_double[j][1] = intk;
          state->heap.ptr.pp_double[j][2] = inta;
-         state->sumerr = state->sumerr + state->heap.ptr.pp_double[j][0];
-         state->sumabs = state->sumabs + state->heap.ptr.pp_double[j][2];
+         state->sumerr += state->heap.ptr.pp_double[j][0];
+         state->sumabs += state->heap.ptr.pp_double[j][2];
       }
       autogk_mheappush(&state->heap, state->heapused - 1, state->heapwidth);
       autogk_mheappush(&state->heap, state->heapused, state->heapwidth);
-      state->heapused = state->heapused + 1;
+      state->heapused++;
    }
    goto Exit;
 

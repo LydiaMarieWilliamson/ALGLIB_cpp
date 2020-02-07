@@ -298,25 +298,25 @@ double cqmeval(convexquadraticmodel *s, RVector x) {
    if (s->alpha > 0.0) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            result = result + s->alpha * 0.5 * x->ptr.p_double[i] * s->a.ptr.pp_double[i][j] * x->ptr.p_double[j];
+            result += s->alpha * 0.5 * x->ptr.p_double[i] * s->a.ptr.pp_double[i][j] * x->ptr.p_double[j];
          }
       }
    }
    if (s->tau > 0.0) {
       for (i = 0; i < n; i++) {
-         result = result + 0.5 * ae_sqr(x->ptr.p_double[i]) * s->tau * s->d.ptr.p_double[i];
+         result += 0.5 * ae_sqr(x->ptr.p_double[i]) * s->tau * s->d.ptr.p_double[i];
       }
    }
 // secondary quadratic term
    if (s->theta > 0.0) {
       for (i = 0; i < s->k; i++) {
          v = ae_v_dotproduct(s->q.ptr.pp_double[i], 1, x->ptr.p_double, 1, n);
-         result = result + 0.5 * s->theta * ae_sqr(v - s->r.ptr.p_double[i]);
+         result += 0.5 * s->theta * ae_sqr(v - s->r.ptr.p_double[i]);
       }
    }
 // linear term
    for (i = 0; i < s->n; i++) {
-      result = result + x->ptr.p_double[i] * s->b.ptr.p_double[i];
+      result += x->ptr.p_double[i] * s->b.ptr.p_double[i];
    }
    return result;
 }
@@ -354,7 +354,7 @@ void cqmevalx(convexquadraticmodel *s, RVector x, double *r, double *noise) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             v = s->alpha * 0.5 * x->ptr.p_double[i] * s->a.ptr.pp_double[i][j] * x->ptr.p_double[j];
-            *r = *r + v;
+            *r += v;
             *noise = ae_maxreal(*noise, eps * fabs(v));
          }
       }
@@ -362,7 +362,7 @@ void cqmevalx(convexquadraticmodel *s, RVector x, double *r, double *noise) {
    if (s->tau > 0.0) {
       for (i = 0; i < n; i++) {
          v = 0.5 * ae_sqr(x->ptr.p_double[i]) * s->tau * s->d.ptr.p_double[i];
-         *r = *r + v;
+         *r += v;
          *noise = ae_maxreal(*noise, eps * fabs(v));
       }
    }
@@ -380,21 +380,21 @@ void cqmevalx(convexquadraticmodel *s, RVector x, double *r, double *noise) {
          mxq = fabs(s->r.ptr.p_double[i]);
          for (j = 0; j < n; j++) {
             v2 = s->q.ptr.pp_double[i][j] * x->ptr.p_double[j];
-            v = v + v2;
+            v += v2;
             mxq = ae_maxreal(mxq, fabs(v2));
          }
-         *r = *r + 0.5 * s->theta * ae_sqr(v - s->r.ptr.p_double[i]);
+         *r += 0.5 * s->theta * ae_sqr(v - s->r.ptr.p_double[i]);
          *noise = ae_maxreal(*noise, eps * mxq * (2 * fabs(v - s->r.ptr.p_double[i]) + eps * mxq));
       }
    }
 // linear term
    for (i = 0; i < s->n; i++) {
-      *r = *r + x->ptr.p_double[i] * s->b.ptr.p_double[i];
+      *r += x->ptr.p_double[i] * s->b.ptr.p_double[i];
       *noise = ae_maxreal(*noise, eps * fabs(x->ptr.p_double[i] * s->b.ptr.p_double[i]));
    }
 
 // Final update of the noise
-   *noise = n * (*noise);
+   *noise *= n;
 }
 
 // This  subroutine  evaluates  gradient of the model; active constraints are
@@ -424,14 +424,14 @@ void cqmgradunconstrained(convexquadraticmodel *s, RVector x, RVector g) {
       for (i = 0; i < n; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + s->alpha * s->a.ptr.pp_double[i][j] * x->ptr.p_double[j];
+            v += s->alpha * s->a.ptr.pp_double[i][j] * x->ptr.p_double[j];
          }
-         g->ptr.p_double[i] = g->ptr.p_double[i] + v;
+         g->ptr.p_double[i] += v;
       }
    }
    if (s->tau > 0.0) {
       for (i = 0; i < n; i++) {
-         g->ptr.p_double[i] = g->ptr.p_double[i] + x->ptr.p_double[i] * s->tau * s->d.ptr.p_double[i];
+         g->ptr.p_double[i] += x->ptr.p_double[i] * s->tau * s->d.ptr.p_double[i];
       }
    }
 // secondary quadratic term
@@ -444,7 +444,7 @@ void cqmgradunconstrained(convexquadraticmodel *s, RVector x, RVector g) {
    }
 // linear term
    for (i = 0; i < n; i++) {
-      g->ptr.p_double[i] = g->ptr.p_double[i] + s->b.ptr.p_double[i];
+      g->ptr.p_double[i] += s->b.ptr.p_double[i];
    }
 }
 
@@ -465,11 +465,11 @@ double cqmxtadx2(convexquadraticmodel *s, RVector x, RVector tmp) {
 
 // main quadratic term
    if (s->alpha > 0.0) {
-      result = result + s->alpha * 0.5 * rmatrixsyvmv(n, &s->a, 0, 0, true, x, 0, tmp);
+      result += s->alpha * 0.5 * rmatrixsyvmv(n, &s->a, 0, 0, true, x, 0, tmp);
    }
    if (s->tau > 0.0) {
       for (i = 0; i < n; i++) {
-         result = result + 0.5 * ae_sqr(x->ptr.p_double[i]) * s->tau * s->d.ptr.p_double[i];
+         result += 0.5 * ae_sqr(x->ptr.p_double[i]) * s->tau * s->d.ptr.p_double[i];
       }
    }
    return result;
@@ -497,7 +497,7 @@ void cqmadx(convexquadraticmodel *s, RVector x, RVector y) {
    }
    if (s->tau > 0.0) {
       for (i = 0; i < n; i++) {
-         y->ptr.p_double[i] = y->ptr.p_double[i] + x->ptr.p_double[i] * s->tau * s->d.ptr.p_double[i];
+         y->ptr.p_double[i] += x->ptr.p_double[i] * s->tau * s->d.ptr.p_double[i];
       }
    }
 }
@@ -563,7 +563,7 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector x) {
       for (i = 0; i < n; i++) {
          if (!s->activeset.ptr.p_bool[i]) {
             s->tmpg.ptr.p_double[cidx0] = s->tmpg.ptr.p_double[i];
-            cidx0 = cidx0 + 1;
+            cidx0++;
          }
       }
 
@@ -600,8 +600,8 @@ bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector x) {
       cidx0 = 0;
       for (i = 0; i < n; i++) {
          if (!s->activeset.ptr.p_bool[i]) {
-            x->ptr.p_double[i] = x->ptr.p_double[i] + s->txc.ptr.p_double[cidx0];
-            cidx0 = cidx0 + 1;
+            x->ptr.p_double[i] += s->txc.ptr.p_double[cidx0];
+            cidx0++;
          }
       }
    }
@@ -644,13 +644,13 @@ void cqmscalevector(convexquadraticmodel *s, RVector x) {
    for (i = 0; i < n; i++) {
       v = 0.0;
       if (s->alpha > 0.0) {
-         v = v + s->a.ptr.pp_double[i][i];
+         v += s->a.ptr.pp_double[i][i];
       }
       if (s->tau > 0.0) {
-         v = v + s->d.ptr.p_double[i];
+         v += s->d.ptr.p_double[i];
       }
       if (v > 0.0) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] / v;
+         x->ptr.p_double[i] /= v;
       }
    }
 }
@@ -721,7 +721,7 @@ double cqmdebugconstrainedevalt(convexquadraticmodel *s, RVector x) {
       if (!s->activeset.ptr.p_bool[i]) {
          ae_assert(j < nfree, "CQMDebugConstrainedEvalT: internal error");
          s->txc.ptr.p_double[j] = x->ptr.p_double[i];
-         j = j + 1;
+         j++;
       }
    }
 
@@ -732,38 +732,38 @@ double cqmdebugconstrainedevalt(convexquadraticmodel *s, RVector x) {
    // Dense TQ2
       for (i = 0; i < nfree; i++) {
          for (j = 0; j < nfree; j++) {
-            result = result + 0.5 * s->txc.ptr.p_double[i] * s->tq2dense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
+            result += 0.5 * s->txc.ptr.p_double[i] * s->tq2dense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
          }
       }
    } else {
 
    // Diagonal TQ2
       for (i = 0; i < nfree; i++) {
-         result = result + 0.5 * s->tq2diag.ptr.p_double[i] * ae_sqr(s->txc.ptr.p_double[i]);
+         result += 0.5 * s->tq2diag.ptr.p_double[i] * ae_sqr(s->txc.ptr.p_double[i]);
       }
    }
    for (i = 0; i < nfree; i++) {
-      result = result + s->tq1.ptr.p_double[i] * s->txc.ptr.p_double[i];
+      result += s->tq1.ptr.p_double[i] * s->txc.ptr.p_double[i];
    }
-   result = result + s->tq0;
+   result += s->tq0;
 
 // TK2, TK1, TK0
    if (s->k > 0 && s->theta > 0.0) {
       for (i = 0; i < s->k; i++) {
          v = 0.0;
          for (j = 0; j < nfree; j++) {
-            v = v + s->tk2.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
+            v += s->tk2.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
          }
-         result = result + 0.5 * ae_sqr(v);
+         result += 0.5 * ae_sqr(v);
       }
       for (i = 0; i < nfree; i++) {
-         result = result + s->tk1.ptr.p_double[i] * s->txc.ptr.p_double[i];
+         result += s->tk1.ptr.p_double[i] * s->txc.ptr.p_double[i];
       }
-      result = result + s->tk0;
+      result += s->tk0;
    }
 // TB (Bf and Bc parts)
    for (i = 0; i < n; i++) {
-      result = result + s->tb.ptr.p_double[i] * s->txc.ptr.p_double[i];
+      result += s->tb.ptr.p_double[i] * s->txc.ptr.p_double[i];
    }
    return result;
 }
@@ -809,7 +809,7 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector x) {
       if (!s->activeset.ptr.p_bool[i]) {
          ae_assert(j < nfree, "CQMDebugConstrainedEvalE: internal error");
          s->txc.ptr.p_double[j] = x->ptr.p_double[i];
-         j = j + 1;
+         j++;
       }
    }
 
@@ -821,34 +821,34 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector x) {
       for (i = 0; i < nfree; i++) {
          v = 0.0;
          for (j = i; j < nfree; j++) {
-            v = v + s->ecadense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
+            v += s->ecadense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
          }
-         result = result + 0.5 * ae_sqr(v);
+         result += 0.5 * ae_sqr(v);
       }
    }
    if (s->ecakind == 1) {
 
    // Diagonal ECA
       for (i = 0; i < nfree; i++) {
-         result = result + 0.5 * ae_sqr(s->ecadiag.ptr.p_double[i] * s->txc.ptr.p_double[i]);
+         result += 0.5 * ae_sqr(s->ecadiag.ptr.p_double[i] * s->txc.ptr.p_double[i]);
       }
    }
 // EQ
    for (i = 0; i < s->k; i++) {
       v = 0.0;
       for (j = 0; j < nfree; j++) {
-         v = v + s->eq.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
+         v += s->eq.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
       }
-      result = result + 0.5 * ae_sqr(v);
+      result += 0.5 * ae_sqr(v);
    }
 
 // EB
    for (i = 0; i < nfree; i++) {
-      result = result + s->eb.ptr.p_double[i] * s->txc.ptr.p_double[i];
+      result += s->eb.ptr.p_double[i] * s->txc.ptr.p_double[i];
    }
 
 // EC
-   result = result + s->ec;
+   result += s->ec;
    return result;
 }
 
@@ -885,14 +885,14 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
       s->nfree = 0;
       for (i = 0; i < n; i++) {
          if (!s->activeset.ptr.p_bool[i]) {
-            s->nfree = s->nfree + 1;
+            s->nfree++;
          }
       }
       j = s->nfree;
       for (i = 0; i < n; i++) {
          if (s->activeset.ptr.p_bool[i]) {
             s->txc.ptr.p_double[j] = s->xc.ptr.p_double[i];
-            j = j + 1;
+            j++;
          }
       }
    }
@@ -948,7 +948,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
                // Element belongs to Aff
                   v = s->alpha * s->a.ptr.pp_double[i][j];
                   if (i == j && s->tau > 0.0) {
-                     v = v + s->tau * s->d.ptr.p_double[i];
+                     v += s->tau * s->d.ptr.p_double[i];
                   }
                   s->tq2dense.ptr.pp_double[ridx0][cidx0] = v;
                }
@@ -967,20 +967,20 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
                // Element belongs to Acc
                   v = s->alpha * s->a.ptr.pp_double[i][j];
                   if (i == j && s->tau > 0.0) {
-                     v = v + s->tau * s->d.ptr.p_double[i];
+                     v += s->tau * s->d.ptr.p_double[i];
                   }
                   s->tq2dense.ptr.pp_double[ridx1][cidx1] = v;
                }
                if (s->activeset.ptr.p_bool[j]) {
-                  cidx1 = cidx1 + 1;
+                  cidx1++;
                } else {
-                  cidx0 = cidx0 + 1;
+                  cidx0++;
                }
             }
             if (s->activeset.ptr.p_bool[i]) {
-               ridx1 = ridx1 + 1;
+               ridx1++;
             } else {
-               ridx0 = ridx0 + 1;
+               ridx0++;
             }
          }
 
@@ -997,7 +997,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
          v = 0.0;
          for (i = s->nfree; i < n; i++) {
             for (j = s->nfree; j < n; j++) {
-               v = v + 0.5 * s->txc.ptr.p_double[i] * s->tq2dense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
+               v += 0.5 * s->txc.ptr.p_double[i] * s->tq2dense.ptr.pp_double[i][j] * s->txc.ptr.p_double[j];
             }
          }
          s->tq0 = v;
@@ -1025,9 +1025,9 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
          for (i = 0; i < n; i++) {
             if (!s->activeset.ptr.p_bool[i]) {
                s->tq2diag.ptr.p_double[ridx0] = s->tau * s->d.ptr.p_double[i];
-               ridx0 = ridx0 + 1;
+               ridx0++;
             } else {
-               s->tq0 = s->tq0 + 0.5 * s->tau * s->d.ptr.p_double[i] * ae_sqr(s->xc.ptr.p_double[i]);
+               s->tq0 += 0.5 * s->tau * s->d.ptr.p_double[i] * ae_sqr(s->xc.ptr.p_double[i]);
             }
          }
          for (i = 0; i < n; i++) {
@@ -1094,14 +1094,14 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
             if (s->activeset.ptr.p_bool[j]) {
                for (i = 0; i < k; i++) {
                   s->tk2.ptr.pp_double[i][cidx1] = s->q.ptr.pp_double[i][j];
-                  s->tmp1.ptr.p_double[i] = s->tmp1.ptr.p_double[i] + s->q.ptr.pp_double[i][j] * s->txc.ptr.p_double[cidx1];
+                  s->tmp1.ptr.p_double[i] += s->q.ptr.pp_double[i][j] * s->txc.ptr.p_double[cidx1];
                }
-               cidx1 = cidx1 + 1;
+               cidx1++;
             } else {
                for (i = 0; i < k; i++) {
                   s->tk2.ptr.pp_double[i][cidx0] = s->q.ptr.pp_double[i][j];
                }
-               cidx0 = cidx0 + 1;
+               cidx0++;
             }
          }
          for (i = 0; i < k; i++) {
@@ -1111,7 +1111,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
       // Calculate TK0
          v = 0.0;
          for (i = 0; i < k; i++) {
-            v = v + s->theta * (0.5 * ae_sqr(s->tmp1.ptr.p_double[i]) - s->r.ptr.p_double[i] * s->tmp0.ptr.p_double[i] - 0.5 * ae_sqr(s->r.ptr.p_double[i]));
+            v += s->theta * (0.5 * ae_sqr(s->tmp1.ptr.p_double[i]) - s->r.ptr.p_double[i] * s->tmp0.ptr.p_double[i] - 0.5 * ae_sqr(s->r.ptr.p_double[i]));
          }
          s->tk0 = v;
 
@@ -1138,10 +1138,10 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
       for (i = 0; i < n; i++) {
          if (s->activeset.ptr.p_bool[i]) {
             s->tb.ptr.p_double[ridx1] = s->b.ptr.p_double[i];
-            ridx1 = ridx1 + 1;
+            ridx1++;
          } else {
             s->tb.ptr.p_double[ridx0] = s->b.ptr.p_double[i];
-            ridx0 = ridx0 + 1;
+            ridx0++;
          }
       }
    }
@@ -1202,7 +1202,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
       if (s->ecakind == 1) {
          for (i = 0; i < k; i++) {
             for (j = 0; j < nfree; j++) {
-               s->tmp2.ptr.pp_double[i][j] = s->tmp2.ptr.pp_double[i][j] / s->ecadiag.ptr.p_double[j];
+               s->tmp2.ptr.pp_double[i][j] /= s->ecadiag.ptr.p_double[j];
             }
          }
       }
@@ -1227,7 +1227,7 @@ static bool cqmodels_cqmrebuild(convexquadraticmodel *s) {
    }
    s->ec = s->tq0 + s->tk0;
    for (i = nfree; i < n; i++) {
-      s->ec = s->ec + s->tb.ptr.p_double[i] * s->txc.ptr.p_double[i];
+      s->ec += s->tb.ptr.p_double[i] * s->txc.ptr.p_double[i];
    }
 
 // Change cache status - everything is cached
@@ -1266,7 +1266,7 @@ static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector x, RVector tmp)
 
    // Diagonal ECA
       for (i = 0; i < s->nfree; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] / ae_sqr(s->ecadiag.ptr.p_double[i]);
+         x->ptr.p_double[i] /= ae_sqr(s->ecadiag.ptr.p_double[i]);
       }
    }
 }
@@ -2024,11 +2024,11 @@ void checklcviolation(RMatrix cleic, ZVector lcsrcidx, ae_int_t nec, ae_int_t ni
       cnrm = 0.0;
       for (j = 0; j < n; j++) {
          v = cleic->ptr.pp_double[i][j];
-         cx = cx + v * x->ptr.p_double[j];
-         cnrm = cnrm + v * v;
+         cx += v * x->ptr.p_double[j];
+         cnrm += v * v;
       }
       cnrm = sqrt(cnrm);
-      cx = cx / coalesce(cnrm, 1.0);
+      cx /= coalesce(cnrm, 1.0);
       if (i < nec) {
          cx = fabs(cx);
       } else {
@@ -2427,14 +2427,14 @@ ae_int_t postprocessboundedstep(RVector x, RVector xprev, RVector bndl, BVector 
       wasactivated = x->ptr.p_double[i] != xprev->ptr.p_double[i] && ((havebndl->ptr.p_bool[i] && x->ptr.p_double[i] == bndl->ptr.p_double[i]) || (havebndu->ptr.p_bool[i] && x->ptr.p_double[i] == bndu->ptr.p_double[i]));
       wasactivated = wasactivated || variabletofreeze == i;
       if (wasactivated) {
-         result = result + 1;
+         result++;
       }
    }
    for (i = 0; i < nslack; i++) {
       wasactivated = x->ptr.p_double[nmain + i] != xprev->ptr.p_double[nmain + i] && x->ptr.p_double[nmain + i] == 0.0;
       wasactivated = wasactivated || variabletofreeze == nmain + i;
       if (wasactivated) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -2484,7 +2484,7 @@ void filterdirection(RVector d, RVector x, RVector bndl, BVector havebndl, RVect
 
    scalednorm = 0.0;
    for (i = 0; i < nmain + nslack; i++) {
-      scalednorm = scalednorm + ae_sqr(d->ptr.p_double[i] * s->ptr.p_double[i]);
+      scalednorm += ae_sqr(d->ptr.p_double[i] * s->ptr.p_double[i]);
    }
    scalednorm = sqrt(scalednorm);
    for (i = 0; i < nmain; i++) {
@@ -2549,13 +2549,13 @@ ae_int_t numberofchangedconstraints(RVector x, RVector xprev, RVector bndl, BVec
             statuschanged = true;
          }
          if (statuschanged) {
-            result = result + 1;
+            result++;
          }
       }
    }
    for (i = 0; i < nslack; i++) {
       if (x->ptr.p_double[nmain + i] != xprev->ptr.p_double[nmain + i] && (x->ptr.p_double[nmain + i] == 0.0 || xprev->ptr.p_double[nmain + i] == 0.0)) {
-         result = result + 1;
+         result++;
       }
    }
    return result;
@@ -2703,7 +2703,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
       s.ptr.p_double[i] = 1.0;
       colnorms.ptr.p_double[i] = 0.0;
       for (j = 0; j < k; j++) {
-         colnorms.ptr.p_double[i] = colnorms.ptr.p_double[i] + ae_sqr(ce->ptr.pp_double[j][i]);
+         colnorms.ptr.p_double[i] += ae_sqr(ce->ptr.pp_double[j][i]);
       }
    }
 
@@ -2744,7 +2744,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
          v = -ce->ptr.pp_double[i][nmain + nslack];
          for (j = 0; j < nmain + nslack; j++) {
             mx = ae_maxreal(mx, fabs(ce->ptr.pp_double[i][j] * x->ptr.p_double[j]));
-            v = v + ce->ptr.pp_double[i][j] * x->ptr.p_double[j];
+            v += ce->ptr.pp_double[i][j] * x->ptr.p_double[j];
          }
          converged = converged && fabs(v) <= 100 * ae_machineepsilon * mx;
       }
@@ -2818,7 +2818,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
             } else {
                newtonstep.ptr.p_double[i] = 0.0;
             }
-            v = v + ae_sqr(newtonstep.ptr.p_double[i]);
+            v += ae_sqr(newtonstep.ptr.p_double[i]);
          }
          if (v == 0.0) {
 
@@ -2846,7 +2846,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
             }
             armijobestfeas = feaserr;
             armijobeststep = armijostep;
-            armijostep = 2.0 * armijostep;
+            armijostep *= 2.0;
          }
          ae_v_addd(x->ptr.p_double, 1, newtonstep.ptr.p_double, 1, nmain + nslack, armijobeststep);
          enforceboundaryconstraints(x, bndl, havebndl, bndu, havebndu, nmain, nslack);
@@ -2862,7 +2862,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
                activeconstraints.ptr.p_double[i] = 1.0;
             }
             if (activeconstraints.ptr.p_double[i] > 0.0) {
-               nactive = nactive + 1;
+               nactive++;
             }
          }
          for (i = 0; i < nslack; i++) {
@@ -2871,14 +2871,14 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
                activeconstraints.ptr.p_double[nmain + i] = 1.0;
             }
             if (activeconstraints.ptr.p_double[nmain + i] > 0.0) {
-               nactive = nactive + 1;
+               nactive++;
             }
          }
          nfree = nmain + nslack - nactive;
          if (nfree == 0) {
             break;
          }
-         *qpits = *qpits + 1;
+         ++*qpits;
 
       // Reorder variables: CE is reordered to PermCE, X is reordered to PermX
          tagsortbuf(&activeconstraints, nmain + nslack, &p1, &p2, &buf);
@@ -2971,7 +2971,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
                if (permce.ptr.pp_double[i][i] < 0.0) {
                   vv = -vv;
                }
-               permce.ptr.pp_double[i][i] = permce.ptr.pp_double[i][i] + vv;
+               permce.ptr.pp_double[i][i] += vv;
             }
             ae_v_moveneg(newtonstep.ptr.p_double, 1, g.ptr.p_double, 1, nfree);
             rmatrixtrsv(nfree, &permce, 0, 0, true, false, 1, &newtonstep, 0);
@@ -3035,7 +3035,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
                   armijobestfeas = feaserr;
                   armijobeststep = armijostep;
                }
-               armijostep = 0.5 * armijostep;
+               armijostep *= 0.5;
             }
             ae_v_move(xa.ptr.p_double, 1, xn.ptr.p_double, 1, nmain + nslack);
             ae_v_addd(xa.ptr.p_double, 1, newtonstep.ptr.p_double, 1, nmain + nslack, armijobeststep);
@@ -3094,7 +3094,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
          filterdirection(&pg, x, bndl, havebndl, bndu, havebndu, &s, nmain, nslack, 1.0E-9);
          for (i = 0; i < nmain + nslack; i++) {
             if (ae_sqr(colnorms.ptr.p_double[i]) != 0.0) {
-               pg.ptr.p_double[i] = pg.ptr.p_double[i] / ae_sqr(colnorms.ptr.p_double[i]);
+               pg.ptr.p_double[i] /= ae_sqr(colnorms.ptr.p_double[i]);
             } else {
                pg.ptr.p_double[i] = 0.0;
             }
@@ -3114,7 +3114,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
          vd = 0.0;
          rmatrixgemv(k, nmain + nslack, 1.0, ce, 0, 0, 0, &pg, 0, 0.0, &tmpk, 0);
          for (i = 0; i < k; i++) {
-            vd = vd + ae_sqr(tmpk.ptr.p_double[i]);
+            vd += ae_sqr(tmpk.ptr.p_double[i]);
          }
          stp = vn / vd;
 
@@ -3139,7 +3139,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
       // check stopping criteria
          werechangesinconstraints = werechangesinconstraints || numberofchangedconstraints(&xn, x, bndl, havebndl, bndu, havebndu, nmain, nslack) > 0;
          ae_v_move(x->ptr.p_double, 1, xn.ptr.p_double, 1, nmain + nslack);
-         *gpaits = *gpaits + 1;
+         ++*gpaits;
          if (!werechangesinconstraints) {
             break;
          }
@@ -3169,7 +3169,7 @@ bool findfeasiblepoint(RVector x, RVector bndl, BVector havebndl, RVector bndu, 
          ae_frame_leave();
          return result;
       }
-      itscount = itscount + 1;
+      itscount++;
 
    // Block below is never executed; it is necessary just to avoid
    // "unreachable code" warning about automatically generated code.
@@ -3213,9 +3213,9 @@ bool derivativecheck(double f0, double df0, double f1, double df1, double f, dou
    bool result;
 
 // Rescale input data to [0,1]
-   df = width * df;
-   df0 = width * df0;
-   df1 = width * df1;
+   df *= width;
+   df0 *= width;
+   df1 *= width;
 
 // Compute error scale, two sources are used:
 // * magnitudes of derivatives and secants
@@ -3407,7 +3407,7 @@ void inexactlbfgspreconditioner(RVector s, ae_int_t n, RVector d, RVector c, RMa
 
    // Calculate YK and Rho
       v = ae_v_dotproduct(w->ptr.pp_double[i], 1, w->ptr.pp_double[i], 1, n);
-      v = v * c->ptr.p_double[i];
+      v *= c->ptr.p_double[i];
       for (j = 0; j < n; j++) {
          buf->yk.ptr.pp_double[i][j] = (d->ptr.p_double[j] + v) * w->ptr.pp_double[i][j];
       }
@@ -3417,9 +3417,9 @@ void inexactlbfgspreconditioner(RVector s, ae_int_t n, RVector d, RVector c, RMa
       for (j = 0; j < n; j++) {
          vx = w->ptr.pp_double[i][j];
          vy = buf->yk.ptr.pp_double[i][j];
-         v = v + vx * vy;
-         v0 = v0 + vx * vx;
-         v1 = v1 + vy * vy;
+         v += vx * vy;
+         v0 += vx * vx;
+         v1 += vy * vy;
       }
       if ((v > 0.0 && v0 * v1 > 0.0) && v / sqrt(v0 * v1) > n * 10 * ae_machineepsilon) {
          buf->rho.ptr.p_double[i] = 1 / v;
@@ -3435,12 +3435,12 @@ void inexactlbfgspreconditioner(RVector s, ae_int_t n, RVector d, RVector c, RMa
    // Calculate Alpha[] according to L-BFGS algorithm
    // and update S[]
       v = ae_v_dotproduct(w->ptr.pp_double[i], 1, s->ptr.p_double, 1, n);
-      v = buf->rho.ptr.p_double[i] * v;
+      v *= buf->rho.ptr.p_double[i];
       buf->alpha.ptr.p_double[i] = v;
       ae_v_subd(s->ptr.p_double, 1, buf->yk.ptr.pp_double[i], 1, n, v);
    }
    for (j = 0; j < n; j++) {
-      s->ptr.p_double[j] = s->ptr.p_double[j] / d->ptr.p_double[j];
+      s->ptr.p_double[j] /= d->ptr.p_double[j];
    }
    for (idx = 0; idx < k; idx++) {
 
@@ -3500,9 +3500,9 @@ void preparelowrankpreconditioner(RVector d, RVector c, RMatrix w, ae_int_t n, a
    // Estimate magnitude of update row; skip zero rows (either W or C are zero)
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + w->ptr.pp_double[i][j] * w->ptr.pp_double[i][j];
+         v += w->ptr.pp_double[i][j] * w->ptr.pp_double[i][j];
       }
-      v = v * c->ptr.p_double[i];
+      v *= c->ptr.p_double[i];
       if (v == 0.0) {
          continue;
       }
@@ -3542,7 +3542,7 @@ void preparelowrankpreconditioner(RVector d, RVector c, RMatrix w, ae_int_t n, a
    }
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         buf->bufw.ptr.pp_double[i][j] = buf->bufw.ptr.pp_double[i][j] * buf->bufw.ptr.pp_double[k][j];
+         buf->bufw.ptr.pp_double[i][j] *= buf->bufw.ptr.pp_double[k][j];
       }
    }
    rmatrixgemm(k, k, n, 1.0, &buf->bufw, 0, 0, 0, &buf->bufw, 0, 0, 1, 1.0, &buf->bufz, 0, 0);
@@ -3551,7 +3551,7 @@ void preparelowrankpreconditioner(RVector d, RVector c, RMatrix w, ae_int_t n, a
    rmatrixlefttrsm(k, n, &buf->bufz, 0, 0, true, false, 1, &buf->v, 0, 0);
    for (i = 0; i < k; i++) {
       for (j = 0; j < n; j++) {
-         buf->v.ptr.pp_double[i][j] = buf->v.ptr.pp_double[i][j] * buf->d.ptr.p_double[j];
+         buf->v.ptr.pp_double[i][j] *= buf->d.ptr.p_double[j];
       }
    }
 }
@@ -3576,10 +3576,10 @@ void applylowrankpreconditioner(RVector s, precbuflowrank *buf) {
    for (i = 0; i < k; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + buf->v.ptr.pp_double[i][j] * s->ptr.p_double[j];
+         v += buf->v.ptr.pp_double[i][j] * s->ptr.p_double[j];
       }
       for (j = 0; j < n; j++) {
-         buf->tmp.ptr.p_double[j] = buf->tmp.ptr.p_double[j] - v * buf->v.ptr.pp_double[i][j];
+         buf->tmp.ptr.p_double[j] -= v * buf->v.ptr.pp_double[i][j];
       }
    }
    for (i = 0; i < n; i++) {
@@ -3889,7 +3889,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector d, double
             // Store to "longest" report
                nrm = 0.0;
                for (i = 0; i < n; i++) {
-                  nrm = nrm + ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
+                  nrm += ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
                }
                nrm = sqrt(nrm);
                nrm = ae_minreal(nrm, 1.0);
@@ -4298,7 +4298,7 @@ static double optserv_feasibilityerror(RMatrix ce, RVector x, ae_int_t nmain, ae
    rmatrixgemv(k, nmain + nslack, 1.0, ce, 0, 0, 0, x, 0, 1.0, tmp0, 0);
    result = 0.0;
    for (i = 0; i < k; i++) {
-      result = result + tmp0->ptr.p_double[i] * tmp0->ptr.p_double[i];
+      result += tmp0->ptr.p_double[i] * tmp0->ptr.p_double[i];
    }
    result = sqrt(result);
    return result;
@@ -4335,7 +4335,7 @@ static void optserv_feasibilityerrorgrad(RMatrix ce, RVector x, ae_int_t nmain, 
    for (i = 0; i < k; i++) {
       v = tmp0->ptr.p_double[i] - ce->ptr.pp_double[i][nmain + nslack];
       tmp0->ptr.p_double[i] = v;
-      *err = *err + v * v;
+      *err += v * v;
    }
    *err = sqrt(*err);
    rmatrixgemv(nmain + nslack, k, 1.0, ce, 0, 0, 1, tmp0, 0, 0.0, grad, 0);
@@ -4524,7 +4524,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
    // Store to "longest" report
       nrm = 0.0;
       for (i = 0; i < n; i++) {
-         nrm = nrm + ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
+         nrm += ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
       }
       nrm = sqrt(nrm);
       nrm = ae_minreal(nrm, 1.0);
@@ -4634,7 +4634,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
       // Store to "longest" report
          nrm = 0.0;
          for (i = 0; i < n; i++) {
-            nrm = nrm + ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
+            nrm += ae_sqr(monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[0] * n + i] - monitor->enqueuedx.ptr.p_double[monitor->sortedidx.ptr.p_int[sortedcnt - 1] * n + i]);
          }
          nrm = sqrt(nrm);
          nrm = ae_minreal(nrm, 1.0);
@@ -5144,7 +5144,7 @@ void snnlssolve(snnlssolver *s, RVector x) {
       // Do not increase iterations counter.
          for (i = 0; i < ns + nd; i++) {
             if (x->ptr.p_double[i] == 0.0 && s->d.ptr.p_double[i] > 0.0) {
-               x->ptr.p_double[i] = x->ptr.p_double[i] + kicklength;
+               x->ptr.p_double[i] += kicklength;
             }
          }
          continue;
@@ -5185,7 +5185,7 @@ void snnlssolve(snnlssolver *s, RVector x) {
       // activated by this step. Break if D is exactly zero.
          dnrm = 0.0;
          for (i = 0; i < ns + nd; i++) {
-            dnrm = dnrm + ae_sqr(s->d.ptr.p_double[i]);
+            dnrm += ae_sqr(s->d.ptr.p_double[i]);
          }
          dnrm = sqrt(dnrm);
          actidx = -1;
@@ -5281,11 +5281,11 @@ static void snnls_funcgradu(snnlssolver *s, RVector x, RVector r, RVector g, dou
    for (i = 0; i < nr; i++) {
       v = ae_v_dotproduct(s->densea.ptr.pp_double[i], 1, &x->ptr.p_double[ns], 1, nd);
       if (i < ns) {
-         v = v + x->ptr.p_double[i];
+         v += x->ptr.p_double[i];
       }
-      v = v - s->b.ptr.p_double[i];
+      v -= s->b.ptr.p_double[i];
       r->ptr.p_double[i] = v;
-      *f = *f + 0.5 * v * v;
+      *f += 0.5 * v * v;
    }
    for (i = 0; i < ns; i++) {
       g->ptr.p_double[i] = r->ptr.p_double[i];
@@ -5318,10 +5318,10 @@ static void snnls_func(snnlssolver *s, RVector x, double *f) {
    for (i = 0; i < nr; i++) {
       v = ae_v_dotproduct(s->densea.ptr.pp_double[i], 1, &x->ptr.p_double[ns], 1, nd);
       if (i < ns) {
-         v = v + x->ptr.p_double[i];
+         v += x->ptr.p_double[i];
       }
-      v = v - s->b.ptr.p_double[i];
-      *f = *f + 0.5 * v * v;
+      v -= s->b.ptr.p_double[i];
+      *f += 0.5 * v * v;
    }
 }
 
@@ -5415,17 +5415,17 @@ static void snnls_trdsolve(RVector trdd, RMatrix trda, ae_int_t ns, ae_int_t nd,
 // * solve diagonal part of U'
 // * solve dense part of U'
    for (i = 0; i < ns; i++) {
-      d->ptr.p_double[i] = d->ptr.p_double[i] / trdd->ptr.p_double[i];
+      d->ptr.p_double[i] /= trdd->ptr.p_double[i];
       v = d->ptr.p_double[i];
       for (j = 0; j < nd; j++) {
-         d->ptr.p_double[ns + j] = d->ptr.p_double[ns + j] - v * trda->ptr.pp_double[i][j];
+         d->ptr.p_double[ns + j] -= v * trda->ptr.pp_double[i][j];
       }
    }
    for (i = 0; i < nd; i++) {
-      d->ptr.p_double[ns + i] = d->ptr.p_double[ns + i] / trda->ptr.pp_double[ns + i][i];
+      d->ptr.p_double[ns + i] /= trda->ptr.pp_double[ns + i][i];
       v = d->ptr.p_double[ns + i];
       for (j = i + 1; j < nd; j++) {
-         d->ptr.p_double[ns + j] = d->ptr.p_double[ns + j] - v * trda->ptr.pp_double[ns + i][j];
+         d->ptr.p_double[ns + j] -= v * trda->ptr.pp_double[ns + i][j];
       }
    }
 
@@ -5437,14 +5437,14 @@ static void snnls_trdsolve(RVector trdd, RMatrix trda, ae_int_t ns, ae_int_t nd,
    for (i = nd - 1; i >= 0; i--) {
       v = 0.0;
       for (j = i + 1; j < nd; j++) {
-         v = v + trda->ptr.pp_double[ns + i][j] * d->ptr.p_double[ns + j];
+         v += trda->ptr.pp_double[ns + i][j] * d->ptr.p_double[ns + j];
       }
       d->ptr.p_double[ns + i] = (d->ptr.p_double[ns + i] - v) / trda->ptr.pp_double[ns + i][i];
    }
    for (i = ns - 1; i >= 0; i--) {
       v = 0.0;
       for (j = 0; j < nd; j++) {
-         v = v + trda->ptr.pp_double[i][j] * d->ptr.p_double[ns + j];
+         v += trda->ptr.pp_double[i][j] * d->ptr.p_double[ns + j];
       }
       d->ptr.p_double[i] = (d->ptr.p_double[i] - v) / trdd->ptr.p_double[i];
    }
@@ -5942,7 +5942,7 @@ void sassetlc(sactiveset *state, RMatrix c, ZVector ct, ae_int_t k) {
    for (i = 0; i < k; i++) {
       if (ct->ptr.p_int[i] == 0) {
          ae_v_move(state->cleic.ptr.pp_double[state->nec], 1, c->ptr.pp_double[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -5952,7 +5952,7 @@ void sassetlc(sactiveset *state, RMatrix c, ZVector ct, ae_int_t k) {
          } else {
             ae_v_move(state->cleic.ptr.pp_double[state->nec + state->nic], 1, c->ptr.pp_double[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 
@@ -6100,9 +6100,9 @@ bool sasstartoptimization(sactiveset *state, RVector x) {
          for (j = 0; j < n; j++) {
             vx = state->tmp0.ptr.p_double[j] / state->s.ptr.p_double[j];
             vc = state->cleic.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
-            v = v + vx * vc;
-            v0 = v0 + ae_sqr(vx);
-            v1 = v1 + ae_sqr(vc);
+            v += vx * vc;
+            v0 += ae_sqr(vx);
+            v1 += ae_sqr(vc);
          }
          vv = sqrt(v0) * sqrt(v1) * 1000 * ae_machineepsilon;
          if (i < state->nec) {
@@ -6261,7 +6261,7 @@ void sasexploredirection(sactiveset *state, RVector d, double *stpmax, ae_int_t 
    for (i = nec; i < nec + nic; i++) {
       if (state->cstatus.ptr.p_int[n + i] <= 0) {
          vc = ae_v_dotproduct(state->cleic.ptr.pp_double[i], 1, state->xc.ptr.p_double, 1, n);
-         vc = vc - state->cleic.ptr.pp_double[i][n];
+         vc -= state->cleic.ptr.pp_double[i][n];
          vd = ae_v_dotproduct(state->cleic.ptr.pp_double[i], 1, d->ptr.p_double, 1, n);
          if (vd <= 0.0) {
             continue;
@@ -6660,10 +6660,10 @@ void sascorrection(sactiveset *state, RVector x, double *penalty) {
    for (i = 0; i < state->densebatchsize; i++) {
       v = -state->sdensebatch.ptr.pp_double[i][n];
       for (j = 0; j < n; j++) {
-         v = v + state->sdensebatch.ptr.pp_double[i][j] * state->corrtmp.ptr.p_double[j];
+         v += state->sdensebatch.ptr.pp_double[i][j] * state->corrtmp.ptr.p_double[j];
       }
       for (j = 0; j < n; j++) {
-         state->corrtmp.ptr.p_double[j] = state->corrtmp.ptr.p_double[j] - v * state->sdensebatch.ptr.pp_double[i][j] * ae_sqr(state->s.ptr.p_double[j]);
+         state->corrtmp.ptr.p_double[j] -= v * state->sdensebatch.ptr.pp_double[i][j] * ae_sqr(state->s.ptr.p_double[j]);
       }
    }
    for (i = 0; i < n; i++) {
@@ -6731,12 +6731,12 @@ double sasactivelcpenalty1(sactiveset *state, RVector x) {
          p = -state->cleic.ptr.pp_double[i][n];
          for (j = 0; j < n; j++) {
             v = state->cleic.ptr.pp_double[i][j];
-            p = p + v * x->ptr.p_double[j];
-            alpha = alpha + ae_sqr(v * state->s.ptr.p_double[j]);
+            p += v * x->ptr.p_double[j];
+            alpha += ae_sqr(v * state->s.ptr.p_double[j]);
          }
          alpha = sqrt(alpha);
          if (alpha != 0.0) {
-            result = result + fabs(p / alpha);
+            result += fabs(p / alpha);
          }
       }
    }
@@ -6793,7 +6793,7 @@ double sasscaledconstrainednorm(sactiveset *state, RVector d) {
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = v + ae_sqr(state->s.ptr.p_double[i] * state->scntmp.ptr.p_double[i]);
+      v += ae_sqr(state->s.ptr.p_double[i] * state->scntmp.ptr.p_double[i]);
    }
    result = sqrt(v);
    return result;
@@ -6939,7 +6939,7 @@ void sasrebuildbasis(sactiveset *state) {
    for (j = 0; j < n; j++) {
       if (state->cstatus.ptr.p_int[j] > 0) {
          state->sparsebatch.ptr.p_int[state->sparsebatchsize] = j;
-         state->sparsebatchsize = state->sparsebatchsize + 1;
+         state->sparsebatchsize++;
       }
    }
    if (!hasactivelin) {
@@ -6966,19 +6966,19 @@ void sasrebuildbasis(sactiveset *state) {
    for (i = 0; i < candidatescnt; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + ae_sqr(state->tmpbasis.ptr.pp_double[i][j]) * state->tmpreciph.ptr.p_double[j];
+         v += ae_sqr(state->tmpbasis.ptr.pp_double[i][j]) * state->tmpreciph.ptr.p_double[j];
       }
       if (v > 0.0) {
          v = 1 / sqrt(v);
          for (j = 0; j <= n; j++) {
-            state->tmpbasis.ptr.pp_double[i][j] = state->tmpbasis.ptr.pp_double[i][j] * v;
+            state->tmpbasis.ptr.pp_double[i][j] *= v;
          }
       }
    }
    for (j = 0; j < n; j++) {
       if (state->cstatus.ptr.p_int[j] > 0) {
          for (i = 0; i < candidatescnt; i++) {
-            state->tmpbasis.ptr.pp_double[i][n] = state->tmpbasis.ptr.pp_double[i][n] - state->tmpbasis.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
+            state->tmpbasis.ptr.pp_double[i][n] -= state->tmpbasis.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
             state->tmpbasis.ptr.pp_double[i][j] = 0.0;
          }
       }
@@ -7067,7 +7067,7 @@ void sasrebuildbasis(sactiveset *state) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             vv = state->pdensebatch.ptr.pp_double[i][j];
-            v = v + vv * vv * state->tmpreciph.ptr.p_double[j];
+            v += vv * vv * state->tmpreciph.ptr.p_double[j];
          }
          v = sqrt(v);
          state->tmpnormestimates.ptr.p_double[i] = v;
@@ -7099,7 +7099,7 @@ void sasrebuildbasis(sactiveset *state) {
       v = 0.0;
       for (j = 0; j < n; j++) {
          vv = state->sdensebatch.ptr.pp_double[state->densebatchsize][j] * state->s.ptr.p_double[j];
-         v = v + vv * vv;
+         v += vv * vv;
       }
       ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, SNorm=0");
       v = 1 / sqrt(v);
@@ -7107,7 +7107,7 @@ void sasrebuildbasis(sactiveset *state) {
       v = 0.0;
       for (j = 0; j < n; j++) {
          vv = state->idensebatch.ptr.pp_double[state->densebatchsize][j];
-         v = v + vv * vv;
+         v += vv * vv;
       }
       ae_assert(v > 0.0, "SActiveSet.RebuildBasis(): integrity check failed, INorm=0");
       v = 1 / sqrt(v);
@@ -7197,7 +7197,7 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
    nact = 0;
    for (i = 0; i < n; i++) {
       if (newentries->ptr.p_bool[i]) {
-         nact = nact + 1;
+         nact++;
       }
    }
    for (i = n; i < n + nec; i++) {
@@ -7205,7 +7205,7 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
    }
    for (i = n + nec; i < n + nec + nic; i++) {
       if (newentries->ptr.p_bool[i]) {
-         nact = nact + 1;
+         nact++;
       }
    }
    if (nact + state->basisage > sactivesets_maxbasisage) {
@@ -7255,7 +7255,7 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
          initnormp = 0.0;
          for (j = 0; j < n; j++) {
             v = state->tmp0.ptr.p_double[j];
-            initnormp = initnormp + v * v / state->h.ptr.p_double[j];
+            initnormp += v * v / state->h.ptr.p_double[j];
          }
          initnormp = sqrt(initnormp);
          if (initnormp == 0.0) {
@@ -7272,7 +7272,7 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
       // I for "traditional" inner product used for Gram-Schmidt orthogonalization).
          for (i = 0; i < state->sparsebatchsize; i++) {
             j = state->sparsebatch.ptr.p_int[i];
-            state->tmp0.ptr.p_double[n] = state->tmp0.ptr.p_double[n] - state->tmp0.ptr.p_double[j] * state->xc.ptr.p_double[j];
+            state->tmp0.ptr.p_double[n] -= state->tmp0.ptr.p_double[j] * state->xc.ptr.p_double[j];
             state->tmp0.ptr.p_double[j] = 0.0;
          }
          for (j = 0; j <= n; j++) {
@@ -7292,9 +7292,9 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
             vs = 0.0;
             vi = 0.0;
             for (j = 0; j < n; j++) {
-               vp = vp + state->pdensebatch.ptr.pp_double[i][j] * state->tmpcp.ptr.p_double[j] * state->tmpprodp.ptr.p_double[j];
-               vs = vs + state->sdensebatch.ptr.pp_double[i][j] * state->tmpcs.ptr.p_double[j] * state->tmpprods.ptr.p_double[j];
-               vi = vi + state->idensebatch.ptr.pp_double[i][j] * state->tmpci.ptr.p_double[j];
+               vp += state->pdensebatch.ptr.pp_double[i][j] * state->tmpcp.ptr.p_double[j] * state->tmpprodp.ptr.p_double[j];
+               vs += state->sdensebatch.ptr.pp_double[i][j] * state->tmpcs.ptr.p_double[j] * state->tmpprods.ptr.p_double[j];
+               vi += state->idensebatch.ptr.pp_double[i][j] * state->tmpci.ptr.p_double[j];
             }
             ae_v_subd(state->tmpcp.ptr.p_double, 1, state->pdensebatch.ptr.pp_double[i], 1, n + 1, vp);
             ae_v_subd(state->tmpcs.ptr.p_double, 1, state->sdensebatch.ptr.pp_double[i], 1, n + 1, vs);
@@ -7304,9 +7304,9 @@ void sasappendtobasis(sactiveset *state, BVector newentries) {
          projnorms = 0.0;
          projnormi = 0.0;
          for (j = 0; j < n; j++) {
-            projnormp = projnormp + ae_sqr(state->tmpcp.ptr.p_double[j]) / state->h.ptr.p_double[j];
-            projnorms = projnorms + ae_sqr(state->tmpcs.ptr.p_double[j]) * ae_sqr(state->s.ptr.p_double[j]);
-            projnormi = projnormi + ae_sqr(state->tmpci.ptr.p_double[j]);
+            projnormp += ae_sqr(state->tmpcp.ptr.p_double[j]) / state->h.ptr.p_double[j];
+            projnorms += ae_sqr(state->tmpcs.ptr.p_double[j]) * ae_sqr(state->s.ptr.p_double[j]);
+            projnormi += ae_sqr(state->tmpci.ptr.p_double[j]);
          }
          projnormp = sqrt(projnormp);
          projnorms = sqrt(projnorms);
@@ -7381,7 +7381,7 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector g, RVector
    for (i = 0; i < state->densebatchsize; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + ha->ptr.pp_double[i][j] * d->ptr.p_double[j] / h->ptr.p_double[j];
+         v += ha->ptr.pp_double[i][j] * d->ptr.p_double[j] / h->ptr.p_double[j];
       }
       ae_v_subd(d->ptr.p_double, 1, ha->ptr.pp_double[i], 1, n, v);
    }
@@ -7392,8 +7392,8 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector g, RVector
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      d->ptr.p_double[i] = -d->ptr.p_double[i] / h->ptr.p_double[i];
-      v = v + ae_sqr(d->ptr.p_double[i]);
+      d->ptr.p_double[i] /= -h->ptr.p_double[i];
+      v += ae_sqr(d->ptr.p_double[i]);
    }
    v = sqrt(v);
    if (state->sparsebatchsize + state->densebatchsize >= n) {
@@ -7404,7 +7404,7 @@ static void sactivesets_constraineddescent(sactiveset *state, RVector g, RVector
    }
    if (normalize && v > 0.0) {
       for (i = 0; i < n; i++) {
-         d->ptr.p_double[i] = d->ptr.p_double[i] / v;
+         d->ptr.p_double[i] /= v;
       }
    }
 }
@@ -7516,8 +7516,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = 1.0;
          state->rctmpisequality.ptr.p_bool[nactiveconstraints] = true;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
       if (state->hasbndl.ptr.p_bool[i] && state->xc.ptr.p_double[i] == state->bndl.ptr.p_double[i]) {
@@ -7527,8 +7527,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = -1.0;
          state->rctmpisequality.ptr.p_bool[nactiveconstraints] = false;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
       if (state->hasbndu.ptr.p_bool[i] && state->xc.ptr.p_double[i] == state->bndu.ptr.p_double[i]) {
@@ -7538,8 +7538,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = 1.0;
          state->rctmpisequality.ptr.p_bool[nactiveconstraints] = false;
-         nactiveconstraints = nactiveconstraints + 1;
-         nactivebnd = nactivebnd + 1;
+         nactiveconstraints++;
+         nactivebnd++;
          continue;
       }
    }
@@ -7551,7 +7551,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
          rowscale = 0.0;
          v = -state->cleic.ptr.pp_double[i][n];
          for (j = 0; j < n; j++) {
-            v = v + state->cleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
+            v += state->cleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
             rowscale = ae_maxreal(rowscale, fabs(state->cleic.ptr.pp_double[i][j] * state->s.ptr.p_double[j]));
          }
          if (v <= -1.0E5 * ae_machineepsilon * rowscale) {
@@ -7566,8 +7566,8 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
       state->rctmpconstraintidx.ptr.p_int[nactiveconstraints] = n + i;
       state->cstatus.ptr.p_int[n + i] = 0;
       state->rctmpisequality.ptr.p_bool[nactiveconstraints] = i < nec;
-      nactiveconstraints = nactiveconstraints + 1;
-      nactivelin = nactivelin + 1;
+      nactiveconstraints++;
+      nactivelin++;
    }
 
 // Skip if no "candidate" constraints was found
@@ -7650,14 +7650,14 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector gc, RVe
             state->rctmpdense1.ptr.pp_double[idx0][j] = state->rctmpdense0.ptr.pp_double[i][j] / state->rctmps.ptr.p_double[i] * v;
          }
          state->rctmprightpart.ptr.p_double[idx0] = state->rctmpg.ptr.p_double[i] / state->rctmps.ptr.p_double[i] * v;
-         idx0 = idx0 + 1;
+         idx0++;
       } else {
          v = 1 / sqrt(h->ptr.p_double[i]);
          for (j = 0; j < nactivelin; j++) {
             state->rctmpdense1.ptr.pp_double[idx1][j] = state->rctmpdense0.ptr.pp_double[i][j] * v;
          }
          state->rctmprightpart.ptr.p_double[idx1] = state->rctmpg.ptr.p_double[i] * v;
-         idx1 = idx1 + 1;
+         idx1++;
       }
    }
    snnlsinit(n, ae_minint(nec + nic, n), n, &state->solver);
@@ -8085,8 +8085,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
             vv = fabs(v);
             sstate->densea.ptr.pp_double[i][j] = v;
             sstate->absamax = ae_maxreal(sstate->absamax, vv);
-            sstate->absasum = sstate->absasum + vv;
-            sstate->absasum2 = sstate->absasum2 + vv * vv;
+            sstate->absasum += vv;
+            sstate->absasum2 += vv * vv;
          }
       }
    }
@@ -8115,16 +8115,16 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
 
             // Diagonal terms are counted only once
                sstate->absamax = ae_maxreal(sstate->absamax, vv);
-               sstate->absasum = sstate->absasum + vv;
-               sstate->absasum2 = sstate->absasum2 + vv * vv;
+               sstate->absasum += vv;
+               sstate->absasum2 += vv * vv;
             } else {
 
             // Offdiagonal terms are counted twice
                sstate->absamax = ae_maxreal(sstate->absamax, vv);
-               sstate->absasum = sstate->absasum + 2 * vv;
-               sstate->absasum2 = sstate->absasum2 + 2 * vv * vv;
+               sstate->absasum += 2 * vv;
+               sstate->absasum2 += 2 * vv * vv;
             }
-            k = k + 1;
+            k++;
          }
       }
    }
@@ -8149,8 +8149,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
                   k = 2;
                }
                sstate->absamax = ae_maxreal(sstate->absamax, vv);
-               sstate->absasum = sstate->absasum + vv * k;
-               sstate->absasum2 = sstate->absasum2 + vv * vv * k;
+               sstate->absasum += vv * k;
+               sstate->absasum2 += vv * vv * k;
             }
          }
       } else {
@@ -8166,8 +8166,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
                   k = 2;
                }
                sstate->absamax = ae_maxreal(sstate->absamax, vv);
-               sstate->absasum = sstate->absasum + vv * k;
-               sstate->absasum2 = sstate->absasum2 + vv * vv * k;
+               sstate->absasum += vv * k;
+               sstate->absasum2 += vv * vv * k;
             }
          }
       }
@@ -8317,7 +8317,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
             if (settings->epsx > 0.0) {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + ae_sqr(sstate->xp.ptr.p_double[i] - sstate->sas.xc.ptr.p_double[i]);
+                  v += ae_sqr(sstate->xp.ptr.p_double[i] - sstate->sas.xc.ptr.p_double[i]);
                }
                if (sqrt(v) <= settings->epsx) {
                   *terminationtype = 2;
@@ -8369,8 +8369,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
             vv = 0.0;
             b = false;
             for (i = 0; i < n; i++) {
-               v = v + sstate->cgc.ptr.p_double[i] * sstate->cgc.ptr.p_double[i];
-               vv = vv + sstate->cgp.ptr.p_double[i] * sstate->cgp.ptr.p_double[i];
+               v += sstate->cgc.ptr.p_double[i] * sstate->cgc.ptr.p_double[i];
+               vv += sstate->cgp.ptr.p_double[i] * sstate->cgp.ptr.p_double[i];
                b = b || ((sstate->havebndl.ptr.p_bool[i] && sstate->sas.xc.ptr.p_double[i] == sstate->bndl.ptr.p_double[i]) && sstate->dp.ptr.p_double[i] != 0.0);
                b = b || ((sstate->havebndu.ptr.p_bool[i] && sstate->sas.xc.ptr.p_double[i] == sstate->bndu.ptr.p_double[i]) && sstate->dp.ptr.p_double[i] != 0.0);
             }
@@ -8478,7 +8478,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix de
             ae_v_move(sstate->cgp.ptr.p_double, 1, sstate->cgc.ptr.p_double, 1, n);
 
          // Update iterations counter
-            sstate->repinneriterationscount = sstate->repinneriterationscount + 1;
+            sstate->repinneriterationscount++;
          }
          if (*terminationtype != 0) {
             break;
@@ -8692,17 +8692,17 @@ static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector x, R
 // f(x) = 0.5*x'*A*x + b'*x
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + sstate->b.ptr.p_double[i] * tmp0->ptr.p_double[i];
+      result += sstate->b.ptr.p_double[i] * tmp0->ptr.p_double[i];
    }
    if (sstate->akind == 0) {
 
    // Dense matrix A
-      result = result + 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, true, tmp0, 0, tmp1);
+      result += 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, true, tmp0, 0, tmp1);
    } else {
 
    // sparse matrix A
       ae_assert(sstate->akind == 1, "QQPOptimize: unexpected AKind in ProjectedTargetFunction");
-      result = result + 0.5 * sparsevsmv(&sstate->sparsea, sstate->sparseupper, tmp0);
+      result += 0.5 * sparsevsmv(&sstate->sparsea, sstate->sparseupper, tmp0);
    }
    return result;
 }
@@ -9054,10 +9054,10 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
       b = b || (sstate->havebndu.ptr.p_bool[i] && sstate->sas.xc.ptr.p_double[i] == sstate->bndu.ptr.p_double[i]);
       if (b) {
          sstate->yidx.ptr.p_int[ridx1] = i;
-         ridx1 = ridx1 - 1;
+         ridx1--;
       } else {
          sstate->yidx.ptr.p_int[ridx0] = i;
-         ridx0 = ridx0 + 1;
+         ridx0++;
       }
    }
    ae_assert(ridx0 == ridx1 + 1, "CNewtonBuild: internal error");
@@ -9088,10 +9088,10 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
       for (i = 0; i < nfree; i++) {
          v = 0.0;
          for (j = 0; j < i; j++) {
-            v = v + fabs(sstate->densez.ptr.pp_double[j][i]);
+            v += fabs(sstate->densez.ptr.pp_double[j][i]);
          }
          for (j = i; j < nfree; j++) {
-            v = v + fabs(sstate->densez.ptr.pp_double[i][j]);
+            v += fabs(sstate->densez.ptr.pp_double[i][j]);
          }
          if (v == 0.0) {
             v = 1.0;
@@ -9099,7 +9099,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
          sstate->regdiag.ptr.p_double[i] = qqpsolver_regz * v;
       }
       for (i = 0; i < nfree; i++) {
-         sstate->densez.ptr.pp_double[i][i] = sstate->densez.ptr.pp_double[i][i] + sstate->regdiag.ptr.p_double[i];
+         sstate->densez.ptr.pp_double[i][i] += sstate->regdiag.ptr.p_double[i];
       }
       inc(ncholesky);
       if (!spdmatrixcholeskyrec(&sstate->densez, 0, nfree, true, &sstate->tmpcn)) {
@@ -9152,7 +9152,7 @@ static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae
                   sstate->sparsecca.vals.ptr.p_double[k] = 0.0;
                }
             }
-            k = k + 1;
+            k++;
          }
       }
 
@@ -9249,10 +9249,10 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
       b = b || (sstate->havebndu.ptr.p_bool[i] && sstate->sas.xc.ptr.p_double[i] == sstate->bndu.ptr.p_double[i]);
       if (b) {
          sstate->tmpcni.ptr.p_int[ridx1] = i;
-         ridx1 = ridx1 - 1;
+         ridx1--;
       } else {
          sstate->tmpcni.ptr.p_int[ridx0] = i;
-         ridx0 = ridx0 + 1;
+         ridx0++;
       }
    }
    ae_assert(ridx0 == ridx1 + 1, "CNewtonUpdate: internal error");
@@ -9282,8 +9282,8 @@ static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, a
 
    // Update information stored in State and exit
       sstate->nfree = nfree - ntofix;
-      sstate->cnmodelage = sstate->cnmodelage + ntofix;
-      *ncupdates = *ncupdates + ntofix;
+      sstate->cnmodelage += ntofix;
+      *ncupdates += ntofix;
       result = true;
       return result;
    }
@@ -9606,10 +9606,10 @@ void scaleshiftdensebrlcinplace(RVector s, RVector xorigin, ae_int_t n, RMatrix 
       v = 0.0;
       for (j = 0; j < n; j++) {
          vv = densea->ptr.pp_double[i][j];
-         v = v + vv * xorigin->ptr.p_double[j];
+         v += vv * xorigin->ptr.p_double[j];
          densea->ptr.pp_double[i][j] = vv * s->ptr.p_double[j];
       }
-      ab->ptr.p_double[i] = ab->ptr.p_double[i] - v;
+      ab->ptr.p_double[i] -= v;
    }
 }
 
@@ -9662,10 +9662,10 @@ void scaleshiftmixedbrlcinplace(RVector s, RVector xorigin, ae_int_t n, sparsema
       for (k = k0; k <= k1; k++) {
          j = sparsea->idx.ptr.p_int[k];
          vv = sparsea->vals.ptr.p_double[k];
-         v = v + vv * xorigin->ptr.p_double[j];
+         v += vv * xorigin->ptr.p_double[j];
          sparsea->vals.ptr.p_double[k] = vv * s->ptr.p_double[j];
       }
-      ab->ptr.p_double[i] = ab->ptr.p_double[i] - v;
+      ab->ptr.p_double[i] -= v;
    }
    for (i = 0; i < mdense; i++) {
 
@@ -9675,10 +9675,10 @@ void scaleshiftmixedbrlcinplace(RVector s, RVector xorigin, ae_int_t n, sparsema
       v = 0.0;
       for (j = 0; j < n; j++) {
          vv = densea->ptr.pp_double[i][j];
-         v = v + vv * xorigin->ptr.p_double[j];
+         v += vv * xorigin->ptr.p_double[j];
          densea->ptr.pp_double[i][j] = vv * s->ptr.p_double[j];
       }
-      ab->ptr.p_double[msparse + i] = ab->ptr.p_double[msparse + i] - v;
+      ab->ptr.p_double[msparse + i] -= v;
    }
 }
 
@@ -9718,11 +9718,11 @@ void scaledenseqpinplace(RMatrix densea, bool isupper, ae_int_t nmain, RVector d
          j1 = i;
       }
       for (j = j0; j <= j1; j++) {
-         densea->ptr.pp_double[i][j] = densea->ptr.pp_double[i][j] * si * s->ptr.p_double[j];
+         densea->ptr.pp_double[i][j] *= si * s->ptr.p_double[j];
       }
    }
    for (i = 0; i < ntotal; i++) {
-      denseb->ptr.p_double[i] = denseb->ptr.p_double[i] * s->ptr.p_double[i];
+      denseb->ptr.p_double[i] *= s->ptr.p_double[i];
    }
 }
 
@@ -9756,9 +9756,9 @@ void scalesparseqpinplace(RVector s, ae_int_t n, sparsematrix *sparsea, RVector 
       k0 = sparsea->ridx.ptr.p_int[i];
       k1 = sparsea->ridx.ptr.p_int[i + 1] - 1;
       for (k = k0; k <= k1; k++) {
-         sparsea->vals.ptr.p_double[k] = sparsea->vals.ptr.p_double[k] * si * s->ptr.p_double[sparsea->idx.ptr.p_int[k]];
+         sparsea->vals.ptr.p_double[k] *= si * s->ptr.p_double[sparsea->idx.ptr.p_int[k]];
       }
-      denseb->ptr.p_double[i] = denseb->ptr.p_double[i] * si;
+      denseb->ptr.p_double[i] *= si;
    }
 }
 
@@ -9800,7 +9800,7 @@ void normalizedensebrlcinplace(RMatrix densea, RVector ab, RVector ar, ae_int_t 
       vv = 0.0;
       for (j = 0; j < n; j++) {
          v = densea->ptr.pp_double[i][j];
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       if (neednorms) {
@@ -9809,11 +9809,11 @@ void normalizedensebrlcinplace(RMatrix densea, RVector ab, RVector ar, ae_int_t 
       if (vv > 0.0) {
          vv = 1 / vv;
          for (j = 0; j < n; j++) {
-            densea->ptr.pp_double[i][j] = densea->ptr.pp_double[i][j] * vv;
+            densea->ptr.pp_double[i][j] *= vv;
          }
-         ab->ptr.p_double[i] = ab->ptr.p_double[i] * vv;
+         ab->ptr.p_double[i] *= vv;
          if (isfinite(ar->ptr.p_double[i])) {
-            ar->ptr.p_double[i] = ar->ptr.p_double[i] * vv;
+            ar->ptr.p_double[i] *= vv;
          }
       }
    }
@@ -9867,7 +9867,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
       k1 = sparsea->ridx.ptr.p_int[i + 1] - 1;
       for (k = k0; k <= k1; k++) {
          v = sparsea->vals.ptr.p_double[k];
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       if (neednorms) {
@@ -9876,11 +9876,11 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
       if (vv > 0.0) {
          vv = 1 / vv;
          for (k = k0; k <= k1; k++) {
-            sparsea->vals.ptr.p_double[k] = sparsea->vals.ptr.p_double[k] * vv;
+            sparsea->vals.ptr.p_double[k] *= vv;
          }
-         ab->ptr.p_double[i] = ab->ptr.p_double[i] * vv;
+         ab->ptr.p_double[i] *= vv;
          if (isfinite(ar->ptr.p_double[i])) {
-            ar->ptr.p_double[i] = ar->ptr.p_double[i] * vv;
+            ar->ptr.p_double[i] *= vv;
          }
       }
    }
@@ -9888,7 +9888,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
       vv = 0.0;
       for (j = 0; j < n; j++) {
          v = densea->ptr.pp_double[i][j];
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       if (neednorms) {
@@ -9897,11 +9897,11 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
       if (vv > 0.0) {
          vv = 1 / vv;
          for (j = 0; j < n; j++) {
-            densea->ptr.pp_double[i][j] = densea->ptr.pp_double[i][j] * vv;
+            densea->ptr.pp_double[i][j] *= vv;
          }
-         ab->ptr.p_double[msparse + i] = ab->ptr.p_double[msparse + i] * vv;
+         ab->ptr.p_double[msparse + i] *= vv;
          if (isfinite(ar->ptr.p_double[msparse + i])) {
-            ar->ptr.p_double[msparse + i] = ar->ptr.p_double[msparse + i] * vv;
+            ar->ptr.p_double[msparse + i] *= vv;
          }
       }
    }
@@ -9966,11 +9966,11 @@ double normalizedenseqpinplace(RMatrix densea, bool isupper, ae_int_t nmain, RVe
          j1 = i;
       }
       for (j = j0; j <= j1; j++) {
-         densea->ptr.pp_double[i][j] = densea->ptr.pp_double[i][j] * v;
+         densea->ptr.pp_double[i][j] *= v;
       }
    }
    for (i = 0; i < ntotal; i++) {
-      denseb->ptr.p_double[i] = denseb->ptr.p_double[i] * v;
+      denseb->ptr.p_double[i] *= v;
    }
    return result;
 }
@@ -10029,9 +10029,9 @@ double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector den
       k0 = sparsea->ridx.ptr.p_int[i];
       k1 = sparsea->ridx.ptr.p_int[i + 1] - 1;
       for (k = k0; k <= k1; k++) {
-         sparsea->vals.ptr.p_double[k] = sparsea->vals.ptr.p_double[k] * v;
+         sparsea->vals.ptr.p_double[k] *= v;
       }
-      denseb->ptr.p_double[i] = denseb->ptr.p_double[i] * v;
+      denseb->ptr.p_double[i] *= v;
    }
    return result;
 }
@@ -10315,7 +10315,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
       vv = 0.0;
       for (i = 0; i < nmain; i++) {
          for (j = 0; j <= i; j++) {
-            vv = vv + state->denseh.ptr.pp_double[i][j];
+            vv += state->denseh.ptr.pp_double[i][j];
          }
       }
       ae_assert(isfinite(vv), "VIPMSetQuadraticLinear: DenseH contains infinite or NaN values!");
@@ -10336,7 +10336,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
       // Sparsify dense term
          nnz = 0;
          for (i = 0; i < n; i++) {
-            nnz = nnz + 1;
+            nnz++;
             if (isupper) {
                j0 = i + 1;
                j1 = n - 1;
@@ -10346,7 +10346,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
             }
             for (j = j0; j <= j1; j++) {
                if (denseh->ptr.pp_double[i][j] != 0) {
-                  nnz = nnz + 1;
+                  nnz++;
                }
             }
          }
@@ -10365,8 +10365,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
                      v = denseh->ptr.pp_double[i][j];
                      state->sparseh.idx.ptr.p_int[offs] = j;
                      state->sparseh.vals.ptr.p_double[offs] = v;
-                     vv = vv + v;
-                     offs = offs + 1;
+                     vv += v;
+                     offs++;
                   }
                }
             }
@@ -10374,8 +10374,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
             v = denseh->ptr.pp_double[i][i];
             state->sparseh.idx.ptr.p_int[offs] = i;
             state->sparseh.vals.ptr.p_double[offs] = v;
-            vv = vv + v;
-            offs = offs + 1;
+            vv += v;
+            offs++;
 
          // Off-diagonal elements are copied only when nonzero
             if (isupper) {
@@ -10384,8 +10384,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
                      v = denseh->ptr.pp_double[i][j];
                      state->sparseh.idx.ptr.p_int[offs] = j;
                      state->sparseh.vals.ptr.p_double[offs] = v;
-                     vv = vv + v;
-                     offs = offs + 1;
+                     vv += v;
+                     offs++;
                   }
                }
             }
@@ -10419,8 +10419,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
                   v = sparseh->vals.ptr.p_double[k];
                   state->sparseh.idx.ptr.p_int[offs] = sparseh->idx.ptr.p_int[k];
                   state->sparseh.vals.ptr.p_double[offs] = v;
-                  vv = vv + v;
-                  offs = offs + 1;
+                  vv += v;
+                  offs++;
                }
             }
          // Diagonal element is always copied
@@ -10430,8 +10430,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
             }
             state->sparseh.idx.ptr.p_int[offs] = i;
             state->sparseh.vals.ptr.p_double[offs] = v;
-            vv = vv + v;
-            offs = offs + 1;
+            vv += v;
+            offs++;
 
          // Copy superdiagonal elements (if needed)
             if (isupper) {
@@ -10441,8 +10441,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix denseh, sparsematrix *spar
                   v = sparseh->vals.ptr.p_double[k];
                   state->sparseh.idx.ptr.p_int[offs] = sparseh->idx.ptr.p_int[k];
                   state->sparseh.vals.ptr.p_double[offs] = v;
-                  vv = vv + v;
-                  offs = offs + 1;
+                  vv += v;
+                  offs++;
                }
             }
          // Finalize row
@@ -10564,11 +10564,11 @@ void vipmsetconstraints(vipmstate *state, RVector bndl, RVector bndu, sparsematr
          j0 = state->sparseafull.ridx.ptr.p_int[i];
          j1 = state->sparseafull.ridx.ptr.p_int[i + 1] - 1;
          for (j = j0; j <= j1; j++) {
-            state->sparseafull.vals.ptr.p_double[j] = state->sparseafull.vals.ptr.p_double[j] * vs;
+            state->sparseafull.vals.ptr.p_double[j] *= vs;
          }
       } else {
          for (j = 0; j < n; j++) {
-            state->denseafull.ptr.pp_double[i - msparse][j] = state->denseafull.ptr.pp_double[i - msparse][j] * vs;
+            state->denseafull.ptr.pp_double[i - msparse][j] *= vs;
          }
       }
       state->ascales.ptr.p_double[i] = vs;
@@ -10576,7 +10576,7 @@ void vipmsetconstraints(vipmstate *state, RVector bndl, RVector bndu, sparsematr
    scaleshiftmixedbrlcinplace(&state->scl, &state->xorigin, n, &state->sparseafull, msparse, &state->denseafull, mdense, &state->b, &state->r);
    normalizemixedbrlcinplace(&state->sparseafull, msparse, &state->denseafull, mdense, &state->b, &state->r, n, &state->tmp0, true);
    for (i = 0; i < m; i++) {
-      state->ascales.ptr.p_double[i] = state->ascales.ptr.p_double[i] * state->tmp0.ptr.p_double[i];
+      state->ascales.ptr.p_double[i] *= state->tmp0.ptr.p_double[i];
    }
    state->mdense = mdense;
    state->msparse = msparse;
@@ -10610,13 +10610,13 @@ void vipmsetconstraints(vipmstate *state, RVector bndl, RVector bndu, sparsematr
             if (k < nmain) {
                state->sparseamain.idx.ptr.p_int[offsmain] = k;
                state->sparseamain.vals.ptr.p_double[offsmain] = v;
-               offsmain = offsmain + 1;
+               offsmain++;
             } else {
                ae_assert(state->tmpi.ptr.p_int[k - nmain] == 0, "VIPMSetConstraints: slack column contains more than one nonzero element");
                state->combinedaslack.idx.ptr.p_int[offscombined] = k - nmain;
                state->combinedaslack.vals.ptr.p_double[offscombined] = v;
-               state->tmpi.ptr.p_int[k - nmain] = state->tmpi.ptr.p_int[k - nmain] + 1;
-               offscombined = offscombined + 1;
+               state->tmpi.ptr.p_int[k - nmain]++;
+               offscombined++;
             }
          }
          state->sparseamain.ridx.ptr.p_int[i + 1] = offsmain;
@@ -10634,8 +10634,8 @@ void vipmsetconstraints(vipmstate *state, RVector bndl, RVector bndu, sparsematr
                ae_assert(state->tmpi.ptr.p_int[k - nmain] == 0, "VIPMSetConstraints: slack column contains more than one nonzero element");
                state->combinedaslack.idx.ptr.p_int[offscombined] = k - nmain;
                state->combinedaslack.vals.ptr.p_double[offscombined] = state->denseafull.ptr.pp_double[i][k];
-               state->tmpi.ptr.p_int[k - nmain] = state->tmpi.ptr.p_int[k - nmain] + 1;
-               offscombined = offscombined + 1;
+               state->tmpi.ptr.p_int[k - nmain]++;
+               offscombined++;
             }
          }
          state->combinedaslack.ridx.ptr.p_int[msparse + i + 1] = offscombined;
@@ -10813,10 +10813,10 @@ void vipmoptimize(vipmstate *state, RVector xs, RVector lagbc, RVector laglc, ae
       xs->ptr.p_double[i] = state->current.x.ptr.p_double[i];
       lagbc->ptr.p_double[i] = 0.0;
       if (state->hasbndl.ptr.p_bool[i]) {
-         lagbc->ptr.p_double[i] = lagbc->ptr.p_double[i] - state->current.z.ptr.p_double[i];
+         lagbc->ptr.p_double[i] -= state->current.z.ptr.p_double[i];
       }
       if (state->hasbndu.ptr.p_bool[i]) {
-         lagbc->ptr.p_double[i] = lagbc->ptr.p_double[i] + state->current.s.ptr.p_double[i];
+         lagbc->ptr.p_double[i] += state->current.s.ptr.p_double[i];
       }
    }
    for (i = 0; i < m; i++) {
@@ -10926,18 +10926,18 @@ static void vipmsolver_varsaddstep(vipmvars *vstate, vipmvars *vdir, double stpp
    ae_assert(n == vdir->n, "VarsAddStep: sizes mismatch");
    ae_assert(m == vdir->m, "VarsAddStep: sizes mismatch");
    for (i = 0; i < n; i++) {
-      vstate->x.ptr.p_double[i] = vstate->x.ptr.p_double[i] + stpp * vdir->x.ptr.p_double[i];
-      vstate->g.ptr.p_double[i] = vstate->g.ptr.p_double[i] + stpp * vdir->g.ptr.p_double[i];
-      vstate->t.ptr.p_double[i] = vstate->t.ptr.p_double[i] + stpp * vdir->t.ptr.p_double[i];
-      vstate->z.ptr.p_double[i] = vstate->z.ptr.p_double[i] + stpd * vdir->z.ptr.p_double[i];
-      vstate->s.ptr.p_double[i] = vstate->s.ptr.p_double[i] + stpd * vdir->s.ptr.p_double[i];
+      vstate->x.ptr.p_double[i] += stpp * vdir->x.ptr.p_double[i];
+      vstate->g.ptr.p_double[i] += stpp * vdir->g.ptr.p_double[i];
+      vstate->t.ptr.p_double[i] += stpp * vdir->t.ptr.p_double[i];
+      vstate->z.ptr.p_double[i] += stpd * vdir->z.ptr.p_double[i];
+      vstate->s.ptr.p_double[i] += stpd * vdir->s.ptr.p_double[i];
    }
    for (i = 0; i < m; i++) {
-      vstate->w.ptr.p_double[i] = vstate->w.ptr.p_double[i] + stpp * vdir->w.ptr.p_double[i];
-      vstate->p.ptr.p_double[i] = vstate->p.ptr.p_double[i] + stpp * vdir->p.ptr.p_double[i];
-      vstate->y.ptr.p_double[i] = vstate->y.ptr.p_double[i] + stpd * vdir->y.ptr.p_double[i];
-      vstate->v.ptr.p_double[i] = vstate->v.ptr.p_double[i] + stpd * vdir->v.ptr.p_double[i];
-      vstate->q.ptr.p_double[i] = vstate->q.ptr.p_double[i] + stpd * vdir->q.ptr.p_double[i];
+      vstate->w.ptr.p_double[i] += stpp * vdir->w.ptr.p_double[i];
+      vstate->p.ptr.p_double[i] += stpp * vdir->p.ptr.p_double[i];
+      vstate->y.ptr.p_double[i] += stpd * vdir->y.ptr.p_double[i];
+      vstate->v.ptr.p_double[i] += stpd * vdir->v.ptr.p_double[i];
+      vstate->q.ptr.p_double[i] += stpd * vdir->q.ptr.p_double[i];
    }
 }
 
@@ -10954,10 +10954,10 @@ static double vipmsolver_varscomputecomplementaritygap(vipmvars *vstate) {
    m = vstate->m;
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + vstate->z.ptr.p_double[i] * vstate->g.ptr.p_double[i] + vstate->s.ptr.p_double[i] * vstate->t.ptr.p_double[i];
+      result += vstate->z.ptr.p_double[i] * vstate->g.ptr.p_double[i] + vstate->s.ptr.p_double[i] * vstate->t.ptr.p_double[i];
    }
    for (i = 0; i < m; i++) {
-      result = result + vstate->v.ptr.p_double[i] * vstate->w.ptr.p_double[i] + vstate->p.ptr.p_double[i] * vstate->q.ptr.p_double[i];
+      result += vstate->v.ptr.p_double[i] * vstate->w.ptr.p_double[i] + vstate->p.ptr.p_double[i] * vstate->q.ptr.p_double[i];
    }
    return result;
 }
@@ -10973,18 +10973,18 @@ static double vipmsolver_varscomputemu(vipmvars *vstate) {
    k = 0;
    for (i = 0; i < vstate->n; i++) {
       if (!(vstate->z.ptr.p_double[i] * vstate->g.ptr.p_double[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
       if (!(vstate->s.ptr.p_double[i] * vstate->t.ptr.p_double[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
    }
    for (i = 0; i < vstate->m; i++) {
       if (!(vstate->v.ptr.p_double[i] * vstate->w.ptr.p_double[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
       if (!(vstate->p.ptr.p_double[i] * vstate->q.ptr.p_double[i] == 0.0)) {
-         k = k + 1;
+         k++;
       }
    }
    result = vipmsolver_varscomputecomplementaritygap(vstate) / coalesce((double)k, 1.0);
@@ -11267,12 +11267,12 @@ static double vipmsolver_vipmtarget(vipmstate *state, RVector x) {
    if (state->hkind == 0) {
       for (i = 0; i < nmain; i++) {
          for (j = 0; j < i; j++) {
-            result = result + x->ptr.p_double[i] * state->denseh.ptr.pp_double[i][j] * x->ptr.p_double[j];
+            result += x->ptr.p_double[i] * state->denseh.ptr.pp_double[i][j] * x->ptr.p_double[j];
          }
-         result = result + 0.5 * x->ptr.p_double[i] * x->ptr.p_double[i] * state->denseh.ptr.pp_double[i][i];
+         result += 0.5 * x->ptr.p_double[i] * x->ptr.p_double[i] * state->denseh.ptr.pp_double[i][i];
       }
       for (i = 0; i < n; i++) {
-         result = result + state->c.ptr.p_double[i] * x->ptr.p_double[i];
+         result += state->c.ptr.p_double[i] * x->ptr.p_double[i];
       }
       return result;
    }
@@ -11280,17 +11280,17 @@ static double vipmsolver_vipmtarget(vipmstate *state, RVector x) {
    if (state->hkind == 1) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + state->c.ptr.p_double[i] * x->ptr.p_double[i];
+         result += state->c.ptr.p_double[i] * x->ptr.p_double[i];
          j0 = state->sparseh.ridx.ptr.p_int[i];
          j1 = state->sparseh.didx.ptr.p_int[i] - 1;
          for (k = j0; k <= j1; k++) {
             v = state->sparseh.vals.ptr.p_double[k];
             j = state->sparseh.idx.ptr.p_int[k];
-            result = result + v * x->ptr.p_double[i] * x->ptr.p_double[j];
+            result += v * x->ptr.p_double[i] * x->ptr.p_double[j];
          }
          ae_assert(state->sparseh.uidx.ptr.p_int[i] != state->sparseh.didx.ptr.p_int[i], "VIPMTarget: sparse diagonal not found");
          v = state->sparseh.vals.ptr.p_double[state->sparseh.didx.ptr.p_int[i]];
-         result = result + 0.5 * v * x->ptr.p_double[i] * x->ptr.p_double[i];
+         result += 0.5 * v * x->ptr.p_double[i] * x->ptr.p_double[i];
       }
       return result;
    }
@@ -11383,10 +11383,10 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
       ae_assert(state->hkind == 1, "VIPMPowerUp: unexpected HKind");
       nnzhalfmax = state->sparseh.ridx.ptr.p_int[n];
       if (state->msparse > 0) {
-         nnzhalfmax = nnzhalfmax + state->sparseafull.ridx.ptr.p_int[state->msparse];
+         nnzhalfmax += state->sparseafull.ridx.ptr.p_int[state->msparse];
       }
       if (state->mdense > 0) {
-         nnzhalfmax = nnzhalfmax + n * state->mdense;
+         nnzhalfmax += n * state->mdense;
       }
    // Prepare strictly lower triangle of template KKT matrix (KKT system without D and E
    // terms being added to diagonals)
@@ -11404,9 +11404,9 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
          for (k = k0; k <= k1; k++) {
             state->tmpsparse0.idx.ptr.p_int[offs] = state->sparseh.idx.ptr.p_int[k];
             state->tmpsparse0.vals.ptr.p_double[offs] = -state->sparseh.vals.ptr.p_double[k];
-            offs = offs + 1;
+            offs++;
          }
-         rowoffs = rowoffs + 1;
+         rowoffs++;
          state->tmpsparse0.ridx.ptr.p_int[rowoffs] = offs;
       }
       for (i = 0; i < state->msparse; i++) {
@@ -11415,9 +11415,9 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
          for (k = k0; k <= k1; k++) {
             state->tmpsparse0.idx.ptr.p_int[offs] = state->sparseafull.idx.ptr.p_int[k];
             state->tmpsparse0.vals.ptr.p_double[offs] = state->sparseafull.vals.ptr.p_double[k];
-            offs = offs + 1;
+            offs++;
          }
-         rowoffs = rowoffs + 1;
+         rowoffs++;
          state->tmpsparse0.ridx.ptr.p_int[rowoffs] = offs;
       }
       for (i = 0; i < state->mdense; i++) {
@@ -11425,10 +11425,10 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
             if (state->denseafull.ptr.pp_double[i][k] != 0.0) {
                state->tmpsparse0.idx.ptr.p_int[offs] = k;
                state->tmpsparse0.vals.ptr.p_double[offs] = state->denseafull.ptr.pp_double[i][k];
-               offs = offs + 1;
+               offs++;
             }
          }
-         rowoffs = rowoffs + 1;
+         rowoffs++;
          state->tmpsparse0.ridx.ptr.p_int[rowoffs] = offs;
       }
       ae_assert(rowoffs == m + n, "VIPMPowerUp: critical integrity check failed");
@@ -11455,7 +11455,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
          for (k = k0; k <= k1; k++) {
             state->factsparsekkttmpl.idx.ptr.p_int[offs] = state->tmpsparse0.idx.ptr.p_int[k];
             state->factsparsekkttmpl.vals.ptr.p_double[offs] = state->tmpsparse0.vals.ptr.p_double[k];
-            offs = offs + 1;
+            offs++;
          }
 
       // Merge in diagonal term
@@ -11466,7 +11466,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
          }
          state->factsparsekkttmpl.idx.ptr.p_int[offs] = i;
          state->factsparsekkttmpl.vals.ptr.p_double[offs] = v;
-         offs = offs + 1;
+         offs++;
 
       // Merge in upper triangle
          k0 = state->tmpsparse1.ridx.ptr.p_int[i];
@@ -11474,7 +11474,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state) {
          for (k = k0; k <= k1; k++) {
             state->factsparsekkttmpl.idx.ptr.p_int[offs] = state->tmpsparse1.idx.ptr.p_int[k];
             state->factsparsekkttmpl.vals.ptr.p_double[offs] = state->tmpsparse1.vals.ptr.p_double[k];
-            offs = offs + 1;
+            offs++;
          }
 
       // Finalize row
@@ -11588,10 +11588,10 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
       for (i = 0; i < n; i++) {
          v = 0.0;
          if (alpha0 > 0.0) {
-            v = v + alpha0 * d->ptr.p_double[i];
+            v += alpha0 * d->ptr.p_double[i];
          }
          if (alpha1 > 0.0) {
-            v = v + alpha1;
+            v += alpha1;
          }
          ae_assert(v > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
          if (i >= nmain) {
@@ -11609,10 +11609,10 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
       // Compute diagonal element of E
          v = 0.0;
          if (beta0 > 0.0) {
-            v = v + beta0 * e->ptr.p_double[i];
+            v += beta0 * e->ptr.p_double[i];
          }
          if (beta1 > 0.0) {
-            v = v + beta1;
+            v += beta1;
          }
          ae_assert(v > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
 
@@ -11621,7 +11621,7 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
          k1 = state->combinedaslack.ridx.ptr.p_int[i + 1] - 1;
          for (k = k0; k <= k1; k++) {
             vv = state->combinedaslack.vals.ptr.p_double[k];
-            v = v + vv * vv * state->factinvdz.ptr.p_double[state->combinedaslack.idx.ptr.p_int[k]];
+            v += vv * vv * state->factinvdz.ptr.p_double[state->combinedaslack.idx.ptr.p_int[k]];
          }
 
       // Save EWave
@@ -11636,7 +11636,7 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
       ae_assert(state->hkind == 0, "VIPMFactorize: unexpected HKind");
       rmatrixcopy(nmain, nmain, &state->denseh, 0, 0, &state->factdensehaug, 0, 0);
       for (i = 0; i < nmain; i++) {
-         state->factdensehaug.ptr.pp_double[i][i] = state->factdensehaug.ptr.pp_double[i][i] + state->factdh.ptr.p_double[i];
+         state->factdensehaug.ptr.pp_double[i][i] += state->factdh.ptr.p_double[i];
       }
       if (msparse > 0) {
 
@@ -11651,7 +11651,7 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
                for (kb = k0; kb <= ka; kb++) {
                   jb = state->sparseamain.idx.ptr.p_int[kb];
                   vb = state->sparseamain.vals.ptr.p_double[kb];
-                  state->factdensehaug.ptr.pp_double[ja][jb] = state->factdensehaug.ptr.pp_double[ja][jb] + v * va * vb;
+                  state->factdensehaug.ptr.pp_double[ja][jb] += v * va * vb;
                }
             }
          }
@@ -11664,7 +11664,7 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
          for (i = 0; i < mdense; i++) {
             v = 1.0 / sqrt(state->facteffectivee.ptr.p_double[msparse + i]);
             for (j = 0; j < nmain; j++) {
-               state->tmpr2.ptr.pp_double[i][j] = v * state->tmpr2.ptr.pp_double[i][j];
+               state->tmpr2.ptr.pp_double[i][j] *= v;
             }
          }
          rmatrixsyrk(nmain, mdense, 1.0, &state->tmpr2, 0, 0, 2, 1.0, &state->factdensehaug, 0, 0, false);
@@ -11682,10 +11682,10 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
          ae_assert(state->factsparsekkt.didx.ptr.p_int[i] + 1 == state->factsparsekkt.uidx.ptr.p_int[i], "VIPMFactorize: integrity check failed, no diagonal element");
          v = state->factsparsekkt.vals.ptr.p_double[state->factsparsekkt.didx.ptr.p_int[i]];
          if (alpha0 > 0.0) {
-            v = v - alpha0 * d->ptr.p_double[i];
+            v -= alpha0 * d->ptr.p_double[i];
          }
          if (alpha1 > 0.0) {
-            v = v - alpha1;
+            v -= alpha1;
          }
          state->factsparsekkt.vals.ptr.p_double[state->factsparsekkt.didx.ptr.p_int[i]] = v;
       }
@@ -11693,10 +11693,10 @@ static void vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector d,
          ae_assert(state->factsparsekkt.didx.ptr.p_int[n + i] + 1 == state->factsparsekkt.uidx.ptr.p_int[n + i], "VIPMFactorize: integrity check failed, no diagonal element");
          v = state->factsparsekkt.vals.ptr.p_double[state->factsparsekkt.didx.ptr.p_int[n + i]];
          if (beta0 > 0.0) {
-            v = v + beta0 * e->ptr.p_double[i];
+            v += beta0 * e->ptr.p_double[i];
          }
          if (beta1 > 0.0) {
-            v = v + beta1;
+            v += beta1;
          }
          ae_assert(v > 0.0, "VIPMFactorize: integrity check failed, degenerate diagonal matrix");
          state->factsparsekkt.vals.ptr.p_double[state->factsparsekkt.didx.ptr.p_int[n + i]] = v;
@@ -11746,7 +11746,7 @@ static void vipmsolver_vipmsolve(vipmstate *state, RVector deltaxy) {
    //     ByWave = By+Az*BzWave
    //     BhWave = Bh-Ah'*inv(EWave)*ByWave
       for (i = 0; i < nslack; i++) {
-         deltaxy->ptr.p_double[nmain + i] = deltaxy->ptr.p_double[nmain + i] * state->factinvdz.ptr.p_double[i];
+         deltaxy->ptr.p_double[nmain + i] *= state->factinvdz.ptr.p_double[i];
       }
       sparsegemv(&state->combinedaslack, 1.0, 0, deltaxy, nmain, 1.0, deltaxy, n);
       rvectorsetlengthatleast(&state->tmp1, m);
@@ -11767,7 +11767,7 @@ static void vipmsolver_vipmsolve(vipmstate *state, RVector deltaxy) {
       sparsegemv(&state->sparseamain, -1.0, 0, deltaxy, 0, 1.0, deltaxy, n);
       rmatrixgemv(mdense, nmain, -1.0, &state->denseamain, 0, 0, 0, deltaxy, 0, 1.0, deltaxy, n + msparse);
       for (i = 0; i < m; i++) {
-         deltaxy->ptr.p_double[n + i] = deltaxy->ptr.p_double[n + i] / state->facteffectivee.ptr.p_double[i];
+         deltaxy->ptr.p_double[n + i] /= state->facteffectivee.ptr.p_double[i];
       }
 
    // Compute Xz = -(BzWave - inv(Dz)*Az'*y)
@@ -11966,10 +11966,10 @@ static void vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    for (i = 0; i < n; i++) {
       state->rhssigma.ptr.p_double[i] = state->c.ptr.p_double[i] - state->tmpaty.ptr.p_double[i] + state->tmphx.ptr.p_double[i];
       if (state->hasbndl.ptr.p_bool[i]) {
-         state->rhssigma.ptr.p_double[i] = state->rhssigma.ptr.p_double[i] - v0->z.ptr.p_double[i];
+         state->rhssigma.ptr.p_double[i] -= v0->z.ptr.p_double[i];
       }
       if (state->hasbndu.ptr.p_bool[i]) {
-         state->rhssigma.ptr.p_double[i] = state->rhssigma.ptr.p_double[i] + v0->s.ptr.p_double[i];
+         state->rhssigma.ptr.p_double[i] += v0->s.ptr.p_double[i];
       }
    }
 
@@ -11977,7 +11977,7 @@ static void vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, 
    for (i = 0; i < m; i++) {
       state->rhsbeta.ptr.p_double[i] = v0->y.ptr.p_double[i] - v0->v.ptr.p_double[i];
       if (state->hasr.ptr.p_bool[i]) {
-         state->rhsbeta.ptr.p_double[i] = state->rhsbeta.ptr.p_double[i] + v0->q.ptr.p_double[i];
+         state->rhsbeta.ptr.p_double[i] += v0->q.ptr.p_double[i];
       }
    }
 
@@ -12161,12 +12161,12 @@ static void vipmsolver_vipmevaluateprogress(vipmstate *state, double mu, double 
    state->errpinf = 0.0;
    for (i = 0; i < m; i++) {
       v = state->tmpax.ptr.p_double[i] - state->current.w.ptr.p_double[i] - state->b.ptr.p_double[i];
-      state->errp2 = state->errp2 + v * v;
+      state->errp2 += v * v;
       state->errpinf = ae_maxreal(state->errpinf, fabs(v));
       inc(&cntp2);
       if (state->hasr.ptr.p_bool[i]) {
          v = state->current.w.ptr.p_double[i] + state->current.p.ptr.p_double[i] - state->r.ptr.p_double[i];
-         state->errp2 = state->errp2 + v * v;
+         state->errp2 += v * v;
          state->errpinf = ae_maxreal(state->errpinf, fabs(v));
          inc(&cntp2);
       }
@@ -12174,13 +12174,13 @@ static void vipmsolver_vipmevaluateprogress(vipmstate *state, double mu, double 
    for (i = 0; i < n; i++) {
       if (state->hasbndl.ptr.p_bool[i]) {
          v = state->current.x.ptr.p_double[i] - state->current.g.ptr.p_double[i] - state->bndl.ptr.p_double[i];
-         state->errp2 = state->errp2 + v * v;
+         state->errp2 += v * v;
          state->errpinf = ae_maxreal(state->errpinf, fabs(v));
          inc(&cntp2);
       }
       if (state->hasbndu.ptr.p_bool[i]) {
          v = state->current.x.ptr.p_double[i] + state->current.t.ptr.p_double[i] - state->bndu.ptr.p_double[i];
-         state->errp2 = state->errp2 + v * v;
+         state->errp2 += v * v;
          state->errpinf = ae_maxreal(state->errpinf, fabs(v));
          inc(&cntp2);
       }
@@ -12192,22 +12192,22 @@ static void vipmsolver_vipmevaluateprogress(vipmstate *state, double mu, double 
    for (i = 0; i < n; i++) {
       v = state->tmphx.ptr.p_double[i] + state->c.ptr.p_double[i] - state->tmpaty.ptr.p_double[i];
       if (state->hasbndl.ptr.p_bool[i]) {
-         v = v - state->current.z.ptr.p_double[i];
+         v -= state->current.z.ptr.p_double[i];
       }
       if (state->hasbndu.ptr.p_bool[i]) {
-         v = v + state->current.s.ptr.p_double[i];
+         v += state->current.s.ptr.p_double[i];
       }
       state->evalprogressg.ptr.p_double[i] = v;
-      state->errd2 = state->errd2 + v * v;
+      state->errd2 += v * v;
       state->errdinf = ae_maxreal(state->errdinf, fabs(v));
       inc(&cntd2);
    }
    for (i = 0; i < m; i++) {
       v = state->current.y.ptr.p_double[i] - state->current.v.ptr.p_double[i];
       if (state->hasr.ptr.p_bool[i]) {
-         v = v + state->current.q.ptr.p_double[i];
+         v += state->current.q.ptr.p_double[i];
       }
-      state->errd2 = state->errd2 + v * v;
+      state->errd2 += v * v;
       state->errdinf = ae_maxreal(state->errdinf, fabs(v));
       inc(&cntd2);
    }
@@ -12608,13 +12608,13 @@ void minsqpinitbuf(RVector bndl, RVector bndu, RVector s, RVector x0, ae_int_t n
       for (j = 0; j < n; j++) {
          v = cleic->ptr.pp_double[i][j] * s->ptr.p_double[j];
          state->scaledcleic.ptr.pp_double[i][j] = v;
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       state->scaledcleic.ptr.pp_double[i][n] = cleic->ptr.pp_double[i][n];
       if (vv > 0.0) {
          for (j = 0; j <= n; j++) {
-            state->scaledcleic.ptr.pp_double[i][j] = state->scaledcleic.ptr.pp_double[i][j] / vv;
+            state->scaledcleic.ptr.pp_double[i][j] /= vv;
          }
       }
    }
@@ -12799,9 +12799,9 @@ Spawn:
          // Function #I needs renormalization:
          // * update function vector element and Jacobian matrix row
          // * update FScales[] array
-            state->stepkfi.ptr.p_double[i] = state->stepkfi.ptr.p_double[i] * multiplyby;
+            state->stepkfi.ptr.p_double[i] *= multiplyby;
             for (j = 0; j < n; j++) {
-               state->stepkj.ptr.pp_double[i][j] = state->stepkj.ptr.pp_double[i][j] * multiplyby;
+               state->stepkj.ptr.pp_double[i][j] *= multiplyby;
             }
             state->fscales.ptr.p_double[i] = setscaleto;
          }
@@ -12840,10 +12840,10 @@ Spawn:
          deltamax = ae_maxreal(deltamax, fabs(state->step0x.ptr.p_double[i] - state->stepkx.ptr.p_double[i]) / state->trustrad);
       }
       if (deltamax <= nlcsqp_sqpdeltadecrease) {
-         state->trustrad = state->trustrad * ae_maxreal(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay);
+         state->trustrad *= ae_maxreal(deltamax / nlcsqp_sqpdeltadecrease, nlcsqp_maxtrustraddecay);
       }
       if (deltamax >= nlcsqp_sqpdeltaincrease) {
-         state->trustrad = state->trustrad * ae_minreal(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth);
+         state->trustrad *= ae_minreal(deltamax / nlcsqp_sqpdeltaincrease, nlcsqp_maxtrustradgrowth);
       }
    // Advance outer iteration counter, test stopping criteria
       inc(&state->repiterationscount);
@@ -12942,7 +12942,7 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
    for (i = 0; i < nec + nic; i++) {
       for (j = 0; j < n; j++) {
          if (sstate->scaledcleic.ptr.pp_double[i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -12960,7 +12960,7 @@ static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolv
          // Primary part of the matrix
             subsolver->sparserawlc.vals.ptr.p_double[offs] = sstate->scaledcleic.ptr.pp_double[i][j];
             subsolver->sparserawlc.idx.ptr.p_int[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       subsolver->sparserawlc.ridx.ptr.p_int[i + 1] = offs;
@@ -13048,16 +13048,16 @@ static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolve
 
    // Compute raw (S,Y) without regularization (to be used later
    // during comparison with zero)
-      rawsy = rawsy + sk * yk;
+      rawsy += sk * yk;
 
    // Convexify Y
-      yk = yk + reg * sk;
+      yk += reg * sk;
 
    // Compute various coefficients using regularized values
-      sy = sy + sk * yk;
-      snrm2 = snrm2 + sk * sk;
-      ynrm2 = ynrm2 + yk * yk;
-      v2 = v2 + gk * gk;
+      sy += sk * yk;
+      snrm2 += sk * sk;
+      ynrm2 += yk * yk;
+      v2 += gk * gk;
       mxs = ae_maxreal(mxs, fabs(sk));
       mxy = ae_maxreal(mxy, fabs(yk));
       subsolver->sk.ptr.p_double[i] = sk;
@@ -13248,7 +13248,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = v + ae_sqr(jac->ptr.pp_double[0][i]);
+      v += ae_sqr(jac->ptr.pp_double[0][i]);
    }
    v = coalesce(sqrt(v), 1.0);
    for (i = n; i < nslack; i++) {
@@ -13272,12 +13272,12 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
    for (i = 0; i < nlec + nlic; i++) {
       for (j = 0; j < n; j++) {
          if (jac->ptr.pp_double[1 + i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
-   nnz = nnz + 2 * nec + nic;
-   nnz = nnz + 2 * nlec + nlic;
+   nnz += 2 * nec + nic;
+   nnz += 2 * nlec + nlic;
    ivectorgrowto(&subsolver->sparseefflc.ridx, lccnt + 1);
    rvectorgrowto(&subsolver->sparseefflc.vals, nnz);
    ivectorgrowto(&subsolver->sparseefflc.idx, nnz);
@@ -13312,11 +13312,11 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          j = subsolver->sparserawlc.idx.ptr.p_int[k];
          v = subsolver->tmp0.ptr.p_double[j];
          vv = subsolver->sparserawlc.vals.ptr.p_double[k];
-         vright = vright + vv * v;
+         vright += vv * v;
          if (vv >= 0) {
-            vmax = vmax + vv * (v + subsolver->curbndu.ptr.p_double[j]);
+            vmax += vv * (v + subsolver->curbndu.ptr.p_double[j]);
          } else {
-            vmax = vmax + vv * (v + subsolver->curbndl.ptr.p_double[j]);
+            vmax += vv * (v + subsolver->curbndl.ptr.p_double[j]);
          }
       }
 
@@ -13343,7 +13343,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       for (k = j0; k <= j1; k++) {
          subsolver->sparseefflc.idx.ptr.p_int[offs] = subsolver->sparserawlc.idx.ptr.p_int[k];
          subsolver->sparseefflc.vals.ptr.p_double[offs] = subsolver->sparserawlc.vals.ptr.p_double[k];
-         offs = offs + 1;
+         offs++;
       }
 
    // Set up slack variables
@@ -13352,13 +13352,13 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->sparseefflc.vals.ptr.p_double[offs + 1] = 1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 0] = offsslackec + 2 * i + 0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 1] = offsslackec + 2 * i + 1;
-         offs = offs + 2;
+         offs += 2;
       } else {
 
       // Slack variables for inequality constraints
          subsolver->sparseefflc.vals.ptr.p_double[offs] = -1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs] = offsslackic + (i - nec);
-         offs = offs + 1;
+         offs++;
       }
 
    // Finalize row
@@ -13391,7 +13391,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->d0.ptr.p_double[offsslackic + (i - nec)] = ae_maxreal(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m = subsolver->sparseefflc.m + (nec + nic);
+   subsolver->sparseefflc.m += nec + nic;
 
 // Append nonlinear equality/inequality constraints
    for (i = 0; i < nlec + nlic; i++) {
@@ -13400,7 +13400,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
       vv = 0.0;
       for (j = 0; j < n; j++) {
          v = jac->ptr.pp_double[1 + i][j];
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = 1 / coalesce(sqrt(vv), 1.0);
 
@@ -13410,7 +13410,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          if (jac->ptr.pp_double[1 + i][j] != 0.0) {
             subsolver->sparseefflc.vals.ptr.p_double[offs] = vv * jac->ptr.pp_double[1 + i][j];
             subsolver->sparseefflc.idx.ptr.p_int[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       if (i < nlec) {
@@ -13420,13 +13420,13 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->sparseefflc.vals.ptr.p_double[offs + 1] = 1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 0] = offsslacknlec + 2 * i + 0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 1] = offsslacknlec + 2 * i + 1;
-         offs = offs + 2;
+         offs += 2;
       } else {
 
       // Add slack terms for inequality constraints
          subsolver->sparseefflc.vals.ptr.p_double[offs] = -1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs] = offsslacknlic + (i - nlec);
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.ptr.p_int[subsolver->sparseefflc.m + i + 1] = offs;
 
@@ -13458,7 +13458,7 @@ static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsol
          subsolver->d0.ptr.p_double[offsslacknlic + (i - nlec)] = ae_maxreal(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m = subsolver->sparseefflc.m + (nlec + nlic);
+   subsolver->sparseefflc.m += nlec + nlic;
 
 // Finalize sparse matrix structure
    ae_assert(subsolver->sparseefflc.ridx.ptr.p_int[subsolver->sparseefflc.m] <= subsolver->sparseefflc.idx.cnt, "QPSubproblemSolve: critical integrity check failed");
@@ -13681,7 +13681,7 @@ Spawn:
       for (i = 1; i <= nlec + nlic; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + meritstate->d.ptr.p_double[j] * meritstate->stepkj.ptr.pp_double[i][j];
+            v += meritstate->d.ptr.p_double[j] * meritstate->stepkj.ptr.pp_double[i][j];
             meritstate->stepkjc.ptr.pp_double[i][j] = meritstate->stepkj.ptr.pp_double[i][j];
          }
          meritstate->stepkfic.ptr.p_double[i] = meritstate->stepkfin.ptr.p_double[i] - v;
@@ -13731,7 +13731,7 @@ Spawn:
             nlcsqp_sqpcopystate(state, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
             break;
          }
-         localstp = nu * localstp;
+         localstp *= nu;
          nu = ae_maxreal(0.1, 0.5 * nu);
       }
    }
@@ -13964,8 +13964,8 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector x, double trustrad, 
       // Primary Lagrangian term
          vact = v;
          vd = 1.0;
-         *f = *f + vlag * vact;
-         tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + vlag * vd;
+         *f += vlag * vact;
+         tmp->sclagtmp1.ptr.p_double[i] += vlag * vd;
 
       // Quadratic augmentation term
          if (i < nec || v > 0) {
@@ -13973,13 +13973,13 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector x, double trustrad, 
          } else {
             vact = 0.0;
          }
-         *f = *f + 0.5 * nlcsqp_augmentationfactor * vact * vact;
-         tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + nlcsqp_augmentationfactor * vact;
+         *f += 0.5 * nlcsqp_augmentationfactor * vact * vact;
+         tmp->sclagtmp1.ptr.p_double[i] += nlcsqp_augmentationfactor * vact;
       }
       if (usesparsegemv) {
          sparsemtv(&state->subsolver.sparserawlc, &tmp->sclagtmp1, &tmp->sclagtmp0);
          for (i = 0; i < n; i++) {
-            g->ptr.p_double[i] = g->ptr.p_double[i] + tmp->sclagtmp0.ptr.p_double[i];
+            g->ptr.p_double[i] += tmp->sclagtmp0.ptr.p_double[i];
          }
       } else {
          rmatrixgemv(n, nec + nic, 1.0, &state->scaledcleic, 0, 0, 1, &tmp->sclagtmp1, 0, 1.0, g, 0);
@@ -13995,8 +13995,8 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector x, double trustrad, 
    // Lagrangian term
       vact = v;
       vd = 1.0;
-      *f = *f + vlag * vact;
-      tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + vlag * vd;
+      *f += vlag * vact;
+      tmp->sclagtmp1.ptr.p_double[i] += vlag * vd;
 
    // Augmentation term
       if (i < nlec || v > 0) {
@@ -14004,8 +14004,8 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector x, double trustrad, 
       } else {
          vact = 0.0;
       }
-      *f = *f + 0.5 * nlcsqp_augmentationfactor * vact * vact;
-      tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + nlcsqp_augmentationfactor * vact;
+      *f += 0.5 * nlcsqp_augmentationfactor * vact * vact;
+      tmp->sclagtmp1.ptr.p_double[i] += nlcsqp_augmentationfactor * vact;
    }
    rmatrixgemv(n, nlec + nlic, 1.0, j, 1, 0, 1, &tmp->sclagtmp1, 0, 1.0, g, 0);
 }
@@ -14064,19 +14064,19 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector x, 
       if (i < nec) {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcsqp_augmentationfactor * v * v;
-         *meritf = *meritf + nlcsqp_meritfunctionbase * fabs(v) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[i])) * fabs(v);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * v * v;
+         *meritf += nlcsqp_meritfunctionbase * fabs(v) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[i])) * fabs(v);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[i] * v;
+         *rawlag += lagmult->ptr.p_double[i] * v;
       } else {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcsqp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
-         *meritf = *meritf + nlcsqp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[i])) * ae_maxreal(v, 0.0);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
+         *meritf += nlcsqp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[i])) * ae_maxreal(v, 0.0);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[i] * v;
+         *rawlag += lagmult->ptr.p_double[i] * v;
       }
    }
 
@@ -14086,19 +14086,19 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector x, 
       if (i < nlec) {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcsqp_augmentationfactor * v * v;
-         *meritf = *meritf + nlcsqp_meritfunctionbase * fabs(v) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[nec + nic + i])) * fabs(v);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * v * v;
+         *meritf += nlcsqp_meritfunctionbase * fabs(v) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[nec + nic + i])) * fabs(v);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[nec + nic + i] * v;
+         *rawlag += lagmult->ptr.p_double[nec + nic + i] * v;
       } else {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcsqp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
-         *meritf = *meritf + nlcsqp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[nec + nic + i])) * ae_maxreal(v, 0.0);
+         *meritf += 0.5 * nlcsqp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
+         *meritf += nlcsqp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcsqp_meritfunctiongain * fabs(1 + fabs(lagmult->ptr.p_double[nec + nic + i])) * ae_maxreal(v, 0.0);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[nec + nic + i] * v;
+         *rawlag += lagmult->ptr.p_double[nec + nic + i] * v;
       }
    }
 }
@@ -14701,7 +14701,7 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector x, ae_int_t flags, double d
    state->n = n;
    state->m = m;
    allocatemem = flags % 2 == 0;
-   flags = flags / 2;
+   flags /= 2;
    if (allocatemem) {
       rvectorsetlengthatleast(&state->rho, m);
       rvectorsetlengthatleast(&state->theta, m);
@@ -15053,7 +15053,7 @@ Spawn:
    state->fold = state->f;
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = v + ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
+      v += ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
    }
    if (sqrt(v) <= state->epsg) {
       state->repterminationtype = 4;
@@ -15083,7 +15083,7 @@ Spawn:
 
    // diagonal approximation is used
       for (i = 0; i < n; i++) {
-         state->d.ptr.p_double[i] = state->d.ptr.p_double[i] / state->diagh.ptr.p_double[i];
+         state->d.ptr.p_double[i] /= state->diagh.ptr.p_double[i];
       }
       state->stp = 1.0;
    }
@@ -15091,7 +15091,7 @@ Spawn:
 
    // scale-based preconditioner is used
       for (i = 0; i < n; i++) {
-         state->d.ptr.p_double[i] = state->d.ptr.p_double[i] * state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
+         state->d.ptr.p_double[i] *= state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
       }
       state->stp = 1.0;
    }
@@ -15176,15 +15176,15 @@ Spawn:
          state->PQ = 14; goto Pause; Resume14:
          state->xupdated = false;
       }
-      state->repnfev = state->repnfev + state->nfev;
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repnfev += state->nfev;
+      state->repiterationscount++;
       ae_v_add(state->sk.ptr.pp_double[state->p], 1, state->x.ptr.p_double, 1, n);
       ae_v_add(state->yk.ptr.pp_double[state->p], 1, state->g.ptr.p_double, 1, n);
 
    // Stopping conditions
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
+         v += ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
       }
       if (!isfinite(v) || !isfinite(state->f)) {
 
@@ -15212,7 +15212,7 @@ Spawn:
       }
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(state->sk.ptr.pp_double[state->p][i] / state->s.ptr.p_double[i]);
+         v += ae_sqr(state->sk.ptr.pp_double[state->p][i] / state->s.ptr.p_double[i]);
       }
       if (sqrt(v) <= state->epsx) {
 
@@ -15283,14 +15283,14 @@ Spawn:
 
          // diagonal approximation is used
             for (i = 0; i < n; i++) {
-               state->work.ptr.p_double[i] = state->work.ptr.p_double[i] / state->diagh.ptr.p_double[i];
+               state->work.ptr.p_double[i] /= state->diagh.ptr.p_double[i];
             }
          }
          if (state->prectype == 3) {
 
          // scale-based preconditioner is used
             for (i = 0; i < n; i++) {
-               state->work.ptr.p_double[i] = state->work.ptr.p_double[i] * state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
+               state->work.ptr.p_double[i] *= state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
             }
          }
          if (state->prectype == 4) {
@@ -15313,7 +15313,7 @@ Spawn:
 
       // Next step
          state->fold = state->f;
-         state->k = state->k + 1;
+         state->k++;
       }
    }
    goto Exit;
@@ -17089,12 +17089,12 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
          state->qqpsettingsuser.epsx = 0.01 * epsx;
          state->qqpsettingsuser.cnphase = true;
          qqpoptimize(&state->dummycqm, &state->dummysparse, &state->exa, 2, true, &state->exb, &state->exbndl, &state->exbndu, &state->exscale, &state->exxorigin, nwork, &state->qqpsettingsuser, &state->qqpbuf, &state->exxc, &k);
-         state->repncholesky = state->repncholesky + state->qqpbuf.repncholesky;
+         state->repncholesky += state->qqpbuf.repncholesky;
 
       // Evaluate violation of constraints
          for (i = 0; i < nictotal; i++) {
             v = ae_v_dotproduct(state->sclsftcleic.ptr.pp_double[nectotal + i], 1, state->exxc.ptr.p_double, 1, nmain);
-            v = v - state->sclsftcleic.ptr.pp_double[nectotal + i][nmain];
+            v -= state->sclsftcleic.ptr.pp_double[nectotal + i][nmain];
             state->nicerr.ptr.p_double[i] = v;
          }
 
@@ -17130,7 +17130,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                swapelements(&state->cscales, nectotal + nicwork, nectotal + k);
                state->exxc.ptr.p_double[nmain + nicwork] = 0.0;
                state->nulc.ptr.p_double[nectotal + nicwork] = 0.0;
-               state->nicnact.ptr.p_int[nicwork] = state->nicnact.ptr.p_int[nicwork] + 1;
+               state->nicnact.ptr.p_int[nicwork]++;
                inc(&nicwork);
                inc(&nwork);
                inc(&kwork);
@@ -17189,19 +17189,19 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < nmain; j++) {
-            v = v + state->sclsftcleic.ptr.pp_double[i][j] * state->exxc.ptr.p_double[j];
-            vv = vv + ae_sqr(state->sclsftcleic.ptr.pp_double[i][j]);
+            v += state->sclsftcleic.ptr.pp_double[i][j] * state->exxc.ptr.p_double[j];
+            vv += ae_sqr(state->sclsftcleic.ptr.pp_double[i][j]);
          }
          if (i >= nectotal) {
-            v = v + state->exxc.ptr.p_double[nmain + (i - nectotal)];
-            vv = vv + ae_sqr(1.0);
+            v += state->exxc.ptr.p_double[nmain + (i - nectotal)];
+            vv += ae_sqr(1.0);
          }
-         v = v - state->sclsftcleic.ptr.pp_double[i][nmain];
+         v -= state->sclsftcleic.ptr.pp_double[i][nmain];
          vv = coalesce(vv, 1.0);
-         v = v / sqrt(vv);
+         v /= sqrt(vv);
 
       // Calculate magnitude of Lagrangian update (and Lagrangian parameters themselves)
-         feaserr = feaserr + ae_sqr(v);
+         feaserr += ae_sqr(v);
          state->nulc.ptr.p_double[i] = state->nulcest.ptr.p_double[i];
       }
       feaserr = sqrt(feaserr);
@@ -17238,7 +17238,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
    for (i = 0; i < nmain; i++) {
       v = state->sclsftb.ptr.p_double[i];
       for (j = 0; j < nmain; j++) {
-         v = v + state->sclsfta.ptr.pp_double[i][j] * state->exxc.ptr.p_double[j];
+         v += state->sclsfta.ptr.pp_double[i][j] * state->exxc.ptr.p_double[j];
       }
       state->tmpg.ptr.p_double[i] = v;
    }
@@ -17555,7 +17555,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix sclsfta, RVector 
    // Subtract reference point (X0,L0) from the system
       for (i = 0; i < nqrcols; i++) {
          v = ae_v_dotproduct(buffers->qrkkt.ptr.pp_double[i], 1, buffers->qrsv0.ptr.p_double, 1, nqrcols);
-         buffers->qrrightpart.ptr.p_double[i] = buffers->qrrightpart.ptr.p_double[i] - v;
+         buffers->qrrightpart.ptr.p_double[i] -= v;
       }
 
    // Handle active "simple" equality constraints
@@ -17593,7 +17593,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix sclsfta, RVector 
       for (i = nqrcols - 1; i >= 0; i--) {
          v = buffers->qrkkt.ptr.pp_double[i][nqrcols];
          for (j = i + 1; j < nqrcols; j++) {
-            v = v - buffers->qrkkt.ptr.pp_double[i][j] * buffers->qrsvx1.ptr.p_double[j];
+            v -= buffers->qrkkt.ptr.pp_double[i][j] * buffers->qrsvx1.ptr.p_double[j];
          }
          buffers->qrsvx1.ptr.p_double[i] = v / buffers->qrkkt.ptr.pp_double[i][i];
       }
@@ -17772,7 +17772,7 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
       j1 = scleic->ridx.ptr.p_int[i + 1] - 1;
       if (j1 >= j0 && scleic->idx.ptr.p_int[j1] == nmain) {
          state->sclsftcleic.ptr.pp_double[dnec + i][nmain] = scleic->vals.ptr.p_double[j1];
-         j1 = j1 - 1;
+         j1--;
       }
       for (j = j0; j <= j1; j++) {
          k = scleic->idx.ptr.p_int[j];
@@ -17789,7 +17789,7 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
       j1 = scleic->ridx.ptr.p_int[snec + i + 1] - 1;
       if (j1 >= j0 && scleic->idx.ptr.p_int[j1] == nmain) {
          state->sclsftcleic.ptr.pp_double[dnec + snec + dnic + i][nmain] = scleic->vals.ptr.p_double[j1];
-         j1 = j1 - 1;
+         j1--;
       }
       for (j = j0; j <= j1; j++) {
          k = scleic->idx.ptr.p_int[j];
@@ -17805,14 +17805,14 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
          vv = 0.0;
          for (j = 0; j < nmain; j++) {
             v = state->sclsftcleic.ptr.pp_double[i][j];
-            vv = vv + v * v;
+            vv += v * v;
          }
          vv = sqrt(vv);
          state->cscales.ptr.p_double[i] = vv;
          if (vv > 0.0) {
             vv = 1 / vv;
             for (j = 0; j <= nmain; j++) {
-               state->sclsftcleic.ptr.pp_double[i][j] = state->sclsftcleic.ptr.pp_double[i][j] * vv;
+               state->sclsftcleic.ptr.pp_double[i][j] *= vv;
             }
          }
       }
@@ -17828,9 +17828,9 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
    // Apply XOrigin
       v = 0.0;
       for (j = 0; j < nmain; j++) {
-         v = v + state->sclsftcleic.ptr.pp_double[i][j] * (xorigin->ptr.p_double[j] / s->ptr.p_double[j]);
+         v += state->sclsftcleic.ptr.pp_double[i][j] * (xorigin->ptr.p_double[j] / s->ptr.p_double[j]);
       }
-      state->sclsftcleic.ptr.pp_double[i][nmain] = state->sclsftcleic.ptr.pp_double[i][nmain] - v;
+      state->sclsftcleic.ptr.pp_double[i][nmain] -= v;
    }
 }
 
@@ -17879,7 +17879,7 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix a, RVector b, ae_i
    anorm = 0.0;
    for (i = 0; i < nmain; i++) {
       for (j = 0; j < nmain; j++) {
-         anorm = anorm + ae_sqr(a->ptr.pp_double[i][j]);
+         anorm += ae_sqr(a->ptr.pp_double[i][j]);
       }
    }
    anorm = sqrt(anorm);
@@ -17893,8 +17893,8 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix a, RVector b, ae_i
          v = 0.0;
          vv = 0.0;
          for (j = 0; j < nmain; j++) {
-            v = v + tmp2->ptr.pp_double[i][j] * cleic->ptr.pp_double[i][j];
-            vv = vv + ae_sqr(cleic->ptr.pp_double[i][j]);
+            v += tmp2->ptr.pp_double[i][j] * cleic->ptr.pp_double[i][j];
+            vv += ae_sqr(cleic->ptr.pp_double[i][j]);
          }
          ae_assert(fabs(vv - 1) < 1.0E-9 || vv == 0.0, "DENSE-AUL: integrity check failed");
          maxcac = ae_maxreal(maxcac, fabs(v));
@@ -17906,11 +17906,11 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix a, RVector b, ae_i
    v = 1 / result;
    for (i = 0; i < nmain; i++) {
       for (j = 0; j < nmain; j++) {
-         a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] * v;
+         a->ptr.pp_double[i][j] *= v;
       }
    }
    for (i = 0; i < nmain; i++) {
-      b->ptr.p_double[i] = b->ptr.p_double[i] * v;
+      b->ptr.p_double[i] *= v;
    }
    return result;
 }
@@ -18388,7 +18388,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix c, ZVector ct, ae_int_t k) {
    for (i = 0; i < k; i++) {
       if (ct->ptr.p_int[i] == 0) {
          ae_v_move(state->cleic.ptr.pp_double[state->nec], 1, c->ptr.pp_double[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -18398,7 +18398,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix c, ZVector ct, ae_int_t k) {
          } else {
             ae_v_move(state->cleic.ptr.pp_double[state->nec + state->nic], 1, c->ptr.pp_double[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 
@@ -18408,7 +18408,7 @@ void minbleicsetlc(minbleicstate *state, RMatrix c, ZVector ct, ae_int_t k) {
    for (i = 0; i < k; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + ae_sqr(state->cleic.ptr.pp_double[i][j]);
+         v += ae_sqr(state->cleic.ptr.pp_double[i][j]);
       }
       if (v == 0.0) {
          continue;
@@ -18802,7 +18802,7 @@ Spawn:
    }
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold);
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    if (state->xrep) {
    // Report current point
       ae_v_move(state->x.ptr.p_double, 1, state->sas.xc.ptr.p_double, 1, n);
@@ -18893,7 +18893,7 @@ Spawn:
       sasconstraineddirection(&state->sas, &state->cgc);
       ginit = 0.0;
       for (i = 0; i < n; i++) {
-         ginit = ginit + ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
+         ginit += ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
       }
       ginit = sqrt(ginit);
       state->maxscaledgrad = ae_maxreal(state->maxscaledgrad, ginit);
@@ -18939,7 +18939,7 @@ Spawn:
       //       instead of just for() loop - this counter may be
       //       decreased at some occasions to perform "restart"
       //       of an iteration.
-         itidx = itidx + 1;
+         itidx++;
 
       // At the beginning of each iteration:
       // * SAS.XC stores current point
@@ -18986,7 +18986,7 @@ Spawn:
          ae_v_moveneg(state->d.ptr.p_double, 1, state->work.ptr.p_double, 1, n);
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
+            v += ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
          }
          v = sqrt(v);
          if (v == 0.0) {
@@ -19024,7 +19024,7 @@ Spawn:
          //              preserve computational budget for iterations.
             sasimmediateactivation(&state->sas, state->cidx, state->cval);
             state->bufsize = 0;
-            itidx = itidx - 1;
+            itidx--;
             continue;
          }
          if (state->stpmax > 0.0) {
@@ -19073,7 +19073,7 @@ Spawn:
                state->needfg = true;
                state->PQ = 13; goto Pause; Resume13:
                state->needfg = false;
-               state->repnfev = state->repnfev + 1;
+               state->repnfev++;
             } else {
             // Numerical differentiation
                state->needf = true;
@@ -19102,7 +19102,7 @@ Spawn:
                      state->PQ = 18; goto Pause; Resume18:
                      state->fp2 = state->f;
                      state->g.ptr.p_double[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.ptr.p_double[i]);
-                     state->repnfev = state->repnfev + 4;
+                     state->repnfev += 4;
                   } else {
                      state->xm1 = v - state->diffstep * state->s.ptr.p_double[i];
                      state->xp1 = v + state->diffstep * state->s.ptr.p_double[i];
@@ -19123,7 +19123,7 @@ Spawn:
                      } else {
                         state->g.ptr.p_double[i] = 0.0;
                      }
-                     state->repnfev = state->repnfev + 2;
+                     state->repnfev += 2;
                   }
                   state->x.ptr.p_double[i] = v;
                }
@@ -19178,7 +19178,7 @@ Spawn:
          // of small steps which increase function value.
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr(state->d.ptr.p_double[i] * state->curstpmax / state->s.ptr.p_double[i]);
+               v += ae_sqr(state->d.ptr.p_double[i] * state->curstpmax / state->s.ptr.p_double[i]);
             }
             v = sqrt(v);
             b = false;
@@ -19202,7 +19202,7 @@ Spawn:
                   state->stp = state->curstpmax;
                   mcinfo = 5;
                   ae_v_move(state->xn.ptr.p_double, 1, state->tmp0.ptr.p_double, 1, n);
-                  state->nonmonotoniccnt = state->nonmonotoniccnt - 1;
+                  state->nonmonotoniccnt--;
                   b = true;
                }
             }
@@ -19248,7 +19248,7 @@ Spawn:
             state->PQ = 21; goto Pause; Resume21:
             state->xupdated = false;
          }
-         state->repinneriterationscount = state->repinneriterationscount + 1;
+         state->repinneriterationscount++;
          if (mcinfo == 1) {
 
          // Accept new LBFGS update given by Sk,Yk
@@ -19266,7 +19266,7 @@ Spawn:
             } else {
 
             // Buffer is not full, increase buffer size by 1
-               state->bufsize = state->bufsize + 1;
+               state->bufsize++;
             }
             v = ae_v_dotproduct(state->bufyk.ptr.pp_double[state->bufsize - 1], 1, state->bufsk.ptr.pp_double[state->bufsize - 1], 1, n);
             vv = ae_v_dotproduct(state->bufyk.ptr.pp_double[state->bufsize - 1], 1, state->bufyk.ptr.pp_double[state->bufsize - 1], 1, n);
@@ -19287,8 +19287,8 @@ Spawn:
             v = 0.0;
             vv = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr((state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
-               vv = vv + ae_sqr(state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]);
+               v += ae_sqr((state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
+               vv += ae_sqr(state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]);
             }
             state->lastgoodstep = sqrt(vv);
             minbleic_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
@@ -19308,7 +19308,7 @@ Spawn:
          // Step is small enough
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr((state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
+               v += ae_sqr((state->sas.xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
             }
             v = sqrt(v);
             if (v <= state->epsx) {
@@ -19337,7 +19337,7 @@ Spawn:
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
+            v += ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
          }
          if (sqrt(v) < gdecay * ginit) {
             break;
@@ -19888,11 +19888,11 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep) 
       return;
    }
    if (newstep < *estimate * 0.01) {
-      *estimate = *estimate * 0.01;
+      *estimate *= 0.01;
       return;
    }
    if (newstep > *estimate * 100) {
-      *estimate = *estimate * 100;
+      *estimate *= 100;
       return;
    }
    *estimate = newstep;
@@ -19930,9 +19930,9 @@ static double minbleic_feasibilityerror(RVector x, RVector s, ae_int_t n, RMatri
       for (j = 0; j < n; j++) {
          vc = cleic->ptr.pp_double[i][j] * s->ptr.p_double[j];
          vx = x->ptr.p_double[j] / s->ptr.p_double[j];
-         v = v + vc * vx;
-         v0 = v0 + ae_sqr(vc);
-         v1 = v1 + ae_sqr(vx);
+         v += vc * vx;
+         v0 += ae_sqr(vc);
+         v1 += ae_sqr(vx);
       }
       v0 = coalesce(sqrt(v0), 1.0);
       v1 = ae_maxreal(sqrt(v1), 1.0);
@@ -21389,9 +21389,9 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
             sparsesmv(sparsea, sparseaupper, &sstate->solver.d, &sstate->tmp0);
             d2 = 0.0;
             for (i = 0; i < n; i++) {
-               d2 = d2 + sstate->solver.d.ptr.p_double[i] * sstate->tmp0.ptr.p_double[i];
+               d2 += sstate->solver.d.ptr.p_double[i] * sstate->tmp0.ptr.p_double[i];
             }
-            d2 = 0.5 * d2;
+            d2 *= 0.5;
          }
          mx = 0.0;
          md = 0.0;
@@ -21448,7 +21448,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
                for (i = 0; i < n; i++) {
                   sstate->tmp0.ptr.p_double[i] = sstate->solver.d.ptr.p_double[i] / s->ptr.p_double[i];
                   sstate->tmp1.ptr.p_double[i] = sstate->solver.g.ptr.p_double[i] * s->ptr.p_double[i];
-                  v = v + ae_sqr(sstate->tmp0.ptr.p_double[i]);
+                  v += ae_sqr(sstate->tmp0.ptr.p_double[i]);
                }
                ae_assert(v > 0.0, "QPBLEICOptimize: inernal errror (scaled direction is zero)");
                v = 1 / sqrt(v);
@@ -21483,7 +21483,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
                v0 = -d1 / (2 * d2);
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + ae_sqr(v0 * sstate->solver.d.ptr.p_double[i] / s->ptr.p_double[i]);
+                  v += ae_sqr(v0 * sstate->solver.d.ptr.p_double[i] / s->ptr.p_double[i]);
                }
                if (sqrt(v) <= settings->epsx) {
                   *terminationtype = 2;
@@ -21823,15 +21823,15 @@ void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isuppe
 
       // Diagonal terms are counted only once
          state->absamax = ae_maxreal(state->absamax, v);
-         state->absasum = state->absasum + v;
-         state->absasum2 = state->absasum2 + v * v;
+         state->absasum += v;
+         state->absasum2 += v * v;
       }
       if ((j > i && isupper) || (j < i && !isupper)) {
 
       // Offdiagonal terms are counted twice
          state->absamax = ae_maxreal(state->absamax, v);
-         state->absasum = state->absasum + 2 * v;
-         state->absasum2 = state->absasum2 + 2 * v * v;
+         state->absasum += 2 * v;
+         state->absasum2 += 2 * v * v;
       }
    }
 }
@@ -22735,8 +22735,8 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector sparsect,
             continue;
          }
          ae_assert(isfinite(v), "MinQPSetLCSparse: C contains infinite or NAN values");
-         nnz = nnz + 1;
-         rs.ptr.p_int[i] = rs.ptr.p_int[i] + 1;
+         nnz++;
+         rs.ptr.p_int[i]++;
       }
 
    // Prepare new sparse CRS storage, copy leading SparseK*N submatrix into the storage
@@ -23122,11 +23122,11 @@ void minqpaddlc2(minqpstate *state, ZVector idxa, RVector vala, ae_int_t nnz, do
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->sparsec.idx.ptr.p_int[offsdst] != state->sparsec.idx.ptr.p_int[offs + i]) {
-         offsdst = offsdst + 1;
+         offsdst++;
          state->sparsec.idx.ptr.p_int[offsdst] = state->sparsec.idx.ptr.p_int[offs + i];
          state->sparsec.vals.ptr.p_double[offsdst] = state->sparsec.vals.ptr.p_double[offs + i];
       } else {
-         state->sparsec.vals.ptr.p_double[offsdst] = state->sparsec.vals.ptr.p_double[offsdst] + state->sparsec.vals.ptr.p_double[offs + i];
+         state->sparsec.vals.ptr.p_double[offsdst] += state->sparsec.vals.ptr.p_double[offs + i];
       }
    }
    nnz = offsdst - offs + 1;
@@ -23256,10 +23256,10 @@ void minqpoptimize(minqpstate *state) {
    nbc = 0;
    for (i = 0; i < n; i++) {
       if (state->havebndl.ptr.p_bool[i]) {
-         nbc = nbc + 1;
+         nbc++;
       }
       if (state->havebndu.ptr.p_bool[i]) {
-         nbc = nbc + 1;
+         nbc++;
       }
    }
 
@@ -23409,7 +23409,7 @@ void minqpoptimize(minqpstate *state) {
       if (state->algokind == 4) {
          qpdenseauloptimize(&state->a, &state->sparsea, state->akind, state->sparseaupper, &state->b, &state->bndl, &state->bndu, &state->effectives, &state->xorigin, n, &state->ecleic, neq, nineq, &state->dummysparse, 0, 0, !state->dbgskipconstraintnormalization, &state->qpdenseaulsettingsuser, &state->qpdenseaulbuf, &state->xs, &state->replagbc, &state->elaglc, &state->repterminationtype);
          for (i = 0; i < neq + nineq; i++) {
-            state->replaglc.ptr.p_double[state->elagidx.ptr.p_int[i]] = state->replaglc.ptr.p_double[state->elagidx.ptr.p_int[i]] + state->elaglc.ptr.p_double[i] * state->elagmlt.ptr.p_double[i];
+            state->replaglc.ptr.p_double[state->elagidx.ptr.p_int[i]] += state->elaglc.ptr.p_double[i] * state->elagmlt.ptr.p_double[i];
          }
          state->repinneriterationscount = state->qpdenseaulbuf.repinneriterationscount;
          state->repouteriterationscount = state->qpdenseaulbuf.repouteriterationscount;
@@ -23564,8 +23564,8 @@ void minqpsetquadratictermfast(minqpstate *state, RMatrix a, bool isupper, doubl
       for (j = j0; j <= j1; j++) {
          v = fabs(a->ptr.pp_double[i][j]);
          state->absamax = ae_maxreal(state->absamax, v);
-         state->absasum = state->absasum + v;
-         state->absasum2 = state->absasum2 + v * v;
+         state->absasum += v;
+         state->absasum2 += v * v;
       }
    }
 }
@@ -25382,7 +25382,7 @@ void dsssetproblem(dualsimplexstate *state, RVector c, RVector bndl, RVector bnd
             vv = v * state->at.vals.ptr.p_double[j];
             jj = state->at.idx.ptr.p_int[j];
             state->at.vals.ptr.p_double[j] = vv;
-            state->rowscales.ptr.p_double[jj] = state->rowscales.ptr.p_double[jj] + vv * vv;
+            state->rowscales.ptr.p_double[jj] += vv * vv;
          }
       }
       rvectorsetlengthatleast(&state->tmp0, k);
@@ -25394,7 +25394,7 @@ void dsssetproblem(dualsimplexstate *state, RVector c, RVector bndl, RVector bnd
          j0 = state->at.ridx.ptr.p_int[i];
          j1 = state->at.ridx.ptr.p_int[i + 1] - 1;
          for (j = j0; j <= j1; j++) {
-            state->at.vals.ptr.p_double[j] = state->at.vals.ptr.p_double[j] * state->tmp0.ptr.p_double[state->at.idx.ptr.p_int[j]];
+            state->at.vals.ptr.p_double[j] *= state->tmp0.ptr.p_double[state->at.idx.ptr.p_int[j]];
          }
       }
       ae_assert(state->at.vals.cnt >= sparsea->ridx.ptr.p_int[k] + k, "DSSSetProblem: integrity check failed");
@@ -25407,9 +25407,9 @@ void dsssetproblem(dualsimplexstate *state, RVector c, RVector bndl, RVector bnd
          state->at.vals.ptr.p_double[offs + i] = -1.0;
          state->at.idx.ptr.p_int[offs + i] = i;
          state->at.ridx.ptr.p_int[ns + i + 1] = state->at.ridx.ptr.p_int[ns + i] + 1;
-         state->at.ninitialized = state->at.ninitialized + 1;
+         state->at.ninitialized++;
       }
-      state->at.m = state->at.m + k;
+      state->at.m += k;
       sparseinitduidx(&state->at);
       processed = true;
    }
@@ -25543,7 +25543,7 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings) {
       reviseddualsimplex_solveboxonly(state);
       state->repf = 0.0;
       for (i = 0; i < state->primary.ns; i++) {
-         state->repf = state->repf + state->repx.ptr.p_double[i] * state->primary.rawc.ptr.p_double[i];
+         state->repf += state->repx.ptr.p_double[i] * state->primary.rawc.ptr.p_double[i];
       }
       reviseddualsimplex_unscaleandenforce(&state->repx, &state->repy, &state->repdx, state);
       ae_frame_leave();
@@ -25653,7 +25653,7 @@ void dssoptimize(dualsimplexstate *state, dualsimplexsettings *settings) {
    rvectorsetlengthatleast(&state->tmp1, m);
    state->repf = 0.0;
    for (i = 0; i < state->primary.ns; i++) {
-      state->repf = state->repf + state->primary.xa.ptr.p_double[i] * state->primary.rawc.ptr.p_double[i];
+      state->repf += state->primary.xa.ptr.p_double[i] * state->primary.rawc.ptr.p_double[i];
    }
    state->repprimalerror = 0.0;
    state->repdualerror = 0.0;
@@ -26034,7 +26034,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
       if (*thetad * dir >= 0.0) {
          return;
       }
-      s->effc.ptr.p_double[q] = s->effc.ptr.p_double[q] - s->d.ptr.p_double[q];
+      s->effc.ptr.p_double[q] -= s->d.ptr.p_double[q];
       s->d.ptr.p_double[q] = 0.0;
       *thetad = 0.0;
       return;
@@ -26050,8 +26050,8 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
 
    // Shift Q-th coefficient
       sft = *thetad * (dir * alphar->ptr.p_double[q]) - s->d.ptr.p_double[q];
-      s->effc.ptr.p_double[q] = s->effc.ptr.p_double[q] + sft;
-      s->d.ptr.p_double[q] = s->d.ptr.p_double[q] + sft;
+      s->effc.ptr.p_double[q] += sft;
+      s->d.ptr.p_double[q] += sft;
 
    // Shift other coefficients
       for (ii = 0; ii < s->ns; ii++) {
@@ -26064,18 +26064,18 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
 
       // Handle variables at lower bound
          if (bndt == reviseddualsimplex_cclower || (bndt == reviseddualsimplex_ccrange && s->xa.ptr.p_double[j] == s->bndl.ptr.p_double[j])) {
-            sft = sft - reviseddualsimplex_dtol;
+            sft -= reviseddualsimplex_dtol;
             if (sft > 0) {
-               s->effc.ptr.p_double[j] = s->effc.ptr.p_double[j] + sft;
-               s->d.ptr.p_double[j] = s->d.ptr.p_double[j] + sft;
+               s->effc.ptr.p_double[j] += sft;
+               s->d.ptr.p_double[j] += sft;
             }
             continue;
          }
          if (bndt == reviseddualsimplex_ccupper || (bndt == reviseddualsimplex_ccrange && s->xa.ptr.p_double[j] == s->bndu.ptr.p_double[j])) {
-            sft = sft + reviseddualsimplex_dtol;
+            sft += reviseddualsimplex_dtol;
             if (sft < 0) {
-               s->effc.ptr.p_double[j] = s->effc.ptr.p_double[j] + sft;
-               s->d.ptr.p_double[j] = s->d.ptr.p_double[j] + sft;
+               s->effc.ptr.p_double[j] += sft;
+               s->d.ptr.p_double[j] += sft;
             }
             continue;
          }
@@ -26332,14 +26332,14 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       if (bndt == reviseddualsimplex_cclower || (bndt == reviseddualsimplex_ccrange && vx == s->bndl.ptr.p_double[nj])) {
          if (alphawaver > vp) {
             state->eligibleset.ptr.p_int[eligiblecnt] = nj;
-            eligiblecnt = eligiblecnt + 1;
+            eligiblecnt++;
             continue;
          }
       }
       if (bndt == reviseddualsimplex_ccupper || (bndt == reviseddualsimplex_ccrange && vx == s->bndu.ptr.p_double[nj])) {
          if (alphawaver < -vp) {
             state->eligibleset.ptr.p_int[eligiblecnt] = nj;
-            eligiblecnt = eligiblecnt + 1;
+            eligiblecnt++;
             continue;
          }
       }
@@ -26407,16 +26407,16 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          }
       // Update and test ADelta. Break BFRT mini-iterations once
       // we get negative slope.
-         adelta = adelta - (s->bndu.ptr.p_double[*q] - s->bndl.ptr.p_double[*q]) * fabs(alphar->ptr.p_double[*q]);
+         adelta -= (s->bndu.ptr.p_double[*q] - s->bndl.ptr.p_double[*q]) * fabs(alphar->ptr.p_double[*q]);
          if (adelta <= 0.0) {
             break;
          }
       // Update eligible set, record flip
          ae_assert(state->eligibleset.ptr.p_int[idx] == (*q), "RatioTest: unexpected failure");
          possibleflips->ptr.p_int[*possibleflipscnt] = *q;
-         *possibleflipscnt = *possibleflipscnt + 1;
+         ++*possibleflipscnt;
          state->eligibleset.ptr.p_int[idx] = state->eligibleset.ptr.p_int[eligiblecnt - 1];
-         eligiblecnt = eligiblecnt - 1;
+         eligiblecnt--;
       }
       ae_assert(*q >= 0, "RatioTest: unexpected failure");
       *thetad = s->d.ptr.p_double[*q] / alphar->ptr.p_double[*q];
@@ -26466,7 +26466,7 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
                continue;
             }
             state->harrisset.ptr.p_int[harrissetsize] = nj;
-            harrissetsize = harrissetsize + 1;
+            harrissetsize++;
             hasnonboxedvars = hasnonboxedvars || s->bndt.ptr.p_int[nj] != reviseddualsimplex_ccrange;
             vtest = fabs(alphawaver);
             if (vtest > vtarget) {
@@ -26486,14 +26486,14 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
 
             // I-th element not present in Harris set, leave it in the eligible set
                state->eligibleset.ptr.p_int[jj] = state->eligibleset.ptr.p_int[i];
-               jj = jj + 1;
+               jj++;
             } else {
 
             // I-th element is present in Harris set, skip it
-               j = j + 1;
+               j++;
             }
          }
-         eligiblecnt = eligiblecnt - harrissetsize;
+         eligiblecnt -= harrissetsize;
          ae_assert(j == harrissetsize, "RatioTest: integrity check failed");
          ae_assert(jj == eligiblecnt, "RatioTest: integrity check failed");
 
@@ -26503,7 +26503,7 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          for (j = 0; j < harrissetsize; j++) {
             nj = state->harrisset.ptr.p_int[j];
             if (!hasnonboxedvars || s->bndt.ptr.p_int[nj] == reviseddualsimplex_ccrange) {
-               adelta = adelta - (s->bndu.ptr.p_double[nj] - s->bndl.ptr.p_double[nj]) * fabs(alphar->ptr.p_double[nj]);
+               adelta -= (s->bndu.ptr.p_double[nj] - s->bndl.ptr.p_double[nj]) * fabs(alphar->ptr.p_double[nj]);
             } else {
                adelta = -1.0;
             }
@@ -26514,7 +26514,7 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
          ae_assert(!hasnonboxedvars, "RatioTest: integrity check failed");
          for (j = 0; j < harrissetsize; j++) {
             possibleflips->ptr.p_int[*possibleflipscnt] = state->harrisset.ptr.p_int[j];
-            *possibleflipscnt = *possibleflipscnt + 1;
+            ++*possibleflipscnt;
          }
       }
       ae_assert(*q >= 0, "RatioTest: unexpected failure");
@@ -26609,7 +26609,7 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
 // Evaluate and update non-basic elements of D
    for (ii = 0; ii < nn; ii++) {
       j = state->basis.nidx.ptr.p_int[ii];
-      s->d.ptr.p_double[j] = s->d.ptr.p_double[j] - thetad * state->alphar.ptr.p_double[j];
+      s->d.ptr.p_double[j] -= thetad * state->alphar.ptr.p_double[j];
    }
    for (ii = 0; ii < possibleflipscnt; ii++) {
       j = possibleflips->ptr.p_int[ii];
@@ -26627,14 +26627,14 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
          }
       }
       if (flipped) {
-         delta = delta - dir * (bndu - bndl) * fabs(alphar->ptr.p_double[j]);
+         delta -= dir * (bndu - bndl) * fabs(alphar->ptr.p_double[j]);
          state->ustmpi.ptr.p_int[actualflipscnt] = j;
-         actualflipscnt = actualflipscnt + 1;
+         actualflipscnt++;
          k0 = state->at.ridx.ptr.p_int[j];
          k1 = state->at.ridx.ptr.p_int[j + 1] - 1;
          for (k = k0; k <= k1; k++) {
             idx = state->at.idx.ptr.p_int[k];
-            state->tmp0.ptr.p_double[idx] = state->tmp0.ptr.p_double[idx] + flip * state->at.vals.ptr.p_double[k];
+            state->tmp0.ptr.p_double[idx] += flip * state->at.vals.ptr.p_double[k];
          }
       }
    }
@@ -26648,11 +26648,11 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
       k1 = state->at.ridx.ptr.p_int[q + 1] - 1;
       for (k = k0; k <= k1; k++) {
          idx = state->at.idx.ptr.p_int[k];
-         state->tmp0.ptr.p_double[idx] = state->tmp0.ptr.p_double[idx] + thetap * state->at.vals.ptr.p_double[k];
+         state->tmp0.ptr.p_double[idx] += thetap * state->at.vals.ptr.p_double[k];
       }
       reviseddualsimplex_basissolve(&state->basis, &state->tmp0, &state->tmp1, &state->tmp2);
       for (j = 0; j < m; j++) {
-         s->xb.ptr.p_double[j] = s->xb.ptr.p_double[j] - state->tmp1.ptr.p_double[j];
+         s->xb.ptr.p_double[j] -= state->tmp1.ptr.p_double[j];
       }
       for (ii = 0; ii < actualflipscnt; ii++) {
          j = state->ustmpi.ptr.p_int[ii];
@@ -26670,7 +26670,7 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
       }
    } else {
       for (j = 0; j < m; j++) {
-         s->xb.ptr.p_double[j] = s->xb.ptr.p_double[j] - thetap * state->alphaq.ptr.p_double[j];
+         s->xb.ptr.p_double[j] -= thetap * state->alphaq.ptr.p_double[j];
       }
       s->xb.ptr.p_double[r] = s->xa.ptr.p_double[q] + thetap;
       if (dir < 0) {
@@ -26713,7 +26713,7 @@ static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, 
    mx = 0.0;
    for (i = 0; i < m; i++) {
       v = state->alphaq.ptr.p_double[i];
-      v = v * v;
+      v *= v;
       if (v > mx) {
          mx = v;
       }
@@ -27072,10 +27072,10 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
          for (i = 0; i < m; i++) {
             bi = state->basis.idx.ptr.p_int[i];
             vv = thetap * (dir * state->alphaq.ptr.p_double[i]);
-            s->xa.ptr.p_double[bi] = s->xa.ptr.p_double[bi] - vv;
+            s->xa.ptr.p_double[bi] -= vv;
          }
          s->xa.ptr.p_double[p] = xbnd;
-         s->xa.ptr.p_double[q] = s->xa.ptr.p_double[q] + dir * thetap;
+         s->xa.ptr.p_double[q] += dir * thetap;
          for (i = 0; i < m; i++) {
             state->tmp0.ptr.p_double[i] = 0.0;
          }
@@ -27097,7 +27097,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
          for (i = 0; i < m; i++) {
             bi = state->basis.idx.ptr.p_int[i];
             vv = lim * (dir * state->alphaq.ptr.p_double[i]);
-            s->xa.ptr.p_double[bi] = s->xa.ptr.p_double[bi] - vv;
+            s->xa.ptr.p_double[bi] -= vv;
          }
       }
       inc(&state->repiterationscount);
@@ -27569,7 +27569,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             s->colpermbwd.ptr.p_int[nlogical] = j;
             s->tcinvidx.ptr.p_int[s->colpermbwd.ptr.p_int[nlogical]] = nlogical;
             s->tcinvidx.ptr.p_int[s->colpermbwd.ptr.p_int[j1]] = j1;
-            nlogical = nlogical + 1;
+            nlogical++;
          }
       }
       sortmiddlei(&s->colpermbwd, nlogical, m - nlogical);
@@ -27617,13 +27617,13 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             // Append element to SparseLU1
                s->sparselu1.idx.ptr.p_int[offs1] = k1;
                s->sparselu1.vals.ptr.p_double[offs1] = at->vals.ptr.p_double[j];
-               offs1 = offs1 + 1;
+               offs1++;
             } else {
 
             // Append element to SparseLU2
                s->sparselu2.idx.ptr.p_int[offs2] = k1 - nlogical;
                s->sparselu2.vals.ptr.p_double[offs2] = at->vals.ptr.p_double[j];
-               offs2 = offs2 + 1;
+               offs2++;
             }
          }
 
@@ -27660,8 +27660,8 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
          nzl = nlogical;
          for (i = 0; i < nstructural; i++) {
             k = s->lubuf2.rowpermrawidx.ptr.p_int[i];
-            nzl = nzl + (s->sparselu1.ridx.ptr.p_int[k + 1] - s->sparselu1.ridx.ptr.p_int[k]);
-            nzl = nzl + 1 + (s->sparselu2.didx.ptr.p_int[i] - s->sparselu2.ridx.ptr.p_int[i]);
+            nzl += s->sparselu1.ridx.ptr.p_int[k + 1] - s->sparselu1.ridx.ptr.p_int[k];
+            nzl += 1 + s->sparselu2.didx.ptr.p_int[i] - s->sparselu2.ridx.ptr.p_int[i];
          }
          rvectorsetlengthatleast(&s->sparsel.vals, nzl);
          ivectorsetlengthatleast(&s->sparsel.idx, nzl);
@@ -27686,18 +27686,18 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             for (j = j0; j <= j1; j++) {
                s->sparsel.idx.ptr.p_int[offs] = s->sparselu1.idx.ptr.p_int[j];
                s->sparsel.vals.ptr.p_double[offs] = -s->sparselu1.vals.ptr.p_double[j];
-               offs = offs + 1;
+               offs++;
             }
             j0 = s->sparselu2.ridx.ptr.p_int[i];
             j1 = s->sparselu2.didx.ptr.p_int[i] - 1;
             for (j = j0; j <= j1; j++) {
                s->sparsel.idx.ptr.p_int[offs] = nlogical + s->sparselu2.idx.ptr.p_int[j];
                s->sparsel.vals.ptr.p_double[offs] = s->sparselu2.vals.ptr.p_double[j];
-               offs = offs + 1;
+               offs++;
             }
             s->sparsel.idx.ptr.p_int[offs] = nlogical + i;
             s->sparsel.vals.ptr.p_double[offs] = 1.0;
-            offs = offs + 1;
+            offs++;
             s->sparsel.ridx.ptr.p_int[nlogical + i + 1] = offs;
          }
          ae_assert(s->sparsel.ninitialized == s->sparsel.ridx.ptr.p_int[m], "BasisFreshTrf: integrity check failed");
@@ -27710,7 +27710,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       // 3. NStructural*NStructural bottom block
          nzu = nlogical;
          for (i = 0; i < nstructural; i++) {
-            nzu = nzu + 1 + (s->sparselu2.ridx.ptr.p_int[i + 1] - s->sparselu2.uidx.ptr.p_int[i]);
+            nzu += 1 + (s->sparselu2.ridx.ptr.p_int[i + 1] - s->sparselu2.uidx.ptr.p_int[i]);
          }
          rvectorsetlengthatleast(&s->sparseu.vals, nzu);
          ivectorsetlengthatleast(&s->sparseu.idx, nzu);
@@ -27737,13 +27737,13 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
             } else {
                s->sparseu.vals.ptr.p_double[offs] = 0.0;
             }
-            offs = offs + 1;
+            offs++;
             j0 = s->sparselu2.uidx.ptr.p_int[i];
             j1 = s->sparselu2.ridx.ptr.p_int[i + 1] - 1;
             for (j = j0; j <= j1; j++) {
                s->sparseu.idx.ptr.p_int[offs] = nlogical + s->sparselu2.idx.ptr.p_int[j];
                s->sparseu.vals.ptr.p_double[offs] = s->sparselu2.vals.ptr.p_double[j];
-               offs = offs + 1;
+               offs++;
             }
             s->sparseu.ridx.ptr.p_int[nlogical + i + 1] = offs;
          }
@@ -27814,7 +27814,7 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
             v = 0.0;
             for (j = 0; j < m; j++) {
                vv = s->wtmp1.ptr.p_double[j];
-               v = v + vv * vv;
+               v += vv * vv;
             }
             s->dseweights.ptr.p_double[i] = v;
          } else {
@@ -27960,8 +27960,8 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             while (srcidx < idxd) {
                s->sparsel.idx.ptr.p_int[dstoffs] = srcidx;
                s->sparsel.vals.ptr.p_double[dstoffs] = srcval;
-               dstoffs = dstoffs + 1;
-               srcoffs = srcoffs + 1;
+               dstoffs++;
+               srcoffs++;
                srcidx = s->sparsel.idx.ptr.p_int[srcoffs];
                srcval = s->sparsel.vals.ptr.p_double[srcoffs];
             }
@@ -27971,7 +27971,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          // is used to determine coefficients of update matrix.
             if (srcidx == idxd) {
                s->utmp0.ptr.p_double[i - 1] = srcval;
-               srcoffs = srcoffs + 1;
+               srcoffs++;
                srcidx = s->sparsel.idx.ptr.p_int[srcoffs];
                srcval = s->sparsel.vals.ptr.p_double[srcoffs];
             }
@@ -27980,9 +27980,9 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             while (srcidx < i) {
                s->sparsel.idx.ptr.p_int[dstoffs] = srcidx - 1;
                s->sparsel.vals.ptr.p_double[dstoffs] = srcval;
-               v = v - srcval * s->utmp0.ptr.p_double[srcidx - 1];
-               dstoffs = dstoffs + 1;
-               srcoffs = srcoffs + 1;
+               v -= srcval * s->utmp0.ptr.p_double[srcidx - 1];
+               dstoffs++;
+               srcoffs++;
                srcidx = s->sparsel.idx.ptr.p_int[srcoffs];
                srcval = s->sparsel.vals.ptr.p_double[srcoffs];
             }
@@ -27991,7 +27991,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          // Write out unit diagonal, finalize row
             s->sparsel.idx.ptr.p_int[dstoffs] = i - 1;
             s->sparsel.vals.ptr.p_double[dstoffs] = 1.0;
-            dstoffs = dstoffs + 1;
+            dstoffs++;
             s->sparsel.ridx.ptr.p_int[i] = dstoffs;
          }
          s->utmp0.ptr.p_double[m - 1] = 1.0;
@@ -28001,7 +28001,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             if (v != 0) {
                s->sparsel.idx.ptr.p_int[dstoffs] = j;
                s->sparsel.vals.ptr.p_double[dstoffs] = v;
-               dstoffs = dstoffs + 1;
+               dstoffs++;
             }
          }
          vcorner = alphaqim->ptr.p_double[idxd];
@@ -28010,13 +28010,13 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
             if (v != 0) {
                s->sparsel.idx.ptr.p_int[dstoffs] = j - 1;
                s->sparsel.vals.ptr.p_double[dstoffs] = v;
-               dstoffs = dstoffs + 1;
-               vcorner = vcorner - v * s->utmp0.ptr.p_double[j - 1];
+               dstoffs++;
+               vcorner -= v * s->utmp0.ptr.p_double[j - 1];
             }
          }
          s->sparsel.idx.ptr.p_int[dstoffs] = m - 1;
          s->sparsel.vals.ptr.p_double[dstoffs] = 1.0;
-         dstoffs = dstoffs + 1;
+         dstoffs++;
          s->sparsel.ridx.ptr.p_int[m] = dstoffs;
          s->sparsel.ninitialized = s->sparsel.ridx.ptr.p_int[m];
          for (i = 0; i < m; i++) {
@@ -28071,11 +28071,11 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       // Compute using update formula
          for (i = 0; i < m; i++) {
             if (i != r) {
-               s->dseweights.ptr.p_double[i] = s->dseweights.ptr.p_double[i] - 2 * (alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]) * tau->ptr.p_double[i] + s->dseweights.ptr.p_double[r] * ae_sqr(alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]);
+               s->dseweights.ptr.p_double[i] -= 2 * (alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]) * tau->ptr.p_double[i] - s->dseweights.ptr.p_double[r] * ae_sqr(alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]);
                s->dseweights.ptr.p_double[i] = ae_maxreal(s->dseweights.ptr.p_double[i], reviseddualsimplex_minbeta);
             }
          }
-         s->dseweights.ptr.p_double[r] = s->dseweights.ptr.p_double[r] / (alphaq->ptr.p_double[r] * alphaq->ptr.p_double[r]);
+         s->dseweights.ptr.p_double[r] /= alphaq->ptr.p_double[r] * alphaq->ptr.p_double[r];
       } else {
 
       // No prior values, compute from scratch (usually it is done only once)
@@ -28152,9 +28152,9 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector r, RVect
       for (k = 0; k < s->trfage; k++) {
          v = x->ptr.p_double[s->rk.ptr.p_int[k]];
          for (i = 0; i < m; i++) {
-            x->ptr.p_double[i] = x->ptr.p_double[i] + s->densepfieta.ptr.p_double[k * m + i] * v;
+            x->ptr.p_double[i] += s->densepfieta.ptr.p_double[k * m + i] * v;
          }
-         x->ptr.p_double[s->rk.ptr.p_int[k]] = x->ptr.p_double[s->rk.ptr.p_int[k]] - v;
+         x->ptr.p_double[s->rk.ptr.p_int[k]] -= v;
       }
       processed = true;
    }
@@ -28188,7 +28188,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector r, RVect
          for (i = d; i < m - 1; i++) {
             v = x->ptr.p_double[i + 1];
             x->ptr.p_double[i] = v;
-            vv = vv + v * s->densemu.ptr.p_double[k * m + i];
+            vv += v * s->densemu.ptr.p_double[k * m + i];
          }
          x->ptr.p_double[m - 1] = vv + vd * s->densemu.ptr.p_double[k * m + m - 1];
       }
@@ -28211,7 +28211,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector r, RVect
    ae_assert(processed, "BasisSolve: unsupported TRF type");
    v = 0.0;
    for (i = 0; i < m; i++) {
-      v = v + x->ptr.p_double[i];
+      v += x->ptr.p_double[i];
    }
    ae_assert(isfinite(v), "BasisSolve: integrity check failed (degeneracy in B?)");
 }
@@ -28246,7 +28246,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector r, RVect
       for (k = s->trfage - 1; k >= 0; k--) {
          v = 0.0;
          for (i = 0; i < m; i++) {
-            v = v + s->densepfieta.ptr.p_double[k * m + i] * x->ptr.p_double[i];
+            v += s->densepfieta.ptr.p_double[k * m + i] * x->ptr.p_double[i];
          }
          x->ptr.p_double[s->rk.ptr.p_int[k]] = v;
       }
@@ -28334,7 +28334,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector r, RVect
    ae_assert(processed, "BasisSolveT: unsupported TRF type");
    v = 0.0;
    for (i = 0; i < m; i++) {
-      v = v + x->ptr.p_double[i];
+      v += x->ptr.p_double[i];
    }
    ae_assert(isfinite(v), "BasisSolveT: integrity check failed (degeneracy in B?)");
 }
@@ -28374,7 +28374,7 @@ static void reviseddualsimplex_computeanxn(dualsimplexstate *state, dualsimplexs
       v = x->ptr.p_double[state->basis.nidx.ptr.p_int[i]];
       for (j = j0; j <= j1; j++) {
          k = state->at.idx.ptr.p_int[j];
-         y->ptr.p_double[k] = y->ptr.p_double[k] + v * state->at.vals.ptr.p_double[j];
+         y->ptr.p_double[k] += v * state->at.vals.ptr.p_double[j];
       }
    }
 }
@@ -28410,7 +28410,7 @@ static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector y, R
       j1 = state->at.ridx.ptr.p_int[state->basis.nidx.ptr.p_int[i] + 1] - 1;
       v = 0.0;
       for (j = j0; j <= j1; j++) {
-         v = v + state->at.vals.ptr.p_double[j] * y->ptr.p_double[state->at.idx.ptr.p_int[j]];
+         v += state->at.vals.ptr.p_double[j] * y->ptr.p_double[state->at.idx.ptr.p_int[j]];
       }
       r->ptr.p_double[state->basis.nidx.ptr.p_int[i]] = v;
    }
@@ -28638,7 +28638,7 @@ static void reviseddualsimplex_unscaleandenforce(RVector repx, RVector repy, RVe
          repx->ptr.p_double[i] = s->rawbndu.ptr.p_double[i];
          continue;
       }
-      repx->ptr.p_double[i] = repx->ptr.p_double[i] * s->varscales.ptr.p_double[i];
+      repx->ptr.p_double[i] *= s->varscales.ptr.p_double[i];
       if (isfinite(s->rawbndl.ptr.p_double[i])) {
          repx->ptr.p_double[i] = ae_maxreal(repx->ptr.p_double[i], s->rawbndl.ptr.p_double[i]);
       }
@@ -28647,8 +28647,8 @@ static void reviseddualsimplex_unscaleandenforce(RVector repx, RVector repy, RVe
       }
    }
    for (i = 0; i < m; i++) {
-      repy->ptr.p_double[i] = repy->ptr.p_double[i] / s->rowscales.ptr.p_double[i];
-      repdx->ptr.p_double[i] = repdx->ptr.p_double[i] / s->rowscales.ptr.p_double[i];
+      repy->ptr.p_double[i] /= s->rowscales.ptr.p_double[i];
+      repdx->ptr.p_double[i] /= s->rowscales.ptr.p_double[i];
    }
 }
 
@@ -29459,7 +29459,7 @@ void minlpaddlc2dense(minlpstate *state, RVector a, double al, double au) {
       if (a->ptr.p_double[i] != 0.0) {
          state->adddtmpi.ptr.p_int[nnz] = i;
          state->adddtmpr.ptr.p_double[nnz] = a->ptr.p_double[i];
-         nnz = nnz + 1;
+         nnz++;
       }
    }
    minlpaddlc2(state, &state->adddtmpi, &state->adddtmpr, nnz, al, au);
@@ -29562,11 +29562,11 @@ void minlpaddlc2(minlpstate *state, ZVector idxa, RVector vala, ae_int_t nnz, do
    offsdst = offs;
    for (i = 1; i < nnz; i++) {
       if (state->a.idx.ptr.p_int[offsdst] != state->a.idx.ptr.p_int[offs + i]) {
-         offsdst = offsdst + 1;
+         offsdst++;
          state->a.idx.ptr.p_int[offsdst] = state->a.idx.ptr.p_int[offs + i];
          state->a.vals.ptr.p_double[offsdst] = state->a.vals.ptr.p_double[offs + i];
       } else {
-         state->a.vals.ptr.p_double[offsdst] = state->a.vals.ptr.p_double[offsdst] + state->a.vals.ptr.p_double[offs + i];
+         state->a.vals.ptr.p_double[offsdst] += state->a.vals.ptr.p_double[offs + i];
       }
    }
    nnz = offsdst - offs + 1;
@@ -30498,13 +30498,13 @@ void minslpinitbuf(RVector bndl, RVector bndu, RVector s, RVector x0, ae_int_t n
       for (j = 0; j < n; j++) {
          v = cleic->ptr.pp_double[i][j] * s->ptr.p_double[j];
          state->scaledcleic.ptr.pp_double[i][j] = v;
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       state->scaledcleic.ptr.pp_double[i][n] = cleic->ptr.pp_double[i][n];
       if (vv > 0.0) {
          for (j = 0; j <= n; j++) {
-            state->scaledcleic.ptr.pp_double[i][j] = state->scaledcleic.ptr.pp_double[i][j] / vv;
+            state->scaledcleic.ptr.pp_double[i][j] /= vv;
          }
       }
    }
@@ -30709,9 +30709,9 @@ Spawn:
          // Function #I needs renormalization:
          // * update function vector element and Jacobian matrix row
          // * update FScales[] array
-            state->stepkfi.ptr.p_double[i] = state->stepkfi.ptr.p_double[i] * multiplyby;
+            state->stepkfi.ptr.p_double[i] *= multiplyby;
             for (j = 0; j < n; j++) {
-               state->stepkj.ptr.pp_double[i][j] = state->stepkj.ptr.pp_double[i][j] * multiplyby;
+               state->stepkj.ptr.pp_double[i][j] *= multiplyby;
             }
             state->fscales.ptr.p_double[i] = setscaleto;
          }
@@ -30813,10 +30813,10 @@ Spawn:
          deltamax = ae_maxreal(deltamax, fabs(state->step0x.ptr.p_double[i] - state->stepkx.ptr.p_double[i]) / state->trustrad);
       }
       if (deltamax <= nlcslp_slpdeltadecrease) {
-         state->trustrad = state->trustrad * ae_maxreal(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay);
+         state->trustrad *= ae_maxreal(deltamax / nlcslp_slpdeltadecrease, nlcslp_maxtrustraddecay);
       }
       if (deltamax >= nlcslp_slpdeltaincrease) {
-         state->trustrad = state->trustrad * ae_minreal(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth);
+         state->trustrad *= ae_minreal(deltamax / nlcslp_slpdeltaincrease, nlcslp_maxtrustradgrowth);
       }
    // Advance outer iteration counter, test stopping criteria
       inc(&state->repouteriterationscount);
@@ -30931,7 +30931,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
    for (i = 0; i < nec + nic; i++) {
       for (j = 0; j < n; j++) {
          if (sstate->scaledcleic.ptr.pp_double[i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
@@ -30949,7 +30949,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
          // Primary part of the matrix
             subsolver->sparserawlc.vals.ptr.p_double[offs] = sstate->scaledcleic.ptr.pp_double[i][j];
             subsolver->sparserawlc.idx.ptr.p_int[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       subsolver->sparserawlc.ridx.ptr.p_int[i + 1] = offs;
@@ -31004,10 +31004,10 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
          sk = x1->ptr.p_double[i] - x0->ptr.p_double[i];
          yk = g1->ptr.p_double[i] - g0->ptr.p_double[i];
          gk = g0->ptr.p_double[i];
-         v = v + sk * yk;
-         v0 = v0 + sk * sk;
-         v1 = v1 + yk * yk;
-         v2 = v2 + gk * gk;
+         v += sk * yk;
+         v0 += sk * sk;
+         v1 += yk * yk;
+         v2 += gk * gk;
          subsolver->sk.ptr.p_double[i] = sk;
          subsolver->yk.ptr.p_double[i] = yk;
       }
@@ -31094,7 +31094,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = v + ae_sqr(jac->ptr.pp_double[0][i]);
+      v += ae_sqr(jac->ptr.pp_double[0][i]);
    }
    v = coalesce(sqrt(v), 1.0);
    for (i = n; i < nslack; i++) {
@@ -31118,13 +31118,13 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    for (i = 0; i < nlec + nlic; i++) {
       for (j = 0; j < n; j++) {
          if (jac->ptr.pp_double[1 + i][j] != 0.0) {
-            nnz = nnz + 1;
+            nnz++;
          }
       }
    }
-   nnz = nnz + 2 * nec + nic;
-   nnz = nnz + 2 * nlec + nlic;
-   nnz = nnz + subsolver->curdcnt * n;
+   nnz += 2 * nec + nic;
+   nnz += 2 * nlec + nlic;
+   nnz += subsolver->curdcnt * n;
    ivectorgrowto(&subsolver->sparseefflc.ridx, lccnt + n + 1);
    rvectorgrowto(&subsolver->sparseefflc.vals, nnz);
    ivectorgrowto(&subsolver->sparseefflc.idx, nnz);
@@ -31159,11 +31159,11 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          j = subsolver->sparserawlc.idx.ptr.p_int[k];
          v = subsolver->tmp0.ptr.p_double[j];
          vv = subsolver->sparserawlc.vals.ptr.p_double[k];
-         vright = vright + vv * v;
+         vright += vv * v;
          if (vv >= 0) {
-            vmax = vmax + vv * (v + subsolver->curbndu.ptr.p_double[j]);
+            vmax += vv * (v + subsolver->curbndu.ptr.p_double[j]);
          } else {
-            vmax = vmax + vv * (v + subsolver->curbndl.ptr.p_double[j]);
+            vmax += vv * (v + subsolver->curbndl.ptr.p_double[j]);
          }
       }
 
@@ -31190,7 +31190,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       for (k = j0; k <= j1; k++) {
          subsolver->sparseefflc.idx.ptr.p_int[offs] = subsolver->sparserawlc.idx.ptr.p_int[k];
          subsolver->sparseefflc.vals.ptr.p_double[offs] = subsolver->sparserawlc.vals.ptr.p_double[k];
-         offs = offs + 1;
+         offs++;
       }
 
    // Set up slack variables
@@ -31199,13 +31199,13 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->sparseefflc.vals.ptr.p_double[offs + 1] = 1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 0] = offsslackec + 2 * i + 0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 1] = offsslackec + 2 * i + 1;
-         offs = offs + 2;
+         offs += 2;
       } else {
 
       // Slack variables for inequality constraints
          subsolver->sparseefflc.vals.ptr.p_double[offs] = -1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs] = offsslackic + (i - nec);
-         offs = offs + 1;
+         offs++;
       }
 
    // Finalize row
@@ -31230,7 +31230,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.ptr.p_double[offsslackic + (i - nec)] = ae_maxreal(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m = subsolver->sparseefflc.m + (nec + nic);
+   subsolver->sparseefflc.m += nec + nic;
 
 // Append nonlinear equality/inequality constraints
    for (i = 0; i < nlec + nlic; i++) {
@@ -31239,7 +31239,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       vv = 0.0;
       for (j = 0; j < n; j++) {
          v = jac->ptr.pp_double[1 + i][j];
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = 1 / coalesce(sqrt(vv), 1.0);
 
@@ -31249,7 +31249,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          if (jac->ptr.pp_double[1 + i][j] != 0.0) {
             subsolver->sparseefflc.vals.ptr.p_double[offs] = vv * jac->ptr.pp_double[1 + i][j];
             subsolver->sparseefflc.idx.ptr.p_int[offs] = j;
-            offs = offs + 1;
+            offs++;
          }
       }
       if (i < nlec) {
@@ -31259,13 +31259,13 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->sparseefflc.vals.ptr.p_double[offs + 1] = 1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 0] = offsslacknlec + 2 * i + 0;
          subsolver->sparseefflc.idx.ptr.p_int[offs + 1] = offsslacknlec + 2 * i + 1;
-         offs = offs + 2;
+         offs += 2;
       } else {
 
       // Add slack terms for inequality constraints
          subsolver->sparseefflc.vals.ptr.p_double[offs] = -1.0;
          subsolver->sparseefflc.idx.ptr.p_int[offs] = offsslacknlic + (i - nlec);
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.ptr.p_int[subsolver->sparseefflc.m + i + 1] = offs;
 
@@ -31289,7 +31289,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          subsolver->curbndu.ptr.p_double[offsslacknlic + (i - nlec)] = ae_maxreal(v, 0.0);
       }
    }
-   subsolver->sparseefflc.m = subsolver->sparseefflc.m + (nlec + nlic);
+   subsolver->sparseefflc.m += nlec + nlic;
 
 // Append conjugacy constraints
    for (i = 0; i < subsolver->curdcnt; i++) {
@@ -31300,7 +31300,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       v = 0.0;
       for (j = 0; j < n; j++) {
          vv = subsolver->curhd.ptr.pp_double[i][j];
-         v = v + vv * vv;
+         v += vv * vv;
       }
       v = 1.0 / coalesce(sqrt(v), 1.0);
       offs = subsolver->sparseefflc.ridx.ptr.p_int[subsolver->sparseefflc.m];
@@ -31308,7 +31308,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
          vv = subsolver->curhd.ptr.pp_double[i][j];
          subsolver->sparseefflc.vals.ptr.p_double[offs] = v * vv;
          subsolver->sparseefflc.idx.ptr.p_int[offs] = j;
-         offs = offs + 1;
+         offs++;
       }
       subsolver->sparseefflc.ridx.ptr.p_int[subsolver->sparseefflc.m + 1] = offs;
 
@@ -31317,7 +31317,7 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
       subsolver->curau.ptr.p_double[subsolver->sparseefflc.m] = 0.0;
 
    // Increase row count
-      subsolver->sparseefflc.m = subsolver->sparseefflc.m + 1;
+      subsolver->sparseefflc.m++;
    }
 
 // Finalize sparse matrix structure
@@ -31340,10 +31340,10 @@ static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsol
    }
    dsssetproblem(&subsolver->dss, &subsolver->curb, &subsolver->curbndl, &subsolver->curbndu, &subsolver->tmp0, &subsolver->densedummy, &subsolver->sparseefflc, 1, &subsolver->cural, &subsolver->curau, subsolver->sparseefflc.m, &subsolver->lastbasis, basisinittype, &subsolver->dsssettings);
    dssoptimize(&subsolver->dss, &subsolver->dsssettings);
-   state->repsimplexiterations = state->repsimplexiterations + subsolver->dss.repiterationscount;
-   state->repsimplexiterations1 = state->repsimplexiterations1 + subsolver->dss.repiterationscount1;
-   state->repsimplexiterations2 = state->repsimplexiterations2 + subsolver->dss.repiterationscount2;
-   state->repsimplexiterations3 = state->repsimplexiterations3 + subsolver->dss.repiterationscount3;
+   state->repsimplexiterations += subsolver->dss.repiterationscount;
+   state->repsimplexiterations1 += subsolver->dss.repiterationscount1;
+   state->repsimplexiterations2 += subsolver->dss.repiterationscount2;
+   state->repsimplexiterations3 += subsolver->dss.repiterationscount3;
    if (subsolver->dss.repterminationtype <= 0) {
 
    // LP solver failed due to numerical errors; exit
@@ -31527,7 +31527,7 @@ Spawn:
          goto Exit;
       }
    // Can not solve LP subproblem, decrease trust radius
-      state->trustrad = 0.5 * state->trustrad;
+      state->trustrad *= 0.5;
       if (state->trustrad < state->epsx) {
          state->repterminationtype = 2;
          *status = 0;
@@ -31572,9 +31572,9 @@ Spawn:
       for (i = 1; i <= nlec + nlic; i++) {
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + state13->d.ptr.p_double[j] * state13->stepkjc.ptr.pp_double[i][j];
+            v += state13->d.ptr.p_double[j] * state13->stepkjc.ptr.pp_double[i][j];
          }
-         state13->stepkfic.ptr.p_double[i] = state13->stepkfic.ptr.p_double[i] - v;
+         state13->stepkfic.ptr.p_double[i] -= v;
       }
 
    // Solve linearized problem one more time, now with new linearization of constraints
@@ -31638,7 +31638,7 @@ Spawn:
          nlcslp_slpcopystate(state, curx, curfi, curj, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn);
          break;
       }
-      localstp = nu * localstp;
+      localstp *= nu;
       nu = ae_maxreal(0.1, 0.5 * nu);
    }
    smoothnessmonitorfinalizelinesearch(smonitor);
@@ -31900,7 +31900,7 @@ Spawn:
       v = 0.0;
       for (i = 0; i < n; i++) {
          state2->stepknlaggrad.ptr.p_double[i] = state2->stepklaggrad.ptr.p_double[i];
-         v = v + state2->d.ptr.p_double[i] * state2->stepklaggrad.ptr.p_double[i];
+         v += state2->d.ptr.p_double[i] * state2->stepklaggrad.ptr.p_double[i];
       }
       if (v >= 0.0) {
 
@@ -31955,7 +31955,7 @@ Spawn:
 
          // The very first iteration failed, really strange.
          // Let's decrease trust radius and try one more time.
-            state->trustrad = 0.5 * state->trustrad;
+            state->trustrad *= 0.5;
             if (state->trustrad < state->epsx) {
                state->repterminationtype = 2;
                *status = 0;
@@ -31975,8 +31975,8 @@ Spawn:
       mx = 0.0;
       for (i = 0; i < n; i++) {
          mx = ae_maxreal(mx, fabs(state2->stepkxn.ptr.p_double[i] - curx->ptr.p_double[i]));
-         v = v + ae_sqr(state2->stepkxn.ptr.p_double[i] - curx->ptr.p_double[i]);
-         vv = vv + (state2->stepkjn.ptr.pp_double[0][i] - curj->ptr.pp_double[0][i]) * (state2->stepkxn.ptr.p_double[i] - curx->ptr.p_double[i]);
+         v += ae_sqr(state2->stepkxn.ptr.p_double[i] - curx->ptr.p_double[i]);
+         vv += (state2->stepkjn.ptr.pp_double[0][i] - curj->ptr.pp_double[0][i]) * (state2->stepkxn.ptr.p_double[i] - curx->ptr.p_double[i]);
       }
       gammaprev = *gammamax;
       if (mx > nlcslp_bfgstol) {
@@ -32222,10 +32222,10 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector x, double trustrad, 
          } else {
             vd = 1 / (1 - dampingfactor * v);
             vact = v * vd;
-            vd = vd * vd;
+            vd *= vd;
          }
-         *f = *f + vlag * vact;
-         tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + vlag * vd;
+         *f += vlag * vact;
+         tmp->sclagtmp1.ptr.p_double[i] += vlag * vd;
 
       // Quadratic augmentation term
          if (i < nec || v > 0) {
@@ -32233,13 +32233,13 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector x, double trustrad, 
          } else {
             vact = 0.0;
          }
-         *f = *f + 0.5 * nlcslp_augmentationfactor * vact * vact;
-         tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + nlcslp_augmentationfactor * vact;
+         *f += 0.5 * nlcslp_augmentationfactor * vact * vact;
+         tmp->sclagtmp1.ptr.p_double[i] += nlcslp_augmentationfactor * vact;
       }
       if (usesparsegemv) {
          sparsemtv(&state->subsolver.sparserawlc, &tmp->sclagtmp1, &tmp->sclagtmp0);
          for (i = 0; i < n; i++) {
-            g->ptr.p_double[i] = g->ptr.p_double[i] + tmp->sclagtmp0.ptr.p_double[i];
+            g->ptr.p_double[i] += tmp->sclagtmp0.ptr.p_double[i];
          }
       } else {
          rmatrixgemv(n, nec + nic, 1.0, &state->scaledcleic, 0, 0, 1, &tmp->sclagtmp1, 0, 1.0, g, 0);
@@ -32269,10 +32269,10 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector x, double trustrad, 
       } else {
          vd = 1 / (1 - dampingfactor * v);
          vact = v * vd;
-         vd = vd * vd;
+         vd *= vd;
       }
-      *f = *f + vlag * vact;
-      tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + vlag * vd;
+      *f += vlag * vact;
+      tmp->sclagtmp1.ptr.p_double[i] += vlag * vd;
 
    // Augmentation term
       if (i < nlec || v > 0) {
@@ -32280,8 +32280,8 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector x, double trustrad, 
       } else {
          vact = 0.0;
       }
-      *f = *f + 0.5 * nlcslp_augmentationfactor * vact * vact;
-      tmp->sclagtmp1.ptr.p_double[i] = tmp->sclagtmp1.ptr.p_double[i] + nlcslp_augmentationfactor * vact;
+      *f += 0.5 * nlcslp_augmentationfactor * vact * vact;
+      tmp->sclagtmp1.ptr.p_double[i] += nlcslp_augmentationfactor * vact;
    }
    rmatrixgemv(n, nlec + nlic, 1.0, j, 1, 0, 1, &tmp->sclagtmp1, 0, 1.0, g, 0);
 }
@@ -32340,19 +32340,19 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector x, 
       if (i < nec) {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcslp_augmentationfactor * v * v;
-         *meritf = *meritf + nlcslp_meritfunctionbase * fabs(v) + nlcslp_meritfunctiongain * fabs(lagmult->ptr.p_double[i]) * fabs(v);
+         *meritf += 0.5 * nlcslp_augmentationfactor * v * v;
+         *meritf += nlcslp_meritfunctionbase * fabs(v) + nlcslp_meritfunctiongain * fabs(lagmult->ptr.p_double[i]) * fabs(v);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[i] * v;
+         *rawlag += lagmult->ptr.p_double[i] * v;
       } else {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcslp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
-         *meritf = *meritf + nlcslp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcslp_meritfunctiongain * ae_maxreal(lagmult->ptr.p_double[i] * v, 0.0);
+         *meritf += 0.5 * nlcslp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
+         *meritf += nlcslp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcslp_meritfunctiongain * ae_maxreal(lagmult->ptr.p_double[i] * v, 0.0);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[i] * v;
+         *rawlag += lagmult->ptr.p_double[i] * v;
       }
    }
 
@@ -32362,19 +32362,19 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector x, 
       if (i < nlec) {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcslp_augmentationfactor * v * v;
-         *meritf = *meritf + nlcslp_meritfunctionbase * fabs(v) + nlcslp_meritfunctiongain * fabs(lagmult->ptr.p_double[nec + nic + i] * v);
+         *meritf += 0.5 * nlcslp_augmentationfactor * v * v;
+         *meritf += nlcslp_meritfunctionbase * fabs(v) + nlcslp_meritfunctiongain * fabs(lagmult->ptr.p_double[nec + nic + i] * v);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[nec + nic + i] * v;
+         *rawlag += lagmult->ptr.p_double[nec + nic + i] * v;
       } else {
 
       // Merit function: augmentation term + L1 penalty term
-         *meritf = *meritf + 0.5 * nlcslp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
-         *meritf = *meritf + nlcslp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcslp_meritfunctiongain * ae_maxreal(lagmult->ptr.p_double[nec + nic + i] * v, 0.0);
+         *meritf += 0.5 * nlcslp_augmentationfactor * ae_sqr(ae_maxreal(v, 0.0));
+         *meritf += nlcslp_meritfunctionbase * ae_maxreal(v, 0.0) + nlcslp_meritfunctiongain * ae_maxreal(lagmult->ptr.p_double[nec + nic + i] * v, 0.0);
 
       // Raw Lagrangian
-         *rawlag = *rawlag + lagmult->ptr.p_double[nec + nic + i] * v;
+         *rawlag += lagmult->ptr.p_double[nec + nic + i] * v;
       }
    }
 }
@@ -33039,7 +33039,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix c, ZVector ct, ae_int_t k) {
       if (ct->ptr.p_int[i] == 0) {
          ae_v_move(state->cleic.ptr.pp_double[state->nec], 1, c->ptr.pp_double[i], 1, n + 1);
          state->lcsrcidx.ptr.p_int[state->nec] = i;
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -33050,7 +33050,7 @@ void minnlcsetlc(minnlcstate *state, RMatrix c, ZVector ct, ae_int_t k) {
             ae_v_move(state->cleic.ptr.pp_double[state->nec + state->nic], 1, c->ptr.pp_double[i], 1, n + 1);
          }
          state->lcsrcidx.ptr.p_int[state->nec + state->nic] = i;
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -33822,19 +33822,19 @@ Spawn:
             ae_v_move(state->xbase.ptr.p_double, 1, state->x.ptr.p_double, 1, n);
             for (k = 0; k < n; k++) {
                ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-               state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - state->s.ptr.p_double[k] * state->diffstep;
+               state->x.ptr.p_double[k] -= state->s.ptr.p_double[k] * state->diffstep;
                state->PQ = 1; goto Pause; Resume01:
                ae_v_move(state->fm2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-               state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+               state->x.ptr.p_double[k] -= 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                state->PQ = 2; goto Pause; Resume02:
                ae_v_move(state->fm1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-               state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+               state->x.ptr.p_double[k] += 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                state->PQ = 3; goto Pause; Resume03:
                ae_v_move(state->fp1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-               state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + state->s.ptr.p_double[k] * state->diffstep;
+               state->x.ptr.p_double[k] += state->s.ptr.p_double[k] * state->diffstep;
                state->PQ = 4; goto Pause; Resume04:
                ae_v_move(state->fp2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                for (i = 0; i <= ng + nh; i++) {
@@ -33917,19 +33917,19 @@ Spawn:
                   } else {
                   // 4-point centered formula does not violate box constraints
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] -= state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 10; goto Pause; Resume10:
                      ae_v_move(state->fm2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] -= 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 11; goto Pause; Resume11:
                      ae_v_move(state->fm1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] += 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 12; goto Pause; Resume12:
                      ae_v_move(state->fp1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] += state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 13; goto Pause; Resume13:
                      ae_v_move(state->fp2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      for (i = 0; i <= ng + nh; i++) {
@@ -34035,19 +34035,19 @@ Spawn:
                   } else {
                   // 4-point centered formula does not violate box constraints
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] -= state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 19; goto Pause; Resume19:
                      ae_v_move(state->fm2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] -= 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 20; goto Pause; Resume20:
                      ae_v_move(state->fm1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + 0.5 * state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] += 0.5 * state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 21; goto Pause; Resume21:
                      ae_v_move(state->fp1.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] += state->s.ptr.p_double[k] * state->diffstep;
                      state->PQ = 22; goto Pause; Resume22:
                      ae_v_move(state->fp2.ptr.p_double, 1, state->fi.ptr.p_double, 1, ng + nh + 1);
                      for (i = 0; i <= ng + nh; i++) {
@@ -34627,7 +34627,7 @@ void minnlcinequalitypenaltyfunction(double alpha, double stabilizingpoint, doub
       *df = 0.0;
       *d2f = 0.0;
    } else {
-      alpha = alpha - stabilizingpoint;
+      alpha -= stabilizingpoint;
       *f = 0.5 * alpha * alpha;
       *df = alpha;
       *d2f = 1.0;
@@ -34805,16 +34805,16 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    for (i = 0; i < n; i++) {
       if ((hasbndl->ptr.p_bool[i] && hasbndu->ptr.p_bool[i]) && bndl->ptr.p_double[i] == bndu->ptr.p_double[i]) {
          minnlcequalitypenaltyfunction((x->ptr.p_double[i] - bndl->ptr.p_double[i]) * rho, &p, &dp, &d2p);
-         bufd->ptr.p_double[i] = bufd->ptr.p_double[i] + d2p * rho;
+         bufd->ptr.p_double[i] += d2p * rho;
          continue;
       }
       if (hasbndl->ptr.p_bool[i]) {
          minnlcinequalityshiftfunction((x->ptr.p_double[i] - bndl->ptr.p_double[i]) * rho + 1, &p, &dp, &d2p);
-         bufd->ptr.p_double[i] = bufd->ptr.p_double[i] + nubc->ptr.p_double[2 * i + 0] * d2p * rho;
+         bufd->ptr.p_double[i] += nubc->ptr.p_double[2 * i + 0] * d2p * rho;
       }
       if (hasbndu->ptr.p_bool[i]) {
          minnlcinequalityshiftfunction((bndu->ptr.p_double[i] - x->ptr.p_double[i]) * rho + 1, &p, &dp, &d2p);
-         bufd->ptr.p_double[i] = bufd->ptr.p_double[i] + nubc->ptr.p_double[2 * i + 1] * d2p * rho;
+         bufd->ptr.p_double[i] += nubc->ptr.p_double[2 * i + 1] * d2p * rho;
       }
    }
 
@@ -34822,7 +34822,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    for (i = 0; i < nec + nic; i++) {
       ae_v_move(bufw->ptr.pp_double[i], 1, cleic->ptr.pp_double[i], 1, n);
       v = ae_v_dotproduct(cleic->ptr.pp_double[i], 1, x->ptr.p_double, 1, n);
-      v = v - cleic->ptr.pp_double[i][n];
+      v -= cleic->ptr.pp_double[i][n];
       if (i < nec) {
 
       // Equality constraint
@@ -34864,11 +34864,11 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    for (i = 0; i < k; i++) {
       v = bufc->ptr.p_double[i];
       for (j = 0; j < n; j++) {
-         tmp0->ptr.p_double[j] = tmp0->ptr.p_double[j] + v * bufw->ptr.pp_double[i][j] * bufw->ptr.pp_double[i][j];
+         tmp0->ptr.p_double[j] += v * bufw->ptr.pp_double[i][j] * bufw->ptr.pp_double[i][j];
       }
    }
    for (j = 0; j < n; j++) {
-      bufd->ptr.p_double[j] = bufd->ptr.p_double[j] + minnlc_regprec * tmp0->ptr.p_double[j];
+      bufd->ptr.p_double[j] += minnlc_regprec * tmp0->ptr.p_double[j];
    }
 
 // Apply preconditioner
@@ -34893,7 +34893,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
             ae_assert(bufc->ptr.p_double[i] >= 0.0, "MinNLC: updatepreconditioner() integrity failure");
             v = sqrt(bufc->ptr.p_double[i]);
             for (j = 0; j < n; j++) {
-               bufw->ptr.pp_double[i][j] = bufw->ptr.pp_double[i][j] * v;
+               bufw->ptr.pp_double[i][j] *= v;
             }
          }
          rmatrixsyrk(n, nec + nic + ng + nh, 1.0, bufw, 0, 0, 2, 1.0, bufz, 0, 0, true);
@@ -34932,29 +34932,29 @@ static void minnlc_penaltybc(RVector x, RVector bndl, BVector hasbndl, RVector b
 
       // I-th boundary constraint is of equality-type
          minnlcequalitypenaltyfunction((x->ptr.p_double[i] - bndl->ptr.p_double[i]) * rho, &p, &dp, &d2p);
-         *f = *f + p / rho - nubc->ptr.p_double[2 * i + 0] * (x->ptr.p_double[i] - bndl->ptr.p_double[i]);
-         g->ptr.p_double[i] = g->ptr.p_double[i] + dp - nubc->ptr.p_double[2 * i + 0];
+         *f += p / rho - nubc->ptr.p_double[2 * i + 0] * (x->ptr.p_double[i] - bndl->ptr.p_double[i]);
+         g->ptr.p_double[i] += dp - nubc->ptr.p_double[2 * i + 0];
          continue;
       }
       if (hasbndl->ptr.p_bool[i]) {
 
       // Handle lower bound
          minnlcinequalitypenaltyfunction(x->ptr.p_double[i] - bndl->ptr.p_double[i], stabilizingpoint, &p, &dp, &d2p);
-         *f = *f + rho * p;
-         g->ptr.p_double[i] = g->ptr.p_double[i] + rho * dp;
+         *f += rho * p;
+         g->ptr.p_double[i] += rho * dp;
          minnlcinequalityshiftfunction((x->ptr.p_double[i] - bndl->ptr.p_double[i]) * rho + 1, &p, &dp, &d2p);
-         *f = *f + p / rho * nubc->ptr.p_double[2 * i + 0];
-         g->ptr.p_double[i] = g->ptr.p_double[i] + dp * nubc->ptr.p_double[2 * i + 0];
+         *f += p / rho * nubc->ptr.p_double[2 * i + 0];
+         g->ptr.p_double[i] += dp * nubc->ptr.p_double[2 * i + 0];
       }
       if (hasbndu->ptr.p_bool[i]) {
 
       // Handle upper bound
          minnlcinequalitypenaltyfunction(bndu->ptr.p_double[i] - x->ptr.p_double[i], stabilizingpoint, &p, &dp, &d2p);
-         *f = *f + rho * p;
-         g->ptr.p_double[i] = g->ptr.p_double[i] - rho * dp;
+         *f += rho * p;
+         g->ptr.p_double[i] -= rho * dp;
          minnlcinequalityshiftfunction((bndu->ptr.p_double[i] - x->ptr.p_double[i]) * rho + 1, &p, &dp, &d2p);
-         *f = *f + p / rho * nubc->ptr.p_double[2 * i + 1];
-         g->ptr.p_double[i] = g->ptr.p_double[i] - dp * nubc->ptr.p_double[2 * i + 1];
+         *f += p / rho * nubc->ptr.p_double[2 * i + 1];
+         g->ptr.p_double[i] -= dp * nubc->ptr.p_double[2 * i + 1];
       }
    }
 }
@@ -34989,28 +34989,28 @@ static void minnlc_penaltylc(RVector x, RMatrix cleic, RVector nulc, ae_int_t n,
 
    for (i = 0; i < nec + nic; i++) {
       v = ae_v_dotproduct(cleic->ptr.pp_double[i], 1, x->ptr.p_double, 1, n);
-      v = v - cleic->ptr.pp_double[i][n];
+      v -= cleic->ptr.pp_double[i][n];
       fupd = 0.0;
       gupd = 0.0;
       if (i < nec) {
 
       // Equality constraint
          minnlcequalitypenaltyfunction(v * rho, &p, &dp, &d2p);
-         fupd = fupd + p / rho;
-         gupd = gupd + dp;
-         fupd = fupd - nulc->ptr.p_double[i] * v;
-         gupd = gupd - nulc->ptr.p_double[i];
+         fupd += p / rho;
+         gupd += dp;
+         fupd -= nulc->ptr.p_double[i] * v;
+         gupd -= nulc->ptr.p_double[i];
       } else {
 
       // Inequality constraint
          minnlcinequalitypenaltyfunction(-v, stabilizingpoint, &p, &dp, &d2p);
-         fupd = fupd + p * rho;
-         gupd = gupd - dp * rho;
+         fupd += p * rho;
+         gupd -= dp * rho;
          minnlcinequalityshiftfunction(-v * rho + 1, &p, &dp, &d2p);
-         fupd = fupd + p / rho * nulc->ptr.p_double[i];
-         gupd = gupd - dp * nulc->ptr.p_double[i];
+         fupd += p / rho * nulc->ptr.p_double[i];
+         gupd -= dp * nulc->ptr.p_double[i];
       }
-      *f = *f + fupd;
+      *f += fupd;
       ae_v_addd(g->ptr.p_double, 1, cleic->ptr.pp_double[i], 1, n, gupd);
    }
 }
@@ -35054,21 +35054,21 @@ static void minnlc_penaltynlc(RVector fi, RMatrix j, RVector nunlc, ae_int_t n, 
 
       // Equality constraint
          minnlcequalitypenaltyfunction(v * rho, &p, &dp, &d2p);
-         fupd = fupd + p / rho;
-         gupd = gupd + dp;
-         fupd = fupd - nunlc->ptr.p_double[i - 1] * v;
-         gupd = gupd - nunlc->ptr.p_double[i - 1];
+         fupd += p / rho;
+         gupd += dp;
+         fupd -= nunlc->ptr.p_double[i - 1] * v;
+         gupd -= nunlc->ptr.p_double[i - 1];
       } else {
 
       // Inequality constraint
          minnlcinequalitypenaltyfunction(-v, stabilizingpoint, &p, &dp, &d2p);
-         fupd = fupd + p * rho;
-         gupd = gupd - dp * rho;
+         fupd += p * rho;
+         gupd -= dp * rho;
          minnlcinequalityshiftfunction(-v * rho + 1, &p, &dp, &d2p);
-         fupd = fupd + p / rho * nunlc->ptr.p_double[i - 1];
-         gupd = gupd - dp * nunlc->ptr.p_double[i - 1];
+         fupd += p / rho * nunlc->ptr.p_double[i - 1];
+         gupd -= dp * nunlc->ptr.p_double[i - 1];
       }
-      *f = *f + fupd;
+      *f += fupd;
       ae_v_addd(g->ptr.p_double, 1, j->ptr.pp_double[i], 1, n, gupd);
    }
 }
@@ -35151,13 +35151,13 @@ Spawn:
       for (j = 0; j < n; j++) {
          v = state->cleic.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
          state->scaledcleic.ptr.pp_double[i][j] = v;
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       state->scaledcleic.ptr.pp_double[i][n] = state->cleic.ptr.pp_double[i][n];
       if (vv > 0.0) {
          for (j = 0; j <= n; j++) {
-            state->scaledcleic.ptr.pp_double[i][j] = state->scaledcleic.ptr.pp_double[i][j] / vv;
+            state->scaledcleic.ptr.pp_double[i][j] /= vv;
          }
       }
    }
@@ -35233,7 +35233,7 @@ Spawn:
             state->needfij = false;
             for (i = 0; i <= ng + nh; i++) {
                for (j = 0; j < n; j++) {
-                  state->j.ptr.pp_double[i][j] = state->j.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
+                  state->j.ptr.pp_double[i][j] *= state->s.ptr.p_double[j];
                }
             }
 
@@ -35306,7 +35306,7 @@ Spawn:
                }
                v2 = 0.0;
                for (i = 0; i < n; i++) {
-                  v2 = v2 + ae_sqr(state->xk.ptr.p_double[i] - state->xk1.ptr.p_double[i]);
+                  v2 += ae_sqr(state->xk.ptr.p_double[i] - state->xk1.ptr.p_double[i]);
                }
                v2 = sqrt(v2);
                if (v2 > minnlc_hessesttol) {
@@ -35314,8 +35314,8 @@ Spawn:
                   v1 = 0.0;
                   for (i = 0; i < n; i++) {
                      v = (state->xk.ptr.p_double[i] - state->xk1.ptr.p_double[i]) / v2;
-                     v0 = v0 + state->gk.ptr.p_double[i] * v;
-                     v1 = v1 + state->gk1.ptr.p_double[i] * v;
+                     v0 += state->gk.ptr.p_double[i] * v;
+                     v1 += state->gk1.ptr.p_double[i] * v;
                   }
                   state->gammak = ae_maxreal(state->gammak, fabs(v1 - v0) / v2);
                }
@@ -35332,8 +35332,8 @@ Spawn:
          } else ae_assert(false, "MinNLC: integrity check failed");
       }
       minlbfgsresultsbuf(&state->auloptimizer, &state->xc, &state->aulreport);
-      state->repinneriterationscount = state->repinneriterationscount + state->aulreport.iterationscount;
-      state->repnfev = state->repnfev + state->aulreport.nfev;
+      state->repinneriterationscount += state->aulreport.iterationscount;
+      state->repnfev += state->aulreport.nfev;
       state->repterminationtype = state->aulreport.terminationtype;
       inc(&state->repouteriterationscount);
       if (state->repterminationtype <= 0 || state->repterminationtype == 8) {
@@ -35366,7 +35366,7 @@ Spawn:
       }
       for (i = 0; i <= ng + nh; i++) {
          for (j = 0; j < n; j++) {
-            state->j.ptr.pp_double[i][j] = state->j.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
+            state->j.ptr.pp_double[i][j] *= state->s.ptr.p_double[j];
          }
       }
       for (i = 0; i < n; i++) {
@@ -35399,7 +35399,7 @@ Spawn:
       }
       for (i = 0; i < nec + nic; i++) {
          v = ae_v_dotproduct(state->scaledcleic.ptr.pp_double[i], 1, state->xc.ptr.p_double, 1, n);
-         v = v - state->scaledcleic.ptr.pp_double[i][n];
+         v -= state->scaledcleic.ptr.pp_double[i][n];
          if (i < nec) {
             minnlcequalitypenaltyfunction(v * state->rho, &p, &dp, &d2p);
             state->nulc.ptr.p_double[i] = boundval(state->nulc.ptr.p_double[i] - dp, -minnlc_maxlagmult, minnlc_maxlagmult);
@@ -35428,7 +35428,7 @@ Spawn:
       }
    }
    for (i = 0; i < n; i++) {
-      state->xc.ptr.p_double[i] = state->xc.ptr.p_double[i] * state->s.ptr.p_double[i];
+      state->xc.ptr.p_double[i] *= state->s.ptr.p_double[i];
    }
    goto Exit;
 
@@ -37886,7 +37886,7 @@ Spawn:
    }
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold);
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
    if (state->xrep) {
    // Report current point
       ae_v_move(state->x.ptr.p_double, 1, state->xc.ptr.p_double, 1, n);
@@ -37974,7 +37974,7 @@ Spawn:
       projectgradientintobc(&state->xc, &state->cgc, &state->bndl, &state->hasbndl, &state->bndu, &state->hasbndu, n, 0);
       ginit = 0.0;
       for (i = 0; i < n; i++) {
-         ginit = ginit + ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
+         ginit += ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
       }
       ginit = sqrt(ginit);
       if (!isfinite(ginit) || !isfinite(state->fc)) {
@@ -38001,7 +38001,7 @@ Spawn:
       }
       scaleddnorm = 0.0;
       for (i = 0; i < n; i++) {
-         scaleddnorm = scaleddnorm + ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
+         scaleddnorm += ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
       }
       scaleddnorm = sqrt(scaleddnorm);
       ae_assert(scaleddnorm > 0.0, "MinBC: integrity check failed");
@@ -38044,7 +38044,7 @@ Spawn:
             state->needfg = true;
             state->PQ = 12; goto Pause; Resume12:
             state->needfg = false;
-            state->repnfev = state->repnfev + 1;
+            state->repnfev++;
          } else {
          // Numerical differentiation
             state->needf = true;
@@ -38073,7 +38073,7 @@ Spawn:
                   state->PQ = 17; goto Pause; Resume17:
                   state->fp2 = state->f;
                   state->g.ptr.p_double[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.ptr.p_double[i]);
-                  state->repnfev = state->repnfev + 4;
+                  state->repnfev += 4;
                } else {
                   state->xm1 = v - state->diffstep * state->s.ptr.p_double[i];
                   state->xp1 = v + state->diffstep * state->s.ptr.p_double[i];
@@ -38094,7 +38094,7 @@ Spawn:
                   } else {
                      state->g.ptr.p_double[i] = 0.0;
                   }
-                  state->repnfev = state->repnfev + 2;
+                  state->repnfev += 2;
                }
                state->x.ptr.p_double[i] = v;
             }
@@ -38155,7 +38155,7 @@ Spawn:
             v = state->curstpmax;
             ae_v_move(state->xn.ptr.p_double, 1, state->xc.ptr.p_double, 1, n);
             ae_v_addd(state->xn.ptr.p_double, 1, state->d.ptr.p_double, 1, n, v);
-            state->nonmonotoniccnt = state->nonmonotoniccnt - 1;
+            state->nonmonotoniccnt--;
          } else {
 
          // Numerical properties of the function does not allow
@@ -38185,11 +38185,11 @@ Spawn:
          state->PQ = 20; goto Pause; Resume20:
          state->xupdated = false;
       }
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repiterationscount++;
       if (mcinfo == 1) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr((state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
+            v += ae_sqr((state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
          }
          v = sqrt(v);
          if (v <= state->epsx) {
@@ -38235,7 +38235,7 @@ Spawn:
          if (state->hasbndu.ptr.p_bool[i] && state->xc.ptr.p_double[i] == state->bndu.ptr.p_double[i]) {
             state->cgc.ptr.p_double[i] = 0.0;
          }
-         ginit = ginit + ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
+         ginit += ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
       }
       ginit = sqrt(ginit);
       state->bufsize = 0;
@@ -38262,7 +38262,7 @@ Spawn:
             ae_v_subd(state->work.ptr.p_double, 1, state->bufyk.ptr.pp_double[i], 1, n, vv);
          }
          for (i = 0; i < n; i++) {
-            state->work.ptr.p_double[i] = state->tmpprec.ptr.p_double[i] * state->work.ptr.p_double[i];
+            state->work.ptr.p_double[i] *= state->tmpprec.ptr.p_double[i];
          }
          for (i = 0; i < state->bufsize; i++) {
             v = ae_v_dotproduct(state->bufyk.ptr.pp_double[i], 1, state->work.ptr.p_double, 1, n);
@@ -38278,7 +38278,7 @@ Spawn:
          ae_assert(!b, "MinBC: integrity check failed (q)");
          scaleddnorm = 0.0;
          for (i = 0; i < n; i++) {
-            scaleddnorm = scaleddnorm + ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
+            scaleddnorm += ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
          }
          scaleddnorm = sqrt(scaleddnorm);
          if (scaleddnorm == 0.0) {
@@ -38323,7 +38323,7 @@ Spawn:
                state->needfg = true;
                state->PQ = 21; goto Pause; Resume21:
                state->needfg = false;
-               state->repnfev = state->repnfev + 1;
+               state->repnfev++;
             } else {
             // Numerical differentiation
                state->needf = true;
@@ -38352,7 +38352,7 @@ Spawn:
                      state->PQ = 26; goto Pause; Resume26:
                      state->fp2 = state->f;
                      state->g.ptr.p_double[i] = (8 * (state->fp1 - state->fm1) - (state->fp2 - state->fm2)) / (6 * state->diffstep * state->s.ptr.p_double[i]);
-                     state->repnfev = state->repnfev + 4;
+                     state->repnfev += 4;
                   } else {
                      state->xm1 = v - state->diffstep * state->s.ptr.p_double[i];
                      state->xp1 = v + state->diffstep * state->s.ptr.p_double[i];
@@ -38373,7 +38373,7 @@ Spawn:
                      } else {
                         state->g.ptr.p_double[i] = 0.0;
                      }
-                     state->repnfev = state->repnfev + 2;
+                     state->repnfev += 2;
                   }
                   state->x.ptr.p_double[i] = v;
                   }
@@ -38462,7 +38462,7 @@ Spawn:
             state->PQ = 29; goto Pause; Resume29:
             state->xupdated = false;
          }
-         state->repiterationscount = state->repiterationscount + 1;
+         state->repiterationscount++;
          if (state->bufsize == m) {
 
          // Buffer is full, shift contents by one row
@@ -38477,7 +38477,7 @@ Spawn:
          } else {
 
          // Buffer is not full, increase buffer size by 1
-            state->bufsize = state->bufsize + 1;
+            state->bufsize++;
          }
          v = ae_v_dotproduct(state->bufyk.ptr.pp_double[state->bufsize - 1], 1, state->bufsk.ptr.pp_double[state->bufsize - 1], 1, n);
          vv = ae_v_dotproduct(state->bufyk.ptr.pp_double[state->bufsize - 1], 1, state->bufyk.ptr.pp_double[state->bufsize - 1], 1, n);
@@ -38496,8 +38496,8 @@ Spawn:
          v = 0.0;
          vv = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr((state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
-            vv = vv + ae_sqr(state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]);
+            v += ae_sqr((state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]) / state->s.ptr.p_double[i]);
+            vv += ae_sqr(state->xc.ptr.p_double[i] - state->xp.ptr.p_double[i]);
          }
          minbc_updateestimateofgoodstep(&state->lastscaledgoodstep, sqrt(v));
 
@@ -38515,7 +38515,7 @@ Spawn:
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
+            v += ae_sqr(state->cgc.ptr.p_double[i] * state->s.ptr.p_double[i]);
          }
          if (sqrt(v) < gdecay * ginit) {
             break;
@@ -39028,11 +39028,11 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep) {
       return;
    }
    if (newstep < *estimate * 0.01) {
-      *estimate = *estimate * 0.01;
+      *estimate *= 0.01;
       return;
    }
    if (newstep > *estimate * 100) {
-      *estimate = *estimate * 100;
+      *estimate *= 100;
       return;
    }
    *estimate = newstep;
@@ -40432,7 +40432,7 @@ void minnssetlc(minnsstate *state, RMatrix c, ZVector ct, ae_int_t k) {
    for (i = 0; i < k; i++) {
       if (ct->ptr.p_int[i] == 0) {
          ae_v_move(state->cleic.ptr.pp_double[state->nec], 1, c->ptr.pp_double[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -40442,7 +40442,7 @@ void minnssetlc(minnsstate *state, RMatrix c, ZVector ct, ae_int_t k) {
          } else {
             ae_v_move(state->cleic.ptr.pp_double[state->nec + state->nic], 1, c->ptr.pp_double[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -40822,7 +40822,7 @@ Spawn:
                   ae_v_sub(&state->j.ptr.pp_double[0][k], state->j.stride, state->fm.ptr.p_double, 1, ng + nh + 1);
                   v = 1 / (xp - xm);
                   ae_v_muld(&state->j.ptr.pp_double[0][k], state->j.stride, ng + nh + 1, v);
-                  state->repnfev = state->repnfev + 2;
+                  state->repnfev += 2;
                } else {
                   for (i = 0; i <= ng + nh; i++) {
                      state->j.ptr.pp_double[i][k] = 0.0;
@@ -41157,7 +41157,7 @@ Spawn:
          state->xc.ptr.p_double[i] = state->scaledbndu.ptr.p_double[i];
          continue;
       }
-      state->xc.ptr.p_double[i] = state->xc.ptr.p_double[i] / state->s.ptr.p_double[i];
+      state->xc.ptr.p_double[i] /= state->s.ptr.p_double[i];
       if (state->hasbndl.ptr.p_bool[i] && state->xc.ptr.p_double[i] <= state->scaledbndl.ptr.p_double[i]) {
          state->xc.ptr.p_double[i] = state->scaledbndl.ptr.p_double[i];
       }
@@ -41177,13 +41177,13 @@ Spawn:
       for (j = 0; j < n; j++) {
          v = state->cleic.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
          state->scaledcleic.ptr.pp_double[i][j] = v;
-         vv = vv + v * v;
+         vv += v * v;
       }
       vv = sqrt(vv);
       state->scaledcleic.ptr.pp_double[i][n] = state->cleic.ptr.pp_double[i][n];
       if (vv > 0.0) {
          for (j = 0; j <= n; j++) {
-            state->scaledcleic.ptr.pp_double[i][j] = state->scaledcleic.ptr.pp_double[i][j] / vv;
+            state->scaledcleic.ptr.pp_double[i][j] /= vv;
          }
       }
    }
@@ -41226,7 +41226,7 @@ Spawn:
       for (i = 0; i < nec + nic; i++) {
          v = -state->scaledcleic.ptr.pp_double[i][n];
          for (j = 0; j < n; j++) {
-            v = v + state->scaledcleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
+            v += state->scaledcleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
          }
          if (i >= nec && v <= 0.0) {
             continue;
@@ -41262,7 +41262,7 @@ Spawn:
       }
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(state->samplegm.ptr.pp_double[0][i]);
+         v += ae_sqr(state->samplegm.ptr.pp_double[0][i]);
       }
       if (!isfinite(v) || !isfinite(state->samplef.ptr.p_double[0])) {
 
@@ -41279,7 +41279,7 @@ Spawn:
       // also covers situations when I-th row is exactly zero).
          v = -state->scaledcleic.ptr.pp_double[i][n];
          for (j = 0; j < n; j++) {
-            v = v + state->scaledcleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
+            v += state->scaledcleic.ptr.pp_double[i][j] * state->xc.ptr.p_double[j];
          }
          if (i < nec && v == 0.0) {
             continue;
@@ -41294,7 +41294,7 @@ Spawn:
          ae_assert(state->agspenaltyincrease > state->agspenaltylevel, "MinNS: integrity error");
          v = 0.0;
          for (j = 0; j < n; j++) {
-            v = v + state->grs.ptr.p_double[j] * state->scaledcleic.ptr.pp_double[i][j];
+            v += state->grs.ptr.p_double[j] * state->scaledcleic.ptr.pp_double[i][j];
          }
          v = fabs(v);
          if (v * state->agspenaltylevel > state->rholinear.ptr.p_double[i]) {
@@ -41365,7 +41365,7 @@ Spawn:
          ae_v_move(state->samplegm.ptr.pp_double[k], 1, state->samplegm.ptr.pp_double[i], 1, n);
          state->samplef.ptr.p_double[k] = state->samplef.ptr.p_double[i];
          state->samplef0.ptr.p_double[k] = state->samplef0.ptr.p_double[i];
-         k = k + 1;
+         k++;
       }
       cursamplesize = k;
       if (state->agssamplesize - cursamplesize < state->agsminupdate) {
@@ -41379,7 +41379,7 @@ Spawn:
             state->samplef.ptr.p_double[i] = state->samplef.ptr.p_double[i + k];
             state->samplef0.ptr.p_double[i] = state->samplef0.ptr.p_double[i + k];
          }
-         cursamplesize = cursamplesize - k;
+         cursamplesize -= k;
       }
       for (k = 0, i = cursamplesize; i < ae_minint(cursamplesize + state->agsminupdate, state->agssamplesize); k++, i++) {
          for (j = 0; j < n; j++) {
@@ -41426,7 +41426,7 @@ Spawn:
          state->needfij = false;
          minns_generatemeritfunction(state, i);
       }
-      cursamplesize = cursamplesize + k;
+      cursamplesize += k;
       fullsample = cursamplesize == state->agssamplesize;
       for (j = 0; j < cursamplesize; j++) {
 
@@ -41548,14 +41548,14 @@ Spawn:
       // Decrease radius and restart.
       //
       // NOTE: we also clear ShortStepsCnt on restart
-         radius = radius * state->agsraddecay;
+         radius *= state->agsraddecay;
          shortstepscnt = 0;
          inc(&radiusdecays);
          inc(&state->repinneriterationscount);
          continue;
       }
       for (i = 0; i < n; i++) {
-         state->d.ptr.p_double[i] = -state->d.ptr.p_double[i] / state->diagh.ptr.p_double[i];
+         state->d.ptr.p_double[i] /= -state->diagh.ptr.p_double[i];
       }
 
    // Perform backtracking line search.
@@ -41567,8 +41567,8 @@ Spawn:
       dnrm = 0.0;
       dg = 0.0;
       for (i = 0; i < n; i++) {
-         dnrm = dnrm + ae_sqr(state->d.ptr.p_double[i]);
-         dg = dg + state->d.ptr.p_double[i] * state->samplegmbc.ptr.pp_double[0][i];
+         dnrm += ae_sqr(state->d.ptr.p_double[i]);
+         dg += state->d.ptr.p_double[i] * state->samplegmbc.ptr.pp_double[0][i];
       }
       dnrm = sqrt(dnrm);
       ae_assert(dnrm > 0.0, "MinNS: integrity error");
@@ -41600,7 +41600,7 @@ Spawn:
             break;
          }
       // Decrease Alpha
-         alpha = alpha * state->agsalphadecay;
+         alpha *= state->agsalphadecay;
          alphadecreased = true;
 
       // Update and check iterations counter.
@@ -41629,17 +41629,17 @@ Spawn:
       // gradients.
       //
       // Decrease radius and restart.
-         radius = radius * state->agsraddecay;
+         radius *= state->agsraddecay;
          shortstepscnt = 0;
          inc(&radiusdecays);
          inc(&state->repinneriterationscount);
          continue;
       }
       if (!alphadecreased) {
-         recommendedstep = recommendedstep * 2.0;
+         recommendedstep *= 2.0;
       }
       if (alphadecreased && fullsample) {
-         recommendedstep = recommendedstep * 0.5;
+         recommendedstep *= 0.5;
       }
    // Next iteration
       ae_v_move(state->xc.ptr.p_double, 1, state->xn.ptr.p_double, 1, n);
@@ -41701,15 +41701,15 @@ static void minns_generatemeritfunction(minnsstate *state, ae_int_t sampleidx) {
    for (i = 0; i < nec + nic; i++) {
       v = -state->scaledcleic.ptr.pp_double[i][n];
       for (j = 0; j < n; j++) {
-         v = v + state->scaledcleic.ptr.pp_double[i][j] * state->samplex.ptr.pp_double[sampleidx][j];
+         v += state->scaledcleic.ptr.pp_double[i][j] * state->samplex.ptr.pp_double[sampleidx][j];
       }
       if (i >= nec && v < 0.0) {
          continue;
       }
-      state->samplef.ptr.p_double[sampleidx] = state->samplef.ptr.p_double[sampleidx] + state->rholinear.ptr.p_double[i] * fabs(v);
+      state->samplef.ptr.p_double[sampleidx] += state->rholinear.ptr.p_double[i] * fabs(v);
       s = (double)(ae_sign(v));
       for (j = 0; j < n; j++) {
-         state->samplegm.ptr.pp_double[sampleidx][j] = state->samplegm.ptr.pp_double[sampleidx][j] + state->rholinear.ptr.p_double[i] * s * state->scaledcleic.ptr.pp_double[i][j];
+         state->samplegm.ptr.pp_double[sampleidx][j] += state->rholinear.ptr.p_double[i] * s * state->scaledcleic.ptr.pp_double[i][j];
       }
    }
 
@@ -41722,10 +41722,10 @@ static void minns_generatemeritfunction(minnsstate *state, ae_int_t sampleidx) {
       if (i > ng && v <= 0.0) {
          continue;
       }
-      state->samplef.ptr.p_double[sampleidx] = state->samplef.ptr.p_double[sampleidx] + state->agsrhononlinear * fabs(v);
+      state->samplef.ptr.p_double[sampleidx] += state->agsrhononlinear * fabs(v);
       s = (double)(ae_sign(v));
       for (j = 0; j < n; j++) {
-         state->samplegm.ptr.pp_double[sampleidx][j] = state->samplegm.ptr.pp_double[sampleidx][j] + state->agsrhononlinear * s * state->j.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
+         state->samplegm.ptr.pp_double[sampleidx][j] += state->agsrhononlinear * s * state->j.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
       }
    }
 }
@@ -41749,7 +41749,7 @@ static void minns_unscalepointbc(minnsstate *state, RVector x) {
          x->ptr.p_double[i] = state->bndu.ptr.p_double[i];
          continue;
       }
-      x->ptr.p_double[i] = x->ptr.p_double[i] * state->s.ptr.p_double[i];
+      x->ptr.p_double[i] *= state->s.ptr.p_double[i];
       if (state->hasbndl.ptr.p_bool[i] && x->ptr.p_double[i] <= state->bndl.ptr.p_double[i]) {
          x->ptr.p_double[i] = state->bndl.ptr.p_double[i];
       }
@@ -41869,7 +41869,7 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
       ncandbnd = 0;
       for (i = 0; i < n; i++) {
          if (state->xc.ptr.p_double[i] == 0.0) {
-            ncandbnd = ncandbnd + 1;
+            ncandbnd++;
          }
       }
       idx1 = ncandbnd;
@@ -41885,14 +41885,14 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
             state->tmpidx.ptr.p_int[idx0] = i;
             state->tmpd.ptr.p_double[idx0] = (-state->gc.ptr.p_double[i]) * (-1);
             state->tmpc2.ptr.pp_double[idx0][0] = 1.0 * (-1);
-            idx0 = idx0 + 1;
+            idx0++;
          } else {
 
          // We are far away from boundary.
             state->tmpidx.ptr.p_int[idx1] = i;
             state->tmpd.ptr.p_double[idx1] = -state->gc.ptr.p_double[i];
             state->tmpc2.ptr.pp_double[idx1][0] = 1.0;
-            idx1 = idx1 + 1;
+            idx1++;
          }
       }
       ae_assert(idx0 == ncandbnd, "MinNSQP: integrity check failed");
@@ -41923,7 +41923,7 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
          if (state->xc.ptr.p_double[i] == 0.0 && state->d.ptr.p_double[i] < 0.0) {
             state->d.ptr.p_double[i] = 0.0;
          }
-         v = v + state->d.ptr.p_double[i];
+         v += state->d.ptr.p_double[i];
          vv = ae_maxreal(vv, fabs(state->gc.ptr.p_double[i]));
       }
       ae_assert(fabs(v) < 1.0E5 * sqrt((double)n) * ae_machineepsilon * ae_maxreal(vv, 1.0), "MinNSQP: integrity check failed");
@@ -41949,13 +41949,13 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
          v = 0.0;
          for (i = 0; i < n; i++) {
             if (state->xc.ptr.p_double[i] == 0.0 && state->d.ptr.p_double[i] > 0.0) {
-               state->xc.ptr.p_double[i] = state->xc.ptr.p_double[i] + kicklength;
+               state->xc.ptr.p_double[i] += kicklength;
             }
-            v = v + state->xc.ptr.p_double[i];
+            v += state->xc.ptr.p_double[i];
          }
          ae_assert(v > 0.0, "MinNSQP: integrity check failed");
          for (i = 0; i < n; i++) {
-            state->xc.ptr.p_double[i] = state->xc.ptr.p_double[i] / v;
+            state->xc.ptr.p_double[i] /= v;
          }
          inc(&innerits);
          continue;
@@ -41987,7 +41987,7 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
          // Cholesky decomposition failed.
          // Increase LambdaV and repeat iteration.
          // Do not increase outer iterations counter.
-            lambdav = lambdav * 10;
+            lambdav *= 10;
             continue;
          }
          break;
@@ -42015,26 +42015,26 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
          v = 0.0;
          vv = 0.0;
          for (i = 0; i < n; i++) {
-            vv = vv + ae_sqr(state->invutc.ptr.p_double[i]);
-            v = v + state->invutc.ptr.p_double[i] * state->d.ptr.p_double[i];
+            vv += ae_sqr(state->invutc.ptr.p_double[i]);
+            v += state->invutc.ptr.p_double[i] * state->d.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
-            state->d.ptr.p_double[i] = state->d.ptr.p_double[i] - v / vv * state->invutc.ptr.p_double[i];
+            state->d.ptr.p_double[i] -= v / vv * state->invutc.ptr.p_double[i];
          }
          minns_qpsolveu(&state->ch, n, &state->d);
          v = 0.0;
          k = 0;
          for (i = 0; i < n; i++) {
-            v = v + state->d.ptr.p_double[i];
+            v += state->d.ptr.p_double[i];
             if (state->d.ptr.p_double[i] != 0.0) {
-               k = k + 1;
+               k++;
             }
          }
          if (k > 0 && v > 0.0) {
             vv = v / k;
             for (i = 0; i < n; i++) {
                if (state->d.ptr.p_double[i] != 0.0) {
-                  state->d.ptr.p_double[i] = state->d.ptr.p_double[i] - vv;
+                  state->d.ptr.p_double[i] -= vv;
                }
             }
          }
@@ -42048,7 +42048,7 @@ static void minns_solveqp(RMatrix sampleg, RVector diagh, ae_int_t nsample, ae_i
       // of AGS algorithm.
          dnrm = 0.0;
          for (i = 0; i < n; i++) {
-            dnrm = dnrm + ae_sqr(state->d.ptr.p_double[i]);
+            dnrm += ae_sqr(state->d.ptr.p_double[i]);
          }
          dnrm = sqrt(dnrm);
          actidx = -1;
@@ -42159,12 +42159,12 @@ static void minns_qpcalculategradfunc(RMatrix sampleg, RVector diagh, ae_int_t n
 // Calculate F
    *f = 0.0;
    for (i = 0; i < nvars; i++) {
-      *f = *f + 0.5 * ae_sqr(tmp->ptr.p_double[i]) / diagh->ptr.p_double[i];
+      *f += 0.5 * ae_sqr(tmp->ptr.p_double[i]) / diagh->ptr.p_double[i];
    }
 
 // Multiply by inverse Hessian
    for (i = 0; i < nvars; i++) {
-      tmp->ptr.p_double[i] = tmp->ptr.p_double[i] / diagh->ptr.p_double[i];
+      tmp->ptr.p_double[i] /= diagh->ptr.p_double[i];
    }
 
 // Function gradient
@@ -42198,7 +42198,7 @@ static void minns_qpcalculatefunc(RMatrix sampleg, RVector diagh, ae_int_t nsamp
 // Calculate F
    *f = 0.0;
    for (i = 0; i < nvars; i++) {
-      *f = *f + 0.5 * ae_sqr(tmp->ptr.p_double[i]) / diagh->ptr.p_double[i];
+      *f += 0.5 * ae_sqr(tmp->ptr.p_double[i]) / diagh->ptr.p_double[i];
    }
 }
 
@@ -42214,7 +42214,7 @@ static void minns_qpsolveu(RMatrix a, ae_int_t n, RVector x) {
    for (i = n - 1; i >= 0; i--) {
       v = x->ptr.p_double[i];
       for (j = i + 1; j < n; j++) {
-         v = v - a->ptr.pp_double[i][j] * x->ptr.p_double[j];
+         v -= a->ptr.pp_double[i][j] * x->ptr.p_double[j];
       }
       x->ptr.p_double[i] = v / a->ptr.pp_double[i][i];
    }
@@ -42230,10 +42230,10 @@ static void minns_qpsolveut(RMatrix a, ae_int_t n, RVector x) {
 
 // A^(-T)*X
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] / a->ptr.pp_double[i][i];
+      x->ptr.p_double[i] /= a->ptr.pp_double[i][i];
       v = x->ptr.p_double[i];
       for (j = i + 1; j < n; j++) {
-         x->ptr.p_double[j] = x->ptr.p_double[j] - a->ptr.pp_double[i][j] * v;
+         x->ptr.p_double[j] -= a->ptr.pp_double[i][j] * v;
       }
    }
 }
@@ -43515,7 +43515,7 @@ Spawn:
       state->repterminationtype = 4;
       goto Exit;
    }
-   state->repnfev = state->repnfev + 1;
+   state->repnfev++;
 
 // Main cycle
 //
@@ -43559,7 +43559,7 @@ Spawn:
                state->needfg = true;
                state->PQ = 2; goto Pause; Resume02:
                state->needfg = false;
-               state->repnfev = state->repnfev + 1;
+               state->repnfev++;
                stepfound = state->f <= state->finit + mincomp_gpaftol * state->dginit;
             } else stepfound = false;
             if (stepfound) {
@@ -43570,8 +43570,8 @@ Spawn:
             // alpha=1 is too large, try smaller values
                state->stp = 1.0;
                linminnormalized(&state->d, &state->stp, n);
-               state->dginit = state->dginit / state->stp;
-               state->stp = mincomp_gpadecay * state->stp;
+               state->dginit /= state->stp;
+               state->stp *= mincomp_gpadecay;
                if (state->stpmax > 0.0) {
                   state->stp = ae_minreal(state->stp, state->stpmax);
                }
@@ -43583,18 +43583,18 @@ Spawn:
                   state->needfg = true;
                   state->PQ = 3; goto Pause; Resume03:
                   state->needfg = false;
-                  state->repnfev = state->repnfev + 1;
+                  state->repnfev++;
                   if (state->stp <= mincomp_stpmin) {
                      break;
                   }
                   if (state->f <= state->finit + state->stp * mincomp_gpaftol * state->dginit) {
                      break;
                   }
-                  state->stp = state->stp * mincomp_gpadecay;
+                  state->stp *= mincomp_gpadecay;
                }
                ae_v_move(state->xn.ptr.p_double, 1, state->x.ptr.p_double, 1, n);
             }
-            state->repiterationscount = state->repiterationscount + 1;
+            state->repiterationscount++;
             if (state->xrep) {
             // progress report
                mincomp_clearrequestfields(state);
@@ -43619,7 +43619,7 @@ Spawn:
                   break;
                }
             }
-            state->acount = state->acount + 1;
+            state->acount++;
             ae_v_move(state->xk.ptr.p_double, 1, state->xn.ptr.p_double, 1, n);
             ae_v_move(state->ak.ptr.p_double, 1, state->an.ptr.p_double, 1, n);
 
@@ -43677,7 +43677,7 @@ Spawn:
                   state->curalgo = 1;
                   break;
                } else {
-                  state->mu = state->mu * mincomp_asarho;
+                  state->mu *= mincomp_asarho;
                }
             } else {
                if (state->acount == mincomp_n1) {
@@ -43689,7 +43689,7 @@ Spawn:
             }
 
          // Next iteration
-            state->k = state->k + 1;
+            state->k++;
          }
       } else if (state->curalgo == 1) { // CG algorithm
       // first, check that there are non-active constraints.
@@ -43772,13 +43772,13 @@ Spawn:
                   state->an.ptr.p_double[i] = 1.0;
                }
                if (state->an.ptr.p_double[i] != state->ak.ptr.p_double[i]) {
-                  diffcnt = diffcnt + 1;
+                  diffcnt++;
                }
                state->ak.ptr.p_double[i] = state->an.ptr.p_double[i];
             }
             ae_v_move(state->xk.ptr.p_double, 1, state->xn.ptr.p_double, 1, n);
-            state->repnfev = state->repnfev + state->nfev;
-            state->repiterationscount = state->repiterationscount + 1;
+            state->repnfev += state->nfev;
+            state->repiterationscount++;
             if (state->xrep) {
             // progress report
                mincomp_clearrequestfields(state);
@@ -43895,7 +43895,7 @@ Spawn:
             // We'll set BetaK=0, which will restart CG algorithm.
             // We can stop later (during normal checks) if stopping conditions are met.
                betak = 0.0;
-               state->debugrestartscount = state->debugrestartscount + 1;
+               state->debugrestartscount++;
             }
             ae_v_moveneg(state->dn.ptr.p_double, 1, state->gc.ptr.p_double, 1, n);
             ae_v_addd(state->dn.ptr.p_double, 1, state->dk.ptr.p_double, 1, n, betak);
@@ -43903,7 +43903,7 @@ Spawn:
 
          // update other information
             state->fold = state->f;
-            state->k = state->k + 1;
+            state->k++;
          }
       }
    }
@@ -43945,7 +43945,7 @@ void minasaresultsbuf(minasastate *state, RVector x, minasareport *rep) {
    rep->activeconstraints = 0;
    for (i = 0; i < state->n; i++) {
       if (state->ak.ptr.p_double[i] == 0.0) {
-         rep->activeconstraints = rep->activeconstraints + 1;
+         rep->activeconstraints++;
       }
    }
 }
@@ -43996,7 +43996,7 @@ static double mincomp_asaboundedantigradnorm(minasastate *state) {
       if (state->x.ptr.p_double[i] == state->bndu.ptr.p_double[i] && -state->g.ptr.p_double[i] > 0.0) {
          v = 0.0;
       }
-      result = result + ae_sqr(v);
+      result += ae_sqr(v);
    }
    result = sqrt(result);
    return result;
@@ -44018,7 +44018,7 @@ static double mincomp_asaginorm(minasastate *state) {
    result = 0.0;
    for (i = 0; i < state->n; i++) {
       if (state->x.ptr.p_double[i] != state->bndl.ptr.p_double[i] && state->x.ptr.p_double[i] != state->bndu.ptr.p_double[i]) {
-         result = result + ae_sqr(state->g.ptr.p_double[i]);
+         result += ae_sqr(state->g.ptr.p_double[i]);
       }
    }
    result = sqrt(result);
@@ -44037,7 +44037,7 @@ static double mincomp_asad1norm(minasastate *state) {
 
    result = 0.0;
    for (i = 0; i < state->n; i++) {
-      result = result + ae_sqr(boundval(state->x.ptr.p_double[i] - state->g.ptr.p_double[i], state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i]) - state->x.ptr.p_double[i]);
+      result += ae_sqr(boundval(state->x.ptr.p_double[i] - state->g.ptr.p_double[i], state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i]) - state->x.ptr.p_double[i]);
    }
    result = sqrt(result);
    return result;
@@ -44922,7 +44922,7 @@ Spawn:
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = v + ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
+      v += ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
    }
    if (sqrt(v) <= state->epsg) {
       ae_v_move(state->xn.ptr.p_double, 1, state->xk.ptr.p_double, 1, n);
@@ -45094,7 +45094,7 @@ Spawn:
       // We'll set BetaK=0, which will restart CG algorithm.
       // We can stop later (during normal checks) if stopping conditions are met.
          betak = 0.0;
-         state->debugrestartscount = state->debugrestartscount + 1;
+         state->debugrestartscount++;
       }
       if (state->repiterationscount > 0 && state->repiterationscount % (3 + n) == 0) {
 
@@ -45104,14 +45104,14 @@ Spawn:
       if (state->mcinfo == 1 || state->mcinfo == 5) {
          state->rstimer = mincg_rscountdownlen;
       } else {
-         state->rstimer = state->rstimer - 1;
+         state->rstimer--;
       }
       ae_v_moveneg(state->dn.ptr.p_double, 1, state->g.ptr.p_double, 1, n);
       mincg_preconditionedmultiply(state, &state->dn, &state->work0, &state->work1);
       ae_v_addd(state->dn.ptr.p_double, 1, state->dk.ptr.p_double, 1, n, betak);
       state->lastscaledstep = 0.0;
       for (i = 0; i < n; i++) {
-         state->lastscaledstep = state->lastscaledstep + ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
+         state->lastscaledstep += ae_sqr(state->d.ptr.p_double[i] / state->s.ptr.p_double[i]);
       }
       state->lastscaledstep = state->stp * sqrt(state->lastscaledstep);
       if (state->mcinfo == 1) {
@@ -45132,7 +45132,7 @@ Spawn:
       // line search stagnates).
          state->lastgoodstep = 0.0;
          for (i = 0; i < n; i++) {
-            state->lastgoodstep = state->lastgoodstep + ae_sqr(state->d.ptr.p_double[i]);
+            state->lastgoodstep += ae_sqr(state->d.ptr.p_double[i]);
          }
          state->lastgoodstep = state->stp * sqrt(state->lastgoodstep);
       }
@@ -45140,7 +45140,7 @@ Spawn:
    // Check stopping conditions.
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
+         v += ae_sqr(state->g.ptr.p_double[i] * state->s.ptr.p_double[i]);
       }
       if (!isfinite(v) || !isfinite(state->f)) {
 
@@ -45148,8 +45148,8 @@ Spawn:
          state->repterminationtype = -8;
          goto Exit;
       }
-      state->repnfev = state->repnfev + state->nfev;
-      state->repiterationscount = state->repiterationscount + 1;
+      state->repnfev += state->nfev;
+      state->repiterationscount++;
       if (state->repiterationscount >= state->maxits && state->maxits > 0) {
 
       // Too many iterations
@@ -45188,7 +45188,7 @@ Spawn:
       ae_v_move(state->xk.ptr.p_double, 1, state->xn.ptr.p_double, 1, n);
       ae_v_move(state->dk.ptr.p_double, 1, state->dn.ptr.p_double, 1, n);
       state->fold = state->f;
-      state->k = state->k + 1;
+      state->k++;
    }
    goto Exit;
 
@@ -45680,11 +45680,11 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector d1, RVector c, RMatrix v
       for (j = i; j < vcnt; j++) {
          t = 0.0;
          for (k = 0; k < n; k++) {
-            t = t + v->ptr.pp_double[i][k] * v->ptr.pp_double[j][k] / d1->ptr.p_double[k];
+            t += v->ptr.pp_double[i][k] * v->ptr.pp_double[j][k] / d1->ptr.p_double[k];
          }
          b.ptr.pp_double[i][j] = t;
       }
-      b.ptr.pp_double[i][i] = b.ptr.pp_double[i][i] + 1.0 / c->ptr.p_double[i];
+      b.ptr.pp_double[i][i] += 1.0 / c->ptr.p_double[i];
    }
    if (!spdmatrixcholeskyrec(&b, 0, vcnt, true, &state->work0)) {
       state->vcnt = 0;
@@ -45750,7 +45750,7 @@ static void mincg_preconditionedmultiply(mincgstate *state, RVector x, RVector w
    }
    if (state->prectype == 3) {
       for (i = 0; i < n; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] * state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
+         x->ptr.p_double[i] *= state->s.ptr.p_double[i] * state->s.ptr.p_double[i];
       }
       return;
    }
@@ -45758,7 +45758,7 @@ static void mincg_preconditionedmultiply(mincgstate *state, RVector x, RVector w
 
 // handle part common for VCnt=0 and VCnt != 0
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[i] = x->ptr.p_double[i] / (state->diagh.ptr.p_double[i] + state->diaghl2.ptr.p_double[i]);
+      x->ptr.p_double[i] /= state->diagh.ptr.p_double[i] + state->diaghl2.ptr.p_double[i];
    }
 
 // if VCnt>0
@@ -45775,7 +45775,7 @@ static void mincg_preconditionedmultiply(mincgstate *state, RVector x, RVector w
          ae_v_addd(state->work1.ptr.p_double, 1, state->vcorr.ptr.pp_double[i], 1, n, v);
       }
       for (i = 0; i < n; i++) {
-         x->ptr.p_double[i] = x->ptr.p_double[i] - state->work1.ptr.p_double[i] / (state->diagh.ptr.p_double[i] + state->diaghl2.ptr.p_double[i]);
+         x->ptr.p_double[i] -= state->work1.ptr.p_double[i] / (state->diagh.ptr.p_double[i] - state->diaghl2.ptr.p_double[i]);
       }
    }
 }
@@ -45805,7 +45805,7 @@ static double mincg_preconditionedmultiply2(mincgstate *state, RVector x, RVecto
    if (state->prectype == 3) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + x->ptr.p_double[i] * state->s.ptr.p_double[i] * state->s.ptr.p_double[i] * y->ptr.p_double[i];
+         result += x->ptr.p_double[i] * state->s.ptr.p_double[i] * state->s.ptr.p_double[i] * y->ptr.p_double[i];
       }
       return result;
    }
@@ -45814,7 +45814,7 @@ static double mincg_preconditionedmultiply2(mincgstate *state, RVector x, RVecto
 // low rank preconditioning
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + x->ptr.p_double[i] * y->ptr.p_double[i] / (state->diagh.ptr.p_double[i] + state->diaghl2.ptr.p_double[i]);
+      result += x->ptr.p_double[i] * y->ptr.p_double[i] / (state->diagh.ptr.p_double[i] + state->diaghl2.ptr.p_double[i]);
    }
    if (vcnt > 0) {
       for (i = 0; i < n; i++) {
@@ -45824,7 +45824,7 @@ static double mincg_preconditionedmultiply2(mincgstate *state, RVector x, RVecto
       for (i = 0; i < vcnt; i++) {
          v0 = ae_v_dotproduct(work0->ptr.p_double, 1, state->vcorr.ptr.pp_double[i], 1, n);
          v1 = ae_v_dotproduct(work1->ptr.p_double, 1, state->vcorr.ptr.pp_double[i], 1, n);
-         result = result - v0 * v1;
+         result -= v0 * v1;
       }
    }
    return result;
@@ -47462,7 +47462,7 @@ void minlmsetlc(minlmstate *state, RMatrix c, ZVector ct, ae_int_t k) {
    for (i = 0; i < k; i++) {
       if (ct->ptr.p_int[i] == 0) {
          ae_v_move(state->cleic.ptr.pp_double[state->nec], 1, c->ptr.pp_double[i], 1, n + 1);
-         state->nec = state->nec + 1;
+         state->nec++;
       }
    }
    for (i = 0; i < k; i++) {
@@ -47472,7 +47472,7 @@ void minlmsetlc(minlmstate *state, RMatrix c, ZVector ct, ae_int_t k) {
          } else {
             ae_v_move(state->cleic.ptr.pp_double[state->nec + state->nic], 1, c->ptr.pp_double[i], 1, n + 1);
          }
-         state->nic = state->nic + 1;
+         state->nic++;
       }
    }
 }
@@ -47661,7 +47661,7 @@ Spawn:
          v = ae_v_dotproduct(state->fi.ptr.p_double, 1, state->fi.ptr.p_double, 1, m);
          state->f = v;
       }
-      state->repnfunc = state->repnfunc + 1;
+      state->repnfunc++;
       ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
       minlm_clearrequestfields(state);
       state->xupdated = true;
@@ -47722,7 +47722,7 @@ Spawn:
                // We guard X[k] from leaving [BndL,BndU].
                // In case BndL=BndU, we assume that derivative in this direction is zero.
                   ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                  state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - state->s.ptr.p_double[k] * state->diffstep;
+                  state->x.ptr.p_double[k] -= state->s.ptr.p_double[k] * state->diffstep;
                   if (state->havebndl.ptr.p_bool[k]) {
                      state->x.ptr.p_double[k] = ae_maxreal(state->x.ptr.p_double[k], state->bndl.ptr.p_double[k]);
                   }
@@ -47733,10 +47733,10 @@ Spawn:
                   minlm_clearrequestfields(state);
                   state->needfi = true;
                   state->PQ = 4; goto Pause; Resume04:
-                  state->repnfunc = state->repnfunc + 1;
+                  state->repnfunc++;
                   ae_v_move(state->fm1.ptr.p_double, 1, state->fi.ptr.p_double, 1, m);
                   ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                  state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + state->s.ptr.p_double[k] * state->diffstep;
+                  state->x.ptr.p_double[k] += state->s.ptr.p_double[k] * state->diffstep;
                   if (state->havebndl.ptr.p_bool[k]) {
                      state->x.ptr.p_double[k] = ae_maxreal(state->x.ptr.p_double[k], state->bndl.ptr.p_double[k]);
                   }
@@ -47747,7 +47747,7 @@ Spawn:
                   minlm_clearrequestfields(state);
                   state->needfi = true;
                   state->PQ = 5; goto Pause; Resume05:
-                  state->repnfunc = state->repnfunc + 1;
+                  state->repnfunc++;
                   ae_v_move(state->fp1.ptr.p_double, 1, state->fi.ptr.p_double, 1, m);
                   v = state->xp1 - state->xm1;
                   if (v != 0.0) {
@@ -47767,8 +47767,8 @@ Spawn:
                state->needfi = true;
                state->PQ = 6; goto Pause; Resume06:
                state->needfi = false;
-               state->repnfunc = state->repnfunc + 1;
-               state->repnjac = state->repnjac + 1;
+               state->repnfunc++;
+               state->repnjac++;
             } else {
             // Obtain f[] and Jacobian
                ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
@@ -47776,8 +47776,8 @@ Spawn:
                state->needfij = true;
                state->PQ = 7; goto Pause; Resume07:
                state->needfij = false;
-               state->repnfunc = state->repnfunc + 1;
-               state->repnjac = state->repnjac + 1;
+               state->repnfunc++;
+               state->repnjac++;
             }
          // New model
             state->modelage = 0;
@@ -47810,7 +47810,7 @@ Spawn:
             ae_v_add(state->fi.ptr.p_double, 1, state->deltaf.ptr.p_double, 1, m);
 
          // Increase model age
-            state->modelage = state->modelage + 1;
+            state->modelage++;
          }
          rmatrixgemm(n, n, m, 2.0, &state->j, 0, 0, 1, &state->j, 0, 0, 0, 0.0, &state->quadraticmodel, 0, 0);
          rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->gbase, 0);
@@ -47838,7 +47838,7 @@ Spawn:
             for (i = 0; i < n; i++) {
                state->lambdav = ae_maxreal(state->lambdav, fabs(state->quadraticmodel.ptr.pp_double[i][i]) * ae_sqr(state->s.ptr.p_double[i]));
             }
-            state->lambdav = 0.001 * state->lambdav;
+            state->lambdav *= 0.001;
             if (state->lambdav == 0.0) {
                state->lambdav = 1.0;
             }
@@ -47862,7 +47862,7 @@ Spawn:
          minlm_minlmstepfinderstart(&state->finderstate, &state->quadraticmodel, &state->gbase, state->fbase, &state->xbase, &state->fibase, state->modelage);
          while (minlm_minlmstepfinderiteration(&state->finderstate, &state->lambdav, &state->nu, &state->xnew, &state->deltax, &state->deltaxready, &state->deltaf, &state->deltafready, &iflag, &fnew, &state->repncholesky)) {
             ae_assert(state->hasfi || state->hasf, "MinLM: internal error 2!");
-            state->repnfunc = state->repnfunc + 1;
+            state->repnfunc++;
             minlm_clearrequestfields(state);
             if (state->finderstate.needfi) {
                ae_assert(state->hasfi, "MinLM: internal error 2!");
@@ -47964,7 +47964,7 @@ Spawn:
             state->PQ = 13; goto Pause; Resume13:
             state->xupdated = false;
          }
-         state->repiterationscount = state->repiterationscount + 1;
+         state->repiterationscount++;
          if (state->repiterationscount >= state->maxits && state->maxits > 0) {
             state->repterminationtype = 5;
          }
@@ -47979,7 +47979,7 @@ Spawn:
             }
             goto Exit;
          }
-         state->modelage = state->modelage + 1;
+         state->modelage++;
       }
 
    // Lambda is too large, we have to break iterations.
@@ -48042,7 +48042,7 @@ Spawn:
                   // We guard X[k] from leaving [BndL,BndU].
                   // In case BndL=BndU, we assume that derivative in this direction is zero.
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] - state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] -= state->s.ptr.p_double[k] * state->diffstep;
                      if (state->havebndl.ptr.p_bool[k]) {
                         state->x.ptr.p_double[k] = ae_maxreal(state->x.ptr.p_double[k], state->bndl.ptr.p_double[k]);
                      }
@@ -48053,10 +48053,10 @@ Spawn:
                      minlm_clearrequestfields(state);
                      state->needfi = true;
                      state->PQ = 16; goto Pause; Resume16:
-                     state->repnfunc = state->repnfunc + 1;
+                     state->repnfunc++;
                      ae_v_move(state->fm1.ptr.p_double, 1, state->fi.ptr.p_double, 1, m);
                      ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-                     state->x.ptr.p_double[k] = state->x.ptr.p_double[k] + state->s.ptr.p_double[k] * state->diffstep;
+                     state->x.ptr.p_double[k] += state->s.ptr.p_double[k] * state->diffstep;
                      if (state->havebndl.ptr.p_bool[k]) {
                         state->x.ptr.p_double[k] = ae_maxreal(state->x.ptr.p_double[k], state->bndl.ptr.p_double[k]);
                      }
@@ -48067,7 +48067,7 @@ Spawn:
                      minlm_clearrequestfields(state);
                      state->needfi = true;
                      state->PQ = 17; goto Pause; Resume17:
-                     state->repnfunc = state->repnfunc + 1;
+                     state->repnfunc++;
                      ae_v_move(state->fp1.ptr.p_double, 1, state->fi.ptr.p_double, 1, m);
                      v = state->xp1 - state->xm1;
                      if (v != 0.0) {
@@ -48087,8 +48087,8 @@ Spawn:
                   state->needfi = true;
                   state->PQ = 18; goto Pause; Resume18:
                   state->needfi = false;
-                  state->repnfunc = state->repnfunc + 1;
-                  state->repnjac = state->repnjac + 1;
+                  state->repnfunc++;
+                  state->repnjac++;
                } else {
                // Obtain f[] and Jacobian
                   ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
@@ -48096,8 +48096,8 @@ Spawn:
                   state->needfij = true;
                   state->PQ = 19; goto Pause; Resume19:
                   state->needfij = false;
-                  state->repnfunc = state->repnfunc + 1;
-                  state->repnjac = state->repnjac + 1;
+                  state->repnfunc++;
+                  state->repnjac++;
                }
             // New model
                state->modelage = 0;
@@ -48130,7 +48130,7 @@ Spawn:
                ae_v_add(state->fi.ptr.p_double, 1, state->deltaf.ptr.p_double, 1, m);
 
             // Increase model age
-               state->modelage = state->modelage + 1;
+               state->modelage++;
             }
 
          // Generate quadratic model:
@@ -48161,9 +48161,9 @@ Spawn:
             state->needfgh = true;
             state->PQ = 20; goto Pause; Resume20:
             state->needfgh = false;
-            state->repnfunc = state->repnfunc + 1;
-            state->repngrad = state->repngrad + 1;
-            state->repnhess = state->repnhess + 1;
+            state->repnfunc++;
+            state->repngrad++;
+            state->repnhess++;
             rmatrixcopy(n, n, &state->h, 0, 0, &state->quadraticmodel, 0, 0);
             ae_v_move(state->gbase.ptr.p_double, 1, state->g.ptr.p_double, 1, n);
             state->fbase = state->f;
@@ -48193,7 +48193,7 @@ Spawn:
             for (i = 0; i < n; i++) {
                state->lambdav = ae_maxreal(state->lambdav, fabs(state->quadraticmodel.ptr.pp_double[i][i]) * ae_sqr(state->s.ptr.p_double[i]));
             }
-            state->lambdav = 0.001 * state->lambdav;
+            state->lambdav *= 0.001;
             if (state->lambdav == 0.0) {
                state->lambdav = 1.0;
             }
@@ -48289,7 +48289,7 @@ Spawn:
             state->deltaxready = true;
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr(state->deltax.ptr.p_double[i] / state->s.ptr.p_double[i]);
+               v += ae_sqr(state->deltax.ptr.p_double[i] / state->s.ptr.p_double[i]);
             }
             v = sqrt(v);
             if (v <= state->epsx) {
@@ -48339,7 +48339,7 @@ Spawn:
                state->PQ = 23; goto Pause; Resume23:
                state->needf = false;
             }
-            state->repnfunc = state->repnfunc + 1;
+            state->repnfunc++;
             if (!isfinite(state->f)) {
 
             // Integrity check failed, break!
@@ -48388,7 +48388,7 @@ Spawn:
          t = 0.0;
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(state->quadraticmodel.ptr.pp_double[i], 1, state->deltax.ptr.p_double, 1, n);
-            t = t + state->deltax.ptr.p_double[i] * state->gbase.ptr.p_double[i] + 0.5 * state->deltax.ptr.p_double[i] * v;
+            t += state->deltax.ptr.p_double[i] * state->gbase.ptr.p_double[i] + 0.5 * state->deltax.ptr.p_double[i] * v;
          }
          state->predicteddecrease = -t;
          state->actualdecrease = -(state->f - state->fbase);
@@ -48431,7 +48431,7 @@ Spawn:
             state->PQ = 25; goto Pause; Resume25:
             state->xupdated = false;
          }
-         state->repiterationscount = state->repiterationscount + 1;
+         state->repiterationscount++;
          if (state->repiterationscount >= state->maxits && state->maxits > 0) {
             state->repterminationtype = 5;
          }
@@ -48446,7 +48446,7 @@ Spawn:
             }
             goto Exit;
          }
-         state->modelage = state->modelage + 1;
+         state->modelage++;
       }
 
    // Lambda is too large, we have to break iterations.
@@ -48829,8 +48829,8 @@ static bool minlm_increaselambda(double *lambdav, double *nu) {
    if (lnnu + log(2.0) > lnmax) {
       return result;
    }
-   *lambdav = *lambdav * minlm_lambdaup * (*nu);
-   *nu = *nu * 2;
+   *lambdav *= minlm_lambdaup * (*nu);
+   *nu *= 2;
    result = true;
    return result;
 }
@@ -48842,7 +48842,7 @@ static void minlm_decreaselambda(double *lambdav, double *nu) {
    if (log(*lambdav) + log(minlm_lambdadown) < log(ae_minrealnumber)) {
       *lambdav = ae_minrealnumber;
    } else {
-      *lambdav = *lambdav * minlm_lambdadown;
+      *lambdav *= minlm_lambdadown;
    }
 }
 
@@ -48877,7 +48877,7 @@ static ae_int_t minlm_checkdecrease(RMatrix quadraticmodel, RVector gbase, doubl
    t = 0.0;
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(quadraticmodel->ptr.pp_double[i], 1, deltax->ptr.p_double, 1, n);
-      t = t + deltax->ptr.p_double[i] * gbase->ptr.p_double[i] + 0.5 * deltax->ptr.p_double[i] * v;
+      t += deltax->ptr.p_double[i] * gbase->ptr.p_double[i] + 0.5 * deltax->ptr.p_double[i] * v;
    }
    predicteddecrease = -t;
    actualdecrease = -(fnew - fbase);
@@ -49091,7 +49091,7 @@ Spawn:
       minqprewritediagonal(&state->qpstate, &state->tmp0);
       minqpoptimize(&state->qpstate);
       minqpresultsbuf(&state->qpstate, xnew, &state->qprep);
-      *ncholesky = *ncholesky + state->qprep.ncholesky;
+      *ncholesky += state->qprep.ncholesky;
       if (state->qprep.terminationtype == -3) {
 
       // Infeasible constraints
@@ -49112,7 +49112,7 @@ Spawn:
       ae_v_sub(state->xdir.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(state->xdir.ptr.p_double[i] / state->s.ptr.p_double[i]);
+         v += ae_sqr(state->xdir.ptr.p_double[i] / state->s.ptr.p_double[i]);
       }
       if (isfinite(v)) {
          v = sqrt(v);
@@ -49152,7 +49152,7 @@ Spawn:
       *deltaxready = true;
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_sqr(deltax->ptr.p_double[i] / state->s.ptr.p_double[i]);
+         v += ae_sqr(deltax->ptr.p_double[i] / state->s.ptr.p_double[i]);
       }
       v = sqrt(v);
       if (v <= state->epsx) {

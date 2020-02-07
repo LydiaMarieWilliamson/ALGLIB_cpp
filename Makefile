@@ -15,57 +15,55 @@ O=.o
 Mods=Ap AlgLibInternal AlgLibMisc DataAnalysis DiffEquations FastTransforms Integration Interpolation LinAlg Optimization Solvers SpecialFunctions Statistics
 Objs=$(Mods:%=%$O)
 Srcs=$(Mods:%=%.cpp)
-ModsF=Ap AlgLibInternal AlgLibMisc DataAnalysis LinAlg Optimization Solvers SpecialFunctions Statistics
-ObjF=$(ModsF:%=%.o)
 ModsY=Ap AlgLibInternal AlgLibMisc LinAlg
 ObjY=$(ModsY:%=%.o)
 
 all: test
 Ap$O: Ap.cpp
-	${Cpp} ${CcOpt} -c Ap.cpp -o Ap$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 AlgLibInternal$O: AlgLibInternal.cpp
-	${Cpp} ${CcOpt} -c AlgLibInternal.cpp -o AlgLibInternal$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 AlgLibMisc$O: AlgLibMisc.cpp
-	${Cpp} ${CcOpt} -c AlgLibMisc.cpp -o AlgLibMisc$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 DataAnalysis$O: DataAnalysis.cpp
-	${Cpp} ${CcOpt} -c DataAnalysis.cpp -o DataAnalysis$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 DiffEquations$O: DiffEquations.cpp
-	${Cpp} ${CcOpt} -c DiffEquations.cpp -o DiffEquations$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 FastTransforms$O: FastTransforms.cpp
-	${Cpp} ${CcOpt} -c FastTransforms.cpp -o FastTransforms$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 Integration$O: Integration.cpp
-	${Cpp} ${CcOpt} -c Integration.cpp -o Integration$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 Interpolation$O: Interpolation.cpp
-	${Cpp} ${CcOpt} -c Interpolation.cpp -o Interpolation$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 LinAlg$O: LinAlg.cpp
-	${Cpp} ${CcOpt} -c LinAlg.cpp -o LinAlg$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 Optimization$O: Optimization.cpp
-	${Cpp} ${CcOpt} -c Optimization.cpp -o Optimization$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 Solvers$O: Solvers.cpp
-	${Cpp} ${CcOpt} -c Solvers.cpp -o Solvers$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 SpecialFunctions$O: SpecialFunctions.cpp
-	${Cpp} ${CcOpt} -c SpecialFunctions.cpp -o SpecialFunctions$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 Statistics$O: Statistics.cpp
-	${Cpp} ${CcOpt} -c Statistics.cpp -o Statistics$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 TestC$O: TestC.cpp
-	${Cpp} ${CcOpt} -c TestC.cpp -DAE_DEBUG4POSIX -o TestC$O
+	${Cpp} ${CcOpt} -c $^ -DAE_DEBUG4POSIX -o $@
 TestI$O: TestI.cpp
-	${Cpp} ${CcOpt} -c TestI.cpp -DAE_USE_ALLOC_COUNTER
+	${Cpp} ${CcOpt} -c $^ -DAE_USE_ALLOC_COUNTER
 TestX$O: TestX.cpp
-	${Cpp} ${CcOpt} -c TestX.cpp -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -o TestX$O
+	${Cpp} ${CcOpt} -c $^ -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -o $@
 TestY$O: TestY.cpp
-	${Cpp} ${CcOpt} -c TestY.cpp -o TestY$O
+	${Cpp} ${CcOpt} -c $^ -o $@
 
 TestC$X: ${Objs} TestC$O
-	${Cpp} ${CcOpt} ${Objs} TestC$O ${Libs} -o TestC$X
+	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestI$X: ${Objs} TestI$O
-	${Cpp} ${CcOpt} ${Objs} TestI$O ${Libs} -o TestI$X
+	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestX$X: ${Objs} TestX$O
-	${Cpp} ${CcOpt} ${Objs} TestX$O ${Libs} -o TestX$X
+	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestY$X: ${ObjY} TestY.o
-	${Cpp} ${CcOpt} ${ObjY} TestY$O ${Libs} -o TestY$X
+	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestZ$X: $(Srcs) TestZ.cpp
-	${Cpp} ${CcOpt} ${Srcs} TestZ.cpp ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=AE_SERIAL_UNSAFE -o TestZ$X
+	${Cpp} ${CcOpt} $^ ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=AE_SERIAL_UNSAFE -o $@
 test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestI: API Interface"
 	./TestI$X

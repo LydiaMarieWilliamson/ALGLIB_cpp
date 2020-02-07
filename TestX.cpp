@@ -253,7 +253,7 @@ int tickcount() {
    v = now.tv_sec;
    r = v * 1000;
    v = now.tv_usec / 1000;
-   r = r + v;
+   r += v;
    return r;
 }
 #elif defined AE_DEBUG4WINDOWS
@@ -1039,7 +1039,7 @@ int main() {
 
             // test that setcontent() actually copies data instead of creating just reference
                r = a0[0];
-               a0[0] = a0[0] + 1;
+               a0[0]++;
                passed = passed && (arr_6[0][0] != a0[0]);
                a0[0] = r;
 
@@ -2122,7 +2122,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          // * first nmax is just large value to test basic uniformity of generator
          //
             nmax[0] = 1000000;
-            nmax[0] = nmax[0] * nmax[0];
+            nmax[0] *= nmax[0];
             nmax[1] = 2147483562;
             nmax[1] *= 1.5;
             nmax[2] = 2147483562;

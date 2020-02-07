@@ -92,7 +92,7 @@ static void testtsortunit_testsortresults(RVector asorted, ZVector p1, ZVector p
       f.ptr.p_int[i] = 0;
    }
    for (i = 0; i < n; i++) {
-      f.ptr.p_int[p1->ptr.p_int[i]] = f.ptr.p_int[p1->ptr.p_int[i]] + 1;
+      f.ptr.p_int[p1->ptr.p_int[i]]++;
    }
    for (i = 0; i < n; i++) {
       *waserrors = *waserrors || f.ptr.p_int[i] != 1;
@@ -442,14 +442,14 @@ static double testnearestneighborunit_vnorm(RVector x, ae_int_t n, ae_int_t norm
    if (normtype == 1) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + fabs(x->ptr.p_double[i]);
+         result += fabs(x->ptr.p_double[i]);
       }
       return result;
    }
    if (normtype == 2) {
       result = 0.0;
       for (i = 0; i < n; i++) {
-         result = result + ae_sqr(x->ptr.p_double[i]);
+         result += ae_sqr(x->ptr.p_double[i]);
       }
       result = sqrt(result);
       return result;
@@ -1102,8 +1102,8 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
          qmin.ptr.p_double[j] = boxmin.ptr.p_double[j] + ae_randomreal() * (boxmax.ptr.p_double[j] - boxmin.ptr.p_double[j]);
          qmax.ptr.p_double[j] = qmin.ptr.p_double[j];
          v = spread * pow(10.0, -2 * ae_randomreal());
-         qmin.ptr.p_double[j] = qmin.ptr.p_double[j] - v;
-         qmax.ptr.p_double[j] = qmax.ptr.p_double[j] + v;
+         qmin.ptr.p_double[j] -= v;
+         qmax.ptr.p_double[j] += v;
       }
       kx = kdtreetsquerybox(&treext, &bufxt, &qmin, &qmax);
       unsetrealmatrix(&qx);
@@ -1139,8 +1139,8 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
          qmin.ptr.p_double[j] = boxmin.ptr.p_double[j] + ae_randomreal() * (boxmax.ptr.p_double[j] - boxmin.ptr.p_double[j]);
          qmax.ptr.p_double[j] = qmin.ptr.p_double[j];
          v = spread * pow(10.0, -2 * ae_randomreal());
-         qmin.ptr.p_double[j] = qmin.ptr.p_double[j] - v;
-         qmax.ptr.p_double[j] = qmax.ptr.p_double[j] + v;
+         qmin.ptr.p_double[j] -= v;
+         qmax.ptr.p_double[j] += v;
       }
       kx = kdtreequerybox(&treext, &qmin, &qmax);
       unsetrealmatrix(&qx);
@@ -1329,7 +1329,7 @@ static void testnearestneighborunit_testkdtreeserialization(bool *err) {
       }
 
    // Next N
-      n = n + 25;
+      n += 25;
    }
    ae_frame_leave();
 }
@@ -1573,7 +1573,7 @@ Local bool hqrndcontinuoustest(bool silent) {
          v = hqrndcontinuous(&state, &sample, samplesize);
          for (j = 0; j < nb; j++) {
             if (v > binbounds.ptr.p_double[j] && v < binbounds.ptr.p_double[j + 1]) {
-               bins.ptr.p_int[j] = bins.ptr.p_int[j] + 1;
+               bins.ptr.p_int[j]++;
                break;
             }
          }
@@ -1632,7 +1632,7 @@ Local bool hqrnddiscretetest(bool silent) {
          tsample = hqrnddiscrete(&state, &sample, binscount);
          for (j = 0; j < binscount; j++) {
             if (tsample == sample.ptr.p_double[j]) {
-               nn.ptr.p_int[j] = nn.ptr.p_int[j] + 1;
+               nn.ptr.p_int[j]++;
                break;
             }
          }
@@ -1679,19 +1679,19 @@ static void testhqrndunit_calculatemv(RVector x, ae_int_t n, double *mean, doubl
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->ptr.p_double[i];
+      *mean += x->ptr.p_double[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + ae_sqr(x->ptr.p_double[i] - (*mean));
+         v1 += ae_sqr(x->ptr.p_double[i] - (*mean));
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->ptr.p_double[i] - (*mean));
+         v2 += x->ptr.p_double[i] - (*mean);
       }
       v2 = ae_sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -1871,7 +1871,7 @@ bool testhqrnd(bool silent) {
       if (i + 1 < samplesize) {
          x.ptr.p_double[i + 1] = r2;
       }
-      i = i + 2;
+      i += 2;
    }
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
@@ -1904,7 +1904,7 @@ bool testhqrnd(bool silent) {
       if (k >= bins.cnt) {
          k = bins.cnt - 1;
       }
-      bins.ptr.p_int[k] = bins.ptr.p_int[k] + 1;
+      bins.ptr.p_int[k]++;
    }
    for (i = 0; i < bins.cnt; i++) {
       ae_set_error_flag(&unit2errors, (double)(bins.ptr.p_int[i]) < 0.9 * n / bins.cnt || (double)(bins.ptr.p_int[i]) > 1.1 * n / bins.cnt, __FILE__, __LINE__, "testhqrndunit.ap:250");
@@ -2070,7 +2070,7 @@ bool testodesolver(bool silent) {
          while (odesolveriteration(&state)) {
             state.dy.ptr.p_double[0] = state.y.ptr.p_double[1];
             state.dy.ptr.p_double[1] = -state.y.ptr.p_double[0];
-            mynfev = mynfev + 1;
+            mynfev++;
          }
          odesolverresults(&state, &m2, &xtbl, &ytbl, &rep);
 
@@ -2122,7 +2122,7 @@ bool testodesolver(bool silent) {
       odesolverrkck(&y, 1, &xg, m, eps, h, &state);
       while (odesolveriteration(&state)) {
          state.dy.ptr.p_double[0] = ae_maxreal(state.x - 1, 0.0);
-         mynfev = mynfev + 1;
+         mynfev++;
       }
       odesolverresults(&state, &m2, &xtbl, &ytbl, &rep);
       if (rep.terminationtype <= 0) {
@@ -2304,8 +2304,8 @@ Local bool skstest() {
          uppercnt = 0;
          lowercnt = 0;
          for (i = 0; i < n; i++) {
-            uppercnt = uppercnt + u.ptr.p_int[i];
-            lowercnt = lowercnt + d.ptr.p_int[i];
+            uppercnt += u.ptr.p_int[i];
+            lowercnt += d.ptr.p_int[i];
          }
 
       // Try to call SparseRewriteExisting() for out-of-band elements, make sure that it returns False.
@@ -2609,7 +2609,7 @@ Local bool basicfunctest() {
                   inc(&lowercnt);
                }
                a.ptr.pp_double[i1][j1] = i1 + j1 + (double)((i + j) * (m + n)) / 2.0;
-               a.ptr.pp_double[i1][j1] = a.ptr.pp_double[i1][j1] + 1;
+               a.ptr.pp_double[i1][j1]++;
                sparseset(&s, i1, j1, i1 + j1 + (double)((i + j) * (m + n)) / 2.0);
                sparseadd(&s, i1, j1, 1.0);
                if (a.ptr.pp_double[i1][j1] != sparseget(&s, i1, j1)) {
@@ -2776,7 +2776,7 @@ Spawn:
                      g->bufa.ptr.pp_double[i][i] = hqrnduniformr(&g->rs) - 0.5;
                   }
                   while (g->bufa.ptr.pp_double[i][i] == 0.0);
-                  g->bufa.ptr.pp_double[i][i] = g->bufa.ptr.pp_double[i][i] + 1.5 * ae_sign(g->bufa.ptr.pp_double[i][i]);
+                  g->bufa.ptr.pp_double[i][i] += 1.5 * ae_sign(g->bufa.ptr.pp_double[i][i]);
                   continue;
                }
                if (hqrnduniformr(&g->rs) <= pnz) {
@@ -2950,9 +2950,9 @@ Local bool testlevel2unsymmetric() {
                         v = 0.0;
                         for (j = 0; j < opn; j++) {
                            if (ops == 0) {
-                              v = v + a.ptr.pp_double[i][j] * x1.ptr.p_double[ix + j];
+                              v += a.ptr.pp_double[i][j] * x1.ptr.p_double[ix + j];
                            } else {
-                              v = v + a.ptr.pp_double[j][i] * x1.ptr.p_double[ix + j];
+                              v += a.ptr.pp_double[j][i] * x1.ptr.p_double[ix + j];
                            }
                         }
                         y1.ptr.p_double[iy + i] = alpha * v + beta * y1.ptr.p_double[iy + i];
@@ -3260,7 +3260,7 @@ Local bool testlevel2symmetric() {
             vb = 0.0;
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  vb = vb + x1.ptr.p_double[i] * a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+                  vb += x1.ptr.p_double[i] * a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
                }
             }
             va = sparsevsmv(&s0, isupper, &x0);
@@ -3795,7 +3795,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
                da->ptr.pp_double[i][j] = v;
                sparseset(sa, i, j, v);
             } else {
-               da->ptr.pp_double[i][j] = da->ptr.pp_double[i][j] + v;
+               da->ptr.pp_double[i][j] += v;
                sparseadd(sa, i, j, v);
             }
          }
@@ -3817,7 +3817,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             rowsizes.ptr.p_int[i] = 0;
             for (j = 0; j < n; j++) {
                if (da->ptr.pp_double[i][j] != 0.0) {
-                  rowsizes.ptr.p_int[i] = rowsizes.ptr.p_int[i] + 1;
+                  rowsizes.ptr.p_int[i]++;
                }
             }
          }
@@ -3987,8 +3987,8 @@ Local bool linearfunctionstest() {
          // Searching true result
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 < j; j1++) {
-                  ty.ptr.p_double[i1] = ty.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
-                  tyt.ptr.p_double[j1] = tyt.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
+                  ty.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
+                  tyt.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
                }
             }
 
@@ -4018,8 +4018,8 @@ Local bool linearfunctionstest() {
          // Searching true result
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 < j; j1++) {
-                  ty.ptr.p_double[i1] = ty.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
-                  tyt.ptr.p_double[j1] = tyt.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
+                  ty.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
+                  tyt.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
                }
             }
             sparsemv(&s, &x0, &y);
@@ -4109,17 +4109,17 @@ Local bool linearfunctionsstest() {
    // of the matrix
       for (i1 = 0; i1 < i; i1++) {
          for (j1 = i1; j1 < i; j1++) {
-            ty.ptr.p_double[i1] = ty.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
+            ty.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
             if (i1 != j1) {
-               ty.ptr.p_double[j1] = ty.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
+               ty.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
             }
          }
       }
       for (i1 = 0; i1 < i; i1++) {
          for (j1 = 0; j1 <= i1; j1++) {
-            tyt.ptr.p_double[i1] = tyt.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x1.ptr.p_double[j1];
+            tyt.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x1.ptr.p_double[j1];
             if (i1 != j1) {
-               tyt.ptr.p_double[j1] = tyt.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
+               tyt.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
             }
          }
       }
@@ -4221,8 +4221,8 @@ Local bool linearfunctionsmmtest() {
             for (i1 = 0; i1 < i; i1++) {
                for (k1 = 0; k1 < kmax; k1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.ptr.pp_double[i1][k1] = ty.ptr.pp_double[i1][k1] + a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
-                     tyt.ptr.pp_double[j1][k1] = tyt.ptr.pp_double[j1][k1] + a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[i1][k1];
+                     ty.ptr.pp_double[i1][k1] += a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
+                     tyt.ptr.pp_double[j1][k1] += a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[i1][k1];
                   }
                }
             }
@@ -4230,8 +4230,8 @@ Local bool linearfunctionsmmtest() {
             for (i1 = 0; i1 < i; i1++) {
                for (k1 = 0; k1 < kmax; k1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.ptr.pp_double[i1][k1] = ty.ptr.pp_double[i1][k1] + a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
-                     tyt.ptr.pp_double[j1][k1] = tyt.ptr.pp_double[j1][k1] + a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[i1][k1];
+                     ty.ptr.pp_double[i1][k1] += a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
+                     tyt.ptr.pp_double[j1][k1] += a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[i1][k1];
                   }
                }
             }
@@ -4368,9 +4368,9 @@ Local bool linearfunctionssmmtest() {
          for (k1 = 0; k1 < j; k1++) {
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = i1; j1 < i; j1++) {
-                  ty.ptr.pp_double[i1][k1] = ty.ptr.pp_double[i1][k1] + a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
+                  ty.ptr.pp_double[i1][k1] += a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[j1][k1];
                   if (i1 != j1) {
-                     ty.ptr.pp_double[j1][k1] = ty.ptr.pp_double[j1][k1] + a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[i1][k1];
+                     ty.ptr.pp_double[j1][k1] += a.ptr.pp_double[i1][j1] * x0.ptr.pp_double[i1][k1];
                   }
                }
             }
@@ -4378,9 +4378,9 @@ Local bool linearfunctionssmmtest() {
          for (k1 = 0; k1 < j; k1++) {
             for (i1 = 0; i1 < i; i1++) {
                for (j1 = 0; j1 <= i1; j1++) {
-                  tyt.ptr.pp_double[i1][k1] = tyt.ptr.pp_double[i1][k1] + a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[j1][k1];
+                  tyt.ptr.pp_double[i1][k1] += a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[j1][k1];
                   if (i1 != j1) {
-                     tyt.ptr.pp_double[j1][k1] = tyt.ptr.pp_double[j1][k1] + a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[i1][k1];
+                     tyt.ptr.pp_double[j1][k1] += a.ptr.pp_double[i1][j1] * x1.ptr.pp_double[i1][k1];
                   }
                }
             }
@@ -4613,8 +4613,8 @@ Local bool copyfunctest(bool silent) {
             // Searching true result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.ptr.p_double[i1] = ty.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
-                     tyt.ptr.p_double[j1] = tyt.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
+                     ty.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
+                     tyt.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x1.ptr.p_double[i1];
                   }
                }
 
@@ -4676,8 +4676,8 @@ Local bool copyfunctest(bool silent) {
             // Searching true result
                for (i1 = 0; i1 < i; i1++) {
                   for (j1 = 0; j1 < j; j1++) {
-                     ty.ptr.p_double[i1] = ty.ptr.p_double[i1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
-                     tyt.ptr.p_double[j1] = tyt.ptr.p_double[j1] + a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
+                     ty.ptr.p_double[i1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[j1];
+                     tyt.ptr.p_double[j1] += a.ptr.pp_double[i1][j1] * x0.ptr.p_double[i1];
                   }
                }
 
@@ -4800,7 +4800,7 @@ static bool testsparseunit_enumeratetest() {
                   a.ptr.pp_double[i][j] = r * (2 * ae_randomreal() - 1);
 
                // Number of non-zero elements
-                  ne = ne + 1;
+                  ne++;
                }
             }
          }
@@ -4819,7 +4819,7 @@ static bool testsparseunit_enumeratetest() {
             counter = 0;
             while (sparseenumerate(&spa, &t0, &t1, &i, &j, &v)) {
                ta.ptr.pp_bool[i][j] = true;
-               counter = counter + 1;
+               counter++;
                if (v != a.ptr.pp_double[i][j]) {
                   result = true;
                   ae_frame_leave();
@@ -4896,7 +4896,7 @@ static bool testsparseunit_rewriteexistingtest() {
                      }
                      while (a.ptr.pp_double[i][j] == 0.0);
                      sparseset(&spa, i, j, a.ptr.pp_double[i][j]);
-                     ne = ne + 1;
+                     ne++;
                   }
                   ta.ptr.pp_bool[i][j] = false;
                }
@@ -4913,7 +4913,7 @@ static bool testsparseunit_rewriteexistingtest() {
                      ta.ptr.pp_bool[i][j] = sparserewriteexisting(&spa, i, j, v);
                      if (ta.ptr.pp_bool[i][j]) {
                         a.ptr.pp_double[i][j] = v;
-                        nr = nr + 1;
+                        nr++;
                      }
                   }
                }
@@ -4924,7 +4924,7 @@ static bool testsparseunit_rewriteexistingtest() {
                for (j = 0; j < n; j++) {
                   if (ta.ptr.pp_bool[i][j]) {
                      spaval = sparseget(&spa, i, j);
-                     nr = nr - 1;
+                     nr--;
                      if (spaval != v || spaval != a.ptr.pp_double[i][j]) {
                         result = true;
                         ae_frame_leave();
@@ -4950,7 +4950,7 @@ static bool testsparseunit_rewriteexistingtest() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (ta.ptr.pp_bool[i][j]) {
-                     ne = ne - 1;
+                     ne--;
                   }
                }
             }
@@ -5125,7 +5125,7 @@ static bool testsparseunit_testconvertsm() {
                ner.ptr.p_int[i] = 0;
                for (j = 0; j < n; j++) {
                   if (ae_randominteger(5) == 3) {
-                     ner.ptr.p_int[i] = ner.ptr.p_int[i] + 1;
+                     ner.ptr.p_int[i]++;
                      a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
                   } else {
                      a.ptr.pp_double[i][j] = 0.0;
@@ -5173,7 +5173,7 @@ static bool testsparseunit_testconvertsm() {
                   sparseset(&cs, i, j, tmp);
                   tmp = 2 * ae_randomreal() - 1;
                   j = ae_randominteger(n);
-                  a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + tmp;
+                  a.ptr.pp_double[i][j] += tmp;
                   sparseadd(&cs, i, j, tmp);
                }
             }
@@ -6171,7 +6171,7 @@ static void testablasunit_refrmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, R
             if (beta == 0.0) {
                c->ptr.pp_double[i + ic][j + jc] = 0.0;
             } else {
-               c->ptr.pp_double[i + ic][j + jc] = c->ptr.pp_double[i + ic][j + jc] * beta;
+               c->ptr.pp_double[i + ic][j + jc] *= beta;
             }
          }
       }
@@ -6199,12 +6199,12 @@ static void testablasunit_refrmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, R
          if (k > 0) {
             vr = ae_v_dotproduct(ae.ptr.pp_double[i], 1, ae.ptr.pp_double[j], 1, k);
          }
-         vr = alpha * vr;
+         vr *= alpha;
          if (isupper && j >= i) {
-            c->ptr.pp_double[ic + i][jc + j] = vr + c->ptr.pp_double[ic + i][jc + j];
+            c->ptr.pp_double[ic + i][jc + j] += vr;
          }
          if (!isupper && j <= i) {
-            c->ptr.pp_double[ic + i][jc + j] = vr + c->ptr.pp_double[ic + i][jc + j];
+            c->ptr.pp_double[ic + i][jc + j] += vr;
          }
       }
    }
@@ -6501,9 +6501,9 @@ static void testablasunit_refrmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, dou
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          vc = ae_v_dotproduct(ae.ptr.pp_double[i], 1, &be.ptr.pp_double[0][j], be.stride, k);
-         vc = alpha * vc;
+         vc *= alpha;
          if (beta != 0.0) {
-            vc = vc + beta * c->ptr.pp_double[ic + i][jc + j];
+            vc += beta * c->ptr.pp_double[ic + i][jc + j];
          }
          c->ptr.pp_double[ic + i][jc + j] = vc;
       }
@@ -7114,7 +7114,7 @@ static void testablasunit_refrmatrixsymv(ae_int_t n, double alpha, RMatrix a, ae
    for (i = 0; i < n; i++) {
       v = beta * y->ptr.p_double[iy + i];
       for (j = 0; j < n; j++) {
-         v = v + alpha * b.ptr.pp_double[i][j] * x->ptr.p_double[ix + j];
+         v += alpha * b.ptr.pp_double[i][j] * x->ptr.p_double[ix + j];
       }
       y->ptr.p_double[iy + i] = v;
    }
@@ -7154,7 +7154,7 @@ static double testablasunit_refrmatrixsyvmv(ae_int_t n, RMatrix a, ae_int_t ia, 
    result = 0.0;
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         result = result + x->ptr.p_double[ix + i] * b.ptr.pp_double[i][j] * x->ptr.p_double[ix + j];
+         result += x->ptr.p_double[ix + i] * b.ptr.pp_double[i][j] * x->ptr.p_double[ix + j];
       }
    }
    ae_frame_leave();
@@ -7299,7 +7299,7 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       isunita = ae_randomreal() > 0.5;
       opa = ae_randominteger(2);
       for (i = 0; i < n; i++) {
-         refra.ptr.pp_double[aoffsi + i][aoffsj + i] = refra.ptr.pp_double[aoffsi + i][aoffsj + i] + 10;
+         refra.ptr.pp_double[aoffsi + i][aoffsj + i] += 10;
       }
 
    // Test RMatrixTRSV():
@@ -8059,7 +8059,7 @@ static bool testmatgenunit_isspd(RMatrix a, ae_int_t n, bool isupper) {
          if (j < n - 1) {
             for (i = j + 1; i < n; i++) {
                v = ae_v_dotproduct(&a->ptr.pp_double[0][i], a->stride, &a->ptr.pp_double[0][j], a->stride, j);
-               a->ptr.pp_double[j][i] = a->ptr.pp_double[j][i] - v;
+               a->ptr.pp_double[j][i] -= v;
             }
             v = 1 / ajj;
             ae_v_muld(&a->ptr.pp_double[j][j + 1], 1, n - j - 1, v);
@@ -8085,7 +8085,7 @@ static bool testmatgenunit_isspd(RMatrix a, ae_int_t n, bool isupper) {
          if (j < n - 1) {
             for (i = j + 1; i < n; i++) {
                v = ae_v_dotproduct(a->ptr.pp_double[i], 1, a->ptr.pp_double[j], 1, j);
-               a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] - v;
+               a->ptr.pp_double[i][j] -= v;
             }
             v = 1 / ajj;
             ae_v_muld(&a->ptr.pp_double[j + 1][j], a->stride, n - j - 1, v);
@@ -8353,12 +8353,12 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
       vscale = 0.0;
       if (i <= m) {
          for (k = i; k <= m; k++) {
-            vscale = vscale + fabs(a->ptr.pp_double[k][i]);
+            vscale += fabs(a->ptr.pp_double[k][i]);
          }
          if (vscale != 0.0) {
             for (k = i; k <= m; k++) {
-               a->ptr.pp_double[k][i] = a->ptr.pp_double[k][i] / vscale;
-               s = s + a->ptr.pp_double[k][i] * a->ptr.pp_double[k][i];
+               a->ptr.pp_double[k][i] /= vscale;
+               s += a->ptr.pp_double[k][i] * a->ptr.pp_double[k][i];
             }
             f = a->ptr.pp_double[i][i];
             g = -testmatgenunit_extsign(sqrt(s), f);
@@ -8368,16 +8368,16 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
                for (j = l; j <= n; j++) {
                   s = 0.0;
                   for (k = i; k <= m; k++) {
-                     s = s + a->ptr.pp_double[k][i] * a->ptr.pp_double[k][j];
+                     s += a->ptr.pp_double[k][i] * a->ptr.pp_double[k][j];
                   }
                   f = s / h;
                   for (k = i; k <= m; k++) {
-                     a->ptr.pp_double[k][j] = a->ptr.pp_double[k][j] + f * a->ptr.pp_double[k][i];
+                     a->ptr.pp_double[k][j] += f * a->ptr.pp_double[k][i];
                   }
                }
             }
             for (k = i; k <= m; k++) {
-               a->ptr.pp_double[k][i] = vscale * a->ptr.pp_double[k][i];
+               a->ptr.pp_double[k][i] *= vscale;
             }
          }
       }
@@ -8387,12 +8387,12 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
       vscale = 0.0;
       if (i <= m && i != n) {
          for (k = l; k <= n; k++) {
-            vscale = vscale + fabs(a->ptr.pp_double[i][k]);
+            vscale += fabs(a->ptr.pp_double[i][k]);
          }
          if (vscale != 0.0) {
             for (k = l; k <= n; k++) {
-               a->ptr.pp_double[i][k] = a->ptr.pp_double[i][k] / vscale;
-               s = s + a->ptr.pp_double[i][k] * a->ptr.pp_double[i][k];
+               a->ptr.pp_double[i][k] /= vscale;
+               s += a->ptr.pp_double[i][k] * a->ptr.pp_double[i][k];
             }
             f = a->ptr.pp_double[i][l];
             g = -testmatgenunit_extsign(sqrt(s), f);
@@ -8405,15 +8405,15 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
                for (j = l; j <= m; j++) {
                   s = 0.0;
                   for (k = l; k <= n; k++) {
-                     s = s + a->ptr.pp_double[j][k] * a->ptr.pp_double[i][k];
+                     s += a->ptr.pp_double[j][k] * a->ptr.pp_double[i][k];
                   }
                   for (k = l; k <= n; k++) {
-                     a->ptr.pp_double[j][k] = a->ptr.pp_double[j][k] + s * rv1.ptr.p_double[k];
+                     a->ptr.pp_double[j][k] += s * rv1.ptr.p_double[k];
                   }
                }
             }
             for (k = l; k <= n; k++) {
-               a->ptr.pp_double[i][k] = vscale * a->ptr.pp_double[i][k];
+               a->ptr.pp_double[i][k] *= vscale;
             }
          }
       }
@@ -8428,10 +8428,10 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
             for (j = l; j <= n; j++) {
                s = 0.0;
                for (k = l; k <= n; k++) {
-                  s = s + a->ptr.pp_double[i][k] * v->ptr.pp_double[k][j];
+                  s += a->ptr.pp_double[i][k] * v->ptr.pp_double[k][j];
                }
                for (k = l; k <= n; k++) {
-                  v->ptr.pp_double[k][j] = v->ptr.pp_double[k][j] + s * v->ptr.pp_double[k][i];
+                  v->ptr.pp_double[k][j] += s * v->ptr.pp_double[k][i];
                }
             }
          }
@@ -8458,23 +8458,23 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
             for (j = l; j <= n; j++) {
                s = 0.0;
                for (k = l; k <= m; k++) {
-                  s = s + a->ptr.pp_double[k][i] * a->ptr.pp_double[k][j];
+                  s += a->ptr.pp_double[k][i] * a->ptr.pp_double[k][j];
                }
                f = s / a->ptr.pp_double[i][i] * g;
                for (k = i; k <= m; k++) {
-                  a->ptr.pp_double[k][j] = a->ptr.pp_double[k][j] + f * a->ptr.pp_double[k][i];
+                  a->ptr.pp_double[k][j] += f * a->ptr.pp_double[k][i];
                }
             }
          }
          for (j = i; j <= m; j++) {
-            a->ptr.pp_double[j][i] = a->ptr.pp_double[j][i] * g;
+            a->ptr.pp_double[j][i] *= g;
          }
       } else {
          for (j = i; j <= m; j++) {
             a->ptr.pp_double[j][i] = 0.0;
          }
       }
-      a->ptr.pp_double[i][i] = a->ptr.pp_double[i][i] + 1.0;
+      a->ptr.pp_double[i][i]++;
    }
    nm = 0;
    for (k = n; k >= 1; k--) {
@@ -8541,7 +8541,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
             g = rv1.ptr.p_double[i];
             y = w->ptr.p_double[i];
             h = s * g;
-            g = c * g;
+            g *= c;
             z = testmatgenunit_pythag(f, h);
             rv1.ptr.p_double[j] = z;
             c = f / z;
@@ -8549,7 +8549,7 @@ static bool testmatgenunit_obsoletesvddecomposition(RMatrix a, ae_int_t m, ae_in
             f = x * c + g * s;
             g = -x * s + g * c;
             h = y * s;
-            y = y * c;
+            y *= c;
             for (jj = 1; jj <= n; jj++) {
                x = v->ptr.pp_double[jj][j];
                z = v->ptr.pp_double[jj][i];
@@ -9309,7 +9309,7 @@ Local bool sparserealcholeskytest() {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sc, k, j) * sparseget(&sc, k, i);
+                     v += sparseget(&sc, k, j) * sparseget(&sc, k, i);
                   }
                   ae_set_error_flag(&result, fabs(a.ptr.pp_double[p0.ptr.p_int[i]][p0.ptr.p_int[j]] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:736");
                }
@@ -9319,7 +9319,7 @@ Local bool sparserealcholeskytest() {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sc, j, k) * sparseget(&sc, i, k);
+                     v += sparseget(&sc, j, k) * sparseget(&sc, i, k);
                   }
                   ae_set_error_flag(&result, fabs(a.ptr.pp_double[p0.ptr.p_int[i]][p0.ptr.p_int[j]] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:747");
                }
@@ -9331,7 +9331,7 @@ Local bool sparserealcholeskytest() {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
 
@@ -9434,7 +9434,7 @@ Local bool sparserealcholeskytest() {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sa, k, j) * sparseget(&sa, k, i);
+                     v += sparseget(&sa, k, j) * sparseget(&sa, k, i);
                   }
                   ae_set_error_flag(&result, fabs(a.ptr.pp_double[i][j] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:880");
                }
@@ -9444,7 +9444,7 @@ Local bool sparserealcholeskytest() {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + sparseget(&sa, j, k) * sparseget(&sa, i, k);
+                     v += sparseget(&sa, j, k) * sparseget(&sa, i, k);
                   }
                   ae_set_error_flag(&result, fabs(a.ptr.pp_double[i][j] - v) > tol, __FILE__, __LINE__, "testtrfacunit.ap:891");
                }
@@ -9479,7 +9479,7 @@ Local bool sparserealcholeskytest() {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
    ae_frame_leave();
@@ -9614,7 +9614,7 @@ Local void sparsereallutest(bool *err) {
          if (nz == 0) {
             break;
          }
-         nz = nz / 2;
+         nz /= 2;
       }
    }
    ae_frame_leave();
@@ -9948,7 +9948,7 @@ static void testtrfacunit_testdensecholeskyupdates(bool *spdupderrorflag) {
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if ((j >= i && isupper) || (j <= i && !isupper)) {
-               a1.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j] + u.ptr.p_double[i] * u.ptr.p_double[j];
+               a1.ptr.pp_double[i][j] += u.ptr.p_double[i] * u.ptr.p_double[j];
             }
          }
       }
@@ -10966,7 +10966,7 @@ static bool testrcondunit_rmatrixinvmatlu(RMatrix a, ZVector pivots, ae_int_t n)
       if (j < n - 1) {
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(&a->ptr.pp_double[i][j + 1], 1, &work.ptr.p_double[j + 1], 1, n - j - 1);
-            a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] - v;
+            a->ptr.pp_double[i][j] -= v;
          }
       }
    }
@@ -11028,12 +11028,12 @@ static void testrcondunit_rmatrixrefrcond(RMatrix a, ae_int_t n, double *rc1, do
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + fabs(a->ptr.pp_double[i][k]);
+         v += fabs(a->ptr.pp_double[i][k]);
       }
       nrm1a = ae_maxreal(nrm1a, v);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + fabs(a->ptr.pp_double[k][i]);
+         v += fabs(a->ptr.pp_double[k][i]);
       }
       nrminfa = ae_maxreal(nrminfa, v);
    }
@@ -11044,12 +11044,12 @@ static void testrcondunit_rmatrixrefrcond(RMatrix a, ae_int_t n, double *rc1, do
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + fabs(inva.ptr.pp_double[i][k]);
+         v += fabs(inva.ptr.pp_double[i][k]);
       }
       nrm1inva = ae_maxreal(nrm1inva, v);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + fabs(inva.ptr.pp_double[k][i]);
+         v += fabs(inva.ptr.pp_double[k][i]);
       }
       nrminfinva = ae_maxreal(nrminfinva, v);
    }
@@ -11281,12 +11281,12 @@ static void testrcondunit_cmatrixrefrcond(CMatrix a, ae_int_t n, double *rc1, do
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_c_abs(a->ptr.pp_complex[i][k]);
+         v += ae_c_abs(a->ptr.pp_complex[i][k]);
       }
       nrm1a = ae_maxreal(nrm1a, v);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_c_abs(a->ptr.pp_complex[k][i]);
+         v += ae_c_abs(a->ptr.pp_complex[k][i]);
       }
       nrminfa = ae_maxreal(nrminfa, v);
    }
@@ -11297,12 +11297,12 @@ static void testrcondunit_cmatrixrefrcond(CMatrix a, ae_int_t n, double *rc1, do
    for (k = 0; k < n; k++) {
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_c_abs(inva.ptr.pp_complex[i][k]);
+         v += ae_c_abs(inva.ptr.pp_complex[i][k]);
       }
       nrm1inva = ae_maxreal(nrm1inva, v);
       v = 0.0;
       for (i = 0; i < n; i++) {
-         v = v + ae_c_abs(inva.ptr.pp_complex[k][i]);
+         v += ae_c_abs(inva.ptr.pp_complex[k][i]);
       }
       nrminfinva = ae_maxreal(nrminfinva, v);
    }
@@ -11391,20 +11391,20 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
       // 1-norm
          v = 1 / rmatrixtrrcond1(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Inf-norm
          v = 1 / rmatrixtrrcondinf(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -11530,20 +11530,20 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
       // 1-norm
          v = 1 / cmatrixtrrcond1(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Inf-norm
          v = 1 / cmatrixtrrcondinf(&a, n, isupper, isunit);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -11644,40 +11644,40 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       // 1-norm, normal
          v = 1 / rmatrixrcond1(&a, n);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // 1-norm, LU
          v = 1 / rmatrixlurcond1(&lua, n);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Inf-norm, normal
          v = 1 / rmatrixrcondinf(&a, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[2] = q50.ptr.p_double[2] + 1.0 / (double)passcount;
+            q50.ptr.p_double[2] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[2] = q90.ptr.p_double[2] + 1.0 / (double)passcount;
+            q90.ptr.p_double[2] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
 
       // Inf-norm, LU
          v = 1 / rmatrixlurcondinf(&lua, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[3] = q50.ptr.p_double[3] + 1.0 / (double)passcount;
+            q50.ptr.p_double[3] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[3] = q90.ptr.p_double[3] + 1.0 / (double)passcount;
+            q90.ptr.p_double[3] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -11776,20 +11776,20 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       // normal
          v = 1 / spdmatrixrcond(&a, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Cholesky
          v = 1 / spdmatrixcholeskyrcond(&cha, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
       }
@@ -11892,40 +11892,40 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       // 1-norm, normal
          v = 1 / cmatrixrcond1(&a, n);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // 1-norm, LU
          v = 1 / cmatrixlurcond1(&lua, n);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Inf-norm, normal
          v = 1 / cmatrixrcondinf(&a, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[2] = q50.ptr.p_double[2] + 1.0 / (double)passcount;
+            q50.ptr.p_double[2] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[2] = q90.ptr.p_double[2] + 1.0 / (double)passcount;
+            q90.ptr.p_double[2] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
 
       // Inf-norm, LU
          v = 1 / cmatrixlurcondinf(&lua, n);
          if (v >= testrcondunit_threshold50 * ercinf) {
-            q50.ptr.p_double[3] = q50.ptr.p_double[3] + 1.0 / (double)passcount;
+            q50.ptr.p_double[3] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * ercinf) {
-            q90.ptr.p_double[3] = q90.ptr.p_double[3] + 1.0 / (double)passcount;
+            q90.ptr.p_double[3] += 1.0 / (double)passcount;
          }
          errless = errless || v > ercinf * 1.001;
       }
@@ -12024,20 +12024,20 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       // normal
          v = 1 / hpdmatrixrcond(&a, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[0] = q50.ptr.p_double[0] + 1.0 / (double)passcount;
+            q50.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[0] = q90.ptr.p_double[0] + 1.0 / (double)passcount;
+            q90.ptr.p_double[0] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
 
       // Cholesky
          v = 1 / hpdmatrixcholeskyrcond(&cha, n, isupper);
          if (v >= testrcondunit_threshold50 * erc1) {
-            q50.ptr.p_double[1] = q50.ptr.p_double[1] + 1.0 / (double)passcount;
+            q50.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          if (v >= testrcondunit_threshold90 * erc1) {
-            q90.ptr.p_double[1] = q90.ptr.p_double[1] + 1.0 / (double)passcount;
+            q90.ptr.p_double[1] += 1.0 / (double)passcount;
          }
          errless = errless || v > erc1 * 1.001;
       }
@@ -12204,7 +12204,7 @@ static bool testmatinvunit_rmatrixcheckinverse(RMatrix a, RMatrix inva, ae_int_t
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->ptr.pp_double[i], 1, &inva->ptr.pp_double[0][j], inva->stride, n);
             if (i == j) {
-               v = v - 1;
+               v--;
             }
             result = result && fabs(v) <= threshold;
          }
@@ -12272,7 +12272,7 @@ static bool testmatinvunit_spdmatrixcheckinverse(RMatrix a, RMatrix inva, bool i
          for (j = 0; j < n; j++) {
             v = ae_v_dotproduct(a->ptr.pp_double[i], 1, &inva->ptr.pp_double[0][j], inva->stride, n);
             if (i == j) {
-               v = v - 1;
+               v--;
             }
             result = result && fabs(v) <= threshold;
          }
@@ -13632,7 +13632,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix a, ae_int_t ai1,
          for (r = bi1; r <= bi2; r++) {
             for (l = ai1; l <= ai2; l++) {
                v = ae_v_dotproduct(&a->ptr.pp_double[l][aj1], 1, &b->ptr.pp_double[r][bj1], 1, aj2 - aj1 + 1);
-               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] = c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] + alpha * v;
+               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave();
@@ -13641,7 +13641,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix a, ae_int_t ai1,
          for (l = ai1; l <= ai2; l++) {
             for (r = bi1; r <= bi2; r++) {
                v = ae_v_dotproduct(&a->ptr.pp_double[l][aj1], 1, &b->ptr.pp_double[r][bj1], 1, aj2 - aj1 + 1);
-               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] = c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] + alpha * v;
+               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave();
@@ -13682,7 +13682,7 @@ static void testortfacunit_internalmatrixmatrixmultiply(RMatrix a, ae_int_t ai1,
             ae_v_move(&work.ptr.p_double[1], 1, &a->ptr.pp_double[ai1][l], a->stride, k);
             for (r = bi1; r <= bi2; r++) {
                v = ae_v_dotproduct(&work.ptr.p_double[1], 1, &b->ptr.pp_double[r][bj1], 1, k);
-               c->ptr.pp_double[ci1 + l - aj1][cj1 + r - bi1] = c->ptr.pp_double[ci1 + l - aj1][cj1 + r - bi1] + alpha * v;
+               c->ptr.pp_double[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
             }
          }
          ae_frame_leave();
@@ -13727,7 +13727,7 @@ static void testortfacunit_testrqrproblem(RMatrix a, ae_int_t m, ae_int_t n, dou
       for (j = 0; j < m; j++) {
          v = ae_v_dotproduct(q.ptr.pp_double[i], 1, q.ptr.pp_double[j], 1, m);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *qrerrors = *qrerrors || fabs(v) >= threshold;
       }
@@ -13831,7 +13831,7 @@ static void testortfacunit_testrlqproblem(RMatrix a, ae_int_t m, ae_int_t n, dou
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.ptr.pp_double[i], 1, q.ptr.pp_double[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *lqerrors = *lqerrors || fabs(v) >= threshold;
       }
@@ -14081,7 +14081,7 @@ static void testortfacunit_testrhessproblem(RMatrix a, ae_int_t n, double thresh
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(&q.ptr.pp_double[0][i], q.stride, &q.ptr.pp_double[0][j], q.stride, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *hesserrors = *hesserrors || fabs(v) > threshold;
       }
@@ -14184,7 +14184,7 @@ static void testortfacunit_testrtdproblem(RMatrix a, ae_int_t n, double threshol
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.ptr.pp_double[i], 1, q.ptr.pp_double[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *tderrors = *tderrors || fabs(v) > threshold;
       }
@@ -14226,7 +14226,7 @@ static void testortfacunit_testrtdproblem(RMatrix a, ae_int_t n, double threshol
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(q.ptr.pp_double[i], 1, q.ptr.pp_double[j], 1, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          *tderrors = *tderrors || fabs(v) > threshold;
       }
@@ -14995,24 +14995,24 @@ bool testcqmodels(bool silent) {
             adxe.ptr.p_double[i] = 0.0;
          }
          for (i = 0; i < n; i++) {
-            v = v + x.ptr.p_double[i] * b.ptr.p_double[i];
-            ge.ptr.p_double[i] = ge.ptr.p_double[i] + b.ptr.p_double[i];
-            v = v + 0.5 * ae_sqr(x.ptr.p_double[i]) * tau * d.ptr.p_double[i];
-            ge.ptr.p_double[i] = ge.ptr.p_double[i] + x.ptr.p_double[i] * tau * d.ptr.p_double[i];
-            adxe.ptr.p_double[i] = adxe.ptr.p_double[i] + x.ptr.p_double[i] * tau * d.ptr.p_double[i];
-            xtadx2 = xtadx2 + 0.5 * ae_sqr(x.ptr.p_double[i]) * tau * d.ptr.p_double[i];
+            v += x.ptr.p_double[i] * b.ptr.p_double[i];
+            ge.ptr.p_double[i] += b.ptr.p_double[i];
+            v += 0.5 * ae_sqr(x.ptr.p_double[i]) * tau * d.ptr.p_double[i];
+            ge.ptr.p_double[i] += x.ptr.p_double[i] * tau * d.ptr.p_double[i];
+            adxe.ptr.p_double[i] += x.ptr.p_double[i] * tau * d.ptr.p_double[i];
+            xtadx2 += 0.5 * ae_sqr(x.ptr.p_double[i]) * tau * d.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               v = v + 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
-               ge.ptr.p_double[i] = ge.ptr.p_double[i] + alpha * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
-               adxe.ptr.p_double[i] = adxe.ptr.p_double[i] + alpha * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
-               xtadx2 = xtadx2 + 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
+               v += 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
+               ge.ptr.p_double[i] += alpha * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
+               adxe.ptr.p_double[i] += alpha * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
+               xtadx2 += 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
             }
          }
          for (i = 0; i < k; i++) {
             v2 = ae_v_dotproduct(q.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-            v = v + 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
+            v += 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
             for (j = 0; j < n; j++) {
-               ge.ptr.p_double[j] = ge.ptr.p_double[j] + theta * (v2 - r.ptr.p_double[i]) * q.ptr.pp_double[i][j];
+               ge.ptr.p_double[j] += theta * (v2 - r.ptr.p_double[i]) * q.ptr.pp_double[i][j];
             }
          }
          v2 = cqmeval(&s, &x);
@@ -15084,14 +15084,14 @@ bool testcqmodels(bool silent) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + xc.ptr.p_double[i] * b.ptr.p_double[i];
+            v += xc.ptr.p_double[i] * b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               v = v + 0.5 * alpha * xc.ptr.p_double[i] * a.ptr.pp_double[i][j] * xc.ptr.p_double[j];
+               v += 0.5 * alpha * xc.ptr.p_double[i] * a.ptr.pp_double[i][j] * xc.ptr.p_double[j];
             }
          }
          for (i = 0; i < k; i++) {
             v2 = ae_v_dotproduct(q.ptr.pp_double[i], 1, xc.ptr.p_double, 1, n);
-            v = v + 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
+            v += 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
          }
          eval1errors = eval1errors || fabs(v - cqmeval(&s, &xc)) > 10000 * ae_machineepsilon;
          eval1errors = eval1errors || fabs(v - cqmdebugconstrainedevalt(&s, &x)) > 10000 * ae_machineepsilon;
@@ -15264,24 +15264,24 @@ bool testcqmodels(bool silent) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + x.ptr.p_double[i] * b.ptr.p_double[i];
+            v += x.ptr.p_double[i] * b.ptr.p_double[i];
          }
          if (tau > 0.0) {
             for (i = 0; i < n; i++) {
-               v = v + 0.5 * tau * d.ptr.p_double[i] * ae_sqr(x.ptr.p_double[i]);
+               v += 0.5 * tau * d.ptr.p_double[i] * ae_sqr(x.ptr.p_double[i]);
             }
          }
          if (alpha > 0.0) {
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  v = v + 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
+                  v += 0.5 * alpha * x.ptr.p_double[i] * a.ptr.pp_double[i][j] * x.ptr.p_double[j];
                }
             }
          }
          if (theta > 0.0) {
             for (i = 0; i < k; i++) {
                v2 = ae_v_dotproduct(q.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-               v = v + 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
+               v += 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
             }
          }
          v2 = cqmeval(&s, &x);
@@ -15453,7 +15453,7 @@ bool testcqmodels(bool silent) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                q.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-               v = v + q.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+               v += q.ptr.pp_double[i][j] * x0.ptr.p_double[j];
             }
             r.ptr.p_double[i] = v;
          }
@@ -15484,11 +15484,11 @@ bool testcqmodels(bool silent) {
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + 0.5 * tau * d.ptr.p_double[i] * ae_sqr(x.ptr.p_double[i]) + x.ptr.p_double[i] * b.ptr.p_double[i];
+               v += 0.5 * tau * d.ptr.p_double[i] * ae_sqr(x.ptr.p_double[i]) + x.ptr.p_double[i] * b.ptr.p_double[i];
             }
             for (i = 0; i < k; i++) {
                v2 = ae_v_dotproduct(q.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-               v = v + 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
+               v += 0.5 * theta * ae_sqr(v2 - r.ptr.p_double[i]);
             }
             v2 = cqmeval(&s, &x);
             newton2errors = (newton2errors || !isfinite(v2)) || fabs(v - v2) > 10000 * ae_machineepsilon;
@@ -15605,7 +15605,7 @@ static void testbdsvdunit_getbdsvderror(RVector d, RVector e, ae_int_t n, bool i
       for (j = 0; j < n; j++) {
          sm = 0.0;
          for (k = 0; k < n; k++) {
-            sm = sm + w->ptr.p_double[k] * u->ptr.pp_double[i][k] * vt->ptr.pp_double[k][j];
+            sm += w->ptr.p_double[k] * u->ptr.pp_double[i][k] * vt->ptr.pp_double[k][j];
          }
          if (isupper) {
             if (i == j) {
@@ -15818,7 +15818,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector d, RVector e, ae_int_t n, dou
       w.ptr.p_double[i] = d->ptr.p_double[i];
    }
    if (!rmatrixbdsvd(&w, e, n, true, false, &u, n, &c, n, &vt, n)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave();
       return;
@@ -15832,7 +15832,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector d, RVector e, ae_int_t n, dou
       w.ptr.p_double[i] = d->ptr.p_double[i];
    }
    if (!rmatrixbdsvd(&w, e, n, true, true, &u, n, &c, n, &vt, n)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave();
       return;
@@ -15849,7 +15849,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector d, RVector e, ae_int_t n, dou
       w.ptr.p_double[i] = d->ptr.p_double[i];
    }
    if (!rmatrixbdsvd(&w, e, n, false, false, &u, n, &c, n, &vt, n)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave();
       return;
@@ -15863,7 +15863,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector d, RVector e, ae_int_t n, dou
       w.ptr.p_double[i] = d->ptr.p_double[i];
    }
    if (!rmatrixbdsvd(&w, e, n, false, true, &u, n, &c, n, &vt, n)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave();
       return;
@@ -15872,7 +15872,7 @@ static void testbdsvdunit_testbdsvdproblem(RVector d, RVector e, ae_int_t n, dou
    testbdsvdunit_checksvdmultiplication(d, e, n, false, &u, &c, &w, &vt, materr);
 
 // update counter
-   *succcount = *succcount + 1;
+   ++*succcount;
    ae_frame_leave();
 }
 
@@ -16147,7 +16147,7 @@ bool testblas(bool silent) {
       }
       v = 0.0;
       for (i = i1; i <= i2; i++) {
-         v = v + ae_sqr(x1.ptr.p_double[i]);
+         v += ae_sqr(x1.ptr.p_double[i]);
       }
       v = sqrt(v);
       e1 = ae_maxreal(e1, fabs(v - vectornorm2(&x1, i1, i2)));
@@ -16160,8 +16160,8 @@ bool testblas(bool silent) {
       }
       e3 = ae_maxreal(e3, fabs(v * scl3 - vectornorm2(&x2, i1, i2)));
    }
-   e2 = e2 / scl2;
-   e3 = e3 / scl3;
+   e2 /= scl2;
+   e3 /= scl3;
    n2errors = (e1 >= threshold || e2 >= threshold) || e3 >= threshold;
 
 // Testing VectorAbsMax, Column/Row AbsMax
@@ -16453,7 +16453,7 @@ static void testsvdunit_getsvderror(RMatrix a, ae_int_t m, ae_int_t n, RMatrix u
       for (j = 0; j < n; j++) {
          sm = 0.0;
          for (k = 0; k < minmn; k++) {
-            sm = sm + w->ptr.p_double[k] * u->ptr.pp_double[i][k] * vt->ptr.pp_double[k][j];
+            sm += w->ptr.p_double[k] * u->ptr.pp_double[i][k] * vt->ptr.pp_double[k][j];
          }
          locerr = ae_maxreal(locerr, fabs(a->ptr.pp_double[i][j] - sm));
       }
@@ -16508,7 +16508,7 @@ static void testsvdunit_testsvdproblem(RMatrix a, ae_int_t m, ae_int_t n, double
 
 // Main SVD test
    if (!rmatrixsvd(a, m, n, 2, 2, 2, &w, &u, &vt)) {
-      *failcount = *failcount + 1;
+      ++*failcount;
       *wfailed = true;
       ae_frame_leave();
       return;
@@ -16520,7 +16520,7 @@ static void testsvdunit_testsvdproblem(RMatrix a, ae_int_t m, ae_int_t n, double
       for (vtjob = 0; vtjob <= 2; vtjob++) {
          for (memjob = 0; memjob <= 2; memjob++) {
             if (!rmatrixsvd(a, m, n, ujob, vtjob, memjob, &w2, &u2, &vt2)) {
-               *failcount = *failcount + 1;
+               ++*failcount;
                *wfailed = true;
                ae_frame_leave();
                return;
@@ -16557,7 +16557,7 @@ static void testsvdunit_testsvdproblem(RMatrix a, ae_int_t m, ae_int_t n, double
    }
 
 // update counter
-   *succcount = *succcount + 1;
+   ++*succcount;
    ae_frame_leave();
 }
 
@@ -16811,7 +16811,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          for (i = 0; i < k; i++) {
             ae_v_move(sk.ptr.pp_double[i], 1, va.ptr.pp_double[i], 1, n);
             v = ae_v_dotproduct(va.ptr.pp_double[i], 1, sk.ptr.pp_double[i], 1, n);
-            v = v * vc.ptr.p_double[i];
+            v *= vc.ptr.p_double[i];
             for (j = 0; j < n; j++) {
                yk.ptr.pp_double[i][j] = vd.ptr.p_double[j] * sk.ptr.pp_double[i][j] + va.ptr.pp_double[i][j] * v;
             }
@@ -16830,8 +16830,8 @@ static void testoptservunit_testprec(bool *wereerrors) {
             for (j0 = 0; j0 < n; j0++) {
                bksk.ptr.p_double[j0] = 0.0;
                for (j1 = 0; j1 < n; j1++) {
-                  theta = theta + sk.ptr.pp_double[i][j0] * bk.ptr.pp_double[j0][j1] * sk.ptr.pp_double[i][j1];
-                  bksk.ptr.p_double[j0] = bksk.ptr.p_double[j0] + bk.ptr.pp_double[j0][j1] * sk.ptr.pp_double[i][j1];
+                  theta += sk.ptr.pp_double[i][j0] * bk.ptr.pp_double[j0][j1] * sk.ptr.pp_double[i][j1];
+                  bksk.ptr.p_double[j0] += bk.ptr.pp_double[j0][j1] * sk.ptr.pp_double[i][j1];
                }
             }
             theta = 1 / theta;
@@ -16839,12 +16839,12 @@ static void testoptservunit_testprec(bool *wereerrors) {
             rho = 1 / rho;
             for (j0 = 0; j0 < n; j0++) {
                for (j1 = 0; j1 < n; j1++) {
-                  bk.ptr.pp_double[j0][j1] = bk.ptr.pp_double[j0][j1] + rho * yk.ptr.pp_double[i][j0] * yk.ptr.pp_double[i][j1];
+                  bk.ptr.pp_double[j0][j1] += rho * yk.ptr.pp_double[i][j0] * yk.ptr.pp_double[i][j1];
                }
             }
             for (j0 = 0; j0 < n; j0++) {
                for (j1 = 0; j1 < n; j1++) {
-                  bk.ptr.pp_double[j0][j1] = bk.ptr.pp_double[j0][j1] - theta * bksk.ptr.p_double[j0] * bksk.ptr.p_double[j1];
+                  bk.ptr.pp_double[j0][j1] -= theta * bksk.ptr.p_double[j0] * bksk.ptr.p_double[j1];
                }
             }
          }
@@ -16937,7 +16937,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
                   v = 0.0;
                }
                for (j1 = 0; j1 < k; j1++) {
-                  v = v + va.ptr.pp_double[j1][i] * vc.ptr.p_double[j1] * va.ptr.pp_double[j1][j];
+                  v += va.ptr.pp_double[j1][i] * vc.ptr.p_double[j1] * va.ptr.pp_double[j1][j];
                }
                bk.ptr.pp_double[i][j] = v;
             }
@@ -16947,7 +16947,7 @@ static void testoptservunit_testprec(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + bk.ptr.pp_double[i][j] * s2.ptr.p_double[j];
+               v += bk.ptr.pp_double[i][j] * s2.ptr.p_double[j];
             }
             tmp.ptr.p_double[i] = v;
          }
@@ -17259,7 +17259,7 @@ bool testsnnls(bool silent) {
                for (i = 0; i < nr; i++) {
                   v = 0.0;
                   for (j = 0; j < ns + nd; j++) {
-                     v = v + effectivea.ptr.pp_double[i][j] * xs.ptr.p_double[j];
+                     v += effectivea.ptr.pp_double[i][j] * xs.ptr.p_double[j];
                   }
                   b.ptr.p_double[i] = v;
                }
@@ -17476,13 +17476,13 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             c.ptr.pp_double[i][j] = hqrndnormal(&rs);
-            v = v + c.ptr.pp_double[i][j] * x.ptr.p_double[j];
+            v += c.ptr.pp_double[i][j] * x.ptr.p_double[j];
          }
          c.ptr.pp_double[i][n] = v;
          if (i < nec) {
             ct.ptr.p_int[i] = 0;
          } else {
-            c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + 0.1;
+            c.ptr.pp_double[i][n] += 0.1;
             ct.ptr.p_int[i] = -1;
          }
       }
@@ -17499,11 +17499,11 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
          if (scaletype != 0) {
             s.ptr.p_double[i] = pow(10.0, 40 * hqrnduniformr(&rs) - 20);
          }
-         x.ptr.p_double[i] = x.ptr.p_double[i] * s.ptr.p_double[i];
-         bl.ptr.p_double[i] = bl.ptr.p_double[i] * s.ptr.p_double[i];
-         bu.ptr.p_double[i] = bu.ptr.p_double[i] * s.ptr.p_double[i];
+         x.ptr.p_double[i] *= s.ptr.p_double[i];
+         bl.ptr.p_double[i] *= s.ptr.p_double[i];
+         bu.ptr.p_double[i] *= s.ptr.p_double[i];
          for (j = 0; j < nec + nic; j++) {
-            c.ptr.pp_double[j][i] = c.ptr.pp_double[j][i] / s.ptr.p_double[i];
+            c.ptr.pp_double[j][i] /= s.ptr.p_double[i];
          }
       }
       for (i = 0; i < nec + nic; i++) {
@@ -17544,8 +17544,8 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = hqrndnormal(&rs);
-               vv = vv + ae_sqr(c.ptr.pp_double[i][j]);
-               v = v + c.ptr.pp_double[i][j] * x.ptr.p_double[j];
+               vv += ae_sqr(c.ptr.pp_double[i][j]);
+               v += c.ptr.pp_double[i][j] * x.ptr.p_double[j];
             }
             c.ptr.pp_double[i][n] = v;
             vv = coalesce(vv, 1.0);
@@ -17573,9 +17573,9 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
             if (scaletype != 0) {
                s.ptr.p_double[i] = pow(10.0, 40 * hqrnduniformr(&rs) - 20);
             }
-            x.ptr.p_double[i] = x.ptr.p_double[i] * s.ptr.p_double[i];
+            x.ptr.p_double[i] *= s.ptr.p_double[i];
             for (j = 0; j < nec + nic; j++) {
-               c.ptr.pp_double[j][i] = c.ptr.pp_double[j][i] / s.ptr.p_double[i];
+               c.ptr.pp_double[j][i] /= s.ptr.p_double[i];
             }
          }
          for (i = 0; i < nec + nic; i++) {
@@ -17591,7 +17591,7 @@ static void testsactivesetsunit_testspecproperties(bool *err) {
          ae_set_error_flag(err, !state.feasinitpt, __FILE__, __LINE__, "testsactivesetsunit.ap:225");
 
       // Solve for infeasible initial X and check State.FeasInitPt flag
-         x.ptr.p_double[distortidx] = x.ptr.p_double[distortidx] + s.ptr.p_double[distortidx] * distortmag;
+         x.ptr.p_double[distortidx] += s.ptr.p_double[distortidx] * distortmag;
          sasinit(n, &state);
          sassetscale(&state, &s);
          sassetlc(&state, &c, &ct, nec + nic);
@@ -19844,7 +19844,7 @@ static void testminlbfgsunit_calciip2(minlbfgsstate *state, ae_int_t n) {
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f = state->f + ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.ptr.p_double[i]);
+         state->f += ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.ptr.p_double[i]);
       }
       if (state->needfg) {
          state->g.ptr.p_double[i] = ae_sqr((double)(i * i + 1)) * 2 * state->x.ptr.p_double[i];
@@ -19916,7 +19916,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntb1 = cntb1 + rep.iterationscount;
+         cntb1 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
 
@@ -19942,7 +19942,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntb2 = cntb2 + rep.iterationscount;
+         cntb2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
 
@@ -19972,7 +19972,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntg1 = cntg1 + rep.iterationscount;
+         cntg1 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
 
@@ -19992,7 +19992,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntg2 = cntg2 + rep.iterationscount;
+         cntg2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
 
@@ -20032,7 +20032,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntb2 = cntb2 + rep.iterationscount;
+         cntb2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
       minlbfgssetprecscale(&state);
@@ -20047,7 +20047,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
             testminlbfgsunit_calciip2(&state, n);
          }
          minlbfgsresults(&state, &x, &rep);
-         cntg2 = cntg2 + rep.iterationscount;
+         cntg2 += rep.iterationscount;
          *err = *err || rep.terminationtype <= 0;
       }
       *err = *err || cntb2 < cntg2;
@@ -20126,7 +20126,7 @@ static void testminlbfgsunit_testother(bool *err) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+            state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
             state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
          }
       }
@@ -20172,7 +20172,7 @@ static void testminlbfgsunit_testother(bool *err) {
          }
          for (i = 0; i < n; i++) {
             if (state.needf || state.needfg) {
-               state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+               state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
             }
             if (state.needfg) {
                state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
@@ -20282,7 +20282,7 @@ static void testminlbfgsunit_testother(bool *err) {
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
+                  state.f += a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
                   state.g.ptr.p_double[i] = 4 * a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 3.0);
                }
             }
@@ -20295,7 +20295,7 @@ static void testminlbfgsunit_testother(bool *err) {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + ae_sqr(s.ptr.p_double[i] * 4 * a.ptr.p_double[i] * pow(x.ptr.p_double[i], 3.0));
+            v += ae_sqr(s.ptr.p_double[i] * 4 * a.ptr.p_double[i] * pow(x.ptr.p_double[i], 3.0));
          }
          v = sqrt(v);
          *err = *err || v > tmpeps;
@@ -20312,7 +20312,7 @@ static void testminlbfgsunit_testother(bool *err) {
             if (state.needfg) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
+                  state.f += a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
                   state.g.ptr.p_double[i] = 4 * a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 3.0);
                }
             }
@@ -20320,7 +20320,7 @@ static void testminlbfgsunit_testother(bool *err) {
                if (hasxlast) {
                   lastscaledstep = 0.0;
                   for (i = 0; i < n; i++) {
-                     lastscaledstep = lastscaledstep + ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
+                     lastscaledstep += ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
                   }
                   lastscaledstep = sqrt(lastscaledstep);
                } else {
@@ -20444,11 +20444,11 @@ static void testminlbfgsunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.f += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.g.ptr.p_double[i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             if (k >= spoiliteration) {
@@ -20561,9 +20561,9 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + fabs(vv);
+            v += fabs(vv);
          }
          ae_set_error_flag(err, fabs(v - rep->f.ptr.p_double[k]) > 1.0E-6 * ae_maxreal(fabs(v), 1.0), __FILE__, __LINE__, "testminlbfgsunit.ap:1780");
       }
@@ -20574,8 +20574,8 @@ static void testminlbfgsunit_testoptguardc1test0reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
       }
@@ -20641,9 +20641,9 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
+            v += ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
             tooclose = tooclose || fabs(vv) < 1.0E-4;
          }
          if (!tooclose) {
@@ -20658,8 +20658,8 @@ static void testminlbfgsunit_testoptguardc1test1reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
@@ -20748,9 +20748,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
+            state.f += 0.5 * state.x.ptr.p_double[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.ptr.p_double[i] = 0.0;
@@ -20805,12 +20805,12 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + fabs(v);
+            state.f += fabs(v);
             v = (double)(ae_sign(v));
             for (j = 0; j < n; j++) {
-               state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+               state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
             }
          }
          continue;
@@ -20863,22 +20863,22 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                  state.f += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                   state.g.ptr.p_double[i] = v;
                }
                if (defecttype == 0) {
                   state.g.ptr.p_double[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] + 1;
+                  state.g.ptr.p_double[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] * 2;
+                  state.g.ptr.p_double[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] / s.ptr.p_double[i];
+                  state.g.ptr.p_double[i] /= s.ptr.p_double[i];
                }
                continue;
             }
@@ -20905,7 +20905,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
             jactrue.ptr.pp_double[0][i] = v;
             jacdefect.ptr.pp_double[0][i] = v;
@@ -20914,14 +20914,14 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             jacdefect.ptr.pp_double[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] + 1;
+            jacdefect.ptr.pp_double[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] * 2;
+            jacdefect.ptr.pp_double[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-            jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
+            jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+            jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
          }
 
       // Check OptGuard report
@@ -21004,12 +21004,12 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
                v = (double)(ae_sign(v));
                for (j = 0; j < n; j++) {
-                  state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+                  state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
                }
             }
             continue;
@@ -21050,8 +21050,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1545");
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / (double)passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / (double)passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / (double)passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1553");
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1554");
@@ -21066,8 +21066,8 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminlbfgsunit.ap:1564");
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / (double)passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / (double)passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / (double)passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1572");
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit.ap:1573");
@@ -21128,9 +21128,9 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
             }
             continue;
          }
@@ -21185,11 +21185,11 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+            state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-               state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.f += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.g.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
             }
          }
          continue;
@@ -21310,7 +21310,7 @@ bool testminlbfgs(bool silent) {
          }
          minlbfgsresults(&state, &x, &rep);
          nonconverror = (nonconverror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0]) > 0.001;
-         v = v + 0.1;
+         v += 0.1;
       }
    }
 
@@ -21377,7 +21377,7 @@ bool testminlbfgs(bool silent) {
          for (j = 0; j < n; j++) {
             a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
          }
-         a.ptr.pp_double[i][i] = a.ptr.pp_double[i][i] + 3 * ae_sign(a.ptr.pp_double[i][i]);
+         a.ptr.pp_double[i][i] += 3 * ae_sign(a.ptr.pp_double[i][i]);
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xe.ptr.p_double, 1, n);
@@ -21411,11 +21411,11 @@ bool testminlbfgs(bool silent) {
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
                   if (state.needf || state.needfg) {
-                     state.f = state.f + ae_sqr(v - b.ptr.p_double[i]);
+                     state.f += ae_sqr(v - b.ptr.p_double[i]);
                   }
                   if (state.needfg) {
                      for (j = 0; j < n; j++) {
-                        state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + 2 * (v - b.ptr.p_double[i]) * a.ptr.pp_double[i][j];
+                        state.g.ptr.p_double[j] += 2 * (v - b.ptr.p_double[i]) * a.ptr.pp_double[i][j];
                      }
                   }
                }
@@ -21704,7 +21704,7 @@ bool testnormestimator(bool silent) {
       normestimatorestimatesparse(&e2, &s);
       normestimatorresults(&e2, &enorm2);
       if (fabs(enorm2 - snorm) < fabs(enorm - snorm)) {
-         nbetter = nbetter + 1;
+         nbetter++;
       }
    }
    waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
@@ -21733,7 +21733,7 @@ bool testnormestimator(bool silent) {
       normestimatorestimatesparse(&e2, &s);
       normestimatorresults(&e2, &enorm2);
       if (fabs(enorm2 - snorm) < fabs(enorm - snorm)) {
-         nbetter = nbetter + 1;
+         nbetter++;
       }
    }
    waserrors = waserrors || (double)nbetter < 0.5 * passcount + sigma * sqrt(0.25 * passcount);
@@ -21837,18 +21837,18 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix a, RVector b, ae_int_t m, a
    for (i = 0; i < minmn; i++) {
       tmparr.ptr.p_double[i] = 0.0;
       for (j = 0; j < m; j++) {
-         tmparr.ptr.p_double[i] = tmparr.ptr.p_double[i] + u.ptr.pp_double[j][i] * b->ptr.p_double[j];
+         tmparr.ptr.p_double[i] += u.ptr.pp_double[j][i] * b->ptr.p_double[j];
       }
       if (w.ptr.p_double[i] <= sqrt(ae_machineepsilon) * w.ptr.p_double[0]) {
          tmparr.ptr.p_double[i] = 0.0;
       } else {
-         tmparr.ptr.p_double[i] = tmparr.ptr.p_double[i] / w.ptr.p_double[i];
+         tmparr.ptr.p_double[i] /= w.ptr.p_double[i];
       }
    }
    for (i = 0; i < n; i++) {
       svdx.ptr.p_double[i] = 0.0;
       for (j = 0; j < minmn; j++) {
-         svdx.ptr.p_double[i] = svdx.ptr.p_double[i] + vt.ptr.pp_double[j][i] * tmparr.ptr.p_double[j];
+         svdx.ptr.p_double[i] += vt.ptr.pp_double[j][i] * tmparr.ptr.p_double[j];
       }
    }
 
@@ -21860,7 +21860,7 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix a, RVector b, ae_int_t m, a
       v = ae_v_dotproduct(svda.ptr.pp_double[i], 1, x->ptr.p_double, 1, n);
       r.ptr.p_double[i] = v;
       if (i < m) {
-         r.ptr.p_double[i] = r.ptr.p_double[i] - b->ptr.p_double[i];
+         r.ptr.p_double[i] -= b->ptr.p_double[i];
       }
    }
    v = ae_v_dotproduct(r.ptr.p_double, 1, r.ptr.p_double, 1, m + n);
@@ -21884,10 +21884,10 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix a, RVector b, ae_int_t m, a
       for (i = 0; i < n; i++) {
          v = 0.0;
          for (j = 0; j < m + n; j++) {
-            v = v + svda.ptr.pp_double[j][i] * r.ptr.p_double[j];
-            anorm = anorm + ae_sqr(svda.ptr.pp_double[j][i]);
+            v += svda.ptr.pp_double[j][i] * r.ptr.p_double[j];
+            anorm += ae_sqr(svda.ptr.pp_double[j][i]);
          }
-         atrnorm = atrnorm + ae_sqr(v);
+         atrnorm += ae_sqr(v);
       }
       anorm = sqrt(anorm);
       atrnorm = sqrt(atrnorm);
@@ -21976,7 +21976,7 @@ static bool testlinlsqrunit_svdtest(bool silent) {
                for (i = 0; i < m; i++) {
                   s.mv.ptr.p_double[i] = 0.0;
                   for (j = 0; j < n; j++) {
-                     s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                     s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                   }
                }
             }
@@ -21984,7 +21984,7 @@ static bool testlinlsqrunit_svdtest(bool silent) {
                for (i = 0; i < n; i++) {
                   s.mtv.ptr.p_double[i] = 0.0;
                   for (j = 0; j < m; j++) {
-                     s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                     s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                   }
                }
             }
@@ -22080,7 +22080,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
                   rmatrixrndcond(m, c, &a);
                   for (i = 0; i < m; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = s0 * a.ptr.pp_double[i][j];
+                        a.ptr.pp_double[i][j] *= s0;
                      }
                   }
                   ae_vector_set_length(&b, m);
@@ -22088,7 +22088,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
                      bnorm = 0.0;
                      for (i = 0; i < m; i++) {
                         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                        bnorm = bnorm + b.ptr.p_double[i] * b.ptr.p_double[i];
+                        bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                      }
                      bnorm = sqrt(bnorm);
                   }
@@ -22107,7 +22107,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
                         for (i = 0; i < m; i++) {
                            s.mv.ptr.p_double[i] = 0.0;
                            for (j = 0; j < n; j++) {
-                              s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                              s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                            }
                         }
                      }
@@ -22115,7 +22115,7 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
                         for (i = 0; i < n; i++) {
                            s.mtv.ptr.p_double[i] = 0.0;
                            for (j = 0; j < m; j++) {
-                              s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                              s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                            }
                         }
                      }
@@ -22211,7 +22211,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
                            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                           bnorm = bnorm + b.ptr.p_double[i] * b.ptr.p_double[i];
+                           bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                         }
                         bnorm = sqrt(bnorm);
                      }
@@ -22230,7 +22230,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
                            for (i = 0; i < m; i++) {
                               s.mv.ptr.p_double[i] = 0.0;
                               for (j = 0; j < n; j++) {
-                                 s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                                 s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                               }
                            }
                         }
@@ -22238,7 +22238,7 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
                            for (i = 0; i < n; i++) {
                               s.mtv.ptr.p_double[i] = 0.0;
                               for (j = 0; j < m; j++) {
-                                 s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                                 s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                               }
                            }
                         }
@@ -22345,7 +22345,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                      }
                      for (i = 0; i < m; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = s0 * a.ptr.pp_double[i][j];
+                           a.ptr.pp_double[i][j] *= s0;
                         }
                      }
                      ae_vector_set_length(&b, m);
@@ -22353,7 +22353,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
                            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                           bnorm = bnorm + b.ptr.p_double[i] * b.ptr.p_double[i];
+                           bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                         }
                         bnorm = sqrt(bnorm);
                      }
@@ -22371,7 +22371,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                            for (i = 0; i < m; i++) {
                               s.mv.ptr.p_double[i] = 0.0;
                               for (j = 0; j < n; j++) {
-                                 s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                                 s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                               }
                            }
                         }
@@ -22379,7 +22379,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                            for (i = 0; i < n; i++) {
                               s.mtv.ptr.p_double[i] = 0.0;
                               for (j = 0; j < m; j++) {
-                                 s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                                 s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                               }
                            }
                         }
@@ -22471,7 +22471,7 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent) {
                   for (i = 0; i < m; i++) {
                      s.mv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22479,7 +22479,7 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent) {
                   for (i = 0; i < n; i++) {
                      s.mtv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < m; j++) {
-                        s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                        s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22564,7 +22564,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
             for (i = 0; i < m + n; i++) {
                if (i < m) {
                   b.ptr.p_double[i] = (mx - mn) * ae_randomreal() + mn;
-                  rnorm = rnorm + b.ptr.p_double[i] * b.ptr.p_double[i];
+                  rnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                } else {
                   b.ptr.p_double[i] = 0.0;
                }
@@ -22586,7 +22586,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                   for (i = 0; i < m; i++) {
                      s.mv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22594,7 +22594,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                   for (i = 0; i < n; i++) {
                      s.mtv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < m; j++) {
-                        s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                        s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22603,9 +22603,9 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                   for (i = 0; i < m + n; i++) {
                      tmp = 0.0;
                      for (j = 0; j < n; j++) {
-                        tmp = tmp + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        tmp += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
-                     tnorm = tnorm + (b.ptr.p_double[i] - tmp) * (b.ptr.p_double[i] - tmp);
+                     tnorm += (b.ptr.p_double[i] - tmp) * (b.ptr.p_double[i] - tmp);
                   }
 
                // check, that RNorm is't more than S.R2
@@ -22623,7 +22623,7 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
                      return result;
                   }
                   rnorm = s.r2;
-                  its = its + 1;
+                  its++;
 
                // get X value from first iteration
                // and from last iteration.
@@ -22724,7 +22724,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
       bnorm = 0.0;
       for (i = 0; i < n; i++) {
          b.ptr.p_double[i] = (mx - mn) * ae_randomreal() + mn;
-         bnorm = bnorm + b.ptr.p_double[i] * b.ptr.p_double[i];
+         bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
       }
       bnorm = sqrt(bnorm);
 
@@ -22742,7 +22742,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -22750,7 +22750,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mtv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                  s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -22786,7 +22786,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -22794,7 +22794,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mtv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                  s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -22804,9 +22804,9 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
       for (i = 0; i < n; i++) {
          tmp = 0.0;
          for (j = 0; j < n; j++) {
-            tmp = tmp + a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            tmp += a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
          }
-         rknorm = rknorm + (tmp - b.ptr.p_double[i]) * (tmp - b.ptr.p_double[i]);
+         rknorm += (tmp - b.ptr.p_double[i]) * (tmp - b.ptr.p_double[i]);
       }
       rknorm = sqrt(rknorm);
       if (rknorm > epsmod * bnorm || rep.terminationtype <= 0) {
@@ -22839,7 +22839,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             rmatrixrndorthogonal(n, &a);
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  a.ptr.pp_double[i][j] = anorm * a.ptr.pp_double[i][j];
+                  a.ptr.pp_double[i][j] *= anorm;
                }
             }
             ae_vector_set_length(&b, n);
@@ -22852,7 +22852,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             }
             tmp = 0.0;
             for (i = 0; i < n; i++) {
-               tmp = tmp + ae_sqr(b.ptr.p_double[i]);
+               tmp += ae_sqr(b.ptr.p_double[i]);
             }
             tmp = pow(10.0, (double)(10 * k1)) / sqrt(tmp);
             ae_v_muld(b.ptr.p_double, 1, n, tmp);
@@ -22872,7 +22872,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
                   for (i = 0; i < n; i++) {
                      s.mv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n - 1; j++) {
-                        s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22880,7 +22880,7 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
                   for (i = 0; i < n - 1; i++) {
                      s.mtv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                        s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -22894,18 +22894,18 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
             for (i = 0; i < n; i++) {
                rk.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n - 1; j++) {
-                  rk.ptr.p_double[i] = rk.ptr.p_double[i] - a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+                  rk.ptr.p_double[i] -= a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
                }
-               rknorm = rknorm + ae_sqr(rk.ptr.p_double[i]);
+               rknorm += ae_sqr(rk.ptr.p_double[i]);
             }
             rknorm = sqrt(rknorm);
             arknorm = 0.0;
             for (i = 0; i < n - 1; i++) {
                ark.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  ark.ptr.p_double[i] = ark.ptr.p_double[i] + a.ptr.pp_double[j][i] * rk.ptr.p_double[j];
+                  ark.ptr.p_double[i] += a.ptr.pp_double[j][i] * rk.ptr.p_double[j];
                }
-               arknorm = arknorm + ae_sqr(ark.ptr.p_double[i]);
+               arknorm += ae_sqr(ark.ptr.p_double[i]);
             }
             arknorm = sqrt(arknorm);
             if (arknorm / (anorm * rknorm) > epsmod || rep.terminationtype != 4) {
@@ -23002,7 +23002,7 @@ static bool testlinlsqrunit_analytictest(bool silent) {
                for (i = 0; i < m; i++) {
                   s.mv.ptr.p_double[i] = 0.0;
                   for (j = 0; j < n; j++) {
-                     s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                     s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                   }
                }
             }
@@ -23010,14 +23010,14 @@ static bool testlinlsqrunit_analytictest(bool silent) {
                for (i = 0; i < n; i++) {
                   s.mtv.ptr.p_double[i] = 0.0;
                   for (j = 0; j < m; j++) {
-                     s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                     s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                   }
                }
             }
             if (s.xupdated) {
                ae_assert(pointsstored < xk.rows, "LinLSQR test: internal error");
                ae_v_move(xk.ptr.pp_double[pointsstored], 1, s.x.ptr.p_double, 1, n);
-               pointsstored = pointsstored + 1;
+               pointsstored++;
             }
          }
          if (pointsstored < 3) {
@@ -23055,7 +23055,7 @@ static bool testlinlsqrunit_analytictest(bool silent) {
             for (i = 0; i < m; i++) {
                ap.ptr.pp_double[k][i] = 0.0;
                for (j = 0; j < n; j++) {
-                  ap.ptr.pp_double[k][i] = ap.ptr.pp_double[k][i] + a.ptr.pp_double[i][j] * (xk.ptr.pp_double[k + 1][j] - xk.ptr.pp_double[k][j]);
+                  ap.ptr.pp_double[k][i] += a.ptr.pp_double[i][j] * (xk.ptr.pp_double[k + 1][j] - xk.ptr.pp_double[k][j]);
                }
             }
 
@@ -23137,7 +23137,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
             for (i = 0; i < m; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
             if (firstpointreported) {
@@ -23151,7 +23151,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
             for (i = 0; i < n; i++) {
                s.mtv.ptr.p_double[i] = 0.0;
                for (j = 0; j < m; j++) {
-                  s.mtv.ptr.p_double[i] = s.mtv.ptr.p_double[i] + a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
+                  s.mtv.ptr.p_double[i] += a.ptr.pp_double[j][i] * s.x.ptr.p_double[j];
                }
             }
             if (firstpointreported) {
@@ -23227,7 +23227,7 @@ static bool testlinlsqrunit_preconditionertest() {
    for (i = 0; i < n; i++) {
       b.ptr.p_double[i] = 0.0;
       for (j = 0; j < n; j++) {
-         b.ptr.p_double[i] = b.ptr.p_double[i] + ta.ptr.pp_double[i][j] * xe.ptr.p_double[j];
+         b.ptr.p_double[i] += ta.ptr.pp_double[i][j] * xe.ptr.p_double[j];
       }
    }
    ae_vector_set_length(&d, n);
@@ -23241,7 +23241,7 @@ static bool testlinlsqrunit_preconditionertest() {
          a.ptr.pp_double[i][j] = ta.ptr.pp_double[i][j] * d.ptr.p_double[j];
          sparseset(&sa, i, j, a.ptr.pp_double[i][j]);
       }
-      xe.ptr.p_double[i] = xe.ptr.p_double[i] / d.ptr.p_double[i];
+      xe.ptr.p_double[i] /= d.ptr.p_double[i];
    }
    sparseconverttocrs(&sa);
    linlsqrcreate(n, n, &s);
@@ -23419,7 +23419,7 @@ static void testminbleicunit_calciip2(minbleicstate *state, ae_int_t n, ae_int_t
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f = state->f + pow((double)(i * i + 1), (double)(2 * fk)) * ae_sqr(state->x.ptr.p_double[i]);
+         state->f += pow((double)(i * i + 1), (double)(2 * fk)) * ae_sqr(state->x.ptr.p_double[i]);
          state->g.ptr.p_double[i] = pow((double)(i * i + 1), (double)(2 * fk)) * 2 * state->x.ptr.p_double[i];
       }
    }
@@ -23539,7 +23539,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
                      c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
                      v = 2 * ae_randomreal() - 1;
-                     c.ptr.pp_double[0][n] = c.ptr.pp_double[0][n] + c.ptr.pp_double[0][i] * v;
+                     c.ptr.pp_double[0][n] += c.ptr.pp_double[0][i] * v;
                   }
                   ct.ptr.p_int[0] = 0;
 
@@ -23559,7 +23559,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i], (double)p);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i], (double)(p - 1));
@@ -23675,7 +23675,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + ae_sqr(state.x.ptr.p_double[i] - x0.ptr.p_double[i]);
+                           state.f += ae_sqr(state.x.ptr.p_double[i] - x0.ptr.p_double[i]);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = 2 * (state.x.ptr.p_double[i] - x0.ptr.p_double[i]);
@@ -23697,7 +23697,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                // Compare with XS
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + ae_sqr(x.ptr.p_double[i] - xs.ptr.p_double[i]);
+                     v += ae_sqr(x.ptr.p_double[i] - xs.ptr.p_double[i]);
                   }
                   v = sqrt(v);
                   *converr = *converr || fabs(v) > 0.001;
@@ -23755,7 +23755,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
@@ -23775,7 +23775,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.ptr.p_double[i] > 0.0 && x.ptr.p_double[i] < 1.0) {
-                        v = v + ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
+                        v += ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
                      }
                      *feaserr = *feaserr || x.ptr.p_double[i] < 0.0;
                      *feaserr = *feaserr || x.ptr.p_double[i] > 1.0;
@@ -23840,7 +23840,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
@@ -23860,7 +23860,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.ptr.p_double[i] > bl.ptr.p_double[i] && x.ptr.p_double[i] < bu.ptr.p_double[i]) {
-                        v = v + ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
+                        v += ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
                      }
                      *feaserr = *feaserr || x.ptr.p_double[i] < bl.ptr.p_double[i];
                      *feaserr = *feaserr || x.ptr.p_double[i] > bu.ptr.p_double[i];
@@ -23921,7 +23921,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                        state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
                      }
                      continue;
@@ -23942,7 +23942,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                v = 0.0;
                for (i = 0; i < n; i++) {
                   if (x.ptr.p_double[i] > 0.02 && x.ptr.p_double[i] < 0.98) {
-                     v = v + ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
+                     v += ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
                   }
                   *feaserr = *feaserr || x.ptr.p_double[i] < 0.0 - epsfeas;
                   *feaserr = *feaserr || x.ptr.p_double[i] > 1.0 + epsfeas;
@@ -23994,7 +23994,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      c.ptr.pp_double[i][n] = 0.0;
                      for (j = 0; j < n; j++) {
                         c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-                        c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + c.ptr.pp_double[i][j] * xc.ptr.p_double[j];
+                        c.ptr.pp_double[i][n] += c.ptr.pp_double[i][j] * xc.ptr.p_double[j];
                      }
                      ct.ptr.p_int[i] = ae_randominteger(3) - 1;
                   }
@@ -24009,7 +24009,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
                         }
                         continue;
@@ -24032,7 +24032,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   for (i = 0; i < k; i++) {
                      v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-                     v = v - c.ptr.pp_double[i][n];
+                     v -= c.ptr.pp_double[i][n];
                      if (ct.ptr.p_int[i] == 0) {
                         *feaserr = *feaserr || fabs(v) > epsfeas;
                      }
@@ -24089,7 +24089,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                        state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
                      }
                      continue;
@@ -24152,7 +24152,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                      if (state.needfg) {
                         state.f = 0.0;
                         for (i = 0; i < n; i++) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i], (double)p);
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i], (double)(p - 1));
                         }
                         continue;
@@ -24282,7 +24282,7 @@ static void testminbleicunit_testother(bool *err) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.ptr.p_double[i];
+            state.f += state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = 1.0;
          }
       }
@@ -24301,7 +24301,7 @@ static void testminbleicunit_testother(bool *err) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.ptr.p_double[i];
+            state.f += state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = 1.0;
          }
       }
@@ -24336,7 +24336,7 @@ static void testminbleicunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+               state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
             }
          }
@@ -24382,7 +24382,7 @@ static void testminbleicunit_testother(bool *err) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+                  state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                }
                if (state.needfg) {
                   state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
@@ -24539,7 +24539,7 @@ static void testminbleicunit_testother(bool *err) {
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + a.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i]);
+                        state.f += a.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i]);
                         state.g.ptr.p_double[i] = 2 * a.ptr.p_double[i] * state.x.ptr.p_double[i];
                      }
                   }
@@ -24552,7 +24552,7 @@ static void testminbleicunit_testother(bool *err) {
                }
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + ae_sqr(s.ptr.p_double[i] * 2 * a.ptr.p_double[i] * x.ptr.p_double[i]);
+                  v += ae_sqr(s.ptr.p_double[i] * 2 * a.ptr.p_double[i] * x.ptr.p_double[i]);
                }
                v = sqrt(v);
                ae_set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbleicunit.ap:1320");
@@ -24734,7 +24734,7 @@ static void testminbleicunit_testother(bool *err) {
             if (state.needfg) {
                state.f = ae_sqr(state.x.ptr.p_double[0] + 1) + ae_sqr(state.x.ptr.p_double[1] + 1);
                if (state.x.ptr.p_double[0] == x.ptr.p_double[0] && state.x.ptr.p_double[1] == x.ptr.p_double[1]) {
-                  state.f = state.f - 0.1;
+                  state.f -= 0.1;
                }
                state.g.ptr.p_double[0] = 2 * (state.x.ptr.p_double[0] + 1);
                state.g.ptr.p_double[1] = 2 * (state.x.ptr.p_double[1] + 1);
@@ -24792,11 +24792,11 @@ static void testminbleicunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.f += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.g.ptr.p_double[i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             if (k >= spoiliteration) {
@@ -24903,13 +24903,13 @@ static void testminbleicunit_testother(bool *err) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             c.ptr.pp_double[i][j] = hqrndnormal(&rs);
-            v = v + c.ptr.pp_double[i][j] * x.ptr.p_double[j];
+            v += c.ptr.pp_double[i][j] * x.ptr.p_double[j];
          }
          c.ptr.pp_double[i][n] = v;
          if (i < nec) {
             ct.ptr.p_int[i] = 0;
          } else {
-            c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + 0.1;
+            c.ptr.pp_double[i][n] += 0.1;
             ct.ptr.p_int[i] = -1;
          }
       }
@@ -24926,11 +24926,11 @@ static void testminbleicunit_testother(bool *err) {
          if (scaletype != 0) {
             s.ptr.p_double[i] = pow(10.0, 40 * hqrnduniformr(&rs) - 20);
          }
-         x.ptr.p_double[i] = x.ptr.p_double[i] * s.ptr.p_double[i];
-         bl.ptr.p_double[i] = bl.ptr.p_double[i] * s.ptr.p_double[i];
-         bu.ptr.p_double[i] = bu.ptr.p_double[i] * s.ptr.p_double[i];
+         x.ptr.p_double[i] *= s.ptr.p_double[i];
+         bl.ptr.p_double[i] *= s.ptr.p_double[i];
+         bu.ptr.p_double[i] *= s.ptr.p_double[i];
          for (j = 0; j < nec + nic; j++) {
-            c.ptr.pp_double[j][i] = c.ptr.pp_double[j][i] / s.ptr.p_double[i];
+            c.ptr.pp_double[j][i] /= s.ptr.p_double[i];
          }
       }
       for (i = 0; i < nec + nic; i++) {
@@ -24948,7 +24948,7 @@ static void testminbleicunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.x.ptr.p_double[i];
+               state.f += state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = 1.0;
             }
          }
@@ -24969,18 +24969,18 @@ static void testminbleicunit_testother(bool *err) {
       spdmatrixrndcond(n, 1.0E3, &fulla);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            fulla.ptr.pp_double[i][j] = fulla.ptr.pp_double[i][j] * 1.0E9;
+            fulla.ptr.pp_double[i][j] *= 1.0E9;
          }
       }
       ae_vector_set_length(&x0, n);
       v = 0.0;
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = hqrnduniformr(&rs);
-         v = v + ae_sqr(x0.ptr.p_double[i]);
+         v += ae_sqr(x0.ptr.p_double[i]);
       }
       ae_assert(v > 0.0, "MinBLEIC: integrity check failed in the unit test");
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = x0.ptr.p_double[i] / sqrt(v);
+         x0.ptr.p_double[i] /= sqrt(v);
       }
       ae_matrix_set_length(&c, 1, n + 1);
       ae_vector_set_length(&ct, 1);
@@ -24989,7 +24989,7 @@ static void testminbleicunit_testother(bool *err) {
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(fulla.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
          c.ptr.pp_double[0][i] = v;
-         c.ptr.pp_double[0][n] = c.ptr.pp_double[0][n] + v * x0.ptr.p_double[i];
+         c.ptr.pp_double[0][n] += v * x0.ptr.p_double[i];
       }
       ae_assert(c.ptr.pp_double[0][n] > 0.0, "MinBLEIC: integrity check failed in the unit test");
       minbleiccreate(n, &x0, &state);
@@ -25000,7 +25000,7 @@ static void testminbleicunit_testother(bool *err) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-               state.f = state.f + 0.5 * v * state.x.ptr.p_double[i];
+               state.f += 0.5 * v * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = v;
             }
          }
@@ -25232,11 +25232,11 @@ static void testminbleicunit_testconv(bool *err) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = randomnormal();
-               v = v + ae_sqr(c.ptr.pp_double[i][j]);
+               v += ae_sqr(c.ptr.pp_double[i][j]);
             }
             if (v > 0.0) {
                for (j = 0; j < n; j++) {
-                  c.ptr.pp_double[i][j] = c.ptr.pp_double[i][j] / sqrt(v);
+                  c.ptr.pp_double[i][j] /= sqrt(v);
                }
             }
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, xf.ptr.p_double, 1, n);
@@ -25245,7 +25245,7 @@ static void testminbleicunit_testconv(bool *err) {
                ct.ptr.p_int[i] = 0;
             } else {
                ct.ptr.p_int[i] = -1;
-               c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + 0.1 + 0.9 * ae_randomreal();
+               c.ptr.pp_double[i][n] += 0.1 + 0.9 * ae_randomreal();
             }
          }
          ae_matrix_set_length(&a, m, n + 1);
@@ -25275,8 +25275,8 @@ static void testminbleicunit_testconv(bool *err) {
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-               v = v - a.ptr.pp_double[i][n];
-               state.f = state.f + 0.5 * ae_sqr(v);
+               v -= a.ptr.pp_double[i][n];
+               state.f += 0.5 * ae_sqr(v);
                ae_v_addd(state.g.ptr.p_double, 1, a.ptr.pp_double[i], 1, n, v);
             }
          }
@@ -25295,7 +25295,7 @@ static void testminbleicunit_testconv(bool *err) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-            v = v - c.ptr.pp_double[i][n];
+            v -= c.ptr.pp_double[i][n];
             if (ct.ptr.p_int[i] == 0 && fabs(v) > epsfeas) {
                *err = true;
                ae_frame_leave();
@@ -25310,8 +25310,8 @@ static void testminbleicunit_testconv(bool *err) {
          f0 = 0.0;
          for (i = 0; i < m; i++) {
             v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-            v = v - a.ptr.pp_double[i][n];
-            f0 = f0 + 0.5 * ae_sqr(v);
+            v -= a.ptr.pp_double[i][n];
+            f0 += 0.5 * ae_sqr(v);
          }
 
       // Solve problem 1:
@@ -25327,8 +25327,8 @@ static void testminbleicunit_testconv(bool *err) {
             }
             for (i = 0; i < m; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-               v = v - a.ptr.pp_double[i][n];
-               state.f = state.f + 0.5 * ae_sqr(v);
+               v -= a.ptr.pp_double[i][n];
+               state.f += 0.5 * ae_sqr(v);
                ae_v_addd(state.g.ptr.p_double, 1, a.ptr.pp_double[i], 1, n, v);
             }
          }
@@ -25347,7 +25347,7 @@ static void testminbleicunit_testconv(bool *err) {
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-            v = v - c.ptr.pp_double[i][n];
+            v -= c.ptr.pp_double[i][n];
             if (ct.ptr.p_int[i] == 0 && fabs(v) > epsfeas) {
                *err = true;
                ae_frame_leave();
@@ -25362,8 +25362,8 @@ static void testminbleicunit_testconv(bool *err) {
          f1 = 0.0;
          for (i = 0; i < m; i++) {
             v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-            v = v - a.ptr.pp_double[i][n];
-            f1 = f1 + 0.5 * ae_sqr(v);
+            v -= a.ptr.pp_double[i][n];
+            f1 += 0.5 * ae_sqr(v);
          }
 
       // compare F0 and F1
@@ -25439,7 +25439,7 @@ static void testminbleicunit_testconv(bool *err) {
                      v = hqrndnormal(&rs);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                           a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                         }
                      }
                   }
@@ -25460,8 +25460,8 @@ static void testminbleicunit_testconv(bool *err) {
                   c.ptr.pp_double[i][n] = ae_sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * ae_machineepsilon;
                   for (j = 0; j < n; j++) {
                      c.ptr.pp_double[i][j] = (double)(2 * (k % 2) - 1);
-                     c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
-                     k = k / 2;
+                     c.ptr.pp_double[i][n] += c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
+                     k /= 2;
                   }
                }
 
@@ -25474,13 +25474,13 @@ static void testminbleicunit_testconv(bool *err) {
                   ae_assert(state.needfg, "Assertion failed");
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + state.x.ptr.p_double[i] * b.ptr.p_double[i];
+                     state.f += state.x.ptr.p_double[i] * b.ptr.p_double[i];
                      state.g.ptr.p_double[i] = b.ptr.p_double[i];
                   }
                   for (i = 0; i < n; i++) {
                      v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-                     state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
-                     state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + v;
+                     state.f += 0.5 * state.x.ptr.p_double[i] * v;
+                     state.g.ptr.p_double[i] += v;
                   }
                }
                minbleicresults(&state, &xs0, &rep);
@@ -25493,14 +25493,14 @@ static void testminbleicunit_testconv(bool *err) {
                vv = 0.0;
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-                  v = v + b.ptr.p_double[i];
+                  v += b.ptr.p_double[i];
                   if (xs0.ptr.p_double[i] <= bl.ptr.p_double[i] + tolconstr && v > 0.0) {
                      v = 0.0;
                   }
                   if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr && v < 0.0) {
                      v = 0.0;
                   }
-                  vv = vv + ae_sqr(v);
+                  vv += ae_sqr(v);
                }
                vv = sqrt(vv);
                ae_set_error_flag(err, vv > 1.0E-5, __FILE__, __LINE__, "testminbleicunit.ap:2365");
@@ -25571,7 +25571,7 @@ static void testminbleicunit_testconv(bool *err) {
                   v = hqrndnormal(&rs);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -25603,13 +25603,13 @@ static void testminbleicunit_testconv(bool *err) {
                ae_assert(state.needfg, "Assertion failed");
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + state.x.ptr.p_double[i] * b.ptr.p_double[i];
+                  state.f += state.x.ptr.p_double[i] * b.ptr.p_double[i];
                   state.g.ptr.p_double[i] = b.ptr.p_double[i];
                }
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-                  state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + v;
+                  state.f += 0.5 * state.x.ptr.p_double[i] * v;
+                  state.g.ptr.p_double[i] += v;
                }
             }
             minbleicresults(&state, &xs0, &rep);
@@ -25661,7 +25661,7 @@ static void testminbleicunit_testconv(bool *err) {
             }
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-               v = v - c.ptr.pp_double[i][n];
+               v -= c.ptr.pp_double[i][n];
                ae_set_error_flag(err, ct.ptr.p_int[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2540");
                ae_set_error_flag(err, ct.ptr.p_int[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2541");
                ae_set_error_flag(err, ct.ptr.p_int[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminbleicunit.ap:2542");
@@ -25692,7 +25692,7 @@ static void testminbleicunit_testconv(bool *err) {
             snnlssolve(&nnls, &tmp);
             for (i = 0; i < k; i++) {
                for (j = 0; j < n; j++) {
-                  g.ptr.p_double[j] = g.ptr.p_double[j] - tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
+                  g.ptr.p_double[j] -= tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
                }
             }
             vv = ae_v_dotproduct(g.ptr.p_double, 1, g.ptr.p_double, 1, n);
@@ -25802,7 +25802,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
                testminbleicunit_calciip2(&state, n, fk);
             }
             minbleicresults(&state, &x, &rep);
-            cntb1 = cntb1 + rep.inneriterationscount;
+            cntb1 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          ae_vector_set_length(&diagh, n);
@@ -25821,7 +25821,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
                testminbleicunit_calciip2(&state, n, fk);
             }
             minbleicresults(&state, &x, &rep);
-            cntg1 = cntg1 + rep.inneriterationscount;
+            cntg1 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb1 < cntg1;
@@ -25843,7 +25843,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
                testminbleicunit_calciip2(&state, n, fk);
             }
             minbleicresults(&state, &x, &rep);
-            cntb2 = cntb2 + rep.inneriterationscount;
+            cntb2 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          minbleicsetprecscale(&state);
@@ -25858,7 +25858,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
                testminbleicunit_calciip2(&state, n, fk);
             }
             minbleicresults(&state, &x, &rep);
-            cntg2 = cntg2 + rep.inneriterationscount;
+            cntg2 += rep.inneriterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -25940,7 +25940,7 @@ static void testminbleicunit_testbugs(bool *err) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + ae_sqr(state.x.ptr.p_double[i]) + state.x.ptr.p_double[i] * c.ptr.pp_double[0][i];
+                     state.f += ae_sqr(state.x.ptr.p_double[i]) + state.x.ptr.p_double[i] * c.ptr.pp_double[0][i];
                      state.g.ptr.p_double[i] = 2 * state.x.ptr.p_double[i] + c.ptr.pp_double[0][i];
                   }
                }
@@ -25981,12 +25981,12 @@ static void testminbleicunit_testbugs(bool *err) {
          c.ptr.pp_double[i][9] = 0.0;
          for (j = 0; j < 9; j++) {
             c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            c.ptr.pp_double[i][9] = c.ptr.pp_double[i][9] + c.ptr.pp_double[i][j] * (1.0 / 9.0);
+            c.ptr.pp_double[i][9] += c.ptr.pp_double[i][j] * (1.0 / 9.0);
          }
       }
       ct.ptr.p_int[0] = 0;
       ct.ptr.p_int[1] = 1;
-      c.ptr.pp_double[1][9] = c.ptr.pp_double[1][9] - 0.1;
+      c.ptr.pp_double[1][9] -= 0.1;
       for (i = 0; i < 3; i++) {
          for (k = 0; k < 9; k++) {
             c.ptr.pp_double[2 + i][k] = 0.0;
@@ -26044,7 +26044,7 @@ static void testminbleicunit_testbugs(bool *err) {
          // Calculate regularization term
             state.f = 0.0;
             for (i = 0; i < 9; i++) {
-               state.f = state.f + regterm * ae_sqr(state.x.ptr.p_double[i] - prior.ptr.p_double[i]);
+               state.f += regterm * ae_sqr(state.x.ptr.p_double[i] - prior.ptr.p_double[i]);
                state.g.ptr.p_double[i] = 2 * regterm * (state.x.ptr.p_double[i] - prior.ptr.p_double[i]);
             }
 
@@ -26052,9 +26052,9 @@ static void testminbleicunit_testbugs(bool *err) {
             for (k = 0; k < xy.rows - 1; k++) {
                for (i = 0; i < 3; i++) {
                   v = ae_v_dotproduct(&state.x.ptr.p_double[i * 3], 1, xy.ptr.pp_double[k], 1, 3);
-                  state.f = state.f + ae_sqr(w.ptr.p_double[i] * (v - xy.ptr.pp_double[k + 1][i]));
+                  state.f += ae_sqr(w.ptr.p_double[i] * (v - xy.ptr.pp_double[k + 1][i]));
                   for (j = 0; j < 3; j++) {
-                     state.g.ptr.p_double[i * 3 + j] = state.g.ptr.p_double[i * 3 + j] + 2 * w.ptr.p_double[i] * w.ptr.p_double[i] * (v - xy.ptr.pp_double[k + 1][i]) * xy.ptr.pp_double[k][j];
+                     state.g.ptr.p_double[i * 3 + j] += 2 * w.ptr.p_double[i] * w.ptr.p_double[i] * (v - xy.ptr.pp_double[k + 1][i]) * xy.ptr.pp_double[k][j];
                   }
                }
             }
@@ -26107,9 +26107,9 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + fabs(vv);
+            v += fabs(vv);
          }
          ae_set_error_flag(err, fabs(v - rep->f.ptr.p_double[k]) > 1.0E-6 * ae_maxreal(fabs(v), 1.0), __FILE__, __LINE__, "testminbleicunit.ap:3601");
       }
@@ -26120,8 +26120,8 @@ static void testminbleicunit_testoptguardc1test0reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
       }
@@ -26187,9 +26187,9 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
+            v += ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
             tooclose = tooclose || fabs(vv) < 1.0E-4;
          }
          if (!tooclose) {
@@ -26204,8 +26204,8 @@ static void testminbleicunit_testoptguardc1test1reportfortask0(bool *err, optgua
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
@@ -26295,9 +26295,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
+            state.f += 0.5 * state.x.ptr.p_double[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.ptr.p_double[i] = 0.0;
@@ -26352,12 +26352,12 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + fabs(v);
+            state.f += fabs(v);
             v = (double)(ae_sign(v));
             for (j = 0; j < n; j++) {
-               state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+               state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
             }
          }
          continue;
@@ -26425,22 +26425,22 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                  state.f += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                   state.g.ptr.p_double[i] = v;
                }
                if (defecttype == 0) {
                   state.g.ptr.p_double[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] + 1;
+                  state.g.ptr.p_double[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] * 2;
+                  state.g.ptr.p_double[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] / s.ptr.p_double[i];
+                  state.g.ptr.p_double[i] /= s.ptr.p_double[i];
                }
                continue;
             }
@@ -26467,7 +26467,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
             jactrue.ptr.pp_double[0][i] = v;
             jacdefect.ptr.pp_double[0][i] = v;
@@ -26476,14 +26476,14 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
             jacdefect.ptr.pp_double[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] + 1;
+            jacdefect.ptr.pp_double[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] * 2;
+            jacdefect.ptr.pp_double[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-            jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
+            jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+            jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
          }
 
       // Check OptGuard report
@@ -26565,12 +26565,12 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
                v = (double)(ae_sign(v));
                for (j = 0; j < n; j++) {
-                  state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+                  state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
                }
             }
             continue;
@@ -26611,8 +26611,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3368");
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / (double)passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / (double)passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / (double)passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3376");
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3377");
@@ -26627,8 +26627,8 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbleicunit.ap:3387");
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / (double)passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / (double)passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / (double)passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3395");
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbleicunit.ap:3396");
@@ -26688,9 +26688,9 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
             }
             continue;
          }
@@ -26744,11 +26744,11 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+            state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-               state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.f += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.g.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
             }
          }
          continue;
@@ -27049,7 +27049,7 @@ Local bool functest1() {
          for (j = 0; j < sn; j++) {
             b.ptr.p_double[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.ptr.p_double[j] = b.ptr.p_double[j] - xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
+               b.ptr.p_double[j] -= xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
             }
          }
          minqpsetlinearterm(&state, &b);
@@ -27096,7 +27096,7 @@ static double testminqpunit_projectedantigradnorm(ae_int_t n, RVector x, RVector
    for (i = 0; i < n; i++) {
       ae_assert(x->ptr.p_double[i] >= bndl->ptr.p_double[i] && x->ptr.p_double[i] <= bndu->ptr.p_double[i], "ProjectedAntiGradNormal: boundary constraints violation");
       if (((x->ptr.p_double[i] > bndl->ptr.p_double[i] && x->ptr.p_double[i] < bndu->ptr.p_double[i]) || (x->ptr.p_double[i] == bndl->ptr.p_double[i] && -g->ptr.p_double[i] > 0.0)) || (x->ptr.p_double[i] == bndu->ptr.p_double[i] && -g->ptr.p_double[i] < 0.0)) {
-         r = r + g->ptr.p_double[i] * g->ptr.p_double[i];
+         r += g->ptr.p_double[i] * g->ptr.p_double[i];
       }
    }
    result = sqrt(r);
@@ -27181,7 +27181,7 @@ Local bool functest2() {
          for (j = 0; j < sn; j++) {
             b.ptr.p_double[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.ptr.p_double[j] = b.ptr.p_double[j] - xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
+               b.ptr.p_double[j] -= xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
             }
          }
          minqpsetlinearterm(&state, &b);
@@ -27217,7 +27217,7 @@ Local bool functest2() {
          for (j = 0; j < sn; j++) {
             c.ptr.p_double[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               c.ptr.p_double[j] = c.ptr.p_double[j] - xori.ptr.p_double[k] * a.ptr.pp_double[k][j];
+               c.ptr.p_double[j] -= xori.ptr.p_double[k] * a.ptr.pp_double[k][j];
             }
          }
 
@@ -27319,7 +27319,7 @@ Local bool consoletest() {
          for (j = 0; j < sn; j++) {
             b.ptr.p_double[j] = 0.0;
             for (k = 0; k < sn; k++) {
-               b.ptr.p_double[j] = b.ptr.p_double[j] - xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
+               b.ptr.p_double[j] -= xoric.ptr.p_double[k] * a.ptr.pp_double[k][j];
             }
             printf("B[%0d]=%0.5f\n", (int)(j), (double)(b.ptr.p_double[j]));
          }
@@ -27346,7 +27346,7 @@ Local bool consoletest() {
          for (j = 0; j < sn; j++) {
             c = 0.0;
             for (k = 0; k < sn; k++) {
-               c = c - xori.ptr.p_double[k] * a.ptr.pp_double[k][j];
+               c -= xori.ptr.p_double[k] * a.ptr.pp_double[k][j];
             }
             g.ptr.p_double[j] = b.ptr.p_double[j] + c + y0.ptr.p_double[j] + y1.ptr.p_double[j];
          }
@@ -27419,7 +27419,7 @@ static void testminqpunit_testbcgradandfeasibility(RMatrix a, RVector b, RVector
    for (i = 0; i < n; i++) {
       g = b->ptr.p_double[i];
       for (j = 0; j < n; j++) {
-         g = g + a->ptr.pp_double[i][j] * x->ptr.p_double[j];
+         g += a->ptr.pp_double[i][j] * x->ptr.p_double[j];
       }
       if (x->ptr.p_double[i] == bndl->ptr.p_double[i] && g > 0.0) {
          g = 0.0;
@@ -27427,7 +27427,7 @@ static void testminqpunit_testbcgradandfeasibility(RMatrix a, RVector b, RVector
       if (x->ptr.p_double[i] == bndu->ptr.p_double[i] && g < 0.0) {
          g = 0.0;
       }
-      gnorm = gnorm + ae_sqr(g);
+      gnorm += ae_sqr(g);
       if (x->ptr.p_double[i] < bndl->ptr.p_double[i]) {
          *errorflag = true;
       }
@@ -27568,9 +27568,9 @@ Local bool quickqptests() {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
+               g += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
          }
          gnorm = sqrt(gnorm);
          ae_set_error_flag(&result, gnorm > eps, __FILE__, __LINE__, "testminqpunit.ap:5703");
@@ -27679,7 +27679,7 @@ Local bool quickqptests() {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
+               g += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
             }
             if (x1.ptr.p_double[i] == bndl.ptr.p_double[i] && g > 0.0) {
                g = 0.0;
@@ -27687,7 +27687,7 @@ Local bool quickqptests() {
             if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(&result, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:5820");
             ae_set_error_flag(&result, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:5821");
          }
@@ -27718,7 +27718,7 @@ Local bool quickqptests() {
       // Generate problem
          spdmatrixrndcond(n, 1.0E3, &fulla);
          for (i = 0; i < n; i++) {
-            fulla.ptr.pp_double[i][i] = fulla.ptr.pp_double[i][i] - 0.5;
+            fulla.ptr.pp_double[i][i] -= 0.5;
          }
          isupper = hqrnduniformr(&rs) < 0.5;
          ae_matrix_set_length(&halfa, n, n);
@@ -27777,7 +27777,7 @@ Local bool quickqptests() {
             if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(&result, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:5912");
             ae_set_error_flag(&result, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:5913");
          }
@@ -27878,7 +27878,7 @@ Local bool quickqptests() {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               g += a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
             }
             if (x1.ptr.p_double[i] == bndl.ptr.p_double[i] && g > 0.0) {
                g = 0.0;
@@ -27886,7 +27886,7 @@ Local bool quickqptests() {
             if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(&result, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6024");
             ae_set_error_flag(&result, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6025");
          }
@@ -28021,7 +28021,7 @@ Local bool quickqptests() {
       for (i = 0; i < n; i++) {
          g = b.ptr.p_double[i];
          for (j = 0; j < n; j++) {
-            g = g + a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+            g += a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
          }
          if (x1.ptr.p_double[i] == bndl.ptr.p_double[i] && g > 0.0) {
             g = 0.0;
@@ -28029,7 +28029,7 @@ Local bool quickqptests() {
          if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
             g = 0.0;
          }
-         gnorm = gnorm + ae_sqr(g);
+         gnorm += ae_sqr(g);
          ae_set_error_flag(&result, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6181");
          ae_set_error_flag(&result, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6182");
       }
@@ -28516,17 +28516,17 @@ Local bool bleictests() {
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + x0.ptr.p_double[i];
+            v += x0.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] - v / n;
+            x0.ptr.p_double[i] -= v / n;
          }
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + b.ptr.p_double[i];
+            v += b.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
-            b.ptr.p_double[i] = b.ptr.p_double[i] - v / n;
+            b.ptr.p_double[i] -= v / n;
          }
          ae_matrix_set_length(&a, n, n);
          for (i = 0; i < n; i++) {
@@ -28565,7 +28565,7 @@ Local bool bleictests() {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               g += a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
             }
             if (x1.ptr.p_double[i] == bndl.ptr.p_double[i] && g > 0.0) {
                g = 0.0;
@@ -28573,7 +28573,7 @@ Local bool bleictests() {
             if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(&result, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6796");
             ae_set_error_flag(&result, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:6797");
          }
@@ -28791,10 +28791,10 @@ Local bool bleictests() {
 
    // Apply random distortion
       for (j = 0; j < n; j++) {
-         b.ptr.p_double[j] = b.ptr.p_double[j] + (2 * hqrnduniformi(&rs, 2) - 1) * 0.1;
+         b.ptr.p_double[j] += (2 * hqrnduniformi(&rs, 2) - 1) * 0.1;
       }
       for (j = 0; j < 6; j++) {
-         c.ptr.pp_double[j][n] = c.ptr.pp_double[j][n] + (2 * hqrnduniformi(&rs, 2) - 1) * 0.1;
+         c.ptr.pp_double[j][n] += (2 * hqrnduniformi(&rs, 2) - 1) * 0.1;
       }
 
    // Solve
@@ -29068,7 +29068,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
+               g += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
             }
             if (x1.ptr.p_double[i] <= bndl.ptr.p_double[i] + bctol && g > 0.0) {
                g = 0.0;
@@ -29076,7 +29076,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             if (x1.ptr.p_double[i] >= bndu.ptr.p_double[i] - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:904");
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:905");
          }
@@ -29090,12 +29090,12 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
+                  v += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
                }
                gtrial.ptr.p_double[i] = v;
             }
             for (i = 0; i < n; i++) {
-               gtrial.ptr.p_double[i] = gtrial.ptr.p_double[i] + rep.lagbc.ptr.p_double[i];
+               gtrial.ptr.p_double[i] += rep.lagbc.ptr.p_double[i];
             }
             for (i = 0; i < n; i++) {
                ae_set_error_flag(wereerrors, fabs(gtrial.ptr.p_double[i]) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:928");
@@ -29200,7 +29200,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
+               g += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xori.ptr.p_double[j]);
             }
             if (x1.ptr.p_double[i] <= vl + bctol && g > 0.0) {
                g = 0.0;
@@ -29208,7 +29208,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             if (x1.ptr.p_double[i] >= vu - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] < vl, __FILE__, __LINE__, "testminqpunit.ap:1037");
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] > vu, __FILE__, __LINE__, "testminqpunit.ap:1038");
          }
@@ -29280,7 +29280,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             g = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               g = g + fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               g += fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
             }
             if (x1.ptr.p_double[i] <= bndl.ptr.p_double[i] + bctol && g > 0.0) {
                g = 0.0;
@@ -29288,7 +29288,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             if (x1.ptr.p_double[i] >= bndu.ptr.p_double[i] - bctol && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:1121");
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:1122");
          }
@@ -29319,7 +29319,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
       // Generate problem
          spdmatrixrndcond(n, 1.0E3, &fulla);
          for (i = 0; i < n; i++) {
-            fulla.ptr.pp_double[i][i] = fulla.ptr.pp_double[i][i] - 0.5;
+            fulla.ptr.pp_double[i][i] -= 0.5;
          }
          isupper = hqrnduniformr(&rs) < 0.5;
          ae_matrix_set_length(&halfa, n, n);
@@ -29379,7 +29379,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
             if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && g < 0.0) {
                g = 0.0;
             }
-            gnorm = gnorm + ae_sqr(g);
+            gnorm += ae_sqr(g);
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:1215");
             ae_set_error_flag(wereerrors, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminqpunit.ap:1216");
          }
@@ -29654,7 +29654,7 @@ static bool testminqpunit_ecqptest() {
          ae_v_move(g.ptr.p_double, 1, b.ptr.p_double, 1, n);
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xend.ptr.p_double, 1, n);
-            g.ptr.p_double[i] = g.ptr.p_double[i] + v;
+            g.ptr.p_double[i] += v;
          }
          for (i = 0; i < k; i++) {
             v = ae_v_dotproduct(g.ptr.p_double, 1, c.ptr.pp_double[i], 1, n);
@@ -29793,11 +29793,11 @@ static bool testminqpunit_ecqptest() {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
-               f1 = f1 + 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
+               f0 += 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
+               f1 += 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
             }
-            f0 = f0 + xend.ptr.p_double[i] * b.ptr.p_double[i];
-            f1 = f1 + xend2.ptr.p_double[i] * b.ptr.p_double[i];
+            f0 += xend.ptr.p_double[i] * b.ptr.p_double[i];
+            f1 += xend2.ptr.p_double[i] * b.ptr.p_double[i];
          }
 
       // Check feasibility properties and compare
@@ -30053,11 +30053,11 @@ static bool testminqpunit_ecqptest() {
       f1 = 0.0;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            f0 = f0 + 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
-            f1 = f1 + 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
+            f0 += 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
+            f1 += 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
          }
-         f0 = f0 + xend.ptr.p_double[i] * b.ptr.p_double[i];
-         f1 = f1 + xend2.ptr.p_double[i] * b.ptr.p_double[i];
+         f0 += xend.ptr.p_double[i] * b.ptr.p_double[i];
+         f1 += xend2.ptr.p_double[i] * b.ptr.p_double[i];
       }
       ae_set_error_flag(&waserrors, fabs(f0 - f1) > eps, __FILE__, __LINE__, "testminqpunit.ap:1965");
    }
@@ -30094,12 +30094,12 @@ static bool testminqpunit_ecqptest() {
       v = 0.0;
       for (i = 0; i < n; i++) {
          c.ptr.pp_double[0][i] = tmp.ptr.p_double[i];
-         c.ptr.pp_double[0][n] = c.ptr.pp_double[0][n] + tmp.ptr.p_double[i] * x0.ptr.p_double[i];
+         c.ptr.pp_double[0][n] += tmp.ptr.p_double[i] * x0.ptr.p_double[i];
          b.ptr.p_double[i] = -(x0.ptr.p_double[i] + tmp.ptr.p_double[i]);
-         v = v + tmp.ptr.p_double[i] * xd.ptr.p_double[i];
+         v += tmp.ptr.p_double[i] * xd.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
-         xd.ptr.p_double[i] = xd.ptr.p_double[i] - v * tmp.ptr.p_double[i];
+         xd.ptr.p_double[i] -= v * tmp.ptr.p_double[i];
          xs.ptr.p_double[i] = x0.ptr.p_double[i] + xd.ptr.p_double[i] * pow(2.0, (double)(-rk));
       }
       ae_matrix_set_length(&a, n, n);
@@ -30128,7 +30128,7 @@ static bool testminqpunit_ecqptest() {
       }
       v = -c.ptr.pp_double[0][n];
       for (i = 0; i < n; i++) {
-         v = v + xend.ptr.p_double[i] * c.ptr.pp_double[0][i];
+         v += xend.ptr.p_double[i] * c.ptr.pp_double[0][i];
       }
       ae_set_error_flag(&waserrors, fabs(v) > 1.0E5 * ae_machineepsilon, __FILE__, __LINE__, "testminqpunit.ap:2044");
    }
@@ -30240,13 +30240,13 @@ static void testminqpunit_icqptest(bool *err) {
             v = 0.0;
             for (i = 0; i < n; i++) {
                c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
-               v = v + ae_sqr(c.ptr.pp_double[0][i]);
+               v += ae_sqr(c.ptr.pp_double[0][i]);
             }
             v = sqrt(v);
          }
          while (v == 0.0);
          for (i = 0; i < n; i++) {
-            c.ptr.pp_double[0][i] = c.ptr.pp_double[0][i] / v;
+            c.ptr.pp_double[0][i] /= v;
          }
          c.ptr.pp_double[0][n] = 0.0;
          ct.ptr.p_int[0] = 1;
@@ -30288,7 +30288,7 @@ static void testminqpunit_icqptest(bool *err) {
             ae_v_move(g.ptr.p_double, 1, b.ptr.p_double, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xend.ptr.p_double, 1, n);
-               g.ptr.p_double[i] = g.ptr.p_double[i] + v;
+               g.ptr.p_double[i] += v;
             }
             v = ae_v_dotproduct(g.ptr.p_double, 1, c.ptr.pp_double[0], 1, n);
             ae_v_subd(g.ptr.p_double, 1, c.ptr.pp_double[0], 1, n, v);
@@ -30387,11 +30387,11 @@ static void testminqpunit_icqptest(bool *err) {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * (xend.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (xend.ptr.p_double[j] - xorigin.ptr.p_double[j]);
-               f1 = f1 + 0.5 * (xend2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (xend2.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+               f0 += 0.5 * (xend.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (xend.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+               f1 += 0.5 * (xend2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (xend2.ptr.p_double[j] - xorigin.ptr.p_double[j]);
             }
-            f0 = f0 + (xend.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
-            f1 = f1 + (xend2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
+            f0 += (xend.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
+            f1 += (xend2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
          }
 
       // Check feasibility properties and compare solutions
@@ -30722,7 +30722,7 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&tmp0, n);
       ae_v_move(tmp0.ptr.p_double, 1, b.ptr.p_double, 1, n);
       for (i = 0; i < n; i++) {
-         tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+         tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
       }
       ae_vector_set_length(&b2, n);
       for (i = 0; i < n; i++) {
@@ -30751,7 +30751,7 @@ static void testminqpunit_icqptest(bool *err) {
          tmp0.ptr.p_double[i] = v - b.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
-         tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+         tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
          ae_set_error_flag(err, fabs(tmp0.ptr.p_double[i] - xend.ptr.p_double[i]) > eps * ae_maxreal(fabs(tmp0.ptr.p_double[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:2732");
@@ -30804,10 +30804,10 @@ static void testminqpunit_icqptest(bool *err) {
          c.ptr.pp_double[i][n] = v;
          ct.ptr.p_int[i] = ae_randominteger(3) - 1;
          if (ct.ptr.p_int[i] < 0) {
-            c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + 0.1;
+            c.ptr.pp_double[i][n] += 0.1;
          }
          if (ct.ptr.p_int[i] > 0) {
-            c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] - 0.1;
+            c.ptr.pp_double[i][n] -= 0.1;
          }
       }
 
@@ -30838,11 +30838,11 @@ static void testminqpunit_icqptest(bool *err) {
       f1 = 0.0;
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            f0 = f0 + 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
-            f1 = f1 + 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
+            f0 += 0.5 * xend.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend.ptr.p_double[j];
+            f1 += 0.5 * xend2.ptr.p_double[i] * a.ptr.pp_double[i][j] * xend2.ptr.p_double[j];
          }
-         f0 = f0 + xend.ptr.p_double[i] * b.ptr.p_double[i];
-         f1 = f1 + xend2.ptr.p_double[i] * b.ptr.p_double[i];
+         f0 += xend.ptr.p_double[i] * b.ptr.p_double[i];
+         f1 += xend2.ptr.p_double[i] * b.ptr.p_double[i];
       }
       ae_set_error_flag(err, fabs(f0 - f1) > eps, __FILE__, __LINE__, "testminqpunit.ap:2837");
    }
@@ -30916,7 +30916,7 @@ static void testminqpunit_icqptest(bool *err) {
                      v = pow(2.0, hqrndnormal(&rs));
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                           a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                         }
                      }
                   }
@@ -30937,7 +30937,7 @@ static void testminqpunit_icqptest(bool *err) {
                      v = hqrndnormal(&rs);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                           a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                         }
                      }
                   }
@@ -30959,8 +30959,8 @@ static void testminqpunit_icqptest(bool *err) {
                   c.ptr.pp_double[i][n] = ae_sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * ae_machineepsilon;
                   for (j = 0; j < n; j++) {
                      c.ptr.pp_double[i][j] = (double)(2 * (k % 2) - 1);
-                     c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
-                     k = k / 2;
+                     c.ptr.pp_double[i][n] += c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
+                     k /= 2;
                   }
                }
 
@@ -30987,14 +30987,14 @@ static void testminqpunit_icqptest(bool *err) {
                vv = 0.0;
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-                  v = v + b.ptr.p_double[i];
+                  v += b.ptr.p_double[i];
                   if (xs0.ptr.p_double[i] <= bl.ptr.p_double[i] + tolconstr && v > 0.0) {
                      v = 0.0;
                   }
                   if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr && v < 0.0) {
                      v = 0.0;
                   }
-                  vv = vv + ae_sqr(v);
+                  vv += ae_sqr(v);
                }
                vv = sqrt(vv);
                ae_set_error_flag(err, vv > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3008");
@@ -31067,7 +31067,7 @@ static void testminqpunit_icqptest(bool *err) {
                   v = pow(2.0, hqrndnormal(&rs));
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -31088,7 +31088,7 @@ static void testminqpunit_icqptest(bool *err) {
                   v = hqrndnormal(&rs);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -31174,7 +31174,7 @@ static void testminqpunit_icqptest(bool *err) {
             }
             for (i = 0; i < ccnt; i++) {
                v = ae_v_dotproduct(c.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-               v = v - c.ptr.pp_double[i][n];
+               v -= c.ptr.pp_double[i][n];
                ae_set_error_flag(err, ct.ptr.p_int[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3196");
                ae_set_error_flag(err, ct.ptr.p_int[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3197");
                ae_set_error_flag(err, ct.ptr.p_int[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:3198");
@@ -31205,7 +31205,7 @@ static void testminqpunit_icqptest(bool *err) {
             snnlssolve(&nnls, &tmp);
             for (i = 0; i < k; i++) {
                for (j = 0; j < n; j++) {
-                  g.ptr.p_double[j] = g.ptr.p_double[j] - tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
+                  g.ptr.p_double[j] -= tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
                }
             }
             vv = ae_v_dotproduct(g.ptr.p_double, 1, g.ptr.p_double, 1, n);
@@ -31315,9 +31315,9 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix rawc, RVector rawcl, RV
    sparseccnt = hqrnduniformi(rs, rawccnt + 1);
    denseccnt = rawccnt - sparseccnt;
    appenddense = hqrnduniformi(rs, denseccnt + 1);
-   denseccnt = denseccnt - appenddense;
+   denseccnt -= appenddense;
    appendsparse = hqrnduniformi(rs, sparseccnt + 1);
-   sparseccnt = sparseccnt - appendsparse;
+   sparseccnt -= appendsparse;
    ae_vector_set_length(&wrkcl, sparseccnt + denseccnt);
    ae_vector_set_length(&wrkcu, sparseccnt + denseccnt);
    if (sparseccnt > 0) {
@@ -31369,7 +31369,7 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix rawc, RVector rawcl, RV
          if (rawc->ptr.pp_double[i][j] != 0.0) {
             cv.ptr.p_double[nnz] = rawc->ptr.pp_double[i][j];
             ci.ptr.p_int[nnz] = j;
-            nnz = nnz + 1;
+            nnz++;
          }
       }
 
@@ -31378,8 +31378,8 @@ static void testminqpunit_randomlysplitandsetlc2(RMatrix rawc, RVector rawcl, RV
          j = hqrnduniformi(rs, nnz);
          ci.ptr.p_int[nnz] = ci.ptr.p_int[j];
          cv.ptr.p_double[nnz] = hqrndnormal(rs);
-         cv.ptr.p_double[j] = cv.ptr.p_double[j] - cv.ptr.p_double[nnz];
-         nnz = nnz + 1;
+         cv.ptr.p_double[j] -= cv.ptr.p_double[nnz];
+         nnz++;
       }
 
    // Add constraint to the set
@@ -31489,9 +31489,9 @@ static double testminqpunit_quadratictarget(RMatrix a, RVector b, ae_int_t n, RV
 
    result = 0.0;
    for (i = 0; i < n; i++) {
-      result = result + b->ptr.p_double[i] * x->ptr.p_double[i];
+      result += b->ptr.p_double[i] * x->ptr.p_double[i];
       for (j = 0; j < n; j++) {
-         result = result + 0.5 * x->ptr.p_double[i] * a->ptr.pp_double[i][j] * x->ptr.p_double[j];
+         result += 0.5 * x->ptr.p_double[i] * a->ptr.pp_double[i][j] * x->ptr.p_double[j];
       }
    }
    return result;
@@ -31633,7 +31633,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_vector_set_length(&tmp, n);
          rmatrixmv(n, n, &rawa, 0, 0, 0, &xs, 0, &gs, 0);
          for (i = 0; i < n; i++) {
-            gs.ptr.p_double[i] = gs.ptr.p_double[i] + b.ptr.p_double[i];
+            gs.ptr.p_double[i] += b.ptr.p_double[i];
          }
          rawccnt = 1 + hqrnduniformi(&rs, n);
          ae_vector_set_length(&bndl, n);
@@ -31662,7 +31662,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   }
                   activeset.ptr.pp_double[i][nactive] = 1.0;
                   activeeq.ptr.p_bool[nactive] = true;
-                  nactive = nactive + 1;
+                  nactive++;
                } else {
 
                // I-th box constraint is inequality one
@@ -31683,7 +31683,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      }
                   }
                   activeeq.ptr.p_bool[nactive] = false;
-                  nactive = nactive + 1;
+                  nactive++;
                }
             }
             for (i = 0; i < rawccnt - 1; i++) {
@@ -31697,13 +31697,13 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                rawc.ptr.pp_double[i][hqrnduniformi(&rs, n)] = hqrndnormal(&rs);
                rawc.ptr.pp_double[i][n] = 0.0;
                for (j = 0; j < n; j++) {
-                  rawc.ptr.pp_double[i][n] = rawc.ptr.pp_double[i][n] + rawc.ptr.pp_double[i][j] * xs.ptr.p_double[j];
+                  rawc.ptr.pp_double[i][n] += rawc.ptr.pp_double[i][j] * xs.ptr.p_double[j];
                }
                rawct.ptr.p_int[i] = -1;
                if (hqrnduniformr(&rs) < 0.66) {
 
                // I-th box constraint is inactive
-                  rawc.ptr.pp_double[i][n] = rawc.ptr.pp_double[i][n] + (1 + hqrnduniformr(&rs));
+                  rawc.ptr.pp_double[i][n] += (1 + hqrnduniformr(&rs));
                   if (hqrnduniformr(&rs) > 0.50) {
                      ae_v_muld(rawc.ptr.pp_double[i], 1, n + 1, -1);
                      rawct.ptr.p_int[i] = -rawct.ptr.p_int[i];
@@ -31718,7 +31718,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      activeset.ptr.pp_double[j][nactive] = rawc.ptr.pp_double[i][j];
                   }
                   activeeq.ptr.p_bool[nactive] = true;
-                  nactive = nactive + 1;
+                  nactive++;
                } else {
 
                // I-th box constraint is inequality one
@@ -31735,7 +31735,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      }
                   }
                   activeeq.ptr.p_bool[nactive] = false;
-                  nactive = nactive + 1;
+                  nactive++;
                }
             }
             ae_v_moveneg(tmp.ptr.p_double, 1, gs.ptr.p_double, 1, n);
@@ -31811,11 +31811,11 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          f0 = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f0 = f0 + b.ptr.p_double[i] * xs.ptr.p_double[i];
-            f1 = f1 + b.ptr.p_double[i] * x1.ptr.p_double[i];
+            f0 += b.ptr.p_double[i] * xs.ptr.p_double[i];
+            f1 += b.ptr.p_double[i] * x1.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * xs.ptr.p_double[i] * rawa.ptr.pp_double[i][j] * xs.ptr.p_double[j];
-               f1 = f1 + 0.5 * x1.ptr.p_double[i] * rawa.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               f0 += 0.5 * xs.ptr.p_double[i] * rawa.ptr.pp_double[i][j] * xs.ptr.p_double[j];
+               f1 += 0.5 * x1.ptr.p_double[i] * rawa.ptr.pp_double[i][j] * x1.ptr.p_double[j];
             }
          }
          ae_set_error_flag(errorflag, fabs(f0 - f1) > 1.0E-3, __FILE__, __LINE__, "testminqpunit.ap:3562");
@@ -31853,13 +31853,13 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   rawc.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
-                  v = v + ae_sqr(rawc.ptr.pp_double[0][i]);
+                  v += ae_sqr(rawc.ptr.pp_double[0][i]);
                }
                v = sqrt(v);
             }
             while (v == 0.0);
             for (i = 0; i < n; i++) {
-               rawc.ptr.pp_double[0][i] = rawc.ptr.pp_double[0][i] / v;
+               rawc.ptr.pp_double[0][i] /= v;
             }
             rawc.ptr.pp_double[0][n] = 0.0;
             rawct.ptr.p_int[0] = 1;
@@ -31918,7 +31918,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                ae_v_move(g.ptr.p_double, 1, b.ptr.p_double, 1, n);
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-                  g.ptr.p_double[i] = g.ptr.p_double[i] + v;
+                  g.ptr.p_double[i] += v;
                }
                v = ae_v_dotproduct(g.ptr.p_double, 1, rawc.ptr.pp_double[0], 1, n);
                ae_v_subd(g.ptr.p_double, 1, rawc.ptr.pp_double[0], 1, n, v);
@@ -32079,7 +32079,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   if ((solvertype == 1 || solvertype == 2) || solvertype == 3) {
                      tolconstr = 1.0E-3;
                      if (akind == 3) {
-                        tolconstr = tolconstr * 5;
+                        tolconstr *= 5;
                      }
                   } else {
                      ae_assert(false, "unexpected solver type");
@@ -32126,7 +32126,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      v = pow(2.0, hqrndnormal(&rs));
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                           a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                         }
                      }
                   }
@@ -32147,7 +32147,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      v = hqrndnormal(&rs);
                      for (i = 0; i < n; i++) {
                         for (j = 0; j < n; j++) {
-                           a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                           a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                         }
                      }
                   }
@@ -32247,7 +32247,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                }
                for (i = 0; i < rawccnt; i++) {
                   v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-                  v = v - rawc.ptr.pp_double[i][n];
+                  v -= rawc.ptr.pp_double[i][n];
                   ae_set_error_flag(errorflag, rawct.ptr.p_int[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4011");
                   ae_set_error_flag(errorflag, rawct.ptr.p_int[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4012");
                   ae_set_error_flag(errorflag, rawct.ptr.p_int[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminqpunit.ap:4013");
@@ -32278,7 +32278,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                snnlssolve(&nnls, &tmp);
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     g.ptr.p_double[j] = g.ptr.p_double[j] - tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
+                     g.ptr.p_double[j] -= tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
                   }
                }
                vv = ae_v_dotproduct(g.ptr.p_double, 1, g.ptr.p_double, 1, n);
@@ -32424,11 +32424,11 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             f1 = 0.0;
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  f0 = f0 + 0.5 * (x1.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
-                  f1 = f1 + 0.5 * (x2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (x2.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                  f0 += 0.5 * (x1.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                  f1 += 0.5 * (x2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * a.ptr.pp_double[i][j] * (x2.ptr.p_double[j] - xorigin.ptr.p_double[j]);
                }
-               f0 = f0 + (x1.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
-               f1 = f1 + (x2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
+               f0 += (x1.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
+               f1 += (x2.ptr.p_double[i] - xorigin.ptr.p_double[i]) * b.ptr.p_double[i];
             }
             ae_set_error_flag(errorflag, fabs(f0 - f1) > ftol, __FILE__, __LINE__, "testminqpunit.ap:4197");
             for (i = 0; i < n; i++) {
@@ -32498,15 +32498,15 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                v = 0.0;
                for (j = 0; j < n; j++) {
                   rawc.ptr.pp_double[i][j] = hqrndnormal(&rs);
-                  v = v + rawc.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+                  v += rawc.ptr.pp_double[i][j] * x0.ptr.p_double[j];
                }
                rawc.ptr.pp_double[i][n] = v;
                rawct.ptr.p_int[i] = hqrnduniformi(&rs, 3) - 1;
                if (rawct.ptr.p_int[i] < 0) {
-                  rawc.ptr.pp_double[i][n] = rawc.ptr.pp_double[i][n] + 0.1;
+                  rawc.ptr.pp_double[i][n] += 0.1;
                }
                if (rawct.ptr.p_int[i] > 0) {
-                  rawc.ptr.pp_double[i][n] = rawc.ptr.pp_double[i][n] - 0.1;
+                  rawc.ptr.pp_double[i][n] -= 0.1;
                }
             }
             testminqpunit_randomlysplitlc(&rawc, &rawct, k, n, &sparsec, &sparsect, &sparseccnt, &densec, &densect, &denseccnt, &rs);
@@ -32551,7 +32551,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             if (akind == 0) {
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+                     a.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
                   }
                }
             } else {
@@ -32563,15 +32563,15 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                }
             }
             for (i = 0; i < n; i++) {
-               b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-               xstart.ptr.p_double[i] = xstart.ptr.p_double[i] * s.ptr.p_double[i];
-               xorigin.ptr.p_double[i] = xorigin.ptr.p_double[i] * s.ptr.p_double[i];
-               bndl.ptr.p_double[i] = bndl.ptr.p_double[i] * s.ptr.p_double[i];
-               bndu.ptr.p_double[i] = bndu.ptr.p_double[i] * s.ptr.p_double[i];
+               b.ptr.p_double[i] /= s.ptr.p_double[i];
+               xstart.ptr.p_double[i] *= s.ptr.p_double[i];
+               xorigin.ptr.p_double[i] *= s.ptr.p_double[i];
+               bndl.ptr.p_double[i] *= s.ptr.p_double[i];
+               bndu.ptr.p_double[i] *= s.ptr.p_double[i];
             }
             for (i = 0; i < denseccnt; i++) {
                for (j = 0; j < n; j++) {
-                  densec.ptr.pp_double[i][j] = densec.ptr.pp_double[i][j] / s.ptr.p_double[j];
+                  densec.ptr.pp_double[i][j] /= s.ptr.p_double[j];
                }
             }
             for (i = 0; i < sparseccnt; i++) {
@@ -32730,7 +32730,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_vector_set_length(&tmp0, n);
          ae_v_move(tmp0.ptr.p_double, 1, b.ptr.p_double, 1, n);
          for (i = 0; i < n; i++) {
-            tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+            tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
          }
          ae_vector_set_length(&b2, n);
          for (i = 0; i < n; i++) {
@@ -32759,7 +32759,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             tmp0.ptr.p_double[i] = v - b.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
-            tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+            tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
             ae_set_error_flag(errorflag, fabs(tmp0.ptr.p_double[i] - x1.ptr.p_double[i]) > xtol * ae_maxreal(fabs(tmp0.ptr.p_double[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:4542");
@@ -33034,8 +33034,8 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                rawc.ptr.pp_double[i][n] = ae_sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * ae_machineepsilon;
                for (j = 0; j < n; j++) {
                   rawc.ptr.pp_double[i][j] = (double)(2 * (k % 2) - 1);
-                  rawc.ptr.pp_double[i][n] = rawc.ptr.pp_double[i][n] + rawc.ptr.pp_double[i][j] * rawc.ptr.pp_double[i][j];
-                  k = k / 2;
+                  rawc.ptr.pp_double[i][n] += rawc.ptr.pp_double[i][j] * rawc.ptr.pp_double[i][j];
+                  k /= 2;
                }
             }
 
@@ -33074,14 +33074,14 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             vv = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-               v = v + b.ptr.p_double[i];
+               v += b.ptr.p_double[i];
                if (x1.ptr.p_double[i] <= bndl.ptr.p_double[i] + tolconstr && v > 0.0) {
                   v = 0.0;
                }
                if (x1.ptr.p_double[i] >= bndu.ptr.p_double[i] - tolconstr && v < 0.0) {
                   v = 0.0;
                }
-               vv = vv + ae_sqr(v);
+               vv += ae_sqr(v);
             }
             vv = sqrt(vv);
             ae_set_error_flag(errorflag, vv > gtol, __FILE__, __LINE__, "testminqpunit.ap:4885");
@@ -33135,7 +33135,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                   v = pow(2.0, hqrndnormal(&rs));
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -33159,7 +33159,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                for (k = 0; k < nnz; k++) {
                   j = hqrnduniformi(&rs, n);
                   v = hqrndnormal(&rs);
-                  v = v + 0.1 * possign(v);
+                  v += 0.1 * possign(v);
                   rawc.ptr.pp_double[i][j] = v;
                }
             }
@@ -33191,16 +33191,16 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + a.ptr.pp_double[i][j] * (xf.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                  v += a.ptr.pp_double[i][j] * (xf.ptr.p_double[j] - xorigin.ptr.p_double[j]);
                }
                g.ptr.p_double[i] = v;
             }
             for (i = 0; i < n; i++) {
-               g.ptr.p_double[i] = g.ptr.p_double[i] + lagbc.ptr.p_double[i];
+               g.ptr.p_double[i] += lagbc.ptr.p_double[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  g.ptr.p_double[j] = g.ptr.p_double[j] + laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
+                  g.ptr.p_double[j] += laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
                }
             }
             ae_vector_set_length(&b, n);
@@ -33241,7 +33241,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             for (i = 0; i < rawccnt; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + rawc.ptr.pp_double[i][j] * xf.ptr.p_double[j];
+                  v += rawc.ptr.pp_double[i][j] * xf.ptr.p_double[j];
                }
                rawcl.ptr.p_double[i] = -INFINITY;
                rawcu.ptr.p_double[i] = +INFINITY;
@@ -33340,16 +33340,16 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                for (i = 0; i < n; i++) {
                   v = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     v = v + a.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                     v += a.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
                   }
                   gtrial.ptr.p_double[i] = v;
                }
                for (i = 0; i < n; i++) {
-                  gtrial.ptr.p_double[i] = gtrial.ptr.p_double[i] + rep.lagbc.ptr.p_double[i];
+                  gtrial.ptr.p_double[i] += rep.lagbc.ptr.p_double[i];
                }
                for (i = 0; i < rawccnt; i++) {
                   for (j = 0; j < n; j++) {
-                     gtrial.ptr.p_double[j] = gtrial.ptr.p_double[j] + rep.laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
+                     gtrial.ptr.p_double[j] += rep.laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
                   }
                }
                for (i = 0; i < n; i++) {
@@ -33547,7 +33547,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       ae_vector_set_length(&tmp0, n);
       ae_v_move(tmp0.ptr.p_double, 1, b.ptr.p_double, 1, n);
       for (i = 0; i < n; i++) {
-         tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+         tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
       }
       ae_vector_set_length(&b2, rawccnt);
       for (i = 0; i < rawccnt; i++) {
@@ -33576,7 +33576,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          tmp0.ptr.p_double[i] = v - b.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
-         tmp0.ptr.p_double[i] = tmp0.ptr.p_double[i] / da.ptr.p_double[i];
+         tmp0.ptr.p_double[i] /= da.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
          ae_set_error_flag(errorflag, fabs(tmp0.ptr.p_double[i] - x1.ptr.p_double[i]) > xtol * ae_maxreal(fabs(tmp0.ptr.p_double[i]), 1.0), __FILE__, __LINE__, "testminqpunit.ap:5416");
@@ -33817,11 +33817,11 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+               rawa.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-            xsol.ptr.p_double[i] = xsol.ptr.p_double[i] * s.ptr.p_double[i];
+            b.ptr.p_double[i] /= s.ptr.p_double[i];
+            x0.ptr.p_double[i] *= s.ptr.p_double[i];
+            xsol.ptr.p_double[i] *= s.ptr.p_double[i];
          }
 
       // Create optimizer, solve
@@ -33942,8 +33942,8 @@ static void testminqpunit_denseaultests(bool *errorflag) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
                rawc.ptr.pp_double[i][j] = hqrndnormal(&rs);
-               v = v + rawc.ptr.pp_double[i][j] * x0.ptr.p_double[j];
-               vv = vv + rawc.ptr.pp_double[i][j] * xsol.ptr.p_double[j];
+               v += rawc.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+               vv += rawc.ptr.pp_double[i][j] * xsol.ptr.p_double[j];
             }
             if (hqrndnormal(&rs) > 0.0) {
                rawct.ptr.p_int[i] = 1;
@@ -33965,17 +33965,17 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+               rawa.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-            xsol.ptr.p_double[i] = xsol.ptr.p_double[i] * s.ptr.p_double[i];
-            bndl.ptr.p_double[i] = bndl.ptr.p_double[i] * s.ptr.p_double[i];
-            bndu.ptr.p_double[i] = bndu.ptr.p_double[i] * s.ptr.p_double[i];
+            b.ptr.p_double[i] /= s.ptr.p_double[i];
+            x0.ptr.p_double[i] *= s.ptr.p_double[i];
+            xsol.ptr.p_double[i] *= s.ptr.p_double[i];
+            bndl.ptr.p_double[i] *= s.ptr.p_double[i];
+            bndu.ptr.p_double[i] *= s.ptr.p_double[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[i][j] = rawc.ptr.pp_double[i][j] / s.ptr.p_double[j];
+               rawc.ptr.pp_double[i][j] /= s.ptr.p_double[j];
             }
          }
 
@@ -34047,15 +34047,15 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+               rawa.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-            xsol.ptr.p_double[i] = xsol.ptr.p_double[i] * s.ptr.p_double[i];
+            b.ptr.p_double[i] /= s.ptr.p_double[i];
+            x0.ptr.p_double[i] *= s.ptr.p_double[i];
+            xsol.ptr.p_double[i] *= s.ptr.p_double[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[i][j] = rawc.ptr.pp_double[i][j] / s.ptr.p_double[j];
+               rawc.ptr.pp_double[i][j] /= s.ptr.p_double[j];
             }
          }
 
@@ -34154,15 +34154,15 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+               rawa.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-            xsol.ptr.p_double[i] = xsol.ptr.p_double[i] * s.ptr.p_double[i];
+            b.ptr.p_double[i] /= s.ptr.p_double[i];
+            x0.ptr.p_double[i] *= s.ptr.p_double[i];
+            xsol.ptr.p_double[i] *= s.ptr.p_double[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[i][j] = rawc.ptr.pp_double[i][j] / s.ptr.p_double[j];
+               rawc.ptr.pp_double[i][j] /= s.ptr.p_double[j];
             }
          }
 
@@ -34287,15 +34287,15 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+               rawa.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
-            x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-            xsol.ptr.p_double[i] = xsol.ptr.p_double[i] * s.ptr.p_double[i];
+            b.ptr.p_double[i] /= s.ptr.p_double[i];
+            x0.ptr.p_double[i] *= s.ptr.p_double[i];
+            xsol.ptr.p_double[i] *= s.ptr.p_double[i];
          }
          for (i = 0; i < rawccnt; i++) {
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[i][j] = rawc.ptr.pp_double[i][j] / s.ptr.p_double[j];
+               rawc.ptr.pp_double[i][j] /= s.ptr.p_double[j];
             }
          }
 
@@ -34303,9 +34303,9 @@ static void testminqpunit_denseaultests(bool *errorflag) {
          v = pow(10.0, (double)(10 * scaletype));
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               rawa.ptr.pp_double[i][j] = rawa.ptr.pp_double[i][j] * v;
+               rawa.ptr.pp_double[i][j] *= v;
             }
-            b.ptr.p_double[i] = b.ptr.p_double[i] * v;
+            b.ptr.p_double[i] *= v;
          }
 
       // Create optimizer, solve
@@ -34507,7 +34507,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
                   v = pow(2.0, hqrndnormal(&rs));
                   for (i = 0; i < nmain; i++) {
                      for (j = 0; j < nmain; j++) {
-                        maina.ptr.pp_double[i][j] = maina.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        maina.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -34544,14 +34544,14 @@ static void testminqpunit_ipmtests(bool *errorflag) {
                   for (k = 0; k < nnz; k++) {
                      j = hqrnduniformi(&rs, nmain);
                      v = hqrndnormal(&rs);
-                     v = v + 0.1 * possign(v);
+                     v += 0.1 * possign(v);
                      rawc.ptr.pp_double[i][j] = v;
                   }
                }
                for (j = nmain; j < n; j++) {
                   if (hqrndnormal(&rs) > 0.0) {
                      v = hqrndnormal(&rs);
-                     v = v + 0.1 * possign(v);
+                     v += 0.1 * possign(v);
                      rawc.ptr.pp_double[hqrnduniformi(&rs, rawccnt)][j] = v;
                   }
                }
@@ -34569,12 +34569,12 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             k = hqrnduniformi(&rs, ae_minint(nactive, rawccnt) + 1);
             for (i = 0; i < k; i++) {
                v = hqrndnormal(&rs);
-               v = v + 0.01 * possign(v);
+               v += 0.01 * possign(v);
                laglc.ptr.p_double[hqrnduniformi(&rs, rawccnt)] = v;
             }
             for (i = k; i < nactive; i++) {
                v = hqrndnormal(&rs);
-               v = v + 0.01 * possign(v);
+               v += 0.01 * possign(v);
                lagbc.ptr.p_double[hqrnduniformi(&rs, n)] = v;
             }
 
@@ -34587,16 +34587,16 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + fulla.ptr.pp_double[i][j] * (xf.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                  v += fulla.ptr.pp_double[i][j] * (xf.ptr.p_double[j] - xorigin.ptr.p_double[j]);
                }
                g.ptr.p_double[i] = v;
             }
             for (i = 0; i < n; i++) {
-               g.ptr.p_double[i] = g.ptr.p_double[i] + lagbc.ptr.p_double[i];
+               g.ptr.p_double[i] += lagbc.ptr.p_double[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  g.ptr.p_double[j] = g.ptr.p_double[j] + laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
+                  g.ptr.p_double[j] += laglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
                }
             }
             ae_vector_set_length(&b, n);
@@ -34637,7 +34637,7 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             for (i = 0; i < rawccnt; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + rawc.ptr.pp_double[i][j] * xf.ptr.p_double[j];
+                  v += rawc.ptr.pp_double[i][j] * xf.ptr.p_double[j];
                }
                rawcl.ptr.p_double[i] = -INFINITY;
                rawcu.ptr.p_double[i] = +INFINITY;
@@ -34719,16 +34719,16 @@ static void testminqpunit_ipmtests(bool *errorflag) {
             for (i = 0; i < n; i++) {
                v = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
+                  v += fulla.ptr.pp_double[i][j] * (x1.ptr.p_double[j] - xorigin.ptr.p_double[j]);
                }
                gtrial.ptr.p_double[i] = v;
             }
             for (i = 0; i < n; i++) {
-               gtrial.ptr.p_double[i] = gtrial.ptr.p_double[i] + replagbc.ptr.p_double[i];
+               gtrial.ptr.p_double[i] += replagbc.ptr.p_double[i];
             }
             for (i = 0; i < rawccnt; i++) {
                for (j = 0; j < n; j++) {
-                  gtrial.ptr.p_double[j] = gtrial.ptr.p_double[j] + replaglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
+                  gtrial.ptr.p_double[j] += replaglc.ptr.p_double[i] * rawc.ptr.pp_double[i][j];
                }
             }
             for (i = 0; i < n; i++) {
@@ -35068,9 +35068,9 @@ static void testminlpunit_validatesolution(RVector c, RVector bndl, RVector bndu
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         d.ptr.p_double[j] = d.ptr.p_double[j] - rep->y.ptr.p_double[i] * a->ptr.pp_double[i][j];
+         d.ptr.p_double[j] -= rep->y.ptr.p_double[i] * a->ptr.pp_double[i][j];
       }
-      d.ptr.p_double[n + i] = d.ptr.p_double[n + i] + rep->y.ptr.p_double[i];
+      d.ptr.p_double[n + i] += rep->y.ptr.p_double[i];
    }
    for (i = 0; i < n; i++) {
       if ((isfinite(bndl->ptr.p_double[i]) && isfinite(bndu->ptr.p_double[i])) && bndl->ptr.p_double[i] == bndu->ptr.p_double[i]) {
@@ -35104,7 +35104,7 @@ static void testminlpunit_validatesolution(RVector c, RVector bndl, RVector bndu
    for (i = 0; i < m; i++) {
       ynrm = ae_maxreal(ynrm, fabs(rep->y.ptr.p_double[i]));
    }
-   *errdual = *errdual / ae_maxreal(ynrm, 1.0);
+   *errdual /= ae_maxreal(ynrm, 1.0);
    ae_frame_leave();
 }
 
@@ -35391,7 +35391,7 @@ static void testminlpunit_basictests(bool *err) {
          v0 = 0.0;
          for (j = 0; j < n; j++) {
             a.ptr.pp_double[i][j] = hqrndnormal(&rs);
-            v0 = v0 + a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            v0 += a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
          }
          al.ptr.p_double[i] = v0 - 0.25 * hqrnduniformr(&rs);
          au.ptr.p_double[i] = v0 + 0.25 * hqrnduniformr(&rs);
@@ -35471,17 +35471,17 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix a, RVec
          if ((isfinite(al->ptr.p_double[i]) && isfinite(au->ptr.p_double[i])) && al->ptr.p_double[i] == au->ptr.p_double[i]) {
             a1.ptr.pp_double[ccnt][n] = al->ptr.p_double[i];
             ct.ptr.p_int[ccnt] = 0;
-            ccnt = ccnt + 1;
+            ccnt++;
          } else {
             if (isfinite(al->ptr.p_double[i])) {
                a1.ptr.pp_double[ccnt][n] = al->ptr.p_double[i];
                ct.ptr.p_int[ccnt] = 1;
-               ccnt = ccnt + 1;
+               ccnt++;
             }
             if (isfinite(au->ptr.p_double[i])) {
                a1.ptr.pp_double[ccnt][n] = au->ptr.p_double[i];
                ct.ptr.p_int[ccnt] = -1;
-               ccnt = ccnt + 1;
+               ccnt++;
             }
          }
       }
@@ -35540,7 +35540,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix a, RVec
                if (a->ptr.pp_double[i][j] != 0.0) {
                   ai.ptr.p_double[nz] = a->ptr.pp_double[i][j];
                   idxi.ptr.p_int[nz] = j;
-                  nz = nz + 1;
+                  nz++;
                }
             }
             rvectorresize(&ai, nz);
@@ -35555,7 +35555,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix a, RVec
                   v = hqrndnormal(rs);
                   idxi.ptr.p_int[nz + j] = idxi.ptr.p_int[k];
                   ai.ptr.p_double[nz + j] = v;
-                  ai.ptr.p_double[k] = ai.ptr.p_double[k] - v;
+                  ai.ptr.p_double[k] -= v;
                }
             }
             ndup = hqrnduniformi(rs, 2) * hqrnduniformi(rs, 4);
@@ -35637,7 +35637,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
       for (j = 0; j < n; j++) {
          ax.ptr.pp_double[i][j] = hqrndnormal(rs);
          a->ptr.pp_double[i][j] = ax.ptr.pp_double[i][j];
-         v = v + xx->ptr.p_double[j] * ax.ptr.pp_double[i][j];
+         v += xx->ptr.p_double[j] * ax.ptr.pp_double[i][j];
       }
       xx->ptr.p_double[n + i] = v;
       for (j = 0; j < m; j++) {
@@ -35797,7 +35797,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->ptr.pp_double[i][j] = hqrndnormal(rs) * hqrnduniformi(rs, 2);
-            v = v + a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            v += a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
          }
          al->ptr.p_double[i] = v - pow(q, hqrndnormal(rs));
          au->ptr.p_double[i] = v + pow(q, hqrndnormal(rs));
@@ -35830,7 +35830,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->ptr.pp_double[i][j] = hqrndnormal(rs);
-            v = v + a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            v += a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
          }
          al->ptr.p_double[i] = v - pow(q, hqrndnormal(rs));
          au->ptr.p_double[i] = v + pow(q, hqrndnormal(rs));
@@ -35888,7 +35888,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
       for (i = 0; i < ndual; i++) {
          j = basicnonbasic.ptr.p_int[*m + hqrnduniformi(rs, n)];
          if (j < n) {
-            c->ptr.p_double[j] = c->ptr.p_double[j] - d.ptr.p_double[j];
+            c->ptr.p_double[j] -= d.ptr.p_double[j];
             d.ptr.p_double[j] = 0.0;
          }
       }
@@ -36003,8 +36003,8 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
          vv = 0.0;
          for (j = 0; j < n; j++) {
             a->ptr.pp_double[i][j] = hqrndnormal(rs);
-            v = v + a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
-            vv = vv + a->ptr.pp_double[i][j] * c->ptr.p_double[j];
+            v += a->ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            vv += a->ptr.pp_double[i][j] * c->ptr.p_double[j];
          }
          if (vv >= 0.0) {
             al->ptr.p_double[i] = -INFINITY;
@@ -36116,7 +36116,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
          al->ptr.p_double[*m] = v;
          au->ptr.p_double[*m] = v - pow(q, hqrndnormal(rs));
       }
-      *m = *m + 1;
+      ++*m;
       ae_frame_leave();
       return;
    }
@@ -36212,8 +36212,8 @@ static void testminlpunit_singlecalltests(bool *err) {
          f = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f = f + x0.ptr.p_double[i] * c.ptr.p_double[i];
-            f1 = f1 + x1.ptr.p_double[i] * c.ptr.p_double[i];
+            f += x0.ptr.p_double[i] * c.ptr.p_double[i];
+            f1 += x1.ptr.p_double[i] * c.ptr.p_double[i];
          }
          ae_set_error_flag(err, fabs(f1 - f) > ftol, __FILE__, __LINE__, "testminlpunit.ap:455");
 
@@ -36529,12 +36529,12 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-                  bndl.ptr.p_double[i] = bndl.ptr.p_double[i] * s.ptr.p_double[i];
-                  bndu.ptr.p_double[i] = bndu.ptr.p_double[i] * s.ptr.p_double[i];
-                  b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
+                  x0.ptr.p_double[i] *= s.ptr.p_double[i];
+                  bndl.ptr.p_double[i] *= s.ptr.p_double[i];
+                  bndu.ptr.p_double[i] *= s.ptr.p_double[i];
+                  b.ptr.p_double[i] /= s.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     fulla.ptr.pp_double[i][j] = fulla.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+                     fulla.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
                   }
                }
 
@@ -36571,11 +36571,11 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                        state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                         state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                         for (j = 0; j < n; j++) {
-                           state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                           state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                           state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                           state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                         }
                      }
                      continue;
@@ -36611,16 +36611,16 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   g = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     g = g + fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+                     g += fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
                   }
-                  g = s.ptr.p_double[i] * g;
+                  g *= s.ptr.p_double[i];
                   if ((isfinite(bndl.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndl.ptr.p_double[i]) < tolx * s.ptr.p_double[i]) && g > 0.0) {
                      g = 0.0;
                   }
                   if ((isfinite(bndu.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndu.ptr.p_double[i]) < tolx * s.ptr.p_double[i]) && g < 0.0) {
                      g = 0.0;
                   }
-                  gnorm = gnorm + ae_sqr(g);
+                  gnorm += ae_sqr(g);
                }
                gnorm = sqrt(gnorm);
                ae_set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:286");
@@ -36702,11 +36702,11 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                        state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                         state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                         for (j = 0; j < n; j++) {
-                           state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                           state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                           state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                           state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                         }
                      }
                      continue;
@@ -36736,7 +36736,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   g = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     g = g + fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+                     g += fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
                   }
                   if ((isfinite(bndl.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndl.ptr.p_double[i]) < tolx) && g > 0.0) {
                      g = 0.0;
@@ -36744,7 +36744,7 @@ static void testminnlcunit_testbc(bool *wereerrors) {
                   if ((isfinite(bndu.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndu.ptr.p_double[i]) < tolx) && g < 0.0) {
                      g = 0.0;
                   }
-                  gnorm = gnorm + ae_sqr(g);
+                  gnorm += ae_sqr(g);
                }
                gnorm = sqrt(gnorm);
                ae_set_error_flag(wereerrors, gnorm > tolg, __FILE__, __LINE__, "testminnlcunit.ap:415");
@@ -36871,13 +36871,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   }
                }
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-                  xstart.ptr.p_double[i] = xstart.ptr.p_double[i] * s.ptr.p_double[i];
-                  b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
+                  x0.ptr.p_double[i] *= s.ptr.p_double[i];
+                  xstart.ptr.p_double[i] *= s.ptr.p_double[i];
+                  b.ptr.p_double[i] /= s.ptr.p_double[i];
                }
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     c.ptr.pp_double[i][j] = c.ptr.pp_double[i][j] / s.ptr.p_double[j];
+                     c.ptr.pp_double[i][j] /= s.ptr.p_double[j];
                   }
                }
 
@@ -36915,7 +36915,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i] + 0.5 * ae_sqr(state.x.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
+                        state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i] + 0.5 * ae_sqr(state.x.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
                         state.j.ptr.pp_double[0][i] = b.ptr.p_double[i] + state.x.ptr.p_double[i] / ae_sqr(s.ptr.p_double[i]);
                      }
                      continue;
@@ -36943,8 +36943,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                f0 = 0.0;
                f1 = 0.0;
                for (i = 0; i < n; i++) {
-                  f0 = f0 + b.ptr.p_double[i] * x0.ptr.p_double[i] + 0.5 * ae_sqr(x0.ptr.p_double[i] / s.ptr.p_double[i]);
-                  f1 = f1 + b.ptr.p_double[i] * x1.ptr.p_double[i] + 0.5 * ae_sqr(x1.ptr.p_double[i] / s.ptr.p_double[i]);
+                  f0 += b.ptr.p_double[i] * x0.ptr.p_double[i] + 0.5 * ae_sqr(x0.ptr.p_double[i] / s.ptr.p_double[i]);
+                  f1 += b.ptr.p_double[i] * x1.ptr.p_double[i] + 0.5 * ae_sqr(x1.ptr.p_double[i] / s.ptr.p_double[i]);
                }
                ae_set_error_flag(wereerrors, fabs(f1 - f0) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:607");
             }
@@ -36985,13 +36985,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
-                  v = v + ae_sqr(c.ptr.pp_double[0][i]);
+                  v += ae_sqr(c.ptr.pp_double[0][i]);
                }
                v = sqrt(v);
             }
             while (v == 0.0);
             for (i = 0; i < n; i++) {
-               c.ptr.pp_double[0][i] = c.ptr.pp_double[0][i] / v;
+               c.ptr.pp_double[0][i] /= v;
             }
             c.ptr.pp_double[0][n] = 0.0;
             ct.ptr.p_int[0] = 1;
@@ -37012,15 +37012,15 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
             }
             for (i = 0; i < n; i++) {
-               xm.ptr.p_double[i] = xm.ptr.p_double[i] * s.ptr.p_double[i];
-               xstart.ptr.p_double[i] = xstart.ptr.p_double[i] * s.ptr.p_double[i];
-               b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
+               xm.ptr.p_double[i] *= s.ptr.p_double[i];
+               xstart.ptr.p_double[i] *= s.ptr.p_double[i];
+               b.ptr.p_double[i] /= s.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  fulla.ptr.pp_double[i][j] = fulla.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+                  fulla.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
                }
             }
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[0][j] = c.ptr.pp_double[0][j] / s.ptr.p_double[j];
+               c.ptr.pp_double[0][j] /= s.ptr.p_double[j];
             }
 
          // Create optimizer, solve
@@ -37047,11 +37047,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                if (state.needfij) {
                   state.fi.ptr.p_double[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                     state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                      state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      }
                   }
                   continue;
@@ -37080,7 +37080,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             ae_v_move(g.ptr.p_double, 1, b.ptr.p_double, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-               g.ptr.p_double[i] = g.ptr.p_double[i] + v;
+               g.ptr.p_double[i] += v;
             }
             v = ae_v_dotproduct(x1.ptr.p_double, 1, c.ptr.pp_double[0], 1, n);
             ae_set_error_flag(wereerrors, v < -tolx, __FILE__, __LINE__, "testminnlcunit.ap:758");
@@ -37091,15 +37091,15 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                v = 0.0;
                vv = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + g.ptr.p_double[i] * c.ptr.pp_double[0][i];
-                  vv = vv + c.ptr.pp_double[0][i] * c.ptr.pp_double[0][i];
+                  v += g.ptr.p_double[i] * c.ptr.pp_double[0][i];
+                  vv += c.ptr.pp_double[0][i] * c.ptr.pp_double[0][i];
                }
-               v = v / vv;
+               v /= vv;
                ae_v_subd(g.ptr.p_double, 1, c.ptr.pp_double[0], 1, n, v);
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr(g.ptr.p_double[i] * s.ptr.p_double[i]);
+               v += ae_sqr(g.ptr.p_double[i] * s.ptr.p_double[i]);
             }
             ae_set_error_flag(wereerrors, sqrt(v) > tolg, __FILE__, __LINE__, "testminnlcunit.ap:778");
          }
@@ -37171,11 +37171,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                if (state.needfij) {
                   state.fi.ptr.p_double[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                     state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                      state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      }
                   }
                   continue;
@@ -37208,7 +37208,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             ae_v_move(g.ptr.p_double, 1, b.ptr.p_double, 1, n);
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(fulla.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-               g.ptr.p_double[i] = g.ptr.p_double[i] + v;
+               g.ptr.p_double[i] += v;
             }
             for (i = 0; i < k; i++) {
                v = ae_v_dotproduct(g.ptr.p_double, 1, c.ptr.pp_double[i], 1, n);
@@ -37291,11 +37291,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37333,11 +37333,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37355,11 +37355,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          f0 = 0.0;
          f1 = 0.0;
          for (i = 0; i < n; i++) {
-            f0 = f0 + b.ptr.p_double[i] * x1.ptr.p_double[i];
-            f1 = f1 + b.ptr.p_double[i] * x2.ptr.p_double[i];
+            f0 += b.ptr.p_double[i] * x1.ptr.p_double[i];
+            f1 += b.ptr.p_double[i] * x2.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * x1.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
-               f1 = f1 + 0.5 * x2.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x2.ptr.p_double[j];
+               f0 += 0.5 * x1.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               f1 += 0.5 * x2.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x2.ptr.p_double[j];
             }
          }
          ae_set_error_flag(wereerrors, fabs(f0 - f1) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1079");
@@ -37435,11 +37435,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37504,7 +37504,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = hqrndnormal(&rs);
-               v = v + c.ptr.pp_double[i][j] * xm.ptr.p_double[j];
+               v += c.ptr.pp_double[i][j] * xm.ptr.p_double[j];
             }
             c.ptr.pp_double[i][n] = v;
             ct.ptr.p_int[i] = 0;
@@ -37513,14 +37513,14 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = hqrndnormal(&rs) / sqrt((double)n);
-               v = v + c.ptr.pp_double[i][j] * xm.ptr.p_double[j];
+               v += c.ptr.pp_double[i][j] * xm.ptr.p_double[j];
             }
             c.ptr.pp_double[i][n] = v;
             ct.ptr.p_int[i] = 2 * hqrnduniformi(&rs, 2) - 1;
             if (ct.ptr.p_int[i] > 0) {
-               c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] - 0.1;
+               c.ptr.pp_double[i][n] -= 0.1;
             } else {
-               c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + 0.1;
+               c.ptr.pp_double[i][n] += 0.1;
             }
          }
 
@@ -37552,11 +37552,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37632,7 +37632,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
             }
-            c.ptr.pp_double[i][i] = c.ptr.pp_double[i][i] + 4;
+            c.ptr.pp_double[i][i] += 4;
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             c.ptr.pp_double[i][n] = v;
             ct.ptr.p_int[i] = 0;
@@ -37666,11 +37666,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37697,11 +37697,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -37720,11 +37720,11 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          f1 = 0.0;
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               f0 = f0 + 0.5 * x0.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x0.ptr.p_double[j];
-               f1 = f1 + 0.5 * x1.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+               f0 += 0.5 * x0.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+               f1 += 0.5 * x1.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
             }
-            f0 = f0 + x0.ptr.p_double[i] * b.ptr.p_double[i];
-            f1 = f1 + x1.ptr.p_double[i] * b.ptr.p_double[i];
+            f0 += x0.ptr.p_double[i] * b.ptr.p_double[i];
+            f1 += x1.ptr.p_double[i] * b.ptr.p_double[i];
          }
          ae_set_error_flag(wereerrors, fabs(f0 - f1) > tolf, __FILE__, __LINE__, "testminnlcunit.ap:1485");
       }
@@ -37800,7 +37800,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   v = hqrndnormal(&rs);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                        a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                      }
                   }
                }
@@ -37821,8 +37821,8 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                c.ptr.pp_double[i][n] = ae_sign((double)shiftkind) * pow(10.0, fabs((double)shiftkind)) * ae_machineepsilon;
                for (j = 0; j < n; j++) {
                   c.ptr.pp_double[i][j] = (double)(2 * (k % 2) - 1);
-                  c.ptr.pp_double[i][n] = c.ptr.pp_double[i][n] + c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
-                  k = k / 2;
+                  c.ptr.pp_double[i][n] += c.ptr.pp_double[i][j] * c.ptr.pp_double[i][j];
+                  k /= 2;
                }
             }
 
@@ -37851,13 +37851,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                ae_assert(state.needfij, "Assertion failed");
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + state.x.ptr.p_double[i] * b.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += state.x.ptr.p_double[i] * b.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                }
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * v;
-                  state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + v;
+                  state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * v;
+                  state.j.ptr.pp_double[0][i] += v;
                }
             }
             minnlcresults(&state, &xs0, &rep);
@@ -37874,14 +37874,14 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             vv = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-               v = v + b.ptr.p_double[i];
+               v += b.ptr.p_double[i];
                if (xs0.ptr.p_double[i] <= bl.ptr.p_double[i] + tolconstr && v > 0.0) {
                   v = 0.0;
                }
                if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr && v < 0.0) {
                   v = 0.0;
                }
-               vv = vv + ae_sqr(v);
+               vv += ae_sqr(v);
             }
             vv = sqrt(vv);
             ae_set_error_flag(wereerrors, vv > 1.0E-3, __FILE__, __LINE__, "testminnlcunit.ap:1669");
@@ -37954,7 +37954,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                         v = hqrndnormal(&rs);
                         for (i = 0; i < n; i++) {
                            for (j = 0; j < n; j++) {
-                              a.ptr.pp_double[i][j] = a.ptr.pp_double[i][j] + v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
+                              a.ptr.pp_double[i][j] += v * tmp.ptr.p_double[i] * tmp.ptr.p_double[j];
                            }
                         }
                      }
@@ -37976,7 +37976,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   for (j = 0; j < n; j++) {
                      c.ptr.pp_double[i][j] = hqrnduniformr(&rs) - 0.5;
                   }
-                  c.ptr.pp_double[i][i] = c.ptr.pp_double[i][i] + 4;
+                  c.ptr.pp_double[i][i] += 4;
                }
 
             // Create and optimize
@@ -38004,13 +38004,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                   ae_assert(state.needfij, "Assertion failed");
                   state.fi.ptr.p_double[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + state.x.ptr.p_double[i] * b.ptr.p_double[i];
+                     state.fi.ptr.p_double[0] += state.x.ptr.p_double[i] * b.ptr.p_double[i];
                      state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   }
                   for (i = 0; i < n; i++) {
                      v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * v;
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + v;
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * v;
+                     state.j.ptr.pp_double[0][i] += v;
                   }
                }
                minnlcresults(&state, &xs0, &rep);
@@ -38066,7 +38066,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                }
                for (i = 0; i < ccnt; i++) {
                   v = ae_v_dotproduct(c.ptr.pp_double[i], 1, xs0.ptr.p_double, 1, n);
-                  v = v - c.ptr.pp_double[i][n];
+                  v -= c.ptr.pp_double[i][n];
                   ae_set_error_flag(wereerrors, ct.ptr.p_int[i] == 0 && fabs(v) > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1872");
                   ae_set_error_flag(wereerrors, ct.ptr.p_int[i] > 0 && v < -tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1873");
                   ae_set_error_flag(wereerrors, ct.ptr.p_int[i] < 0 && v > tolconstr, __FILE__, __LINE__, "testminnlcunit.ap:1874");
@@ -38097,7 +38097,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                snnlssolve(&nnls, &tmp);
                for (i = 0; i < k; i++) {
                   for (j = 0; j < n; j++) {
-                     g.ptr.p_double[j] = g.ptr.p_double[j] - tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
+                     g.ptr.p_double[j] -= tmp.ptr.p_double[i] * ce.ptr.pp_double[j][i];
                   }
                }
                vv = ae_v_dotproduct(g.ptr.p_double, 1, g.ptr.p_double, 1, n);
@@ -38287,12 +38287,12 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
             }
             for (i = 0; i < n; i++) {
-               x0.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
-               bndl.ptr.p_double[i] = bndl.ptr.p_double[i] * s.ptr.p_double[i];
-               bndu.ptr.p_double[i] = bndu.ptr.p_double[i] * s.ptr.p_double[i];
-               b.ptr.p_double[i] = b.ptr.p_double[i] / s.ptr.p_double[i];
+               x0.ptr.p_double[i] *= s.ptr.p_double[i];
+               bndl.ptr.p_double[i] *= s.ptr.p_double[i];
+               bndu.ptr.p_double[i] *= s.ptr.p_double[i];
+               b.ptr.p_double[i] /= s.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  fulla.ptr.pp_double[i][j] = fulla.ptr.pp_double[i][j] / (s.ptr.p_double[i] * s.ptr.p_double[j]);
+                  fulla.ptr.pp_double[i][j] /= s.ptr.p_double[i] * s.ptr.p_double[j];
                }
             }
 
@@ -38328,11 +38328,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
 
                // Function itself
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                     state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                      state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      }
                   }
 
@@ -38378,16 +38378,16 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                g.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  g.ptr.p_double[i] = g.ptr.p_double[i] + fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+                  g.ptr.p_double[i] += fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
                }
-               g.ptr.p_double[i] = s.ptr.p_double[i] * g.ptr.p_double[i];
+               g.ptr.p_double[i] *= s.ptr.p_double[i];
                if ((isfinite(bndl.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndl.ptr.p_double[i]) < tolx * s.ptr.p_double[i]) && g.ptr.p_double[i] > 0.0) {
                   g.ptr.p_double[i] = 0.0;
                }
                if ((isfinite(bndu.ptr.p_double[i]) && fabs(x1.ptr.p_double[i] - bndu.ptr.p_double[i]) < tolx * s.ptr.p_double[i]) && g.ptr.p_double[i] < 0.0) {
                   g.ptr.p_double[i] = 0.0;
                }
-               gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[i]);
+               gnorm2 += ae_sqr(g.ptr.p_double[i]);
             }
             ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg), __FILE__, __LINE__, "testminnlcunit.ap:2196");
          }
@@ -38553,11 +38553,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                // Evaluate target function
                   state.fi.ptr.p_double[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                     state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                      state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                      for (j = 0; j < n; j++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                        state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      }
                   }
 
@@ -38670,17 +38670,17 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  v = v + fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+                  v += fulla.ptr.pp_double[i][j] * x1.ptr.p_double[j];
                }
                g.ptr.p_double[i] = v;
-               rawgnorm2 = rawgnorm2 + v * v;
+               rawgnorm2 += v * v;
             }
             klc = 0;
             for (i = 0; i < n2; i++) {
                if (ckind.ptr.p_int[i] == 0) {
 
                // Unconstrained
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2535");
                   continue;
                }
@@ -38689,7 +38689,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                // Bound equality constrained, unconditionally set gradient to zero
                   g.ptr.p_double[2 * i + 0] = 0.0;
                   g.ptr.p_double[2 * i + 1] = 0.0;
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2546");
                   continue;
                }
@@ -38703,7 +38703,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   if (x1.ptr.p_double[2 * i + 1] < bndl.ptr.p_double[2 * i + 1] + tolx || x1.ptr.p_double[2 * i + 1] > bndu.ptr.p_double[2 * i + 1] - tolx) {
                      g.ptr.p_double[2 * i + 1] = 0.0;
                   }
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2560");
                   continue;
                }
@@ -38713,10 +38713,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                // equality constrained subspace
                   v = g.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
                   vv = ae_sqr(c.ptr.pp_double[klc][2 * i + 0]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
-                  g.ptr.p_double[2 * i + 0] = g.ptr.p_double[2 * i + 0] - c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
-                  g.ptr.p_double[2 * i + 1] = g.ptr.p_double[2 * i + 1] - c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
+                  g.ptr.p_double[2 * i + 0] -= c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
+                  g.ptr.p_double[2 * i + 1] -= c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
                   inc(&klc);
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2575");
                   continue;
                }
@@ -38728,11 +38728,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   if (v > -tolx) {
                      v = g.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
                      vv = ae_sqr(c.ptr.pp_double[klc][2 * i + 0]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
-                     g.ptr.p_double[2 * i + 0] = g.ptr.p_double[2 * i + 0] - c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
-                     g.ptr.p_double[2 * i + 1] = g.ptr.p_double[2 * i + 1] - c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
+                     g.ptr.p_double[2 * i + 0] -= c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
+                     g.ptr.p_double[2 * i + 1] -= c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
                   }
                   inc(&klc);
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2594");
                   continue;
                }
@@ -38746,9 +38746,9 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   vx = x1.ptr.p_double[2 * i + 0] / v;
                   vy = x1.ptr.p_double[2 * i + 1] / v;
                   v = g.ptr.p_double[2 * i + 0] * vx + g.ptr.p_double[2 * i + 1] * vy;
-                  g.ptr.p_double[2 * i + 0] = g.ptr.p_double[2 * i + 0] - vx * v;
-                  g.ptr.p_double[2 * i + 1] = g.ptr.p_double[2 * i + 1] - vy * v;
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  g.ptr.p_double[2 * i + 0] -= vx * v;
+                  g.ptr.p_double[2 * i + 1] -= vy * v;
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2612");
                   continue;
                }
@@ -38765,10 +38765,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                      vx = x1.ptr.p_double[2 * i + 0] / v;
                      vy = x1.ptr.p_double[2 * i + 1] / v;
                      v = g.ptr.p_double[2 * i + 0] * vx + g.ptr.p_double[2 * i + 1] * vy;
-                     g.ptr.p_double[2 * i + 0] = g.ptr.p_double[2 * i + 0] - vx * v;
-                     g.ptr.p_double[2 * i + 1] = g.ptr.p_double[2 * i + 1] - vy * v;
+                     g.ptr.p_double[2 * i + 0] -= vx * v;
+                     g.ptr.p_double[2 * i + 1] -= vy * v;
                   }
-                  gnorm2 = gnorm2 + ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2635");
                   continue;
                }
@@ -38881,7 +38881,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       ae_set_error_flag(wereerrors, fabs(nd2f - d2f) > dtol * ae_maxreal(fabs(nd2f), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2726");
 
    // Next point
-      v = v + h;
+      v += h;
    }
    minnlcequalitypenaltyfunction(0.0, &f0, &df, &d2f);
    ae_set_error_flag(wereerrors, f0 != 0.0, __FILE__, __LINE__, "testminnlcunit.ap:2734");
@@ -38906,7 +38906,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       ae_set_error_flag(wereerrors, fabs(nd2f - d2f) > dtol * ae_maxreal(fabs(nd2f), 1.0), __FILE__, __LINE__, "testminnlcunit.ap:2761");
 
    // Next point
-      v = v + h;
+      v += h;
    }
    minnlcinequalityshiftfunction(1.0, &f0, &df, &d2f);
    ae_set_error_flag(wereerrors, fabs(f0) > 1.0E-6, __FILE__, __LINE__, "testminnlcunit.ap:2769");
@@ -39058,7 +39058,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                c.ptr.pp_double[i][j] = hqrndnormal(&rs);
-               v = v + ae_sqr(c.ptr.pp_double[i][j]);
+               v += ae_sqr(c.ptr.pp_double[i][j]);
             }
             v = 1 / sqrt(v);
             ae_v_muld(c.ptr.pp_double[i], 1, n, v);
@@ -39097,7 +39097,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                continue;
@@ -39142,7 +39142,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                for (i = 0; i < k; i++) {
@@ -39224,11 +39224,11 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                if (k >= spoiliteration) {
@@ -39295,11 +39295,11 @@ static void testminnlcunit_testother(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   ae_set_error_flag(wereerrors, state.x.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminnlcunit.ap:3173");
                   ae_set_error_flag(wereerrors, state.x.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminnlcunit.ap:3174");
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                     state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.j.ptr.pp_double[0][i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -39328,9 +39328,9 @@ static void testminnlcunit_testother(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   ae_set_error_flag(wereerrors, state.x.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminnlcunit.ap:3209");
                   ae_set_error_flag(wereerrors, state.x.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminnlcunit.ap:3210");
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                }
                continue;
@@ -39368,7 +39368,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + pow(state.x.ptr.p_double[i], 4.0);
+                  state.fi.ptr.p_double[0] += pow(state.x.ptr.p_double[i], 4.0);
                   state.j.ptr.pp_double[0][i] = 4 * pow(state.x.ptr.p_double[i], 3.0);
                }
                continue;
@@ -39444,7 +39444,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
+                  state.fi.ptr.p_double[0] += pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
                   state.j.ptr.pp_double[0][i] = 2 * (state.x.ptr.p_double[i] - xu.ptr.p_double[i]);
                }
                continue;
@@ -39544,7 +39544,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
+                  state.fi.ptr.p_double[0] += pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
                   state.j.ptr.pp_double[0][i] = 2 * (state.x.ptr.p_double[i] - xu.ptr.p_double[i]);
                }
                continue;
@@ -39563,7 +39563,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
       // Check constraint violation reports
          if (rep.bcerr > 0.0) {
             v = ae_maxreal(bndl.ptr.p_double[badidx1] - x1.ptr.p_double[badidx1], x1.ptr.p_double[badidx1] - bndu.ptr.p_double[badidx1]);
-            v = v / s.ptr.p_double[badidx1];
+            v /= s.ptr.p_double[badidx1];
             ae_set_error_flag(wereerrors, rep.bcidx != badidx1, __FILE__, __LINE__, "testminnlcunit.ap:3463");
             ae_set_error_flag(wereerrors, fabs(rep.bcerr - v) > 1.0E3 * ae_machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3465");
          } else {
@@ -39651,13 +39651,13 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
+                  state.fi.ptr.p_double[0] += pow(state.x.ptr.p_double[i] - xu.ptr.p_double[i], 2.0);
                   state.j.ptr.pp_double[0][i] = 2 * (state.x.ptr.p_double[i] - xu.ptr.p_double[i]);
                }
                for (i = 0; i < k; i++) {
                   state.fi.ptr.p_double[i + 1] = -c.ptr.pp_double[i][n];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[i + 1] = state.fi.ptr.p_double[i + 1] + c.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[i + 1] += c.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      state.j.ptr.pp_double[i + 1][j] = c.ptr.pp_double[i][j];
                   }
                }
@@ -39678,7 +39678,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
          if (badidx0 < nlec) {
             if (rep.bcerr > 0.0) {
                v = ae_maxreal(bndl.ptr.p_double[badidx0] - x1.ptr.p_double[badidx0], x1.ptr.p_double[badidx0] - bndu.ptr.p_double[badidx0]);
-               v = v / s.ptr.p_double[badidx0];
+               v /= s.ptr.p_double[badidx0];
                ae_set_error_flag(wereerrors, rep.bcidx != badidx0, __FILE__, __LINE__, "testminnlcunit.ap:3594");
                ae_set_error_flag(wereerrors, fabs(rep.bcerr - v) > 1.0E3 * ae_machineepsilon, __FILE__, __LINE__, "testminnlcunit.ap:3596");
             } else {
@@ -39840,7 +39840,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                if (ctype == 1) {
@@ -39861,7 +39861,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             ae_frame_leave();
             return;
          }
-         nnone = nnone + rep.iterationscount;
+         nnone += rep.iterationscount;
 
       // Test LBFGS preconditioned iteration
          minnlccreate(n, &x0, &state);
@@ -39877,7 +39877,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                if (ctype == 1) {
@@ -39898,7 +39898,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             ae_frame_leave();
             return;
          }
-         nlbfgs = nlbfgs + rep.iterationscount;
+         nlbfgs += rep.iterationscount;
 
       // Test exact low rank preconditioner
          minnlccreate(n, &x0, &state);
@@ -39914,7 +39914,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                if (ctype == 1) {
@@ -39935,7 +39935,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             ae_frame_leave();
             return;
          }
-         nexactlowrank = nexactlowrank + rep.iterationscount;
+         nexactlowrank += rep.iterationscount;
 
       // Test exact robust preconditioner
          minnlccreate(n, &x0, &state);
@@ -39951,7 +39951,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + ae_sqr(state.x.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += ae_sqr(state.x.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = 2 * state.x.ptr.p_double[i];
                }
                if (ctype == 1) {
@@ -39972,7 +39972,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
             ae_frame_leave();
             return;
          }
-         nexactrobust = nexactrobust + rep.iterationscount;
+         nexactrobust += rep.iterationscount;
       }
 
    // Compare.
@@ -40031,8 +40031,8 @@ static void testminnlcunit_testoptguardc1test0reportfortask0(bool *err, optguard
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
       }
@@ -40100,8 +40100,8 @@ static void testminnlcunit_testoptguardc1test1reportfortask0(bool *err, optguard
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
@@ -40308,17 +40308,17 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * v;
+               state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * v;
             }
             state.fi.ptr.p_double[1] = 0.0;
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a1.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a1.ptr.pp_double[i][j];
                }
-               state.fi.ptr.p_double[1] = state.fi.ptr.p_double[1] + 0.5 * state.x.ptr.p_double[i] * v;
+               state.fi.ptr.p_double[1] += 0.5 * state.x.ptr.p_double[i] * v;
             }
             for (i = 0; i < n; i++) {
                state.j.ptr.pp_double[0][i] = 0.0;
@@ -40387,12 +40387,12 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + fabs(v);
+               state.fi.ptr.p_double[0] += fabs(v);
                v = (double)(ae_sign(v));
                for (j = 0; j < n; j++) {
-                  state.j.ptr.pp_double[0][j] = state.j.ptr.pp_double[0][j] + v * a.ptr.pp_double[i][j];
+                  state.j.ptr.pp_double[0][j] += v * a.ptr.pp_double[i][j];
                }
             }
             continue;
@@ -40477,32 +40477,32 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                      for (i = 0; i < n; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                           v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                         }
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                        state.fi.ptr.p_double[0] += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                         state.j.ptr.pp_double[0][i] = v;
                      }
                      state.fi.ptr.p_double[1] = 0.0;
                      for (i = 0; i < n; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
+                           v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
                         }
-                        state.fi.ptr.p_double[1] = state.fi.ptr.p_double[1] + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                        state.fi.ptr.p_double[1] += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                         state.j.ptr.pp_double[1][i] = v;
                      }
                      if (defecttype == 0) {
                         state.j.ptr.pp_double[funcidx][varidx] = 0.0;
                      }
                      if (defecttype == 1) {
-                        state.j.ptr.pp_double[funcidx][varidx] = state.j.ptr.pp_double[funcidx][varidx] + 1;
+                        state.j.ptr.pp_double[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.ptr.pp_double[funcidx][varidx] = state.j.ptr.pp_double[funcidx][varidx] * 2;
+                        state.j.ptr.pp_double[funcidx][varidx] *= 2;
                      }
                      for (i = 0; i < n; i++) {
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] / s.ptr.p_double[i];
-                        state.j.ptr.pp_double[1][i] = state.j.ptr.pp_double[1][i] / s.ptr.p_double[i];
+                        state.j.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+                        state.j.ptr.pp_double[1][i] /= s.ptr.p_double[i];
                      }
                      continue;
                   }
@@ -40529,7 +40529,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
                   jactrue.ptr.pp_double[0][i] = v;
                   jacdefect.ptr.pp_double[0][i] = v;
@@ -40537,7 +40537,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
+                     v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
                   }
                   jactrue.ptr.pp_double[1][i] = v;
                   jacdefect.ptr.pp_double[1][i] = v;
@@ -40546,16 +40546,16 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   jacdefect.ptr.pp_double[funcidx][varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  jacdefect.ptr.pp_double[funcidx][varidx] = jacdefect.ptr.pp_double[funcidx][varidx] + 1;
+                  jacdefect.ptr.pp_double[funcidx][varidx]++;
                }
                if (defecttype == 2) {
-                  jacdefect.ptr.pp_double[funcidx][varidx] = jacdefect.ptr.pp_double[funcidx][varidx] * 2;
+                  jacdefect.ptr.pp_double[funcidx][varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-                  jactrue.ptr.pp_double[1][i] = jactrue.ptr.pp_double[1][i] / s.ptr.p_double[i];
-                  jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
-                  jacdefect.ptr.pp_double[1][i] = jacdefect.ptr.pp_double[1][i] / s.ptr.p_double[i];
+                  jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+                  jactrue.ptr.pp_double[1][i] /= s.ptr.p_double[i];
+                  jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+                  jacdefect.ptr.pp_double[1][i] /= s.ptr.p_double[i];
                }
 
             // Check OptGuard report
@@ -40624,11 +40624,11 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          if (state.needfij) {
             state.fi.ptr.p_double[0] = 0.0;
             for (i = 0; i < n; i++) {
-               state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                  state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.j.ptr.pp_double[0][i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             continue;
@@ -40693,13 +40693,13 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   xu.ptr.p_double[i] = 0.1 + hqrnduniformr(&rs);
-                  v = v + ae_sqr(xu.ptr.p_double[i]);
+                  v += ae_sqr(xu.ptr.p_double[i]);
                }
                v = sqrt(v);
             }
             while (v <= 0.0);
             for (i = 0; i < n; i++) {
-               xu.ptr.p_double[i] = xu.ptr.p_double[i] / v;
+               xu.ptr.p_double[i] /= v;
             }
             for (i = 0; i < n; i++) {
                xlast.ptr.p_double[i] = 0.0;
@@ -40745,17 +40745,17 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                if (state.needfij) {
                   state.fi.ptr.p_double[0] = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + fscale * pow(state.x.ptr.p_double[i], 2.0);
+                     state.fi.ptr.p_double[0] += fscale * pow(state.x.ptr.p_double[i], 2.0);
                      state.j.ptr.pp_double[0][i] = 2 * fscale * state.x.ptr.p_double[i];
                   }
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + state.x.ptr.p_double[i] * xu.ptr.p_double[i];
+                     v += state.x.ptr.p_double[i] * xu.ptr.p_double[i];
                   }
                   if (v < vbnd) {
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + (vshift + vpower * (vbnd - v));
+                     state.fi.ptr.p_double[0] += (vshift + vpower * (vbnd - v));
                      for (i = 0; i < n; i++) {
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] - vpower * xu.ptr.p_double[i];
+                        state.j.ptr.pp_double[0][i] -= vpower * xu.ptr.p_double[i];
                      }
                      if (linesearchstarted) {
                         inc(&cntbelow);
@@ -40773,7 +40773,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   if (linesearchstarted) {
                      stplen = 0.0;
                      for (i = 0; i < n; i++) {
-                        stplen = stplen + ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]);
+                        stplen += ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]);
                      }
                      stplen = sqrt(stplen);
                      wasgoodlinesearch0 = wasgoodlinesearch0 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
@@ -40788,7 +40788,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   }
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + state.x.ptr.p_double[i] * xu.ptr.p_double[i];
+                     v += state.x.ptr.p_double[i] * xu.ptr.p_double[i];
                   }
                   if (v < vbnd) {
                      inc(&cntbelow);
@@ -40911,12 +40911,12 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + fabs(v);
+                  state.fi.ptr.p_double[0] += fabs(v);
                   v = (double)(ae_sign(v));
                   for (j = 0; j < n; j++) {
-                     state.j.ptr.pp_double[0][j] = state.j.ptr.pp_double[0][j] + v * a.ptr.pp_double[i][j];
+                     state.j.ptr.pp_double[0][j] += v * a.ptr.pp_double[i][j];
                   }
                }
                continue;
@@ -40957,8 +40957,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4689");
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-            avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / (double)passcount;
-            avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / (double)passcount;
+            avgstr0len += (double)ognonc1test0strrep.cnt / (double)passcount;
+            avglng0len += (double)ognonc1test0lngrep.cnt / (double)passcount;
          } else {
             ae_set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4697");
             ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4698");
@@ -40973,8 +40973,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit.ap:4708");
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-            avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / (double)passcount;
-            avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / (double)passcount;
+            avgstr1len += (double)ognonc1test1strrep.cnt / (double)passcount;
+            avglng1len += (double)ognonc1test1lngrep.cnt / (double)passcount;
          } else {
             ae_set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4716");
             ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit.ap:4717");
@@ -41049,9 +41049,9 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + fabs(v);
+                  state.fi.ptr.p_double[0] += fabs(v);
                }
                continue;
             }
@@ -41144,19 +41144,19 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+                  state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                   state.j.ptr.pp_double[0][i] = b.ptr.p_double[i];
                }
                for (i = 0; i < n; i++) {
                   state.fi.ptr.p_double[1 + i] = -1.0;
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[1 + i] = state.fi.ptr.p_double[1 + i] + a.ptr.pp_double[i][j] * ae_sqr(state.x.ptr.p_double[j]);
+                     state.fi.ptr.p_double[1 + i] += a.ptr.pp_double[i][j] * ae_sqr(state.x.ptr.p_double[j]);
                      state.j.ptr.pp_double[1 + i][j] = 2 * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                   }
                   if (i != goodidx) {
                      state.fi.ptr.p_double[1 + i] = ae_maxreal(state.fi.ptr.p_double[1 + i], 0.0);
                      for (j = 0; j < n; j++) {
-                        state.j.ptr.pp_double[1 + i][j] = ae_sign(state.fi.ptr.p_double[1 + i]) * state.j.ptr.pp_double[1 + i][j];
+                        state.j.ptr.pp_double[1 + i][j] *= ae_sign(state.fi.ptr.p_double[1 + i]);
                      }
                   }
                }
@@ -41455,13 +41455,13 @@ static void testminnlcunit_testbugs(bool *wereerrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (j = 0; j < n; j++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * d.ptr.p_double[j] * ae_sqr(state.x.ptr.p_double[j]);
+                  state.fi.ptr.p_double[0] += 0.5 * d.ptr.p_double[j] * ae_sqr(state.x.ptr.p_double[j]);
                   state.j.ptr.pp_double[0][j] = d.ptr.p_double[j] * state.x.ptr.p_double[j];
                }
                for (i = 0; i < 2 * k; i++) {
                   state.fi.ptr.p_double[1 + i] = -c.ptr.pp_double[i][n];
                   for (j = 0; j < n; j++) {
-                     state.fi.ptr.p_double[1 + i] = state.fi.ptr.p_double[1 + i] + c.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                     state.fi.ptr.p_double[1 + i] += c.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                      state.j.ptr.pp_double[1 + i][j] = hqrnduniformi(&rs, 2) * c.ptr.pp_double[i][j];
                   }
                }
@@ -41575,7 +41575,7 @@ static void testminbcunit_calciip2(minbcstate *state, ae_int_t n, ae_int_t fk) {
    }
    for (i = 0; i < n; i++) {
       if (state->needfg) {
-         state->f = state->f + pow((double)(i * i + 1), (double)(2 * fk)) * ae_sqr(state->x.ptr.p_double[i]);
+         state->f += pow((double)(i * i + 1), (double)(2 * fk)) * ae_sqr(state->x.ptr.p_double[i]);
          state->g.ptr.p_double[i] = pow((double)(i * i + 1), (double)(2 * fk)) * 2 * state->x.ptr.p_double[i];
       }
    }
@@ -41696,7 +41696,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
@@ -41716,7 +41716,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.ptr.p_double[i] > 0.0 && x.ptr.p_double[i] < 1.0) {
-                        v = v + ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
+                        v += ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
                      }
                      *feaserr = *feaserr || x.ptr.p_double[i] < 0.0;
                      *feaserr = *feaserr || x.ptr.p_double[i] > 1.0;
@@ -41781,7 +41781,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                      }
                      for (i = 0; i < n; i++) {
                         if (state.needf || state.needfg) {
-                           state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                           state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         }
                         if (state.needfg) {
                            state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
@@ -41801,7 +41801,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   v = 0.0;
                   for (i = 0; i < n; i++) {
                      if (x.ptr.p_double[i] > bl.ptr.p_double[i] && x.ptr.p_double[i] < bu.ptr.p_double[i]) {
-                        v = v + ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
+                        v += ae_sqr(p * pow(x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1)));
                      }
                      *feaserr = *feaserr || x.ptr.p_double[i] < bl.ptr.p_double[i];
                      *feaserr = *feaserr || x.ptr.p_double[i] > bu.ptr.p_double[i];
@@ -41853,7 +41853,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
+                        state.f += pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)p);
                         state.g.ptr.p_double[i] = p * pow(state.x.ptr.p_double[i] - x0.ptr.p_double[i], (double)(p - 1));
                      }
                      continue;
@@ -41970,7 +41970,7 @@ static void testminbcunit_testother(bool *err) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + state.x.ptr.p_double[i];
+            state.f += state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = 1.0;
          }
       }
@@ -42005,7 +42005,7 @@ static void testminbcunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+               state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
             }
          }
@@ -42051,7 +42051,7 @@ static void testminbcunit_testother(bool *err) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+                  state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                }
                if (state.needfg) {
                   state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
@@ -42198,7 +42198,7 @@ static void testminbcunit_testother(bool *err) {
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + a.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i]);
+                        state.f += a.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i]);
                         state.g.ptr.p_double[i] = 2 * a.ptr.p_double[i] * state.x.ptr.p_double[i];
                      }
                   }
@@ -42211,7 +42211,7 @@ static void testminbcunit_testother(bool *err) {
                }
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + ae_sqr(s.ptr.p_double[i] * 2 * a.ptr.p_double[i] * x.ptr.p_double[i]);
+                  v += ae_sqr(s.ptr.p_double[i] * 2 * a.ptr.p_double[i] * x.ptr.p_double[i]);
                }
                v = sqrt(v);
                ae_set_error_flag(err, v > tmpeps, __FILE__, __LINE__, "testminbcunit.ap:754");
@@ -42393,7 +42393,7 @@ static void testminbcunit_testother(bool *err) {
             if (state.needfg) {
                state.f = ae_sqr(state.x.ptr.p_double[0] + 1) + ae_sqr(state.x.ptr.p_double[1] + 1);
                if (state.x.ptr.p_double[0] == x.ptr.p_double[0] && state.x.ptr.p_double[1] == x.ptr.p_double[1]) {
-                  state.f = state.f - 0.1;
+                  state.f -= 0.1;
                }
                state.g.ptr.p_double[0] = 2 * (state.x.ptr.p_double[0] + 1);
                state.g.ptr.p_double[1] = 2 * (state.x.ptr.p_double[1] + 1);
@@ -42451,11 +42451,11 @@ static void testminbcunit_testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.f += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.g.ptr.p_double[i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             if (k >= spoiliteration) {
@@ -42618,7 +42618,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
                testminbcunit_calciip2(&state, n, fk);
             }
             minbcresults(&state, &x, &rep);
-            cntb1 = cntb1 + rep.iterationscount;
+            cntb1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          ae_vector_set_length(&diagh, n);
@@ -42637,7 +42637,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
                testminbcunit_calciip2(&state, n, fk);
             }
             minbcresults(&state, &x, &rep);
-            cntg1 = cntg1 + rep.iterationscount;
+            cntg1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb1 < cntg1;
@@ -42659,7 +42659,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
                testminbcunit_calciip2(&state, n, fk);
             }
             minbcresults(&state, &x, &rep);
-            cntb2 = cntb2 + rep.iterationscount;
+            cntb2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          minbcsetprecscale(&state);
@@ -42674,7 +42674,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
                testminbcunit_calciip2(&state, n, fk);
             }
             minbcresults(&state, &x, &rep);
-            cntg2 = cntg2 + rep.iterationscount;
+            cntg2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -42725,9 +42725,9 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + fabs(vv);
+            v += fabs(vv);
          }
          ae_set_error_flag(err, fabs(v - rep->f.ptr.p_double[k]) > 1.0E-6 * ae_maxreal(fabs(v), 1.0), __FILE__, __LINE__, "testminbcunit.ap:1891");
       }
@@ -42738,8 +42738,8 @@ static void testminbcunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
       }
@@ -42805,9 +42805,9 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
+            v += ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
             tooclose = tooclose || fabs(vv) < 1.0E-4;
          }
          if (!tooclose) {
@@ -42822,8 +42822,8 @@ static void testminbcunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
@@ -42913,9 +42913,9 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
+            state.f += 0.5 * state.x.ptr.p_double[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.ptr.p_double[i] = 0.0;
@@ -42970,12 +42970,12 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + fabs(v);
+            state.f += fabs(v);
             v = (double)(ae_sign(v));
             for (j = 0; j < n; j++) {
-               state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+               state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
             }
          }
          continue;
@@ -43043,22 +43043,22 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                  state.f += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                   state.g.ptr.p_double[i] = v;
                }
                if (defecttype == 0) {
                   state.g.ptr.p_double[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] + 1;
+                  state.g.ptr.p_double[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] * 2;
+                  state.g.ptr.p_double[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] / s.ptr.p_double[i];
+                  state.g.ptr.p_double[i] /= s.ptr.p_double[i];
                }
                continue;
             }
@@ -43085,7 +43085,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
             jactrue.ptr.pp_double[0][i] = v;
             jacdefect.ptr.pp_double[0][i] = v;
@@ -43094,14 +43094,14 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
             jacdefect.ptr.pp_double[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] + 1;
+            jacdefect.ptr.pp_double[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] * 2;
+            jacdefect.ptr.pp_double[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-            jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
+            jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+            jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
          }
 
       // Check OptGuard report
@@ -43183,12 +43183,12 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
                v = (double)(ae_sign(v));
                for (j = 0; j < n; j++) {
-                  state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+                  state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
                }
             }
             continue;
@@ -43229,8 +43229,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1633");
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / (double)passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / (double)passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / (double)passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1641");
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1642");
@@ -43245,8 +43245,8 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminbcunit.ap:1652");
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / (double)passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / (double)passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / (double)passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1660");
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbcunit.ap:1661");
@@ -43306,9 +43306,9 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
             }
             continue;
          }
@@ -43362,11 +43362,11 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+            state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-               state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.f += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.g.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
             }
          }
          continue;
@@ -43496,7 +43496,7 @@ static void testminnsunit_basictest0uc(bool *errors) {
          if (s.needfij) {
             s.fi.ptr.p_double[0] = 0.0;
             for (i = 0; i < n; i++) {
-               s.fi.ptr.p_double[0] = s.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(s.x.ptr.p_double[i]);
+               s.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(s.x.ptr.p_double[i]);
                s.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(s.x.ptr.p_double[i]);
             }
             continue;
@@ -43512,8 +43512,8 @@ static void testminnsunit_basictest0uc(bool *errors) {
       for (i = 0; i < n; i++) {
          ae_set_error_flag(errors, !isfinite(x1.ptr.p_double[i]) || fabs(x1.ptr.p_double[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:147");
       }
-      sumits = sumits + (double)rep.iterationscount / (double)passcount;
-      sumnfev = sumnfev + (double)rep.nfev / (double)passcount;
+      sumits += (double)rep.iterationscount / (double)passcount;
+      sumnfev += (double)rep.nfev / (double)passcount;
    }
    ae_frame_leave();
 }
@@ -43551,12 +43551,12 @@ static void testminnsunit_basictest1uc(bool *errors) {
          s.j.ptr.pp_double[0][0] = 10 * ae_sign(ae_sqr(v0) - v1) * 2 * v0 + 2 * (v0 - 1);
          s.j.ptr.pp_double[0][1] = (double)(10 * ae_sign(ae_sqr(v0) - v1) * (-1));
          if (sqrt(2.0) * v0 - 1 > 0.0) {
-            s.fi.ptr.p_double[0] = s.fi.ptr.p_double[0] + 100 * (sqrt(2.0) * v0 - 1);
-            s.j.ptr.pp_double[0][0] = s.j.ptr.pp_double[0][0] + 100 * sqrt(2.0);
+            s.fi.ptr.p_double[0] += 100 * (sqrt(2.0) * v0 - 1);
+            s.j.ptr.pp_double[0][0] += 100 * sqrt(2.0);
          }
          if (2 * v1 - 1 > 0.0) {
-            s.fi.ptr.p_double[0] = s.fi.ptr.p_double[0] + 100 * (2 * v1 - 1);
-            s.j.ptr.pp_double[0][1] = s.j.ptr.pp_double[0][1] + 100 * 2;
+            s.fi.ptr.p_double[0] += 100 * (2 * v1 - 1);
+            s.j.ptr.pp_double[0][1] += 100 * 2;
          }
          continue;
       }
@@ -43618,7 +43618,7 @@ static void testminnsunit_basictest0bc(bool *errors) {
          if (s.needfij) {
             s.fi.ptr.p_double[0] = 0.0;
             for (i = 0; i < n; i++) {
-               s.fi.ptr.p_double[0] = s.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(s.x.ptr.p_double[i]);
+               s.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(s.x.ptr.p_double[i]);
                s.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(s.x.ptr.p_double[i]);
             }
             continue;
@@ -43634,8 +43634,8 @@ static void testminnsunit_basictest0bc(bool *errors) {
       for (i = 0; i < n; i++) {
          ae_set_error_flag(errors, !isfinite(x1.ptr.p_double[i]) || fabs(x1.ptr.p_double[i] - boundval(0.0, bl.ptr.p_double[i], bu.ptr.p_double[i])) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:267");
       }
-      sumits = sumits + (double)rep.iterationscount / (double)passcount;
-      sumnfev = sumnfev + (double)rep.nfev / (double)passcount;
+      sumits += (double)rep.iterationscount / (double)passcount;
+      sumnfev += (double)rep.nfev / (double)passcount;
    }
    ae_frame_leave();
 }
@@ -43747,7 +43747,7 @@ static void testminnsunit_basictest0lc(bool *errors) {
             c.ptr.pp_double[nc + 1][i] = 1.0 + ae_randomreal();
             ct.ptr.p_int[nc + 0] = 1;
             ct.ptr.p_int[nc + 1] = -1;
-            nc = nc + 2;
+            nc += 2;
          }
       }
       minnscreate(n, &x0, &s);
@@ -43773,8 +43773,8 @@ static void testminnsunit_basictest0lc(bool *errors) {
       for (i = 0; i < n; i++) {
          ae_set_error_flag(errors, !isfinite(x1.ptr.p_double[i]) || fabs(x1.ptr.p_double[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:408");
       }
-      sumits = sumits + (double)rep.iterationscount / (double)passcount;
-      sumnfev = sumnfev + (double)rep.nfev / (double)passcount;
+      sumits += (double)rep.iterationscount / (double)passcount;
+      sumnfev += (double)rep.nfev / (double)passcount;
    }
    ae_frame_leave();
 }
@@ -43889,7 +43889,7 @@ static void testminnsunit_basictest0nlc(bool *errors) {
             }
             ic.ptr.pp_double[nic + 0][i] = 1.0 + ae_randomreal();
             ic.ptr.pp_double[nic + 1][i] = -1.0 - ae_randomreal();
-            nic = nic + 2;
+            nic += 2;
          }
       }
       minnscreate(n, &x0, &s);
@@ -43905,14 +43905,14 @@ static void testminnsunit_basictest0nlc(bool *errors) {
             for (i = 0; i < nec; i++) {
                s.fi.ptr.p_double[1 + i] = -ec.ptr.pp_double[i][n];
                for (j = 0; j < n; j++) {
-                  s.fi.ptr.p_double[1 + i] = s.fi.ptr.p_double[1 + i] + s.x.ptr.p_double[j] * ec.ptr.pp_double[i][j];
+                  s.fi.ptr.p_double[1 + i] += s.x.ptr.p_double[j] * ec.ptr.pp_double[i][j];
                   s.j.ptr.pp_double[1 + i][j] = ec.ptr.pp_double[i][j];
                }
             }
             for (i = 0; i < nic; i++) {
                s.fi.ptr.p_double[1 + nec + i] = -ic.ptr.pp_double[i][n];
                for (j = 0; j < n; j++) {
-                  s.fi.ptr.p_double[1 + nec + i] = s.fi.ptr.p_double[1 + nec + i] + s.x.ptr.p_double[j] * ic.ptr.pp_double[i][j];
+                  s.fi.ptr.p_double[1 + nec + i] += s.x.ptr.p_double[j] * ic.ptr.pp_double[i][j];
                   s.j.ptr.pp_double[1 + nec + i][j] = ic.ptr.pp_double[i][j];
                }
             }
@@ -43929,8 +43929,8 @@ static void testminnsunit_basictest0nlc(bool *errors) {
       for (i = 0; i < n; i++) {
          ae_set_error_flag(errors, !isfinite(x1.ptr.p_double[i]) || fabs(x1.ptr.p_double[i]) > 0.001, __FILE__, __LINE__, "testminnsunit.ap:571");
       }
-      sumits = sumits + (double)rep.iterationscount / (double)passcount;
-      sumnfev = sumnfev + (double)rep.nfev / (double)passcount;
+      sumits += (double)rep.iterationscount / (double)passcount;
+      sumnfev += (double)rep.nfev / (double)passcount;
    }
    ae_frame_leave();
 }
@@ -44000,7 +44000,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
@@ -44013,7 +44013,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
                werexreports = true;
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  v += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                repferr = ae_maxreal(repferr, fabs(v - state.f));
                continue;
@@ -44063,14 +44063,14 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             if (state.needfi) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
             }
             if (state.xupdated) {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  v += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                repferr = ae_maxreal(repferr, fabs(v - state.f));
                continue;
@@ -44123,7 +44123,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
@@ -44144,7 +44144,7 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]) / s.ptr.p_double[i];
                }
                continue;
@@ -44271,7 +44271,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
@@ -44284,7 +44284,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                werexreports = true;
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  v += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                repferr = ae_maxreal(repferr, fabs(v - state.f));
                for (i = 0; i < n; i++) {
@@ -44349,15 +44349,15 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                state.j.ptr.pp_double[0][i] = 0.0;
             }
             for (i = 0; i < n; i++) {
-               state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.fi.ptr.p_double[0] += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             for (i = 0; i < n; i++) {
-               state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + b.ptr.p_double[i];
+               state.j.ptr.pp_double[0][i] += b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.j.ptr.pp_double[0][i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             continue;
@@ -44374,7 +44374,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
       for (i = 0; i < n; i++) {
          v = b.ptr.p_double[i];
          for (j = 0; j < n; j++) {
-            v = v + a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
+            v += a.ptr.pp_double[i][j] * x1.ptr.p_double[j];
          }
          if (x1.ptr.p_double[i] == bndl.ptr.p_double[i] && v > 0.0) {
             v = 0.0;
@@ -44382,7 +44382,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          if (x1.ptr.p_double[i] == bndu.ptr.p_double[i] && v < 0.0) {
             v = 0.0;
          }
-         gnorm = gnorm + ae_sqr(v);
+         gnorm += ae_sqr(v);
          ae_set_error_flag(primaryerrors, x1.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1045");
          ae_set_error_flag(primaryerrors, x1.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1046");
       }
@@ -44418,7 +44418,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
                for (i = 0; i < n; i++) {
                   v0 = fabs(state.x.ptr.p_double[i]);
                   v1 = (double)(ae_sign(state.x.ptr.p_double[i]));
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + v * (v0 + v0 * v0);
+                  state.fi.ptr.p_double[0] += v * (v0 + v0 * v0);
                   state.j.ptr.pp_double[0][i] = v * (v1 + 2 * v0 * v1);
                }
                continue;
@@ -44486,7 +44486,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             if (state.needfi) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   ae_set_error_flag(primaryerrors, state.x.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1164");
                   ae_set_error_flag(primaryerrors, state.x.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1165");
                }
@@ -44495,7 +44495,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             if (state.xupdated) {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  v = v + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  v += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   ae_set_error_flag(primaryerrors, state.x.ptr.p_double[i] < bndl.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1176");
                   ae_set_error_flag(primaryerrors, state.x.ptr.p_double[i] > bndu.ptr.p_double[i], __FILE__, __LINE__, "testminnsunit.ap:1177");
                }
@@ -44580,7 +44580,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
@@ -44600,7 +44600,7 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]) / s.ptr.p_double[i];
                }
                continue;
@@ -44712,7 +44712,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * (2 * (state.x.ptr.p_double[i] - xc.ptr.p_double[i]));
                }
                continue;
@@ -44720,7 +44720,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.xupdated) {
                flast0 = 0.0;
                for (i = 0; i < n; i++) {
-                  flast0 = flast0 + d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  flast0 += d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                repferr = ae_maxreal(repferr, fabs(flast0 - state.f));
                continue;
@@ -44744,12 +44744,12 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * (2 * (state.x.ptr.p_double[i] - xc.ptr.p_double[i]));
                }
                for (i = 0; i < nc; i++) {
                   v = ae_v_dotproduct(state.x.ptr.p_double, 1, c.ptr.pp_double[i], 1, n);
-                  v = v - c.ptr.pp_double[i][n];
+                  v -= c.ptr.pp_double[i][n];
                   vv = 0.0;
                   if (ct.ptr.p_int[i] < 0) {
                      vv = (double)(ae_sign(ae_maxreal(v, 0.0)));
@@ -44763,9 +44763,9 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                      vv = (double)(-ae_sign(ae_maxreal(-v, 0.0)));
                      v = ae_maxreal(-v, 0.0);
                   }
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + rho * v;
+                  state.fi.ptr.p_double[0] += rho * v;
                   for (j = 0; j < n; j++) {
-                     state.j.ptr.pp_double[0][j] = state.j.ptr.pp_double[0][j] + rho * vv * c.ptr.pp_double[i][j];
+                     state.j.ptr.pp_double[0][j] += rho * vv * c.ptr.pp_double[i][j];
                   }
                }
                continue;
@@ -44773,7 +44773,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.xupdated) {
                flast1 = 0.0;
                for (i = 0; i < n; i++) {
-                  flast1 = flast1 + d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  flast1 += d.ptr.p_double[i] * ae_sqr(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
             }
@@ -44819,7 +44819,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
                for (i = 0; i < n; i++) {
                   v0 = fabs(state.x.ptr.p_double[i]);
                   v1 = (double)(ae_sign(state.x.ptr.p_double[i]));
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + v * (v0 + v0 * v0);
+                  state.fi.ptr.p_double[0] += v * (v0 + v0 * v0);
                   state.j.ptr.pp_double[0][i] = v * (v1 + 2 * v0 * v1);
                }
                continue;
@@ -44910,7 +44910,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                }
                continue;
@@ -44930,7 +44930,7 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             if (state.needfij) {
                state.fi.ptr.p_double[0] = 0.0;
                for (i = 0; i < n; i++) {
-                  state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
+                  state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
                   state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]) / s.ptr.p_double[i];
                }
                continue;
@@ -45031,7 +45031,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                        state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                         state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                      }
                      for (i = 1; i <= nc; i++) {
@@ -45101,7 +45101,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   if (state.needfi) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                        state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                      }
                      for (i = 1; i <= nc; i++) {
                         state.fi.ptr.p_double[i] = state.x.ptr.p_double[i - 1] * r.ptr.p_double[i - 1];
@@ -45181,7 +45181,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
+                        state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                         state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] - xc.ptr.p_double[i]);
                      }
                      for (i = 1; i <= nc; i++) {
@@ -45207,7 +45207,7 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                   if (state.needfij) {
                      state.fi.ptr.p_double[0] = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
+                        state.fi.ptr.p_double[0] += d.ptr.p_double[i] * fabs(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]);
                         state.j.ptr.pp_double[0][i] = d.ptr.p_double[i] * ae_sign(state.x.ptr.p_double[i] / s.ptr.p_double[i] - xc.ptr.p_double[i]) / s.ptr.p_double[i];
                      }
                      for (i = 1; i <= nc; i++) {
@@ -45451,7 +45451,7 @@ Local void testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+               state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
             }
          }
@@ -45496,7 +45496,7 @@ Local void testother(bool *err) {
             }
             for (i = 0; i < n; i++) {
                if (state.needf || state.needfg) {
-                  state.f = state.f + ae_sqr((1 + i) * state.x.ptr.p_double[i]);
+                  state.f += ae_sqr((1 + i) * state.x.ptr.p_double[i]);
                }
                if (state.needfg) {
                   state.g.ptr.p_double[i] = 2 * (1 + i) * state.x.ptr.p_double[i];
@@ -45604,7 +45604,7 @@ Local void testother(bool *err) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
+                     state.f += a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
                      state.g.ptr.p_double[i] = 4 * a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 3.0);
                   }
                }
@@ -45617,7 +45617,7 @@ Local void testother(bool *err) {
             }
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v = v + ae_sqr(s.ptr.p_double[i] * 4 * a.ptr.p_double[i] * pow(x.ptr.p_double[i], 3.0));
+               v += ae_sqr(s.ptr.p_double[i] * 4 * a.ptr.p_double[i] * pow(x.ptr.p_double[i], 3.0));
             }
             v = sqrt(v);
             *err = *err || v > tmpeps;
@@ -45634,7 +45634,7 @@ Local void testother(bool *err) {
                if (state.needfg) {
                   state.f = 0.0;
                   for (i = 0; i < n; i++) {
-                     state.f = state.f + a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
+                     state.f += a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 4.0);
                      state.g.ptr.p_double[i] = 4 * a.ptr.p_double[i] * pow(state.x.ptr.p_double[i], 3.0);
                   }
                }
@@ -45642,7 +45642,7 @@ Local void testother(bool *err) {
                   if (hasxlast) {
                      lastscaledstep = 0.0;
                      for (i = 0; i < n; i++) {
-                        lastscaledstep = lastscaledstep + ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
+                        lastscaledstep += ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]) / ae_sqr(s.ptr.p_double[i]);
                      }
                      lastscaledstep = sqrt(lastscaledstep);
                   } else {
@@ -45762,11 +45762,11 @@ Local void testother(bool *err) {
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = b.ptr.p_double[i];
                for (j = 0; j < n; j++) {
-                  state.f = state.f + 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.f += 0.5 * state.x.ptr.p_double[i] * fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.g.ptr.p_double[i] += fulla.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
             if (k >= spoiliteration) {
@@ -45912,7 +45912,7 @@ static void testmincgunit_calciip2(mincgstate *state, ae_int_t n) {
    }
    for (i = 0; i < n; i++) {
       if (state->needf || state->needfg) {
-         state->f = state->f + ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.ptr.p_double[i]);
+         state->f += ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.ptr.p_double[i]);
       }
       if (state->needfg) {
          state->g.ptr.p_double[i] = ae_sqr((double)(i * i + 1)) * 2 * state->x.ptr.p_double[i];
@@ -45934,15 +45934,15 @@ static void testmincgunit_calclowrank(mincgstate *state, ae_int_t n, ae_int_t vc
    }
    for (i = 0; i < n; i++) {
       dx = state->x.ptr.p_double[i] - x0->ptr.p_double[i];
-      state->f = state->f + 0.5 * dx * d->ptr.p_double[i] * dx;
-      state->g.ptr.p_double[i] = state->g.ptr.p_double[i] + d->ptr.p_double[i] * dx;
+      state->f += 0.5 * dx * d->ptr.p_double[i] * dx;
+      state->g.ptr.p_double[i] += d->ptr.p_double[i] * dx;
    }
    for (i = 0; i < vcnt; i++) {
       t = 0.0;
       for (j = 0; j < n; j++) {
-         t = t + v->ptr.pp_double[i][j] * (state->x.ptr.p_double[j] - x0->ptr.p_double[j]);
+         t += v->ptr.pp_double[i][j] * (state->x.ptr.p_double[j] - x0->ptr.p_double[j]);
       }
-      state->f = state->f + 0.5 * t * vd->ptr.p_double[i] * t;
+      state->f += 0.5 * t * vd->ptr.p_double[i] * t;
       t2 = t * vd->ptr.p_double[i];
       ae_v_addd(state->g.ptr.p_double, 1, v->ptr.pp_double[i], 1, n, t2);
    }
@@ -46012,7 +46012,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                testmincgunit_calciip2(&state, n);
             }
             mincgresults(&state, &x, &rep);
-            cntb1 = cntb1 + rep.iterationscount;
+            cntb1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
 
@@ -46032,7 +46032,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                testmincgunit_calciip2(&state, n);
             }
             mincgresults(&state, &x, &rep);
-            cntg1 = cntg1 + rep.iterationscount;
+            cntg1 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
 
@@ -46087,7 +46087,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                   testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
                }
                mincgresults(&state, &x, &rep);
-               cntb1 = cntb1 + rep.iterationscount;
+               cntb1 += rep.iterationscount;
                *err = *err || rep.terminationtype <= 0;
             }
 
@@ -46103,7 +46103,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                   testmincgunit_calclowrank(&state, n, vs, &d, &v, &vd, &x0);
                }
                mincgresults(&state, &x, &rep);
-               cntg1 = cntg1 + rep.iterationscount;
+               cntg1 += rep.iterationscount;
                *err = *err || rep.terminationtype <= 0;
             }
 
@@ -46141,7 +46141,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                testmincgunit_calciip2(&state, n);
             }
             mincgresults(&state, &x, &rep);
-            cntb2 = cntb2 + rep.iterationscount;
+            cntb2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          mincgsetprecscale(&state);
@@ -46156,7 +46156,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                testmincgunit_calciip2(&state, n);
             }
             mincgresults(&state, &x, &rep);
-            cntg2 = cntg2 + rep.iterationscount;
+            cntg2 += rep.iterationscount;
             *err = *err || rep.terminationtype <= 0;
          }
          *err = *err || cntb2 < cntg2;
@@ -46207,9 +46207,9 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + fabs(vv);
+            v += fabs(vv);
          }
          ae_set_error_flag(err, fabs(v - rep->f.ptr.p_double[k]) > 1.0E-6 * ae_maxreal(fabs(v), 1.0), __FILE__, __LINE__, "testmincgunit.ap:1803");
       }
@@ -46220,8 +46220,8 @@ static void testmincgunit_testoptguardc1test0reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
       }
@@ -46287,9 +46287,9 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          for (i = 0; i < n; i++) {
             vv = 0.0;
             for (j = 0; j < n; j++) {
-               vv = vv + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
+               vv += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[k]);
             }
-            v = v + ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
+            v += ae_sign(vv) * a->ptr.pp_double[i][rep->vidx];
             tooclose = tooclose || fabs(vv) < 1.0E-4;
          }
          if (!tooclose) {
@@ -46304,8 +46304,8 @@ static void testmincgunit_testoptguardc1test1reportfortask0(bool *err, optguardn
          va = 0.0;
          vb = 0.0;
          for (j = 0; j < n; j++) {
-            va = va + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
-            vb = vb + a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
+            va += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxa]);
+            vb += a->ptr.pp_double[i][j] * (rep->x0.ptr.p_double[j] + rep->d.ptr.p_double[j] * rep->stp.ptr.p_double[rep->stpidxb]);
          }
          tooclose = (tooclose || fabs(va) < 1.0E-8) || fabs(vb) < 1.0E-8;
          hasc1discontinuities = hasc1discontinuities || ae_sign(va) != ae_sign(vb);
@@ -46393,9 +46393,9 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + 0.5 * state.x.ptr.p_double[i] * v;
+            state.f += 0.5 * state.x.ptr.p_double[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.g.ptr.p_double[i] = 0.0;
@@ -46450,12 +46450,12 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.f = state.f + fabs(v);
+            state.f += fabs(v);
             v = (double)(ae_sign(v));
             for (j = 0; j < n; j++) {
-               state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+               state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
             }
          }
          continue;
@@ -46507,22 +46507,22 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
                for (i = 0; i < n; i++) {
                   v = 0.0;
                   for (j = 0; j < n; j++) {
-                     v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                     v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                   }
-                  state.f = state.f + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                  state.f += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                   state.g.ptr.p_double[i] = v;
                }
                if (defecttype == 0) {
                   state.g.ptr.p_double[varidx] = 0.0;
                }
                if (defecttype == 1) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] + 1;
+                  state.g.ptr.p_double[varidx]++;
                }
                if (defecttype == 2) {
-                  state.g.ptr.p_double[varidx] = state.g.ptr.p_double[varidx] * 2;
+                  state.g.ptr.p_double[varidx] *= 2;
                }
                for (i = 0; i < n; i++) {
-                  state.g.ptr.p_double[i] = state.g.ptr.p_double[i] / s.ptr.p_double[i];
+                  state.g.ptr.p_double[i] /= s.ptr.p_double[i];
                }
                continue;
             }
@@ -46549,7 +46549,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
             jactrue.ptr.pp_double[0][i] = v;
             jacdefect.ptr.pp_double[0][i] = v;
@@ -46558,14 +46558,14 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             jacdefect.ptr.pp_double[0][varidx] = 0.0;
          }
          if (defecttype == 1) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] + 1;
+            jacdefect.ptr.pp_double[0][varidx]++;
          }
          if (defecttype == 2) {
-            jacdefect.ptr.pp_double[0][varidx] = jacdefect.ptr.pp_double[0][varidx] * 2;
+            jacdefect.ptr.pp_double[0][varidx] *= 2;
          }
          for (i = 0; i < n; i++) {
-            jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-            jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
+            jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+            jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
          }
 
       // Check OptGuard report
@@ -46647,12 +46647,12 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
                v = (double)(ae_sign(v));
                for (j = 0; j < n; j++) {
-                  state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + v * a.ptr.pp_double[i][j];
+                  state.g.ptr.p_double[j] += v * a.ptr.pp_double[i][j];
                }
             }
             continue;
@@ -46693,8 +46693,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1570");
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         avgstr0len = avgstr0len + (double)ognonc1test0strrep.cnt / (double)passcount;
-         avglng0len = avglng0len + (double)ognonc1test0lngrep.cnt / (double)passcount;
+         avgstr0len += (double)ognonc1test0strrep.cnt / (double)passcount;
+         avglng0len += (double)ognonc1test0lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test0strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1578");
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1579");
@@ -46709,8 +46709,8 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testmincgunit.ap:1589");
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         avgstr1len = avgstr1len + (double)ognonc1test1strrep.cnt / (double)passcount;
-         avglng1len = avglng1len + (double)ognonc1test1lngrep.cnt / (double)passcount;
+         avgstr1len += (double)ognonc1test1strrep.cnt / (double)passcount;
+         avglng1len += (double)ognonc1test1lngrep.cnt / (double)passcount;
       } else {
          ae_set_error_flag(wereerrors, ognonc1test1strrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1597");
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testmincgunit.ap:1598");
@@ -46770,9 +46770,9 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
-               state.f = state.f + fabs(v);
+               state.f += fabs(v);
             }
             continue;
          }
@@ -46826,11 +46826,11 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       if (state.needfg) {
          state.f = 0.0;
          for (i = 0; i < n; i++) {
-            state.f = state.f + b.ptr.p_double[i] * state.x.ptr.p_double[i];
+            state.f += b.ptr.p_double[i] * state.x.ptr.p_double[i];
             state.g.ptr.p_double[i] = b.ptr.p_double[i];
             for (j = 0; j < n; j++) {
-               state.f = state.f + 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
-               state.g.ptr.p_double[i] = state.g.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.f += 0.5 * state.x.ptr.p_double[i] * a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+               state.g.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
             }
          }
          continue;
@@ -47028,7 +47028,7 @@ bool testmincg(bool silent) {
                for (j = 0; j < n; j++) {
                   a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
                }
-               a.ptr.pp_double[i][i] = a.ptr.pp_double[i][i] + 3 * ae_sign(a.ptr.pp_double[i][i]);
+               a.ptr.pp_double[i][i] += 3 * ae_sign(a.ptr.pp_double[i][i]);
             }
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xe.ptr.p_double, 1, n);
@@ -47058,11 +47058,11 @@ bool testmincg(bool silent) {
                for (i = 0; i < n; i++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, state.x.ptr.p_double, 1, n);
                   if (state.needf || state.needfg) {
-                     state.f = state.f + ae_sqr(v - b.ptr.p_double[i]);
+                     state.f += ae_sqr(v - b.ptr.p_double[i]);
                   }
                   if (state.needfg) {
                      for (j = 0; j < n; j++) {
-                        state.g.ptr.p_double[j] = state.g.ptr.p_double[j] + 2 * (v - b.ptr.p_double[i]) * a.ptr.pp_double[i][j];
+                        state.g.ptr.p_double[j] += 2 * (v - b.ptr.p_double[i]) * a.ptr.pp_double[i][j];
                      }
                   }
                }
@@ -47239,22 +47239,22 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
 
    nset = 0;
    if (state->needfi) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needf) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfg) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfij) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->needfgh) {
-      nset = nset + 1;
+      nset++;
    }
    if (state->xupdated) {
-      nset = nset + 1;
+      nset++;
    }
    if (nset != 1) {
       result = false;
@@ -47321,17 +47321,17 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix a, RVector b, ae_int_t
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(a->ptr.pp_double[i], 1, state->x.ptr.p_double, 1, n);
       if ((state->needf || state->needfg) || state->needfgh) {
-         state->f = state->f + ae_sqr(v - b->ptr.p_double[i]);
+         state->f += ae_sqr(v - b->ptr.p_double[i]);
       }
       if (state->needfg || state->needfgh) {
          for (j = 0; j < n; j++) {
-            state->g.ptr.p_double[j] = state->g.ptr.p_double[j] + 2 * (v - b->ptr.p_double[i]) * a->ptr.pp_double[i][j];
+            state->g.ptr.p_double[j] += 2 * (v - b->ptr.p_double[i]) * a->ptr.pp_double[i][j];
          }
       }
       if (state->needfgh) {
          for (j = 0; j < n; j++) {
             for (k = 0; k < n; k++) {
-               state->h.ptr.pp_double[j][k] = state->h.ptr.pp_double[j][k] + 2 * a->ptr.pp_double[i][j] * a->ptr.pp_double[i][k];
+               state->h.ptr.pp_double[j][k] += 2 * a->ptr.pp_double[i][j] * a->ptr.pp_double[i][k];
             }
          }
       }
@@ -47742,7 +47742,7 @@ static void testminlmunit_testfunc1(ae_int_t n, ae_int_t m, RMatrix c, RVector x
    for (i = 0; i < m; i++) {
       v = c->ptr.pp_double[i][n];
       for (j = 0; j < n; j++) {
-         v = v + (alpha * x->ptr.p_double[j] + pow(x->ptr.p_double[j], 3.0)) * c->ptr.pp_double[i][j];
+         v += (alpha * x->ptr.p_double[j] + pow(x->ptr.p_double[j], 3.0)) * c->ptr.pp_double[i][j];
          if (needjac) {
             jac->ptr.pp_double[i][j] = (alpha + 3 * pow(x->ptr.p_double[j], 2.0)) * c->ptr.pp_double[i][j];
          }
@@ -47751,7 +47751,7 @@ static void testminlmunit_testfunc1(ae_int_t n, ae_int_t m, RMatrix c, RVector x
          fi->ptr.p_double[i] = v;
       }
       if (needf) {
-         *f = *f + v * v;
+         *f += v * v;
       }
    }
 }
@@ -47825,7 +47825,7 @@ static void testminlmunit_testbc(bool *errorflag) {
             if ((state.needf || state.needfg) || state.needfgh) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
-                  state.f = state.f + pow(state.x.ptr.p_double[i] - xe.ptr.p_double[i], 4.0);
+                  state.f += pow(state.x.ptr.p_double[i] - xe.ptr.p_double[i], 4.0);
                }
             }
             if (state.needfg || state.needfgh) {
@@ -48103,7 +48103,7 @@ static void testminlmunit_testlc(bool *errorflag) {
             v = 0.0;
             for (j = 0; j < n; j++) {
                rawc.ptr.pp_double[i][j] = hqrndnormal(&rs);
-               v = v + x0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
+               v += x0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
             }
             rawc.ptr.pp_double[i][n] = v;
             rawct.ptr.p_int[i] = 2 * hqrnduniformi(&rs, 2) - 1;
@@ -48147,7 +48147,7 @@ static void testminlmunit_testlc(bool *errorflag) {
          }
          for (i = 0; i < rawccnt; i++) {
             v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-            v = v - rawc.ptr.pp_double[i][n];
+            v -= rawc.ptr.pp_double[i][n];
             if (rawct.ptr.p_int[i] > 0) {
                ae_set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testminlmunit.ap:911");
             }
@@ -48174,7 +48174,7 @@ static void testminlmunit_testlc(bool *errorflag) {
             for (i = 0; i < rawccnt; i++) {
                ae_assert(rawct.ptr.p_int[i] != 0, "Assertion failed");
                v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
-               v = v - rawc.ptr.pp_double[i][n];
+               v -= rawc.ptr.pp_double[i][n];
                bflag = bflag || (rawct.ptr.p_int[i] > 0 && v < 0.0);
                bflag = bflag || (rawct.ptr.p_int[i] < 0 && v > 0.0);
             }
@@ -48231,7 +48231,7 @@ static void testminlmunit_testlc(bool *errorflag) {
          v = 0.0;
          for (j = 0; j < n; j++) {
             rawc.ptr.pp_double[i][j] = z.ptr.pp_double[i][j];
-            v = v + x0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
+            v += x0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
          }
          rawc.ptr.pp_double[i][n] = v;
          rawct.ptr.p_int[i] = 0;
@@ -48266,7 +48266,7 @@ static void testminlmunit_testlc(bool *errorflag) {
    // Test feasibility w.r.t. linear equality constraints
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x.ptr.p_double, 1, n);
-         v = v - rawc.ptr.pp_double[i][n];
+         v -= rawc.ptr.pp_double[i][n];
          ae_set_error_flag(errorflag, fabs(v) > xtol, __FILE__, __LINE__, "testminlmunit.ap:1042");
       }
 
@@ -48756,9 +48756,9 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
+               v += state.x.ptr.p_double[j] * a.ptr.pp_double[i][j];
             }
-            state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * state.x.ptr.p_double[i] * v;
+            state.fi.ptr.p_double[0] += 0.5 * state.x.ptr.p_double[i] * v;
          }
          for (i = 0; i < n; i++) {
             state.j.ptr.pp_double[0][i] = 0.0;
@@ -48834,9 +48834,9 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                   for (i = 0; i < n; i++) {
                      v = 0.0;
                      for (j = 0; j < n; j++) {
-                        v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                        v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                      }
-                     state.fi.ptr.p_double[0] = state.fi.ptr.p_double[0] + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                     state.fi.ptr.p_double[0] += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                      if (state.needfij) {
                         state.j.ptr.pp_double[0][i] = v;
                      }
@@ -48845,9 +48845,9 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                   for (i = 0; i < n; i++) {
                      v = 0.0;
                      for (j = 0; j < n; j++) {
-                        v = v + state.x.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
+                        v += state.x.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
                      }
-                     state.fi.ptr.p_double[1] = state.fi.ptr.p_double[1] + 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
+                     state.fi.ptr.p_double[1] += 0.5 * (state.x.ptr.p_double[i] / s.ptr.p_double[i]) * v;
                      if (state.needfij) {
                         state.j.ptr.pp_double[1][i] = v;
                      }
@@ -48857,16 +48857,16 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                         state.j.ptr.pp_double[funcidx][varidx] = 0.0;
                      }
                      if (defecttype == 1) {
-                        state.j.ptr.pp_double[funcidx][varidx] = state.j.ptr.pp_double[funcidx][varidx] + 1;
+                        state.j.ptr.pp_double[funcidx][varidx]++;
                      }
                      if (defecttype == 2) {
-                        state.j.ptr.pp_double[funcidx][varidx] = state.j.ptr.pp_double[funcidx][varidx] * 2;
+                        state.j.ptr.pp_double[funcidx][varidx] *= 2;
                      }
                   }
                   if (state.needfij) {
                      for (i = 0; i < n; i++) {
-                        state.j.ptr.pp_double[0][i] = state.j.ptr.pp_double[0][i] / s.ptr.p_double[i];
-                        state.j.ptr.pp_double[1][i] = state.j.ptr.pp_double[1][i] / s.ptr.p_double[i];
+                        state.j.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+                        state.j.ptr.pp_double[1][i] /= s.ptr.p_double[i];
                      }
                   }
                   continue;
@@ -48894,7 +48894,7 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
+                  v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a.ptr.pp_double[i][j];
                }
                jactrue.ptr.pp_double[0][i] = v;
                jacdefect.ptr.pp_double[0][i] = v;
@@ -48902,7 +48902,7 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
             for (i = 0; i < n; i++) {
                v = 0.0;
                for (j = 0; j < n; j++) {
-                  v = v + ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
+                  v += ogrep.badgradxbase.ptr.p_double[j] / s.ptr.p_double[j] * a1.ptr.pp_double[i][j];
                }
                jactrue.ptr.pp_double[1][i] = v;
                jacdefect.ptr.pp_double[1][i] = v;
@@ -48911,16 +48911,16 @@ static void testminlmunit_testoptguard(bool *wereerrors) {
                jacdefect.ptr.pp_double[funcidx][varidx] = 0.0;
             }
             if (defecttype == 1) {
-               jacdefect.ptr.pp_double[funcidx][varidx] = jacdefect.ptr.pp_double[funcidx][varidx] + 1;
+               jacdefect.ptr.pp_double[funcidx][varidx]++;
             }
             if (defecttype == 2) {
-               jacdefect.ptr.pp_double[funcidx][varidx] = jacdefect.ptr.pp_double[funcidx][varidx] * 2;
+               jacdefect.ptr.pp_double[funcidx][varidx] *= 2;
             }
             for (i = 0; i < n; i++) {
-               jactrue.ptr.pp_double[0][i] = jactrue.ptr.pp_double[0][i] / s.ptr.p_double[i];
-               jactrue.ptr.pp_double[1][i] = jactrue.ptr.pp_double[1][i] / s.ptr.p_double[i];
-               jacdefect.ptr.pp_double[0][i] = jacdefect.ptr.pp_double[0][i] / s.ptr.p_double[i];
-               jacdefect.ptr.pp_double[1][i] = jacdefect.ptr.pp_double[1][i] / s.ptr.p_double[i];
+               jactrue.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+               jactrue.ptr.pp_double[1][i] /= s.ptr.p_double[i];
+               jacdefect.ptr.pp_double[0][i] /= s.ptr.p_double[i];
+               jacdefect.ptr.pp_double[1][i] /= s.ptr.p_double[i];
             }
 
          // Check OptGuard report
@@ -49205,7 +49205,7 @@ static double testevdunit_tdtestproduct(RVector d, RVector e, ae_int_t n, RMatri
       // Calculate V = A[i,j], A = Z*Lambda*Z'
          v = 0.0;
          for (k = 0; k < n; k++) {
-            v = v + z->ptr.pp_double[i][k] * lambdav->ptr.p_double[k] * z->ptr.pp_double[j][k];
+            v += z->ptr.pp_double[i][k] * lambdav->ptr.p_double[k] * z->ptr.pp_double[j][k];
          }
 
       // Compare
@@ -49230,7 +49230,7 @@ static double testevdunit_tdtestproduct(RVector d, RVector e, ae_int_t n, RMatri
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -49251,7 +49251,7 @@ static double testevdunit_testproduct(RMatrix a, ae_int_t n, RMatrix z, RVector 
       // Calculate V = A[i,j], A = Z*Lambda*Z'
          v = 0.0;
          for (k = 0; k < n; k++) {
-            v = v + z->ptr.pp_double[i][k] * lambdav->ptr.p_double[k] * z->ptr.pp_double[j][k];
+            v += z->ptr.pp_double[i][k] * lambdav->ptr.p_double[k] * z->ptr.pp_double[j][k];
          }
 
       // Compare
@@ -49267,7 +49267,7 @@ static double testevdunit_testproduct(RMatrix a, ae_int_t n, RMatrix z, RVector 
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -49304,7 +49304,7 @@ static double testevdunit_testcproduct(CMatrix a, ae_int_t n, CMatrix z, RVector
    if (mx == 0.0) {
       mx = 1.0;
    }
-   result = result / mx;
+   result /= mx;
    return result;
 }
 
@@ -49321,7 +49321,7 @@ static double testevdunit_testort(RMatrix z, ae_int_t n) {
       for (j = 0; j < n; j++) {
          v = ae_v_dotproduct(&z->ptr.pp_double[0][i], z->stride, &z->ptr.pp_double[0][j], z->stride, n);
          if (i == j) {
-            v = v - 1;
+            v--;
          }
          result = ae_maxreal(result, fabs(v));
       }
@@ -49363,9 +49363,9 @@ static void testevdunit_testsevdproblem(RMatrix a, RMatrix al, RMatrix au, ae_in
 // Test simple EVD: values and full vectors, lower A
    testevdunit_unset1d(&lambdaref);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(al, n, 1, false, &lambdaref, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49382,9 +49382,9 @@ static void testevdunit_testsevdproblem(RMatrix a, RMatrix al, RMatrix au, ae_in
 // Test simple EVD: values and full vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(au, n, 1, true, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49401,9 +49401,9 @@ static void testevdunit_testsevdproblem(RMatrix a, RMatrix al, RMatrix au, ae_in
 // Test simple EVD: values only, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(al, n, 0, false, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49414,9 +49414,9 @@ static void testevdunit_testsevdproblem(RMatrix a, RMatrix al, RMatrix au, ae_in
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(au, n, 0, true, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49439,9 +49439,9 @@ static void testevdunit_testhevdproblem(CMatrix a, CMatrix al, CMatrix au, ae_in
 // Test simple EVD: values and full vectors, lower A
    testevdunit_unset1d(&lambdaref);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(al, n, 1, false, &lambdaref, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49458,9 +49458,9 @@ static void testevdunit_testhevdproblem(CMatrix a, CMatrix al, CMatrix au, ae_in
 // Test simple EVD: values and full vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(au, n, 1, true, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49477,9 +49477,9 @@ static void testevdunit_testhevdproblem(CMatrix a, CMatrix al, CMatrix au, ae_in
 // Test simple EVD: values only, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(al, n, 0, false, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49490,9 +49490,9 @@ static void testevdunit_testhevdproblem(CMatrix a, CMatrix al, CMatrix au, ae_in
 // Test simple EVD: values only, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(au, n, 0, true, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49535,9 +49535,9 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
    ae_matrix_set_length(&a2, n, n);
 
 // Reference EVD
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevd(afull, n, 1, true, &lambdaref, &zref)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49551,13 +49551,13 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
       if (fabs(lambdaref.ptr.p_double[i1 - 1] - lambdaref.ptr.p_double[i1]) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (fabs(lambdaref.ptr.p_double[i2 + 1] - lambdaref.ptr.p_double[i2]) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 
 // Select A, B
@@ -49575,14 +49575,14 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test interval, no vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(al, n, 0, false, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49593,14 +49593,14 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(au, n, 0, true, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49611,9 +49611,9 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(al, n, 0, false, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49625,9 +49625,9 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(au, n, 0, true, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49639,14 +49639,14 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(al, n, 1, false, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49671,14 +49671,14 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test interval, vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdr(au, n, 1, true, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49703,9 +49703,9 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test indexes, vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(al, n, 1, false, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49731,9 +49731,9 @@ static void testevdunit_testsevdbiproblem(RMatrix afull, RMatrix al, RMatrix au,
 // Test indexes, vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_unset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixevdi(au, n, 1, true, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49792,9 +49792,9 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
    ae_matrix_set_length(&a2, n, n);
 
 // Reference EVD
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevd(afull, n, 1, true, &lambdaref, &zref)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49808,13 +49808,13 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
       if (fabs(lambdaref.ptr.p_double[i1 - 1] - lambdaref.ptr.p_double[i1]) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (fabs(lambdaref.ptr.p_double[i2 + 1] - lambdaref.ptr.p_double[i2]) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 
 // Select A, B
@@ -49832,14 +49832,14 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test interval, no vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(al, n, 0, false, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49850,14 +49850,14 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test interval, no vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(au, n, 0, true, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49868,9 +49868,9 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test indexes, no vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(al, n, 0, false, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49882,9 +49882,9 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test indexes, no vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(au, n, 0, true, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49896,14 +49896,14 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test interval, vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(al, n, 1, false, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49927,14 +49927,14 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test interval, vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdr(au, n, 1, true, a, b, &m, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49958,9 +49958,9 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test indexes, vectors, lower A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(al, n, 1, false, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -49985,9 +49985,9 @@ static void testevdunit_testhevdbiproblem(CMatrix afull, CMatrix al, CMatrix au,
 // Test indexes, vectors, upper A
    testevdunit_unset1d(&lambdav);
    testevdunit_cunset2d(&z);
-   *runs = *runs + 1;
+   ++*runs;
    if (!hmatrixevdi(au, n, 1, true, i1, i2, &lambdav, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50203,9 +50203,9 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
 // Reference EVD
    ae_vector_set_length(&lambdaref, n);
    ae_v_move(lambdaref.ptr.p_double, 1, d->ptr.p_double, 1, n);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevd(&lambdaref, e, n, 2, &zref)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50219,13 +50219,13 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
       if (fabs(lambdaref.ptr.p_double[i1 - 1] - lambdaref.ptr.p_double[i1]) > 10 * threshold) {
          break;
       }
-      i1 = i1 - 1;
+      i1--;
    }
    while (i2 < n - 1) {
       if (fabs(lambdaref.ptr.p_double[i2 + 1] - lambdaref.ptr.p_double[i2]) > 10 * threshold) {
          break;
       }
-      i2 = i2 + 1;
+      i2++;
    }
 
 // Test different combinations
@@ -50247,14 +50247,14 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
    for (i = 0; i < n; i++) {
       lambdav.ptr.p_double[i] = d->ptr.p_double[i];
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 0, a, b, &m, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50267,9 +50267,9 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
    for (i = 0; i < n; i++) {
       lambdav.ptr.p_double[i] = d->ptr.p_double[i];
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 0, i1, i2, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50291,14 +50291,14 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
          a2.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j];
       }
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 1, a, b, &m, &a1)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50338,9 +50338,9 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
          a2.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j];
       }
    }
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 1, i1, i2, &a1)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50374,14 +50374,14 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
       lambdav.ptr.p_double[i] = d->ptr.p_double[i];
    }
    ae_matrix_set_length(&z, 0 + 1, 0 + 1);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdr(&lambdav, e, n, 2, a, b, &m, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
    if (m != i2 - i1 + 1) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50407,9 +50407,9 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
       lambdav.ptr.p_double[i] = d->ptr.p_double[i];
    }
    ae_matrix_set_length(&z, 0 + 1, 0 + 1);
-   *runs = *runs + 1;
+   ++*runs;
    if (!smatrixtdevdi(&lambdav, e, n, 2, i1, i2, &z)) {
-      *failc = *failc + 1;
+      ++*failc;
       ae_frame_leave();
       return;
    }
@@ -50571,7 +50571,7 @@ static void testevdunit_testnsevdproblem(RMatrix a, ae_int_t n, double threshold
                vec2r.ptr.p_double[i] = vt;
                vt = ae_v_dotproduct(a->ptr.pp_double[i], 1, vec1i.ptr.p_double, 1, n);
                vec2i.ptr.p_double[i] = vt;
-               vnorm = vnorm + ae_sqr(vec1r.ptr.p_double[i]) + ae_sqr(vec1i.ptr.p_double[i]);
+               vnorm += ae_sqr(vec1r.ptr.p_double[i]) + ae_sqr(vec1i.ptr.p_double[i]);
             }
             vnorm = sqrt(vnorm);
             ae_v_moved(vec3r.ptr.p_double, 1, vec1r.ptr.p_double, 1, n, curwr);
@@ -50583,7 +50583,7 @@ static void testevdunit_testnsevdproblem(RMatrix a, ae_int_t n, double threshold
                ae_set_error_flag(nserrors, fabs(vec2r.ptr.p_double[i] - vec3r.ptr.p_double[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1657");
                ae_set_error_flag(nserrors, fabs(vec2i.ptr.p_double[i] - vec3i.ptr.p_double[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1658");
             }
-            k = k + 1;
+            k++;
          }
       }
    // Test left vectors
@@ -50618,7 +50618,7 @@ static void testevdunit_testnsevdproblem(RMatrix a, ae_int_t n, double threshold
                vec2r.ptr.p_double[j] = vt;
                vt = ae_v_dotproduct(vec1i.ptr.p_double, 1, &a->ptr.pp_double[0][j], a->stride, n);
                vec2i.ptr.p_double[j] = -vt;
-               vnorm = vnorm + ae_sqr(vec1r.ptr.p_double[j]) + ae_sqr(vec1i.ptr.p_double[j]);
+               vnorm += ae_sqr(vec1r.ptr.p_double[j]) + ae_sqr(vec1i.ptr.p_double[j]);
             }
             vnorm = sqrt(vnorm);
             ae_v_moved(vec3r.ptr.p_double, 1, vec1r.ptr.p_double, 1, n, curwr);
@@ -50630,7 +50630,7 @@ static void testevdunit_testnsevdproblem(RMatrix a, ae_int_t n, double threshold
                ae_set_error_flag(nserrors, fabs(vec2r.ptr.p_double[i] - vec3r.ptr.p_double[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1713");
                ae_set_error_flag(nserrors, fabs(vec2i.ptr.p_double[i] - vec3i.ptr.p_double[i]) > threshold, __FILE__, __LINE__, "testevdunit.ap:1714");
             }
-            k = k + 1;
+            k++;
          }
       }
    }
@@ -50783,8 +50783,8 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
          i = 2;
          while (j < n - 1) {
             e.ptr.p_double[j] = 0.0;
-            j = j + i;
-            i = i + 1;
+            j += i;
+            i++;
          }
       }
       if (mkind == 4) {
@@ -50926,7 +50926,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + qa.ptr.pp_double[k][i] * diaga.ptr.p_double[k] * qa.ptr.pp_double[k][j];
+                     v += qa.ptr.pp_double[k][i] * diaga.ptr.p_double[k] * qa.ptr.pp_double[k][j];
                   }
                   densea.ptr.pp_double[i][j] = v;
                }
@@ -51020,7 +51020,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                diaga.ptr.p_double[i] = diaga.ptr.p_double[i - 1] * sgn / (decaya * (1 + 0.01 * hqrnduniformr(&rs)));
             }
             for (i = m; i < n; i++) {
-               diaga.ptr.p_double[i] = diaga.ptr.p_double[i] / (100 + 10 * hqrnduniformr(&rs));
+               diaga.ptr.p_double[i] /= 100 + 10 * hqrnduniformr(&rs);
             }
             rmatrixrndorthogonal(n, &qa);
             ae_matrix_set_length(&densea, n, n);
@@ -51028,7 +51028,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (k = 0; k < n; k++) {
-                     v = v + qa.ptr.pp_double[k][i] * diaga.ptr.p_double[k] * qa.ptr.pp_double[k][j];
+                     v += qa.ptr.pp_double[k][i] * diaga.ptr.p_double[k] * qa.ptr.pp_double[k][j];
                   }
                   densea.ptr.pp_double[i][j] = v;
                }
@@ -51084,7 +51084,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
                         rmatrixsetlengthatleast(&rb, n, requestsize);
                         rmatrixgemm(n, requestsize, n, 1.0, &densea, 0, 0, 0, &ra, 0, 0, 0, 0.0, &rb, 0, 0);
                         eigsubspaceoocsendresult(&s, &rb);
-                        callcount = callcount + 1;
+                        callcount++;
                      }
                      eigsubspaceoocstop(&s, &sw, &sz, &rep);
                      ae_set_error_flag(errorflag, callcount > itscount + 2, __FILE__, __LINE__, "testevdunit.ap:2238");
@@ -51134,7 +51134,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
             for (j = i; j < m; j++) {
                v = ae_v_dotproduct(&sz.ptr.pp_double[0][i], sz.stride, &sz.ptr.pp_double[0][j], sz.stride, n);
                if (j == i) {
-                  v = v - 1;
+                  v--;
                }
                ae_set_error_flag(errorflag, fabs(v) > 1.0E3 * ae_machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2291");
             }
@@ -51150,7 +51150,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
             for (j = i; j < m; j++) {
                v = ae_v_dotproduct(&sz.ptr.pp_double[0][i], sz.stride, &sz.ptr.pp_double[0][j], sz.stride, n);
                if (j == i) {
-                  v = v - 1;
+                  v--;
                }
                ae_set_error_flag(errorflag, fabs(v) > 1.0E3 * ae_machineepsilon, __FILE__, __LINE__, "testevdunit.ap:2310");
             }
@@ -51194,7 +51194,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
       eigsubspacecreate(n, m, &s);
       eigsubspacesetcond(&s, eps, 0);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
-      cnta = cnta + rep.iterationscount;
+      cnta += rep.iterationscount;
 
    // Solve with eigensolver operating in warm-start mode,
    // iteration count based stopping condition.
@@ -51204,7 +51204,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
       rmatrixger(n, n, &ra, 0, 0, nu, &u, 0, &u, 0);
       eigsubspacesetwarmstart(&s, true);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
-      cntb = cntb + rep.iterationscount;
+      cntb += rep.iterationscount;
 
    // Solve with eigensolver operating in explicit cold-start mode,
    // iteration count based stopping condition.
@@ -51214,7 +51214,7 @@ static void testevdunit_testsisymm(bool *errorflag) {
       rmatrixger(n, n, &ra, 0, 0, nu, &u, 0, &u, 0);
       eigsubspacesetwarmstart(&s, false);
       eigsubspacesolvedenses(&s, &ra, true, &sw, &sz, &rep);
-      cntc = cntc + rep.iterationscount;
+      cntc += rep.iterationscount;
    }
    ae_set_error_flag(errorflag, (double)cntb > 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2387");
    ae_set_error_flag(errorflag, (double)cntc < 0.66 * cnta, __FILE__, __LINE__, "testevdunit.ap:2388");
@@ -51821,19 +51821,19 @@ static void testpcaunit_calculatemv(RVector x, ae_int_t n, double *mean, double 
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->ptr.p_double[i];
+      *mean += x->ptr.p_double[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + ae_sqr(x->ptr.p_double[i] - (*mean));
+         v1 += ae_sqr(x->ptr.p_double[i] - (*mean));
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->ptr.p_double[i] - (*mean));
+         v2 += x->ptr.p_double[i] - (*mean);
       }
       v2 = ae_sqr(v2) / n;
       variance = (v1 - v2) / n;
@@ -51935,7 +51935,7 @@ bool testpca(bool silent) {
             for (j = 0; j < m; j++) {
                t = ae_v_dotproduct(&v.ptr.pp_double[0][i], v.stride, &v.ptr.pp_double[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                pcaorterrors = pcaorterrors || fabs(t) > threshold;
             }
@@ -51979,9 +51979,9 @@ bool testpca(bool silent) {
             t = 0.0;
             for (j = 0; j < m; j++) {
                if (j != k / 2) {
-                  t = t + ae_sqr(v.ptr.pp_double[j][0]);
+                  t += ae_sqr(v.ptr.pp_double[j][0]);
                } else {
-                  t = t + ae_sqr(v.ptr.pp_double[j][0] + h);
+                  t += ae_sqr(v.ptr.pp_double[j][0] + h);
                }
             }
             t = 1 / sqrt(t);
@@ -52006,7 +52006,7 @@ bool testpca(bool silent) {
          for (j = 0; j < m; j++) {
             t = ae_v_dotproduct(&v.ptr.pp_double[0][i], v.stride, &v.ptr.pp_double[0][j], v.stride, m);
             if (i == j) {
-               t = t - 1;
+               t--;
             }
             pcaorterrors = pcaorterrors || fabs(t) > threshold;
          }
@@ -52048,7 +52048,7 @@ bool testpca(bool silent) {
             for (j = 0; j < requested; j++) {
                t = ae_v_dotproduct(&v.ptr.pp_double[0][i], v.stride, &v.ptr.pp_double[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                ae_set_error_flag(&pcadensesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:217");
             }
@@ -52083,8 +52083,8 @@ bool testpca(bool silent) {
          varcomplete = 0.0;
          varreduced = 0.0;
          for (k = 0; k < requested; k++) {
-            varreduced = varreduced + s.ptr.p_double[k];
-            varcomplete = varcomplete + s2.ptr.p_double[k];
+            varreduced += s.ptr.p_double[k];
+            varcomplete += s2.ptr.p_double[k];
          }
          ae_set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:256");
          ae_set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * ae_machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:257");
@@ -52143,7 +52143,7 @@ bool testpca(bool silent) {
          for (j = 0; j < requested; j++) {
             t = ae_v_dotproduct(&v.ptr.pp_double[0][i], v.stride, &v.ptr.pp_double[0][j], v.stride, m);
             if (i == j) {
-               t = t - 1;
+               t--;
             }
             ae_set_error_flag(&pcadensesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:323");
          }
@@ -52175,8 +52175,8 @@ bool testpca(bool silent) {
       varcomplete = 0.0;
       varreduced = 0.0;
       for (k = 0; k < requested; k++) {
-         varreduced = varreduced + s.ptr.p_double[k];
-         varcomplete = varcomplete + s2.ptr.p_double[k];
+         varreduced += s.ptr.p_double[k];
+         varcomplete += s2.ptr.p_double[k];
       }
       ae_set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:360");
       ae_set_error_flag(&pcadensesubspaceerrors, (varreduced - varcomplete) / varcomplete > 1.0E5 * ae_machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:361");
@@ -52227,7 +52227,7 @@ bool testpca(bool silent) {
             for (j = 0; j < requested; j++) {
                t = ae_v_dotproduct(&v.ptr.pp_double[0][i], v.stride, &v.ptr.pp_double[0][j], v.stride, m);
                if (i == j) {
-                  t = t - 1;
+                  t--;
                }
                ae_set_error_flag(&pcasparsesubspaceerrors, fabs(t) > threshold, __FILE__, __LINE__, "testpcaunit.ap:417");
             }
@@ -52262,8 +52262,8 @@ bool testpca(bool silent) {
          varcomplete = 0.0;
          varreduced = 0.0;
          for (k = 0; k < requested; k++) {
-            varreduced = varreduced + s.ptr.p_double[k];
-            varcomplete = varcomplete + s2.ptr.p_double[k];
+            varreduced += s.ptr.p_double[k];
+            varcomplete += s2.ptr.p_double[k];
          }
          ae_set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / ae_maxreal(varcomplete, 1.0) < -tolreduced, __FILE__, __LINE__, "testpcaunit.ap:456");
          ae_set_error_flag(&pcasparsesubspaceerrors, (varreduced - varcomplete) / ae_maxreal(varcomplete, 1.0) > 1.0E5 * ae_machineepsilon, __FILE__, __LINE__, "testpcaunit.ap:457");
@@ -52443,9 +52443,9 @@ bool testbdss(bool silent) {
          for (i = 0; i < n; i++) {
             a.ptr.p_double[i] = (double)(ae_randominteger(2));
             if (a.ptr.p_double[i] == 0.0) {
-               c0 = c0 + 1;
+               c0++;
             } else {
-               c1 = c1 + 1;
+               c1++;
             }
             a0.ptr.p_double[i] = a.ptr.p_double[i];
             at.ptr.p_double[i] = a.ptr.p_double[i];
@@ -52848,10 +52848,10 @@ bool testbdss(bool silent) {
             a.ptr.p_double[i] = (double)(i / ((n + 1) / 2));
             c.ptr.p_int[i] = i / ((n + 1) / 2);
             if (c.ptr.p_int[i] == 0) {
-               c0 = c0 + 1;
+               c0++;
             }
             if (c.ptr.p_int[i] == 1) {
-               c1 = c1 + 1;
+               c1++;
             }
          }
          dsoptimalsplitk(&a, &c, n, 2, 2 + ae_randominteger(5), &info, &thresholds, &ni, &cve);
@@ -52950,10 +52950,10 @@ bool testbdss(bool silent) {
             a.ptr.p_double[i] = (double)(i / ((n + 1) / 2));
             c.ptr.p_int[i] = i / ((n + 1) / 2);
             if (c.ptr.p_int[i] == 0) {
-               c0 = c0 + 1;
+               c0++;
             }
             if (c.ptr.p_int[i] == 1) {
-               c1 = c1 + 1;
+               c1++;
             }
          }
          dssplitk(&a, &c, n, 2, 2 + ae_randominteger(5), &info, &thresholds, &ni, &cve);
@@ -53074,15 +53074,15 @@ static double testmlpbaseunit_vectordiff(RVector g0, RVector g1, ae_int_t n, dou
    norm1 = 0.0;
    diff = 0.0;
    for (i = 0; i < n; i++) {
-      norm0 = norm0 + ae_sqr(g0->ptr.p_double[i]);
-      norm1 = norm1 + ae_sqr(g1->ptr.p_double[i]);
-      diff = diff + ae_sqr(g0->ptr.p_double[i] - g1->ptr.p_double[i]);
+      norm0 += ae_sqr(g0->ptr.p_double[i]);
+      norm1 += ae_sqr(g1->ptr.p_double[i]);
+      diff += ae_sqr(g0->ptr.p_double[i] - g1->ptr.p_double[i]);
    }
    norm0 = sqrt(norm0);
    norm1 = sqrt(norm1);
    diff = sqrt(diff);
    if ((norm0 != 0.0 || norm1 != 0.0) || s != 0.0) {
-      diff = diff / ae_maxreal(ae_maxreal(norm0, norm1), s);
+      diff /= ae_maxreal(ae_maxreal(norm0, norm1), s);
    } else {
       diff = 0.0;
    }
@@ -53696,7 +53696,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    for (i = 1; i < nlayers; i++) {
       for (j = 0; j < mlpgetlayersize(&network, i); j++) {
          for (k = 0; k < mlpgetlayersize(&network, i - 1); k++) {
-            neurons.ptr.pp_double[i][j] = neurons.ptr.pp_double[i][j] + mlpgetweight(&network, i - 1, k, i, j) * neurons.ptr.pp_double[i - 1][k];
+            neurons.ptr.pp_double[i][j] += mlpgetweight(&network, i - 1, k, i, j) * neurons.ptr.pp_double[i - 1][k];
          }
          mlpgetneuroninfo(&network, i, j, &fkind, &c);
          mlpactivationfunction(neurons.ptr.pp_double[i][j] - c, fkind, &f, &df, &d2f);
@@ -53706,7 +53706,7 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    if (nkind == 1) {
       s = 0.0;
       for (j = 0; j < nout; j++) {
-         s = s + exp(neurons.ptr.pp_double[nlayers - 1][j]);
+         s += exp(neurons.ptr.pp_double[nlayers - 1][j]);
       }
       for (j = 0; j < nout; j++) {
          neurons.ptr.pp_double[nlayers - 1][j] = exp(neurons.ptr.pp_double[nlayers - 1][j]) / s;
@@ -53995,7 +53995,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          mlpprocess(&network, &x1, &y1);
          v = 0.0;
          for (i = 0; i < nout; i++) {
-            v = v + y1.ptr.p_double[i];
+            v += y1.ptr.p_double[i];
             *err = *err || y1.ptr.p_double[i] < 0.0;
          }
          *err = *err || fabs(v - 1) > 1000 * ae_machineepsilon;
@@ -54196,29 +54196,29 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       mlpprocess(&network, &x, &y2);
       ae_v_sub(y2.ptr.p_double, 1, y.ptr.p_double, 1, nout);
       referencee = ae_v_dotproduct(y2.ptr.p_double, 1, y2.ptr.p_double, 1, nout);
-      referencee = referencee / 2;
+      referencee /= 2;
       for (i = 0; i < wcount; i++) {
          wprev = network.weights.ptr.p_double[i];
          network.weights.ptr.p_double[i] = wprev - 2 * h;
          mlpprocess(&network, &x, &y1);
          ae_v_sub(y1.ptr.p_double, 1, y.ptr.p_double, 1, nout);
          v1 = ae_v_dotproduct(y1.ptr.p_double, 1, y1.ptr.p_double, 1, nout);
-         v1 = v1 / 2;
+         v1 /= 2;
          network.weights.ptr.p_double[i] = wprev - h;
          mlpprocess(&network, &x, &y1);
          ae_v_sub(y1.ptr.p_double, 1, y.ptr.p_double, 1, nout);
          v2 = ae_v_dotproduct(y1.ptr.p_double, 1, y1.ptr.p_double, 1, nout);
-         v2 = v2 / 2;
+         v2 /= 2;
          network.weights.ptr.p_double[i] = wprev + h;
          mlpprocess(&network, &x, &y1);
          ae_v_sub(y1.ptr.p_double, 1, y.ptr.p_double, 1, nout);
          v3 = ae_v_dotproduct(y1.ptr.p_double, 1, y1.ptr.p_double, 1, nout);
-         v3 = v3 / 2;
+         v3 /= 2;
          network.weights.ptr.p_double[i] = wprev + 2 * h;
          mlpprocess(&network, &x, &y1);
          ae_v_sub(y1.ptr.p_double, 1, y.ptr.p_double, 1, nout);
          v4 = ae_v_dotproduct(y1.ptr.p_double, 1, y1.ptr.p_double, 1, nout);
-         v4 = v4 / 2;
+         v4 /= 2;
          network.weights.ptr.p_double[i] = wprev;
          referenceg.ptr.p_double[i] = (v1 - 8 * v2 + 8 * v3 - v4) / (12 * h);
       }
@@ -54256,7 +54256,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       if (nkind != 1) {
          for (i = 0; i < nout; i++) {
-            referencee = referencee + 0.5 * ae_sqr(y2.ptr.p_double[i] - y.ptr.p_double[i]);
+            referencee += 0.5 * ae_sqr(y2.ptr.p_double[i] - y.ptr.p_double[i]);
          }
       } else {
          for (i = 0; i < nout; i++) {
@@ -54264,7 +54264,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
                if (y2.ptr.p_double[i] == 0.0) {
                   referencee = referencee + y.ptr.p_double[i] * log(ae_maxrealnumber);
                } else {
-                  referencee = referencee + y.ptr.p_double[i] * log(y.ptr.p_double[i] / y2.ptr.p_double[i]);
+                  referencee += y.ptr.p_double[i] * log(y.ptr.p_double[i] / y2.ptr.p_double[i]);
                }
             }
          }
@@ -54279,7 +54279,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          v = 0.0;
          if (nkind != 1) {
             for (j = 0; j < nout; j++) {
-               v = v + 0.5 * (ae_sqr(y2.ptr.p_double[j] - y.ptr.p_double[j]) - ae_sqr(y1.ptr.p_double[j] - y.ptr.p_double[j])) / (2 * h);
+               v += 0.5 * (ae_sqr(y2.ptr.p_double[j] - y.ptr.p_double[j]) - ae_sqr(y1.ptr.p_double[j] - y.ptr.p_double[j])) / (2 * h);
             }
          } else {
             for (j = 0; j < nout; j++) {
@@ -54287,16 +54287,16 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
                   if (y2.ptr.p_double[j] == 0.0) {
                      v = v + y.ptr.p_double[j] * log(ae_maxrealnumber);
                   } else {
-                     v = v + y.ptr.p_double[j] * log(y.ptr.p_double[j] / y2.ptr.p_double[j]);
+                     v += y.ptr.p_double[j] * log(y.ptr.p_double[j] / y2.ptr.p_double[j]);
                   }
                   if (y1.ptr.p_double[j] == 0.0) {
                      v = v - y.ptr.p_double[j] * log(ae_maxrealnumber);
                   } else {
-                     v = v - y.ptr.p_double[j] * log(y.ptr.p_double[j] / y1.ptr.p_double[j]);
+                     v -= y.ptr.p_double[j] * log(y.ptr.p_double[j] / y1.ptr.p_double[j]);
                   }
                }
             }
-            v = v / (2 * h);
+            v /= 2 * h;
          }
          referenceg.ptr.p_double[i] = v;
       }
@@ -54359,7 +54359,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
          }
          mlpgrad(&network, &x1, &y1, &v, &grad2);
-         referencee = referencee + v;
+         referencee += v;
          ae_v_add(referenceg.ptr.p_double, 1, grad2.ptr.p_double, 1, wcount);
       }
       sparseconverttocrs(&sparsexy);
@@ -54497,7 +54497,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
          }
          mlpgradn(&network, &x1, &y1, &v, &grad2);
-         referencee = referencee + v;
+         referencee += v;
          ae_v_add(referenceg.ptr.p_double, 1, grad2.ptr.p_double, 1, wcount);
       }
       mlpgradnbatch(&network, &xy, ssize, &e2, &grad2);
@@ -54619,7 +54619,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
             } else {
                mlpgradn(&network, &x1, &y1, &v, &grad2);
             }
-            e1 = e1 + v;
+            e1 += v;
             ae_v_add(grad1.ptr.p_double, 1, grad2.ptr.p_double, 1, wcount);
 
          // H1
@@ -54813,7 +54813,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          nnmax = 0;
          if (mlpissoftmax(&network)) {
             if (y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] > 0.0) {
-               refavgce = refavgce + log(1 / y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])]);
+               refavgce += log(1 / y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])]);
             } else {
                refavgce = refavgce + log(ae_maxrealnumber);
             }
@@ -54824,11 +54824,11 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             dsmax = 0;
          }
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
-            refavgerror = refavgerror + fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]);
+            refrmserror += ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
+            refavgerror += fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]);
             if (y1.ptr.p_double[j] != 0.0) {
-               refavgrelerror = refavgrelerror + fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]) / fabs(y1.ptr.p_double[j]);
-               avgrelcnt = avgrelcnt + 1;
+               refavgrelerror += fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]) / fabs(y1.ptr.p_double[j]);
+               avgrelcnt++;
             }
             if (y.ptr.p_double[j] > y.ptr.p_double[nnmax]) {
                nnmax = j;
@@ -54838,20 +54838,20 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             }
          }
          if (nnmax != dsmax) {
-            refclserror = refclserror + 1;
+            refclserror++;
          }
       }
       sparseconverttocrs(&sparsexy);
       if (ssize > 0) {
          refrmserror = sqrt(refrmserror / (ssize * nout));
-         refavgerror = refavgerror / (ssize * nout);
+         refavgerror /= ssize * nout;
          refrelclserror = refclserror / ssize;
-         refavgce = refavgce / (ssize * log(2.0));
+         refavgce /= ssize * log(2.0);
       } else {
          refrelclserror = 0.0;
       }
       if (avgrelcnt > 0) {
-         refavgrelerror = refavgrelerror / avgrelcnt;
+         refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
       seterrorflagdiff(err, mlprmserror(&network, &xy, ssize), refrmserror, etol, escale);
@@ -54899,7 +54899,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
          }
          mlpprocess(&network, &x1, &y);
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
+            refrmserror += ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
          }
       }
       if (subsetsize > 0) {
@@ -55320,7 +55320,7 @@ static void testldaunit_gensimpleset(ae_int_t nfeatures, ae_int_t nclasses, ae_i
          xy->ptr.pp_double[i][j] = testldaunit_generatenormal(0.0, 1.0);
       }
       c = i % nclasses;
-      xy->ptr.pp_double[i][axis] = xy->ptr.pp_double[i][axis] + c;
+      xy->ptr.pp_double[i][axis] += c;
       xy->ptr.pp_double[i][nfeatures] = (double)c;
    }
 }
@@ -55346,7 +55346,7 @@ static void testldaunit_gendeg1set(ae_int_t nfeatures, ae_int_t nclasses, ae_int
       }
       xy->ptr.pp_double[i][nfeatures - 1] = xy->ptr.pp_double[i][nfeatures - 2];
       c = i % nclasses;
-      xy->ptr.pp_double[i][axis] = xy->ptr.pp_double[i][axis] + c;
+      xy->ptr.pp_double[i][axis] += c;
       xy->ptr.pp_double[i][nfeatures] = (double)c;
    }
 }
@@ -55425,7 +55425,7 @@ static void testldaunit_fishers(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures
    for (i = 0; i < npoints; i++) {
       ae_v_add(mu.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nfeatures);
       ae_v_add(muc.ptr.pp_double[c.ptr.p_int[i]], 1, xy->ptr.pp_double[i], 1, nfeatures);
-      nc.ptr.p_int[c.ptr.p_int[i]] = nc.ptr.p_int[c.ptr.p_int[i]] + 1;
+      nc.ptr.p_int[c.ptr.p_int[i]]++;
    }
    for (i = 0; i < nclasses; i++) {
       v = 1.0 / (double)nc.ptr.p_int[i];
@@ -55537,7 +55537,7 @@ static bool testldaunit_testwn(RMatrix xy, RMatrix wn, ae_int_t ns, ae_int_t nf,
       result = result && fabs(v - 1) <= 1000 * ae_machineepsilon;
       v = 0.0;
       for (i = 0; i < nf; i++) {
-         v = v + wn->ptr.pp_double[i][j];
+         v += wn->ptr.pp_double[i][j];
       }
       result = result && v >= 0.0;
    }
@@ -55887,15 +55887,15 @@ static void testssaunit_testgeneral(bool *errorflag) {
             for (i = 0; i < windowwidth; i++) {
                b.ptr.pp_double[i][0] = 1 / sqrt((double)windowwidth);
                b.ptr.pp_double[i][1] = (double)i;
-               v = v + (double)i / (double)windowwidth;
+               v += (double)i / (double)windowwidth;
             }
             vv = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.ptr.pp_double[i][1] = b.ptr.pp_double[i][1] - v;
-               vv = vv + ae_sqr(b.ptr.pp_double[i][1]);
+               b.ptr.pp_double[i][1] -= v;
+               vv += ae_sqr(b.ptr.pp_double[i][1]);
             }
             for (i = 0; i < windowwidth; i++) {
-               b.ptr.pp_double[i][1] = b.ptr.pp_double[i][1] / sqrt(vv);
+               b.ptr.pp_double[i][1] /= sqrt(vv);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 2);
          } else {
@@ -56052,15 +56052,15 @@ static void testssaunit_testgeneral(bool *errorflag) {
             for (i = 0; i < windowwidth; i++) {
                b.ptr.pp_double[i][0] = 1 / sqrt((double)windowwidth);
                b.ptr.pp_double[i][1] = (double)i;
-               v = v + (double)i / (double)windowwidth;
+               v += (double)i / (double)windowwidth;
             }
             vv = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.ptr.pp_double[i][1] = b.ptr.pp_double[i][1] - v;
-               vv = vv + ae_sqr(b.ptr.pp_double[i][1]);
+               b.ptr.pp_double[i][1] -= v;
+               vv += ae_sqr(b.ptr.pp_double[i][1]);
             }
             for (i = 0; i < windowwidth; i++) {
-               b.ptr.pp_double[i][1] = b.ptr.pp_double[i][1] / sqrt(vv);
+               b.ptr.pp_double[i][1] /= sqrt(vv);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 2);
          } else {
@@ -56814,7 +56814,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x, nticks - i, forecastlen + i, true, &tmp0);
          for (j = 0; j < forecastlen; j++) {
-            trend2.ptr.p_double[j] = trend2.ptr.p_double[j] + tmp0.ptr.p_double[i + j] / navg;
+            trend2.ptr.p_double[j] += tmp0.ptr.p_double[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -56834,7 +56834,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x2, nticks - i, forecastlen + i, true, &tmp0);
          for (j = 0; j < forecastlen; j++) {
-            trend2.ptr.p_double[j] = trend2.ptr.p_double[j] + tmp0.ptr.p_double[i + j] / navg;
+            trend2.ptr.p_double[j] += tmp0.ptr.p_double[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -56854,7 +56854,7 @@ static void testssaunit_testgeneral(bool *errorflag) {
       for (i = 0; i < navg; i++) {
          ssaforecastsequence(&state, &x2, nticks - i, forecastlen + i, false, &tmp0);
          for (j = 0; j < forecastlen; j++) {
-            trend2.ptr.p_double[j] = trend2.ptr.p_double[j] + tmp0.ptr.p_double[i + j] / navg;
+            trend2.ptr.p_double[j] += tmp0.ptr.p_double[i + j] / navg;
          }
       }
       for (i = 0; i < forecastlen; i++) {
@@ -57529,7 +57529,7 @@ static void testssaunit_testspecial(bool *errorflag) {
                for (j = 0; j < windowwidth; j++) {
                   v = ae_v_dotproduct(a.ptr.pp_double[i], 1, a.ptr.pp_double[j], 1, windowwidth);
                   if (i == j) {
-                     v = v - 1;
+                     v--;
                   }
                   ae_set_error_flag(errorflag, fabs(v) > 100 * ae_machineepsilon, __FILE__, __LINE__, "testssaunit.ap:1899");
                }
@@ -58142,19 +58142,19 @@ static void testlinregunit_calculatemv(RVector x, ae_int_t n, double *mean, doub
    }
 // Mean
    for (i = 0; i < n; i++) {
-      *mean = *mean + x->ptr.p_double[i];
+      *mean += x->ptr.p_double[i];
    }
-   *mean = *mean / n;
+   *mean /= n;
 
 // Variance (using corrected two-pass algorithm)
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 = v1 + ae_sqr(x->ptr.p_double[i] - (*mean));
+         v1 += ae_sqr(x->ptr.p_double[i] - (*mean));
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
-         v2 = v2 + (x->ptr.p_double[i] - (*mean));
+         v2 += x->ptr.p_double[i] - (*mean);
       }
       v2 = ae_sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
@@ -58393,7 +58393,7 @@ bool testlinreg(bool silent) {
             tb.ptr.p_double[epass] = b;
             for (i = 0; i < qcnt; i++) {
                if (p <= qtbl.ptr.p_double[i]) {
-                  qvals.ptr.p_double[i] = qvals.ptr.p_double[i] + 1.0 / (double)estpasscount;
+                  qvals.ptr.p_double[i] += 1.0 / (double)estpasscount;
                }
             }
          }
@@ -58647,7 +58647,7 @@ bool testlinreg(bool silent) {
                v = tmpweights.ptr.p_double[m];
                for (i = 0; i < m; i++) {
                   x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  v = v + tmpweights.ptr.p_double[i] * x.ptr.p_double[i];
+                  v += tmpweights.ptr.p_double[i] * x.ptr.p_double[i];
                }
                grothererrors = grothererrors || fabs(v - lrprocess(&wt, &x)) / ae_maxreal(fabs(v), 1.0) > threshold; //(@)
 
@@ -58677,16 +58677,16 @@ bool testlinreg(bool silent) {
                   for (i = 0; i < n; i++) {
                      v = tmpweights.ptr.p_double[m];
                      for (j = 0; j < m; j++) {
-                        v = v + xy.ptr.pp_double[i][j] * tmpweights.ptr.p_double[j];
+                        v += xy.ptr.pp_double[i][j] * tmpweights.ptr.p_double[j];
                      }
-                     f = f + ae_sqr((v - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
+                     f += ae_sqr((v - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
                      if (k < m) {
                         vv = xy.ptr.pp_double[i][k];
                      } else {
                         vv = 1.0;
                      }
-                     fp = fp + ae_sqr((v + vv * hstep - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
-                     fm = fm + ae_sqr((v - vv * hstep - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
+                     fp += ae_sqr((v + vv * hstep - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
+                     fm += ae_sqr((v - vv * hstep - xy.ptr.pp_double[i][m]) / s.ptr.p_double[i]);
                   }
                   gropterrors = (gropterrors || f > fp) || f > fm;
                }
@@ -58750,10 +58750,10 @@ bool testlinreg(bool silent) {
 
                // Trn
                   v = ae_v_dotproduct(xy.ptr.pp_double[i], 1, tmpweights.ptr.p_double, 1, m);
-                  v = v + tmpweights.ptr.p_double[m];
-                  rmserror = rmserror + ae_sqr(v - xy.ptr.pp_double[i][m]);
-                  avgerror = avgerror + fabs(v - xy.ptr.pp_double[i][m]);
-                  avgrelerror = avgrelerror + fabs((v - xy.ptr.pp_double[i][m]) / xy.ptr.pp_double[i][m]);
+                  v += tmpweights.ptr.p_double[m];
+                  rmserror += ae_sqr(v - xy.ptr.pp_double[i][m]);
+                  avgerror += fabs(v - xy.ptr.pp_double[i][m]);
+                  avgrelerror += fabs((v - xy.ptr.pp_double[i][m]) / xy.ptr.pp_double[i][m]);
 
                // CV: non-defect vectors only
                   nondefect = true;
@@ -58774,10 +58774,10 @@ bool testlinreg(bool silent) {
                      }
                      lrunpack(&wt, &w2, &tmpi);
                      v = ae_v_dotproduct(xy.ptr.pp_double[i], 1, w2.ptr.p_double, 1, m);
-                     v = v + w2.ptr.p_double[m];
-                     cvrmserror = cvrmserror + ae_sqr(v - xy.ptr.pp_double[i][m]);
-                     cvavgerror = cvavgerror + fabs(v - xy.ptr.pp_double[i][m]);
-                     cvavgrelerror = cvavgrelerror + fabs((v - xy.ptr.pp_double[i][m]) / xy.ptr.pp_double[i][m]);
+                     v += w2.ptr.p_double[m];
+                     cvrmserror += ae_sqr(v - xy.ptr.pp_double[i][m]);
+                     cvavgerror += fabs(v - xy.ptr.pp_double[i][m]);
+                     cvavgrelerror += fabs((v - xy.ptr.pp_double[i][m]) / xy.ptr.pp_double[i][m]);
                   }
                // Next set
                   if (i != n - 1) {
@@ -58786,11 +58786,11 @@ bool testlinreg(bool silent) {
                   }
                }
                cvrmserror = sqrt(cvrmserror / (n - ar.ncvdefects));
-               cvavgerror = cvavgerror / (n - ar.ncvdefects);
-               cvavgrelerror = cvavgrelerror / (n - ar.ncvdefects);
+               cvavgerror /= n - ar.ncvdefects;
+               cvavgrelerror /= n - ar.ncvdefects;
                rmserror = sqrt(rmserror / n);
-               avgerror = avgerror / n;
-               avgrelerror = avgrelerror / n;
+               avgerror /= n;
+               avgrelerror /= n;
                gresterrors = gresterrors || fabs(log(ar.cvrmserror / cvrmserror)) > log(1 + 1.0E-5);
                gresterrors = gresterrors || fabs(log(ar.cvavgerror / cvavgerror)) > log(1 + 1.0E-5);
                gresterrors = gresterrors || fabs(log(ar.cvavgrelerror / cvavgrelerror)) > log(1 + 1.0E-5);
@@ -59246,15 +59246,15 @@ static void testmcpdunit_testsimple(bool *err) {
       }
       for (j = 0; j < n; j++) {
          i = ae_randominteger(n);
-         pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] + 0.1;
+         pexact.ptr.pp_double[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.ptr.pp_double[i][j];
+            v += pexact.ptr.pp_double[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] / v;
+            pexact.ptr.pp_double[i][j] /= v;
          }
       }
 
@@ -59310,15 +59310,15 @@ static void testmcpdunit_testsimple(bool *err) {
       }
       for (j = 0; j < n; j++) {
          i = ae_randominteger(n);
-         pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] + 0.1;
+         pexact.ptr.pp_double[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.ptr.pp_double[i][j];
+            v += pexact.ptr.pp_double[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] / v;
+            pexact.ptr.pp_double[i][j] /= v;
          }
       }
 
@@ -59342,13 +59342,13 @@ static void testmcpdunit_testsimple(bool *err) {
          if (i > 0) {
             xy.ptr.pp_double[0][i - 1] = offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.ptr.pp_double[1][j] = xy.ptr.pp_double[1][j] + offdiagonal * pexact.ptr.pp_double[j][i - 1];
+               xy.ptr.pp_double[1][j] += offdiagonal * pexact.ptr.pp_double[j][i - 1];
             }
          }
          if (i < n - 1) {
             xy.ptr.pp_double[0][i + 1] = offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.ptr.pp_double[1][j] = xy.ptr.pp_double[1][j] + offdiagonal * pexact.ptr.pp_double[j][i + 1];
+               xy.ptr.pp_double[1][j] += offdiagonal * pexact.ptr.pp_double[j][i + 1];
             }
          }
          mcpdaddtrack(&s, &xy, 2);
@@ -59390,15 +59390,15 @@ static void testmcpdunit_testsimple(bool *err) {
       }
       for (j = 0; j < n; j++) {
          i = ae_randominteger(n);
-         pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] + 0.1;
+         pexact.ptr.pp_double[i][j] += 0.1;
       }
       for (j = 0; j < n; j++) {
          v = 0.0;
          for (i = 0; i < n; i++) {
-            v = v + pexact.ptr.pp_double[i][j];
+            v += pexact.ptr.pp_double[i][j];
          }
          for (i = 0; i < n; i++) {
-            pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] / v;
+            pexact.ptr.pp_double[i][j] /= v;
          }
       }
 
@@ -59423,13 +59423,13 @@ static void testmcpdunit_testsimple(bool *err) {
          if (i > 0) {
             xy.ptr.pp_double[0][i - 1] = v0 * offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.ptr.pp_double[1][j] = xy.ptr.pp_double[1][j] + v0 * offdiagonal * pexact.ptr.pp_double[j][i - 1];
+               xy.ptr.pp_double[1][j] += v0 * offdiagonal * pexact.ptr.pp_double[j][i - 1];
             }
          }
          if (i < n - 1) {
             xy.ptr.pp_double[0][i + 1] = v0 * offdiagonal;
             for (j = 0; j < n; j++) {
-               xy.ptr.pp_double[1][j] = xy.ptr.pp_double[1][j] + v0 * offdiagonal * pexact.ptr.pp_double[j][i + 1];
+               xy.ptr.pp_double[1][j] += v0 * offdiagonal * pexact.ptr.pp_double[j][i + 1];
             }
          }
          mcpdaddtrack(&s, &xy, 2);
@@ -59519,11 +59519,11 @@ static void testmcpdunit_testentryexit(bool *err) {
                for (j = 0; j < n; j++) {
                   v = 0.0;
                   for (i = 0; i < n; i++) {
-                     v = v + pexact.ptr.pp_double[i][j];
+                     v += pexact.ptr.pp_double[i][j];
                   }
                   if (v != 0.0) {
                      for (i = 0; i < n; i++) {
-                        pexact.ptr.pp_double[i][j] = pexact.ptr.pp_double[i][j] / v;
+                        pexact.ptr.pp_double[i][j] /= v;
                      }
                   }
                }
@@ -59574,11 +59574,11 @@ static void testmcpdunit_testentryexit(bool *err) {
                      for (i = 0; i < xy.rows; i++) {
                         v = 0.0;
                         for (j = 0; j < n; j++) {
-                           v = v + xy.ptr.pp_double[i][j];
+                           v += xy.ptr.pp_double[i][j];
                         }
                         if (v > 0.0) {
                            for (j = 0; j < n; j++) {
-                              xy.ptr.pp_double[i][j] = xy.ptr.pp_double[i][j] / v;
+                              xy.ptr.pp_double[i][j] /= v;
                            }
                         }
                      }
@@ -60071,17 +60071,17 @@ static void testmcpdunit_testlc(bool *err) {
                      c.ptr.pp_double[0][i * n + j] = 0.0;
                   } else {
                      c.ptr.pp_double[0][i * n + j] = ae_randomreal();
-                     v = v + c.ptr.pp_double[0][i * n + j] * (1.0 / (double)n);
+                     v += c.ptr.pp_double[0][i * n + j] * (1.0 / (double)n);
                   }
                }
             }
             c.ptr.pp_double[0][n * n] = v;
             ct.ptr.p_int[0] = ae_randominteger(3) - 1;
             if (ct.ptr.p_int[0] < 0) {
-               c.ptr.pp_double[0][n * n] = c.ptr.pp_double[0][n * n] + 0.1;
+               c.ptr.pp_double[0][n * n] += 0.1;
             }
             if (ct.ptr.p_int[0] > 0) {
-               c.ptr.pp_double[0][n * n] = c.ptr.pp_double[0][n * n] - 0.1;
+               c.ptr.pp_double[0][n * n] -= 0.1;
             }
             testmcpdunit_createee(n, entrystate, exitstate, &s);
             mcpdaddtrack(&s, &xy, xy.rows);
@@ -60092,7 +60092,7 @@ static void testmcpdunit_testlc(bool *err) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     v = v + p.ptr.pp_double[i][j] * c.ptr.pp_double[0][i * n + j];
+                     v += p.ptr.pp_double[i][j] * c.ptr.pp_double[0][i * n + j];
                   }
                }
                if (ct.ptr.p_int[0] < 0) {
@@ -60244,17 +60244,17 @@ static void testmcpdunit_testlc(bool *err) {
             c.ptr.pp_double[i][n * n] = 0.0;
             for (j = 0; j < n * n; j++) {
                c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-               c.ptr.pp_double[i][n * n] = c.ptr.pp_double[i][n * n] + c.ptr.pp_double[i][j] * (1.0 / (double)n);
+               c.ptr.pp_double[i][n * n] += c.ptr.pp_double[i][j] * (1.0 / (double)n);
             }
             ct.ptr.p_int[i] = ae_randominteger(3) - 1;
 
          // If we have inequality constraint, we "shift" right part
          // in order to make feasible some neighborhood of P=(1/N ... 1/N).
             if (ct.ptr.p_int[i] < 0) {
-               c.ptr.pp_double[i][n * n] = c.ptr.pp_double[i][n * n] + 0.1;
+               c.ptr.pp_double[i][n * n] += 0.1;
             }
             if (ct.ptr.p_int[i] > 0) {
-               c.ptr.pp_double[i][n * n] = c.ptr.pp_double[i][n * n] - 0.1;
+               c.ptr.pp_double[i][n * n] -= 0.1;
             }
          }
 
@@ -60269,7 +60269,7 @@ static void testmcpdunit_testlc(bool *err) {
                v = 0.0;
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     v = v + p.ptr.pp_double[i][j] * c.ptr.pp_double[t][i * n + j];
+                     v += p.ptr.pp_double[i][j] * c.ptr.pp_double[t][i * n + j];
                   }
                }
                if (ct.ptr.p_int[t] < 0) {
@@ -60699,7 +60699,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             mlpeprocess(&ensemble, &x1, &y1);
             v = 0.0;
             for (i = 0; i < nout; i++) {
-               v = v + y1.ptr.p_double[i];
+               v += y1.ptr.p_double[i];
                *err = *err || y1.ptr.p_double[i] < 0.0;
             }
             *err = *err || fabs(v - 1) > 1000 * ae_machineepsilon;
@@ -60862,7 +60862,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
          nnmax = 0;
          if (mlpeissoftmax(&ensemble)) {
             if (y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] > 0.0) {
-               refavgce = refavgce + log(1 / y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])]);
+               refavgce += log(1 / y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])]);
             } else {
                refavgce = refavgce + log(ae_maxrealnumber);
             }
@@ -60873,11 +60873,11 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             dsmax = 0;
          }
          for (j = 0; j < nout; j++) {
-            refrmserror = refrmserror + ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
-            refavgerror = refavgerror + fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]);
+            refrmserror += ae_sqr(y.ptr.p_double[j] - y1.ptr.p_double[j]);
+            refavgerror += fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]);
             if (y1.ptr.p_double[j] != 0.0) {
-               refavgrelerror = refavgrelerror + fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]) / fabs(y1.ptr.p_double[j]);
-               avgrelcnt = avgrelcnt + 1;
+               refavgrelerror += fabs(y.ptr.p_double[j] - y1.ptr.p_double[j]) / fabs(y1.ptr.p_double[j]);
+               avgrelcnt++;
             }
             if (y.ptr.p_double[j] > y.ptr.p_double[nnmax]) {
                nnmax = j;
@@ -60887,17 +60887,17 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             }
          }
          if (nnmax != dsmax) {
-            refclserror = refclserror + 1;
+            refclserror++;
          }
       }
       sparseconverttocrs(&sparsexy);
       if (ssize > 0) {
          refrmserror = sqrt(refrmserror / (ssize * nout));
-         refavgerror = refavgerror / (ssize * nout);
-         refavgce = refavgce / (ssize * log(2.0));
+         refavgerror /= ssize * nout;
+         refavgce /= ssize * log(2.0);
       }
       if (avgrelcnt > 0) {
-         refavgrelerror = refavgrelerror / avgrelcnt;
+         refavgrelerror /= avgrelcnt;
       }
    // Test "continuous" errors on full dataset
       seterrorflagdiff(err, mlpermserror(&ensemble, &xy, ssize), refrmserror, etol, escale);
@@ -61184,7 +61184,7 @@ static bool testmlptrainunit_testmlptrainregr() {
          mlpprocess(&net, &x, &y);
 
       // Calculate average error
-         averr = averr + fabs(y.ptr.p_double[0] - xy.ptr.pp_double[i][2]);
+         averr += fabs(y.ptr.p_double[0] - xy.ptr.pp_double[i][2]);
       }
       if (averr / n > eps) {
          result = true;
@@ -61314,7 +61314,7 @@ static bool testmlptrainunit_testmlpxorregr() {
             mlpprocess(&net, &x, &y);
 
          // Calculate average error
-            averr = averr + fabs(y.ptr.p_double[0] - xy.ptr.pp_double[i][2]);
+            averr += fabs(y.ptr.p_double[0] - xy.ptr.pp_double[i][2]);
          }
          if (averr / n > eps) {
             result = true;
@@ -61832,7 +61832,7 @@ static bool testmlptrainunit_testmlprestarts() {
          e1 = ae_v_dotproduct(net1.weights.ptr.p_double, 1, net1.weights.ptr.p_double, 1, wcount1);
          e1 = mlperrorn(&net1, &xy, n) + 0.5 * vdecay * e1;
          if (e0 <= e1) {
-            avval = avval + 1;
+            avval++;
          }
       }
       if (mean - numsigma < avval) {
@@ -62047,20 +62047,20 @@ static bool testmlptrainunit_testmlpcverror() {
       mlpkfoldcv(&trainer, &net, nneedrest, foldscount, &cvrep);
       if (!isregr) {
          if (fabs(tstrelclserror - rep.relclserror) < fabs(tstrelclserror - cvrep.relclserror)) {
-            r0 = r0 + 1;
+            r0++;
          }
          if (fabs(tstavgce - rep.avgce) < fabs(tstavgce - cvrep.avgce)) {
-            r1 = r1 + 1;
+            r1++;
          }
       }
       if (fabs(tstrmserror - rep.rmserror) < fabs(tstrmserror - cvrep.rmserror)) {
-         r2 = r2 + 1;
+         r2++;
       }
       if (fabs(tstavgerror - rep.avgerror) < fabs(tstavgerror - cvrep.avgerror)) {
-         r3 = r3 + 1;
+         r3++;
       }
       if (fabs(tstavgrelerror - rep.avgrelerror) < fabs(tstavgrelerror - cvrep.avgrelerror)) {
-         r4 = r4 + 1;
+         r4++;
       }
    }
    if (!isregr) {
@@ -62177,10 +62177,10 @@ static bool testmlptrainunit_testmlptrainens() {
                result = true;
             } else {
                if (mlpermserror(&ensemble, &xy, npoints) < e) {
-                  nless = nless + 1;
+                  nless++;
                }
             }
-            nall = nall + 1;
+            nall++;
          }
       }
    }
@@ -62265,7 +62265,7 @@ static bool testmlptrainunit_testmlptrainensregr() {
          }
          xytrain.ptr.pp_double[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
-            xytrain.ptr.pp_double[i][nin] = xytrain.ptr.pp_double[i][nin] + xytrain.ptr.pp_double[i][j];
+            xytrain.ptr.pp_double[i][nin] += xytrain.ptr.pp_double[i][j];
          }
       }
       if (withtrainer == 1) {
@@ -62295,7 +62295,7 @@ static bool testmlptrainunit_testmlptrainensregr() {
          }
          xytest.ptr.pp_double[i][nin] = 0.0;
          for (j = 0; j < nin; j++) {
-            xytest.ptr.pp_double[i][nin] = xytest.ptr.pp_double[i][nin] + xytest.ptr.pp_double[i][j];
+            xytest.ptr.pp_double[i][nin] += xytest.ptr.pp_double[i][j];
          }
       }
 
@@ -62332,17 +62332,17 @@ static bool testmlptrainunit_testmlptrainensregr() {
             sparsegetrow(&xytrainsp, i, &x);
          }
          mlpeprocess(&netens, &x, &y);
-         avgerr = avgerr + fabs(y.ptr.p_double[0] - xytrain.ptr.pp_double[i][nin]);
+         avgerr += fabs(y.ptr.p_double[0] - xytrain.ptr.pp_double[i][nin]);
       }
-      avgerr = avgerr / ntrain;
+      avgerr /= ntrain;
       ae_set_error_flag(&result, avgerr > eps, __FILE__, __LINE__, "testmlptrainunit.ap:1799");
       avgerr = 0.0;
       for (i = 0; i < ntest; i++) {
          ae_v_move(x.ptr.p_double, 1, xytest.ptr.pp_double[i], 1, nin);
          mlpeprocess(&netens, &x, &y);
-         avgerr = avgerr + fabs(y.ptr.p_double[0] - xytest.ptr.pp_double[i][nin]);
+         avgerr += fabs(y.ptr.p_double[0] - xytest.ptr.pp_double[i][nin]);
       }
-      avgerr = avgerr / ntest;
+      avgerr /= ntest;
       ae_set_error_flag(&result, avgerr > 2 * eps, __FILE__, __LINE__, "testmlptrainunit.ap:1808");
    }
 
@@ -62434,7 +62434,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          for (j = 0; j < nin; j++) {
             xytrain.ptr.pp_double[i][j] = delta * (ae_randomreal() - 1);
          }
-         xytrain.ptr.pp_double[i][val] = xytrain.ptr.pp_double[i][val] + 1;
+         xytrain.ptr.pp_double[i][val]++;
          xytrain.ptr.pp_double[i][nin] = (double)val;
       }
 
@@ -62462,7 +62462,7 @@ static bool testmlptrainunit_testmlptrainenscls() {
          for (j = 0; j < nin; j++) {
             xytest.ptr.pp_double[i][j] = delta * (ae_randomreal() - 1);
          }
-         xytest.ptr.pp_double[i][val] = xytest.ptr.pp_double[i][val] + 1;
+         xytest.ptr.pp_double[i][val]++;
          xytest.ptr.pp_double[i][nin] = (double)val;
       }
 
@@ -62491,13 +62491,13 @@ static bool testmlptrainunit_testmlptrainenscls() {
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
             if ((double)j != xytrain.ptr.pp_double[i][nin]) {
-               avgerr = avgerr + y.ptr.p_double[j];
+               avgerr += y.ptr.p_double[j];
             } else {
-               avgerr = avgerr + (1 - y.ptr.p_double[j]);
+               avgerr += 1 - y.ptr.p_double[j];
             }
          }
       }
-      avgerr = avgerr / (ntrain * nout);
+      avgerr /= ntrain * nout;
       if (avgerr > eps) {
          result = true;
          ae_frame_leave();
@@ -62510,13 +62510,13 @@ static bool testmlptrainunit_testmlptrainenscls() {
          mlpeprocess(&netens, &x, &y);
          for (j = 0; j < nout; j++) {
             if ((double)j != xytest.ptr.pp_double[i][nin]) {
-               avgerr = avgerr + y.ptr.p_double[j];
+               avgerr += y.ptr.p_double[j];
             } else {
-               avgerr = avgerr + (1 - y.ptr.p_double[j]);
+               avgerr += 1 - y.ptr.p_double[j];
             }
          }
       }
-      avgerr = avgerr / (ntest * nout);
+      avgerr /= ntest * nout;
       if (avgerr > eps) {
          result = true;
          ae_frame_leave();
@@ -62928,11 +62928,11 @@ static bool testclusteringunit_errorsinmerges(RMatrix d, RMatrix xy, ae_int_t np
       t = 0;
       for (j = 0; j < clustersizes.ptr.p_int[rep->z.ptr.pp_int[mergeidx][0]]; j++) {
          cm.ptr.pp_int[npoints + mergeidx][t] = cm.ptr.pp_int[rep->z.ptr.pp_int[mergeidx][0]][j];
-         t = t + 1;
+         t++;
       }
       for (j = 0; j < clustersizes.ptr.p_int[rep->z.ptr.pp_int[mergeidx][1]]; j++) {
          cm.ptr.pp_int[npoints + mergeidx][t] = cm.ptr.pp_int[rep->z.ptr.pp_int[mergeidx][1]][j];
-         t = t + 1;
+         t++;
       }
       clustersizes.ptr.p_int[npoints + mergeidx] = t;
       clustersizes.ptr.p_int[rep->z.ptr.pp_int[mergeidx][0]] = 0;
@@ -62978,11 +62978,11 @@ static bool testclusteringunit_errorsinmerges(RMatrix d, RMatrix xy, ae_int_t np
                t = 0;
                for (i0 = 0; i0 < clustersizes.ptr.p_int[i]; i0++) {
                   for (i1 = 0; i1 < clustersizes.ptr.p_int[npoints + mergeidx]; i1++) {
-                     v = v + d->ptr.pp_double[cm.ptr.pp_int[i][i0]][cm.ptr.pp_int[npoints + mergeidx][i1]];
-                     t = t + 1;
+                     v += d->ptr.pp_double[cm.ptr.pp_int[i][i0]][cm.ptr.pp_int[npoints + mergeidx][i1]];
+                     t++;
                   }
                }
-               v = v / t;
+               v /= t;
             }
             if (ahcalgo == 3) {
                ae_assert(false, "Assertion failed");
@@ -63002,17 +63002,17 @@ static bool testclusteringunit_errorsinmerges(RMatrix d, RMatrix xy, ae_int_t np
                }
                for (i0 = 0; i0 < clustersizes.ptr.p_int[i]; i0++) {
                   for (j = 0; j < nf; j++) {
-                     x0.ptr.p_double[j] = x0.ptr.p_double[j] + xy->ptr.pp_double[cm.ptr.pp_int[i][i0]][j] / clustersizes.ptr.p_int[i];
+                     x0.ptr.p_double[j] += xy->ptr.pp_double[cm.ptr.pp_int[i][i0]][j] / clustersizes.ptr.p_int[i];
                   }
                }
                for (i1 = 0; i1 < clustersizes.ptr.p_int[npoints + mergeidx]; i1++) {
                   for (j = 0; j < nf; j++) {
-                     x1.ptr.p_double[j] = x1.ptr.p_double[j] + xy->ptr.pp_double[cm.ptr.pp_int[npoints + mergeidx][i1]][j] / clustersizes.ptr.p_int[npoints + mergeidx];
+                     x1.ptr.p_double[j] += xy->ptr.pp_double[cm.ptr.pp_int[npoints + mergeidx][i1]][j] / clustersizes.ptr.p_int[npoints + mergeidx];
                   }
                }
                v = 0.0;
                for (j = 0; j < nf; j++) {
-                  v = v + ae_sqr(x0.ptr.p_double[j] - x1.ptr.p_double[j]);
+                  v += ae_sqr(x0.ptr.p_double[j] - x1.ptr.p_double[j]);
                }
                v = v * clustersizes.ptr.p_int[i] * clustersizes.ptr.p_int[npoints + mergeidx] / (clustersizes.ptr.p_int[i] + clustersizes.ptr.p_int[npoints + mergeidx]);
             }
@@ -63652,14 +63652,14 @@ static double testclusteringunit_distfunc(RVector x0, RVector x1, ae_int_t d, ae
    if (disttype == 1) {
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + fabs(x0->ptr.p_double[i] - x1->ptr.p_double[i]);
+         result += fabs(x0->ptr.p_double[i] - x1->ptr.p_double[i]);
       }
       return result;
    }
    if (disttype == 2) {
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + ae_sqr(x0->ptr.p_double[i] - x1->ptr.p_double[i]);
+         result += ae_sqr(x0->ptr.p_double[i] - x1->ptr.p_double[i]);
       }
       result = sqrt(result);
       return result;
@@ -63676,14 +63676,14 @@ static double testclusteringunit_distfunc(RVector x0, RVector x1, ae_int_t d, ae
       s0 = 0.0;
       s1 = 0.0;
       for (i = 0; i < d; i++) {
-         s0 = s0 + ae_sqr(x0->ptr.p_double[i]) / d;
-         s1 = s1 + ae_sqr(x1->ptr.p_double[i]) / d;
+         s0 += ae_sqr(x0->ptr.p_double[i]) / d;
+         s1 += ae_sqr(x1->ptr.p_double[i]) / d;
       }
       s0 = sqrt(s0);
       s1 = sqrt(s1);
       result = 0.0;
       for (i = 0; i < d; i++) {
-         result = result + x0->ptr.p_double[i] / s0 * (x1->ptr.p_double[i] / s1) / d;
+         result += x0->ptr.p_double[i] / s0 * (x1->ptr.p_double[i] / s1) / d;
       }
       if (disttype == 12) {
          result = ae_maxreal(1 - result, 0.0);
@@ -63777,7 +63777,7 @@ static bool testclusteringunit_advancedahctests() {
             for (j = 0; j < d; j++) {
                xy.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
             }
-            xy.ptr.pp_double[i][i % d] = xy.ptr.pp_double[i][i % d] + 1.0;
+            xy.ptr.pp_double[i][i % d]++;
             idx.ptr.p_int[i] = i % d;
          }
          for (i = 0; i < n * d; i++) {
@@ -64034,7 +64034,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
       majoraxis = ae_randominteger(nvars);
       for (i = 0; i < npoints; i++) {
          testclusteringunit_rsphere(&xy, nvars, i);
-         xy.ptr.pp_double[i][majoraxis] = nc * xy.ptr.pp_double[i][majoraxis];
+         xy.ptr.pp_double[i][majoraxis] *= nc;
       }
 
    // Test
@@ -64076,7 +64076,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
          ae_v_move(tmp.ptr.p_double, 1, xy.ptr.pp_double[i], 1, nvars);
          ae_v_sub(tmp.ptr.p_double, 1, rep.c.ptr.pp_double[rep.cidx.ptr.p_int[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.ptr.p_double, 1, tmp.ptr.p_double, 1, nvars);
-         ekmeans = ekmeans + v;
+         ekmeans += v;
       }
       erandom = 0.0;
       for (i = 0; i < npoints; i++) {
@@ -64090,7 +64090,7 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
                dclosest = v;
             }
          }
-         erandom = erandom + v;
+         erandom += v;
       }
       if (erandom < ekmeans) {
          *simpleerrors = true;
@@ -64230,7 +64230,7 @@ static void testclusteringunit_kmeansspecialtests(bool *othererrors) {
             clusterizersetpoints(&s, &xy, npoints, nfeatures, 2);
             clusterizerrunkmeans(&s, nclusters, &rep);
             ae_set_error_flag(othererrors, rep.terminationtype <= 0, __FILE__, __LINE__, "testclusteringunit.ap:1069");
-            energies.ptr.p_double[initalgo] = energies.ptr.p_double[initalgo] + rep.energy / passcount;
+            energies.ptr.p_double[initalgo] += rep.energy / passcount;
          }
       }
 
@@ -64642,7 +64642,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
       for (i = 0; i < npoints; i++) {
          testclusteringunit_rsphere(&xy, nvars, i);
          for (j = 0; j < nvars; j++) {
-            xy.ptr.pp_double[i][j] = xy.ptr.pp_double[i][j] + (double)i / (double)clustersize *5;
+            xy.ptr.pp_double[i][j] += (double)i / (double)clustersize *5;
          }
       }
       clusterizercreate(&state);
@@ -64661,7 +64661,7 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
          ae_v_move(tmp.ptr.p_double, 1, xy.ptr.pp_double[i], 1, nvars);
          ae_v_sub(tmp.ptr.p_double, 1, rep1.c.ptr.pp_double[rep1.cidx.ptr.p_int[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.ptr.p_double, 1, tmp.ptr.p_double, 1, nvars);
-         ea = ea + v;
+         ea += v;
       }
 
    // Test: Restarts>1
@@ -64677,15 +64677,15 @@ static void testclusteringunit_kmeansrestartstest(bool *converrors, bool *restar
          ae_v_move(tmp.ptr.p_double, 1, xy.ptr.pp_double[i], 1, nvars);
          ae_v_sub(tmp.ptr.p_double, 1, rep2.c.ptr.pp_double[rep2.cidx.ptr.p_int[i]], 1, nvars);
          v = ae_v_dotproduct(tmp.ptr.p_double, 1, tmp.ptr.p_double, 1, nvars);
-         eb = eb + v;
+         eb += v;
       }
 
    // Calculate statistic.
       if (ea < eb) {
-         p = p + 1;
+         p++;
       }
       if (ea == eb) {
-         p = p + 0.5;
+         p += 0.5;
       }
    }
 
@@ -65057,7 +65057,7 @@ static void testdforestunit_testprocessing(bool *err) {
          dfprocess(&df1, &x1, &y1);
          v = 0.0;
          for (i = 0; i < nclasses; i++) {
-            v = v + y1.ptr.p_double[i];
+            v += y1.ptr.p_double[i];
             *err = *err || y1.ptr.p_double[i] < 0.0;
          }
          *err = *err || fabs(v - 1) > 1000 * ae_machineepsilon;
@@ -65177,7 +65177,7 @@ static void testdforestunit_basictest1(bool *err) {
                   s = 0.0;
                   for (j = 0; j < nclasses; j++) {
                      ae_set_error_flag(err, y.ptr.p_double[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:492");
-                     s = s + y.ptr.p_double[j];
+                     s += y.ptr.p_double[j];
                   }
                   ae_set_error_flag(err, fabs(s - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:495");
                   ae_set_error_flag(err, fabs(y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nvars])] - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:496");
@@ -65234,7 +65234,7 @@ static void testdforestunit_basictest1(bool *err) {
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
                   ae_set_error_flag(err, y.ptr.p_double[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:564");
-                  s = s + y.ptr.p_double[j];
+                  s += y.ptr.p_double[j];
                }
                ae_set_error_flag(err, fabs(s - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:567");
                ae_set_error_flag(err, fabs(y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nvars])] - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:568");
@@ -65257,7 +65257,7 @@ static void testdforestunit_basictest1(bool *err) {
                s = 0.0;
                for (j = 0; j < nclasses; j++) {
                   ae_set_error_flag(err, y.ptr.p_double[j] < 0.0, __FILE__, __LINE__, "testdforestunit.ap:596");
-                  s = s + y.ptr.p_double[j];
+                  s += y.ptr.p_double[j];
                }
                ae_set_error_flag(err, fabs(s - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:599");
                ae_set_error_flag(err, fabs(y.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nvars])] - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit.ap:600");
@@ -65359,7 +65359,7 @@ static void testdforestunit_basictest2(bool *err) {
             ae_set_error_flag(err, y.ptr.p_double[1] < 0.8, __FILE__, __LINE__, "testdforestunit.ap:712");
          }
       // Advance
-         x.ptr.p_double[0] = x.ptr.p_double[0] + 0.01;
+         x.ptr.p_double[0] += 0.01;
       }
    }
    ae_frame_leave();
@@ -65564,11 +65564,11 @@ static void testdforestunit_basictest4(bool *err) {
             ey = ae_sqr(x.ptr.p_double[0]) + x.ptr.p_double[1];
             dfprocess(&df, &x, &y);
             maxerr = ae_maxreal(maxerr, fabs(y.ptr.p_double[0] - ey));
-            avgerr = avgerr + fabs(y.ptr.p_double[0] - ey);
-            cnt = cnt + 1;
+            avgerr += fabs(y.ptr.p_double[0] - ey);
+            cnt++;
          }
       }
-      avgerr = avgerr / cnt;
+      avgerr /= cnt;
       ae_set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testdforestunit.ap:962");
       ae_set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testdforestunit.ap:963");
    }
@@ -65747,16 +65747,16 @@ static void testdforestunit_basictestrandom(bool *err) {
                }
                dfprocess(&df, &x, &y);
                v = y.ptr.p_double[0] - xy.ptr.pp_double[i][nvars];
-               refrms = refrms + ae_sqr(v);
-               refavg = refavg + fabs(v);
+               refrms += ae_sqr(v);
+               refavg += fabs(v);
                if (xy.ptr.pp_double[i][nvars] != 0.0) {
-                  refavgrel = refavgrel + fabs(v / xy.ptr.pp_double[i][nvars]);
-                  relcnt = relcnt + 1;
+                  refavgrel += fabs(v / xy.ptr.pp_double[i][nvars]);
+                  relcnt++;
                }
             }
             refrms = sqrt(refrms / npoints);
-            refavg = refavg / npoints;
-            refavgrel = refavgrel / coalesce((double)relcnt, 1.0);
+            refavg /= npoints;
+            refavgrel /= coalesce((double)relcnt, 1.0);
             ae_set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1164");
             ae_set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1165");
             ae_set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1166");
@@ -65789,20 +65789,20 @@ static void testdforestunit_basictestrandom(bool *err) {
                   v = y.ptr.p_double[j];
                   if ((double)j == xy.ptr.pp_double[i][nvars]) {
                      refavgce -= log(coalesce(v, ae_minrealnumber)); //(@) Added
-                     v = v - 1;
+                     v--;
                   }
-                  refrms = refrms + ae_sqr(v);
-                  refavg = refavg + fabs(v);
+                  refrms += ae_sqr(v);
+                  refavg += fabs(v);
                   if ((double)j == xy.ptr.pp_double[i][nvars]) {
-                     refavgrel = refavgrel + fabs(v);
+                     refavgrel += fabs(v);
                   // refavgce = refavgce - log(v); //(@) Removed
                   }
                }
             }
             refrms = sqrt(refrms / (npoints * nclasses));
-            refavg = refavg / (npoints * nclasses);
-            refavgrel = refavgrel / npoints;
-            refavgce = refavgce / npoints;
+            refavg /= npoints * nclasses;
+            refavgrel /= npoints;
+            refavgce /= npoints;
             ae_set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1215");
             ae_set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1216");
             ae_set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1217");
@@ -65911,16 +65911,16 @@ static void testdforestunit_basictestallsame(bool *err) {
             }
             dfprocess(&df, &x, &y);
             v = y.ptr.p_double[0] - xy.ptr.pp_double[i][nvars];
-            refrms = refrms + ae_sqr(v);
-            refavg = refavg + fabs(v);
+            refrms += ae_sqr(v);
+            refavg += fabs(v);
             if (xy.ptr.pp_double[i][nvars] != 0.0) {
-               refavgrel = refavgrel + fabs(v / xy.ptr.pp_double[i][nvars]);
-               relcnt = relcnt + 1;
+               refavgrel += fabs(v / xy.ptr.pp_double[i][nvars]);
+               relcnt++;
             }
          }
          refrms = sqrt(refrms / npoints);
-         refavg = refavg / npoints;
-         refavgrel = refavgrel / coalesce((double)relcnt, 1.0);
+         refavg /= npoints;
+         refavgrel /= coalesce((double)relcnt, 1.0);
          ae_set_error_flag(err, rep.relclserror != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1339");
          ae_set_error_flag(err, rep.avgce != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1340");
          ae_set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1341");
@@ -65946,20 +65946,20 @@ static void testdforestunit_basictestallsame(bool *err) {
                v = y.ptr.p_double[j];
                if ((double)j == xy.ptr.pp_double[i][nvars]) {
                   refavgce -= log(coalesce(v, ae_minrealnumber)); //(@) Added
-                  v = v - 1;
+                  v--;
                }
-               refrms = refrms + ae_sqr(v);
-               refavg = refavg + fabs(v);
+               refrms += ae_sqr(v);
+               refavg += fabs(v);
                if ((double)j == xy.ptr.pp_double[i][nvars]) {
-                  refavgrel = refavgrel + fabs(v);
+                  refavgrel += fabs(v);
                // refavgce = refavgce - log(v); //(@) Removed
                }
             }
          }
          refrms = sqrt(refrms / (npoints * nclasses));
-         refavg = refavg / (npoints * nclasses);
-         refavgrel = refavgrel / npoints;
-         refavgce = refavgce / npoints;
+         refavg /= npoints * nclasses;
+         refavgrel /= npoints;
+         refavgce /= npoints;
          ae_set_error_flag(err, fabs(rep.avgce - refavgce) / refavgce > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1383");
          ae_set_error_flag(err, fabs(rep.rmserror - refrms) / refrms > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1384");
          ae_set_error_flag(err, fabs(rep.avgerror - refavg) / refavg > 1.0E-6, __FILE__, __LINE__, "testdforestunit.ap:1385");
@@ -66027,7 +66027,7 @@ static void testdforestunit_testcompression(bool *err) {
             k = i;
             for (j = 0; j < nvars; j++) {
                xy.ptr.pp_double[i][j] = (double)(k % 3 - 1);
-               k = k / 3;
+               k /= 3;
             }
             if (nclasses == 1) {
                xy.ptr.pp_double[i][nvars] = hqrnduniformr(&rs) - 0.5;
@@ -66432,7 +66432,7 @@ static void testdforestunit_testimportance(bool *err) {
                return;
             }
             ae_set_error_flag(err, tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1869");
-            tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] = tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] + 1;
+            tmp.ptr.p_double[rep.topvars.ptr.p_int[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
             ae_set_error_flag(err, rep.varimportances.ptr.p_double[rep.topvars.ptr.p_int[j]] < rep.varimportances.ptr.p_double[rep.topvars.ptr.p_int[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1873");
@@ -66442,7 +66442,7 @@ static void testdforestunit_testimportance(bool *err) {
          // TRN-Gini importances sum to 1.0
             v = 0.0;
             for (j = 0; j < nvars; j++) {
-               v = v + rep.varimportances.ptr.p_double[j];
+               v += rep.varimportances.ptr.p_double[j];
             }
             ae_set_error_flag(err, fabs(v - 1) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1882");
          }
@@ -66462,8 +66462,8 @@ static void testdforestunit_testimportance(bool *err) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.ptr.pp_double[i][j] = (double)(k % 3);
-                  xy.ptr.pp_double[i][nvars] = xy.ptr.pp_double[i][nvars] + RoundZ(xy.ptr.pp_double[i][j]);
-                  k = k / 3;
+                  xy.ptr.pp_double[i][nvars] += RoundZ(xy.ptr.pp_double[i][j]);
+                  k /= 3;
                }
                xy.ptr.pp_double[i][nvars] = (double)(RoundZ(xy.ptr.pp_double[i][nvars]) % 3 - 1);
             } else {
@@ -66471,8 +66471,8 @@ static void testdforestunit_testimportance(bool *err) {
                k = i;
                for (j = 0; j < nvars; j++) {
                   xy.ptr.pp_double[i][j] = (double)(k % nclasses);
-                  xy.ptr.pp_double[i][nvars] = xy.ptr.pp_double[i][nvars] + RoundZ(xy.ptr.pp_double[i][j]);
-                  k = k / nclasses;
+                  xy.ptr.pp_double[i][nvars] += RoundZ(xy.ptr.pp_double[i][j]);
+                  k /= nclasses;
                }
                xy.ptr.pp_double[i][nvars] = (double)(RoundZ(xy.ptr.pp_double[i][nvars]) % nclasses);
             }
@@ -66514,7 +66514,7 @@ static void testdforestunit_testimportance(bool *err) {
                return;
             }
             ae_set_error_flag(err, tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] != 0.0, __FILE__, __LINE__, "testdforestunit.ap:1960");
-            tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] = tmp.ptr.p_double[rep.topvars.ptr.p_int[j]] + 1;
+            tmp.ptr.p_double[rep.topvars.ptr.p_int[j]]++;
          }
          for (j = 0; j < nvars - 1; j++) {
             ae_set_error_flag(err, rep.varimportances.ptr.p_double[rep.topvars.ptr.p_int[j]] < rep.varimportances.ptr.p_double[rep.topvars.ptr.p_int[j + 1]], __FILE__, __LINE__, "testdforestunit.ap:1964");
@@ -66524,7 +66524,7 @@ static void testdforestunit_testimportance(bool *err) {
          // TRN-Gini importances sum to 1.0
             v = 0.0;
             for (j = 0; j < nvars; j++) {
-               v = v + rep.varimportances.ptr.p_double[j];
+               v += rep.varimportances.ptr.p_double[j];
             }
             ae_set_error_flag(err, fabs(v - 1) > 1.0e-6, __FILE__, __LINE__, "testdforestunit.ap:1973");
          }
@@ -66554,7 +66554,7 @@ static void testdforestunit_testimportance(bool *err) {
          xy2.ptr.pp_double[i][nvars] = 0.01 * hqrndnormal(&rs);
          for (j = 0; j < nvars; j++) {
             xy2.ptr.pp_double[i][j] = hqrnduniformr(&rs) - 0.5;
-            xy2.ptr.pp_double[i][nvars] = xy2.ptr.pp_double[i][nvars] + xy2.ptr.pp_double[i][j] * c.ptr.p_double[j];
+            xy2.ptr.pp_double[i][nvars] += xy2.ptr.pp_double[i][j] * c.ptr.p_double[j];
          }
          if (nclasses == 2) {
             if (xy2.ptr.pp_double[i][nvars] > 0.0) {
@@ -66778,11 +66778,11 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
          if (iscls) {
             *avgce = *avgce - ey.ptr.p_double[j] * log(y.ptr.p_double[j] + ae_minrealnumber);
          }
-         *rms = *rms + ae_sqr(v);
-         *avg = *avg + fabs(v);
+         *rms += ae_sqr(v);
+         *avg += fabs(v);
          if (ey.ptr.p_double[j] != 0.0) {
-            *avgrel = *avgrel + fabs(v / ey.ptr.p_double[j]);
-            relcnt = relcnt + 1;
+            *avgrel += fabs(v / ey.ptr.p_double[j]);
+            relcnt++;
          }
       }
       if (iscls) {
@@ -66797,24 +66797,24 @@ static void testknnunit_testseterrors(knnmodel *model, ae_int_t nvars, ae_int_t 
          // of the uncertainty interval for the classification error.
             for (j = 0; j < nout; j++) {
                if (j != RoundZ(xy->ptr.pp_double[i][nvars]) && y.ptr.p_double[j] == mxy) {
-                  *relcls1 = *relcls1 + 1;
+                  ++*relcls1;
                   break;
                }
             }
          } else {
 
          // Both bounds of the error range are increased by 1
-            *relcls0 = *relcls0 + 1;
-            *relcls1 = *relcls1 + 1;
+            ++*relcls0;
+            ++*relcls1;
          }
       }
    }
-   *relcls0 = *relcls0 / npoints;
-   *relcls1 = *relcls1 / npoints;
-   *avgce = *avgce / npoints;
+   *relcls0 /= npoints;
+   *relcls1 /= npoints;
+   *avgce /= npoints;
    *rms = sqrt(*rms / (npoints * nout));
-   *avg = *avg / (npoints * nout);
-   *avgrel = *avgrel / coalesce((double)relcnt, 1.0);
+   *avg /= npoints * nout;
+   *avgrel /= coalesce((double)relcnt, 1.0);
    ae_frame_leave();
 }
 
@@ -67108,7 +67108,7 @@ static void testknnunit_testknnalgo(bool *err) {
          knnprocess(&model1, &x1, &y1);
          v = 0.0;
          for (i = 0; i < nout; i++) {
-            v = v + y1.ptr.p_double[i];
+            v += y1.ptr.p_double[i];
             ae_set_error_flag(err, y1.ptr.p_double[i] < 0.0, __FILE__, __LINE__, "testknnunit.ap:359");
          }
          ae_set_error_flag(err, fabs(v - 1) > 1000 * ae_machineepsilon, __FILE__, __LINE__, "testknnunit.ap:361");
@@ -67328,7 +67328,7 @@ static void testknnunit_testknnalgo(bool *err) {
          if (x1.ptr.p_double[0] > 2.0) {
             ae_set_error_flag(err, y1.ptr.p_double[1] < 0.8, __FILE__, __LINE__, "testknnunit.ap:614");
          }
-         x1.ptr.p_double[0] = x1.ptr.p_double[0] + 0.01;
+         x1.ptr.p_double[0] += 0.01;
       }
    }
 
@@ -67369,10 +67369,10 @@ static void testknnunit_testknnalgo(bool *err) {
       knnprocess(&model1, &x1, &y1);
       v = fabs(y1.ptr.p_double[0] - v);
       maxerr = ae_maxreal(maxerr, v);
-      avgerr = avgerr + v;
-      cnt = cnt + 1;
+      avgerr += v;
+      cnt++;
    }
-   avgerr = avgerr / cnt;
+   avgerr /= cnt;
    ae_set_error_flag(err, maxerr > 0.15, __FILE__, __LINE__, "testknnunit.ap:669");
    ae_set_error_flag(err, avgerr > 0.05, __FILE__, __LINE__, "testknnunit.ap:670");
 
@@ -67501,7 +67501,7 @@ static void testgqunit_buildgausslegendrequadrature(ae_int_t n, RVector x, RVect
          }
          dp3 = n * (r * p3 - p2) / (r * r - 1);
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       }
       while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
@@ -67564,13 +67564,13 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
             t1 = (4.1 + alpha) / ((1 + alpha) * (1 + 0.156 * alpha));
             t2 = 1 + 0.06 * (n - 8) * (1 + 0.12 * alpha) / n;
             t3 = 1 + 0.012 * beta * (1 + 0.25 * fabs(alpha)) / n;
-            r = r - t1 * t2 * t3 * (1 - r);
+            r -= t1 * t2 * t3 * (1 - r);
          } else {
             if (i == 2) {
                t1 = (1.67 + 0.28 * alpha) / (1 + 0.37 * alpha);
                t2 = 1 + 0.22 * (n - 8) / n;
                t3 = 1 + 8 * beta / ((6.28 + beta) * n * n);
-               r = r - t1 * t2 * t3 * (x->ptr.p_double[0] - r);
+               r -= t1 * t2 * t3 * (x->ptr.p_double[0] - r);
             } else {
                if (i < n - 2) {
                   r = 3 * x->ptr.p_double[i - 1] - 3 * x->ptr.p_double[i - 2] + x->ptr.p_double[i - 3];
@@ -67579,13 +67579,13 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
                      t1 = (1 + 0.235 * beta) / (0.766 + 0.119 * beta);
                      t2 = 1 / (1 + 0.639 * (n - 4) / (1 + 0.71 * (n - 4)));
                      t3 = 1 / (1 + 20 * alpha / ((7.5 + alpha) * n * n));
-                     r = r + t1 * t2 * t3 * (r - x->ptr.p_double[i - 2]);
+                     r += t1 * t2 * t3 * (r - x->ptr.p_double[i - 2]);
                   } else {
                      if (i == n - 1) {
                         t1 = (1 + 0.37 * beta) / (1.67 + 0.28 * beta);
                         t2 = 1 / (1 + 0.22 * (n - 8) / n);
                         t3 = 1 / (1 + 8 * alpha / ((6.28 + alpha) * n * n));
-                        r = r + t1 * t2 * t3 * (r - x->ptr.p_double[i - 2]);
+                        r += t1 * t2 * t3 * (r - x->ptr.p_double[i - 2]);
                      }
                   }
                }
@@ -67652,9 +67652,9 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          r = (1 + alpha) * (3 + 0.92 * alpha) / (1 + 2.4 * n + 1.8 * alpha);
       } else {
          if (i == 1) {
-            r = r + (15 + 6.25 * alpha) / (1 + 0.9 * alpha + 2.5 * n);
+            r += (15 + 6.25 * alpha) / (1 + 0.9 * alpha + 2.5 * n);
          } else {
-            r = r + ((1 + 2.55 * (i - 1)) / (1.9 * (i - 1)) + 1.26 * (i - 1) * alpha / (1 + 3.5 * (i - 1))) / (1 + 0.3 * alpha) * (r - x->ptr.p_double[i - 2]);
+            r += ((1 + 2.55 * (i - 1)) / (1.9 * (i - 1)) + 1.26 * (i - 1) * alpha / (1 + 3.5 * (i - 1))) / (1 + 0.3 * alpha) * (r - x->ptr.p_double[i - 2]);
          }
       }
       do {
@@ -67667,7 +67667,7 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          }
          dp3 = (n * p3 - (n + alpha) * p2) / r;
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       }
       while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
@@ -67712,7 +67712,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector x, RVecto
          r = sqrt((double)(2 * n + 1)) - 1.85575 * pow((double)(2 * n + 1), -1.0 / 6.0);
       } else {
          if (i == 1) {
-            r = r - 1.14 * pow((double)n, 0.426) / r;
+            r -= 1.14 * pow((double)n, 0.426) / r;
          } else {
             if (i == 2) {
                r = 1.86 * r - 0.86 * x->ptr.p_double[0];
@@ -67735,7 +67735,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector x, RVecto
          }
          dp3 = sqrt((double)(2 * j)) * p2;
          r1 = r;
-         r = r - p3 / dp3;
+         r -= p3 / dp3;
       }
       while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
@@ -67866,7 +67866,7 @@ bool testgq(bool silent) {
       } else {
          recerrors = true;
       }
-      n = n * 2;
+      n *= 2;
    }
    recerrors = recerrors || err > errtol;
 
@@ -68592,8 +68592,8 @@ static void testfftunit_refinternalcfft(RVector a, ae_int_t nn, bool inversefft)
             im = a->ptr.p_double[2 * k + 1];
             c = cos(-2 * ae_pi * k * i / nn);
             s = sin(-2 * ae_pi * k * i / nn);
-            hre = hre + c * re - s * im;
-            him = him + c * im + s * re;
+            hre += c * re - s * im;
+            him += c * im + s * re;
          }
          tmp.ptr.p_double[2 * i] = hre;
          tmp.ptr.p_double[2 * i + 1] = him;
@@ -68610,8 +68610,8 @@ static void testfftunit_refinternalcfft(RVector a, ae_int_t nn, bool inversefft)
             im = a->ptr.p_double[2 * i + 1];
             c = cos(2 * ae_pi * k * i / nn);
             s = sin(2 * ae_pi * k * i / nn);
-            hre = hre + c * re - s * im;
-            him = him + c * im + s * re;
+            hre += c * re - s * im;
+            him += c * im + s * re;
          }
          tmp.ptr.p_double[2 * k] = hre / nn;
          tmp.ptr.p_double[2 * k + 1] = him / nn;
@@ -68734,8 +68734,8 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr) {
          im = a1.ptr.p_complex[j].y;
          c = cos(-2 * ae_pi * j * idx / n);
          s = sin(-2 * ae_pi * j * idx / n);
-         v.x = v.x + c * re - s * im;
-         v.y = v.y + c * im + s * re;
+         v.x += c * re - s * im;
+         v.y += c * im + s * re;
       }
       *referr = ae_maxreal(*referr, ae_c_abs(ae_c_sub(v, a0.ptr.p_complex[idx])));
    }
@@ -69029,7 +69029,7 @@ static void testfhtunit_reffhtr1d(RVector a, ae_int_t n) {
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < n; j++) {
-         v = v + a->ptr.p_double[j] * (cos(2 * ae_pi * i * j / n) + sin(2 * ae_pi * i * j / n));
+         v += a->ptr.p_double[j] * (cos(2 * ae_pi * i * j / n) + sin(2 * ae_pi * i * j / n));
       }
       buf.ptr.p_double[i] = v;
    }
@@ -69046,7 +69046,7 @@ static void testfhtunit_reffhtr1dinv(RVector a, ae_int_t n) {
    ae_assert(n > 0, "RefFHTR1DInv: incorrect N!");
    testfhtunit_reffhtr1d(a, n);
    for (i = 0; i < n; i++) {
-      a->ptr.p_double[i] = a->ptr.p_double[i] / n;
+      a->ptr.p_double[i] /= n;
    }
 }
 
@@ -69201,7 +69201,7 @@ static void testconvunit_refconvc1dcircular(CVector a, ae_int_t m, CVector b, ae
       i2 = ae_minint(i1 + m - 1, m + n - 2);
       j2 = i2 - i1;
       ae_v_cadd(r->ptr.p_complex, 1, &buf.ptr.p_complex[i1], 1, "N", j2 + 1);
-      i1 = i1 + m;
+      i1 += m;
    }
    ae_frame_leave();
 }
@@ -69242,7 +69242,7 @@ static void testconvunit_refconvr1dcircular(RVector a, ae_int_t m, RVector b, ae
       i2 = ae_minint(i1 + m - 1, m + n - 2);
       j2 = i2 - i1;
       ae_v_add(r->ptr.p_double, 1, &buf.ptr.p_double[i1], 1, j2 + 1);
-      i1 = i1 + m;
+      i1 += m;
    }
    ae_frame_leave();
 }
@@ -69588,14 +69588,14 @@ static void testcorrunit_refcorrr1d(RVector signal, ae_int_t n, RVector pattern,
          if (i + j >= n) {
             break;
          }
-         v = v + pattern->ptr.p_double[j] * s.ptr.p_double[i + j];
+         v += pattern->ptr.p_double[j] * s.ptr.p_double[i + j];
       }
       r->ptr.p_double[i] = v;
    }
    for (i = 1; i < m; i++) {
       v = 0.0;
       for (j = i; j < m; j++) {
-         v = v + pattern->ptr.p_double[j] * s.ptr.p_double[-i + j];
+         v += pattern->ptr.p_double[j] * s.ptr.p_double[-i + j];
       }
       r->ptr.p_double[m + n - 1 - i] = v;
    }
@@ -69614,7 +69614,7 @@ static void testcorrunit_refcorrr1dcircular(RVector signal, ae_int_t n, RVector 
    for (i = 0; i < n; i++) {
       v = 0.0;
       for (j = 0; j < m; j++) {
-         v = v + pattern->ptr.p_double[j] * signal->ptr.p_double[(i + j) % n];
+         v += pattern->ptr.p_double[j] * signal->ptr.p_double[(i + j) % n];
       }
       r->ptr.p_double[i] = v;
    }
@@ -69795,7 +69795,7 @@ static void testidwunit_testcontinuity(idwmodel *model, ae_int_t nx, ae_int_t ny
             yy.ptr.pp_double[i][j] = yy.ptr.pp_double[i + 1][j] - yy.ptr.pp_double[i][j];
          }
       }
-      nsteps = nsteps - 1;
+      nsteps--;
    }
    ae_frame_leave();
 }
@@ -70008,9 +70008,9 @@ static void testidwunit_testcommon(bool *err) {
          // Point is accepted
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = hqrndnormal(&rs);
-               meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][nx + j] / n;
+               meany.ptr.p_double[j] += xy.ptr.pp_double[i][nx + j] / n;
             }
-            i = i + 1;
+            i++;
          }
 
       // Build IDW model
@@ -70142,7 +70142,7 @@ static void testidwunit_testcommon(bool *err) {
             for (i = 0; i < n; i++) {
                vv = 0.0;
                for (j = 0; j < nx; j++) {
-                  vv = vv + ae_sqr(x.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
+                  vv += ae_sqr(x.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
                }
                if (vv < v && vv > 0.0) {
                   i1 = i;
@@ -70228,31 +70228,31 @@ static void testidwunit_testcommon(bool *err) {
             }
          // Update meanY
             for (j = 0; j < ny; j++) {
-               meany.ptr.p_double[j] = meany.ptr.p_double[j] + (xy.ptr.pp_double[2 * i + 0][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j]) / n;
+               meany.ptr.p_double[j] += (xy.ptr.pp_double[2 * i + 0][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j]) / n;
             }
 
          // Apply perturbation to the target value
             for (j = 0; j < ny; j++) {
                v = pow(2.0, hqrndnormal(&rs));
-               xy.ptr.pp_double[2 * i + 0][nx + j] = xy.ptr.pp_double[2 * i + 0][nx + j] + v;
-               xy.ptr.pp_double[2 * i + 1][nx + j] = xy.ptr.pp_double[2 * i + 1][nx + j] - v;
+               xy.ptr.pp_double[2 * i + 0][nx + j] += v;
+               xy.ptr.pp_double[2 * i + 1][nx + j] -= v;
                v = fabs(v);
-               refrms = refrms + 2 * v * v;
-               refavg = refavg + 2 * v;
+               refrms += 2 * v * v;
+               refavg += 2 * v;
                refmax = ae_maxreal(refmax, v);
-               refrss = refrss + 2 * v * v;
+               refrss += 2 * v * v;
             }
 
          // Next I
-            i = i + 1;
+            i++;
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < ny; j++) {
-               reftss = reftss + ae_sqr(xy.ptr.pp_double[i][nx + j] - meany.ptr.p_double[j]);
+               reftss += ae_sqr(xy.ptr.pp_double[i][nx + j] - meany.ptr.p_double[j]);
             }
          }
          refrms = sqrt(refrms / (n * ny));
-         refavg = refavg / (n * ny);
+         refavg /= n * ny;
          refr2 = 1.0 - refrss / coalesce(reftss, 1.0);
 
       // Build IDW model
@@ -70347,7 +70347,7 @@ static void testidwunit_testcommon(bool *err) {
             for (i = 0; i < n; i++) {
                vv = 0.0;
                for (j = 0; j < nx; j++) {
-                  vv = vv + ae_sqr(x.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
+                  vv += ae_sqr(x.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
                }
                if (vv < v && vv > 0.0) {
                   i1 = i;
@@ -70394,7 +70394,7 @@ static void testidwunit_testcommon(bool *err) {
             }
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = hqrndnormal(&rs);
-               meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][nx + j] / n;
+               meany.ptr.p_double[j] += xy.ptr.pp_double[i][nx + j] / n;
             }
          }
          initdone = false;
@@ -70607,7 +70607,7 @@ static void testratintunit_poldiff2(RVector x, RVector f, ae_int_t n, double t, 
    NewVector(df, 0, DT_REAL);
    NewVector(d2f, 0, DT_REAL);
 
-   n = n - 1;
+   n--;
    ae_vector_set_length(&df, n + 1);
    ae_vector_set_length(&d2f, n + 1);
    for (i = 0; i <= n; i++) {
@@ -70728,7 +70728,7 @@ bool testratint(bool silent) {
             w.ptr.p_double[j] = 1.0;
             for (k = 0; k < n; k++) {
                if (k != j) {
-                  w.ptr.p_double[j] = w.ptr.p_double[j] / (x.ptr.p_double[j] - x.ptr.p_double[k]);
+                  w.ptr.p_double[j] /= x.ptr.p_double[j] - x.ptr.p_double[k];
                }
             }
          }
@@ -70772,7 +70772,7 @@ bool testratint(bool silent) {
                v2 = x.ptr.p_double[i] + (t - x.ptr.p_double[i]) * (j + 1) / k;
                s1 = ae_maxreal(s1, fabs(barycentriccalc(&b1, v2) - barycentriccalc(&b1, v1)) / fabs(v2 - v1));
             }
-            k = 2 * k;
+            k *= 2;
             s2 = 0.0;
             for (j = 0; j < k; j++) {
                v1 = x.ptr.p_double[i] + (t - x.ptr.p_double[i]) * j / k;
@@ -71097,7 +71097,7 @@ static void testfitsphereunit_calcradii(RMatrix xy, ae_int_t npoints, ae_int_t n
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + ae_sqr(xy->ptr.pp_double[i][j] - cx->ptr.p_double[j]);
+         v += ae_sqr(xy->ptr.pp_double[i][j] - cx->ptr.p_double[j]);
       }
       v = sqrt(v);
       *rhi = ae_maxreal(*rhi, v);
@@ -71118,17 +71118,17 @@ static void testfitsphereunit_calclserror(RMatrix xy, ae_int_t npoints, ae_int_t
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + ae_sqr(cx->ptr.p_double[j] - xy->ptr.pp_double[i][j]);
+         v += ae_sqr(cx->ptr.p_double[j] - xy->ptr.pp_double[i][j]);
       }
-      rad = rad + sqrt(v) / npoints;
+      rad += sqrt(v) / npoints;
    }
    *err = 0.0;
    for (i = 0; i < npoints; i++) {
       v = 0.0;
       for (j = 0; j < nx; j++) {
-         v = v + ae_sqr(cx->ptr.p_double[j] - xy->ptr.pp_double[i][j]);
+         v += ae_sqr(cx->ptr.p_double[j] - xy->ptr.pp_double[i][j]);
       }
-      *err = *err + ae_sqr(rad - sqrt(v));
+      *err += ae_sqr(rad - sqrt(v));
    }
 }
 
@@ -71172,13 +71172,13 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
             vv = hqrndnormal(&rs);
-            v = v + ae_sqr(vv);
+            v += ae_sqr(vv);
             xy.ptr.pp_double[i][j] = vv;
          }
          ae_assert(v > 0.0, "Assertion failed");
          v = (1 + 0.1 * hqrnduniformr(&rs)) / sqrt(v);
          for (j = 0; j < nx; j++) {
-            xy.ptr.pp_double[i][j] = xy.ptr.pp_double[i][j] * v;
+            xy.ptr.pp_double[i][j] *= v;
          }
       }
 
@@ -71193,9 +71193,9 @@ static void testfitsphereunit_testspherefittingls(bool *err) {
       for (i = 0; i < npoints; i++) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
-            v = v + ae_sqr(cx.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
+            v += ae_sqr(cx.ptr.p_double[j] - xy.ptr.pp_double[i][j]);
          }
-         vv = vv + sqrt(v) / npoints;
+         vv += sqrt(v) / npoints;
       }
       ae_set_error_flag(err, fabs(vv - rlo) > xtol, __FILE__, __LINE__, "testfitsphereunit.ap:118");
       testfitsphereunit_calclserror(&xy, npoints, nx, &cx, &v0);
@@ -71274,13 +71274,13 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
          v = 0.0;
          for (j = 0; j < nx; j++) {
             vv = hqrndnormal(&rs);
-            v = v + ae_sqr(vv);
+            v += ae_sqr(vv);
             xy.ptr.pp_double[i][j] = vv;
          }
          ae_assert(v > 0.0, "Assertion failed");
          v = (1 + 0.1 * hqrnduniformr(&rs)) / sqrt(v);
          for (j = 0; j < nx; j++) {
-            xy.ptr.pp_double[i][j] = xy.ptr.pp_double[i][j] * v;
+            xy.ptr.pp_double[i][j] *= v;
          }
       }
 
@@ -71357,7 +71357,7 @@ static void testfitsphereunit_testspherefittingns(bool *err) {
 static void testfitsphereunit_addvalue(RMatrix xy, ae_int_t *cnt, double v) {
 
    xy->ptr.pp_double[*cnt / xy->cols][*cnt % xy->cols] = v;
-   *cnt = *cnt + 1;
+   ++*cnt;
 }
 
 // This function tests sphere fitting
@@ -71630,7 +71630,7 @@ static void testspline1dunit_lconst(double a, double b, spline1dinterpolant *c, 
       *l0 = ae_maxreal(*l0, fabs((f - prevf) / lstep));
       *l1 = ae_maxreal(*l1, fabs((d - prevd) / lstep));
       *l2 = ae_maxreal(*l2, fabs((d2 - prevd2) / lstep));
-      t = t + lstep;
+      t += lstep;
    }
 }
 
@@ -71671,7 +71671,7 @@ static bool testspline1dunit_enumerateallsplines(RVector x, RVector y, ae_int_t 
 
    // Linear spline
       spline1dbuildlinear(x, y, n, s);
-      *splineindex = *splineindex + 1;
+      ++*splineindex;
       result = true;
       return result;
    } else {
@@ -71688,7 +71688,7 @@ static bool testspline1dunit_enumerateallsplines(RVector x, RVector y, ae_int_t 
          // Non-periodic spline
             spline1dbuildcubic(x, y, n, idxoffs / 3, 2 * ae_randomreal() - 1, idxoffs % 3, 2 * ae_randomreal() - 1, s);
          }
-         *splineindex = *splineindex + 1;
+         ++*splineindex;
          result = true;
          return result;
       }
@@ -71941,7 +71941,7 @@ static bool testspline1dunit_testmonotonespline() {
       alln = 0;
       for (i = 0; i < m; i++) {
          n.ptr.p_int[i] = ae_randominteger(npoints) + 2;
-         alln = alln + n.ptr.p_int[i];
+         alln += n.ptr.p_int[i];
       }
       ae_vector_set_length(&x, alln);
       ae_vector_set_length(&y, alln);
@@ -71958,14 +71958,14 @@ static bool testspline1dunit_testmonotonespline() {
             delta = ae_maxreal(delta, x.ptr.p_double[shift + j] - x.ptr.p_double[shift + j - 1]);
             y.ptr.p_double[shift + j] = y.ptr.p_double[shift + j - 1] + sign0 * (st + ae_randomreal());
          }
-         shift = shift + n.ptr.p_int[i];
+         shift += n.ptr.p_int[i];
          if (i != m - 1) {
             sign0 = pow(-1.0, (double)(i + 1));
             x.ptr.p_double[shift] = x.ptr.p_double[shift - 1] + st + ae_randomreal();
             y.ptr.p_double[shift] = y.ptr.p_double[shift - 1] + sign0 * ae_randomreal();
          }
       }
-      delta = 3 * delta;
+      delta *= 3;
       spline1dbuildmonotone(&x, &y, alln, &c);
 
    // Check that built function is monotone
@@ -71975,14 +71975,14 @@ static bool testspline1dunit_testmonotonespline() {
             st = (x.ptr.p_double[shift + j] - x.ptr.p_double[shift + j - 1]) / tp;
             sign0 = y.ptr.p_double[shift + j] - y.ptr.p_double[shift + j - 1];
             if (sign0 != 0.0) {
-               sign0 = sign0 / fabs(sign0);
+               sign0 /= fabs(sign0);
             }
             for (l = 0; l < tp; l++) {
                c0 = spline1dcalc(&c, x.ptr.p_double[shift + j - 1] + l * st);
                c1 = spline1dcalc(&c, x.ptr.p_double[shift + j - 1] + (l + 1) * st);
                sign1 = c1 - c0;
                if (sign1 != 0.0) {
-                  sign1 = sign1 / fabs(sign1);
+                  sign1 /= fabs(sign1);
                }
                if (sign0 * sign1 < 0.0) {
                   result = true;
@@ -72238,18 +72238,18 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
       // Compute residuals and penalty
          residuals = 0.0;
          for (i = 0; i < n; i++) {
-            residuals = residuals + ae_sqr(spline1dcalc(&c, x.ptr.p_double[i]) - y.ptr.p_double[i]);
+            residuals += ae_sqr(spline1dcalc(&c, x.ptr.p_double[i]) - y.ptr.p_double[i]);
          }
-         residuals = residuals / n;
+         residuals /= n;
          penalty = 0.0;
          mxd2 = 0.0;
          k = 100 * m;
          for (i = 0; i <= k; i++) {
             spline1ddiff(&c, a + (b - a) * i / k, &v, &v1, &v2);
-            penalty = penalty + ae_sqr(v2);
+            penalty += ae_sqr(v2);
             mxd2 = ae_maxreal(mxd2, fabs(v2));
          }
-         penalty = penalty / (k + 1);
+         penalty /= k + 1;
 
       // Compare with previous, update previous, update Rho
       //
@@ -72258,7 +72258,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          ae_set_error_flag(fiterrors, penalty >= prevpenalty, __FILE__, __LINE__, "testspline1dunit.ap:1675");
          prevresiduals = residuals;
          prevpenalty = penalty;
-         rho = rho + 1;
+         rho++;
       }
       ae_set_error_flag(fiterrors, penalty >= 1.0E-6, __FILE__, __LINE__, "testspline1dunit.ap:1680");
       ae_set_error_flag(fiterrors, mxd2 >= 1.0E-3, __FILE__, __LINE__, "testspline1dunit.ap:1681");
@@ -73016,7 +73016,7 @@ bool testspline1d(bool silent) {
          t = a + (b - a) * ae_randomreal();
          v = -cos(ae_pi * a + 0.4) / ae_pi + exp(a);
          v = -cos(ae_pi * t + 0.4) / ae_pi + exp(t) - v;
-         v = v - spline1dintegrate(&c, t);
+         v -= spline1dintegrate(&c, t);
          err = ae_maxreal(err, fabs(v));
       }
    }
@@ -73043,7 +73043,7 @@ bool testspline1d(bool silent) {
    for (pass = 1; pass <= 100; pass++) {
       t = bl + (br - bl) * ae_randomreal();
       v = p0 * t + p1 * ae_sqr(t) / 2 + p2 * ae_sqr(t) * t / 3 - (p0 * a + p1 * ae_sqr(a) / 2 + p2 * ae_sqr(a) * a / 3);
-      v = v - spline1dintegrate(&c, t);
+      v -= spline1dintegrate(&c, t);
       err = ae_maxreal(err, fabs(v));
    }
    ierrors = ierrors || err > threshold;
@@ -73404,7 +73404,7 @@ static void testparametricunit_testrdp(bool *errorflag) {
             }
             spline1dbuildlinear(&x, &y, nsections + 1, &s);
             for (i = 0; i < n; i++) {
-               e.ptr.p_double[i] = e.ptr.p_double[i] + ae_sqr(spline1dcalc(&s, (double)i) - xy.ptr.pp_double[i][j]);
+               e.ptr.p_double[i] += ae_sqr(spline1dcalc(&s, (double)i) - xy.ptr.pp_double[i][j]);
             }
          }
          for (i = 0; i < n; i++) {
@@ -73427,7 +73427,7 @@ static void testparametricunit_testrdp(bool *errorflag) {
       }
 
    // Next epsilon
-      eps = eps * 0.5;
+      eps *= 0.5;
    }
    ae_frame_leave();
 }
@@ -74071,7 +74071,7 @@ static bool testspline3dunit_basictest() {
             for (i = 0; i < n; i++) {
                for (di = 0; di < d; di++) {
                   vf.ptr.p_double[offs] = di + ax * i + ay * j + az * k + axy * i * j + ayz * j * k;
-                  offs = offs + 1;
+                  offs++;
                }
             }
          }
@@ -74233,7 +74233,7 @@ static bool testspline3dunit_testunpack() {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 = v1 + tbl1.ptr.pp_double[p1][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
+                           v1 += tbl1.ptr.pp_double[p1][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
                         }
                      }
                   }
@@ -74245,7 +74245,7 @@ static bool testspline3dunit_testunpack() {
                   for (ci = 0; ci <= 1; ci++) {
                      for (cj = 0; cj <= 1; cj++) {
                         for (ck = 0; ck <= 1; ck++) {
-                           v1 = v1 + tbl0.ptr.pp_double[p0][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
+                           v1 += tbl0.ptr.pp_double[p0][6 + 2 * (2 * ck + cj) + ci] * pow(tx, (double)ci) * pow(ty, (double)cj) * pow(tz, (double)ck);
                         }
                      }
                   }
@@ -74313,19 +74313,19 @@ static bool testspline3dunit_testlintrans() {
                   a1 = 2.0 * ae_randomreal() - 1.0;
                }
                while (a1 == 0.0);
-               a1 = a1 * xjob;
+               a1 *= xjob;
                b1 = x.ptr.p_double[0] + ae_randomreal() * (x.ptr.p_double[n - 1] - x.ptr.p_double[0] + 2.0) - 1.0;
                do {
                   a2 = 2.0 * ae_randomreal() - 1.0;
                }
                while (a2 == 0.0);
-               a2 = a2 * yjob;
+               a2 *= yjob;
                b2 = y.ptr.p_double[0] + ae_randomreal() * (y.ptr.p_double[m - 1] - y.ptr.p_double[0] + 2.0) - 1.0;
                do {
                   a3 = 2.0 * ae_randomreal() - 1.0;
                }
                while (a3 == 0.0);
-               a3 = a3 * zjob;
+               a3 *= zjob;
                b3 = z.ptr.p_double[0] + ae_randomreal() * (z.ptr.p_double[l - 1] - z.ptr.p_double[0] + 2.0) - 1.0;
 
             // Test XYZ
@@ -74525,7 +74525,7 @@ static double testpolintunit_internalpolint(RVector x, RVector f, ae_int_t n, do
    ae_frame_make(&_frame_block);
    DupVector(f);
 
-   n = n - 1;
+   n--;
    for (j = 0; j < n; j++) {
       for (i = j + 1; i <= n; i++) {
          f->ptr.p_double[i] = ((t - x->ptr.p_double[j]) * f->ptr.p_double[i] - (t - x->ptr.p_double[i]) * f->ptr.p_double[j]) / (x->ptr.p_double[i] - x->ptr.p_double[j]);
@@ -75067,8 +75067,8 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
             v1 = 0.0;
             v2 = 0.0;
             for (i = 0; i < n; i++) {
-               v1 = v1 + ae_sqr(barycentriccalc(&p1, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
-               v2 = v2 + ae_sqr(barycentriccalc(&p2, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
+               v1 += ae_sqr(barycentriccalc(&p1, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
+               v2 += ae_sqr(barycentriccalc(&p2, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
             }
             v1 = sqrt(v1 / n);
             v2 = sqrt(v2 / n);
@@ -75328,8 +75328,8 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
             v1 = 0.0;
             v2 = 0.0;
             for (i = 0; i < n; i++) {
-               v1 = v1 + ae_sqr(barycentriccalc(&b1, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
-               v2 = v2 + ae_sqr(barycentriccalc(&b2, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
+               v1 += ae_sqr(barycentriccalc(&b1, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
+               v2 += ae_sqr(barycentriccalc(&b2, x2.ptr.p_double[i]) - y2.ptr.p_double[i]);
             }
             v1 = sqrt(v1 / n);
             v2 = sqrt(v2 / n);
@@ -75887,7 +75887,7 @@ static void testlsfitunit_testfunc1(ae_int_t k, RVector x, RVector z, double *f,
    alpha = 0.01;
    v = 0.0;
    for (j = 0; j < k; j++) {
-      v = v + (alpha * z->ptr.p_double[j] + pow(z->ptr.p_double[j], 3.0)) * x->ptr.p_double[j];
+      v += (alpha * z->ptr.p_double[j] + pow(z->ptr.p_double[j], 3.0)) * x->ptr.p_double[j];
       if (needg) {
          g->ptr.p_double[j] = (alpha + 3 * pow(z->ptr.p_double[j], 2.0)) * x->ptr.p_double[j];
       }
@@ -75925,7 +75925,7 @@ static void testlsfitunit_testfunc3(RVector x, ae_int_t nx, RVector c, ae_int_t 
    ae_assert(nx == 1, "TestFunc3: integrity check failure");
    v = 0.0;
    for (i = 0; i < nc; i++) {
-      v = v + c->ptr.p_double[i] * pow(x->ptr.p_double[0], (double)i);
+      v += c->ptr.p_double[i] * pow(x->ptr.p_double[0], (double)i);
       if (needg) {
          g->ptr.p_double[i] = pow(x->ptr.p_double[0], (double)i);
       }
@@ -76030,7 +76030,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false);
-            f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+            f0 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc);
@@ -76041,12 +76041,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] + h;
+               c2.ptr.p_double[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2652");
             }
@@ -76054,12 +76054,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] - h;
+               c2.ptr.p_double[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2668");
             }
@@ -76129,7 +76129,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false);
-            f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+            f0 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc);
@@ -76140,12 +76140,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] + h;
+               c2.ptr.p_double[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2766");
             }
@@ -76153,12 +76153,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] - h;
+               c2.ptr.p_double[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2782");
             }
@@ -76230,7 +76230,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc2(&x, nx, &c1, nc, &v, true, &state.g, false);
-            f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+            f0 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc);
@@ -76241,12 +76241,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] + h;
+               c2.ptr.p_double[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2882");
             }
@@ -76254,12 +76254,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] - h;
+               c2.ptr.p_double[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc2(&x, nx, &c2, nc, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2898");
             }
@@ -76329,7 +76329,7 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc3(&x, nx, &c1, nc, &v, true, &state.g, false);
-            f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+            f0 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          h = 0.001;
          ae_vector_set_length(&c2, nc);
@@ -76340,12 +76340,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] + h;
+               c2.ptr.p_double[i] += h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:2996");
             }
@@ -76353,12 +76353,12 @@ static void testlsfitunit_testbcnls(bool *errorflag) {
                for (j = 0; j < nc; j++) {
                   c2.ptr.p_double[j] = c1.ptr.p_double[j];
                }
-               c2.ptr.p_double[i] = c2.ptr.p_double[i] - h;
+               c2.ptr.p_double[i] -= h;
                f1 = 0.0;
                for (ii = 0; ii < m; ii++) {
                   ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
                   testlsfitunit_testfunc3(&x, nx, &c2, nc, &v, true, &state.g, false);
-                  f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+                  f1 += ae_sqr(v - y.ptr.p_double[ii]);
                }
                ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3012");
             }
@@ -76454,7 +76454,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          v = 0.0;
          for (j = 0; j < nc; j++) {
             rawc.ptr.pp_double[i][j] = hqrndnormal(&rs);
-            v = v + c0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
+            v += c0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
          }
          rawc.ptr.pp_double[i][nc] = v;
          rawct.ptr.p_int[i] = 2 * hqrnduniformi(&rs, 2) - 1;
@@ -76498,7 +76498,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       }
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, c1.ptr.p_double, 1, nc);
-         v = v - rawc.ptr.pp_double[i][nc];
+         v -= rawc.ptr.pp_double[i][nc];
          if (rawct.ptr.p_int[i] > 0) {
             ae_set_error_flag(errorflag, v < -xtol, __FILE__, __LINE__, "testlsfitunit.ap:3154");
          }
@@ -76515,7 +76515,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       for (ii = 0; ii < m; ii++) {
          ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
          testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false);
-         f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+         f0 += ae_sqr(v - y.ptr.p_double[ii]);
       }
       ae_vector_set_length(&c2, nc);
       for (trialidx = 0; trialidx <= 10 * nc; trialidx++) {
@@ -76530,7 +76530,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (i = 0; i < rawccnt; i++) {
             ae_assert(rawct.ptr.p_int[i] != 0, "Assertion failed");
             v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, c2.ptr.p_double, 1, nc);
-            v = v - rawc.ptr.pp_double[i][nc];
+            v -= rawc.ptr.pp_double[i][nc];
             bflag = bflag || (rawct.ptr.p_int[i] > 0 && v < 0.0);
             bflag = bflag || (rawct.ptr.p_int[i] < 0 && v > 0.0);
          }
@@ -76541,7 +76541,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-            f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+            f1 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3205");
       }
@@ -76593,7 +76593,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          v = 0.0;
          for (j = 0; j < nc; j++) {
             rawc.ptr.pp_double[i][j] = z.ptr.pp_double[i][j];
-            v = v + c0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
+            v += c0.ptr.p_double[j] * rawc.ptr.pp_double[i][j];
          }
          rawc.ptr.pp_double[i][nc] = v;
          rawct.ptr.p_int[i] = 0;
@@ -76628,7 +76628,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
    // Test feasibility w.r.t. linear equality constraints
       for (i = 0; i < rawccnt; i++) {
          v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, c1.ptr.p_double, 1, nc);
-         v = v - rawc.ptr.pp_double[i][nc];
+         v -= rawc.ptr.pp_double[i][nc];
          ae_set_error_flag(errorflag, fabs(v) > xtol, __FILE__, __LINE__, "testlsfitunit.ap:3302");
       }
 
@@ -76640,7 +76640,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
       for (ii = 0; ii < m; ii++) {
          ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
          testlsfitunit_testfunc1(nx, &x, &c1, &v, true, &state.g, false);
-         f0 = f0 + ae_sqr(v - y.ptr.p_double[ii]);
+         f0 += ae_sqr(v - y.ptr.p_double[ii]);
       }
       ae_vector_set_length(&c2, nc);
       for (trialidx = 0; trialidx <= nc; trialidx++) {
@@ -76661,7 +76661,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (ii = 0; ii < m; ii++) {
             ae_v_move(x.ptr.p_double, 1, xx.ptr.pp_double[ii], 1, nx);
             testlsfitunit_testfunc1(nx, &x, &c2, &v, true, &state.g, false);
-            f1 = f1 + ae_sqr(v - y.ptr.p_double[ii]);
+            f1 += ae_sqr(v - y.ptr.p_double[ii]);
          }
          ae_set_error_flag(errorflag, f1 < f0, __FILE__, __LINE__, "testlsfitunit.ap:3344");
       }
@@ -76797,7 +76797,7 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          }
          v = -rawc.ptr.pp_double[0][nc];
          for (j = 0; j < nc; j++) {
-            v = v + rawc.ptr.pp_double[0][j] * c1.ptr.p_double[j];
+            v += rawc.ptr.pp_double[0][j] * c1.ptr.p_double[j];
          }
          ae_set_error_flag(errorflag, fabs(v) > 1.0E-6, __FILE__, __LINE__, "testlsfitunit.ap:3485");
       }
@@ -76831,13 +76831,13 @@ static void testlsfitunit_fitlinearnonlinear(ae_int_t m, ae_int_t deravailable, 
       }
       i = 0;
       if (state->needf) {
-         i = i + 1;
+         i++;
       }
       if (state->needfg) {
-         i = i + 1;
+         i++;
       }
       if (state->needfgh) {
-         i = i + 1;
+         i++;
       }
       if (i != 1) {
          *nlserrors = true;
@@ -76882,7 +76882,7 @@ static double testlsfitunit_getglserror(ae_int_t n, ae_int_t m, RVector y, RVect
    result = 0.0;
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(fmatrix->ptr.pp_double[i], 1, c->ptr.p_double, 1, m);
-      result = result + ae_sqr(w->ptr.p_double[i] * (v - y->ptr.p_double[i]));
+      result += ae_sqr(w->ptr.p_double[i] * (v - y->ptr.p_double[i]));
    }
    return result;
 }
@@ -77496,13 +77496,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   if (state.needf) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+                        state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
                      }
                   }
                   if (state.needfg) {
                      state.f = 0.0;
                      for (i = 0; i < n; i++) {
-                        state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+                        state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
                         state.g.ptr.p_double[i] = state.x.ptr.p_double[i];
                      }
                   }
@@ -77539,15 +77539,15 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             }
             for (i = 0; i < n; i++) {
                avgdeviationpar = (avgdeviationpar * adpcnt + fabs(c.ptr.p_double[i] - cend.ptr.p_double[i]) / rep.errpar.ptr.p_double[i]) / (adpcnt + 1);
-               adpcnt = adpcnt + 1;
+               adpcnt++;
             }
             for (i = 0; i < a.rows; i++) {
                v1 = ae_v_dotproduct(c.ptr.p_double, 1, a.ptr.pp_double[i], 1, n);
                v2 = ae_v_dotproduct(cend.ptr.p_double, 1, a.ptr.pp_double[i], 1, n);
                avgdeviationcurve = (avgdeviationcurve * adccnt + fabs(v1 - v2) / rep.errcurve.ptr.p_double[i]) / (adccnt + 1);
-               adccnt = adccnt + 1;
+               adccnt++;
                avgdeviationnoise = (avgdeviationnoise * adncnt + rep.noise.ptr.p_double[i] / s.ptr.p_double[i]) / (adncnt + 1);
-               adncnt = adncnt + 1;
+               adncnt++;
             }
 
          // Check that estimates are not too optimistic.
@@ -77620,13 +77620,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
             }
          }
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = state.x.ptr.p_double[i];
             }
          }
@@ -77645,13 +77645,13 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
          if (state.needf) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
             }
          }
          if (state.needfg) {
             state.f = 0.0;
             for (i = 0; i < n; i++) {
-               state.f = state.f + state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.f += state.c.ptr.p_double[i] * state.x.ptr.p_double[i];
                state.g.ptr.p_double[i] = state.x.ptr.p_double[i];
             }
          }
@@ -77858,7 +77858,7 @@ static void testlsfitunit_testrdp(bool *errorflag) {
       }
 
    // Next epsilon
-      eps = eps * 0.5;
+      eps *= 0.5;
    }
 
 // Test that non-parametric RDP correctly handles requests for more than N-1 section
@@ -78090,7 +78090,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
          } else {
             vv = a;
          }
-         v = v + ae_sqr(y.ptr.p_double[i] - vv);
+         v += ae_sqr(y.ptr.p_double[i] - vv);
       }
       v = sqrt(v / ntotal);
       ae_set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2177");
@@ -78144,7 +78144,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                      vv = d;
                   }
                }
-               v = v + ae_sqr(y.ptr.p_double[i] - vv);
+               v += ae_sqr(y.ptr.p_double[i] - vv);
             }
             v = sqrt(v / ntotal);
             ae_set_error_flag(fiterrors, v > (1 + tol) * noise, __FILE__, __LINE__, "testlsfitunit.ap:2240");
@@ -78221,7 +78221,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                vv = d;
             }
          }
-         v = v + ae_sqr(y.ptr.p_double[i] - vv);
+         v += ae_sqr(y.ptr.p_double[i] - vv);
       }
       v = sqrt(v / n);
       ae_set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2325");
@@ -78274,7 +78274,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                      vv = d;
                   }
                }
-               v = v + ae_sqr(y.ptr.p_double[i] - vv);
+               v += ae_sqr(y.ptr.p_double[i] - vv);
             }
             v = sqrt(v / n);
             ae_set_error_flag(fiterrors, v > scaley * tol, __FILE__, __LINE__, "testlsfitunit.ap:2388");
@@ -78292,9 +78292,9 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       for (i = 0; i < n; i++) {
          x.ptr.p_double[i] = (double)i;
          y.ptr.p_double[i] = hqrnduniformr(&rs) - 0.5;
-         meany = meany + y.ptr.p_double[i];
+         meany += y.ptr.p_double[i];
       }
-      meany = meany / n;
+      meany /= n;
       x.ptr.p_double[1] = 0.0;
 
    // Choose model fitting function to test
@@ -78335,22 +78335,22 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                v = d;
             }
          }
-         v = v - y.ptr.p_double[i];
-         rss = rss + v * v;
-         tss = tss + ae_sqr(y.ptr.p_double[i] - meany);
-         erms = erms + ae_sqr(v);
-         eavg = eavg + fabs(v);
+         v -= y.ptr.p_double[i];
+         rss += v * v;
+         tss += ae_sqr(y.ptr.p_double[i] - meany);
+         erms += ae_sqr(v);
+         eavg += fabs(v);
          if (y.ptr.p_double[i] != 0.0) {
-            eavgrel = eavgrel + fabs(v / y.ptr.p_double[i]);
-            k = k + 1;
+            eavgrel += fabs(v / y.ptr.p_double[i]);
+            k++;
          }
          emax = ae_maxreal(emax, fabs(v));
       }
       er2 = 1.0 - rss / tss;
       erms = sqrt(erms / n);
-      eavg = eavg / n;
+      eavg /= n;
       if (k > 0) {
-         eavgrel = eavgrel / k;
+         eavgrel /= k;
       }
       ae_set_error_flag(fiterrors, fabs(erms - rep.rmserror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2477");
       ae_set_error_flag(fiterrors, fabs(eavg - rep.avgerror) > tol, __FILE__, __LINE__, "testlsfitunit.ap:2478");
@@ -78442,18 +78442,18 @@ static void testlsfitunit_funcderiv(RVector c, RVector x, RVector x0, ae_int_t k
    if (functype == 1) {
       *f = 0.0;
       for (i = 0; i < ae_minint(m, k); i++) {
-         *f = *f + ae_sqr(c->ptr.p_double[i] * (x->ptr.p_double[i] - x0->ptr.p_double[i]));
+         *f += ae_sqr(c->ptr.p_double[i] * (x->ptr.p_double[i] - x0->ptr.p_double[i]));
          g->ptr.p_double[i] = 2 * c->ptr.p_double[i] * ae_sqr(x->ptr.p_double[i] - x0->ptr.p_double[i]);
       }
       if (k > m) {
          for (i = m; i < k; i++) {
-            *f = *f + ae_sqr(c->ptr.p_double[i]);
+            *f += ae_sqr(c->ptr.p_double[i]);
             g->ptr.p_double[i] = 2 * c->ptr.p_double[i];
          }
       }
       if (k < m) {
          for (i = k; i < m; i++) {
-            *f = *f + ae_sqr(x->ptr.p_double[i] - x0->ptr.p_double[i]);
+            *f += ae_sqr(x->ptr.p_double[i] - x0->ptr.p_double[i]);
          }
       }
       return;
@@ -78461,18 +78461,18 @@ static void testlsfitunit_funcderiv(RVector c, RVector x, RVector x0, ae_int_t k
    if (functype == 2) {
       *f = 0.0;
       for (i = 0; i < ae_minint(m, k); i++) {
-         *f = *f + c->ptr.p_double[i] * ae_sqr(sin(x->ptr.p_double[i] - x0->ptr.p_double[i]));
+         *f += c->ptr.p_double[i] * ae_sqr(sin(x->ptr.p_double[i] - x0->ptr.p_double[i]));
          g->ptr.p_double[i] = ae_sqr(sin(x->ptr.p_double[i] - x0->ptr.p_double[i]));
       }
       if (k > m) {
          for (i = m; i < k; i++) {
-            *f = *f + c->ptr.p_double[i] * c->ptr.p_double[i] * c->ptr.p_double[i];
+            *f += c->ptr.p_double[i] * c->ptr.p_double[i] * c->ptr.p_double[i];
             g->ptr.p_double[i] = 3 * ae_sqr(c->ptr.p_double[i]);
          }
       }
       if (k < m) {
          for (i = k; i < m; i++) {
-            *f = *f + ae_sqr(sin(x->ptr.p_double[i] - x0->ptr.p_double[i]));
+            *f += ae_sqr(sin(x->ptr.p_double[i] - x0->ptr.p_double[i]));
          }
       }
       return;
@@ -78480,10 +78480,10 @@ static void testlsfitunit_funcderiv(RVector c, RVector x, RVector x0, ae_int_t k
    if (functype == 3) {
       *f = 0.0;
       for (i = 0; i < m; i++) {
-         *f = *f + ae_sqr(x->ptr.p_double[i] - x0->ptr.p_double[i]);
+         *f += ae_sqr(x->ptr.p_double[i] - x0->ptr.p_double[i]);
       }
       for (i = 0; i < k; i++) {
-         *f = *f + c->ptr.p_double[i] * c->ptr.p_double[i];
+         *f += c->ptr.p_double[i] * c->ptr.p_double[i];
       }
       for (i = 0; i < k; i++) {
          g->ptr.p_double[i] = 2 * c->ptr.p_double[i];
@@ -78599,7 +78599,7 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
       while (lsfititeration(&state)) {
          if (state.needfg) {
             testlsfitunit_funcderiv(&state.c, &state.x, &x0, k, m, func, &state.f, &state.g);
-            state.g.ptr.p_double[nbrcomp] = state.g.ptr.p_double[nbrcomp] + noise;
+            state.g.ptr.p_double[nbrcomp] += noise;
          }
       }
       lsfitresults(&state, &info, &cres, &rep);
@@ -78835,7 +78835,7 @@ static bool testspline2dunit_testunpack(spline2dinterpolant *c, RVector lx, RVec
             v1 = 0.0;
             for (ci = 0; ci <= 3; ci++) {
                for (cj = 0; cj <= 3; cj++) {
-                  v1 = v1 + tbl.ptr.pp_double[p][4 + ci * 4 + cj] * pow(tx, (double)ci) * pow(ty, (double)cj);
+                  v1 += tbl.ptr.pp_double[p][4 + ci * 4 + cj] * pow(tx, (double)ci) * pow(ty, (double)cj);
                }
             }
             v2 = spline2dcalc(c, tbl.ptr.pp_double[p][0] + tx, tbl.ptr.pp_double[p][2] + ty);
@@ -78889,13 +78889,13 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
                a1 = 2 * ae_randomreal() - 1;
             }
             while (a1 == 0.0);
-            a1 = a1 * xjob;
+            a1 *= xjob;
             b1 = 2 * ae_randomreal() - 1;
             do {
                a2 = 2 * ae_randomreal() - 1;
             }
             while (a2 == 0.0);
-            a2 = a2 * yjob;
+            a2 *= yjob;
             b2 = 2 * ae_randomreal() - 1;
 
          // Test XY
@@ -79264,7 +79264,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   xy.ptr.pp_double[i][1] = hqrnduniformr(&rs);
                   for (j = 0; j < d; j++) {
                      xy.ptr.pp_double[i][2 + j] = vterm.ptr.pp_double[j][0] * xy.ptr.pp_double[i][0] + vterm.ptr.pp_double[j][1] * xy.ptr.pp_double[i][1] + vterm.ptr.pp_double[j][2];
-                     meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+                     meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints);
@@ -79320,7 +79320,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   xy.ptr.pp_double[i][1] = hqrnduniformr(&rs);
                   for (j = 0; j < d; j++) {
                      xy.ptr.pp_double[i][2 + j] = vterm.ptr.pp_double[j][0] * xy.ptr.pp_double[i][0] + vterm.ptr.pp_double[j][1] * xy.ptr.pp_double[i][1] + vterm.ptr.pp_double[j][2];
-                     meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+                     meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints);
@@ -79355,7 +79355,7 @@ static void testspline2dunit_testfittingprior(bool *errorflag) {
                   xy.ptr.pp_double[i][1] = hqrnduniformr(&rs);
                   for (j = 0; j < d; j++) {
                      xy.ptr.pp_double[i][2 + j] = vprior;
-                     meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+                     meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
                   }
                }
                spline2dbuildersetpoints(&state, &xy, npoints);
@@ -79544,20 +79544,20 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
                   f0 = spline2dcalcvi(&s, v0 - v, v1, k);
                   f1 = spline2dcalcvi(&s, v0, v1, k);
                   f2 = spline2dcalcvi(&s, v0 + v, v1, k);
-                  penalty.ptr.p_double[k] = penalty.ptr.p_double[k] + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
+                  penalty.ptr.p_double[k] += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
                }
                for (k = 0; k < d; k++) {
                   f0 = spline2dcalcvi(&s, v0, v1 - v, k);
                   f1 = spline2dcalcvi(&s, v0, v1, k);
                   f2 = spline2dcalcvi(&s, v0, v1 + v, k);
-                  penalty.ptr.p_double[k] = penalty.ptr.p_double[k] + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
+                  penalty.ptr.p_double[k] += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
                }
                for (k = 0; k < d; k++) {
                   f0 = spline2dcalcvi(&s, v0 - v, v1 - v, k);
                   f1 = spline2dcalcvi(&s, v0 + v, v1 - v, k);
                   f2 = spline2dcalcvi(&s, v0 - v, v1 + v, k);
                   f3 = spline2dcalcvi(&s, v0 + v, v1 + v, k);
-                  penalty.ptr.p_double[k] = penalty.ptr.p_double[k] + 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(v));
+                  penalty.ptr.p_double[k] += 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(v));
                }
             }
          }
@@ -79587,20 +79587,20 @@ static void testspline2dunit_testfittingpenalty(bool *errorflag) {
                      f0 = spline2dcalcvi(&s, v0 - v, v1, k);
                      f1 = spline2dcalcvi(&s, v0, v1, k);
                      f2 = spline2dcalcvi(&s, v0 + v, v1, k);
-                     penalty2.ptr.p_double[k] = penalty2.ptr.p_double[k] + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
+                     penalty2.ptr.p_double[k] += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
                   }
                   for (k = 0; k < d; k++) {
                      f0 = spline2dcalcvi(&s, v0, v1 - v, k);
                      f1 = spline2dcalcvi(&s, v0, v1, k);
                      f2 = spline2dcalcvi(&s, v0, v1 + v, k);
-                     penalty2.ptr.p_double[k] = penalty2.ptr.p_double[k] + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
+                     penalty2.ptr.p_double[k] += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(v));
                   }
                   for (k = 0; k < d; k++) {
                      f0 = spline2dcalcvi(&s, v0 - v, v1 - v, k);
                      f1 = spline2dcalcvi(&s, v0 + v, v1 - v, k);
                      f2 = spline2dcalcvi(&s, v0 - v, v1 + v, k);
                      f3 = spline2dcalcvi(&s, v0 + v, v1 + v, k);
-                     penalty2.ptr.p_double[k] = penalty2.ptr.p_double[k] + 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(v));
+                     penalty2.ptr.p_double[k] += 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(v));
                   }
                }
             }
@@ -79772,7 +79772,7 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                      xy.ptr.pp_double[i][1] = yc + w1 * (2 * hqrnduniformr(&rs) - 1) * ky;
                      for (j = 0; j < d; j++) {
                         xy.ptr.pp_double[i][2 + j] = hqrndnormal(&rs);
-                        meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+                        meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
                      }
                   }
 
@@ -79815,10 +79815,10 @@ static void testspline2dunit_testfittingblocksolver(bool *errorflag) {
                      spline2dcalcv(&s, xy.ptr.pp_double[i][0], xy.ptr.pp_double[i][1], &tmp0);
                      for (j = 0; j < d; j++) {
                         v = xy.ptr.pp_double[i][2 + j] - tmp0.ptr.p_double[j];
-                        rss = rss + v * v;
-                        tss = tss + ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
-                        rmserror = rmserror + ae_sqr(v);
-                        avgerror = avgerror + fabs(v) / (npoints * d);
+                        rss += v * v;
+                        tss += ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
+                        rmserror += ae_sqr(v);
+                        avgerror += fabs(v) / (npoints * d);
                         maxerror = ae_maxreal(maxerror, fabs(v));
                      }
                   }
@@ -80085,7 +80085,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
             xy.ptr.pp_double[i][1] = hqrnduniformr(&rs);
             for (j = 0; j < d; j++) {
                xy.ptr.pp_double[i][2 + j] = hqrndnormal(&rs);
-               meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+               meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
             }
          }
 
@@ -80130,10 +80130,10 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < d; j++) {
                v = xy.ptr.pp_double[i][2 + j] - spline2dcalcvi(&s1, xy.ptr.pp_double[i][0], xy.ptr.pp_double[i][1], j);
-               rss = rss + v * v;
-               tss = tss + ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
-               rmserror = rmserror + ae_sqr(v);
-               avgerror = avgerror + fabs(v) / (npoints * d);
+               rss += v * v;
+               tss += ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
+               rmserror += ae_sqr(v);
+               avgerror += fabs(v) / (npoints * d);
                maxerror = ae_maxreal(maxerror, fabs(v));
             }
          }
@@ -80245,7 +80245,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
             xy.ptr.pp_double[i][1] = hqrnduniformr(&rs);
             for (j = 0; j < d; j++) {
                xy.ptr.pp_double[i][2 + j] = hqrndnormal(&rs);
-               meany.ptr.p_double[j] = meany.ptr.p_double[j] + xy.ptr.pp_double[i][2 + j] / npoints;
+               meany.ptr.p_double[j] += xy.ptr.pp_double[i][2 + j] / npoints;
             }
          }
 
@@ -80268,10 +80268,10 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < d; j++) {
                v = xy.ptr.pp_double[i][2 + j] - spline2dcalcvi(&s1, xy.ptr.pp_double[i][0], xy.ptr.pp_double[i][1], j);
-               rss = rss + v * v;
-               tss = tss + ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
-               rmserror = rmserror + ae_sqr(v);
-               avgerror = avgerror + fabs(v) / (npoints * d);
+               rss += v * v;
+               tss += ae_sqr(xy.ptr.pp_double[i][2 + j] - meany.ptr.p_double[j]);
+               rmserror += ae_sqr(v);
+               avgerror += fabs(v) / (npoints * d);
                maxerror = ae_maxreal(maxerror, fabs(v));
             }
          }
@@ -80369,7 +80369,7 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
          for (j = 0; j < d; j++) {
             v = fabs(spline2dcalcvi(&s1, xy.ptr.pp_double[i][0], xy.ptr.pp_double[i][1], j) - xy.ptr.pp_double[i][2 + j]);
             emax = ae_maxreal(emax, v);
-            eavg = eavg + v / (npoints * d);
+            eavg += v / (npoints * d);
          }
       }
       ae_set_error_flag(errorflag, emax > 0.00100, __FILE__, __LINE__, "testspline2dunit.ap:2265");
@@ -80461,16 +80461,16 @@ static void testspline2dunit_testfittingfastddmsolver(bool *errorflag) {
                f0 = spline2dcalc(&s1, v0 - h, v1);
                f1 = spline2dcalc(&s1, v0, v1);
                f2 = spline2dcalc(&s1, v0 + h, v1);
-               v = v + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(h));
+               v += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(h));
                f0 = spline2dcalc(&s1, v0, v1 - h);
                f1 = spline2dcalc(&s1, v0, v1);
                f2 = spline2dcalc(&s1, v0, v1 + h);
-               v = v + ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(h));
+               v += ae_sqr((f0 + f2 - 2 * f1) / ae_sqr(h));
                f0 = spline2dcalc(&s1, v0 - h, v1 - h);
                f1 = spline2dcalc(&s1, v0 + h, v1 - h);
                f2 = spline2dcalc(&s1, v0 - h, v1 + h);
                f3 = spline2dcalc(&s1, v0 + h, v1 + h);
-               v = v + 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(h));
+               v += 2 * ae_sqr((f3 - f2 - f1 + f0) / ae_sqr(h));
             }
          }
          penaltya.ptr.p_double[k] = v;
@@ -81523,8 +81523,8 @@ Local bool basicmultilayerrbf1dtest() {
             ae_frame_leave();
             return result;
          }
-         q = q / 2;
-         nlayers = nlayers + 1;
+         q /= 2;
+         nlayers++;
          if (errtype == 1 && q <= 1 / f2) {
             errtype = 2;
          }
@@ -81910,7 +81910,7 @@ static bool testrbfunit_specialtest() {
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = vf.ptr.pp_double[j][nx];
                for (k = 0; k < nx; k++) {
-                  xy.ptr.pp_double[i][nx + j] = xy.ptr.pp_double[i][nx + j] + vf.ptr.pp_double[j][k] * xy.ptr.pp_double[i][k];
+                  xy.ptr.pp_double[i][nx + j] += vf.ptr.pp_double[j][k] * xy.ptr.pp_double[i][k];
                }
             }
          }
@@ -81931,7 +81931,7 @@ static bool testrbfunit_specialtest() {
          for (k = 0; k < ny; k++) {
             vv = vf.ptr.pp_double[k][nx];
             for (j = 0; j < nx; j++) {
-               vv = vv + vf.ptr.pp_double[k][j] * x.ptr.p_double[j];
+               vv += vf.ptr.pp_double[k][j] * x.ptr.p_double[j];
             }
             ae_set_error_flag(&result, fabs(vv - y.ptr.p_double[k]) > errtol, __FILE__, __LINE__, "testrbfunit.ap:537");
          }
@@ -82583,7 +82583,7 @@ static bool testrbfunit_linearitymodelrbftest() {
                         gp.ptr.pp_double[i * k1 + j][1] = point.ptr.p_double[1] + sx * j;
                         gp.ptr.pp_double[i * k1 + j][nx] = a.ptr.p_double[nx];
                         for (k = 0; k < nx; k++) {
-                           gp.ptr.pp_double[i * k1 + j][nx] = gp.ptr.pp_double[i * k1 + j][nx] + gp.ptr.pp_double[i * k1 + j][k] * a.ptr.p_double[k];
+                           gp.ptr.pp_double[i * k1 + j][nx] += gp.ptr.pp_double[i * k1 + j][k] * a.ptr.p_double[k];
                         }
                      }
                   }
@@ -82635,7 +82635,7 @@ static bool testrbfunit_linearitymodelrbftest() {
                               gp.ptr.pp_double[(i * k1 + j) * k2 + k][2] = point.ptr.p_double[2] + sx * k;
                               gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx] = a.ptr.p_double[nx];
                               for (l = 0; l < nx; l++) {
-                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx] = gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx] + gp.ptr.pp_double[(i * k1 + j) * k2 + k][l] * a.ptr.p_double[l];
+                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx] += gp.ptr.pp_double[(i * k1 + j) * k2 + k][l] * a.ptr.p_double[l];
                               }
                            }
                         }
@@ -82993,7 +82993,7 @@ static bool testrbfunit_serializationtest() {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.ptr.pp_double[i][j] = (double)(k % gridsize) / (double)(gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = ae_randomreal() - 0.5;
@@ -83639,7 +83639,7 @@ static bool testrbfunit_basichrbftest() {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.ptr.pp_double[i][j] = (double)(k % gridsize) / (double)(gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = ae_randomreal() - 0.5;
@@ -83793,7 +83793,7 @@ static bool testrbfunit_basichrbftest() {
             k = i;
             for (j = 0; j < nx; j++) {
                xy.ptr.pp_double[i][j] = (double)(k % gridsize) / (double)(gridsize - 1);
-               k = k / gridsize;
+               k /= gridsize;
             }
             for (j = 0; j < ny; j++) {
                xy.ptr.pp_double[i][nx + j] = ae_randomreal() - 0.5;
@@ -83871,13 +83871,13 @@ static bool testrbfunit_basichrbftest() {
             for (j = 0; j < ny; j++) {
                y.ptr.p_double[j] = uv.ptr.pp_double[j][nx];
                for (k = 0; k < nx; k++) {
-                  y.ptr.p_double[j] = y.ptr.p_double[j] + x.ptr.p_double[k] * uv.ptr.pp_double[j][k];
+                  y.ptr.p_double[j] += x.ptr.p_double[k] * uv.ptr.pp_double[j][k];
                }
             }
             for (k = 0; k < unc; k++) {
                v = 0.0;
                for (j = 0; j < nx; j++) {
-                  v = v + ae_sqr(uxwr.ptr.pp_double[k][j] - x.ptr.p_double[j]) / ae_sqr(uxwr.ptr.pp_double[k][nx + ny + j]);
+                  v += ae_sqr(uxwr.ptr.pp_double[k][j] - x.ptr.p_double[j]) / ae_sqr(uxwr.ptr.pp_double[k][nx + ny + j]);
                }
                if (v < rbfv2farradius(bf) * rbfv2farradius(bf)) {
                   v = rbfv2basisfunc(bf, v);
@@ -83885,7 +83885,7 @@ static bool testrbfunit_basichrbftest() {
                   v = 0.0;
                }
                for (j = 0; j < ny; j++) {
-                  y.ptr.p_double[j] = y.ptr.p_double[j] + v * uxwr.ptr.pp_double[k][nx + j];
+                  y.ptr.p_double[j] += v * uxwr.ptr.pp_double[k][nx + j];
                }
             }
             for (j = 0; j < ny; j++) {
@@ -84108,7 +84108,7 @@ static bool testrbfunit_basichrbftest() {
          for (j = 0; j < nx; j++) {
             xy.ptr.pp_double[i][j] = (double)(k % gridsize) / (double)(gridsize - 1);
             xy2.ptr.pp_double[i][j] = xy.ptr.pp_double[i][j] * scalefactor;
-            k = k / gridsize;
+            k /= gridsize;
          }
          for (j = 0; j < ny; j++) {
             xy.ptr.pp_double[i][nx + j] = ae_randomreal() - 0.5;
@@ -84360,14 +84360,14 @@ static bool testrbfunit_scaledhrbftest() {
                k = i;
                for (j = 0; j < nx; j++) {
                   xy.ptr.pp_double[i][j] = (double)(k % gridsize) / (double)(gridsize - 1);
-                  k = k / gridsize;
+                  k /= gridsize;
                }
                for (j = 0; j < ny; j++) {
                   xy.ptr.pp_double[i][nx + j] = 0.0;
                   for (k = 0; k < nx; k++) {
-                     xy.ptr.pp_double[i][nx + j] = xy.ptr.pp_double[i][nx + j] + c0.ptr.p_double[k] * cos(ae_pi * (1 + k) * xy.ptr.pp_double[i][k]);
+                     xy.ptr.pp_double[i][nx + j] += c0.ptr.p_double[k] * cos(ae_pi * (1 + k) * xy.ptr.pp_double[i][k]);
                   }
-                  xy.ptr.pp_double[i][nx + j] = c1.ptr.p_double[j] * xy.ptr.pp_double[i][nx + j];
+                  xy.ptr.pp_double[i][nx + j] *= c1.ptr.p_double[j];
                }
             }
             ae_matrix_set_length(&xy2, n, nx + ny);
@@ -84443,7 +84443,7 @@ static bool testrbfunit_scaledhrbftest() {
                }
                rbfcalc(&s, &x, &y);
                for (j = 0; j < nx; j++) {
-                  x.ptr.p_double[j] = x.ptr.p_double[j] * scalex.ptr.p_double[j];
+                  x.ptr.p_double[j] *= scalex.ptr.p_double[j];
                }
                rbfcalc(&s2, &x, &y2);
                for (j = 0; j < ny; j++) {
@@ -84496,7 +84496,7 @@ static bool testrbfunit_spechrbftest() {
       vref = exp(-d2);
       vfunc = rbfv2basisfunc(0, d2);
       ae_set_error_flag(&result, fabs(vref - vfunc) > 1.0E-9 * vref, __FILE__, __LINE__, "testrbfunit.ap:3563");
-      d2 = d2 + 1.0 / 64.0;
+      d2 += 1.0 / 64.0;
    }
    d2 = 0.0;
    maxerr = 0.0;
@@ -84505,7 +84505,7 @@ static bool testrbfunit_spechrbftest() {
       vfunc = rbfv2basisfunc(1, d2);
       maxerr = ae_maxreal(maxerr, fabs(vref - vfunc));
       ae_set_error_flag(&result, fabs(vref - vfunc) > 0.005, __FILE__, __LINE__, "testrbfunit.ap:3573");
-      d2 = d2 + 1.0 / 64.0;
+      d2 += 1.0 / 64.0;
    }
 
 // Test that tiny changes in dataset points introduce tiny
@@ -84539,8 +84539,8 @@ static bool testrbfunit_spechrbftest() {
       return result;
    }
    for (i = 0; i < n * n; i++) {
-      xy.ptr.pp_double[i][0] = xy.ptr.pp_double[i][0] + 1.0E-14 * sin((double)(3 * i));
-      xy.ptr.pp_double[i][1] = xy.ptr.pp_double[i][1] + 1.0E-14 * sin((double)(7 * i * i));
+      xy.ptr.pp_double[i][0] += 1.0E-14 * sin((double)(3 * i));
+      xy.ptr.pp_double[i][1] += 1.0E-14 * sin((double)(7 * i * i));
    }
    rbfcreate(nx, ny, &s1);
    rbfsetalgohierarchical(&s1, rbase, nlayers, 0.0);
@@ -84555,7 +84555,7 @@ static bool testrbfunit_spechrbftest() {
    vdiff = 0.0;
    for (i = 0; i < n - 1; i++) {
       for (j = 0; j < n - 1; j++) {
-         vdiff = vdiff + fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / ae_sqr((double)(n - 1));
+         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / ae_sqr((double)(n - 1));
       }
    }
    ae_set_error_flag(&result, vdiff > 0.00200 || vdiff < 0.00001, __FILE__, __LINE__, "testrbfunit.ap:3630");
@@ -84831,7 +84831,7 @@ static bool testrbfunit_gridhrbftest() {
             } else {
                scalevec2.ptr.p_double[i] = 1.0;
             }
-            scalevec2.ptr.p_double[i] = scalevec2.ptr.p_double[i] / scalefactor;
+            scalevec2.ptr.p_double[i] /= scalefactor;
          }
          rbfsetpointsandscales(&s, &xy, n, &scalevec2);
          rbfsetv2bf(&s, bf);
@@ -85047,7 +85047,7 @@ static bool testrbfunit_gridhrbftest() {
             } else {
                scalevec2.ptr.p_double[i] = 1.0;
             }
-            scalevec2.ptr.p_double[i] = scalevec2.ptr.p_double[i] / scalefactor;
+            scalevec2.ptr.p_double[i] /= scalefactor;
          }
          rbfsetpointsandscales(&s, &xy, n, &scalevec2);
          rbfsetv2bf(&s, bf);
@@ -85258,7 +85258,7 @@ bool testhermite(bool silent) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
-         v = v + hermitecalculate(n, x) * c.ptr.p_double[n];
+         v += hermitecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - hermitesum(&c, n, x)));
       }
    }
@@ -85379,7 +85379,7 @@ bool testlaguerre(bool silent) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
-         v = v + laguerrecalculate(n, x) * c.ptr.p_double[n];
+         v += laguerrecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - laguerresum(&c, n, x)));
       }
    }
@@ -85474,8 +85474,8 @@ bool testlegendre(bool silent) {
          v = legendrecalculate(n, x);
          t = 1.0;
          for (i = 0; i <= n; i++) {
-            v = v - c.ptr.p_double[i] * t;
-            t = t * x;
+            v -= c.ptr.p_double[i] * t;
+            t *= x;
          }
          err = ae_maxreal(err, fabs(v));
       }
@@ -85489,7 +85489,7 @@ bool testlegendre(bool silent) {
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
          c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
-         v = v + legendrecalculate(n, x) * c.ptr.p_double[n];
+         v += legendrecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - legendresum(&c, n, x)));
       }
    }
@@ -85636,7 +85636,7 @@ bool testchebyshev(bool silent) {
          v = 0.0;
          for (n = 0; n <= maxn; n++) {
             c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
-            v = v + chebyshevcalculate(k, n, x) * c.ptr.p_double[n];
+            v += chebyshevcalculate(k, n, x) * c.ptr.p_double[n];
             sumerr = ae_maxreal(sumerr, fabs(v - chebyshevsum(&c, k, n, x)));
          }
       }
@@ -86223,7 +86223,7 @@ bool testmannwhitneyu(bool silent) {
          tailrprev = 0.0;
          taillprev = 1.0;
          for (i = 0; i < m; i++) {
-            y.ptr.p_double[i] = y.ptr.p_double[i] + ebase;
+            y.ptr.p_double[i] += ebase;
          }
          for (k = 0; k < ecnt; k++) {
             mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr);
@@ -86233,7 +86233,7 @@ bool testmannwhitneyu(bool silent) {
             tailrprev = tailr;
             taillprev = taill;
             for (i = 0; i < m; i++) {
-               y.ptr.p_double[i] = y.ptr.p_double[i] + eshift;
+               y.ptr.p_double[i] += eshift;
             }
          }
       }
@@ -86260,7 +86260,7 @@ bool testmannwhitneyu(bool silent) {
          }
          mannwhitneyutest(&x, n, &y, m, &tailb, &taill, &tailr);
          if (tailb < 0.05) {
-            k = k + 1;
+            k++;
          }
       }
       v = fabs((double)k / (double)testcnt - 0.05);
@@ -86818,7 +86818,7 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix a0, ae_
             if (i + 1 <= s) {
                v.ptr.p_double[i + 1] = u2 * sm;
             }
-            i = i + 2;
+            i += 2;
          }
          lambdav = ae_v_dotproduct(&v.ptr.p_double[1], 1, &v.ptr.p_double[1], 1, s);
       }
@@ -86876,7 +86876,7 @@ static void testinverseupdateunit_generaterandommatrixcond(RMatrix a0, ae_int_t 
       for (j = 0; j < n; j++) {
          a0->ptr.pp_double[i][j] = 0.0;
          for (k = 0; k < n; k++) {
-            a0->ptr.pp_double[i][j] = a0->ptr.pp_double[i][j] + q1.ptr.pp_double[i][k] * cc.ptr.p_double[k] * q2.ptr.pp_double[j][k];
+            a0->ptr.pp_double[i][j] += q1.ptr.pp_double[i][k] * cc.ptr.p_double[k] * q2.ptr.pp_double[j][k];
          }
       }
    }
@@ -87014,7 +87014,7 @@ static bool testinverseupdateunit_invmatlu(RMatrix a, ZVector pivots, ae_int_t n
       if (j < n - 1) {
          for (i = 0; i < n; i++) {
             v = ae_v_dotproduct(&a->ptr.pp_double[i][j + 1], 1, &work.ptr.p_double[j + 1], 1, n - j - 1);
-            a->ptr.pp_double[i][j] = a->ptr.pp_double[i][j] - v;
+            a->ptr.pp_double[i][j] -= v;
          }
       }
    }
@@ -87614,15 +87614,15 @@ bool testnleq(bool silent) {
       // update info and continue
          ae_v_move(xlast.ptr.p_double, 1, state.x.ptr.p_double, 1, n);
          flast = state.f;
-         itcnt = itcnt + 1;
+         itcnt++;
          continue;
       }
       if (state.needf) {
-         nfunc = nfunc + 1;
+         nfunc++;
       }
       if (state.needfij) {
-         nfunc = nfunc + 1;
-         njac = njac + 1;
+         nfunc++;
+         njac++;
       }
       testnlequnit_testfunchbm(&state);
    }
@@ -87919,7 +87919,7 @@ static void testdirectsparsesolversunit_testgen(bool *errorflag) {
             if (noffdiag == 0) {
                break;
             }
-            noffdiag = noffdiag / 2;
+            noffdiag /= 2;
          }
       }
    }
@@ -88046,7 +88046,7 @@ static bool testlincgunit_complextest(bool silent) {
             for (i = 0; i < sz; i++) {
                state.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < sz; j++) {
-                  state.mv.ptr.p_double[i] = state.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
             }
          }
@@ -88055,9 +88055,9 @@ static bool testlincgunit_complextest(bool silent) {
             for (i = 0; i < sz; i++) {
                state.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < sz; j++) {
-                  state.mv.ptr.p_double[i] = state.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
+                  state.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * state.x.ptr.p_double[j];
                }
-               state.vmv = state.vmv + state.mv.ptr.p_double[i] * state.x.ptr.p_double[i];
+               state.vmv += state.mv.ptr.p_double[i] * state.x.ptr.p_double[i];
             }
          }
          if (state.needprec) {
@@ -88077,7 +88077,7 @@ static bool testlincgunit_complextest(bool silent) {
                mtx.ptr.pp_double[numofit][i] = state.x.ptr.p_double[i];
             }
             getrnorm = state.r2;
-            numofit = numofit + 1;
+            numofit++;
          }
       }
       lincgresults(&state, &x0, &rep);
@@ -88095,7 +88095,7 @@ static bool testlincgunit_complextest(bool silent) {
       for (i = 0; i < sz; i++) {
          tmp = 0.0;
          for (j = 0; j < sz; j++) {
-            tmp = tmp + a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+            tmp += a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
          }
          residual.ptr.p_double[i] = b.ptr.p_double[i] - tmp;
       }
@@ -88110,7 +88110,7 @@ static bool testlincgunit_complextest(bool silent) {
             ae_frame_leave();
             return result;
          }
-         normofresidual = normofresidual + residual.ptr.p_double[i] * residual.ptr.p_double[i];
+         normofresidual += residual.ptr.p_double[i] * residual.ptr.p_double[i];
       }
       if (fabs(normofresidual - rep.r2) > testlincgunit_e0) {
          if (!silent) {
@@ -88134,7 +88134,7 @@ static bool testlincgunit_complextest(bool silent) {
                mtp.ptr.pp_double[i][j] = mtx.ptr.pp_double[i + 1][j] - mtx.ptr.pp_double[i][j];
                tmp = 0.0;
                for (k = 0; k < sz; k++) {
-                  tmp = tmp + a.ptr.pp_double[j][k] * mtx.ptr.pp_double[i][k];
+                  tmp += a.ptr.pp_double[j][k] * mtx.ptr.pp_double[i][k];
                }
                mtr.ptr.pp_double[i][j] = b.ptr.p_double[j] - tmp;
             }
@@ -88152,11 +88152,11 @@ static bool testlincgunit_complextest(bool silent) {
                for (k = 0; k < sz; k++) {
                   tmp = 0.0;
                   for (l = 0; l < sz; l++) {
-                     tmp = tmp + a.ptr.pp_double[k][l] * mtp.ptr.pp_double[i][l];
+                     tmp += a.ptr.pp_double[k][l] * mtp.ptr.pp_double[i][l];
                   }
-                  sclr = sclr + tmp * mtp.ptr.pp_double[j][k];
-                  nv0 = nv0 + mtp.ptr.pp_double[i][k] * mtp.ptr.pp_double[i][k];
-                  nv1 = nv1 + mtp.ptr.pp_double[j][k] * mtp.ptr.pp_double[j][k];
+                  sclr += tmp * mtp.ptr.pp_double[j][k];
+                  nv0 += mtp.ptr.pp_double[i][k] * mtp.ptr.pp_double[i][k];
+                  nv1 += mtp.ptr.pp_double[j][k] * mtp.ptr.pp_double[j][k];
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
@@ -88179,9 +88179,9 @@ static bool testlincgunit_complextest(bool silent) {
                nv0 = 0.0;
                nv1 = 0.0;
                for (k = 0; k < sz; k++) {
-                  sclr = sclr + mtr.ptr.pp_double[i][k] * mtp.ptr.pp_double[j][k];
-                  nv0 = nv0 + mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[i][k];
-                  nv1 = nv1 + mtp.ptr.pp_double[j][k] * mtp.ptr.pp_double[j][k];
+                  sclr += mtr.ptr.pp_double[i][k] * mtp.ptr.pp_double[j][k];
+                  nv0 += mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[i][k];
+                  nv1 += mtp.ptr.pp_double[j][k] * mtp.ptr.pp_double[j][k];
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
@@ -88204,9 +88204,9 @@ static bool testlincgunit_complextest(bool silent) {
                nv0 = 0.0;
                nv1 = 0.0;
                for (k = 0; k < sz; k++) {
-                  sclr = sclr + mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[j][k];
-                  nv0 = nv0 + mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[i][k];
-                  nv1 = nv1 + mtr.ptr.pp_double[j][k] * mtr.ptr.pp_double[j][k];
+                  sclr += mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[j][k];
+                  nv0 += mtr.ptr.pp_double[i][k] * mtr.ptr.pp_double[i][k];
+                  nv1 += mtr.ptr.pp_double[j][k] * mtr.ptr.pp_double[j][k];
                }
                nv0 = sqrt(nv0);
                nv1 = sqrt(nv1);
@@ -88287,9 +88287,9 @@ static bool testlincgunit_complexres(bool silent) {
             for (i = 0; i < n; i++) {
                b.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  b.ptr.p_double[i] = b.ptr.p_double[i] + a.ptr.pp_double[i][j] * xs.ptr.p_double[j];
+                  b.ptr.p_double[i] += a.ptr.pp_double[i][j] * xs.ptr.p_double[j];
                }
-               eps = eps + b.ptr.p_double[i] * b.ptr.p_double[i];
+               eps += b.ptr.p_double[i] * b.ptr.p_double[i];
             }
             eps = 1.0E-6 * sqrt(eps);
 
@@ -88308,7 +88308,7 @@ static bool testlincgunit_complexres(bool silent) {
                   for (i = 0; i < n; i++) {
                      s.mv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
                   }
                }
@@ -88317,9 +88317,9 @@ static bool testlincgunit_complexres(bool silent) {
                   for (i = 0; i < n; i++) {
                      s.mv.ptr.p_double[i] = 0.0;
                      for (j = 0; j < n; j++) {
-                        s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                        s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                      }
-                     s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+                     s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
                   }
                }
                if (s.needprec) {
@@ -88335,9 +88335,9 @@ static bool testlincgunit_complexres(bool silent) {
             for (i = 0; i < n; i++) {
                tmp = 0.0;
                for (j = 0; j < n; j++) {
-                  tmp = tmp + a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+                  tmp += a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
                }
-               err = err + ae_sqr(b.ptr.p_double[i] - tmp);
+               err += ae_sqr(b.ptr.p_double[i] - tmp);
             }
             err = sqrt(err);
             if (err > eps) {
@@ -88423,7 +88423,7 @@ static bool testlincgunit_basictestx(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -88432,9 +88432,9 @@ static bool testlincgunit_basictestx(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -88453,7 +88453,7 @@ static bool testlincgunit_basictestx(bool silent) {
                   x01.ptr.p_double[i] = s.x.ptr.p_double[i];
                }
             }
-            iters = iters + 1;
+            iters++;
          }
       }
 
@@ -88543,7 +88543,7 @@ static bool testlincgunit_testrcorrectness(bool silent) {
          for (i = 0; i < n; i++) {
             s.mv.ptr.p_double[i] = 0.0;
             for (j = 0; j < n; j++) {
-               s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+               s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
             }
          }
       }
@@ -88552,9 +88552,9 @@ static bool testlincgunit_testrcorrectness(bool silent) {
          for (i = 0; i < n; i++) {
             s.mv.ptr.p_double[i] = 0.0;
             for (j = 0; j < n; j++) {
-               s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+               s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
             }
-            s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+            s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
          }
       }
       if (s.needprec) {
@@ -88569,9 +88569,9 @@ static bool testlincgunit_testrcorrectness(bool silent) {
          for (i = 0; i < n; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               v = v + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+               v += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
             }
-            r2 = r2 + ae_sqr(v - b.ptr.p_double[i]);
+            r2 += ae_sqr(v - b.ptr.p_double[i]);
          }
          if (fabs(r2 - s.r2) > rtol) {
             result = true;
@@ -88641,7 +88641,7 @@ static bool testlincgunit_basictestiters(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -88650,9 +88650,9 @@ static bool testlincgunit_basictestiters(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -88661,7 +88661,7 @@ static bool testlincgunit_basictestiters(bool silent) {
             }
          }
          if (s.xupdated) {
-            iters = iters + 1;
+            iters++;
          }
       }
       lincgresults(&s, &x0, &rep);
@@ -88695,7 +88695,7 @@ static bool testlincgunit_basictestiters(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -88704,9 +88704,9 @@ static bool testlincgunit_basictestiters(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -88715,7 +88715,7 @@ static bool testlincgunit_basictestiters(bool silent) {
             }
          }
          if (s.xupdated) {
-            iters = iters + 1;
+            iters++;
          }
       }
       lincgresults(&s, &x0, &rep);
@@ -88764,7 +88764,7 @@ static void testlincgunit_gramshmidtortnorm(RMatrix a, ae_int_t n, ae_int_t k, d
    for (i = 0; i < k; i++) {
       tmp = 0.0;
       for (j = 0; j < n; j++) {
-         tmp = tmp + a->ptr.pp_double[i][j] * a->ptr.pp_double[i][j];
+         tmp += a->ptr.pp_double[i][j] * a->ptr.pp_double[i][j];
       }
       if (tmp > scaling) {
          scaling = tmp;
@@ -88776,7 +88776,7 @@ static void testlincgunit_gramshmidtortnorm(RMatrix a, ae_int_t n, ae_int_t k, d
       tmp = 0.0;
       for (j = 0; j < n; j++) {
          b->ptr.pp_double[*k2][j] = a->ptr.pp_double[i][j];
-         tmp = tmp + a->ptr.pp_double[i][j] * a->ptr.pp_double[i][j];
+         tmp += a->ptr.pp_double[i][j] * a->ptr.pp_double[i][j];
       }
       tmp = sqrt(tmp);
       if (tmp <= e) {
@@ -88785,25 +88785,25 @@ static void testlincgunit_gramshmidtortnorm(RMatrix a, ae_int_t n, ae_int_t k, d
       for (j = 0; j < *k2; j++) {
          sc = 0.0;
          for (m = 0; m < n; m++) {
-            sc = sc + b->ptr.pp_double[*k2][m] * b->ptr.pp_double[j][m];
+            sc += b->ptr.pp_double[*k2][m] * b->ptr.pp_double[j][m];
          }
          for (l = 0; l < n; l++) {
-            b->ptr.pp_double[*k2][l] = b->ptr.pp_double[*k2][l] - sc * b->ptr.pp_double[j][l];
+            b->ptr.pp_double[*k2][l] -= sc * b->ptr.pp_double[j][l];
          }
       }
       tmp = 0.0;
       for (j = 0; j < n; j++) {
-         tmp = tmp + b->ptr.pp_double[*k2][j] * b->ptr.pp_double[*k2][j];
+         tmp += b->ptr.pp_double[*k2][j] * b->ptr.pp_double[*k2][j];
       }
       tmp = sqrt(tmp);
       if (tmp <= e) {
          continue;
       } else {
          for (j = 0; j < n; j++) {
-            b->ptr.pp_double[*k2][j] = b->ptr.pp_double[*k2][j] / tmp;
+            b->ptr.pp_double[*k2][j] /= tmp;
          }
       }
-      *k2 = *k2 + 1;
+      ++*k2;
    }
 }
 
@@ -88826,7 +88826,7 @@ static bool testlincgunit_frombasis(RVector x, RMatrix basis, ae_int_t n, ae_int
 // calculating NORM for X
    normx = 0.0;
    for (i = 0; i < n; i++) {
-      normx = normx + x->ptr.p_double[i] * x->ptr.p_double[i];
+      normx += x->ptr.p_double[i] * x->ptr.p_double[i];
    }
    normx = sqrt(normx);
 
@@ -88835,7 +88835,7 @@ static bool testlincgunit_frombasis(RVector x, RMatrix basis, ae_int_t n, ae_int
    for (i = 0; i < k2; i++) {
       alpha = 0.0;
       for (j = 0; j < n; j++) {
-         alpha = alpha + x->ptr.p_double[j] * ortnormbasis.ptr.pp_double[i][j];
+         alpha += x->ptr.p_double[j] * ortnormbasis.ptr.pp_double[i][j];
       }
       alphas.ptr.p_double[i] = alpha;
    }
@@ -88844,7 +88844,7 @@ static bool testlincgunit_frombasis(RVector x, RMatrix basis, ae_int_t n, ae_int
    for (i = 0; i < n; i++) {
       alpha = 0.0;
       for (j = 0; j < k2; j++) {
-         alpha = alpha + alphas.ptr.p_double[j] * ortnormbasis.ptr.pp_double[j][i];
+         alpha += alphas.ptr.p_double[j] * ortnormbasis.ptr.pp_double[j][i];
       }
       if (fabs(x->ptr.p_double[i] - alpha) > normx * eps) {
          result = false;
@@ -88922,10 +88922,10 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
          for (i = 0; i < n; i++) {
             tmp = 0.0;
             for (j = 0; j < n; j++) {
-               tmp = tmp + a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
+               tmp += a.ptr.pp_double[i][j] * x0.ptr.p_double[j];
             }
             r0.ptr.p_double[i] = b.ptr.p_double[i] - tmp;
-            normr0 = normr0 + r0.ptr.p_double[i] * r0.ptr.p_double[i];
+            normr0 += r0.ptr.p_double[i] * r0.ptr.p_double[i];
          }
       }
       while (sqrt(normr0) <= eps);
@@ -88939,7 +88939,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
             for (l = 0; l < n; l++) {
                tarray.ptr.p_double[l] = 0.0;
                for (m = 0; m < n; m++) {
-                  tarray.ptr.p_double[l] = tarray.ptr.p_double[l] + a.ptr.pp_double[l][m] * ksr.ptr.pp_double[i][m];
+                  tarray.ptr.p_double[l] += a.ptr.pp_double[l][m] * ksr.ptr.pp_double[i][m];
                }
             }
             for (l = 0; l < n; l++) {
@@ -88962,7 +88962,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -88971,9 +88971,9 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -88985,7 +88985,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
             for (i = 0; i < n; i++) {
                mtx.ptr.pp_double[numofit][i] = s.x.ptr.p_double[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
 
@@ -89067,9 +89067,9 @@ static bool testlincgunit_sparsetest(bool silent) {
       for (i = 0; i < n; i++) {
          b.ptr.p_double[i] = 0.0;
          for (j = 0; j < n; j++) {
-            b.ptr.p_double[i] = b.ptr.p_double[i] + a.ptr.pp_double[i][j] * xs.ptr.p_double[j];
+            b.ptr.p_double[i] += a.ptr.pp_double[i][j] * xs.ptr.p_double[j];
          }
-         eps = eps + b.ptr.p_double[i] * b.ptr.p_double[i];
+         eps += b.ptr.p_double[i] * b.ptr.p_double[i];
       }
       eps = 1.0E-6 * sqrt(eps);
       sparsecreate(n, n, 0, &uppera);
@@ -89094,7 +89094,7 @@ static bool testlincgunit_sparsetest(bool silent) {
       lincgresults(&s, &x0, &rep);
       err = 0.0;
       for (i = 0; i < n; i++) {
-         err = err + ae_sqr(x0.ptr.p_double[i] - xs.ptr.p_double[i]);
+         err += ae_sqr(x0.ptr.p_double[i] - xs.ptr.p_double[i]);
       }
       err = sqrt(err);
       if (err > eps) {
@@ -89109,7 +89109,7 @@ static bool testlincgunit_sparsetest(bool silent) {
       lincgresults(&s, &x1, &rep);
       err = 0.0;
       for (i = 0; i < n; i++) {
-         err = err + ae_sqr(x1.ptr.p_double[i] - xs.ptr.p_double[i]);
+         err += ae_sqr(x1.ptr.p_double[i] - xs.ptr.p_double[i]);
       }
       err = sqrt(err);
       if (err > eps) {
@@ -89223,7 +89223,7 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -89232,9 +89232,9 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += a.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -89251,7 +89251,7 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                mtx.ptr.pp_double[numofit][i] = s.x.ptr.p_double[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
       lincgsetstartingpoint(&s, &tx0);
@@ -89263,7 +89263,7 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + ta.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += ta.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
             }
          }
@@ -89272,9 +89272,9 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                s.mv.ptr.p_double[i] = 0.0;
                for (j = 0; j < n; j++) {
-                  s.mv.ptr.p_double[i] = s.mv.ptr.p_double[i] + ta.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
+                  s.mv.ptr.p_double[i] += ta.ptr.pp_double[i][j] * s.x.ptr.p_double[j];
                }
-               s.vmv = s.vmv + s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
+               s.vmv += s.mv.ptr.p_double[i] * s.x.ptr.p_double[i];
             }
          }
          if (s.needprec) {
@@ -89291,7 +89291,7 @@ static bool testlincgunit_precondtest(bool silent) {
             for (i = 0; i < n; i++) {
                mtprex.ptr.pp_double[numofit][i] = s.x.ptr.p_double[i];
             }
-            numofit = numofit + 1;
+            numofit++;
          }
       }
 
@@ -89349,7 +89349,7 @@ static bool testlincgunit_precondtest(bool silent) {
    for (i = 0; i < n; i++) {
       b.ptr.p_double[i] = 0.0;
       for (j = 0; j < n; j++) {
-         b.ptr.p_double[i] = b.ptr.p_double[i] + ta.ptr.pp_double[i][j] * xe.ptr.p_double[j];
+         b.ptr.p_double[i] += ta.ptr.pp_double[i][j] * xe.ptr.p_double[j];
       }
    }
    ae_vector_set_length(&d, n);
@@ -89363,8 +89363,8 @@ static bool testlincgunit_precondtest(bool silent) {
          a.ptr.pp_double[i][j] = d.ptr.p_double[i] * ta.ptr.pp_double[i][j] * d.ptr.p_double[j];
          sparseset(&sa, i, j, a.ptr.pp_double[i][j]);
       }
-      b.ptr.p_double[i] = b.ptr.p_double[i] * d.ptr.p_double[i];
-      xe.ptr.p_double[i] = xe.ptr.p_double[i] / d.ptr.p_double[i];
+      b.ptr.p_double[i] *= d.ptr.p_double[i];
+      xe.ptr.p_double[i] /= d.ptr.p_double[i];
    }
    sparseconverttocrs(&sa);
    lincgcreate(n, &s);
@@ -90572,7 +90572,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       return result;
    }
    seedrec2.bval = !seedrec2.bval;
-   seedrec2.recval.i1val.ptr.p_int[0] = seedrec2.recval.i1val.ptr.p_int[0] + 1;
+   seedrec2.recval.i1val.ptr.p_int[0]++;
    ae_shared_pool_retrieve(&pool, &_prec2);
    if (!(prec2 != NULL)) {
       ae_frame_leave();
@@ -90593,7 +90593,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
 // * check that it is unchanged.
    testalglibbasicsunit_createpoolandrecords(&seedrec2, &seedrec2copy, &pool);
    ae_shared_pool_retrieve(&pool, &_prec2);
-   prec2->recval.ival = prec2->recval.ival + 1;
+   prec2->recval.ival++;
    ae_shared_pool_retrieve(&pool, &_prec2);
    if (prec2->recval.ival != seedrec2copy.recval.ival) {
       ae_frame_leave();
@@ -90612,7 +90612,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
 // * check that unmodified value was returned,
    testalglibbasicsunit_createpoolandrecords(&seedrec2, &seedrec2copy, &pool);
    ae_shared_pool_retrieve(&pool, &_prec2);
-   prec2->recval.ival = prec2->recval.ival + 1;
+   prec2->recval.ival++;
    ae_shared_pool_recycle(&pool, &_prec2);
    if (prec2 != NULL) {
       ae_frame_leave();
@@ -90660,13 +90660,13 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
    ae_shared_pool_first_recycled(&pool, &_prec2);
    while (prec2 != NULL) {
       if (prec2->recval.ival == 100) {
-         val100cnt = val100cnt + 1;
+         val100cnt++;
       }
       if (prec2->recval.ival == 101) {
-         val101cnt = val101cnt + 1;
+         val101cnt++;
       }
       if (prec2->recval.ival == 102) {
-         val102cnt = val102cnt + 1;
+         val102cnt++;
       }
       ae_shared_pool_next_recycled(&pool, &_prec2);
    }
@@ -90680,13 +90680,13 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
    ae_shared_pool_first_recycled(&pool, &_prec2);
    while (prec2 != NULL) {
       if (prec2->recval.ival == 100) {
-         val100cnt = val100cnt + 1;
+         val100cnt++;
       }
       if (prec2->recval.ival == 101) {
-         val101cnt = val101cnt + 1;
+         val101cnt++;
       }
       if (prec2->recval.ival == 102) {
-         val102cnt = val102cnt + 1;
+         val102cnt++;
       }
       ae_shared_pool_next_recycled(&pool, &_prec2);
    }
@@ -90714,7 +90714,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       return result;
    }
    ae_shared_pool_retrieve(ppool0, &_p0);
-   p0->recval.ival = p0->recval.ival + 1;
+   p0->recval.ival++;
    tmpval = p0->recval.ival;
    ae_shared_pool_recycle(ppool0, &_p0);
    ae_shared_pool_retrieve(ppool1, &_p1);
@@ -90867,24 +90867,24 @@ static void testalglibbasicsunit_mergesortedarrays(ZVector a, ZVector buf, ae_in
       }
       if (srcleft == idx1) {
          buf->ptr.p_int[dst] = a->ptr.p_int[srcright];
-         srcright = srcright + 1;
-         dst = dst + 1;
+         srcright++;
+         dst++;
          continue;
       }
       if (srcright == idx2) {
          buf->ptr.p_int[dst] = a->ptr.p_int[srcleft];
-         srcleft = srcleft + 1;
-         dst = dst + 1;
+         srcleft++;
+         dst++;
          continue;
       }
       if (a->ptr.p_int[srcleft] < a->ptr.p_int[srcright]) {
          buf->ptr.p_int[dst] = a->ptr.p_int[srcleft];
-         srcleft = srcleft + 1;
-         dst = dst + 1;
+         srcleft++;
+         dst++;
       } else {
          buf->ptr.p_int[dst] = a->ptr.p_int[srcright];
-         srcright = srcright + 1;
-         dst = dst + 1;
+         srcright++;
+         dst++;
       }
    }
    for (dst = idx0; dst < idx2; dst++) {
@@ -91138,7 +91138,7 @@ static void testalglibbasicsunit_parallelpoolsum(ae_shared_pool *sumpool, ae_int
 
    if (ind1 - ind0 <= 2) {
       ae_shared_pool_retrieve(sumpool, &_ptr);
-      ptr->val = ptr->val + ind1 - ind0;
+      ptr->val += ind1 - ind0;
       ae_shared_pool_recycle(sumpool, &_ptr);
    } else {
       i = (ind0 + ind1) / 2;
@@ -91174,7 +91174,7 @@ static bool testalglibbasicsunit_performtestpoolsum() {
    sum = 0;
    ae_shared_pool_first_recycled(&pool, &_ptr);
    while (ptr != NULL) {
-      sum = sum + ptr->val;
+      sum += ptr->val;
       ae_shared_pool_next_recycled(&pool, &_ptr);
    }
    result = sum == n;
