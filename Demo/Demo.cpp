@@ -10,7 +10,7 @@ double counter() {
    v = now.tv_sec;
    r = v*1000;
    v = now.tv_usec/1000;
-   r = r + v;
+   r += v;
    return 0.001*r;
 }
 
