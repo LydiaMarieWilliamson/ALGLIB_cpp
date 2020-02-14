@@ -133,11 +133,10 @@ unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _
 //                            =  0 for manually defined number of cores (AE_NWORKERS is defined)
 // PROTECTION:  not needed; runtime modification is possible, but we do not need exact
 //              synchronization.
-#if defined AE_NWORKERS && AE_NWORKERS <= 0
-#   error AE_NWORKERS must be positive number or not defined at all.
-#endif
-
 #if defined AE_NWORKERS
+#   if AE_NWORKERS <= 0
+#      error AE_NWORKERS must be positive number or not defined at all.
+#   endif
 ae_int_t _alglib_cores_to_use = 0;
 #else
 ae_int_t _alglib_cores_to_use = 0;
@@ -194,11 +193,6 @@ static volatile ae_int_t ae_never_change_it = 1;
 // This function should never  be  called.  It is  here  to  prevent spurious
 // compiler warnings about unused variables (in fact: used).
 void ae_never_call_it() {
-   ae_touch_ptr((void *)_ae_bool_must_be_8_bits_wide);
-   ae_touch_ptr((void *)_ae_int32_t_must_be_32_bits_wide);
-   ae_touch_ptr((void *)_ae_int64_t_must_be_64_bits_wide);
-   ae_touch_ptr((void *)_ae_uint64_t_must_be_64_bits_wide);
-   ae_touch_ptr((void *)_ae_int_t_must_be_pointer_sized);
 }
 
 void ae_set_dbg_flag(ae_int64_t flag_id, ae_int64_t flag_val) {
@@ -732,18 +726,6 @@ bool ae_check_zeros(const void *ptr, ae_int_t n) {
    return c == 0x0;
 }
 
-// This  dummy  function  is  used to prevent compiler messages about unused
-// locals in automatically generated code.
-//
-// It makes nothing - just accepts pointer, "touches" it - and that is  all.
-// It performs several tricky operations without side effects which  confuse
-// compiler so it does not compain about unused locals in THIS function.
-void ae_touch_ptr(void *p) {
-   void *volatile fake_variable0 = p;
-   void *volatile fake_variable1 = fake_variable0;
-   fake_variable0 = fake_variable1;
-}
-
 // Flags: call-local settings for ALGLIB
 AutoS ae_uint64_t CurFlags;
 
@@ -827,7 +809,6 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
 //       memory allocation.
    ae_assert(size >= 0, "ae_db_init(): negative size");
    block->ptr = NULL;
-   ae_touch_ptr(block->ptr);
    if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
    if (size != 0) block->ptr = ae_malloc((size_t)size);
    block->deallocator = ae_free;
@@ -1627,15 +1608,18 @@ double ae_maxreal(double m1, double m2) { return m1 > m2 ? m1 : m2; }
 double ae_minreal(double m1, double m2) { return m1 > m2 ? m2 : m1; }
 
 double ae_randomreal() {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)RAND_MAX + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
 }
-
+double ae_randommid() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return 2.0*(rand() + rand() / mx) / mx - 1.0;
+}
 ae_int_t ae_randominteger(ae_int_t maxv) { return rand() % maxv; }
+bool ae_randombool(double p) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p*mx;
+}
 
 // Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
@@ -3489,39 +3473,17 @@ void ae_serializer_stop(ae_serializer *serializer) {
 }
 
 // Complex math functions
-ae_complex ae_complex_from_i(ae_int_t v) {
-   ae_complex r;
-   r.x = (double)v;
-   r.y = 0.0;
-   return r;
-}
-
-ae_complex ae_complex_from_d(double v) {
-   ae_complex r;
-   r.x = v;
-   r.y = 0.0;
-   return r;
-}
-
 ae_complex ae_c_neg(ae_complex lhs) {
-   ae_complex result;
-   result.x = -lhs.x;
-   result.y = -lhs.y;
-   return result;
+   return ae_complex_from_d(-lhs.x, -lhs.y);
 }
 
 ae_complex ae_c_conj(ae_complex lhs) {
-   ae_complex result;
-   result.x = +lhs.x;
-   result.y = -lhs.y;
-   return result;
+   return ae_complex_from_d(+lhs.x, -lhs.y);
 }
 
 ae_complex ae_c_sqr(ae_complex lhs) {
-   ae_complex result;
-   result.x = lhs.x * lhs.x - lhs.y * lhs.y;
-   result.y = 2 * lhs.x * lhs.y;
-   return result;
+   double x = lhs.x, y = lhs.y;
+   return ae_complex_from_d(x * x - y * y, 2.0 * x * y);
 }
 
 double ae_c_abs(ae_complex z) {
@@ -3558,42 +3520,31 @@ bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
 }
 
 ae_complex ae_c_add(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
-   result.x = lhs.x + rhs.x;
-   result.y = lhs.y + rhs.y;
-   return result;
+   return ae_complex_from_d(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
 ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
-   result.x = lhs.x * rhs.x - lhs.y * rhs.y;
-   result.y = lhs.x * rhs.y + lhs.y * rhs.x;
-   return result;
+   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
+   return ae_complex_from_d(x1 * x2 - y1 * y2, x1 * y2 + y1 * x2);
 }
 
 ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
-   result.x = lhs.x - rhs.x;
-   result.y = lhs.y - rhs.y;
-   return result;
+   return ae_complex_from_d(lhs.x - rhs.x, lhs.y - rhs.y);
 }
 
 ae_complex ae_c_div(ae_complex lhs, ae_complex rhs) {
-   ae_complex result;
+   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
    double e;
    double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result.x = (lhs.x + lhs.y * e) / f;
-      result.y = (lhs.y - lhs.x * e) / f;
+   if (fabs(y2) < fabs(x2)) {
+      e = y2 / x2;
+      f = x2 + y2 * e;
+      return ae_complex_from_d((x1 + y1 * e) / f, (y1 - x1 * e) / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result.x = (lhs.y + lhs.x * e) / f;
-      result.y = (-lhs.x + lhs.y * e) / f;
+      e = x2 / y2;
+      f = y2 + x2 * e;
+      return ae_complex_from_d((x1 * e + y1) / f, (y1 * e - x1) / f);
    }
-   return result;
 }
 
 bool ae_c_eq_d(ae_complex lhs, double rhs) {
@@ -3613,65 +3564,46 @@ bool ae_c_neq_d(ae_complex lhs, double rhs) {
 }
 
 ae_complex ae_c_add_d(ae_complex lhs, double rhs) {
-   ae_complex result;
-   result.x = lhs.x + rhs;
-   result.y = lhs.y;
-   return result;
+   return ae_complex_from_d(lhs.x + rhs, lhs.y);
 }
 
 ae_complex ae_c_mul_d(ae_complex lhs, double rhs) {
-   ae_complex result;
-   result.x = lhs.x * rhs;
-   result.y = lhs.y * rhs;
-   return result;
+   return ae_complex_from_d(lhs.x * rhs, lhs.y * rhs);
 }
 
 ae_complex ae_c_sub_d(ae_complex lhs, double rhs) {
-   ae_complex result;
-   result.x = lhs.x - rhs;
-   result.y = lhs.y;
-   return result;
+   return ae_complex_from_d(lhs.x - rhs, lhs.y);
 }
 
 ae_complex ae_c_d_sub(double lhs, ae_complex rhs) {
-   ae_complex result;
-   result.x = lhs - rhs.x;
-   result.y = -rhs.y;
-   return result;
+   return ae_complex_from_d(lhs - rhs.x, -rhs.y);
 }
 
 ae_complex ae_c_div_d(ae_complex lhs, double rhs) {
-   ae_complex result;
-   result.x = lhs.x / rhs;
-   result.y = lhs.y / rhs;
-   return result;
+   return ae_complex_from_d(lhs.x / rhs, lhs.y / rhs);
 }
 
 ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
-   ae_complex result;
+   double x2 = rhs.x, y2 = rhs.y;
    double e;
    double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result.x = lhs / f;
-      result.y = -lhs * e / f;
+   if (fabs(y2) < fabs(x2)) {
+      e = y2 / x2;
+      f = x2 + y2 * e;
+      return ae_complex_from_d(lhs / f, -lhs * e / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result.x = lhs * e / f;
-      result.y = -lhs / f;
+      e = x2 / y2;
+      f = y2 + x2 * e;
+      return ae_complex_from_d(lhs * e / f, -lhs / f);
    }
-   return result;
 }
 
 // Complex BLAS operations
 ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
    double rx = 0.0, ry = 0.0;
    ae_int_t i;
-   bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
-   bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
-   ae_complex result;
+   bool bconj0 = !(conj0[0] == 'N' || conj0[0] == 'n');
+   bool bconj1 = !(conj1[0] == 'N' || conj1[0] == 'n');
    if (bconj0 && bconj1) {
       double v0x, v0y, v1x, v1y;
       for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
@@ -3716,13 +3648,11 @@ ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *
          ry += v0x * v1y + v0y * v1x;
       }
    }
-   result.x = rx;
-   result.y = ry;
-   return result;
+   return ae_complex_from_d(rx, ry);
 }
 
 void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3750,7 +3680,7 @@ void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3782,7 +3712,7 @@ void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc
 }
 
 void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3814,7 +3744,7 @@ void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
 }
 
 void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3850,7 +3780,7 @@ void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
 }
 
 void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3882,7 +3812,7 @@ void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae
 }
 
 void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3914,7 +3844,7 @@ void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3948,7 +3878,7 @@ void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -3984,9 +3914,7 @@ void ae_v_csubd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_csubc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   alpha.x = -alpha.x;
-   alpha.y = -alpha.y;
-   ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, alpha);
+   ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, ae_complex_from_d(-alpha.x, -alpha.y));
 }
 
 void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
@@ -5300,7 +5228,7 @@ bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, 
          _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
          arow++;
       }
-      if (beta.x == 0 && beta.y == 0)
+      if (beta.x == 0.0 && beta.y == 0.0)
          _ialglib_vzero_complex(n, crow, 1);
       cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
       crow += _c_stride;
@@ -5347,11 +5275,9 @@ bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t 
          ae_complex tmp_c;
          ae_complex beta;
          ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = ae_complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
          cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -5361,11 +5287,9 @@ bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t 
          ae_complex tmp_c;
          ae_complex beta;
          ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = ae_complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
          cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -5468,11 +5392,9 @@ bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
          ae_complex tmp_c;
          ae_complex beta;
          ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = ae_complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
          cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -5482,11 +5404,9 @@ bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
          ae_complex tmp_c;
          ae_complex beta;
          ae_complex alpha;
-         tmp_c.x = pdiag[0];
-         tmp_c.y = pdiag[1];
+         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
          beta = ae_c_d_div(1.0, tmp_c);
-         alpha.x = -beta.x;
-         alpha.y = -beta.y;
+         alpha = ae_complex_from_d(-beta.x, -beta.y);
          _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
          cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
@@ -5570,10 +5490,8 @@ bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, 
 // if beta == 0, then C is filled by zeros (and not referenced)
 //
 // alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   c_alpha.x = alpha;
-   c_alpha.y = 0;
-   c_beta.x = beta;
-   c_beta.y = 0;
+   c_alpha = ae_complex_from_d(alpha);
+   c_beta = ae_complex_from_d(beta);
    if (alpha == 0)
       k = 0;
    if (k > 0) {
@@ -6026,12 +5944,12 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
       if (beta == 0) {
          r[0] = alpha * v00;
          r[1] = alpha * v01;
-         r[stride + 0] = alpha * v10;
+         r[stride] = alpha * v10;
          r[stride + 1] = alpha * v11;
       } else {
          r[0] = beta * r[0] + alpha * v00;
          r[1] = beta * r[1] + alpha * v01;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+         r[stride] = beta * r[stride] + alpha * v10;
          r[stride + 1] = beta * r[stride + 1] + alpha * v11;
       }
       return;
@@ -6049,10 +5967,10 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
    if (store_mode == 2) {
       if (beta == 0) {
          r[0] = alpha * v00;
-         r[stride + 0] = alpha * v10;
+         r[stride] = alpha * v10;
       } else {
          r[0] = beta * r[0] + alpha * v00;
-         r[stride + 0] = beta * r[stride + 0] + alpha * v10;
+         r[stride] = beta * r[stride] + alpha * v10;
       }
       return;
    }
@@ -6165,10 +6083,10 @@ void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t
       _mm_storeu_pd(buf + 2, r1);
       if (beta == 0) {
          r[0] = buf[0];
-         r[stride + 0] = buf[2];
+         r[stride] = buf[2];
       } else {
          r[0] = beta * r[0] + buf[0];
-         r[stride + 0] = beta * r[stride + 0] + buf[2];
+         r[stride] = beta * r[stride] + buf[2];
       }
       return;
    }
@@ -6352,10 +6270,6 @@ void clear_error_flag() { _alglib_last_error = NULL; }
 const xparams xdefault = 0x0, serial = _ALGLIB_FLG_THREADING_SERIAL, parallel = _ALGLIB_FLG_THREADING_PARALLEL;
 
 // Complex number with double precision.
-complex::complex():x(0.0), y(0.0) { }
-complex::complex(const double &_x):x(_x), y(0.0) { }
-complex::complex(const double &_x, const double &_y):x(_x), y(_y) { }
-complex::complex(const complex &z):x(z.x), y(z.y) { }
 complex &complex::operator=(const double &v) { x = v, y = 0.0; return *this; }
 complex &complex::operator+=(const double &v) { x += v; return *this; }
 complex &complex::operator-=(const double &v) { x -= v; return *this; }
@@ -6367,26 +6281,22 @@ complex &complex::operator-=(const complex &z) { x -= z.x, y -= z.y; return *thi
 complex &complex::operator*=(const complex &z) { double t = x*z.x - y*z.y; y = x*z.y + y*z.x, x = t; return *this; }
 
 complex &complex::operator/=(const complex &z) {
-   complex result;
+   double x2 = z.x, y2 = z.y;
    double e;
    double f;
-   if (fabs(z.y) < fabs(z.x)) {
-      e = z.y / z.x;
-      f = z.x + z.y * e;
-      result.x = (x + y * e) / f;
-      result.y = (y - x * e) / f;
+   if (fabs(y2) < fabs(x2)) {
+      e = y2 / x2;
+      f = x2 + y2 * e;
+      return *this = complex((x + y * e) / f, (y - x * e) / f);
    } else {
-      e = z.x / z.y;
-      f = z.y + z.x * e;
-      result.x = (y + x * e) / f;
-      result.y = (-x + y * e) / f;
+      e = x2 / y2;
+      f = y2 + x2 * e;
+      return *this = complex((x * e + y) / f, (y * e - x) / f);
    }
-   *this = result;
-   return *this;
 }
 
-alglib_impl::ae_complex *complex::c_ptr() { return (alglib_impl::ae_complex *)this; }
-const alglib_impl::ae_complex *complex::c_ptr() const { return (const alglib_impl::ae_complex *)this; }
+// alglib_impl-alglib gateway
+static inline alglib_impl::ae_complex ae_complex_from_c(complex z) { return alglib_impl::ae_complex_from_d(z.x, z.y); }
 
 #if !defined AE_NO_EXCEPTIONS
 std::string complex::tostring(int _dps) const {
@@ -6445,39 +6355,33 @@ const complex operator*(const complex &lhs, const double &rhs) { return complex(
 const complex operator*(const double &lhs, const complex &rhs) { return complex(lhs*rhs.x, lhs*rhs.y); }
 
 const complex operator/(const complex &lhs, const complex &rhs) {
-   complex result;
+   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
    double e;
    double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result.x = (lhs.x + lhs.y * e) / f;
-      result.y = (lhs.y - lhs.x * e) / f;
+   if (fabs(y2) < fabs(x2)) {
+      e = y2 / x2;
+      f = x2 + y2 * e;
+      return complex((x1 + y1 * e) / f, (y1 - x1 * e) / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result.x = (lhs.y + lhs.x * e) / f;
-      result.y = (-lhs.x + lhs.y * e) / f;
+      e = x2 / y2;
+      f = y2 + x2 * e;
+      return complex((x1 * e + y1) / f, (y1 * e - x1) / f);
    }
-   return result;
 }
 
 const complex operator/(const double &lhs, const complex &rhs) {
-   complex result;
+   double x2 = rhs.x, y2 = rhs.y;
    double e;
    double f;
-   if (fabs(rhs.y) < fabs(rhs.x)) {
-      e = rhs.y / rhs.x;
-      f = rhs.x + rhs.y * e;
-      result.x = lhs / f;
-      result.y = -lhs * e / f;
+   if (fabs(y2) < fabs(x2)) {
+      e = y2 / x2;
+      f = x2 + y2 * e;
+      return complex(lhs / f, -lhs * e / f);
    } else {
-      e = rhs.x / rhs.y;
-      f = rhs.y + rhs.x * e;
-      result.x = lhs * e / f;
-      result.y = -lhs / f;
+      e = x2 / y2;
+      f = y2 + x2 * e;
+      return complex(lhs * e / f, -lhs / f);
    }
-   return result;
 }
 
 const complex operator/(const complex &lhs, const double &rhs) { return complex(lhs.x / rhs, lhs.y / rhs); }
@@ -6580,8 +6484,8 @@ double vdotproduct(const double *v1, const double *v2, ae_int_t N) {
 complex vdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
    double rx = 0.0, ry = 0.0;
    ae_int_t i;
-   bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
-   bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
+   bool bconj0 = !(conj0[0] == 'N' || conj0[0] == 'n');
+   bool bconj1 = !(conj1[0] == 'N' || conj1[0] == 'n');
    if (bconj0 && bconj1) {
       double v0x, v0y, v1x, v1y;
       for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
@@ -6660,7 +6564,7 @@ void vmove(double *vdst, const double *vsrc, ae_int_t N) {
 }
 
 void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -6722,7 +6626,7 @@ void vmoveneg(double *vdst, const double *vsrc, ae_int_t N) {
 }
 
 void vmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -6788,7 +6692,7 @@ void vmove(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
 }
 
 void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -6828,7 +6732,7 @@ void vmove(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
 }
 
 void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -6898,7 +6802,7 @@ void vadd(double *vdst, const double *vsrc, ae_int_t N) {
 }
 
 void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -6964,7 +6868,7 @@ void vadd(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
 }
 
 void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -7004,7 +6908,7 @@ void vadd(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
 }
 
 void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -7072,7 +6976,7 @@ void vsub(double *vdst, const double *vsrc, ae_int_t N) {
 }
 
 void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    //
@@ -7303,9 +7207,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
          if (datatype == alglib_impl::DT_BOOL) This->ptr.p_bool[i] = parse_bool_delim(svec[i], ",]");
          if (datatype == alglib_impl::DT_INT) This->ptr.p_int[i] = parse_int_delim(svec[i], ",]");
          if (datatype == alglib_impl::DT_REAL) This->ptr.p_double[i] = parse_real_delim(svec[i], ",]");
-         if (datatype == alglib_impl::DT_COMPLEX) {
-            complex t = parse_complex_delim(svec[i], ",]"); This->ptr.p_complex[i].x = t.x, This->ptr.p_complex[i].y = t.y;
-         }
+         if (datatype == alglib_impl::DT_COMPLEX) This->ptr.p_complex[i] = ae_complex_from_c(parse_complex_delim(svec[i], ",]"));
       }
       alglib_impl::ae_free(p);
    } catch( ...) {
@@ -7434,7 +7336,7 @@ void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
    setlength(iLen);
    if (This == NULL || This->cnt != iLen) return;
 // copy
-   for (i = 0; i < iLen; i++) This->ptr.p_complex[i].x = pContent[i].x, This->ptr.p_complex[i].y = pContent[i].y;
+   for (i = 0; i < iLen; i++) This->ptr.p_complex[i] = ae_complex_from_c(pContent[i]);
 }
 
 complex *complex_1d_array::getcontent() { return (complex *)This->ptr.p_complex; }
@@ -7548,10 +7450,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
          if (datatype == alglib_impl::DT_BOOL) This->ptr.pp_bool[i][j] = parse_bool_delim(smat[i][j], ",]");
          if (datatype == alglib_impl::DT_INT) This->ptr.pp_int[i][j] = parse_int_delim(smat[i][j], ",]");
          if (datatype == alglib_impl::DT_REAL) This->ptr.pp_double[i][j] = parse_real_delim(smat[i][j], ",]");
-         if (datatype == alglib_impl::DT_COMPLEX) {
-            complex t = parse_complex_delim(smat[i][j], ",]");
-            This->ptr.pp_complex[i][j].x = t.x, This->ptr.pp_complex[i][j].y = t.y;
-         }
+         if (datatype == alglib_impl::DT_COMPLEX) This->ptr.pp_complex[i][j] = ae_complex_from_c(parse_complex_delim(smat[i][j], ",]"));
       }
       alglib_impl::ae_free(p);
    } catch( ...) {
@@ -7711,7 +7610,7 @@ void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex 
    if (This == NULL || This->rows != irows || This->cols != icols) return;
 // copy
    for (i = 0; i < irows; i++) for (j = 0; j < icols; j++) {
-      This->ptr.pp_complex[i][j].x = pContent[i * icols + j].x, This->ptr.pp_complex[i][j].y = pContent[i * icols + j].y;
+      This->ptr.pp_complex[i][j] = ae_complex_from_c(pContent[i * icols + j]);
    }
 }
 
@@ -8084,15 +7983,19 @@ std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
 int sign(double x) { return x > 0? +1: x < 0? -1: 0; }
 
 double randomreal() {
-   int i1 = rand();
-   int i2 = rand();
-   double mx = (double)RAND_MAX + 1.0;
-   volatile double tmp0 = i2 / mx;
-   volatile double tmp1 = i1 + tmp0;
-   return tmp1 / mx;
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
+}
+double randommid() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return 2.0*(rand() + rand() / mx) / mx - 1.0;
+}
+ae_int_t randominteger(ae_int_t maxv) { return ((ae_int_t) rand()) % maxv; }
+bool randombool(double p) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p*mx;
 }
 
-ae_int_t randominteger(ae_int_t maxv) { return ((ae_int_t) rand()) % maxv; }
 int RoundZ(double x) { return int(round(x)); }
 int TruncZ(double x) { return int(trunc(x)); }
 int FloorZ(double x) { return int(floor(x)); }
@@ -8162,7 +8065,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
    }
    if (filesize == 0)
       return;
-   p_buf[filesize + 0] = '\n';
+   p_buf[filesize] = '\n';
    p_buf[filesize + 1] = '\0';
    filesize += 2;
 //

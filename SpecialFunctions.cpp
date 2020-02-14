@@ -16,7 +16,29 @@
 
 // === GAMMAFUNC Package ===
 namespace alglib_impl {
-static double gammafunc_gammastirf(double x);
+static double gammafunc_gammastirf(double x) {
+   double y;
+   double w;
+   double v;
+   double stir;
+   double result;
+   w = 1 / x;
+   stir = 7.87311395793093628397E-4;
+   stir = -2.29549961613378126380E-4 + w * stir;
+   stir = -2.68132617805781232825E-3 + w * stir;
+   stir = 3.47222221605458667310E-3 + w * stir;
+   stir = 8.33333333333482257126E-2 + w * stir;
+   w = 1 + w * stir;
+   y = exp(x);
+   if (x > 143.01608) {
+      v = pow(x, 0.5 * x - 0.25);
+      y = v * (v / y);
+   } else {
+      y = pow(x, x - 0.5) / y;
+   }
+   result = 2.50662827463100050242 * y * w;
+   return result;
+}
 
 // Gamma function
 //
@@ -250,30 +272,6 @@ double lngamma(double x, double *sgngam) {
    return _ialglib_i_lngamma(x, sgngam);
 #endif
 }
-
-static double gammafunc_gammastirf(double x) {
-   double y;
-   double w;
-   double v;
-   double stir;
-   double result;
-   w = 1 / x;
-   stir = 7.87311395793093628397E-4;
-   stir = -2.29549961613378126380E-4 + w * stir;
-   stir = -2.68132617805781232825E-3 + w * stir;
-   stir = 3.47222221605458667310E-3 + w * stir;
-   stir = 8.33333333333482257126E-2 + w * stir;
-   w = 1 + w * stir;
-   y = exp(x);
-   if (x > 143.01608) {
-      v = pow(x, 0.5 * x - 0.25);
-      y = v * (v / y);
-   } else {
-      y = pow(x, x - 0.5) / y;
-   }
-   result = 2.50662827463100050242 * y * w;
-   return result;
-}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -345,9 +343,6 @@ double lngamma(const double x, double &sgngam) {
 // === NORMALDISTR Package ===
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
-static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx);
-static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx);
-
 // Error function
 //
 // The integral is
@@ -688,7 +683,6 @@ double invnormalcdf(double y0) {
 // with -1<rho<+1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalpdf(double x, double y, double rho) {
    double onerho2;
@@ -699,6 +693,44 @@ double bivariatenormalpdf(double x, double y, double rho) {
    ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range");
    onerho2 = (1 - rho) * (1 + rho);
    result = exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2)) / (2 * ae_pi * sqrt(onerho2));
+   return result;
+}
+
+// Internal function which computes integrand of  formula  (3)  by  Alan
+// Genz times Gaussian weights (passed by user).
+// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
+static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx) {
+   double r;
+   double t2;
+   double dd;
+   double sinr;
+   double cosr;
+   double result;
+   r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
+   t2 = tan(0.5 * r);
+   dd = 1 / (1 + t2 * t2);
+   sinr = 2 * t2 * dd;
+   cosr = (1 - t2 * t2) * dd;
+   result = gw * exp(-(x * x + y * y - 2 * x * y * sinr) / (2 * cosr * cosr));
+   return result;
+}
+
+// Internal function which computes integrand of  formula  (6)  by  Alan
+// Genz times Gaussian weights (passed by user).
+// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
+static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx) {
+   double r;
+   double exphsk22x2;
+   double exphsk2;
+   double sqrt1x2;
+   double exphsk1sqrt1x2;
+   double result;
+   r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
+   exphsk22x2 = exp(-(x - s * y) * (x - s * y) / (2 * r * r));
+   exphsk2 = exp(-x * s * y / 2);
+   sqrt1x2 = sqrt((1 - r) * (1 + r));
+   exphsk1sqrt1x2 = exp(-x * s * y / (1 + sqrt1x2));
+   result = gw * exphsk22x2 * (exphsk1sqrt1x2 / sqrt1x2 - exphsk2 * (1 + (4 - x * y * s) * r * r / 8));
    return result;
 }
 
@@ -732,7 +764,6 @@ double bivariatenormalpdf(double x, double y, double rho) {
 // absolute error roughly equal to 1e-14.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalcdf(double x, double y, double rho) {
    double rangea;
@@ -820,46 +851,6 @@ double bivariatenormalcdf(double x, double y, double rho) {
    }
    result = ae_maxreal(result, 0.0);
    result = ae_minreal(result, 1.0);
-   return result;
-}
-
-// Internal function which computes integrand of  formula  (3)  by  Alan
-// Genz times Gaussian weights (passed by user).
-//
-// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-static double normaldistr_bvnintegrate3(double rangea, double rangeb, double x, double y, double gw, double gx) {
-   double r;
-   double t2;
-   double dd;
-   double sinr;
-   double cosr;
-   double result;
-   r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
-   t2 = tan(0.5 * r);
-   dd = 1 / (1 + t2 * t2);
-   sinr = 2 * t2 * dd;
-   cosr = (1 - t2 * t2) * dd;
-   result = gw * exp(-(x * x + y * y - 2 * x * y * sinr) / (2 * cosr * cosr));
-   return result;
-}
-
-// Internal function which computes integrand of  formula  (6)  by  Alan
-// Genz times Gaussian weights (passed by user).
-//
-// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
-static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, double y, double s, double gw, double gx) {
-   double r;
-   double exphsk22x2;
-   double exphsk2;
-   double sqrt1x2;
-   double exphsk1sqrt1x2;
-   double result;
-   r = (rangeb - rangea) * 0.5 * gx + (rangeb + rangea) * 0.5;
-   exphsk22x2 = exp(-(x - s * y) * (x - s * y) / (2 * r * r));
-   exphsk2 = exp(-x * s * y / 2);
-   sqrt1x2 = sqrt((1 - r) * (1 + r));
-   exphsk1sqrt1x2 = exp(-x * s * y / (1 + sqrt1x2));
-   result = gw * exphsk22x2 * (exphsk1sqrt1x2 / sqrt1x2 - exphsk2 * (1 + (4 - x * y * s) * r * r / 8));
    return result;
 }
 } // end of namespace alglib_impl
@@ -1058,7 +1049,6 @@ double invnormalcdf(const double y0) {
 // with -1<rho<+1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalpdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state_init();
@@ -1098,7 +1088,6 @@ double bivariatenormalpdf(const double x, const double y, const double rho) {
 // absolute error roughly equal to 1e-14.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalcdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state_init();
@@ -1169,8 +1158,7 @@ double incompletegamma(double a, double x) {
       r++;
       c = c * x / r;
       ans += c;
-   }
-   while (c / ans > igammaepsilon);
+   } while (c / ans > igammaepsilon);
    result = ans * ax / a;
    return result;
 }
@@ -1275,8 +1263,7 @@ double incompletegammac(double a, double x) {
          qkm2 *= igammabignumberinv;
          qkm1 *= igammabignumberinv;
       }
-   }
-   while (t > igammaepsilon);
+   } while (t > igammaepsilon);
    result = ans * ax;
    return result;
 }
@@ -2429,8 +2416,6 @@ double dawsonintegral(const double x) {
 
 // === TRIGINTEGRALS Package ===
 namespace alglib_impl {
-static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2);
-
 // Sine and cosine integrals
 //
 // Evaluates the integrals
@@ -2621,6 +2606,12 @@ void sinecosineintegrals(double x, double *si, double *ci) {
    *ci = f * s - g * c;
 }
 
+static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2) {
+   *b2 = *b1;
+   *b1 = *b0;
+   *b0 = x * (*b1) - (*b2) + c;
+}
+
 // Hyperbolic sine and cosine integrals
 //
 // Approximates the integrals
@@ -2695,8 +2686,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
          a /= k;
          s += a / k;
          k++;
-      }
-      while (fabs(a / s) >= ae_machineepsilon);
+      } while (fabs(a / s) >= ae_machineepsilon);
       s *= x;
    } else {
       if (x < 18.0) {
@@ -2822,12 +2812,6 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
    }
    *shi = s;
    *chi = 0.57721566490153286061 + log(x) + c;
-}
-
-static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
 }
 } // end of namespace alglib_impl
 
@@ -3103,12 +3087,46 @@ double invpoissondistribution(const ae_int_t k, const double y) {
 
 // === BESSEL Package ===
 namespace alglib_impl {
-static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2);
-static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2);
-static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2);
-static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2);
-static void bessel_besselasympt0(double x, double *pzero, double *qzero);
-static void bessel_besselasympt1(double x, double *pzero, double *qzero);
+static void bessel_besselasympt0(double x, double *pzero, double *qzero) {
+   double xsq;
+   double p2;
+   double q2;
+   double p3;
+   double q3;
+   *pzero = 0;
+   *qzero = 0;
+   xsq = 64.0 / (x * x);
+   p2 = 0.0;
+   p2 = 2485.271928957404011288128951 + xsq * p2;
+   p2 = 153982.6532623911470917825993 + xsq * p2;
+   p2 = 2016135.283049983642487182349 + xsq * p2;
+   p2 = 8413041.456550439208464315611 + xsq * p2;
+   p2 = 12332384.76817638145232406055 + xsq * p2;
+   p2 = 5393485.083869438325262122897 + xsq * p2;
+   q2 = 1.0;
+   q2 = 2615.700736920839685159081813 + xsq * q2;
+   q2 = 156001.7276940030940592769933 + xsq * q2;
+   q2 = 2025066.801570134013891035236 + xsq * q2;
+   q2 = 8426449.050629797331554404810 + xsq * q2;
+   q2 = 12338310.22786324960844856182 + xsq * q2;
+   q2 = 5393485.083869438325560444960 + xsq * q2;
+   p3 = -0.0;
+   p3 = -4.887199395841261531199129300 + xsq * p3;
+   p3 = -226.2630641933704113967255053 + xsq * p3;
+   p3 = -2365.956170779108192723612816 + xsq * p3;
+   p3 = -8239.066313485606568803548860 + xsq * p3;
+   p3 = -10381.41698748464093880530341 + xsq * p3;
+   p3 = -3984.617357595222463506790588 + xsq * p3;
+   q3 = 1.0;
+   q3 = 408.7714673983499223402830260 + xsq * q3;
+   q3 = 15704.89191515395519392882766 + xsq * q3;
+   q3 = 156021.3206679291652539287109 + xsq * q3;
+   q3 = 533291.3634216897168722255057 + xsq * q3;
+   q3 = 666745.4239319826986004038103 + xsq * q3;
+   q3 = 255015.5108860942382983170882 + xsq * q3;
+   *pzero = p2 / q2;
+   *qzero = 8 * p3 / q3 / x;
+}
 
 // Bessel function of order zero
 //
@@ -3176,6 +3194,45 @@ double besselj0(double x) {
    q1 = 493378725179413356211.3278438 + xsq * q1;
    result = p1 / q1;
    return result;
+}
+
+static void bessel_besselasympt1(double x, double *pzero, double *qzero) {
+   double xsq;
+   double p2;
+   double q2;
+   double p3;
+   double q3;
+   *pzero = 0;
+   *qzero = 0;
+   xsq = 64.0 / (x * x);
+   p2 = -1611.616644324610116477412898;
+   p2 = -109824.0554345934672737413139 + xsq * p2;
+   p2 = -1523529.351181137383255105722 + xsq * p2;
+   p2 = -6603373.248364939109255245434 + xsq * p2;
+   p2 = -9942246.505077641195658377899 + xsq * p2;
+   p2 = -4435757.816794127857114720794 + xsq * p2;
+   q2 = 1.0;
+   q2 = -1455.009440190496182453565068 + xsq * q2;
+   q2 = -107263.8599110382011903063867 + xsq * q2;
+   q2 = -1511809.506634160881644546358 + xsq * q2;
+   q2 = -6585339.479723087072826915069 + xsq * q2;
+   q2 = -9934124.389934585658967556309 + xsq * q2;
+   q2 = -4435757.816794127856828016962 + xsq * q2;
+   p3 = 35.26513384663603218592175580;
+   p3 = 1706.375429020768002061283546 + xsq * p3;
+   p3 = 18494.26287322386679652009819 + xsq * p3;
+   p3 = 66178.83658127083517939992166 + xsq * p3;
+   p3 = 85145.16067533570196555001171 + xsq * p3;
+   p3 = 33220.91340985722351859704442 + xsq * p3;
+   q3 = 1.0;
+   q3 = 863.8367769604990967475517183 + xsq * q3;
+   q3 = 37890.22974577220264142952256 + xsq * q3;
+   q3 = 400294.4358226697511708610813 + xsq * q3;
+   q3 = 1419460.669603720892855755253 + xsq * q3;
+   q3 = 1819458.042243997298924553839 + xsq * q3;
+   q3 = 708712.8194102874357377502472 + xsq * q3;
+   *pzero = p2 / q2;
+   *qzero = 8 * p3 / q3 / x;
 }
 
 // Bessel function of order one
@@ -3320,8 +3377,7 @@ double besseljn(ae_int_t n, double x) {
       pk -= 2.0;
       ans = pk - xk / ans;
       k--;
-   }
-   while (k != 0);
+   } while (k != 0);
    ans = x / ans;
    pk = 1.0;
    pkm1 = 1.0 / ans;
@@ -3333,8 +3389,7 @@ double besseljn(ae_int_t n, double x) {
       pkm1 = pkm2;
       r -= 2.0;
       k--;
-   }
-   while (k != 0);
+   } while (k != 0);
    if (fabs(pk) > fabs(pkm1)) {
       ans = besselj1(x) / pk;
    } else {
@@ -3517,6 +3572,26 @@ double besselyn(ae_int_t n, double x) {
    return result;
 }
 
+// Internal subroutine
+//
+// Cephes Math Library Release 2.8:  June, 2000
+// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2) {
+   *b0 = c;
+   *b1 = 0.0;
+   *b2 = 0.0;
+}
+
+// Internal subroutine
+//
+// Cephes Math Library Release 2.8:  June, 2000
+// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2) {
+   *b2 = *b1;
+   *b1 = *b0;
+   *b0 = x * (*b1) - (*b2) + c;
+}
+
 // Modified Bessel function of order zero
 //
 // Returns modified Bessel function of order zero of the
@@ -3612,6 +3687,26 @@ double besseli0(double x) {
    v = 0.5 * (b0 - b2);
    result = exp(x) * v / sqrt(x);
    return result;
+}
+
+// Internal subroutine
+//
+// Cephes Math Library Release 2.8:  June, 2000
+// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2) {
+   *b0 = c;
+   *b1 = 0.0;
+   *b2 = 0.0;
+}
+
+// Internal subroutine
+//
+// Cephes Math Library Release 2.8:  June, 2000
+// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2) {
+   *b2 = *b1;
+   *b1 = *b0;
+   *b0 = x * (*b1) - (*b2) + c;
 }
 
 // Modified Bessel function of order one
@@ -3970,8 +4065,7 @@ double besselkn(ae_int_t nn, double x) {
          pn += 1.0 / (k + n);
          s += (pk + pn - tlg) * t;
          k++;
-      }
-      while (fabs(t / s) > ae_machineepsilon);
+      } while (fabs(t / s) > ae_machineepsilon);
       s = 0.5 * s / zmn;
       if (n % 2 != 0) {
          s = -s;
@@ -4005,130 +4099,9 @@ double besselkn(ae_int_t nn, double x) {
       fn++;
       pk += 2.0;
       i++;
-   }
-   while (fabs(t / s) > ae_machineepsilon);
+   } while (fabs(t / s) > ae_machineepsilon);
    result = exp(-x) * sqrt(ae_pi / (2.0 * x)) * s;
    return result;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2) {
-   *b0 = c;
-   *b1 = 0.0;
-   *b2 = 0.0;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2) {
-   *b0 = c;
-   *b1 = 0.0;
-   *b2 = 0.0;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
-}
-
-static void bessel_besselasympt0(double x, double *pzero, double *qzero) {
-   double xsq;
-   double p2;
-   double q2;
-   double p3;
-   double q3;
-   *pzero = 0;
-   *qzero = 0;
-   xsq = 64.0 / (x * x);
-   p2 = 0.0;
-   p2 = 2485.271928957404011288128951 + xsq * p2;
-   p2 = 153982.6532623911470917825993 + xsq * p2;
-   p2 = 2016135.283049983642487182349 + xsq * p2;
-   p2 = 8413041.456550439208464315611 + xsq * p2;
-   p2 = 12332384.76817638145232406055 + xsq * p2;
-   p2 = 5393485.083869438325262122897 + xsq * p2;
-   q2 = 1.0;
-   q2 = 2615.700736920839685159081813 + xsq * q2;
-   q2 = 156001.7276940030940592769933 + xsq * q2;
-   q2 = 2025066.801570134013891035236 + xsq * q2;
-   q2 = 8426449.050629797331554404810 + xsq * q2;
-   q2 = 12338310.22786324960844856182 + xsq * q2;
-   q2 = 5393485.083869438325560444960 + xsq * q2;
-   p3 = -0.0;
-   p3 = -4.887199395841261531199129300 + xsq * p3;
-   p3 = -226.2630641933704113967255053 + xsq * p3;
-   p3 = -2365.956170779108192723612816 + xsq * p3;
-   p3 = -8239.066313485606568803548860 + xsq * p3;
-   p3 = -10381.41698748464093880530341 + xsq * p3;
-   p3 = -3984.617357595222463506790588 + xsq * p3;
-   q3 = 1.0;
-   q3 = 408.7714673983499223402830260 + xsq * q3;
-   q3 = 15704.89191515395519392882766 + xsq * q3;
-   q3 = 156021.3206679291652539287109 + xsq * q3;
-   q3 = 533291.3634216897168722255057 + xsq * q3;
-   q3 = 666745.4239319826986004038103 + xsq * q3;
-   q3 = 255015.5108860942382983170882 + xsq * q3;
-   *pzero = p2 / q2;
-   *qzero = 8 * p3 / q3 / x;
-}
-
-static void bessel_besselasympt1(double x, double *pzero, double *qzero) {
-   double xsq;
-   double p2;
-   double q2;
-   double p3;
-   double q3;
-   *pzero = 0;
-   *qzero = 0;
-   xsq = 64.0 / (x * x);
-   p2 = -1611.616644324610116477412898;
-   p2 = -109824.0554345934672737413139 + xsq * p2;
-   p2 = -1523529.351181137383255105722 + xsq * p2;
-   p2 = -6603373.248364939109255245434 + xsq * p2;
-   p2 = -9942246.505077641195658377899 + xsq * p2;
-   p2 = -4435757.816794127857114720794 + xsq * p2;
-   q2 = 1.0;
-   q2 = -1455.009440190496182453565068 + xsq * q2;
-   q2 = -107263.8599110382011903063867 + xsq * q2;
-   q2 = -1511809.506634160881644546358 + xsq * q2;
-   q2 = -6585339.479723087072826915069 + xsq * q2;
-   q2 = -9934124.389934585658967556309 + xsq * q2;
-   q2 = -4435757.816794127856828016962 + xsq * q2;
-   p3 = 35.26513384663603218592175580;
-   p3 = 1706.375429020768002061283546 + xsq * p3;
-   p3 = 18494.26287322386679652009819 + xsq * p3;
-   p3 = 66178.83658127083517939992166 + xsq * p3;
-   p3 = 85145.16067533570196555001171 + xsq * p3;
-   p3 = 33220.91340985722351859704442 + xsq * p3;
-   q3 = 1.0;
-   q3 = 863.8367769604990967475517183 + xsq * q3;
-   q3 = 37890.22974577220264142952256 + xsq * q3;
-   q3 = 400294.4358226697511708610813 + xsq * q3;
-   q3 = 1419460.669603720892855755253 + xsq * q3;
-   q3 = 1819458.042243997298924553839 + xsq * q3;
-   q3 = 708712.8194102874357377502472 + xsq * q3;
-   *pzero = p2 / q2;
-   *qzero = 8 * p3 / q3 / x;
 }
 } // end of namespace alglib_impl
 
@@ -4455,9 +4428,247 @@ double besselkn(const ae_int_t nn, const double x) {
 // === IBETAF Package ===
 // Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
-static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv);
-static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv);
-static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam);
+// Continued fraction expansion #1 for incomplete beta integral
+//
+// Cephes Math Library, Release 2.8:  June, 2000
+// Copyright 1984, 1995, 2000 by Stephen L. Moshier
+static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv) {
+   double xk;
+   double pk;
+   double pkm1;
+   double pkm2;
+   double qk;
+   double qkm1;
+   double qkm2;
+   double k1;
+   double k2;
+   double k3;
+   double k4;
+   double k5;
+   double k6;
+   double k7;
+   double k8;
+   double r;
+   double t;
+   double ans;
+   double thresh;
+   ae_int_t n;
+   double result;
+   k1 = a;
+   k2 = a + b;
+   k3 = a;
+   k4 = a + 1.0;
+   k5 = 1.0;
+   k6 = b - 1.0;
+   k7 = k4;
+   k8 = a + 2.0;
+   pkm2 = 0.0;
+   qkm2 = 1.0;
+   pkm1 = 1.0;
+   qkm1 = 1.0;
+   ans = 1.0;
+   r = 1.0;
+   n = 0;
+   thresh = 3.0 * ae_machineepsilon;
+   do {
+      xk = -x * k1 * k2 / (k3 * k4);
+      pk = pkm1 + pkm2 * xk;
+      qk = qkm1 + qkm2 * xk;
+      pkm2 = pkm1;
+      pkm1 = pk;
+      qkm2 = qkm1;
+      qkm1 = qk;
+      xk = x * k5 * k6 / (k7 * k8);
+      pk = pkm1 + pkm2 * xk;
+      qk = qkm1 + qkm2 * xk;
+      pkm2 = pkm1;
+      pkm1 = pk;
+      qkm2 = qkm1;
+      qkm1 = qk;
+      if (qk != 0.0) {
+         r = pk / qk;
+      }
+      if (r != 0.0) {
+         t = fabs((ans - r) / r);
+         ans = r;
+      } else {
+         t = 1.0;
+      }
+      if (t < thresh) {
+         break;
+      }
+      k1++;
+      k2++;
+      k3 += 2.0;
+      k4 += 2.0;
+      k5++;
+      k6--;
+      k7 += 2.0;
+      k8 += 2.0;
+      if (fabs(qk) + fabs(pk) > big) {
+         pkm2 *= biginv;
+         pkm1 *= biginv;
+         qkm2 *= biginv;
+         qkm1 *= biginv;
+      }
+      if (fabs(qk) < biginv || fabs(pk) < biginv) {
+         pkm2 *= big;
+         pkm1 *= big;
+         qkm2 *= big;
+         qkm1 *= big;
+      }
+      n++;
+   } while (n != 300);
+   result = ans;
+   return result;
+}
+
+// Continued fraction expansion #2
+// for incomplete beta integral
+//
+// Cephes Math Library, Release 2.8:  June, 2000
+// Copyright 1984, 1995, 2000 by Stephen L. Moshier
+static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv) {
+   double xk;
+   double pk;
+   double pkm1;
+   double pkm2;
+   double qk;
+   double qkm1;
+   double qkm2;
+   double k1;
+   double k2;
+   double k3;
+   double k4;
+   double k5;
+   double k6;
+   double k7;
+   double k8;
+   double r;
+   double t;
+   double ans;
+   double z;
+   double thresh;
+   ae_int_t n;
+   double result;
+   k1 = a;
+   k2 = b - 1.0;
+   k3 = a;
+   k4 = a + 1.0;
+   k5 = 1.0;
+   k6 = a + b;
+   k7 = a + 1.0;
+   k8 = a + 2.0;
+   pkm2 = 0.0;
+   qkm2 = 1.0;
+   pkm1 = 1.0;
+   qkm1 = 1.0;
+   z = x / (1.0 - x);
+   ans = 1.0;
+   r = 1.0;
+   n = 0;
+   thresh = 3.0 * ae_machineepsilon;
+   do {
+      xk = -z * k1 * k2 / (k3 * k4);
+      pk = pkm1 + pkm2 * xk;
+      qk = qkm1 + qkm2 * xk;
+      pkm2 = pkm1;
+      pkm1 = pk;
+      qkm2 = qkm1;
+      qkm1 = qk;
+      xk = z * k5 * k6 / (k7 * k8);
+      pk = pkm1 + pkm2 * xk;
+      qk = qkm1 + qkm2 * xk;
+      pkm2 = pkm1;
+      pkm1 = pk;
+      qkm2 = qkm1;
+      qkm1 = qk;
+      if (qk != 0.0) {
+         r = pk / qk;
+      }
+      if (r != 0.0) {
+         t = fabs((ans - r) / r);
+         ans = r;
+      } else {
+         t = 1.0;
+      }
+      if (t < thresh) {
+         break;
+      }
+      k1++;
+      k2--;
+      k3 += 2.0;
+      k4 += 2.0;
+      k5++;
+      k6++;
+      k7 += 2.0;
+      k8 += 2.0;
+      if (fabs(qk) + fabs(pk) > big) {
+         pkm2 *= biginv;
+         pkm1 *= biginv;
+         qkm2 *= biginv;
+         qkm1 *= biginv;
+      }
+      if (fabs(qk) < biginv || fabs(pk) < biginv) {
+         pkm2 *= big;
+         pkm1 *= big;
+         qkm2 *= big;
+         qkm1 *= big;
+      }
+      n++;
+   } while (n != 300);
+   result = ans;
+   return result;
+}
+
+// Power series for incomplete beta integral.
+// Use when b*x is small and x not too close to 1.
+//
+// Cephes Math Library, Release 2.8:  June, 2000
+// Copyright 1984, 1995, 2000 by Stephen L. Moshier
+static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam) {
+   double s;
+   double t;
+   double u;
+   double v;
+   double n;
+   double t1;
+   double z;
+   double ai;
+   double sg;
+   double result;
+   ai = 1.0 / a;
+   u = (1.0 - b) * x;
+   v = u / (a + 1.0);
+   t1 = v;
+   t = u;
+   n = 2.0;
+   s = 0.0;
+   z = ae_machineepsilon * ai;
+   while (fabs(v) > z) {
+      u = (n - b) * x / n;
+      t *= u;
+      v = t / (a + n);
+      s += v;
+      n++;
+   }
+   s += t1;
+   s += ai;
+   u = a * log(x);
+   if (a + b < maxgam && fabs(u) < log(ae_maxrealnumber)) {
+      t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
+      s *= t * pow(x, a);
+   } else {
+      t = lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg) + u + log(s);
+      if (t < log(ae_minrealnumber)) {
+         s = 0.0;
+      } else {
+         s = exp(t);
+      }
+   }
+   result = s;
+   return result;
+}
 
 // Incomplete beta integral
 //
@@ -4944,250 +5155,6 @@ double invincompletebeta(double a, double b, double y) {
       }
    }
    result = x;
-   return result;
-}
-
-// Continued fraction expansion #1 for incomplete beta integral
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetafe(double a, double b, double x, double big, double biginv) {
-   double xk;
-   double pk;
-   double pkm1;
-   double pkm2;
-   double qk;
-   double qkm1;
-   double qkm2;
-   double k1;
-   double k2;
-   double k3;
-   double k4;
-   double k5;
-   double k6;
-   double k7;
-   double k8;
-   double r;
-   double t;
-   double ans;
-   double thresh;
-   ae_int_t n;
-   double result;
-   k1 = a;
-   k2 = a + b;
-   k3 = a;
-   k4 = a + 1.0;
-   k5 = 1.0;
-   k6 = b - 1.0;
-   k7 = k4;
-   k8 = a + 2.0;
-   pkm2 = 0.0;
-   qkm2 = 1.0;
-   pkm1 = 1.0;
-   qkm1 = 1.0;
-   ans = 1.0;
-   r = 1.0;
-   n = 0;
-   thresh = 3.0 * ae_machineepsilon;
-   do {
-      xk = -x * k1 * k2 / (k3 * k4);
-      pk = pkm1 + pkm2 * xk;
-      qk = qkm1 + qkm2 * xk;
-      pkm2 = pkm1;
-      pkm1 = pk;
-      qkm2 = qkm1;
-      qkm1 = qk;
-      xk = x * k5 * k6 / (k7 * k8);
-      pk = pkm1 + pkm2 * xk;
-      qk = qkm1 + qkm2 * xk;
-      pkm2 = pkm1;
-      pkm1 = pk;
-      qkm2 = qkm1;
-      qkm1 = qk;
-      if (qk != 0.0) {
-         r = pk / qk;
-      }
-      if (r != 0.0) {
-         t = fabs((ans - r) / r);
-         ans = r;
-      } else {
-         t = 1.0;
-      }
-      if (t < thresh) {
-         break;
-      }
-      k1++;
-      k2++;
-      k3 += 2.0;
-      k4 += 2.0;
-      k5++;
-      k6--;
-      k7 += 2.0;
-      k8 += 2.0;
-      if (fabs(qk) + fabs(pk) > big) {
-         pkm2 *= biginv;
-         pkm1 *= biginv;
-         qkm2 *= biginv;
-         qkm1 *= biginv;
-      }
-      if (fabs(qk) < biginv || fabs(pk) < biginv) {
-         pkm2 *= big;
-         pkm1 *= big;
-         qkm2 *= big;
-         qkm1 *= big;
-      }
-      n++;
-   }
-   while (n != 300);
-   result = ans;
-   return result;
-}
-
-// Continued fraction expansion #2
-// for incomplete beta integral
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetafe2(double a, double b, double x, double big, double biginv) {
-   double xk;
-   double pk;
-   double pkm1;
-   double pkm2;
-   double qk;
-   double qkm1;
-   double qkm2;
-   double k1;
-   double k2;
-   double k3;
-   double k4;
-   double k5;
-   double k6;
-   double k7;
-   double k8;
-   double r;
-   double t;
-   double ans;
-   double z;
-   double thresh;
-   ae_int_t n;
-   double result;
-   k1 = a;
-   k2 = b - 1.0;
-   k3 = a;
-   k4 = a + 1.0;
-   k5 = 1.0;
-   k6 = a + b;
-   k7 = a + 1.0;
-   k8 = a + 2.0;
-   pkm2 = 0.0;
-   qkm2 = 1.0;
-   pkm1 = 1.0;
-   qkm1 = 1.0;
-   z = x / (1.0 - x);
-   ans = 1.0;
-   r = 1.0;
-   n = 0;
-   thresh = 3.0 * ae_machineepsilon;
-   do {
-      xk = -z * k1 * k2 / (k3 * k4);
-      pk = pkm1 + pkm2 * xk;
-      qk = qkm1 + qkm2 * xk;
-      pkm2 = pkm1;
-      pkm1 = pk;
-      qkm2 = qkm1;
-      qkm1 = qk;
-      xk = z * k5 * k6 / (k7 * k8);
-      pk = pkm1 + pkm2 * xk;
-      qk = qkm1 + qkm2 * xk;
-      pkm2 = pkm1;
-      pkm1 = pk;
-      qkm2 = qkm1;
-      qkm1 = qk;
-      if (qk != 0.0) {
-         r = pk / qk;
-      }
-      if (r != 0.0) {
-         t = fabs((ans - r) / r);
-         ans = r;
-      } else {
-         t = 1.0;
-      }
-      if (t < thresh) {
-         break;
-      }
-      k1++;
-      k2--;
-      k3 += 2.0;
-      k4 += 2.0;
-      k5++;
-      k6++;
-      k7 += 2.0;
-      k8 += 2.0;
-      if (fabs(qk) + fabs(pk) > big) {
-         pkm2 *= biginv;
-         pkm1 *= biginv;
-         qkm2 *= biginv;
-         qkm1 *= biginv;
-      }
-      if (fabs(qk) < biginv || fabs(pk) < biginv) {
-         pkm2 *= big;
-         pkm1 *= big;
-         qkm2 *= big;
-         qkm1 *= big;
-      }
-      n++;
-   }
-   while (n != 300);
-   result = ans;
-   return result;
-}
-
-// Power series for incomplete beta integral.
-// Use when b*x is small and x not too close to 1.
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1995, 2000 by Stephen L. Moshier
-static double ibetaf_incompletebetaps(double a, double b, double x, double maxgam) {
-   double s;
-   double t;
-   double u;
-   double v;
-   double n;
-   double t1;
-   double z;
-   double ai;
-   double sg;
-   double result;
-   ai = 1.0 / a;
-   u = (1.0 - b) * x;
-   v = u / (a + 1.0);
-   t1 = v;
-   t = u;
-   n = 2.0;
-   s = 0.0;
-   z = ae_machineepsilon * ai;
-   while (fabs(v) > z) {
-      u = (n - b) * x / n;
-      t *= u;
-      v = t / (a + n);
-      s += v;
-      n++;
-   }
-   s += t1;
-   s += ai;
-   u = a * log(x);
-   if (a + b < maxgam && fabs(u) < log(ae_maxrealnumber)) {
-      t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
-      s *= t * pow(x, a);
-   } else {
-      t = lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg) + u + log(s);
-      if (t < log(ae_minrealnumber)) {
-         s = 0.0;
-      } else {
-         s = exp(t);
-      }
-   }
-   result = s;
    return result;
 }
 } // end of namespace alglib_impl
@@ -5856,8 +5823,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       b = phi;
       phi = (asin(t) + phi) / 2.0;
       i--;
-   }
-   while (i != 0);
+   } while (i != 0);
    *sn = sin(phi);
    t = cos(phi);
    *cn = t;
@@ -6363,8 +6329,7 @@ double exponentialintegralen(double x, ae_int_t n) {
          } else {
             t = 1.0;
          }
-      }
-      while (t >= ae_machineepsilon);
+      } while (t >= ae_machineepsilon);
       t = 1.0;
       for (i = 1; i < n; i++) {
          t = t * z / i;
@@ -6406,8 +6371,7 @@ double exponentialintegralen(double x, ae_int_t n) {
             qkm2 /= big;
             qkm1 /= big;
          }
-      }
-      while (t >= ae_machineepsilon);
+      } while (t >= ae_machineepsilon);
       result *= exp(-x);
    }
    return result;
@@ -7182,8 +7146,7 @@ void fromchebyshev(RVector a, ae_int_t n, RVector b) {
          }
          d = e;
          k++;
-      }
-      while (k <= n);
+      } while (k <= n);
       d = b->ptr.p_double[i];
       e = 0.0;
       k = i;
@@ -7193,8 +7156,7 @@ void fromchebyshev(RVector a, ae_int_t n, RVector b) {
       }
       b->ptr.p_double[i] = e;
       i++;
-   }
-   while (i <= n);
+   } while (i <= n);
 }
 } // end of namespace alglib_impl
 

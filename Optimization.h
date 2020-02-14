@@ -259,7 +259,6 @@ namespace alglib {
 //
 // More detailed error log can  be  obtained  from  optimizer  by  explicitly
 // requesting reports for tests C0.0, C1.0, C1.1.
-//
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 DecClass(optguardreport, bool &nonc0suspected; bool &nonc0test0positive; ae_int_t &nonc0fidx; double &nonc0lipschitzc; bool &nonc1suspected; bool &nonc1test0positive; bool &nonc1test1positive; ae_int_t &nonc1fidx; double &nonc1lipschitzc; bool &badgradsuspected; ae_int_t &badgradfidx; ae_int_t &badgradvidx; real_1d_array badgradxbase; real_2d_array badgraduser; real_2d_array badgradnum;);
 
@@ -301,7 +300,6 @@ DecClass(optguardreport, bool &nonc0suspected; bool &nonc0test0positive; ae_int_
 // You can plot function values stored in stp[]  and  f[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
-//
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 DecClass(optguardnonc0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
@@ -346,7 +344,6 @@ DecClass(optguardnonc0report, bool &positive; ae_int_t &fidx; real_1d_array x0; 
 // You can plot function values stored in stp[]  and  f[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
-//
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 DecClass(optguardnonc1test0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
@@ -402,7 +399,6 @@ DecClass(optguardnonc1test0report, bool &positive; ae_int_t &fidx; real_1d_array
 // You can plot function values stored in stp[]  and  g[]  arrays  and  study
 // behavior of your function by your own eyes, just  to  be  sure  that  test
 // correctly reported C1 violation.
-//
 // ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array g; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
@@ -480,7 +476,7 @@ typedef struct {
    double nonc1test1lngrating;
    optguardnonc1test1report nonc1test1strrep;
    optguardnonc1test1report nonc1test1lngrep;
-   bool needfij;
+// bool needfij; //(@) Redundant.
    ae_vector x;
    ae_vector fi;
    ae_matrix j;
@@ -1205,7 +1201,6 @@ DecClass(minlbfgsreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &te
 //    use MinLBFGSSetStpMax() function to bound algorithm's  steps.  However,
 //    L-BFGS rarely needs such a tuning.
 //
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlbfgscreate(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlbfgsstate &state);
 void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &state);
@@ -1252,7 +1247,6 @@ void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &sta
 //    Thus  we  recommend to use this function for fast prototyping on small-
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
-//
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
 void minlbfgscreatef(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state);
 void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diffstep, minlbfgsstate &state);
@@ -1284,7 +1278,6 @@ void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diff
 //
 // Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
@@ -1296,7 +1289,6 @@ void minlbfgssetcond(const minlbfgsstate &state, const double epsg, const double
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinLBFGSOptimize().
-//
 //
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep);
@@ -1313,7 +1305,6 @@ void minlbfgssetxrep(const minlbfgsstate &state, const bool needxrep);
 // large  steps  which  leads  to overflow. This function allows us to reject
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax);
 
@@ -1343,7 +1334,6 @@ void minlbfgssetstpmax(const minlbfgsstate &state, const double stpmax);
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s);
 
@@ -1355,7 +1345,6 @@ void minlbfgssetscale(const minlbfgsstate &state, const real_1d_array &s);
 //
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetprecdefault(const minlbfgsstate &state);
 
@@ -1377,7 +1366,6 @@ void minlbfgssetprecdefault(const minlbfgsstate &state);
 // iterations.
 //
 // NOTE 2:  P  should  be nonsingular. Exception will be thrown otherwise.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p, const bool isupper);
 
@@ -1395,7 +1383,6 @@ void minlbfgssetpreccholesky(const minlbfgsstate &state, const real_2d_array &p,
 // NOTE 2: D[i] should be positive. Exception will be thrown otherwise.
 //
 // NOTE 3: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d);
 
@@ -1416,7 +1403,6 @@ void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetprecscale(const minlbfgsstate &state);
 
@@ -1469,7 +1455,6 @@ bool minlbfgsiteration(const minlbfgsstate &state);
 //    to pass gradient information to MinCGOptimize()) will lead to exception
 //    being thrown. Either  you  did  not pass gradient when it WAS needed or
 //    you passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 //
 void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -1525,7 +1510,6 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x,
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep);
 
@@ -1587,7 +1571,6 @@ void minlbfgsoptguardgradient(const minlbfgsstate &state, const double teststep)
 // errors. Upon discovering suspicious pair of points it  raises  appropriate
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minlbfgsoptguardsmoothness(const minlbfgsstate &state, const ae_int_t level);
 void minlbfgsoptguardsmoothness(const minlbfgsstate &state);
@@ -1657,7 +1640,6 @@ void minlbfgsoptguardsmoothness(const minlbfgsstate &state);
 //       Our current approach is to have less than 0.1%  false  negatives  in
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep);
 
@@ -1698,7 +1680,6 @@ void minlbfgsoptguardresults(const minlbfgsstate &state, optguardreport &rep);
 // Outputs:
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 
@@ -1746,7 +1727,6 @@ void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1
 // Outputs:
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 
@@ -1777,7 +1757,6 @@ void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1
 //                             termination request was submitted.
 //                 * Rep.IterationsCount contains iterations count
 //                 * NFEV countains number of function calculations
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep);
 
@@ -1787,7 +1766,6 @@ void minlbfgsresults(const minlbfgsstate &state, real_1d_array &x, minlbfgsrepor
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsreport &rep);
 
@@ -1800,7 +1778,6 @@ void minlbfgsresultsbuf(const minlbfgsstate &state, real_1d_array &x, minlbfgsre
 // Inputs:
 //     State   -   structure used to store algorithm state
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x);
 
@@ -1823,7 +1800,6 @@ void minlbfgsrestartfrom(const minlbfgsstate &state, const real_1d_array &x);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void minlbfgsrequesttermination(const minlbfgsstate &state);
 } // end of namespace alglib
@@ -2140,7 +2116,6 @@ DecClass(minbleicreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &va
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleiccreate(const ae_int_t n, const real_1d_array &x, minbleicstate &state);
 void minbleiccreate(const real_1d_array &x, minbleicstate &state);
@@ -2182,7 +2157,6 @@ void minbleiccreate(const real_1d_array &x, minbleicstate &state);
 //    Thus  we  recommend to use this function for fast prototyping on small-
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
-//
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
 void minbleiccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbleicstate &state);
 void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstate &state);
@@ -2218,7 +2192,6 @@ void minbleiccreatef(const real_1d_array &x, const double diffstep, minbleicstat
 // * function is evaluated only INSIDE area specified by  bound  constraints,
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -2253,7 +2226,6 @@ void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const 
 // problem  in  such  manner  that  all constraints will become boundary ones
 // (this kind of constraints is always satisfied exactly, both in  the  final
 // solution and in all intermediate points).
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -2289,7 +2261,6 @@ void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const int
 // NOTE: when SetCond() called with non-zero MaxIts, BLEIC solver may perform
 //       slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
 //       limit on iterations count.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetcond(const minbleicstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
@@ -2319,7 +2290,6 @@ void minbleicsetcond(const minbleicstate &state, const double epsg, const double
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minbleicsetscale(const minbleicstate &state, const real_1d_array &s);
 
@@ -2327,7 +2297,6 @@ void minbleicsetscale(const minbleicstate &state, const real_1d_array &s);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbleicsetprecdefault(const minbleicstate &state);
 
@@ -2342,7 +2311,6 @@ void minbleicsetprecdefault(const minbleicstate &state);
 // NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
 //
 // NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d);
 
@@ -2363,7 +2331,6 @@ void minbleicsetprecdiag(const minbleicstate &state, const real_1d_array &d);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbleicsetprecscale(const minbleicstate &state);
 
@@ -2375,7 +2342,6 @@ void minbleicsetprecscale(const minbleicstate &state);
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinBLEICOptimize().
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetxrep(const minbleicstate &state, const bool needxrep);
 
@@ -2399,7 +2365,6 @@ void minbleicsetxrep(const minbleicstate &state, const bool needxrep);
 // large  steps  which  lead   to overflow. This function allows us to reject
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minbleicsetstpmax(const minbleicstate &state, const double stpmax);
 
@@ -2452,7 +2417,6 @@ bool minbleiciteration(const minbleicstate &state);
 //    and  to  pass  gradient information to MinBLEICOptimize()) will lead to
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 //
 void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -2508,7 +2472,6 @@ void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x,
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void minbleicoptguardgradient(const minbleicstate &state, const double teststep);
 
@@ -2570,7 +2533,6 @@ void minbleicoptguardgradient(const minbleicstate &state, const double teststep)
 // errors. Upon discovering suspicious pair of points it  raises  appropriate
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbleicoptguardsmoothness(const minbleicstate &state, const ae_int_t level);
 void minbleicoptguardsmoothness(const minbleicstate &state);
@@ -2640,7 +2602,6 @@ void minbleicoptguardsmoothness(const minbleicstate &state);
 //       Our current approach is to have less than 0.1%  false  negatives  in
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep);
 
@@ -2681,7 +2642,6 @@ void minbleicoptguardresults(const minbleicstate &state, optguardreport &rep);
 // Outputs:
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 
@@ -2729,7 +2689,6 @@ void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1
 // Outputs:
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 
@@ -2758,7 +2717,6 @@ void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1
 //                        termination request was submitted.
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on MinBLEICReport datatype.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicreport &rep);
 
@@ -2768,7 +2726,6 @@ void minbleicresults(const minbleicstate &state, real_1d_array &x, minbleicrepor
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicreport &rep);
 
@@ -2781,7 +2738,6 @@ void minbleicresultsbuf(const minbleicstate &state, real_1d_array &x, minbleicre
 // Inputs:
 //     State   -   structure previously allocated with MinBLEICCreate call.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x);
 
@@ -2804,7 +2760,6 @@ void minbleicrestartfrom(const minbleicstate &state, const real_1d_array &x);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void minbleicrequesttermination(const minbleicstate &state);
 } // end of namespace alglib
@@ -3075,7 +3030,6 @@ DecClass(minqpreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationsc
 // Outputs:
 //     State   -   optimizer with zero quadratic/linear terms
 //                 and no constraints
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpcreate(const ae_int_t n, minqpstate &state);
 
@@ -3086,7 +3040,6 @@ void minqpcreate(const ae_int_t n, minqpstate &state);
 // Inputs:
 //     State   -   structure which stores algorithm state
 //     B       -   linear term, array[N].
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b);
 
@@ -3113,7 +3066,6 @@ void minqpsetlinearterm(const minqpstate &state, const real_1d_array &b);
 //                   triangle, and the upper triangle isn't used
 //                 * if not given, both lower and upper  triangles  must  be
 //                   filled.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a, const bool isupper);
 void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a);
@@ -3145,7 +3097,6 @@ void minqpsetquadraticterm(const minqpstate &state, const real_2d_array &a);
 //                   triangle, and the upper triangle isn't used
 //                 * if not given, both lower and upper  triangles  must  be
 //                   filled.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a, const bool isupper);
 
@@ -3158,7 +3109,6 @@ void minqpsetquadratictermsparse(const minqpstate &state, const sparsematrix &a,
 // Inputs:
 //     State   -   structure which stores algorithm state
 //     X       -   starting point, array[N].
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x);
 
@@ -3178,7 +3128,6 @@ void minqpsetstartingpoint(const minqpstate &state, const real_1d_array &x);
 // Inputs:
 //     State   -   structure which stores algorithm state
 //     XOrigin -   origin, array[N].
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin);
 
@@ -3203,7 +3152,6 @@ void minqpsetorigin(const minqpstate &state, const real_1d_array &xorigin);
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minqpsetscale(const minqpstate &state, const real_1d_array &s);
 
@@ -3230,7 +3178,6 @@ void minqpsetscale(const minqpstate &state, const real_1d_array &s);
 //
 // Inputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void minqpsetscaleautodiag(const minqpstate &state);
 
@@ -3313,7 +3260,6 @@ void minqpsetscaleautodiag(const minqpstate &state);
 // Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetalgobleic(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
@@ -3391,7 +3337,6 @@ void minqpsetalgobleic(const minqpstate &state, const double epsg, const double 
 // NOTE: Passing  EpsX=0  will  lead  to  automatic  step  length  selection
 //       (specific step length chosen may change in the future  versions  of
 //       ALGLIB, so it is better to specify step length explicitly).
-//
 // ALGLIB: Copyright 20.08.2016 by Sergey Bochkanov
 void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const double rho, const ae_int_t itscnt);
 
@@ -3447,7 +3392,6 @@ void minqpsetalgodenseaul(const minqpstate &state, const double epsx, const doub
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetalgodenseipm(const minqpstate &state, const double eps);
 
@@ -3511,7 +3455,6 @@ void minqpsetalgodenseipm(const minqpstate &state, const double eps);
 // BECAUSE ITS CONVERGENCE PROPERTIES AND STOPPING CRITERIA ARE SCALE-DEPENDENT!
 //
 // NOTE: Passing EpsX=0 will lead to automatic selection of small epsilon.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetalgosparseipm(const minqpstate &state, const double eps);
 
@@ -3610,7 +3553,6 @@ void minqpsetalgosparseipm(const minqpstate &state, const double eps);
 // Passing EpsG=0, EpsF=0 and EpsX=0 and MaxIts=0 (simultaneously) will lead
 // to automatic stopping criterion selection (presently it is  small    step
 // length, but it may change in the future versions of ALGLIB).
-//
 // ALGLIB: Copyright 22.05.2014 by Sergey Bochkanov
 void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxouterits, const bool usenewton);
 
@@ -3653,7 +3595,6 @@ void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const doubl
 //       which allows to specify constraints without using arrays.
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -3688,7 +3629,6 @@ void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1
 //       errors in the algorithm.
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu);
 
@@ -3718,7 +3658,6 @@ void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu
 //       errors in the algorithm.
 //
 // NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu);
 
@@ -3752,7 +3691,6 @@ void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, c
 //         there always exists some violation due  to  numerical  errors  and
 //         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
 //         solver is less precise).
-//
 // ALGLIB: Copyright 19.06.2012 by Sergey Bochkanov
 void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -3787,7 +3725,6 @@ void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1
 //         there always exists some violation due  to  numerical  errors  and
 //         algorithmic limitations (BLEIC-QP solver is most  precise,  AUL-QP
 //         solver is less precise).
-//
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
 void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const integer_1d_array &ct, const ae_int_t k);
 
@@ -3838,7 +3775,6 @@ void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const inte
 //         will be  used.  However,  the  rest  of  ALGLIB  has  more  strict
 //         requirements on the input size, so we recommend you to pass sparse
 //         term whose size exactly matches algorithm expectations.
-//
 // ALGLIB: Copyright 22.08.2016 by Sergey Bochkanov
 void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek);
 
@@ -3854,7 +3790,6 @@ void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const
 // function is here to simplify situation with code relying on legacy API. It
 // simply accepts constraints in one order (old) and passes them to new  API,
 // now in correct order.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec, const integer_1d_array &densect, const ae_int_t densek, const sparsematrix &sparsec, const integer_1d_array &sparsect, const ae_int_t sparsek);
 
@@ -3882,7 +3817,6 @@ void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec,
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au);
@@ -3906,7 +3840,6 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 
@@ -3942,7 +3875,6 @@ void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_a
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, const ae_int_t ksparse, const real_2d_array &densea, const ae_int_t kdense, const real_1d_array &al, const real_1d_array &au);
 
@@ -3959,7 +3891,6 @@ void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, cons
 //                 * AL=-INF  => one-sided constraint Ai*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const double al, const double au);
 
@@ -3984,7 +3915,6 @@ void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const dou
 //                 * AL=-INF  => one-sided constraint A*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 
@@ -4009,7 +3939,6 @@ void minqpaddlc2(const minqpstate &state, const integer_1d_array &idxa, const re
 //
 // You should use MinQPResults() function to access results after calls
 // to this function.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 //      Special thanks to Elvira Illarionova  for  important  suggestions  on
 //      the linearly constrained QP algorithm.
@@ -4030,7 +3959,6 @@ void minqpoptimize(const minqpstate &state);
 //                 * Lagrange multipliers - for QP solvers which support then
 //                 * other statistics
 //                 See comments on minqpreport structure for more information
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 
@@ -4040,7 +3968,6 @@ void minqpresults(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpresultsbuf(const minqpstate &state, real_1d_array &x, minqpreport &rep);
 } // end of namespace alglib
@@ -4298,7 +4225,6 @@ DecClass(minlpreport, double &f; real_1d_array y; integer_1d_array stats; double
 //
 // Outputs:
 //     State   -   optimizer in the default state
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpcreate(const ae_int_t n, minlpstate &state);
 
@@ -4309,7 +4235,6 @@ void minlpcreate(const ae_int_t n, minlpstate &state);
 // Inputs:
 //     State   -   structure which stores algorithm state
 //     C       -   cost term, array[N].
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetcost(const minlpstate &state, const real_1d_array &c);
 
@@ -4327,7 +4252,6 @@ void minlpsetcost(const minlpstate &state, const real_1d_array &c);
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetscale(const minlpstate &state, const real_1d_array &s);
 
@@ -4366,7 +4290,6 @@ void minlpsetscale(const minlpstate &state, const real_1d_array &s);
 //       which allows to specify constraints without using arrays.
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -4404,7 +4327,6 @@ void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1
 //       different variables.
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu);
 
@@ -4441,7 +4363,6 @@ void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu
 //       different variables.
 //
 // NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu);
 
@@ -4468,7 +4389,6 @@ void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, c
 //                 * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A and CT.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct, const ae_int_t k);
 void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1d_array &ct);
@@ -4504,7 +4424,6 @@ void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A, AL, AU.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const real_1d_array &al, const real_1d_array &au);
@@ -4528,7 +4447,6 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
 //     K       -   number  of equality/inequality constraints, K >= 0.  If  K=0
 //                 is specified, A, AL, AU are ignored.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_array &al, const real_1d_array &au, const ae_int_t k);
 
@@ -4551,7 +4469,6 @@ void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_a
 //                 * AL=-INF  => one-sided constraint Ai*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const double al, const double au);
 
@@ -4576,7 +4493,6 @@ void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const dou
 //                 * AL=-INF  => one-sided constraint A*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const real_1d_array &vala, const ae_int_t nnz, const double al, const double au);
 
@@ -4587,7 +4503,6 @@ void minlpaddlc2(const minlpstate &state, const integer_1d_array &idxa, const re
 //
 // You should use minlpresults() function to access results  after  calls  to
 // this function.
-//
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpoptimize(const minlpstate &state);
 
@@ -4610,7 +4525,6 @@ void minlpoptimize(const minlpstate &state);
 //                 Success codes:
 //                 *  1..4 successful completion
 //                 *  5    MaxIts steps was taken
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep);
 
@@ -4620,7 +4534,6 @@ void minlpresults(const minlpstate &state, real_1d_array &x, minlpreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minlpresultsbuf(const minlpstate &state, real_1d_array &x, minlpreport &rep);
 } // end of namespace alglib
@@ -5088,7 +5001,6 @@ DecClass(minnlcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &term
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlccreate(const ae_int_t n, const real_1d_array &x, minnlcstate &state);
 void minnlccreate(const real_1d_array &x, minnlcstate &state);
@@ -5133,7 +5045,6 @@ void minnlccreate(const real_1d_array &x, minnlcstate &state);
 //    Thus  we  recommend to use this function for fast prototyping on small-
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnlcstate &state);
 void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &state);
@@ -5164,7 +5075,6 @@ void minnlccreatef(const real_1d_array &x, const double diffstep, minnlcstate &s
 //          boundary constraints are  satisfied  only  approximately!  It  is
 //          possible   that  algorithm  will  evaluate  function  outside  of
 //          feasible area!
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -5198,7 +5108,6 @@ void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real
 //         linear constraints are  satisfied  only   approximately!   It   is
 //         possible   that  algorithm  will  evaluate  function  outside   of
 //         feasible area!
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -5247,7 +5156,6 @@ void minnlcsetlc(const minnlcstate &state, const real_2d_array &c, const integer
 //         with unit scale)  or  has  magnitude approximately equal to 1/S[i]
 //         (where S is a scale set by MinNLCSetScale() function).
 //
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t nlic);
 
@@ -5267,7 +5175,6 @@ void minnlcsetnlc(const minnlcstate &state, const ae_int_t nlec, const ae_int_t 
 //
 // Passing EpsX=0 and MaxIts=0 (simultaneously) will lead to automatic
 // selection of the stopping condition.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t maxits);
 
@@ -5286,7 +5193,6 @@ void minnlcsetcond(const minnlcstate &state, const double epsx, const ae_int_t m
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetscale(const minnlcstate &state, const real_1d_array &s);
 
@@ -5317,7 +5223,6 @@ void minnlcsetscale(const minnlcstate &state, const real_1d_array &s);
 //
 // Inputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 void minnlcsetprecinexact(const minnlcstate &state);
 
@@ -5361,7 +5266,6 @@ void minnlcsetprecinexact(const minnlcstate &state);
 //     UpdateFreq- update frequency. Preconditioner is  rebuilt  after  every
 //                 UpdateFreq iterations. Recommended value: 10 or higher.
 //                 Zero value means that good default value will be used.
-//
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefreq);
 
@@ -5410,7 +5314,6 @@ void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefr
 //     UpdateFreq- update frequency. Preconditioner is  rebuilt  after  every
 //                 UpdateFreq iterations. Recommended value: 10 or higher.
 //                 Zero value means that good default value will be used.
-//
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefreq);
 
@@ -5431,7 +5334,6 @@ void minnlcsetprecexactrobust(const minnlcstate &state, const ae_int_t updatefre
 //
 // Inputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 26.09.2014 by Sergey Bochkanov
 void minnlcsetprecnone(const minnlcstate &state);
 
@@ -5451,7 +5353,6 @@ void minnlcsetprecnone(const minnlcstate &state);
 //
 // NOTE: different solvers employed by MinNLC optimizer use  different  norms
 //       for step; AUL solver uses 2-norm, whilst SLP solver uses INF-norm.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 
@@ -5646,7 +5547,6 @@ void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 // Final reason is numerical noise. AUL algorithm is robust against  moderate
 // noise (more robust than, say, active set methods),  but  large  noise  may
 // destabilize algorithm.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t itscnt);
 
@@ -5692,7 +5592,6 @@ void minnlcsetalgoaul(const minnlcstate &state, const double rho, const ae_int_t
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 02.04.2018 by Sergey Bochkanov
 void minnlcsetalgoslp(const minnlcstate &state);
 
@@ -5742,7 +5641,6 @@ void minnlcsetalgoslp(const minnlcstate &state);
 //
 // So, if you suspect that your problem is nonsmooth, we recommend you to use
 // AUL or SLP solvers.
-//
 // ALGLIB: Copyright 02.12.2019 by Sergey Bochkanov
 void minnlcsetalgosqp(const minnlcstate &state);
 
@@ -5759,7 +5657,6 @@ void minnlcsetalgosqp(const minnlcstate &state);
 //       and penalized function value at current point. Important -  function
 //       value which is returned is NOT function being minimized. It  is  sum
 //       of the value of the function being minimized - and penalty term.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minnlcsetxrep(const minnlcstate &state, const bool needxrep);
 
@@ -5809,7 +5706,6 @@ bool minnlciteration(const minnlcstate &state);
 //    function  and  MinNLCOptimize()  version.   Attemps   to    use    such
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 //
 void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -5866,7 +5762,6 @@ void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void minnlcoptguardgradient(const minnlcstate &state, const double teststep);
 
@@ -5932,7 +5827,6 @@ void minnlcoptguardgradient(const minnlcstate &state, const double teststep);
 // errors. Upon discovering suspicious pair of points it  raises  appropriate
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minnlcoptguardsmoothness(const minnlcstate &state, const ae_int_t level);
 void minnlcoptguardsmoothness(const minnlcstate &state);
@@ -6003,7 +5897,6 @@ void minnlcoptguardsmoothness(const minnlcstate &state);
 //       Our current approach is to have less than 0.1%  false  negatives  in
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep);
 
@@ -6046,7 +5939,6 @@ void minnlcoptguardresults(const minnlcstate &state, optguardreport &rep);
 // Outputs:
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 
@@ -6096,7 +5988,6 @@ void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test
 // Outputs:
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 
@@ -6142,7 +6033,6 @@ void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test
 //
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on minnlcreport datatype.
-//
 // ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep);
 
@@ -6152,7 +6042,6 @@ void minnlcresults(const minnlcstate &state, real_1d_array &x, minnlcreport &rep
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &rep);
 
@@ -6175,7 +6064,6 @@ void minnlcresultsbuf(const minnlcstate &state, real_1d_array &x, minnlcreport &
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void minnlcrequesttermination(const minnlcstate &state);
 
@@ -6188,7 +6076,6 @@ void minnlcrequesttermination(const minnlcstate &state);
 // Inputs:
 //     State   -   structure previously allocated with MinNLCCreate call.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minnlcrestartfrom(const minnlcstate &state, const real_1d_array &x);
 } // end of namespace alglib
@@ -6389,7 +6276,6 @@ DecClass(minbcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varid
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbccreate(const ae_int_t n, const real_1d_array &x, minbcstate &state);
 void minbccreate(const real_1d_array &x, minbcstate &state);
@@ -6431,7 +6317,6 @@ void minbccreate(const real_1d_array &x, minbcstate &state);
 //    Thus  we  recommend to use this function for fast prototyping on small-
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
-//
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
 void minbccreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minbcstate &state);
 void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &state);
@@ -6458,7 +6343,6 @@ void minbccreatef(const real_1d_array &x, const double diffstep, minbcstate &sta
 // * function is evaluated only INSIDE area specified by  bound  constraints,
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -6493,7 +6377,6 @@ void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1
 // NOTE: when SetCond() called with non-zero MaxIts, BC solver may perform
 //       slightly more than MaxIts iterations. I.e., MaxIts  sets  non-strict
 //       limit on iterations count.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcsetcond(const minbcstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
@@ -6523,7 +6406,6 @@ void minbcsetcond(const minbcstate &state, const double epsg, const double epsf,
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minbcsetscale(const minbcstate &state, const real_1d_array &s);
 
@@ -6531,7 +6413,6 @@ void minbcsetscale(const minbcstate &state, const real_1d_array &s);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbcsetprecdefault(const minbcstate &state);
 
@@ -6546,7 +6427,6 @@ void minbcsetprecdefault(const minbcstate &state);
 // NOTE 1: D[i] should be positive. Exception will be thrown otherwise.
 //
 // NOTE 2: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d);
 
@@ -6567,7 +6447,6 @@ void minbcsetprecdiag(const minbcstate &state, const real_1d_array &d);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minbcsetprecscale(const minbcstate &state);
 
@@ -6579,7 +6458,6 @@ void minbcsetprecscale(const minbcstate &state);
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinBCOptimize().
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcsetxrep(const minbcstate &state, const bool needxrep);
 
@@ -6595,7 +6473,6 @@ void minbcsetxrep(const minbcstate &state, const bool needxrep);
 // large  steps  which  lead   to overflow. This function allows us to reject
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minbcsetstpmax(const minbcstate &state, const double stpmax);
 
@@ -6648,7 +6525,6 @@ bool minbciteration(const minbcstate &state);
 //    and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 //
 void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -6704,7 +6580,6 @@ void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, doubl
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void minbcoptguardgradient(const minbcstate &state, const double teststep);
 
@@ -6766,7 +6641,6 @@ void minbcoptguardgradient(const minbcstate &state, const double teststep);
 // errors. Upon discovering suspicious pair of points it  raises  appropriate
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbcoptguardsmoothness(const minbcstate &state, const ae_int_t level);
 void minbcoptguardsmoothness(const minbcstate &state);
@@ -6836,7 +6710,6 @@ void minbcoptguardsmoothness(const minbcstate &state);
 //       Our current approach is to have less than 0.1%  false  negatives  in
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbcoptguardresults(const minbcstate &state, optguardreport &rep);
 
@@ -6877,7 +6750,6 @@ void minbcoptguardresults(const minbcstate &state, optguardreport &rep);
 // Outputs:
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 
@@ -6925,7 +6797,6 @@ void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0r
 // Outputs:
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 
@@ -6952,7 +6823,6 @@ void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1r
 //                        termination request was submitted.
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on MinBCReport datatype.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 
@@ -6962,7 +6832,6 @@ void minbcresults(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep);
 
@@ -6975,7 +6844,6 @@ void minbcresultsbuf(const minbcstate &state, real_1d_array &x, minbcreport &rep
 // Inputs:
 //     State   -   structure previously allocated with MinBCCreate call.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcrestartfrom(const minbcstate &state, const real_1d_array &x);
 
@@ -6998,7 +6866,6 @@ void minbcrestartfrom(const minbcstate &state, const real_1d_array &x);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void minbcrequesttermination(const minbcstate &state);
 } // end of namespace alglib
@@ -7281,7 +7148,6 @@ DecClass(minnsreport, ae_int_t &iterationscount; ae_int_t &nfev; double &cerr; d
 // NOTE: minnscreatef() function may be used if  you  do  not  have  analytic
 //       gradient.   This   function  creates  solver  which  uses  numerical
 //       differentiation with user-specified step.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnscreate(const ae_int_t n, const real_1d_array &x, minnsstate &state);
 void minnscreate(const real_1d_array &x, minnsstate &state);
@@ -7311,7 +7177,6 @@ void minnscreate(const real_1d_array &x, minnsstate &state);
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnscreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, minnsstate &state);
 void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &state);
@@ -7338,7 +7203,6 @@ void minnscreatef(const real_1d_array &x, const double diffstep, minnsstate &sta
 // * function is evaluated only INSIDE area specified by  bound  constraints,
 //   even  when  numerical  differentiation is used (algorithm adjusts  nodes
 //   according to boundary constraints)
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -7376,7 +7240,6 @@ void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1
 // problem  in  such  manner  that  all constraints will become boundary ones
 // (this kind of constraints is always satisfied exactly, both in  the  final
 // solution and in all intermediate points).
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -7436,7 +7299,6 @@ void minnssetlc(const minnsstate &state, const real_2d_array &c, const integer_1
 //         Rho parameter of minnssetalgoags(), because too  large  value  may
 //         slow down convergence.
 //
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nlic);
 
@@ -7453,7 +7315,6 @@ void minnssetnlc(const minnsstate &state, const ae_int_t nlec, const ae_int_t nl
 // Passing EpsX=0  and  MaxIts=0  (simultaneously)  will  lead  to  automatic
 // stopping criterion selection. We do not recommend you to rely  on  default
 // choice in production code.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t maxits);
 
@@ -7472,7 +7333,6 @@ void minnssetcond(const minnsstate &state, const double epsx, const ae_int_t max
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetscale(const minnsstate &state, const real_1d_array &s);
 
@@ -7565,7 +7425,6 @@ void minnssetscale(const minnsstate &state, const real_1d_array &s);
 // * penalty coefficient for  linear  constraints  is  chosen  automatically;
 //   however, penalty coefficient for nonlinear constraints must be specified
 //   by user.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnssetalgoags(const minnsstate &state, const double radius, const double penalty);
 
@@ -7577,7 +7436,6 @@ void minnssetalgoags(const minnsstate &state, const double radius, const double 
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to minnsoptimize().
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minnssetxrep(const minnsstate &state, const bool needxrep);
 
@@ -7600,7 +7458,6 @@ void minnssetxrep(const minnsstate &state, const bool needxrep);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsrequesttermination(const minnsstate &state);
 
@@ -7650,7 +7507,6 @@ bool minnsiteration(const minnsstate &state);
 //    function  and  minnsoptimize()  version.   Attemps   to    use     such
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 //
 void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -7678,7 +7534,6 @@ void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1
 //                         further improvement is impossible,
 //                         X contains best point found so far.
 //                 *  8    User requested termination via minnsrequesttermination()
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 
@@ -7687,7 +7542,6 @@ void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 
@@ -7700,7 +7554,6 @@ void minnsresultsbuf(const minnsstate &state, real_1d_array &x, minnsreport &rep
 // Inputs:
 //     State   -   structure previously allocated with minnscreate() call.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsrestartfrom(const minnsstate &state, const real_1d_array &x);
 } // end of namespace alglib
@@ -7788,55 +7641,46 @@ DecClass(minasastate, bool &needfg; bool &xupdated; double &f; real_1d_array g; 
 DecClass(minasareport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype; ae_int_t &activeconstraints;);
 
 // Obsolete function, use MinLBFGSSetPrecDefault() instead.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetdefaultpreconditioner(const minlbfgsstate &state);
 
 // Obsolete function, use MinLBFGSSetCholeskyPreconditioner() instead.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void minlbfgssetcholeskypreconditioner(const minlbfgsstate &state, const real_2d_array &p, const bool isupper);
 
 // This is obsolete function which was used by previous version of the  BLEIC
 // optimizer. It does nothing in the current version of BLEIC.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetbarrierwidth(const minbleicstate &state, const double mu);
 
 // This is obsolete function which was used by previous version of the  BLEIC
 // optimizer. It does nothing in the current version of BLEIC.
-//
 // ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicsetbarrierdecay(const minbleicstate &state, const double mudecay);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 25.03.2010 by Sergey Bochkanov
 void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state);
 void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu, minasastate &state);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minasasetcond(const minasastate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minasasetxrep(const minasastate &state, const bool needxrep);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minasasetalgorithm(const minasastate &state, const ae_int_t algotype);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minasasetstpmax(const minasastate &state, const double stpmax);
 
@@ -7856,26 +7700,22 @@ bool minasaiteration(const minasastate &state);
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 //
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 //
 void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void minasaresults(const minasastate &state, real_1d_array &x, minasareport &rep);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void minasaresultsbuf(const minasastate &state, real_1d_array &x, minasareport &rep);
 
 // Obsolete optimization algorithm.
 // Was replaced by MinBLEIC subpackage.
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void minasarestartfrom(const minasastate &state, const real_1d_array &x, const real_1d_array &bndl, const real_1d_array &bndu);
 } // end of namespace alglib
@@ -8060,7 +7900,6 @@ DecClass(mincgreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &termi
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 25.03.2010 by Sergey Bochkanov
 void mincgcreate(const ae_int_t n, const real_1d_array &x, mincgstate &state);
 void mincgcreate(const real_1d_array &x, mincgstate &state);
@@ -8102,7 +7941,6 @@ void mincgcreate(const real_1d_array &x, mincgstate &state);
 //    Thus  we  recommend to use this function for fast prototyping on small-
 //    dimensional problems only, and to implement analytical gradient as soon
 //    as possible.
-//
 // ALGLIB: Copyright 16.05.2011 by Sergey Bochkanov
 void mincgcreatef(const ae_int_t n, const real_1d_array &x, const double diffstep, mincgstate &state);
 void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &state);
@@ -8134,7 +7972,6 @@ void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &sta
 //
 // Passing EpsG=0, EpsF=0, EpsX=0 and MaxIts=0 (simultaneously) will lead to
 // automatic stopping criterion selection (small EpsX).
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void mincgsetcond(const mincgstate &state, const double epsg, const double epsf, const double epsx, const ae_int_t maxits);
 
@@ -8163,7 +8000,6 @@ void mincgsetcond(const mincgstate &state, const double epsg, const double epsf,
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void mincgsetscale(const mincgstate &state, const real_1d_array &s);
 
@@ -8175,7 +8011,6 @@ void mincgsetscale(const mincgstate &state, const real_1d_array &s);
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinCGOptimize().
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void mincgsetxrep(const mincgstate &state, const bool needxrep);
 
@@ -8187,7 +8022,6 @@ void mincgsetxrep(const mincgstate &state, const bool needxrep);
 //                 * -1    automatic selection of the best algorithm
 //                 * 0     DY (Dai and Yuan) algorithm
 //                 * 1     Hybrid DY-HS algorithm
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype);
 
@@ -8203,7 +8037,6 @@ void mincgsetcgtype(const mincgstate &state, const ae_int_t cgtype);
 // large  steps  which  leads  to overflow. This function allows us to reject
 // steps  that  are  too  large  (and  therefore  expose  us  to the possible
 // overflow) without actually calculating function value at the x+stp*d.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void mincgsetstpmax(const mincgstate &state, const double stpmax);
 
@@ -8235,7 +8068,6 @@ void mincgsetstpmax(const mincgstate &state, const double stpmax);
 //     State   -   structure used to store algorithm state.
 //     Stp     -   initial estimate of the step length.
 //                 Can be zero (no estimate).
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void mincgsuggeststep(const mincgstate &state, const double stp);
 
@@ -8246,7 +8078,6 @@ void mincgsuggeststep(const mincgstate &state, const double stp);
 //
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void mincgsetprecdefault(const mincgstate &state);
 
@@ -8264,7 +8095,6 @@ void mincgsetprecdefault(const mincgstate &state);
 // NOTE 2: D[i] should be positive. Exception will be thrown otherwise.
 //
 // NOTE 3: you should pass diagonal of approximate Hessian - NOT ITS INVERSE.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d);
 
@@ -8287,7 +8117,6 @@ void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d);
 //
 // NOTE:  you  can  change  preconditioner  "on  the  fly",  during algorithm
 // iterations.
-//
 // ALGLIB: Copyright 13.10.2010 by Sergey Bochkanov
 void mincgsetprecscale(const mincgstate &state);
 
@@ -8340,7 +8169,6 @@ bool mincgiteration(const mincgstate &state);
 //    gradient information to MinCGOptimize()) will lead to  exception  being
 //    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
 //    passed gradient when it was NOT needed.
-//
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 //
 void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -8396,7 +8224,6 @@ void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, doubl
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void mincgoptguardgradient(const mincgstate &state, const double teststep);
 
@@ -8458,7 +8285,6 @@ void mincgoptguardgradient(const mincgstate &state, const double teststep);
 // errors. Upon discovering suspicious pair of points it  raises  appropriate
 // flag (and allows you to continue optimization). When optimization is done,
 // you can study OptGuard result.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void mincgoptguardsmoothness(const mincgstate &state, const ae_int_t level);
 void mincgoptguardsmoothness(const mincgstate &state);
@@ -8528,7 +8354,6 @@ void mincgoptguardsmoothness(const mincgstate &state);
 //       Our current approach is to have less than 0.1%  false  negatives  in
 //       our test examples  (measured  with  multiple  restarts  from  random
 //       points), and to have exactly 0% false positives.
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void mincgoptguardresults(const mincgstate &state, optguardreport &rep);
 
@@ -8569,7 +8394,6 @@ void mincgoptguardresults(const mincgstate &state, optguardreport &rep);
 // Outputs:
 //     strrep  -   C1 test #0 "strong" report
 //     lngrep  -   C1 test #0 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0report &strrep, optguardnonc1test0report &lngrep);
 
@@ -8617,7 +8441,6 @@ void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0r
 // Outputs:
 //     strrep  -   C1 test #1 "strong" report
 //     lngrep  -   C1 test #1 "long" report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1report &strrep, optguardnonc1test1report &lngrep);
 
@@ -8646,7 +8469,6 @@ void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1r
 //                     *  8    terminated by user
 //                 * Rep.IterationsCount contains iterations count
 //                 * NFEV countains number of function calculations
-//
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 
@@ -8656,7 +8478,6 @@ void mincgresults(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep);
 
@@ -8669,7 +8490,6 @@ void mincgresultsbuf(const mincgstate &state, real_1d_array &x, mincgreport &rep
 // Inputs:
 //     State   -   structure used to store algorithm state.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void mincgrestartfrom(const mincgstate &state, const real_1d_array &x);
 
@@ -8692,7 +8512,6 @@ void mincgrestartfrom(const mincgstate &state, const real_1d_array &x);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void mincgrequesttermination(const mincgstate &state);
 } // end of namespace alglib
@@ -8754,7 +8573,7 @@ typedef struct {
    ae_matrix h;
    ae_vector g;
    bool needf;
-   bool needfg;
+// bool needfg; //(@) Not used.
    bool needfgh;
    bool needfij;
    bool needfi;
@@ -8860,7 +8679,7 @@ namespace alglib {
 // This structure should be created using one of the MinLMCreate???()
 // functions. You should not access its fields directly; use ALGLIB functions
 // to work with it.
-DecClass(minlmstate, bool &needf; bool &needfg; bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
+DecClass(minlmstate, bool &needf; bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
 
 // Optimization report, filled by MinLMResults() function
 //
@@ -8943,7 +8762,6 @@ DecClass(minlmreport, ae_int_t &iterationscount; ae_int_t &terminationtype; ae_i
 // 2. if target function contains exp() or other fast growing functions,  and
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatevj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
@@ -9004,7 +8822,6 @@ void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 // 2. if target function contains exp() or other fast growing functions,  and
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatev(const ae_int_t n, const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state);
 void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffstep, minlmstate &state);
@@ -9066,7 +8883,6 @@ void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffste
 // 2. if target function contains exp() or other fast growing functions,  and
 //    optimization algorithm makes too large steps which leads  to  overflow,
 //    use MinLMSetStpMax() function to bound algorithm's steps.
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatefgh(const ae_int_t n, const real_1d_array &x, minlmstate &state);
 void minlmcreatefgh(const real_1d_array &x, minlmstate &state);
@@ -9095,7 +8911,6 @@ void minlmcreatefgh(const real_1d_array &x, minlmstate &state);
 //
 // NOTE: it is not recommended to set large EpsX (say, 0.001). Because LM  is
 //       a second-order method, it performs very precise steps anyway.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t maxits);
 
@@ -9108,7 +8923,6 @@ void minlmsetcond(const minlmstate &state, const double epsx, const ae_int_t max
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinLMOptimize(). Both Levenberg-Marquardt and internal  L-BFGS
 // iterations are reported.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlmsetxrep(const minlmstate &state, const bool needxrep);
 
@@ -9128,7 +8942,6 @@ void minlmsetxrep(const minlmstate &state, const bool needxrep);
 // NOTE: non-zero StpMax leads to moderate  performance  degradation  because
 // intermediate  step  of  preconditioned L-BFGS optimization is incompatible
 // with limits on step size.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void minlmsetstpmax(const minlmstate &state, const double stpmax);
 
@@ -9154,7 +8967,6 @@ void minlmsetstpmax(const minlmstate &state, const double stpmax);
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minlmsetscale(const minlmstate &state, const real_1d_array &s);
 
@@ -9181,7 +8993,6 @@ void minlmsetscale(const minlmstate &state, const real_1d_array &s);
 // * bound constraints are always satisfied exactly
 // * function is evaluated only INSIDE area specified by bound constraints
 //   or at its boundary
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -9225,7 +9036,6 @@ void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1
 //       subproblem, which requires ~3-5 times more Cholesky  decompositions.
 //       Thus, if you can reformulate your problem in such way  this  it  has
 //       only box constraints, it may be beneficial to do so.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -9269,7 +9079,6 @@ void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1
 //
 // NOTE: attempt to call this function with unsupported protocol/acceleration
 // combination will result in exception being thrown.
-//
 // ALGLIB: Copyright 14.10.2010 by Sergey Bochkanov
 void minlmsetacctype(const minlmstate &state, const ae_int_t acctype);
 
@@ -9311,7 +9120,6 @@ bool minlmiteration(const minlmstate &state);
 //
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 //
 void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -9370,7 +9178,6 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
 //   * we  build  cubic  model using function values and derivatives at trial
 //     points and we compare its prediction with actual value in  the  middle
 //     point
-//
 // ALGLIB: Copyright 15.06.2014 by Sergey Bochkanov
 void minlmoptguardgradient(const minlmstate &state, const double teststep);
 
@@ -9404,7 +9211,6 @@ void minlmoptguardgradient(const minlmstate &state, const double teststep);
 //
 // Outputs:
 //     rep     -   OptGuard report
-//
 // ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 void minlmoptguardresults(const minlmstate &state, optguardreport &rep);
 
@@ -9433,7 +9239,6 @@ void minlmoptguardresults(const minlmstate &state, optguardreport &rep);
 //                 *  8    terminated by user who called minlmrequesttermination().
 //                         X contains point which was "current accepted" when
 //                         termination request was submitted.
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 
@@ -9443,7 +9248,6 @@ void minlmresults(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep);
 
@@ -9457,7 +9261,6 @@ void minlmresultsbuf(const minlmstate &state, real_1d_array &x, minlmreport &rep
 //     State   -   structure used for reverse communication previously
 //                 allocated with MinLMCreateXXX call.
 //     X       -   new starting point.
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void minlmrestartfrom(const minlmstate &state, const real_1d_array &x);
 
@@ -9480,14 +9283,12 @@ void minlmrestartfrom(const minlmstate &state, const real_1d_array &x);
 //
 // NOTE: multiple calls to this function are possible. First call is counted,
 //       subsequent calls are silently ignored.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void minlmrequesttermination(const minlmstate &state);
 
 // This is obsolete function.
 //
 // Since ALGLIB 3.3 it is equivalent to MinLMCreateVJ().
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatevgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
@@ -9495,7 +9296,6 @@ void minlmcreatevgj(const ae_int_t m, const real_1d_array &x, minlmstate &state)
 // This is obsolete function.
 //
 // Since ALGLIB 3.3 it is equivalent to MinLMCreateFJ().
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatefgj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
@@ -9503,7 +9303,6 @@ void minlmcreatefgj(const ae_int_t m, const real_1d_array &x, minlmstate &state)
 // This function is considered obsolete since ALGLIB 3.1.0 and is present for
 // backward  compatibility  only.  We  recommend  to use MinLMCreateVJ, which
 // provides similar, but more consistent and feature-rich interface.
-//
 // ALGLIB: Copyright 30.03.2009 by Sergey Bochkanov
 void minlmcreatefj(const ae_int_t n, const ae_int_t m, const real_1d_array &x, minlmstate &state);
 void minlmcreatefj(const ae_int_t m, const real_1d_array &x, minlmstate &state);

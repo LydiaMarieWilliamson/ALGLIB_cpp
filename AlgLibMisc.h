@@ -168,7 +168,6 @@ void kdtreeunserialize(const std::istream &s_in, kdtree &obj);
 //    are most useful in low-dimensional tasks (NX=2, NX=3). NX=1  is another
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
@@ -205,7 +204,6 @@ void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, 
 //    are most useful in low-dimensional tasks (NX=2, NX=3). NX=1  is another
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
@@ -232,7 +230,6 @@ void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, co
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
 void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf);
 
@@ -265,7 +262,6 @@ void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf);
 // * KDTreeQueryResultsXY() to get X- and Y-values
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k);
@@ -306,7 +302,6 @@ ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k);
@@ -345,7 +340,6 @@ ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 // * KDTreeQueryResultsXY() to get X- and Y-values
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r);
@@ -383,7 +377,6 @@ ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double 
 // * KDTreeQueryResultsDistances() to get distances
 //
 // As indicated by "U" suffix, this function returns unordered results.
-//
 // ALGLIB: Copyright 01.11.2018 by Sergey Bochkanov
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r);
@@ -429,7 +422,6 @@ ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
@@ -474,7 +466,6 @@ ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
@@ -515,7 +506,6 @@ ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 // * KDTreeQueryResultsXY() to get X- and Y-values
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps);
@@ -563,7 +553,6 @@ ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps);
@@ -597,7 +586,6 @@ ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, co
 //       meaningful way of  ordering  points.  Furthermore,  no 'distance' is
 //       associated with points - it is either INSIDE  or OUTSIDE (so request
 //       for distances will return zeros).
-//
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
 ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax);
 
@@ -636,7 +624,6 @@ ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const re
 //            different object is dangerous - you  may  get  integrity  check
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
-//
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
 ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax);
 
@@ -669,7 +656,6 @@ ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, con
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x);
 
@@ -703,7 +689,6 @@ void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x);
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy);
 
@@ -737,7 +722,6 @@ void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy);
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags);
 
@@ -770,7 +754,6 @@ void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags);
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r);
 
@@ -800,7 +783,6 @@ void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r);
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x);
 
@@ -831,7 +813,6 @@ void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, re
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy);
 
@@ -867,7 +848,6 @@ void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, r
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags);
 
@@ -902,7 +882,6 @@ void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf,
 // * KDTreeQueryResultsX()             X-values
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r);
 
@@ -913,7 +892,6 @@ void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer 
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x);
 
@@ -924,7 +902,6 @@ void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x);
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy);
 
@@ -935,7 +912,6 @@ void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy);
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags);
 
@@ -946,7 +922,6 @@ void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags);
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r);
 } // end of namespace alglib
@@ -988,12 +963,10 @@ DecClass(hqrndstate, EndD);
 
 // HQRNDState  initialization  with  random  values  which come from standard
 // RNG.
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void hqrndrandomize(hqrndstate &state);
 
 // HQRNDState initialization with seed values
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
 
@@ -1001,7 +974,6 @@ void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
 // not including interval boundaries
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 double hqrnduniformr(const hqrndstate &state);
 
@@ -1012,7 +984,6 @@ double hqrnduniformr(const hqrndstate &state);
 //    * close to 2^31 on 32-bit systems
 //    * close to 2^62 on 64-bit systems
 //    An exception will be generated if N is too large.
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
 
@@ -1022,14 +993,12 @@ ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
 // Its performance is equal to that of HQRNDNormal2()
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 double hqrndnormal(const hqrndstate &state);
 
 // Random number generator: random X and Y such that X^2+Y^2=1
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void hqrndunit2(const hqrndstate &state, double &x, double &y);
 
@@ -1039,14 +1008,12 @@ void hqrndunit2(const hqrndstate &state, double &x, double &y);
 // distribution. Its performance is equal to that of HQRNDNormal()
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void hqrndnormal2(const hqrndstate &state, double &x1, double &x2);
 
 // Random number generator: exponential distribution
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-//
 // ALGLIB: Copyright 11.08.2007 by Sergey Bochkanov
 double hqrndexponential(const hqrndstate &state, const double lambdav);
 
@@ -1061,7 +1028,6 @@ double hqrndexponential(const hqrndstate &state, const double lambdav);
 //
 // Result:
 //     this function returns one of the X[i] for random i=0..N-1
-//
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
 double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
 
@@ -1079,7 +1045,6 @@ double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_i
 // Result:
 //     this function returns random number from continuous distribution which
 //     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
-//
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
 double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
 } // end of namespace alglib
@@ -1140,7 +1105,6 @@ DecClass(xdebugrecord1, ae_int_t &i; complex &c; real_1d_array a;);
 // Creates and returns XDebugRecord1 structure:
 // * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
 // * array field of Rec1 is set to [2,3]
-//
 // ALGLIB: Copyright 27.05.2014 by Sergey Bochkanov
 void xdebuginitrecord1(xdebugrecord1 &rec1);
 
@@ -1148,7 +1112,6 @@ void xdebuginitrecord1(xdebugrecord1 &rec1);
 // Never use it in any real life project.
 //
 // Counts number of True values in the boolean 1D array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugb1count(const boolean_1d_array &a);
 
@@ -1157,7 +1120,6 @@ ae_int_t xdebugb1count(const boolean_1d_array &a);
 //
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb1not(const boolean_1d_array &a);
 
@@ -1166,7 +1128,6 @@ void xdebugb1not(const boolean_1d_array &a);
 //
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb1appendcopy(boolean_1d_array &a);
 
@@ -1175,7 +1136,6 @@ void xdebugb1appendcopy(boolean_1d_array &a);
 //
 // Generate N-element array with even-numbered elements set to True.
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a);
 
@@ -1183,7 +1143,6 @@ void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugi1sum(const integer_1d_array &a);
 
@@ -1192,7 +1151,6 @@ ae_int_t xdebugi1sum(const integer_1d_array &a);
 //
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi1neg(const integer_1d_array &a);
 
@@ -1201,7 +1159,6 @@ void xdebugi1neg(const integer_1d_array &a);
 //
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi1appendcopy(integer_1d_array &a);
 
@@ -1212,7 +1169,6 @@ void xdebugi1appendcopy(integer_1d_array &a);
 // ones set to 0.
 //
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi1outeven(const ae_int_t n, integer_1d_array &a);
 
@@ -1220,7 +1176,6 @@ void xdebugi1outeven(const ae_int_t n, integer_1d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugr1sum(const real_1d_array &a);
 
@@ -1229,7 +1184,6 @@ double xdebugr1sum(const real_1d_array &a);
 //
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr1neg(const real_1d_array &a);
 
@@ -1238,7 +1192,6 @@ void xdebugr1neg(const real_1d_array &a);
 //
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr1appendcopy(real_1d_array &a);
 
@@ -1249,7 +1202,6 @@ void xdebugr1appendcopy(real_1d_array &a);
 // and odd-numbered ones are set to 0.
 //
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr1outeven(const ae_int_t n, real_1d_array &a);
 
@@ -1257,7 +1209,6 @@ void xdebugr1outeven(const ae_int_t n, real_1d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 complex xdebugc1sum(const complex_1d_array &a);
 
@@ -1266,7 +1217,6 @@ complex xdebugc1sum(const complex_1d_array &a);
 //
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc1neg(const complex_1d_array &a);
 
@@ -1275,7 +1225,6 @@ void xdebugc1neg(const complex_1d_array &a);
 //
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc1appendcopy(complex_1d_array &a);
 
@@ -1286,7 +1235,6 @@ void xdebugc1appendcopy(complex_1d_array &a);
 // and odd-numbered ones are set to 0.
 //
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc1outeven(const ae_int_t n, complex_1d_array &a);
 
@@ -1294,7 +1242,6 @@ void xdebugc1outeven(const ae_int_t n, complex_1d_array &a);
 // Never use it in any real life project.
 //
 // Counts number of True values in the boolean 2D array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugb2count(const boolean_2d_array &a);
 
@@ -1303,7 +1250,6 @@ ae_int_t xdebugb2count(const boolean_2d_array &a);
 //
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb2not(const boolean_2d_array &a);
 
@@ -1312,7 +1258,6 @@ void xdebugb2not(const boolean_2d_array &a);
 //
 // Transposes array.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb2transpose(boolean_2d_array &a);
 
@@ -1321,7 +1266,6 @@ void xdebugb2transpose(boolean_2d_array &a);
 //
 // Generate MxN matrix with elements set to "sin(3*I+5*J)>0"
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a);
 
@@ -1329,7 +1273,6 @@ void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugi2sum(const integer_2d_array &a);
 
@@ -1338,7 +1281,6 @@ ae_int_t xdebugi2sum(const integer_2d_array &a);
 //
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi2neg(const integer_2d_array &a);
 
@@ -1347,7 +1289,6 @@ void xdebugi2neg(const integer_2d_array &a);
 //
 // Transposes array.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi2transpose(integer_2d_array &a);
 
@@ -1356,7 +1297,6 @@ void xdebugi2transpose(integer_2d_array &a);
 //
 // Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
 
@@ -1364,7 +1304,6 @@ void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugr2sum(const real_2d_array &a);
 
@@ -1373,7 +1312,6 @@ double xdebugr2sum(const real_2d_array &a);
 //
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr2neg(const real_2d_array &a);
 
@@ -1382,7 +1320,6 @@ void xdebugr2neg(const real_2d_array &a);
 //
 // Transposes array.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr2transpose(real_2d_array &a);
 
@@ -1391,7 +1328,6 @@ void xdebugr2transpose(real_2d_array &a);
 //
 // Generate MxN matrix with elements set to "sin(3*I+5*J)"
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a);
 
@@ -1399,7 +1335,6 @@ void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of elements in the array.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 complex xdebugc2sum(const complex_2d_array &a);
 
@@ -1408,7 +1343,6 @@ complex xdebugc2sum(const complex_2d_array &a);
 //
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc2neg(const complex_2d_array &a);
 
@@ -1417,7 +1351,6 @@ void xdebugc2neg(const complex_2d_array &a);
 //
 // Transposes array.
 // Array is passed using "var" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc2transpose(complex_2d_array &a);
 
@@ -1426,7 +1359,6 @@ void xdebugc2transpose(complex_2d_array &a);
 //
 // Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
 // Array is passed using "out" convention.
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
 
@@ -1434,7 +1366,6 @@ void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
 // Never use it in any real life project.
 //
 // Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
-//
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c);
 } // end of namespace alglib

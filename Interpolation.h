@@ -208,7 +208,6 @@ void idwunserialize(const std::istream &s_in, idwmodel &obj);
 //            internal structures are determined only after model  is  built,
 //            so buffer object created before model construction  stage  will
 //            be useless (and any attempt to use it will result in exception).
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf);
 
@@ -253,7 +252,6 @@ void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state);
 // Inputs:
 //     State   -   builder object
 //     NLayers -   NLayers >= 1, the number of layers used by the model.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers);
 
@@ -270,7 +268,6 @@ void idwbuildersetnlayers(const idwbuilder &state, const ae_int_t nlayers);
 //                 specified, in  this  case  only leading [N,NX+NY] elements
 //                 will be used.
 //     N       -   number of points in the dataset, N >= 0.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy, const ae_int_t n);
 void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy);
@@ -351,7 +348,6 @@ void idwbuildersetpoints(const idwbuilder &state, const real_2d_array &xy);
 //
 // By default, 16 layers is built, which is enough for most  cases.  You  can
 // change this parameter with idwbuildersetnlayers() method.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwbuildersetalgomstab(const idwbuilder &state, const double srad);
 
@@ -368,7 +364,6 @@ void idwbuildersetalgomstab(const idwbuilder &state, const double srad);
 // NOTE 1: IDW interpolation can  correctly  handle  ANY  dataset,  including
 //         datasets with non-distinct points. In case non-distinct points are
 //         found, an average value for this point will be calculated.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p);
 
@@ -385,7 +380,6 @@ void idwbuildersetalgotextbookshepard(const idwbuilder &state, const double p);
 // NOTE 1: IDW interpolation can  correctly  handle  ANY  dataset,  including
 //         datasets with non-distinct points. In case non-distinct points are
 //         found, an average value for this point will be calculated.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r);
 
@@ -398,7 +392,6 @@ void idwbuildersetalgotextbookmodshepard(const idwbuilder &state, const double r
 //
 // NOTE: for vector-valued models all components of the prior are set to same
 //       user-specified value
-//
 // ALGLIB: Copyright 29.10.2018 by Sergey Bochkanov
 void idwbuildersetuserterm(const idwbuilder &state, const double v);
 
@@ -408,7 +401,6 @@ void idwbuildersetuserterm(const idwbuilder &state, const double v);
 //
 // Inputs:
 //     S       -   spline builder
-//
 // ALGLIB: Copyright 29.10.2018 by Sergey Bochkanov
 void idwbuildersetconstterm(const idwbuilder &state);
 
@@ -416,7 +408,6 @@ void idwbuildersetconstterm(const idwbuilder &state);
 //
 // Inputs:
 //     S       -   spline builder
-//
 // ALGLIB: Copyright 29.10.2018 by Sergey Bochkanov
 void idwbuildersetzeroterm(const idwbuilder &state);
 
@@ -433,7 +424,6 @@ void idwbuildersetzeroterm(const idwbuilder &state);
 //
 // Result:
 //     IDW interpolant S(X0)
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 double idwcalc1(const idwmodel &s, const double x0);
 
@@ -450,7 +440,6 @@ double idwcalc1(const idwmodel &s, const double x0);
 //
 // Result:
 //     IDW interpolant S(X0,X1)
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 double idwcalc2(const idwmodel &s, const double x0, const double x1);
 
@@ -467,7 +456,6 @@ double idwcalc2(const idwmodel &s, const double x0, const double x1);
 //
 // Result:
 //     IDW interpolant S(X0,X1,X2)
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 double idwcalc3(const idwmodel &s, const double x0, const double x1, const double x2);
 
@@ -493,7 +481,6 @@ double idwcalc3(const idwmodel &s, const double x0, const double x1, const doubl
 //                 reallocated after call to this function. In case you  want
 //                 to reuse previously allocated Y, you may use idwcalcbuf(),
 //                 which reallocates Y only when it is too small.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y);
 
@@ -516,7 +503,6 @@ void idwcalc(const idwmodel &s, const real_1d_array &x, real_1d_array &y);
 // Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y);
 
@@ -539,7 +525,6 @@ void idwcalcbuf(const idwmodel &s, const real_1d_array &x, real_1d_array &y);
 // Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_array &x, real_1d_array &y);
 
@@ -558,7 +543,6 @@ void idwtscalcbuf(const idwmodel &s, const idwcalcbuffer &buf, const real_1d_arr
 //       tries to fit the model exactly, it can  handle  datasets  with  non-
 //       distinct points which can not be fit exactly; in such  cases  least-
 //       squares fitting is performed.
-//
 // ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep);
 } // end of namespace alglib
@@ -603,7 +587,6 @@ DecClass(barycentricinterpolant, EndD);
 //
 // Result:
 //     barycentric interpolant F(t)
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 double barycentriccalc(const barycentricinterpolant &b, const double t);
 
@@ -624,7 +607,6 @@ double barycentriccalc(const barycentricinterpolant &b, const double t);
 //
 // NOTE
 //
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df);
 
@@ -643,7 +625,6 @@ void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f
 // NOTE: this algorithm may fail due to overflow/underflor if  used  on  data
 // whose values are close to MaxRealNumber or MinRealNumber.  Use more robust
 // BarycentricDiff1() subroutine in such cases.
-//
 //
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f);
@@ -683,7 +664,6 @@ void barycentriclintransy(const barycentricinterpolant &b, const double ca, cons
 //     X   -   interpolation nodes, array[0..N-1]
 //     F   -   function values, array[0..N-1]
 //     W   -   barycentric weights, array[0..N-1]
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w);
 
@@ -699,7 +679,6 @@ void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_arr
 //
 // Outputs:
 //     B   -   barycentric interpolant built from (X, Y, W)
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b);
 
@@ -766,7 +745,6 @@ namespace alglib {
 // Outputs:
 //     CX      -   central point for a sphere
 //     R       -   radius
-//
 // ALGLIB: Copyright 07.05.2018 by Sergey Bochkanov
 void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r);
 
@@ -793,7 +771,6 @@ void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
 //
 //       If you are ready to experiment with settings of  "expert"  function,
 //       you can achieve ~2-4x speedup over standard "bulletproof" settings.
-//
 //
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
@@ -822,7 +799,6 @@ void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
 //       If you are ready to experiment with settings of  "expert"  function,
 //       you can achieve ~2-4x speedup over standard "bulletproof" settings.
 //
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
 
@@ -850,7 +826,6 @@ void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
 //
 //       If you are ready to experiment with settings of  "expert"  function,
 //       you can achieve ~2-4x speedup over standard "bulletproof" settings.
-//
 //
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
@@ -1001,7 +976,6 @@ void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t
 // Because linearization approach failed to achieve stable results, we do not
 // include it in ALGLIB.
 //
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
 } // end of namespace alglib
@@ -1059,6 +1033,8 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix tbl);
 void spline1dlintransx(spline1dinterpolant *c, double a, double b);
 void spline1dlintransy(spline1dinterpolant *c, double a, double b);
 double spline1dintegrate(spline1dinterpolant *c, double x);
+void spline1dfitpenalized(RVector x, RVector y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
+void spline1dfitpenalizedw(RVector x, RVector y, RVector w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
 void spline1dfit(RVector x, RVector y, ae_int_t n, ae_int_t m, double lambdans, spline1dinterpolant *s, spline1dfitreport *rep);
 void spline1dconvdiffinternal(RVector xold, RVector yold, RVector dold, ae_int_t n, RVector x2, ae_int_t n2, RVector y, bool needy, RVector d1, bool needd1, RVector d2, bool needd2);
 void spline1drootsandextrema(spline1dinterpolant *c, RVector r, ae_int_t *nr, bool *dr, RVector e, ZVector et, ae_int_t *ne, bool *de);
@@ -1659,6 +1635,30 @@ void spline1dlintransy(const spline1dinterpolant &c, const double a, const doubl
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 double spline1dintegrate(const spline1dinterpolant &c, const double x);
 
+// This function is an obsolete and deprecated version of fitting by
+// penalized cubic spline.
+//
+// It was superseded by spline1dfit(), which is an orders of magnitude faster
+// and more memory-efficient implementation.
+//
+// Do NOT use this function in the new code!
+//
+// ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+
+// This function is an obsolete and deprecated version of fitting by
+// penalized cubic spline.
+//
+// It was superseded by spline1dfit(), which is an orders of magnitude faster
+// and more memory-efficient implementation.
+//
+// Do NOT use this function in the new code!
+//
+// ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
+
 // Fitting by smoothing (penalized) cubic spline.
 //
 // This function approximates N scattered points (some of X[] may be equal to
@@ -2166,7 +2166,6 @@ double pspline3arclength(const pspline3interpolant &p, const double a, const dou
 //       If both StopM and StopEps are non-zero, algorithm is stopped by  the
 //       FIRST criterion which is satisfied. In case both StopM  and  StopEps
 //       are zero, algorithm stops because of (c).
-//
 // ALGLIB: Copyright 02.10.2014 by Sergey Bochkanov
 void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections);
 } // end of namespace alglib
@@ -2430,7 +2429,6 @@ namespace alglib {
 //     NOT polynomial. We can't distinguish between these two cases, and this
 //     algorithm just tries to work assuming that P IS a polynomial.  If not,
 //     algorithm will return results, but they won't have any meaning.
-//
 // ALGLIB: Copyright 30.09.2010 by Sergey Bochkanov
 void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t);
 
@@ -2449,7 +2447,6 @@ void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const d
 //
 // Outputs:
 //     P   -   polynomial in barycentric form
-//
 // ALGLIB: Copyright 30.09.2010 by Sergey Bochkanov
 void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p);
 void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p);
@@ -2489,7 +2486,6 @@ void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, 
 //     NOT polynomial. We can't distinguish between these two cases, and this
 //     algorithm just tries to work assuming that P IS a polynomial.  If not,
 //     algorithm will return results, but they won't have any meaning.
-//
 // ALGLIB: Copyright 30.09.2010 by Sergey Bochkanov
 void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a);
 void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a);
@@ -2525,7 +2521,6 @@ void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a);
 //     this problem completely. This function  will  return barycentric model
 //     in any case, but for N>8 accuracy well degrade. However, N's less than
 //     5 are pretty safe.
-//
 // ALGLIB: Copyright 30.09.2010 by Sergey Bochkanov
 void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p);
 void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p);
@@ -2542,7 +2537,6 @@ void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p);
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
 void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p);
@@ -2561,7 +2555,6 @@ void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentric
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
-//
 // ALGLIB: Copyright 03.12.2009 by Sergey Bochkanov
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
 void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
@@ -2581,7 +2574,6 @@ void polynomialbuildeqdist(const double a, const double b, const real_1d_array &
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
-//
 // ALGLIB: Copyright 03.12.2009 by Sergey Bochkanov
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
 void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
@@ -2601,7 +2593,6 @@ void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y
 //     P   -   barycentric model which represents Lagrange interpolant
 //             (see ratint unit info and BarycentricCalc() description for
 //             more information).
-//
 // ALGLIB: Copyright 03.12.2009 by Sergey Bochkanov
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
 void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
@@ -2625,7 +2616,6 @@ void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y
 //     the best option is to use  PolynomialBuildEqDist()/BarycentricCalc()
 //     subroutines unless you are pretty sure that your data will not result
 //     in overflow.
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
 double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t);
@@ -2651,7 +2641,6 @@ double polynomialcalceqdist(const double a, const double b, const real_1d_array 
 //     the best option is to use  PolIntBuildCheb1()/BarycentricCalc()
 //     subroutines unless you are pretty sure that your data will not result
 //     in overflow.
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
 double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t);
@@ -2677,7 +2666,6 @@ double polynomialcalccheb1(const double a, const double b, const real_1d_array &
 //     the best option is to use PolIntBuildCheb2()/BarycentricCalc()
 //     subroutines unless you are pretty sure that your data will not result
 //     in overflow.
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
 double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t);
@@ -2925,7 +2913,6 @@ DecClass(lsfitstate, bool &needf; bool &needfg; bool &needfgh; bool &xupdated; r
 //
 // NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
 //       curve, (X2[NSection-1],Y2[NSection-1]) is the last point.
-//
 // ALGLIB: Copyright 02.10.2014 by Sergey Bochkanov
 void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections);
 
@@ -2967,7 +2954,6 @@ void lstfitpiecewiselinearrdpfixed(const real_1d_array &x, const real_1d_array &
 //
 // NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
 //       curve, (X2[NSection-1],Y2[NSection-1]) is the last point.
-//
 // ALGLIB: Copyright 02.10.2014 by Sergey Bochkanov
 void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double eps, real_1d_array &x2, real_1d_array &y2, ae_int_t &nsections);
 
@@ -4053,7 +4039,6 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
@@ -4149,7 +4134,6 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
 // ALGLIB: Copyright 07.09.2009 by Sergey Bochkanov
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
@@ -4224,7 +4208,6 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
@@ -4316,7 +4299,6 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t 
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
 // ALGLIB: Copyright 07.09.2009 by Sergey Bochkanov
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
@@ -4354,7 +4336,6 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 18.10.2008 by Sergey Bochkanov
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state);
 void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const double diffstep, lsfitstate &state);
@@ -4391,7 +4372,6 @@ void lsfitcreatewf(const real_2d_array &x, const real_1d_array &y, const real_1d
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 18.10.2008 by Sergey Bochkanov
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const double diffstep, lsfitstate &state);
 void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const double diffstep, lsfitstate &state);
@@ -4436,7 +4416,6 @@ void lsfitcreatef(const real_2d_array &x, const real_1d_array &y, const real_1d_
 //     LSFitCreateFG (fitting without weights)
 //     LSFitCreateWFGH (fitting using Hessian)
 //     LSFitCreateFGH (fitting using Hessian, without weights)
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state);
 void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const bool cheapfg, lsfitstate &state);
@@ -4474,7 +4453,6 @@ void lsfitcreatewfg(const real_2d_array &x, const real_1d_array &y, const real_1
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, const bool cheapfg, lsfitstate &state);
 void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const bool cheapfg, lsfitstate &state);
@@ -4505,7 +4483,6 @@ void lsfitcreatefg(const real_2d_array &x, const real_1d_array &y, const real_1d
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state);
 void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &c, lsfitstate &state);
@@ -4536,7 +4513,6 @@ void lsfitcreatewfgh(const real_2d_array &x, const real_1d_array &y, const real_
 // Outputs:
 //     State   -   structure which stores algorithm state
 //
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, const ae_int_t n, const ae_int_t m, const ae_int_t k, lsfitstate &state);
 void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1d_array &c, lsfitstate &state);
@@ -4563,7 +4539,6 @@ void lsfitcreatefgh(const real_2d_array &x, const real_1d_array &y, const real_1
 // Passing EpsX=0  and  MaxIts=0  (simultaneously)  will  lead  to  automatic
 // stopping criterion selection (according to the scheme used by MINLM unit).
 //
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t maxits);
 
@@ -4583,7 +4558,6 @@ void lsfitsetcond(const lsfitstate &state, const double epsx, const ae_int_t max
 // NOTE: non-zero StpMax leads to moderate  performance  degradation  because
 // intermediate  step  of  preconditioned L-BFGS optimization is incompatible
 // with limits on step size.
-//
 // ALGLIB: Copyright 02.04.2010 by Sergey Bochkanov
 void lsfitsetstpmax(const lsfitstate &state, const double stpmax);
 
@@ -4595,7 +4569,6 @@ void lsfitsetstpmax(const lsfitstate &state, const double stpmax);
 //
 // When reports are needed, State.C (current parameters) and State.F (current
 // value of fitting function) are reported.
-//
 //
 // ALGLIB: Copyright 15.08.2010 by Sergey Bochkanov
 void lsfitsetxrep(const lsfitstate &state, const bool needxrep);
@@ -4622,7 +4595,6 @@ void lsfitsetxrep(const lsfitstate &state, const bool needxrep);
 //     State   -   structure stores algorithm state
 //     S       -   array[N], non-zero scaling coefficients
 //                 S[i] may be negative, sign doesn't matter.
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void lsfitsetscale(const lsfitstate &state, const real_1d_array &s);
 
@@ -4649,7 +4621,6 @@ void lsfitsetscale(const lsfitstate &state, const real_1d_array &s);
 // following useful properties:
 // * bound constraints are always satisfied exactly
 // * function is evaluated only INSIDE area specified by bound constraints
-//
 // ALGLIB: Copyright 14.01.2011 by Sergey Bochkanov
 void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -4690,7 +4661,6 @@ void lsfitsetbc(const lsfitstate &state, const real_1d_array &bndl, const real_1
 //       subproblem, which requires ~3-5 times more Cholesky  decompositions.
 //       Thus, if you can reformulate your problem in such way  this  it  has
 //       only box constraints, it may be beneficial to do so.
-//
 // ALGLIB: Copyright 29.04.2017 by Sergey Bochkanov
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void lsfitsetlc(const lsfitstate &state, const real_2d_array &c, const integer_1d_array &ct);
@@ -4748,7 +4718,6 @@ bool lsfititeration(const lsfitstate &state);
 //
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 //
 void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &c, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -4824,7 +4793,6 @@ void lsfitfit(lsfitstate &state, void (*func)(const real_1d_array &c, const real
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
 // ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsfitreport &rep);
 
@@ -4874,7 +4842,6 @@ void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsf
 //     TestStep    -   verification step:
 //                     * TestStep=0 turns verification off
 //                     * TestStep>0 activates verification
-//
 // ALGLIB: Copyright 15.06.2012 by Sergey Bochkanov
 void lsfitsetgradientcheck(const lsfitstate &state, const double teststep);
 } // end of namespace alglib
@@ -5464,7 +5431,6 @@ void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state);
 // Inputs:
 //     S       -   spline builder
 //     V       -   value for user-defined prior
-//
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v);
 
@@ -5476,7 +5442,6 @@ void spline2dbuildersetuserterm(const spline2dbuilder &state, const double v);
 //
 // Inputs:
 //     S       -   spline builder
-//
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 void spline2dbuildersetlinterm(const spline2dbuilder &state);
 
@@ -5488,7 +5453,6 @@ void spline2dbuildersetlinterm(const spline2dbuilder &state);
 //
 // Inputs:
 //     S       -   spline builder
-//
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 void spline2dbuildersetconstterm(const spline2dbuilder &state);
 
@@ -5498,7 +5462,6 @@ void spline2dbuildersetconstterm(const spline2dbuilder &state);
 //
 // Inputs:
 //     S       -   spline builder
-//
 // ALGLIB: Copyright 01.02.2018 by Sergey Bochkanov
 void spline2dbuildersetzeroterm(const spline2dbuilder &state);
 
@@ -5515,7 +5478,6 @@ void spline2dbuildersetzeroterm(const spline2dbuilder &state);
 //                 specified, in  this  case  only leading [N,NX+NY] elements
 //                 will be used.
 //     N       -   number of points in the dataset
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array &xy, const ae_int_t n);
 
@@ -5524,7 +5486,6 @@ void spline2dbuildersetpoints(const spline2dbuilder &state, const real_2d_array 
 //
 // Inputs:
 //     S       -   spline 2D builder object
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetareaauto(const spline2dbuilder &state);
 
@@ -5535,7 +5496,6 @@ void spline2dbuildersetareaauto(const spline2dbuilder &state);
 //     S       -   spline 2D builder object
 //     XA,XB   -   spatial extent in the first (X) dimension, XA<XB
 //     YA,YB   -   spatial extent in the second (Y) dimension, YA<YB
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const double xb, const double ya, const double yb);
 
@@ -5554,7 +5514,6 @@ void spline2dbuildersetarea(const spline2dbuilder &state, const double xa, const
 //
 // NOTE: at  least  4  nodes  is  created in each dimension, so KX and KY are
 //       silently increased if needed.
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, const ae_int_t ky);
 
@@ -5625,7 +5584,6 @@ void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, con
 //     LambdaV -   regularization coefficient, chosen in such a way  that  it
 //                 penalizes bottom layers (fine details) first.
 //                 LambdaV >= 0, zero value means that no penalty is applied.
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t nlayers, const double lambdav);
 
@@ -5664,7 +5622,6 @@ void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t 
 //                 * zero value means  that  no  smoothing  is  applied,  and
 //                   corresponding entries of design matrix  are  numerically
 //                   zero and dropped from consideration.
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double lambdans);
 
@@ -5689,7 +5646,6 @@ void spline2dbuildersetalgoblocklls(const spline2dbuilder &state, const double l
 // Inputs:
 //     S       -   spline 2D builder object
 //     LambdaNS-   nonsmoothness penalty
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double lambdans);
 
@@ -5703,7 +5659,6 @@ void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double l
 //     S       -   2D spline, fit result
 //     Rep     -   fitting report, which provides some additional info  about
 //                 errors, R2 coefficient and so on.
-//
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
 void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep);
 } // end of namespace alglib
@@ -6001,7 +5956,6 @@ void rbfunserialize(const std::istream &s_in, rbfmodel &obj);
 //         However, if you create a model with NX neither 2 nor 3,  you  have
 //         no backward compatibility from the start, and you  are  forced  to
 //         use hierarchical RBFs and ALGLIB 3.11 or later.
-//
 // ALGLIB: Copyright 13.12.2011, 20.06.2016 by Sergey Bochkanov
 void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s);
 
@@ -6043,7 +5997,6 @@ void rbfcreate(const ae_int_t nx, const ae_int_t ny, rbfmodel &s);
 //            determined only after model is built, so buffer object  created
 //            before model  construction  stage  will  be  useless  (and  any
 //            attempt to use it will result in exception).
-//
 // ALGLIB: Copyright 02.04.2016 by Sergey Bochkanov
 void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf);
 
@@ -6082,7 +6035,6 @@ void rbfcreatecalcbuffer(const rbfmodel &s, rbfcalcbuffer &buf);
 //       then after (2) you will get your fully constructed RBF model  -  but
 //       again with no dataset attached, so subsequent calls to rbfbuildmodel()
 //       will produce empty model.
-//
 //
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy, const ae_int_t n);
@@ -6132,7 +6084,6 @@ void rbfsetpoints(const rbfmodel &s, const real_2d_array &xy);
 //       then after (2) you will get your fully constructed RBF model  -  but
 //       again with no dataset attached, so subsequent calls to rbfbuildmodel()
 //       will produce empty model.
-//
 //
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const ae_int_t n, const real_1d_array &s);
@@ -6191,7 +6142,6 @@ void rbfsetpointsandscales(const rbfmodel &r, const real_2d_array &xy, const rea
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
 //       recommend you to study serialization examples from ALGLIB  Reference
 //       Manual if you want to perform serialization of your models.
-//
 //
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfsetalgoqnn(const rbfmodel &s, const double q, const double z);
@@ -6288,7 +6238,6 @@ void rbfsetalgoqnn(const rbfmodel &s);
 // 4. Using too many layers - you will get too large and too slow model. This
 //    model  will  perfectly  reproduce  your function, but maybe you will be
 //    able to achieve similar results with less layers (and less memory).
-//
 // ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdav);
 void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t nlayers);
@@ -6379,7 +6328,6 @@ void rbfsetalgomultilayer(const rbfmodel &s, const double rbase, const ae_int_t 
 // 2. Using  initial  radius  which  is  too  small.  You will get model with
 //    "holes" in the areas which are too far away from interpolation centers.
 //    However, algorithm will work correctly (and quickly) in this case.
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_t nlayers, const double lambdans);
 
@@ -6393,7 +6341,6 @@ void rbfsetalgohierarchical(const rbfmodel &s, const double rbase, const ae_int_
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
 //       recommend you to study serialization examples from ALGLIB  Reference
 //       Manual if you want to perform serialization of your models.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfsetlinterm(const rbfmodel &s);
 
@@ -6407,7 +6354,6 @@ void rbfsetlinterm(const rbfmodel &s);
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
 //       recommend you to study serialization examples from ALGLIB  Reference
 //       Manual if you want to perform serialization of your models.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfsetconstterm(const rbfmodel &s);
 
@@ -6421,7 +6367,6 @@ void rbfsetconstterm(const rbfmodel &s);
 // NOTE: this   function  has   some   serialization-related  subtleties.  We
 //       recommend you to study serialization examples from ALGLIB  Reference
 //       Manual if you want to perform serialization of your models.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfsetzeroterm(const rbfmodel &s);
 
@@ -6435,7 +6380,6 @@ void rbfsetzeroterm(const rbfmodel &s);
 //     BF      -   basis function type:
 //                 * 0 - classic Gaussian
 //                 * 1 - fast and compact one
-//
 // ALGLIB: Copyright 01.02.2017 by Sergey Bochkanov
 void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf);
 
@@ -6448,7 +6392,6 @@ void rbfsetv2bf(const rbfmodel &s, const ae_int_t bf);
 //                 Typically a few hundreds iterations is required,  with 400
 //                 being a good default value to start experimentation.
 //                 Zero value means that default value will be selected.
-//
 // ALGLIB: Copyright 01.02.2017 by Sergey Bochkanov
 void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits);
 
@@ -6471,7 +6414,6 @@ void rbfsetv2its(const rbfmodel &s, const ae_int_t maxits);
 //     R       -   support radius coefficient, >= 0.
 //                 Recommended values are [0.1,0.4] range, with 0.1 being
 //                 default value.
-//
 // ALGLIB: Copyright 01.02.2017 by Sergey Bochkanov
 void rbfsetv2supportr(const rbfmodel &s, const double r);
 
@@ -6519,7 +6461,6 @@ void rbfsetv2supportr(const rbfmodel &s, const double r);
 //
 // NOTE:  failure  to  build  model will leave current state of the structure
 // unchanged.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfbuildmodel(const rbfmodel &s, rbfreport &rep);
 
@@ -6549,7 +6490,6 @@ void rbfbuildmodel(const rbfmodel &s, rbfreport &rep);
 //
 // Result:
 //     value of the model or 0.0 (as defined above)
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfcalc1(const rbfmodel &s, const double x0);
 
@@ -6579,7 +6519,6 @@ double rbfcalc1(const rbfmodel &s, const double x0);
 //
 // Result:
 //     value of the model or 0.0 (as defined above)
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfcalc2(const rbfmodel &s, const double x0, const double x1);
 
@@ -6610,7 +6549,6 @@ double rbfcalc2(const rbfmodel &s, const double x0, const double x1);
 //
 // Result:
 //     value of the model or 0.0 (as defined above)
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const double x2);
 
@@ -6637,7 +6575,6 @@ double rbfcalc3(const rbfmodel &s, const double x0, const double x1, const doubl
 //                 reallocated after call to this function. In case you  want
 //                 to reuse previously allocated Y, you may use RBFCalcBuf(),
 //                 which reallocates Y only when it is too small.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 
@@ -6659,7 +6596,6 @@ void rbfcalc(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 // Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 
@@ -6683,14 +6619,12 @@ void rbfcalcbuf(const rbfmodel &s, const real_1d_array &x, real_1d_array &y);
 // Outputs:
 //     Y       -   function value, array[NY]. Y is not reallocated when it
 //                 is larger than NY.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbftscalcbuf(const rbfmodel &s, const rbfcalcbuffer &buf, const real_1d_array &x, real_1d_array &y);
 
 // This is legacy function for gridded calculation of RBF model.
 //
 // It is superseded by rbfgridcalc2v() and  rbfgridcalc2vsubset()  functions.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_2d_array &y);
 
@@ -6743,7 +6677,6 @@ void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0,
 // NOTE: if you need function values on some subset  of  regular  grid, which
 //       may be described as "several compact and  dense  islands",  you  may
 //       use rbfgridcalc2vsubset().
-//
 // ALGLIB: Copyright 27.01.2017 by Sergey Bochkanov
 void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, real_1d_array &y);
 
@@ -6806,7 +6739,6 @@ void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
 // NOTE: this  function  is  re-entrant,  i.e.  you  may  use  same  rbfmodel
 //       structure in multiple threads calling  this function  for  different
 //       grids.
-//
 // ALGLIB: Copyright 04.03.2016 by Sergey Bochkanov
 void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const boolean_1d_array &flagy, real_1d_array &y);
 
@@ -6865,7 +6797,6 @@ void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_in
 // NOTE: if you need function values on some subset  of  regular  grid, which
 //       may be described as "several compact and  dense  islands",  you  may
 //       use rbfgridcalc3vsubset().
-//
 // ALGLIB: Copyright 04.03.2016 by Sergey Bochkanov
 void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y);
 
@@ -6933,7 +6864,6 @@ void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
 // NOTE: this  function  is  re-entrant,  i.e.  you  may  use  same  rbfmodel
 //       structure in multiple threads calling  this function  for  different
 //       grids.
-//
 // ALGLIB: Copyright 04.03.2016 by Sergey Bochkanov
 void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0, const real_1d_array &x1, const ae_int_t n1, const real_1d_array &x2, const ae_int_t n2, const boolean_1d_array &flagy, real_1d_array &y);
 
@@ -6965,7 +6895,6 @@ void rbfgridcalc3vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_in
 //                   compatible with ALGLIB 3.10 or earlier.
 //                 * 2 - for models created by HierarchicalRBF, requires
 //                   ALGLIB 3.11 or later
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr, ae_int_t &nc, real_2d_array &v, ae_int_t &modelversion);
 
@@ -6979,7 +6908,6 @@ void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr
 //       compatible with ALGLIB 3.10 or earlier.
 //     * 2 - for models created by HierarchicalRBF, requires
 //       ALGLIB 3.11 or later
-//
 // ALGLIB: Copyright 06.07.2016 by Sergey Bochkanov
 ae_int_t rbfgetmodelversion(const rbfmodel &s);
 
@@ -6996,7 +6924,6 @@ ae_int_t rbfgetmodelversion(const rbfmodel &s);
 //
 // Result:
 //     progress value, in [0,1]
-//
 // ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
 double rbfpeekprogress(const rbfmodel &s);
 
@@ -7018,7 +6945,6 @@ double rbfpeekprogress(const rbfmodel &s);
 //
 // Inputs:
 //     S           -   RBF model object
-//
 // ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
 void rbfrequesttermination(const rbfmodel &s);
 } // end of namespace alglib
@@ -7030,59 +6956,29 @@ void nsfitspheremcc(RMatrix xy, ae_int_t npoints, ae_int_t nx, RVector cx, doubl
 void nsfitspheremic(RMatrix xy, ae_int_t npoints, ae_int_t nx, RVector cx, double *rlo);
 void nsfitspheremzc(RMatrix xy, ae_int_t npoints, ae_int_t nx, RVector cx, double *rlo, double *rhi);
 void nsfitspherex(RMatrix xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector cx, double *rlo, double *rhi);
-void spline1dfitpenalized(RVector x, RVector y, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
-void spline1dfitpenalizedw(RVector x, RVector y, RVector w, ae_int_t n, ae_int_t m, double rho, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
 // This function is left for backward compatibility.
 // Use fitspheremc() instead.
 //
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
 
 // This function is left for backward compatibility.
 // Use fitspheremi() instead.
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
 
 // This function is left for backward compatibility.
 // Use fitspheremz() instead.
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
 
 // This function is left for backward compatibility.
 // Use fitspherex() instead.
-//
 // ALGLIB: Copyright 14.04.2017 by Sergey Bochkanov
 void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
-
-// This function is an obsolete and deprecated version of fitting by
-// penalized cubic spline.
-//
-// It was superseded by spline1dfit(), which is an orders of magnitude faster
-// and more memory-efficient implementation.
-//
-// Do NOT use this function in the new code!
-//
-// ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-
-// This function is an obsolete and deprecated version of fitting by
-// penalized cubic spline.
-//
-// It was superseded by spline1dfit(), which is an orders of magnitude faster
-// and more memory-efficient implementation.
-//
-// Do NOT use this function in the new code!
-//
-// ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
-void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 } // end of namespace alglib
 
 #endif // OnceOnly

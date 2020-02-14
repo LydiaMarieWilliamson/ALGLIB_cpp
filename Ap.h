@@ -221,7 +221,6 @@ void *ae_malloc(size_t size);
 void ae_free(void *p);
 ae_int_t ae_sizeof(ae_datatype datatype);
 bool ae_check_zeros(const void *ptr, ae_int_t n);
-void ae_touch_ptr(void *p);
 
 // dynamic block which may be automatically deallocated during stack unwinding
 //
@@ -670,13 +669,15 @@ ae_int_t ae_minint(ae_int_t m1, ae_int_t m2);
 double ae_maxreal(double m1, double m2);
 double ae_minreal(double m1, double m2);
 double ae_randomreal();
+double ae_randommid();
 ae_int_t ae_randominteger(ae_int_t maxv);
+bool ae_randombool(double p = 0.5);
 
 // Complex math functions:
 // * basic arithmetic operations
 // * standard functions
-ae_complex ae_complex_from_i(ae_int_t v);
-ae_complex ae_complex_from_d(double v);
+inline ae_complex ae_complex_from_i(ae_int_t x, ae_int_t y = 0) { ae_complex r; r.x = (double)x, r.y = (double)y; return r; }
+inline ae_complex ae_complex_from_d(double x, double y = 0.0) { ae_complex r; r.x = x, r.y = y; return r; }
 
 ae_complex ae_c_neg(ae_complex lhs);
 bool ae_c_eq(ae_complex lhs, ae_complex rhs);
@@ -853,9 +854,9 @@ struct Type: public Type##I { \
    Type(); \
    Type(const Type &A); \
    Type &operator=(const Type &A); \
-   ~Type(); \
-   alglib_impl::Type *c_ptr(); \
-   alglib_impl::Type *c_ptr() const; \
+   ~Type() { alglib_impl::Type##_free(&Obj, false); } \
+   alglib_impl::Type *c_ptr() { return &Obj; } \
+   alglib_impl::Type *c_ptr() const { return const_cast<alglib_impl::Type *>(&Obj); } \
    Pars \
 }
 
@@ -882,23 +883,21 @@ Type &Type::operator=(const Type &A) { \
    memset(&Obj, 0, sizeof Obj), alglib_impl::Type##_copy(&Obj, const_cast<alglib_impl::Type *>(&A.Obj), false); \
    alglib_impl::ae_state_clear(); \
    return *this; \
-} \
-Type::~Type() { alglib_impl::Type##_free(&Obj, false); } \
-alglib_impl::Type *Type::c_ptr() { return &Obj; } \
-alglib_impl::Type *Type::c_ptr() const { return const_cast<alglib_impl::Type *>(&Obj); } \
+}
 
 // Complex number with double precision.
 struct complex {
-   complex();
-   complex(const double &X);
-   complex(const double &X, const double &Y);
-   complex(const complex &Z);
-   complex &operator=(const double &A); complex &operator=(const complex &A);
-   complex &operator+=(const double &A); complex &operator+=(const complex &A);
-   complex &operator-=(const double &A); complex &operator-=(const complex &A);
-   complex &operator*=(const double &A); complex &operator*=(const complex &A);
-   complex &operator/=(const double &A); complex &operator/=(const complex &A);
-   alglib_impl::ae_complex *c_ptr(); const alglib_impl::ae_complex *c_ptr() const;
+   complex(): x(0.0), y(0.0) { }
+   complex(const double &X): x(X), y(0.0) { }
+   complex(const double &X, const double &Y): x(X), y(Y) { }
+   complex(const complex &Z): x(Z.x), y(Z.y) { }
+   complex &operator=(const double &X); complex &operator=(const complex &Z);
+   complex &operator+=(const double &X); complex &operator+=(const complex &Z);
+   complex &operator-=(const double &X); complex &operator-=(const complex &Z);
+   complex &operator*=(const double &X); complex &operator*=(const complex &Z);
+   complex &operator/=(const double &X); complex &operator/=(const complex &Z);
+   alglib_impl::ae_complex *c_ptr() { return (alglib_impl::ae_complex *)this; }
+   const alglib_impl::ae_complex *c_ptr() const { return (const alglib_impl::ae_complex *)this; }
 #if !defined AE_NO_EXCEPTIONS
    std::string tostring(int dps) const;
 #endif
@@ -1420,7 +1419,9 @@ static const int CSV_SKIP_HEADERS = 0x1;
 
 int sign(double x);
 double randomreal();
+double randommid();
 ae_int_t randominteger(ae_int_t maxv);
+bool randombool(double p = 0.5);
 int RoundZ(double x);
 int TruncZ(double x);
 int FloorZ(double x);

@@ -167,8 +167,7 @@ The other wrapper forms that occur in the C++ namespace are for
 <p>
 <a name=supp_ObjClassDef class=sheader></a><h3>A3.2. Defining Object Classes</h3>
 The current implementation defines an object class for some C types <code>alglib_impl::</code>Type,
-layering on top of it a C++ type <code>alglib::</code>TypeI to handle object constructors
-and <code>alglib::</code>Type to internalize *_init(), *_copy(), *_free() and to enforce the distinction for <code>alglib_impl::</code>Type between public and private members.
+layering on top of it a C++ type <code>alglib::</code>TypeI to handle object constructors and <code>alglib::</code>Type to internalize *_init(), *_copy(), *_free() and to enforce the distinction for <code>alglib_impl::</code>Type between public and private members. The details of this implementation should not be relied on: it will undergo further changes as we experiment with different object models, with an eye toward eliminating it entirely and going fully native with C++.
 </p>
 <p>
 To expedite this process, the routines _Type_{init,init_copy,clear,destroy} have been renamed and/or redefined as Type_{init,copy,free}.
@@ -588,6 +587,9 @@ The routines are listed by subpackage module:
 ]</font>
 </p>
 <p>
+We maintain several independently recoded versions of ALGLIB, locally, for testing and experimentation and cross-validation.
+The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one of these; and the revisions made here - as well as in the local versions - result from reconciling the different versions with one another.
+</p>
 <a name=supp_History1 class=sheader></a><h3>A6.1. Revision Notes</h3>
 <pre class=narration>
 ∙	Corrected "ASCI" to "ASCII" and "#alglib_packages" to "#alglib_main" (mistakes inherited from the original ALGLIB manual).
@@ -733,6 +735,10 @@ The routines are listed by subpackage module:
 	Minor change in Ap.cpp.
 28	Conversions of assignment expressions to update operators (++X, --X, X++, X--, X op= Y), where applicable.
 29	Normalization of conditionals and layout.
+30	In-line some of the alglib:: object member functions.
+	Topological sorting of internal routines &amp; commenting out or eliminating dead-code and vestigial code from the commercial version.
+	Normalized the RCOMM interface.
+	Synthesis of new routines and generalized versions of existing routines.
 </pre>
 </p>
 <p>
@@ -805,6 +811,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 25	2283 3534 3510 3235 1580240643 212 // Final fixes in preparation for upgrade to 3.16.
 25	2299 3559 3510 3243 1580249792 204 // Final fixes in preparation for upgrade to 3.16.
 25	2268 3521 3498 3287 1580340998 200 // Final test of Version 3.15.
+30	2257 3534 3486 3279 1581358777 202 // Final test of Version 3.15 with retrofits.
 26	2146 3402 3486 3230 1580248905 220 // Version 3.16.
 26	2294 3449 3522 3247 1580273645 212
 26	2273 3534 3461 2865 1580343048 213
@@ -812,9 +819,13 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 27	2257 3509 3449 3262 1581001359 218
 28	2278 3497 3510 3253 1581027835 // 5 TestC tests failed.
 28	2268 3497 3498 3205 1581032293 222 // Corrected.
-28	2294 3485 3498 3271 1581033702 228 // Modifications, following validation against local version.
+28	2294 3485 3498 3271 1581033702 228 // Modifications, following cross-validation against local version.
 29	2268 3460 3461 3193 1581111823 230 // 1 TestC test failed.
 29	2294 3472 3498 3237 1581112921 215 // Corrected.
+29	2268 3559 3498 3248 1581201426 234 // Modifications, following cross-validation against local version.
+30	2268 3472 3498 3235 1581312636 213
+30	2278 3413 3498 3241 1581556573 216
+30	2273 3509 3510 3261 1581634496 220
 </pre>
 </p>
 </div>

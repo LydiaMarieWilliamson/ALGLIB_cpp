@@ -62,7 +62,6 @@ namespace alglib {
 //     X       -   array[0..N-1] - array of quadrature nodes,
 //                 in ascending order.
 //     W       -   array[0..N-1] - array of quadrature weights.
-//
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 
@@ -100,7 +99,6 @@ void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const 
 //     X       -   array[0..N-1] - array of quadrature nodes,
 //                 in ascending order.
 //     W       -   array[0..N-1] - array of quadrature weights.
-//
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 
@@ -138,7 +136,6 @@ void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &
 //                 in ascending order.
 //     W       -   array[0..N-1] - array of quadrature weights.
 //
-//
 // ALGLIB: Copyright 2005-2009 by Sergey Bochkanov
 void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 
@@ -160,7 +157,6 @@ void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &be
 //     X           -   array[0..N-1] - array of quadrature nodes,
 //                     in ascending order.
 //     W           -   array[0..N-1] - array of quadrature weights.
-//
 //
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
@@ -187,7 +183,6 @@ void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x,
 //                     in ascending order.
 //     W           -   array[0..N-1] - array of quadrature weights.
 //
-//
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 
@@ -212,7 +207,6 @@ void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double be
 //                     in ascending order.
 //     W           -   array[0..N-1] - array of quadrature weights.
 //
-//
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w);
 
@@ -233,7 +227,6 @@ void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &inf
 //     X           -   array[0..N-1] - array of quadrature nodes,
 //                     in ascending order.
 //     W           -   array[0..N-1] - array of quadrature weights.
-//
 //
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w);
@@ -291,7 +284,6 @@ namespace alglib {
 //     WKronrod    -   array[0..N-1] - Kronrod weights
 //     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
 //                     corresponding to extended Kronrod nodes).
-//
 // ALGLIB: Copyright 08.05.2009 by Sergey Bochkanov
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 
@@ -318,7 +310,6 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
 //     WKronrod    -   array[0..N-1] - Kronrod weights
 //     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
 //                     corresponding to extended Kronrod nodes).
-//
 //
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
@@ -354,7 +345,6 @@ void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x
 //     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
 //                     corresponding to extended Kronrod nodes).
 //
-//
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 
@@ -379,7 +369,6 @@ void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double b
 //     WKronrod    -   array[0..N-1] - Kronrod weights
 //     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
 //                     corresponding to extended Kronrod nodes).
-//
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss);
 
@@ -399,7 +388,6 @@ void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d
 //     WKronrod    -   array[0..N-1] - Kronrod weights
 //     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
 //                     corresponding to extended Kronrod nodes).
-//
 //
 // ALGLIB: Copyright 12.05.2009 by Sergey Bochkanov
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps);
@@ -452,7 +440,7 @@ typedef struct {
    double x;
    double xminusa;
    double bminusx;
-   bool needf;
+// bool needf; //(@) Redundant.
    double f;
    ae_int_t wrappermode;
    autogkinternalstate internalstate;
@@ -492,7 +480,7 @@ DecClass(autogkreport, ae_int_t &terminationtype; ae_int_t &nfev; ae_int_t &nint
 // * autogksmooth()/AutoGKSmoothW()/... to create objects
 // * autogkintegrate() to begin integration
 // * autogkresults() to get results
-DecClass(autogkstate, bool &needf; double &x; double &xminusa; double &bminusx; double &f;);
+DecClass(autogkstate, double &x; double &xminusa; double &bminusx; double &f;);
 
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
@@ -515,7 +503,6 @@ DecClass(autogkstate, bool &needf; double &x; double &xminusa; double &bminusx; 
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
 //
-//
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksmooth(const double a, const double b, autogkstate &state);
 
@@ -536,7 +523,6 @@ void autogksmooth(const double a, const double b, autogkstate &state);
 //
 // SEE ALSO
 //     AutoGKSmooth, AutoGKSingular, AutoGKResults.
-//
 //
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state);
@@ -568,7 +554,6 @@ void autogksmoothw(const double a, const double b, const double xwidth, autogkst
 // SEE ALSO
 //     AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
 //
-//
 // ALGLIB: Copyright 06.05.2009 by Sergey Bochkanov
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state);
 
@@ -582,7 +567,6 @@ bool autogkiteration(const autogkstate &state);
 // It accepts following parameters:
 //     func    -   callback which calculates f(x) for given x
 //     ptr     -   optional pointer which is passed to func; can be NULL
-//
 //
 // ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
 //
@@ -598,7 +582,6 @@ void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, 
 // Outputs:
 //     V       -   integral(f(x)dx,a,b)
 //     Rep     -   optimization report (see AutoGKReport description)
-//
 // ALGLIB: Copyright 14.11.2007 by Sergey Bochkanov
 void autogkresults(const autogkstate &state, double &v, autogkreport &rep);
 } // end of namespace alglib

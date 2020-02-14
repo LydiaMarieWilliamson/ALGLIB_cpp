@@ -52,7 +52,6 @@ namespace alglib {
 //     A   -   DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
 //
-//
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 void fftc1d(complex_1d_array &a, const ae_int_t n);
 void fftc1d(complex_1d_array &a);
@@ -71,7 +70,6 @@ void fftc1d(complex_1d_array &a);
 // Outputs:
 //     A   -   inverse DFT of a input array, array[0..N-1]
 //             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-//
 //
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 void fftc1dinv(complex_1d_array &a, const ae_int_t n);
@@ -94,7 +92,6 @@ void fftc1dinv(complex_1d_array &a);
 // of  array  is  usually needed. But for convinience subroutine returns full
 // complex array (with frequencies above N/2), so its result may be  used  by
 // other FFT-related subroutines.
-//
 //
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f);
@@ -130,7 +127,6 @@ void fftr1d(const real_1d_array &a, complex_1d_array &f);
 // - you must pass FULL array with N elements (although higher  N/2 are still
 // not used) because array size is used to automatically determine FFT length
 //
-//
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a);
 void fftr1dinv(const complex_1d_array &f, real_1d_array &a);
@@ -156,7 +152,6 @@ namespace alglib {
 //     A   -   FHT of a input array, array[0..N-1],
 //             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
 //
-//
 // ALGLIB: Copyright 04.06.2009 by Sergey Bochkanov
 void fhtr1d(real_1d_array &a, const ae_int_t n);
 
@@ -170,7 +165,6 @@ void fhtr1d(real_1d_array &a, const ae_int_t n);
 //
 // Outputs:
 //     A   -   inverse FHT of a input array, array[0..N-1]
-//
 //
 // ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 void fhtr1dinv(real_1d_array &a, const ae_int_t n);
@@ -216,7 +210,6 @@ namespace alglib {
 //     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 
@@ -241,7 +234,6 @@ void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array
 //     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 
@@ -268,7 +260,6 @@ void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_ar
 //     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c);
 
@@ -293,7 +284,6 @@ void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_
 //     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r);
 
@@ -314,7 +304,6 @@ void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const compl
 //     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 
@@ -339,7 +328,6 @@ void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, c
 //     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 
@@ -360,7 +348,6 @@ void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b
 //     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c);
 
@@ -385,7 +372,6 @@ void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_arr
 //     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r);
 } // end of namespace alglib
@@ -431,7 +417,6 @@ namespace alglib {
 // NOTE:
 //     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
 // on [-K..M-1],  you can still use this subroutine, just shift result by K.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r);
 
@@ -456,7 +441,6 @@ void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_
 //
 // Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
-//
 //
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c);
@@ -492,7 +476,6 @@ void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const com
 // NOTE:
 //     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
 // on [-K..M-1],  you can still use this subroutine, just shift result by K.
-//
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r);
 
@@ -517,7 +500,6 @@ void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array 
 //
 // Outputs:
 //     R   -   convolution: A*B. array[0..M-1].
-//
 //
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
 void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c);

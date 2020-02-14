@@ -124,7 +124,6 @@ DecClass(densesolverlsreport, double &r2; real_2d_array cx; ae_int_t &n; ae_int_
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 
@@ -156,7 +155,6 @@ void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array 
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 
@@ -214,7 +212,6 @@ void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_ar
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 
@@ -253,7 +250,6 @@ void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
@@ -307,7 +303,6 @@ void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_a
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 
@@ -338,7 +333,6 @@ void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const a
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info);
 
@@ -394,7 +388,6 @@ void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, con
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 
@@ -426,7 +419,6 @@ void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const 
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -461,7 +453,6 @@ void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, co
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 
@@ -496,7 +487,6 @@ void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const i
 //     X       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 
@@ -551,7 +541,6 @@ void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const 
 //     X       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 
@@ -579,7 +568,6 @@ void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -625,7 +613,6 @@ void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const comple
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 
@@ -650,7 +637,6 @@ void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info);
 
@@ -700,7 +686,6 @@ void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex
 //     X       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 
@@ -728,7 +713,6 @@ void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, con
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
@@ -780,7 +764,6 @@ void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p,
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 
@@ -814,7 +797,6 @@ void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, cons
 //       because this check is easy to do. However,  very  badly  conditioned
 //       matrices may went unnoticed.
 //
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolvefast(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info);
 
@@ -846,7 +828,6 @@ void cmatrixlusolvefast(const complex_2d_array &lua, const integer_1d_array &p, 
 //     X       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 
@@ -877,7 +858,6 @@ void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, 
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 
@@ -929,7 +909,6 @@ void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, c
 //     X       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 
@@ -956,7 +935,6 @@ void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isuppe
 //     B       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -1008,7 +986,6 @@ void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool is
 //     X       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 
@@ -1035,7 +1012,6 @@ void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper
 //     B       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info);
 
@@ -1091,7 +1067,6 @@ void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isu
 //     X       -   array[N]:
 //                 * for info>0 contains solution
 //                 * for info=-3 filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x);
 
@@ -1122,7 +1097,6 @@ void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const b
 //     B       -   array[N]:
 //                 * for info>0 overwritten by solution
 //                 * for info=-3 filled by zeros
-//
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -1175,7 +1149,6 @@ void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, con
 //     X       -   array[N]:
 //                 * for info>0  - solution
 //                 * for info=-3 - filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x);
 
@@ -1204,7 +1177,6 @@ void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bo
 //     B       -   array[N]:
 //                 * for info>0  - overwritten by solution
 //                 * for info=-3 - filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info);
 
@@ -1249,7 +1221,6 @@ void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, cons
 //                 Returns -3 for non-HPD matrices.
 //     Rep     -   same as in RMatrixSolve
 //     X       -   same as in RMatrixSolve
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 
@@ -1277,7 +1248,6 @@ void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isu
 //     B       -   array[0..N-1]:
 //                 * overwritten by solution
 //                 * zeros, if problem was not solved
-//
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -1322,7 +1292,6 @@ void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool
 //                 Returns -3 for non-HPD matrices.
 //     Rep     -   same as in RMatrixSolve
 //     X       -   same as in RMatrixSolve
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 
@@ -1351,7 +1320,6 @@ void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isup
 //                 * overwritten by solution
 //                 * zeros, if A is exactly singular (diagonal of its LU
 //                   decomposition has exact zeros).
-//
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info);
 
@@ -1408,7 +1376,6 @@ void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool 
 //     X       -   array[N]:
 //                 * for info>0 contains solution
 //                 * for info=-3 filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x);
 
@@ -1438,7 +1405,6 @@ void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, cons
 //     B       -   array[N]:
 //                 * for info>0 overwritten by solution
 //                 * for info=-3 filled by zeros
-//
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info);
 
@@ -1491,7 +1457,6 @@ void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, 
 //     X       -   array[N]:
 //                 * for info>0  - solution
 //                 * for info=-3 - filled by zeros
-//
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 
@@ -1520,7 +1485,6 @@ void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const
 //     B       -   array[N]:
 //                 * for info>0  - overwritten by solution
 //                 * for info=-3 - filled by zeros
-//
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info);
 
@@ -1564,7 +1528,6 @@ void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, c
 // * K         dim(Null(A))
 // * CX        array[0..N-1,0..K-1], kernel of A.
 //             Columns of CX store such vectors that A*CX[i]=0.
-//
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
 void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x);
 } // end of namespace alglib
@@ -1615,9 +1578,9 @@ typedef struct {
    bool xupdated;
    bool needmv;
    bool needmtv;
-   bool needmv2;
-   bool needvmv;
-   bool needprec;
+// bool needmv2; //(@) Not used.
+// bool needvmv; //(@) Not used.
+// bool needprec; //(@) Not used.
    ae_int_t repiterationscount;
    ae_int_t repnmv;
    ae_int_t repterminationtype;
@@ -1686,7 +1649,6 @@ DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &term
 //
 // NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
 //       allocated place as much as possible.
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
 
@@ -1700,7 +1662,6 @@ void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 14.11.2018 by Sergey Bochkanov
 void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
 
@@ -1711,7 +1672,6 @@ void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &st
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 void linlsqrsetprecunit(const linlsqrstate &state);
 
@@ -1721,7 +1681,6 @@ void linlsqrsetprecunit(const linlsqrstate &state);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 void linlsqrsetprecdiag(const linlsqrstate &state);
 
@@ -1733,7 +1692,6 @@ void linlsqrsetprecdiag(const linlsqrstate &state);
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
 
@@ -1755,7 +1713,6 @@ void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
 //       calling LinLSQRSetPrecUnit(). However, preconditioning cost is   low
 //       and preconditioner is very important for solution  of  badly  scaled
 //       problems.
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b);
 
@@ -1772,7 +1729,6 @@ void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const 
 //
 // NOTE: if EpsA,EpsB,EpsC and MaxIts are zero then these variables will
 // be setted as default values.
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits);
 
@@ -1797,7 +1753,6 @@ void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double e
 //                             linlsqrrequesttermination()
 //                 * Rep.IterationsCount contains iterations count
 //                 * NMV countains number of matrix-vector calculations
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep);
 
@@ -1809,7 +1764,6 @@ void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinCGOptimize().
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
 
@@ -1821,7 +1775,6 @@ void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
 //
 // Result:
 //     iteration counter, in [0,INF)
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
 
@@ -1847,7 +1800,6 @@ ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
 // NOTE: solver clears termination flag on its start, it means that  if  some
 //       other thread will request termination too soon, its request will went
 //       unnoticed.
-//
 // ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
 void linlsqrrequesttermination(const linlsqrstate &state);
 } // end of namespace alglib
@@ -1903,7 +1855,6 @@ DecClass(polynomialsolverreport, double &maxerr;);
 //
 // NOTE:   roots are not "polished" and  no  matrix  balancing  is  performed
 //         for them.
-//
 // ALGLIB: Copyright 24.02.2014 by Sergey Bochkanov
 void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
 } // end of namespace alglib
@@ -2031,7 +1982,6 @@ DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac;
 //    convergence of a New Levenberg-Marquardt Method'  by  Jin-yan  Fan  and
 //    Ya-Xiang Yuan.
 //
-//
 // ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
 void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
@@ -2050,7 +2000,6 @@ void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
 // stopping criterion selection (small EpsF).
 //
 // NOTES:
-//
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
 
@@ -2062,7 +2011,6 @@ void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxit
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to NLEQSolve().
-//
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 void nleqsetxrep(const nleqstate &state, const bool needxrep);
 
@@ -2078,7 +2026,6 @@ void nleqsetxrep(const nleqstate &state, const bool needxrep);
 // overflow. This function allows us to reject steps that are too large  (and
 // therefore expose us to the possible overflow) without actually calculating
 // function value at the x+stp*d.
-//
 // ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
 void nleqsetstpmax(const nleqstate &state, const double stpmax);
 
@@ -2099,7 +2046,6 @@ bool nleqiteration(const nleqstate &state);
 //                 can be NULL
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
-//
 //
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 //
@@ -2125,7 +2071,6 @@ void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &fu
 //                 * Rep.IterationsCount contains iterations count
 //                 * NFEV countains number of function calculations
 //                 * ActiveConstraints contains number of active constraints
-//
 // ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 
@@ -2135,7 +2080,6 @@ void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
 // where array reallocation penalty is too large to be ignored.
-//
 // ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 
@@ -2151,7 +2095,6 @@ void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
 //     X       -   new starting point.
 //     BndL    -   new lower bounds
 //     BndU    -   new upper bounds
-//
 // ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
 void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
 } // end of namespace alglib
@@ -2199,7 +2142,6 @@ DecClass(sparsesolverreport, ae_int_t &terminationtype;);
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
 
@@ -2223,7 +2165,6 @@ void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper,
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype>0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
-//
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
 
@@ -2245,7 +2186,6 @@ void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool 
 //     Rep     -   solver report, following fields are set:
 //                 * rep.terminationtype - solver status; >0 for success,
 //                   set to -3 on failure (degenerate system).
-//
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 
@@ -2270,7 +2210,6 @@ void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b
 //     Rep     -   solver report, following fields are set:
 //                 * rep.terminationtype - solver status; >0 for success,
 //                   set to -3 on failure (degenerate system).
-//
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 } // end of namespace alglib
@@ -2305,8 +2244,8 @@ typedef struct {
    bool xrep;
    bool xupdated;
    bool needmv;
-   bool needmtv;
-   bool needmv2;
+// bool needmtv; //(@) Not used.
+// bool needmv2; //(@) Not used.
    bool needvmv;
    bool needprec;
    ae_int_t repiterationscount;
@@ -2374,7 +2313,6 @@ DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &termin
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgcreate(const ae_int_t n, lincgstate &state);
 
@@ -2386,7 +2324,6 @@ void lincgcreate(const ae_int_t n, lincgstate &state);
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x);
 
@@ -2397,7 +2334,6 @@ void lincgsetstartingpoint(const lincgstate &state, const real_1d_array &x);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 void lincgsetprecunit(const lincgstate &state);
 
@@ -2407,7 +2343,6 @@ void lincgsetprecunit(const lincgstate &state);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//
 // ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
 void lincgsetprecdiag(const lincgstate &state);
 
@@ -2425,7 +2360,6 @@ void lincgsetprecdiag(const lincgstate &state);
 // NOTES:
 // If  both  EpsF  and  MaxIts  are  zero then small EpsF will be set to small
 // value.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t maxits);
 
@@ -2451,7 +2385,6 @@ void lincgsetcond(const lincgstate &state, const double epsf, const ae_int_t max
 //       calling LinCGSetPrecUnit(). However, preconditioning cost is low and
 //       preconditioner  is  very  important  for  solution  of  badly scaled
 //       problems.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsolvesparse(const lincgstate &state, const sparsematrix &a, const bool isupper, const real_1d_array &b);
 
@@ -2476,13 +2409,11 @@ void lincgsolvesparse(const lincgstate &state, const sparsematrix &a, const bool
 //                             best point found is returned
 //                 * Rep.IterationsCount contains iterations count
 //                 * NMV countains number of matrix-vector calculations
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep);
 
 // This function sets restart frequency. By default, algorithm  is  restarted
 // after N subsequent iterations.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetrestartfreq(const lincgstate &state, const ae_int_t srf);
 
@@ -2499,7 +2430,6 @@ void lincgsetrestartfreq(const lincgstate &state, const ae_int_t srf);
 // Inputs:
 //     Freq    -   desired update frequency, Freq >= 0.
 //                 Zero value means that no updates will be done.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq);
 
@@ -2511,7 +2441,6 @@ void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq);
 //
 // If NeedXRep is True, algorithm will call rep() callback function if  it is
 // provided to MinCGOptimize().
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 void lincgsetxrep(const lincgstate &state, const bool needxrep);
 } // end of namespace alglib

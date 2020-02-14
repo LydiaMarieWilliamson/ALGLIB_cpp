@@ -36,7 +36,6 @@ typedef struct {
 
 void innerrec_init(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, make_automatic);
 }
 
@@ -52,7 +51,6 @@ void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
 
 void innerrec_free(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
@@ -64,7 +62,6 @@ typedef struct {
 
 void seedrec_init(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
    innerrec_init(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, make_automatic);
 }
@@ -79,7 +76,6 @@ void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
 
 void seedrec_free(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
-   alglib_impl::ae_touch_ptr((void *)p);
    innerrec_free(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
 }
@@ -240,6 +236,7 @@ struct async_rbf_record {
    rbfreport * p_report;
    bool thread_finished;
 };
+
 DWORD WINAPI async_build_rbf_model(LPVOID T) {
    async_rbf_record *p = (async_rbf_record *) T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
@@ -1123,11 +1120,11 @@ int main() {
                   passed = passed && (proxy[i][j] == targt[i * NCOLS + j]);
                   passed = passed && (acopy[i][j] == targt[i * NCOLS + j]);
                }
-            r = targt[0 * NCOLS + 0];
-            targt[0 * NCOLS + 0] = r + 1;
-            passed = passed && (targt[0 * NCOLS + 0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            r = targt[0 * NCOLS];
+            targt[0 * NCOLS] = r + 1;
+            passed = passed && (targt[0 * NCOLS] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
-            passed = passed && (targt[0 * NCOLS + 0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && (targt[0 * NCOLS] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
          // subtest 1
             acopy = s4;
             proxy = acopy;
@@ -1136,11 +1133,11 @@ int main() {
                   passed = passed && (proxy[i][j] == acopy[i][j]);
                   passed = passed && (targt[i * NCOLS + j] == acopy[i][j]);
                }
-            r = targt[0 * NCOLS + 0];
-            targt[0 * NCOLS + 0] = r + 1;
-            passed = passed && (targt[0 * NCOLS + 0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            r = targt[0 * NCOLS];
+            targt[0 * NCOLS] = r + 1;
+            passed = passed && (targt[0 * NCOLS] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
             proxy[0][0] = r;
-            passed = passed && (targt[0 * NCOLS + 0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && (targt[0 * NCOLS] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
          // subtest 2
             acopy2 = s5;
             proxy = s5;
@@ -1689,7 +1686,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       alglib_impl::rbfrequesttermination(rbf.c_ptr());
       while (!async_rec.thread_finished) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         passed = passed && ((new_progress <= 0.1) || (new_progress == 1.0));   // we expect to terminate well before reaching 10%
+         passed = passed && (new_progress <= 0.1 || new_progress == 1.0);   // we expect to terminate well before reaching 10%
       }
       passed = passed && (rbfpeekprogress(rbf) == 1);
       passed = passed && (rep.terminationtype == 8);
@@ -1960,7 +1957,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgstate state;
          mincgreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20.0 * randomreal() - 10.0;
+         double x0 = 10.0 * randommid();
          double epsx = 1.0E-9;
          mincgcreate(1, x, state);
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
@@ -1977,7 +1974,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmstate state;
          minlmreport rep;
          real_1d_array x = "[0.0]";
-         double x0 = 20.0 * randomreal() - 10.0;
+         double x0 = 10.0 * randommid();
          double epsx = 1.0E-9;
          minlmcreatevj(1, 2, x, state);
          minlmsetcond(state, epsx, 0);

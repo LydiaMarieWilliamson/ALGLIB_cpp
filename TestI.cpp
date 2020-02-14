@@ -6,7 +6,7 @@
 using namespace alglib;
 
 bool doc_test_bool(bool v, bool t) {
-   return (v && t) || (!v && !t);
+   return v == t;
 }
 
 bool doc_test_int(ae_int_t v, ae_int_t t) {

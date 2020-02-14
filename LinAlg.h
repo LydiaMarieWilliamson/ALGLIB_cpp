@@ -2393,7 +2393,6 @@ bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 //
 // NOTE: this function checks sizes of input arrays, but it does  NOT  checks
 //       for presence of infinities or NAN's.
-//
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u);
 
@@ -2449,7 +2448,6 @@ void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const
 //       variables - say, 0.1*N or 0.3*N. For larger amount of  variables  it
 //       will  still  work,  but  you  may  get   better   performance   with
 //       straightforward Cholesky.
-//
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix);
 
@@ -2476,7 +2474,6 @@ void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const 
 //     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
-//
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &u, real_1d_array &bufr);
 
@@ -2503,7 +2500,6 @@ void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, co
 //     A       -   updated factorization.  If  IsUpper=True,  then  the  upper
 //                 triangle contains matrix U, and the elements below the main
 //                 diagonal are not modified. Similarly, if IsUpper = False.
-//
 // ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr);
 
@@ -3016,7 +3012,6 @@ void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t
 // Result:
 //     True, if the matrix is not singular.
 //     False, if the matrix is singular.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -3057,7 +3052,6 @@ void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_in
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -3221,7 +3215,6 @@ void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
 //     Info    -   same as for RMatrixLUInverse
 //     Rep     -   same as for RMatrixLUInverse
 //     A       -   same as for RMatrixLUInverse.
-//
 // ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
 void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
 void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
@@ -3259,7 +3252,6 @@ void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, mati
 //     Info    -   same as for RMatrixLUInverse
 //     Rep     -   same as for RMatrixLUInverse
 //     A       -   same as for RMatrixLUInverse.
-//
 // ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
 void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, const bool isunit, ae_int_t &info, matinvreport &rep);
 void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep);
@@ -3613,7 +3605,6 @@ void rmatrixbd(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_arr
 //     Q           -   first QColumns columns of matrix Q.
 //                     Array[0..M-1, 0..QColumns-1]
 //                     If QColumns=0, the array is not modified.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, const ae_int_t qcolumns, real_2d_array &q);
 
@@ -3641,7 +3632,6 @@ void rmatrixbdunpackq(const real_2d_array &qp, const ae_int_t m, const ae_int_t 
 //     Z           -   product of Z and Q.
 //                     Array[0..ZRows-1,0..ZColumns-1]
 //                     If ZRows=0 or ZColumns=0, the array is not modified.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &tauq, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 
@@ -3661,7 +3651,6 @@ void rmatrixbdmultiplybyq(const real_2d_array &qp, const ae_int_t m, const ae_in
 //     PT      -   first PTRows columns of matrix P^T
 //                 Array[0..PTRows-1, 0..N-1]
 //                 If PTRows=0, the array is not modified.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, const ae_int_t ptrows, real_2d_array &pt);
 
@@ -3689,7 +3678,6 @@ void rmatrixbdunpackpt(const real_2d_array &qp, const ae_int_t m, const ae_int_t
 //     Z - product of Z and P.
 //                 Array whose indexes range within [0..ZRows-1,0..ZColumns-1].
 //                 If ZRows=0 or ZColumns=0, the array is not modified.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_int_t n, const real_1d_array &taup, real_2d_array &z, const ae_int_t zrows, const ae_int_t zcolumns, const bool fromtheright, const bool dotranspose);
 
@@ -3710,7 +3698,6 @@ void rmatrixbdmultiplybyp(const real_2d_array &qp, const ae_int_t m, const ae_in
 //                 the value of IsUpper).
 //                 Array index ranges within [0..Min(M,N)-1], the last
 //                 element is not used.
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixbdunpackdiagonals(const real_2d_array &b, const ae_int_t m, const ae_int_t n, bool &isupper, real_1d_array &d, real_1d_array &e);
 
@@ -3759,7 +3746,6 @@ void rmatrixhessenberg(real_2d_array &a, const ae_int_t n, real_1d_array &tau);
 // Outputs:
 //     Q   -   matrix Q.
 //             Array whose indexes range within [0..N-1, 0..N-1].
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const real_1d_array &tau, real_2d_array &q);
 
@@ -3771,7 +3757,6 @@ void rmatrixhessenbergunpackq(const real_2d_array &a, const ae_int_t n, const re
 //
 // Outputs:
 //     H   -   matrix H. Array whose indexes range within [0..N-1, 0..N-1].
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void rmatrixhessenbergunpackh(const real_2d_array &a, const ae_int_t n, real_2d_array &h);
 
@@ -3856,7 +3841,6 @@ void smatrixtd(real_2d_array &a, const ae_int_t n, const bool isupper, real_1d_a
 // Outputs:
 //     Q       -   transformation matrix.
 //                 array with elements [0..N-1, 0..N-1].
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void smatrixtdunpackq(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &tau, real_2d_array &q);
 
@@ -3941,7 +3925,6 @@ void hmatrixtd(complex_2d_array &a, const ae_int_t n, const bool isupper, comple
 // Outputs:
 //     Q       -   transformation matrix.
 //                 array with elements [0..N-1, 0..N-1].
-//
 // ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &tau, complex_2d_array &q);
 } // end of namespace alglib
@@ -4127,7 +4110,6 @@ namespace alglib {
 //                     within [0..min(M,N)-1, 0..N-1].
 //                     if VTNeeded=2, VT contains matrix V^T wholly. Array whose
 //                     indexes range within [0..N-1, 0..N-1].
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 bool rmatrixsvd(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const ae_int_t uneeded, const ae_int_t vtneeded, const ae_int_t additionalmemory, real_1d_array &w, real_2d_array &u, real_2d_array &vt);
 } // end of namespace alglib
@@ -4198,7 +4180,6 @@ DecClass(normestimatorstate, EndD);
 // bug).
 //
 // Algorithm can be made non-deterministic with NormEstimatorSetSeed(0) call.
-//
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nstart, const ae_int_t nits, normestimatorstate &state);
 
@@ -4214,7 +4195,6 @@ void normestimatorcreate(const ae_int_t m, const ae_int_t n, const ae_int_t nsta
 //     State       -   norm estimator state, must be initialized with a  call
 //                     to NormEstimatorCreate()
 //     SeedVal     -   seed value, >= 0. Zero value = non-deterministic algo.
-//
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedval);
 
@@ -4228,7 +4208,6 @@ void normestimatorsetseed(const normestimatorstate &state, const ae_int_t seedva
 //
 // After this function  is  over  you can call NormEstimatorResults() to get
 // estimate of the norm(A).
-//
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 void normestimatorestimatesparse(const normestimatorstate &state, const sparsematrix &a);
 
@@ -4239,7 +4218,6 @@ void normestimatorestimatesparse(const normestimatorstate &state, const sparsema
 //
 // Outputs:
 //     Nrm     -   estimate of the matrix norm, Nrm >= 0
-//
 // ALGLIB: Copyright 06.12.2011 by Sergey Bochkanov
 void normestimatorresults(const normestimatorstate &state, double &nrm);
 } // end of namespace alglib
@@ -4382,13 +4360,11 @@ DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 // NOTE: if you solve many similar EVD problems you may  find  it  useful  to
 //       reuse previous subspace as warm-start point for new EVD problem.  It
 //       can be done with eigsubspacesetwarmstart() function.
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacecreate(const ae_int_t n, const ae_int_t k, eigsubspacestate &state);
 
 // Buffered version of constructor which aims to reuse  previously  allocated
 // memory as much as possible.
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspacestate &state);
 
@@ -4428,7 +4404,6 @@ void eigsubspacecreatebuf(const ae_int_t n, const ae_int_t k, const eigsubspaces
 //       EVD problems, where cost of matrix-matrix product is low.
 //       If you set eps to exactly zero,  Rayleigh-Ritz  phase  is completely
 //       turned off.
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const ae_int_t maxits);
 
@@ -4439,7 +4414,6 @@ void eigsubspacesetcond(const eigsubspacestate &state, const double eps, const a
 // Inputs:
 //     State       -   solver structure
 //     UseWarmStart-   either True or False
-//
 // ALGLIB: Copyright 12.11.2017 by Sergey Bochkanov
 void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmstart);
 
@@ -4466,7 +4440,6 @@ void eigsubspacesetwarmstart(const eigsubspacestate &state, const bool usewarmst
 //                     other  matrix   types;   for   now,   only   symmetric
 //                     eigenproblems are supported.
 //
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype);
 
@@ -4481,7 +4454,6 @@ void eigsubspaceoocstart(const eigsubspacestate &state, const ae_int_t mtype);
 // >     [calculate  Y=A*X, with X=R^NxM]
 // >     alglib.eigsubspaceoocsendresult(state, in Y)
 // > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
-//
 //
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 bool eigsubspaceooccontinue(const eigsubspacestate &state);
@@ -4518,7 +4490,6 @@ bool eigsubspaceooccontinue(const eigsubspacestate &state);
 //                         it is several times larger than number of  vectors
 //                         K requested by user.
 //
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &requesttype, ae_int_t &requestsize);
 
@@ -4550,7 +4521,6 @@ void eigsubspaceoocgetrequestinfo(const eigsubspacestate &state, ae_int_t &reque
 //     X               -   array[N,RequestSize] or larger, leading  rectangle
 //                         is filled with dense matrix X.
 //
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &x);
 
@@ -4572,7 +4542,6 @@ void eigsubspaceoocgetrequestdata(const eigsubspacestate &state, real_2d_array &
 //     State           -   solver running in out-of-core mode
 //     AX              -   array[N,RequestSize] or larger, leading  rectangle
 //                         is filled with product A*X.
-//
 //
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array &ax);
@@ -4601,7 +4570,6 @@ void eigsubspaceoocsendresult(const eigsubspacestate &state, const real_2d_array
 //                     * matrix of eigenvectors found
 //                     * orthogonal basis of K-dimensional invariant subspace
 //     Rep         -   report with additional parameters
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 
@@ -4626,7 +4594,6 @@ void eigsubspaceoocstop(const eigsubspacestate &state, real_1d_array &w, real_2d
 // NOTE: internally this function allocates a copy of NxN dense A. You should
 //       take it into account when working with very large matrices occupying
 //       almost all RAM.
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 
@@ -4646,7 +4613,6 @@ void eigsubspacesolvedenses(const eigsubspacestate &state, const real_2d_array &
 //                     of their absolute values
 //     Z           -   array[N,K], matrix of eigenvectors found
 //     Rep         -   report with additional parameters
-//
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &a, const bool isupper, real_1d_array &w, real_2d_array &z, eigsubspacereport &rep);
 
@@ -4678,7 +4644,6 @@ void eigsubspacesolvesparses(const eigsubspacestate &state, const sparsematrix &
 // Result:
 //     True, if the algorithm has converged.
 //     False, if the algorithm hasn't converged (rare case).
-//
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, real_2d_array &z);
 
@@ -4717,7 +4682,6 @@ bool smatrixevd(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded
 //     wasn't able to find all the corresponding eigenvectors.
 //     In that case, the eigenvalues and eigenvectors are not returned,
 //     M is equal to 0.
-//
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
 bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, real_2d_array &z);
 
@@ -4753,7 +4717,6 @@ bool smatrixevdr(const real_2d_array &a, const ae_int_t n, const ae_int_t zneede
 //     eigenvalues in the given interval or if the inverse iteration subroutine
 //     wasn't able to find all the corresponding eigenvectors.
 //     In that case, the eigenvalues and eigenvectors are not returned.
-//
 // ALGLIB: Copyright 07.01.2006 by Sergey Bochkanov
 bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, real_2d_array &z);
 
@@ -4789,7 +4752,6 @@ bool smatrixevdi(const real_2d_array &a, const ae_int_t n, const ae_int_t zneede
 // Note:
 //     eigenvectors of Hermitian matrix are defined up to  multiplication  by
 //     a complex number L, such that |L|=1.
-//
 // ALGLIB: Copyright 2005, 2007 March 23 by Sergey Bochkanov
 bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, real_1d_array &d, complex_2d_array &z);
 
@@ -4833,7 +4795,6 @@ bool hmatrixevd(const complex_2d_array &a, const ae_int_t n, const ae_int_t znee
 // Note:
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
 //     a complex number L, such as |L|=1.
-//
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const double b1, const double b2, ae_int_t &m, real_1d_array &w, complex_2d_array &z);
 
@@ -4875,7 +4836,6 @@ bool hmatrixevdr(const complex_2d_array &a, const ae_int_t n, const ae_int_t zne
 // Note:
 //     eigen vectors of Hermitian matrix are defined up to multiplication  by
 //     a complex number L, such as |L|=1.
-//
 // ALGLIB: Copyright 07.01.2006, 24.03.2007 by Sergey Bochkanov
 bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zneeded, const bool isupper, const ae_int_t i1, const ae_int_t i2, real_1d_array &w, complex_2d_array &z);
 
@@ -4976,7 +4936,6 @@ bool smatrixtdevd(real_1d_array &d, const real_1d_array &e, const ae_int_t n, co
 //     eigenvalues in the given interval or if the inverse iteration subroutine
 //     wasn't able to find all the corresponding eigenvectors. In that case,
 //     the eigenvalues and eigenvectors are not returned, M is equal to 0.
-//
 // ALGLIB: Copyright 31.03.2008 by Sergey Bochkanov
 bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const double a, const double b, ae_int_t &m, real_2d_array &z);
 
@@ -5028,7 +4987,6 @@ bool smatrixtdevdr(real_1d_array &d, const real_1d_array &e, const ae_int_t n, c
 //     in the given interval or if the inverse iteration subroutine wasn't able
 //     to find all the corresponding eigenvectors. In that case, the eigenvalues
 //     and eigenvectors are not returned.
-//
 // ALGLIB: Copyright 25.12.2005 by Sergey Bochkanov
 bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, const ae_int_t zneeded, const ae_int_t i1, const ae_int_t i2, real_2d_array &z);
 
@@ -5201,7 +5159,6 @@ namespace alglib {
 //     algorithm for solving the symmetric eigenproblem.
 //
 // See also the GeneralizedSymmetricDefiniteEVDReduce subroutine.
-//
 // ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t zneeded, const ae_int_t problemtype, real_1d_array &d, real_2d_array &z);
 
@@ -5252,7 +5209,6 @@ bool smatrixgevd(const real_2d_array &a, const ae_int_t n, const bool isuppera, 
 //     True, if the problem was reduced successfully.
 //     False, if the error occurred during the Cholesky decomposition of
 //         matrix B (the matrix is not positive-definite).
-//
 // ALGLIB: Copyright 01.28.2006 by Sergey Bochkanov
 bool smatrixgevdreduce(real_2d_array &a, const ae_int_t n, const bool isuppera, const real_2d_array &b, const bool isupperb, const ae_int_t problemtype, real_2d_array &r, bool &isupperr);
 } // end of namespace alglib
@@ -5282,7 +5238,6 @@ namespace alglib {
 //
 // Outputs:
 //     InvA    -   inverse of modified matrix A.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const ae_int_t updcolumn, const double updval);
 
@@ -5302,7 +5257,6 @@ void rmatrixinvupdatesimple(real_2d_array &inva, const ae_int_t n, const ae_int_
 //
 // Outputs:
 //     InvA    -   inverse of modified matrix A.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t updrow, const real_1d_array &v);
 
@@ -5322,7 +5276,6 @@ void rmatrixinvupdaterow(real_2d_array &inva, const ae_int_t n, const ae_int_t u
 //
 // Outputs:
 //     InvA        -   inverse of modified matrix A.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_t updcolumn, const real_1d_array &u);
 
@@ -5342,7 +5295,6 @@ void rmatrixinvupdatecolumn(real_2d_array &inva, const ae_int_t n, const ae_int_
 //
 // Outputs:
 //     InvA - inverse of matrix A + u*v'.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 void rmatrixinvupdateuv(real_2d_array &inva, const ae_int_t n, const real_1d_array &u, const real_1d_array &v);
 } // end of namespace alglib
@@ -5374,7 +5326,6 @@ namespace alglib {
 //                   (A must be square matrix)
 //
 // Result: matrix determinant.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots);
@@ -5390,7 +5341,6 @@ double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots);
 //                   (A must be square matrix)
 //
 // Result: determinant of matrix A.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 double rmatrixdet(const real_2d_array &a, const ae_int_t n);
 double rmatrixdet(const real_2d_array &a);
@@ -5410,7 +5360,6 @@ double rmatrixdet(const real_2d_array &a);
 //                   (A must be square matrix)
 //
 // Result: matrix determinant.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n);
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots);
@@ -5426,7 +5375,6 @@ complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots);
 //                   (A must be square matrix)
 //
 // Result: determinant of matrix A.
-//
 // ALGLIB: Copyright 2005 by Sergey Bochkanov
 complex cmatrixdet(const complex_2d_array &a, const ae_int_t n);
 complex cmatrixdet(const complex_2d_array &a);
@@ -5448,7 +5396,6 @@ complex cmatrixdet(const complex_2d_array &a);
 //
 // Result:
 //     matrix determinant.
-//
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n);
 double spdmatrixcholeskydet(const real_2d_array &a);
@@ -5475,7 +5422,6 @@ double spdmatrixcholeskydet(const real_2d_array &a);
 // Result:
 //     determinant of matrix A.
 //     If matrix A is not positive definite, exception is thrown.
-//
 // ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper);
 double spdmatrixdet(const real_2d_array &a);

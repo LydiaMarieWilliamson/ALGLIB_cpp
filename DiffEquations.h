@@ -30,7 +30,7 @@ typedef struct {
    ae_vector escale;
    ae_vector xg;
    ae_int_t solvertype;
-   bool needdy;
+// bool needdy; //(@) Redundant.
    double x;
    ae_vector y;
    ae_vector dy;
@@ -64,7 +64,7 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix 
 } // end of namespace alglib_impl
 
 namespace alglib {
-DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
+DecClass(odesolverstate, real_1d_array y; real_1d_array dy; double &x;);
 DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // Cash-Karp adaptive ODE solver.
@@ -109,7 +109,6 @@ DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
 //
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state);
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state);
@@ -124,7 +123,6 @@ bool odesolveriteration(const odesolverstate &state);
 // It accepts following parameters:
 //     diff    -   callback which calculates dy/dx for given y and x
 //     ptr     -   optional pointer which is passed to diff; can be NULL
-//
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 //
@@ -148,7 +146,6 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
 //                     * -1    incorrect parameters were specified
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep);
 } // end of namespace alglib

@@ -19,7 +19,74 @@
 namespace alglib_impl {
 static const double odesolver_odesolvermaxgrow = 3.0;
 static const double odesolver_odesolvermaxshrink = 10.0;
-static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state);
+
+// Internal initialization subroutine
+static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
+   ae_int_t i;
+   double v;
+   SetObj(odesolverstate, state);
+// Prepare RComm
+   state->PQ = -1;
+// check parameters.
+   if (n <= 0 || m < 1 || eps == 0.0) {
+      state->repterminationtype = -1;
+      return;
+   }
+   if (h < 0.0) {
+      h = -h;
+   }
+// quick exit if necessary.
+// after this block we assume that M>1
+   if (m == 1) {
+      state->repnfev = 0;
+      state->repterminationtype = 1;
+      ae_matrix_set_length(&state->ytbl, 1, n);
+      ae_v_move(state->ytbl.ptr.pp_double[0], 1, y->ptr.p_double, 1, n);
+      ae_vector_set_length(&state->xg, m);
+      ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
+      return;
+   }
+// check again: correct order of X[]
+   if (x->ptr.p_double[1] == x->ptr.p_double[0]) {
+      state->repterminationtype = -2;
+      return;
+   }
+   for (i = 1; i < m; i++) {
+      if (x->ptr.p_double[1] > x->ptr.p_double[0] && x->ptr.p_double[i] <= x->ptr.p_double[i - 1] || x->ptr.p_double[1] < x->ptr.p_double[0] && x->ptr.p_double[i] >= x->ptr.p_double[i - 1]) {
+         state->repterminationtype = -2;
+         return;
+      }
+   }
+// auto-select H if necessary
+   if (h == 0.0) {
+      v = fabs(x->ptr.p_double[1] - x->ptr.p_double[0]);
+      for (i = 2; i < m; i++) {
+         v = ae_minreal(v, fabs(x->ptr.p_double[i] - x->ptr.p_double[i - 1]));
+      }
+      h = 0.001 * v;
+   }
+// store parameters
+   state->n = n;
+   state->m = m;
+   state->h = h;
+   state->eps = fabs(eps);
+   state->fraceps = eps < 0.0;
+   ae_vector_set_length(&state->xg, m);
+   ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
+   if (x->ptr.p_double[1] > x->ptr.p_double[0]) {
+      state->xscale = 1.0;
+   } else {
+      state->xscale = -1.0;
+      ae_v_muld(state->xg.ptr.p_double, 1, m, -1);
+   }
+   ae_vector_set_length(&state->yc, n);
+   ae_v_move(state->yc.ptr.p_double, 1, y->ptr.p_double, 1, n);
+   state->solvertype = solvertype;
+   state->repterminationtype = 0;
+// Allocate arrays
+   ae_vector_set_length(&state->y, n);
+   ae_vector_set_length(&state->dy, n);
+}
 
 // Cash-Karp adaptive ODE solver.
 //
@@ -63,7 +130,6 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
 //
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
    SetObj(odesolverstate, state);
@@ -79,7 +145,6 @@ void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, dou
    odesolver_odesolverinit(0, y, n, x, m, eps, h, state);
 }
 
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 bool odesolveriteration(odesolverstate *state) {
    AutoS ae_int_t n;
@@ -105,8 +170,6 @@ bool odesolveriteration(odesolverstate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   m = -58;
    i = -919;
    j = -909;
    k = 81;
@@ -114,10 +177,8 @@ Spawn:
    gridpoint = false;
    xc = -788;
    v = 809;
-   h = 205;
    h2 = -838;
    err = 939;
-   maxgrowpow = -526;
 // prepare
    if (state->repterminationtype != 0) {
       goto Exit;
@@ -223,9 +284,7 @@ Spawn:
                   v = state->rkb.ptr.pp_double[k][j];
                   ae_v_addd(state->y.ptr.p_double, 1, state->rkk.ptr.pp_double[j], 1, n, v);
                }
-               state->needdy = true;
                state->PQ = 0; goto Pause; Resume0:
-               state->needdy = false;
                state->repnfev++;
                v = h * state->xscale;
                ae_v_moved(state->rkk.ptr.pp_double[k], 1, state->dy.ptr.p_double, 1, n, v);
@@ -279,12 +338,11 @@ Spawn:
       state->repterminationtype = 1;
       goto Exit;
    }
-   goto Exit;
-Pause:
-   return true;
 Exit:
    state->PQ = -1;
    return false;
+Pause:
+   return true;
 }
 
 // ODE solver results
@@ -305,7 +363,6 @@ Exit:
 //                     * -1    incorrect parameters were specified
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix ytbl, odesolverreport *rep) {
    double v;
@@ -330,78 +387,8 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix 
    }
 }
 
-// Internal initialization subroutine
-static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
-   ae_int_t i;
-   double v;
-   SetObj(odesolverstate, state);
-// Prepare RComm
-   state->PQ = -1;
-   state->needdy = false;
-// check parameters.
-   if (n <= 0 || m < 1 || eps == 0.0) {
-      state->repterminationtype = -1;
-      return;
-   }
-   if (h < 0.0) {
-      h = -h;
-   }
-// quick exit if necessary.
-// after this block we assume that M>1
-   if (m == 1) {
-      state->repnfev = 0;
-      state->repterminationtype = 1;
-      ae_matrix_set_length(&state->ytbl, 1, n);
-      ae_v_move(state->ytbl.ptr.pp_double[0], 1, y->ptr.p_double, 1, n);
-      ae_vector_set_length(&state->xg, m);
-      ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
-      return;
-   }
-// check again: correct order of X[]
-   if (x->ptr.p_double[1] == x->ptr.p_double[0]) {
-      state->repterminationtype = -2;
-      return;
-   }
-   for (i = 1; i < m; i++) {
-      if (x->ptr.p_double[1] > x->ptr.p_double[0] && x->ptr.p_double[i] <= x->ptr.p_double[i - 1] || x->ptr.p_double[1] < x->ptr.p_double[0] && x->ptr.p_double[i] >= x->ptr.p_double[i - 1]) {
-         state->repterminationtype = -2;
-         return;
-      }
-   }
-// auto-select H if necessary
-   if (h == 0.0) {
-      v = fabs(x->ptr.p_double[1] - x->ptr.p_double[0]);
-      for (i = 2; i < m; i++) {
-         v = ae_minreal(v, fabs(x->ptr.p_double[i] - x->ptr.p_double[i - 1]));
-      }
-      h = 0.001 * v;
-   }
-// store parameters
-   state->n = n;
-   state->m = m;
-   state->h = h;
-   state->eps = fabs(eps);
-   state->fraceps = eps < 0.0;
-   ae_vector_set_length(&state->xg, m);
-   ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
-   if (x->ptr.p_double[1] > x->ptr.p_double[0]) {
-      state->xscale = 1.0;
-   } else {
-      state->xscale = -1.0;
-      ae_v_muld(state->xg.ptr.p_double, 1, m, -1);
-   }
-   ae_vector_set_length(&state->yc, n);
-   ae_v_move(state->yc.ptr.p_double, 1, y->ptr.p_double, 1, n);
-   state->solvertype = solvertype;
-   state->repterminationtype = 0;
-// Allocate arrays
-   ae_vector_set_length(&state->y, n);
-   ae_vector_set_length(&state->dy, n);
-}
-
 void odesolverstate_init(void *_p, bool make_automatic) {
    odesolverstate *p = (odesolverstate *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->yc, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->escale, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xg, 0, DT_REAL, make_automatic);
@@ -430,7 +417,6 @@ void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
    ae_vector_copy(&dst->escale, &src->escale, make_automatic);
    ae_vector_copy(&dst->xg, &src->xg, make_automatic);
    dst->solvertype = src->solvertype;
-   dst->needdy = src->needdy;
    dst->x = src->x;
    ae_vector_copy(&dst->y, &src->y, make_automatic);
    ae_vector_copy(&dst->dy, &src->dy, make_automatic);
@@ -449,7 +435,6 @@ void odesolverstate_copy(void *_dst, void *_src, bool make_automatic) {
 
 void odesolverstate_free(void *_p, bool make_automatic) {
    odesolverstate *p = (odesolverstate *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->yc, make_automatic);
    ae_vector_free(&p->escale, make_automatic);
    ae_vector_free(&p->xg, make_automatic);
@@ -466,8 +451,6 @@ void odesolverstate_free(void *_p, bool make_automatic) {
 }
 
 void odesolverreport_init(void *_p, bool make_automatic) {
-   odesolverreport *p = (odesolverreport *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void odesolverreport_copy(void *_dst, void *_src, bool make_automatic) {
@@ -478,13 +461,11 @@ void odesolverreport_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void odesolverreport_free(void *_p, bool make_automatic) {
-   odesolverreport *p = (odesolverreport *) _p;
-   ae_touch_ptr((void *)p);
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-DefClass(odesolverstate, AndD DecVal(needdy) AndD DecVar(y) AndD DecVar(dy) AndD DecVal(x))
+DefClass(odesolverstate, AndD DecVar(y) AndD DecVar(dy) AndD DecVal(x))
 DefClass(odesolverreport, AndD DecVal(nfev) AndD DecVal(terminationtype))
 
 // Cash-Karp adaptive ODE solver.
@@ -528,7 +509,6 @@ DefClass(odesolverreport, AndD DecVal(nfev) AndD DecVal(terminationtype))
 //
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-//
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state) {
@@ -580,7 +560,6 @@ void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array
 // SEE ALSO
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
 //
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state) {
@@ -610,8 +589,7 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
    alglib_impl::ae_assert(diff != NULL, "ALGLIB: error in 'odesolversolve()' (diff is NULL)");
    while (alglib_impl::odesolveriteration(state.c_ptr()))
    BegPoll
-      if (state.needdy) diff(state.y, state.x, state.dy, ptr);
-      else alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'odesolversolve'");
+      diff(state.y, state.x, state.dy, ptr);
    EndPoll
    alglib_impl::ae_state_clear();
 }
@@ -634,7 +612,6 @@ void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, 
 //                     * -1    incorrect parameters were specified
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
-//
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep) {
    alglib_impl::ae_state_init();

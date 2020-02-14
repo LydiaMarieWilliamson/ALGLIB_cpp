@@ -57,7 +57,6 @@ namespace alglib {
 //                     to basis vectors.
 //     V           -   array[0..NVars-1,0..NVars-1]
 //                     matrix, whose columns store basis vectors.
-//
 // ALGLIB: Copyright 25.08.2008 by Sergey Bochkanov
 void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v);
 
@@ -101,7 +100,6 @@ void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_
 // NOTE: passing eps=0 and maxits=0 results in small eps  being  selected  as
 // stopping condition. Exact value of automatically selected eps is  version-
 // -dependent.
-//
 // ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
 void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
 
@@ -152,7 +150,6 @@ void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const 
 //       prevents eternal loops (possible when inputs are degenerate and  too
 //       stringent stopping criteria are specified). In  current  version  it
 //       is 50+2*NVars.
-//
 // ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
 void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nneeded, const double eps, const ae_int_t maxits, real_1d_array &s2, real_2d_array &v);
 } // end of namespace alglib
@@ -208,7 +205,6 @@ namespace alglib {
 //     PAL, PBL-   probabilities P(0|v<Threshold) and P(1|v<Threshold)
 //     PAR, PBR-   probabilities P(0|v >= Threshold) and P(1|v >= Threshold)
 //     CVE     -   cross-validation estimate of cross-entropy
-//
 // ALGLIB: Copyright 22.05.2008 by Sergey Bochkanov
 void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae_int_t n, ae_int_t &info, double &threshold, double &pal, double &pbl, double &par, double &pbr, double &cve);
 
@@ -231,7 +227,6 @@ void dsoptimalsplit2(const real_1d_array &a, const integer_1d_array &c, const ae
 // Note:
 //     content of all arrays is changed by subroutine;
 //     it doesn't allocate temporaries.
-//
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
 void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array &tiesbuf, integer_1d_array &cntbuf, real_1d_array &bufr, integer_1d_array &bufi, const ae_int_t n, const ae_int_t nc, const double alpha, ae_int_t &info, double &threshold, double &rms, double &cvrms);
 } // end of namespace alglib
@@ -431,20 +426,17 @@ void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj);
 // Creates  neural  network  with  NIn  inputs,  NOut outputs, without hidden
 // layers, with linear output layer. Network weights are  filled  with  small
 // random values.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreate0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 
 // Same  as  MLPCreate0,  but  with  one  hidden  layer  (NHid  neurons) with
 // non-linear activation function. Output layer is linear.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 
 // Same as MLPCreate0, but with two hidden layers (NHid1 and  NHid2  neurons)
 // with non-linear activation function. Output layer is linear.
 //  $ALL
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
 
@@ -460,34 +452,28 @@ void mlpcreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, 
 //
 //     (-INF, B), if D<0.
 //
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 
 // Same as MLPCreateB0 but with non-linear hidden layer.
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 
 // Same as MLPCreateB0 but with two non-linear hidden layers.
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, multilayerperceptron &network);
 
 // Creates  neural  network  with  NIn  inputs,  NOut outputs, without hidden
 // layers with non-linear output layer. Network weights are filled with small
 // random values. Activation function of the output layer takes values [A,B].
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 
 // Same as MLPCreateR0, but with non-linear hidden layer.
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 
 // Same as MLPCreateR0, but with two non-linear hidden layers.
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, multilayerperceptron &network);
 
@@ -495,17 +481,14 @@ void mlpcreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2,
 // Network contains no hidden layers and linear output  layer  with  SOFTMAX-
 // normalization  (so  outputs  sums  up  to  1.0  and  converge to posterior
 // probabilities).
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreatec0(const ae_int_t nin, const ae_int_t nout, multilayerperceptron &network);
 
 // Same as MLPCreateC0, but with one non-linear hidden layer.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, multilayerperceptron &network);
 
 // Same as MLPCreateC0, but with two non-linear hidden layers.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, multilayerperceptron &network);
 
@@ -516,7 +499,6 @@ void mlpcreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2,
 //
 // Outputs:
 //     Network2 -   copy
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network2);
 
@@ -533,54 +515,44 @@ void mlpcopy(const multilayerperceptron &network1, multilayerperceptron &network
 //
 // Outputs:
 //     Network2 -   network state is copied from source to target
-//
 // ALGLIB: Copyright 20.06.2013 by Sergey Bochkanov
 void mlpcopytunableparameters(const multilayerperceptron &network1, const multilayerperceptron &network2);
 
 // Randomization of neural network weights
-//
 // ALGLIB: Copyright 06.11.2007 by Sergey Bochkanov
 void mlprandomize(const multilayerperceptron &network);
 
 // Randomization of neural network weights and standartisator
-//
 // ALGLIB: Copyright 10.03.2008 by Sergey Bochkanov
 void mlprandomizefull(const multilayerperceptron &network);
 
 // Internal subroutine.
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 void mlpinitpreprocessor(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
 
 // Returns information about initialized network: number of inputs, outputs,
 // weights.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpproperties(const multilayerperceptron &network, ae_int_t &nin, ae_int_t &nout, ae_int_t &wcount);
 
 // Returns number of inputs.
-//
 // ALGLIB: Copyright 19.10.2011 by Sergey Bochkanov
 ae_int_t mlpgetinputscount(const multilayerperceptron &network);
 
 // Returns number of outputs.
-//
 // ALGLIB: Copyright 19.10.2011 by Sergey Bochkanov
 ae_int_t mlpgetoutputscount(const multilayerperceptron &network);
 
 // Returns number of weights.
-//
 // ALGLIB: Copyright 19.10.2011 by Sergey Bochkanov
 ae_int_t mlpgetweightscount(const multilayerperceptron &network);
 
 // Tells whether network is SOFTMAX-normalized (i.e. classifier) or not.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 bool mlpissoftmax(const multilayerperceptron &network);
 
 // This function returns total number of layers (including input, hidden and
 // output layers).
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 ae_int_t mlpgetlayerscount(const multilayerperceptron &network);
 
@@ -591,7 +563,6 @@ ae_int_t mlpgetlayerscount(const multilayerperceptron &network);
 // Size of the output layer is always equal to the number of outputs, although
 // when we have softmax-normalized network, last neuron doesn't have any
 // connections - it is just zero.
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k);
 
@@ -609,7 +580,6 @@ ae_int_t mlpgetlayersize(const multilayerperceptron &network, const ae_int_t k);
 // I-th input is passed through linear transformation
 //     IN[i] = (IN[i]-Mean)/Sigma
 // before feeding to the network
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
 
@@ -628,7 +598,6 @@ void mlpgetinputscaling(const multilayerperceptron &network, const ae_int_t i, d
 //     OUT[i] = OUT[i]*Sigma+Mean
 // before returning it to user. In case we have SOFTMAX-normalized network,
 // we return (Mean,Sigma)=(0.0,1.0).
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, double &mean, double &sigma);
 
@@ -647,7 +616,6 @@ void mlpgetoutputscaling(const multilayerperceptron &network, const ae_int_t i, 
 //
 // NOTE: this function throws exception if layer or neuron with  given  index
 // do not exists.
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpgetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, ae_int_t &fkind, double &threshold);
 
@@ -667,7 +635,6 @@ void mlpgetneuroninfo(const multilayerperceptron &network, const ae_int_t k, con
 // This function:
 // 1. throws exception if layer or neuron with given index do not exists.
 // 2. returns zero if neurons exist, but there is no connection between them
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1);
 
@@ -683,7 +650,6 @@ double mlpgetweight(const multilayerperceptron &network, const ae_int_t k0, cons
 // NTE: I-th input is passed through linear transformation
 //     IN[i] = (IN[i]-Mean)/Sigma
 // before feeding to the network. This function sets Mean and Sigma.
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma);
 
@@ -703,7 +669,6 @@ void mlpsetinputscaling(const multilayerperceptron &network, const ae_int_t i, c
 // before returning it to user. This function sets Sigma/Mean. In case we
 // have SOFTMAX-normalized network, you can not set (Sigma,Mean) to anything
 // other than(0.0,1.0) - this function will throw exception.
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, const double mean, const double sigma);
 
@@ -728,7 +693,6 @@ void mlpsetoutputscaling(const multilayerperceptron &network, const ae_int_t i, 
 //    neurons of classifier network.
 // 3. this function throws exception when you try to set non-zero threshold for
 //    input neurons (any kind of network).
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, const ae_int_t i, const ae_int_t fkind, const double threshold);
 
@@ -748,7 +712,6 @@ void mlpsetneuroninfo(const multilayerperceptron &network, const ae_int_t k, con
 // 1. throws exception if layer or neuron with given index do not exists.
 // 2. throws exception if you try to set non-zero weight for non-existent
 //    connection
-//
 // ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const ae_int_t i0, const ae_int_t k1, const ae_int_t i1, const double w);
 
@@ -762,7 +725,6 @@ void mlpsetweight(const multilayerperceptron &network, const ae_int_t k0, const 
 //     F           -   function
 //     DF          -   its derivative
 //     D2F         -   its second derivative
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpactivationfunction(const double net, const ae_int_t k, double &f, double &df, double &d2f);
 
@@ -777,7 +739,6 @@ void mlpactivationfunction(const double net, const ae_int_t k, double &f, double
 //                 vector of posterior probabilities for classification task.
 //
 // See also MLPProcessI
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
 
@@ -788,7 +749,6 @@ void mlpprocess(const multilayerperceptron &network, const real_1d_array &x, rea
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 21.09.2010 by Sergey Bochkanov
 void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, real_1d_array &y);
 
@@ -820,7 +780,6 @@ void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, re
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -856,7 +815,6 @@ double mlperror(const multilayerperceptron &network, const real_2d_array &xy, co
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -864,7 +822,6 @@ double mlperrorsparse(const multilayerperceptron &network, const sparsematrix &x
 //
 // NOTE: this function is single-threaded. Unlike other  error  function,  it
 // receives no speed-up from being executed in SMP mode.
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize);
 
@@ -896,7 +853,6 @@ double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, c
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -929,7 +885,6 @@ ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &x
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 25.12.2008 by Sergey Bochkanov
 double mlprelclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -963,7 +918,6 @@ double mlprelclserror(const multilayerperceptron &network, const real_2d_array &
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 double mlprelclserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -996,7 +950,6 @@ double mlprelclserrorsparse(const multilayerperceptron &network, const sparsemat
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 08.01.2009 by Sergey Bochkanov
 double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -1034,7 +987,6 @@ double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, co
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -1068,7 +1020,6 @@ double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &x
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -1106,7 +1057,6 @@ double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy,
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -1139,7 +1089,6 @@ double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 11.03.2008 by Sergey Bochkanov
 double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -1176,7 +1125,6 @@ double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy,
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -1210,7 +1158,6 @@ double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 11.03.2008 by Sergey Bochkanov
 double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -1248,7 +1195,6 @@ double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -1266,7 +1212,6 @@ double mlpavgrelerrorsparse(const multilayerperceptron &network, const sparsemat
 // Outputs:
 //     E       -   error function, SUM(sqr(y[i]-desiredy[i])/2,i)
 //     Grad    -   gradient of E with respect to weights of network, array[WCount]
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
 
@@ -1285,7 +1230,6 @@ void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const 
 //     E       -   error function, sum-of-squares for regression networks,
 //                 cross-entropy for classification networks.
 //     Grad    -   gradient of E with respect to weights of network, array[WCount]
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const real_1d_array &desiredy, double &e, real_1d_array &grad);
 
@@ -1308,7 +1252,6 @@ void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const
 // Outputs:
 //     E       -   error function, SUM(sqr(y[i]-desiredy[i])/2,i)
 //     Grad    -   gradient of E with respect to weights of network, array[WCount]
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 
@@ -1333,7 +1276,6 @@ void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, 
 // Outputs:
 //     E       -   error function, SUM(sqr(y[i]-desiredy[i])/2,i)
 //     Grad    -   gradient of E with respect to weights of network, array[WCount]
-//
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 
@@ -1370,7 +1312,6 @@ void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix 
 //     E         - error function, SUM(sqr(y[i]-desiredy[i])/2,i)
 //     Grad      - gradient  of  E  with  respect   to  weights  of  network,
 //                 array[WCount]
-//
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
 
@@ -1412,7 +1353,6 @@ void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array
 //
 // NOTE: when  SubsetSize<0 is used full dataset by call MLPGradBatchSparse
 //       function.
-//
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &idx, const ae_int_t subsetsize, double &e, real_1d_array &grad);
 
@@ -1434,13 +1374,11 @@ void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsem
 //     E       -   error function, sum-of-squares for regression networks,
 //                 cross-entropy for classification networks.
 //     Grad    -   gradient of E with respect to weights of network, array[WCount]
-//
 // ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 void mlpgradnbatch(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t ssize, double &e, real_1d_array &grad);
 
 // Batch Hessian calculation (natural error function) using R-algorithm.
 // Internal subroutine.
-//
 // ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 //
 //      Hessian calculation based on R-algorithm described in
@@ -1451,7 +1389,6 @@ void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &
 
 // Batch Hessian calculation using R-algorithm.
 // Internal subroutine.
-//
 // ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 //
 //      Hessian calculation based on R-algorithm described in
@@ -1478,7 +1415,6 @@ void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &x
 //
 // Outputs:
 //     Rep     -   it contains all type of errors.
-//
 // ALGLIB: Copyright 04.09.2012 by Sergey Bochkanov
 void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
 
@@ -1501,7 +1437,6 @@ void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array
 //
 // Outputs:
 //     Rep     -   it contains all type of errors.
-//
 //
 // ALGLIB: Copyright 04.09.2012 by Sergey Bochkanov
 void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep);
@@ -1541,7 +1476,6 @@ void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsem
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 04.09.2012 by Sergey Bochkanov
 double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
 
@@ -1585,7 +1519,6 @@ double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 04.09.2012 by Sergey Bochkanov
 double mlperrorsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
 } // end of namespace alglib
@@ -1625,7 +1558,6 @@ namespace alglib {
 //                     *  2, if there was a multicollinearity in training set,
 //                           but task has been solved.
 //     W           -   linear combination coefficients, array[0..NVars-1]
-//
 // ALGLIB: Copyright 31.05.2008 by Sergey Bochkanov
 void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
 
@@ -1659,7 +1591,6 @@ void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t n
 //     W           -   basis, array[0..NVars-1,0..NVars-1]
 //                     columns of matrix stores basis vectors, sorted by
 //                     quality of training set separation (in descending order)
-//
 // ALGLIB: Copyright 31.05.2008 by Sergey Bochkanov
 void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
 } // end of namespace alglib
@@ -1781,7 +1712,6 @@ DecClass(ssamodel, EndD);
 //
 // Outputs:
 //     S               -   structure which stores model state
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssacreate(ssamodel &s);
 
@@ -1806,7 +1736,6 @@ void ssacreate(ssamodel &s);
 //
 // Outputs:
 //     S               -   SSA model, updated
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
 
@@ -1829,7 +1758,6 @@ void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
 //                 * positive values = use deterministic seed for each run of
 //                   algorithms which depend on random initialization
 //                 * zero or negative values = use non-deterministic seed
-//
 // ALGLIB: Copyright 03.11.2017 by Sergey Bochkanov
 void ssasetseed(const ssamodel &s, const ae_int_t seed);
 
@@ -1850,7 +1778,6 @@ void ssasetseed(const ssamodel &s, const ae_int_t seed);
 //                 * 0 means that no power-up is requested
 //                 * 1 is the same as 0
 //                 * >1 means that delayed power-up is performed
-//
 // ALGLIB: Copyright 03.11.2017 by Sergey Bochkanov
 void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
 
@@ -1869,7 +1796,6 @@ void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
 // Inputs:
 //     S       -   SSA model
 //     MemLimit-   memory limit, >= 0. Zero value means no limit.
-//
 // ALGLIB: Copyright 20.12.2017 by Sergey Bochkanov
 void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit);
 
@@ -1910,7 +1836,6 @@ void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit);
 //     S               -   SSA model, updated
 //
 // NOTE: you can clear dataset with ssacleardata()
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n);
 void ssaaddsequence(const ssamodel &s, const real_1d_array &x);
@@ -1969,7 +1894,6 @@ void ssaaddsequence(const ssamodel &s, const real_1d_array &x);
 //
 // NOTE: this function throws an exception if called for empty dataset (there
 //       is no "last" sequence to modify).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits);
 
@@ -2025,7 +1949,6 @@ void ssaappendpointandupdate(const ssamodel &s, const double x, const double upd
 //       not an option - all updates will fire at same moments.
 //
 //       You may change it with ssasetseed() function.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits);
 void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits);
@@ -2060,7 +1983,6 @@ void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const
 //     S               -   updated model
 //
 // NOTE: calling this function invalidates basis in all cases.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis);
 void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a);
@@ -2089,7 +2011,6 @@ void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a);
 //
 // NOTE: calling this function invalidates basis, except  for  the  situation
 //       when this algorithm was already set with same parameters.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
 
@@ -2129,7 +2050,6 @@ void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
 //
 // NOTE: calling this function invalidates basis, except  for  the  situation
 //       when this algorithm was already set with same parameters.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
 
@@ -2141,7 +2061,6 @@ void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
 //
 // Outputs:
 //     S               -   SSA model, updated
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssacleardata(const ssamodel &s);
 
@@ -2181,7 +2100,6 @@ void ssacleardata(const ssamodel &s);
 // Calling  this  function  in  degenerate  cases  (no  data  or all data are
 // shorter than window size; no algorithm is specified)  returns  basis  with
 // just one zero vector.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis);
 
@@ -2218,7 +2136,6 @@ void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_
 //
 // Calling  this  function  in  degenerate  cases  (no  data  or all data are
 // shorter than window size; no algorithm is specified) returns zeros.
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth);
 
@@ -2290,7 +2207,6 @@ void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth);
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks);
 
@@ -2379,7 +2295,6 @@ void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
 
@@ -2451,7 +2366,6 @@ void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &tre
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
 void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise);
@@ -2524,7 +2438,6 @@ void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_ar
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend);
 
@@ -2599,7 +2512,6 @@ void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &tr
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
 void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t forecastlen, real_1d_array &trend);
@@ -2676,7 +2588,6 @@ void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend);
 
@@ -2754,7 +2665,6 @@ void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t ntic
 //
 // No analysis is performed in degenerate cases (we immediately return  dummy
 // values, no basis is ever constructed).
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
 void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t m, const ae_int_t forecastlen, real_1d_array &trend);
@@ -2853,7 +2763,6 @@ DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &
 //                     this unit to work with the model.
 //     AR          -   additional results
 //
-//
 // ALGLIB: Copyright 02.08.2008 by Sergey Bochkanov
 void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 
@@ -2882,7 +2791,6 @@ void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nva
 //                     this unit to work with the model.
 //     AR          -   additional results
 //
-//
 // ALGLIB: Copyright 02.08.2008 by Sergey Bochkanov
 void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 
@@ -2891,7 +2799,6 @@ void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t np
 //     Y = A(0)*X[0] + ... + A(N-1)*X[N-1]
 //
 // i.e. with zero constant term.
-//
 // ALGLIB: Copyright 30.10.2008 by Sergey Bochkanov
 void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 
@@ -2900,7 +2807,6 @@ void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t n
 //     Y = A(0)*X[0] + ... + A(N-1)*X[N-1]
 //
 // i.e. with zero constant term.
-//
 // ALGLIB: Copyright 30.10.2008 by Sergey Bochkanov
 void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
 
@@ -2914,7 +2820,6 @@ void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nv
 //                     constant term (intercept) is stored in the V[NVars].
 //     NVars       -   number of independent variables (one less than number
 //                     of coefficients)
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
 
@@ -2927,7 +2832,6 @@ void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
 //
 // OUTPUT PAREMETERS:
 //     LM          -   linear model.
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
 
@@ -2939,7 +2843,6 @@ void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
 //
 // Result:
 //     value of linear model regression estimate
-//
 // ALGLIB: Copyright 03.09.2008 by Sergey Bochkanov
 double lrprocess(const linearmodel &lm, const real_1d_array &x);
 
@@ -2952,7 +2855,6 @@ double lrprocess(const linearmodel &lm, const real_1d_array &x);
 //
 // Result:
 //     root mean square error.
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -2965,7 +2867,6 @@ double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t
 //
 // Result:
 //     average error.
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -2978,7 +2879,6 @@ double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t
 //
 // Result:
 //     average relative error.
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
@@ -3023,7 +2923,6 @@ namespace alglib {
 //         used when calculating new value of X[i]. We should also note that
 //         this algorithm uses BOTH previous points and  current  one,  i.e.
 //         new value of X[i] depends on BOTH previous point and X[i] itself.
-//
 // ALGLIB: Copyright 25.10.2011 by Sergey Bochkanov
 void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
 void filtersma(real_1d_array &x, const ae_int_t k);
@@ -3054,7 +2953,6 @@ void filtersma(real_1d_array &x, const ae_int_t k);
 // NOTE 3: technical analytis users quite often work  with  EMA  coefficient
 //         expressed in DAYS instead of fractions. If you want to  calculate
 //         EMA(N), where N is a number of days, you can use alpha=2/(N+1).
-//
 // ALGLIB: Copyright 25.10.2011 by Sergey Bochkanov
 void filterema(real_1d_array &x, const ae_int_t n, const double alpha);
 void filterema(real_1d_array &x, const double alpha);
@@ -3093,7 +2991,6 @@ void filterema(real_1d_array &x, const double alpha);
 //         used when calculating new value of X[i]. We should also note that
 //         this algorithm uses BOTH previous points and  current  one,  i.e.
 //         new value of X[i] depends on BOTH previous point and X[i] itself.
-//
 // ALGLIB: Copyright 25.10.2011 by Sergey Bochkanov
 void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
 void filterlrma(real_1d_array &x, const ae_int_t k);
@@ -3192,7 +3089,6 @@ DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
 //                     *  1, if task has been solved
 //     LM          -   model built
 //     Rep         -   training report
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
 
@@ -3210,7 +3106,6 @@ void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t n
 // Outputs:
 //     Y       -   result, array[0..NClasses-1]
 //                 Vector of posterior probabilities for classification task.
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
 
@@ -3221,7 +3116,6 @@ void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
 
@@ -3238,7 +3132,6 @@ void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y)
 //     V           -   coefficients, array[0..NClasses-2,0..NVars]
 //     NVars       -   number of independent variables
 //     NClasses    -   number of classes
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses);
 
@@ -3252,7 +3145,6 @@ void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t
 //
 // Outputs:
 //     LM          -   logit model.
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm);
 
@@ -3265,7 +3157,6 @@ void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclass
 //
 // Result:
 //     CrossEntropy/(NPoints*ln(2)).
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -3278,7 +3169,6 @@ double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t np
 //
 // Result:
 //     percent of incorrectly classified cases.
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -3291,7 +3181,6 @@ double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_in
 //
 // Result:
 //     root mean square error (error when estimating posterior probabilities).
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -3304,7 +3193,6 @@ double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t
 //
 // Result:
 //     average error (error when estimating posterior probabilities).
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -3317,12 +3205,10 @@ double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t
 //
 // Result:
 //     average relative error (error when estimating posterior probabilities).
-//
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize);
 
 // Classification error on test set = MNLRelClsError*NPoints
-//
 // ALGLIB: Copyright 10.09.2008 by Sergey Bochkanov
 ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
@@ -3394,7 +3280,6 @@ namespace alglib {
 // This structure is a MCPD (Markov Chains for Population Data) solver.
 //
 // You should use ALGLIB functions in order to work with this object.
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 DecClass(mcpdstate, EndD);
 
@@ -3408,7 +3293,6 @@ DecClass(mcpdstate, EndD);
 //                                 (same as for MinBLEIC optimizer, positive
 //                                 values denote success, negative ones -
 //                                 failure)
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
@@ -3463,7 +3347,6 @@ DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationsco
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdcreate(const ae_int_t n, mcpdstate &s);
 
@@ -3508,7 +3391,6 @@ void mcpdcreate(const ae_int_t n, mcpdstate &s);
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
 
@@ -3553,7 +3435,6 @@ void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
 
@@ -3609,7 +3490,6 @@ void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
 //
 // Outputs:
 //     State   -   structure stores algorithm state
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s);
 
@@ -3640,7 +3520,6 @@ void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_i
 //      proportions instead of absolute population values
 //    * with population data rows of XY contain population counts and generally
 //      do not sum to 1.0 (although they still must be non-negative)
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k);
 void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy);
@@ -3696,7 +3575,6 @@ void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy);
 // 1. infinite values of EC will lead to exception being thrown. Values  less
 // than 0.0 or greater than 1.0 will lead to error code being returned  after
 // call to MCPDSolve().
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsetec(const mcpdstate &s, const real_2d_array &ec);
 
@@ -3747,7 +3625,6 @@ void mcpdsetec(const mcpdstate &s, const real_2d_array &ec);
 // 1. infinite values of C  will lead to exception being thrown. Values  less
 // than 0.0 or greater than 1.0 will lead to error code being returned  after
 // call to MCPDSolve().
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c);
 
@@ -3794,7 +3671,6 @@ void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const dou
 //                 be finite numbers or -INF.
 //     BndU    -   upper bounds constraints, array[N,N]. Elements of BndU can
 //                 be finite numbers or +INF.
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu);
 
@@ -3841,7 +3717,6 @@ void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_arra
 //     J       -   column index of element being constrained
 //     BndL    -   lower bound
 //     BndU    -   upper bound
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu);
 
@@ -3881,7 +3756,6 @@ void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const dou
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
 void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct);
@@ -3901,7 +3775,6 @@ void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_arra
 //     V       -   regularization  coefficient, finite non-negative value. It
 //                 is  not  recommended  to specify zero value unless you are
 //                 pretty sure that you want it.
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsettikhonovregularizer(const mcpdstate &s, const double v);
 
@@ -3922,7 +3795,6 @@ void mcpdsettikhonovregularizer(const mcpdstate &s, const double v);
 //                 2. columns must sum to 1.0.
 //                 First property is checked (exception is thrown otherwise),
 //                 while second one is not checked/enforced.
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
 
@@ -3946,7 +3818,6 @@ void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
 //     PW      -   array[N], weights:
 //                 * must be non-negative values (exception will be thrown otherwise)
 //                 * zero values will be replaced by automatically chosen values
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw);
 
@@ -3954,7 +3825,6 @@ void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw);
 //
 // After return from this function, you can use MCPDResults() to get solution
 // and completion code.
-//
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdsolve(const mcpdstate &s);
 
@@ -3971,7 +3841,6 @@ void mcpdsolve(const mcpdstate &s);
 //                 success, negative ones are failures.
 //                 More information about fields of this  structure  can  be
 //                 found in the comments on MCPDReport datatype.
-//
 //
 // ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep);
@@ -4065,82 +3934,66 @@ void mlpeserialize(mlpensemble &obj, std::ostream &s_out);
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj);
 
 // Like MLPCreate0, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreate0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreate1, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreate1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreate2, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreate2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateB0, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreateb0(const ae_int_t nin, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateB1, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreateb1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateB2, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreateb2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double b, const double d, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateR0, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreater0(const ae_int_t nin, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateR1, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreater1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateR2, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreater2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const double a, const double b, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateC0, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreatec0(const ae_int_t nin, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateC1, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreatec1(const ae_int_t nin, const ae_int_t nhid, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Like MLPCreateC2, but for ensembles.
-//
 // ALGLIB: Copyright 18.02.2009 by Sergey Bochkanov
 void mlpecreatec2(const ae_int_t nin, const ae_int_t nhid1, const ae_int_t nhid2, const ae_int_t nout, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Creates ensemble from network. Only network geometry is copied.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpecreatefromnetwork(const multilayerperceptron &network, const ae_int_t ensemblesize, mlpensemble &ensemble);
 
 // Randomization of MLP ensemble
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlperandomize(const mlpensemble &ensemble);
 
 // Return ensemble properties (number of inputs and outputs).
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpeproperties(const mlpensemble &ensemble, ae_int_t &nin, ae_int_t &nout);
 
 // Return normalization type (whether ensemble is SOFTMAX-normalized or not).
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 bool mlpeissoftmax(const mlpensemble &ensemble);
 
@@ -4157,7 +4010,6 @@ bool mlpeissoftmax(const mlpensemble &ensemble);
 // Outputs:
 //     Y       -   result. Regression estimate when solving regression  task,
 //                 vector of posterior probabilities for classification task.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpeprocess(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y);
 
@@ -4168,7 +4020,6 @@ void mlpeprocess(const mlpensemble &ensemble, const real_1d_array &x, real_1d_ar
 // This function allocates new array on each call,  so  it  is  significantly
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpeprocessi(const mlpensemble &ensemble, const real_1d_array &x, real_1d_array &y);
 
@@ -4183,7 +4034,6 @@ void mlpeprocessi(const mlpensemble &ensemble, const real_1d_array &x, real_1d_a
 //     percent of incorrectly classified cases.
 //     Works both for classifier betwork and for regression networks which
 // are used as classifiers.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -4197,7 +4047,6 @@ double mlperelclserror(const mlpensemble &ensemble, const real_2d_array &xy, con
 // Result:
 //     CrossEntropy/(NPoints*LN(2)).
 //     Zero if ensemble solves regression task.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -4212,7 +4061,6 @@ double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_
 //     root mean square error.
 //     Its meaning for regression task is obvious. As for classification task
 // RMS error means error when estimating posterior probabilities.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -4226,7 +4074,6 @@ double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const 
 // Result:
 //     Its meaning for regression task is obvious. As for classification task
 // it means average error when estimating posterior probabilities.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -4240,7 +4087,6 @@ double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const 
 // Result:
 //     Its meaning for regression task is obvious. As for classification task
 // it means average relative error when estimating posterior probabilities.
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
@@ -4419,7 +4265,6 @@ DecClass(mlptrainer, EndD);
 //                           (NPoints<0, Restarts<1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 
@@ -4455,7 +4300,6 @@ void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, co
 //                           (NPoints<0, Restarts<1).
 //                     *  2, if task has been solved.
 //     Rep         -   training report
-//
 // ALGLIB: Copyright 09.12.2007 by Sergey Bochkanov
 void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep);
 
@@ -4504,7 +4348,6 @@ void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy,
 // step size is small enought  (there  are  task  where  validation  set  may
 // decrease for eternity). In any case solution returned corresponds  to  the
 // minimum of validation set error.
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 
@@ -4532,7 +4375,6 @@ void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy,
 //     Info        -   return code, same as in MLPTrainLBFGS
 //     Rep         -   report, same as in MLPTrainLM/MLPTrainLBFGS
 //     CVRep       -   generalization error estimates
-//
 // ALGLIB: Copyright 09.12.2007 by Sergey Bochkanov
 void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
 
@@ -4558,7 +4400,6 @@ void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &x
 //     Info        -   return code, same as in MLPTrainLBFGS
 //     Rep         -   report, same as in MLPTrainLM/MLPTrainLBFGS
 //     CVRep       -   generalization error estimates
-//
 // ALGLIB: Copyright 09.12.2007 by Sergey Bochkanov
 void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
 
@@ -4606,7 +4447,6 @@ void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, 
 //
 // NOTE: on classification problems Rep.RMSError/Rep.AvgError/Rep.AvgRelError
 //       contain errors in prediction of posterior probabilities.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
 
@@ -4620,7 +4460,6 @@ void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const 
 //     S           -   neural network trainer object.
 //                     This structure can be used to train any regression
 //                     network with NIn inputs and NOut outputs.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
 
@@ -4634,7 +4473,6 @@ void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
 //     S           -   neural network trainer object.
 //                     This structure can be used to train any classification
 //                     network with NIn inputs and NOut outputs.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
 
@@ -4667,7 +4505,6 @@ void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -4701,7 +4538,6 @@ void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t 
 // * each row corresponds to one example
 // * first NIn columns are inputs, last column stores class number (from 0 to
 //   NClasses-1).
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints);
 
@@ -4716,7 +4552,6 @@ void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_i
 //                     is trained without weight decay.
 //
 // NOTE: by default network uses some small nonzero value for weight decay.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpsetdecay(const mlptrainer &s, const double decay);
 
@@ -4741,7 +4576,6 @@ void mlpsetdecay(const mlptrainer &s, const double decay);
 //       for "conventional" networks, they are  used  as  the  only  stopping
 //       criteria. When combined with early stopping, they used as ADDITIONAL
 //       stopping criteria which can terminate early stopping algorithm.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
 
@@ -4757,7 +4591,6 @@ void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
 //
 // Inputs:
 //     S           -   trainer object
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpsetalgobatch(const mlptrainer &s);
 
@@ -4788,7 +4621,6 @@ void mlpsetalgobatch(const mlptrainer &s);
 //       MLPStartTraining and MLPContinueTraining.
 //
 // NOTE: this method uses sum-of-squares error function for training.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
 
@@ -4839,7 +4671,6 @@ void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, c
 //       training set during training. It is possible and there is no defense
 //       against  such  actions,  but  algorithm  behavior  in  such cases is
 //       undefined and can be unpredictable.
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart);
 
@@ -4901,7 +4732,6 @@ void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, 
 //       training is a trainer object. Any attempt to interfere with  trainer
 //       may lead to unpredictable results.
 //
-//
 // ALGLIB: Copyright 23.07.2012 by Sergey Bochkanov
 bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network);
 
@@ -4925,7 +4755,6 @@ bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &networ
 //                     *  2, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
 
@@ -4952,7 +4781,6 @@ void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const a
 //                     *  2, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
-//
 // ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
 
@@ -4975,7 +4803,6 @@ void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, cons
 //                     *  6, if task has been solved.
 //     Rep         -   training report.
 //     OOBErrors   -   out-of-bag generalization error estimate
-//
 // ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
 
@@ -5007,7 +4834,6 @@ void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_
 //       values.
 //
 // NOTE: this method uses sum-of-squares error function for training.
-//
 // ALGLIB: Copyright 22.08.2012 by Sergey Bochkanov
 void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep);
 } // end of namespace alglib
@@ -5102,7 +4928,6 @@ namespace alglib {
 //
 // You should not try to access its fields directly.
 // Use ALGLIB functions in order to work with this object.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 DecClass(clusterizerstate, EndD);
 
@@ -5203,7 +5028,6 @@ DecClass(clusterizerstate, EndD);
 // NOTE: there is one-to-one correspondence between merges described by Z and
 //       PM. I-th row of Z describes same merge of clusters as I-th row of PM,
 //       with "left" cluster from Z corresponding to the "left" one from PM.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 DecClass(ahcreport, ae_int_t &terminationtype; ae_int_t &npoints; integer_1d_array p; integer_2d_array z; integer_2d_array pz; integer_2d_array pm; real_1d_array mergedist;);
 
@@ -5238,7 +5062,6 @@ DecClass(ahcreport, ae_int_t &terminationtype; ae_int_t &npoints; integer_1d_arr
 //                     total number of iterations is returned.
 //     Energy          merit function, "energy", sum  of  squared  deviations
 //                     from cluster centers
-//
 // ALGLIB: Copyright 27.11.2012 by Sergey Bochkanov
 DecClass(kmeansreport, ae_int_t &npoints; ae_int_t &nfeatures; ae_int_t &terminationtype; ae_int_t &iterationscount; double &energy; ae_int_t &k; real_2d_array c; integer_1d_array cidx;);
 
@@ -5248,7 +5071,6 @@ DecClass(kmeansreport, ae_int_t &npoints; ae_int_t &nfeatures; ae_int_t &termina
 // 2. dataset is added with ClusterizerSetPoints()
 // 3. additional parameters are set
 // 3. clusterization is performed with one of the clustering functions
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizercreate(clusterizerstate &s);
 
@@ -5296,7 +5118,6 @@ void clusterizercreate(clusterizerstate &s);
 //           distance function
 //         Thus, list of specific clustering algorithms you may  use  depends
 //         on distance function you specify when you set your dataset.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype);
 void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, const ae_int_t disttype);
@@ -5325,7 +5146,6 @@ void clusterizersetpoints(const clusterizerstate &s, const real_2d_array &xy, co
 //           used with dataset given by distance matrix
 //         Thus, if you call this function, you will be unable to use k-means
 //         clustering algorithm to process your problem.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const ae_int_t npoints, const bool isupper);
 void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, const bool isupper);
@@ -5348,7 +5168,6 @@ void clusterizersetdistances(const clusterizerstate &s, const real_2d_array &d, 
 //       It is possible, however,  to  use  this  method  with  user-supplied
 //       distance matrix. It  is  your  responsibility  to pass one which was
 //       calculated with Euclidean distance function.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo);
 
@@ -5363,7 +5182,6 @@ void clusterizersetahcalgo(const clusterizerstate &s, const ae_int_t algo);
 //     MaxIts  -   maximum number of k-means iterations performed during  one
 //                 run. >= 0, zero value means that algorithm performs unlimited
 //                 number of iterations.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restarts, const ae_int_t maxits);
 
@@ -5387,7 +5205,6 @@ void clusterizersetkmeanslimits(const clusterizerstate &s, const ae_int_t restar
 //                 *-1  "debug" algorithm which always selects first  K  rows
 //                      of dataset; this algorithm is used for debug purposes
 //                      only. Do not use it in the industrial code!
-//
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo);
 
@@ -5403,7 +5220,6 @@ void clusterizersetkmeansinit(const clusterizerstate &s, const ae_int_t initalgo
 //                 * positive values = use deterministic seed for each run of
 //                   algorithms which depend on random initialization
 //                 * zero or negative values = use non-deterministic seed
-//
 // ALGLIB: Copyright 08.06.2017 by Sergey Bochkanov
 void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed);
 
@@ -5434,7 +5250,6 @@ void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed);
 //
 //         For example, problem with 10000 points  would require 800M of RAM,
 //         even when working in a 1-dimensional space.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep);
 
@@ -5479,7 +5294,6 @@ void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep);
 //         which is used to select initial centers. As  result,  each  run of
 //         algorithm may return different values. If you  need  deterministic
 //         behavior, use ClusterizerSetSeed() function.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep);
 
@@ -5519,7 +5333,6 @@ void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansrep
 //        distance functions are computed using optimized linear algebra kernels,
 //        while Chebyshev and city block distance functions are computed using
 //        simple nested loops with two branches at each iteration.
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const ae_int_t disttype, real_2d_array &d);
 
@@ -5561,7 +5374,6 @@ void clusterizergetdistances(const real_2d_array &xy, const ae_int_t npoints, co
 //       it will perform many times faster than  for  K=100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_array &cidx, integer_1d_array &cz);
 
@@ -5609,7 +5421,6 @@ void clusterizergetkclusters(const ahcreport &rep, const ae_int_t k, integer_1d_
 //       it will perform many times faster than  for  K=100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
 
@@ -5657,7 +5468,6 @@ void clusterizerseparatedbydist(const ahcreport &rep, const double r, ae_int_t &
 //       it will perform many times faster than  for  K=100.  Its  worst-case
 //       performance is O(N*K), although in average case  it  perform  better
 //       (up to O(N*log(K))).
-//
 // ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 void clusterizerseparatedbycorr(const ahcreport &rep, const double r, ae_int_t &k, integer_1d_array &cidx, integer_1d_array &cz);
 } // end of namespace alglib
@@ -6009,7 +5819,6 @@ void dfunserialize(const std::istream &s_in, decisionforest &obj);
 //            object is dangerous - you  may   get  integrity  check  failure
 //            (exception) because sizes of internal  arrays  do  not  fit  to
 //            dimensions of the model structure.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf);
 
@@ -6038,7 +5847,6 @@ void dfcreatebuffer(const decisionforest &model, decisionforestbuffer &buf);
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildercreate(decisionforestbuilder &s);
 
@@ -6065,7 +5873,6 @@ void dfbuildercreate(decisionforestbuilder &s);
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
 
@@ -6081,7 +5888,6 @@ void dfbuildersetdataset(const decisionforestbuilder &s, const real_2d_array &xy
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars);
 
@@ -6096,7 +5902,6 @@ void dfbuildersetrndvars(const decisionforestbuilder &s, const ae_int_t rndvars)
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrndvarsratio(const decisionforestbuilder &s, const double f);
 
@@ -6109,7 +5914,6 @@ void dfbuildersetrndvarsratio(const decisionforestbuilder &s, const double f);
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrndvarsauto(const decisionforestbuilder &s);
 
@@ -6130,7 +5934,6 @@ void dfbuildersetrndvarsauto(const decisionforestbuilder &s);
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f);
 
@@ -6155,7 +5958,6 @@ void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f);
 //
 // Outputs:
 //     S           -   decision forest builder, see
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
 
@@ -6171,7 +5973,6 @@ void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
 //
 // Outputs:
 //     S           -   decision forest builder, see
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype);
 
@@ -6188,7 +5989,6 @@ void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype
 //
 // Outputs:
 //     S           -   decision forest builder, see
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength);
 
@@ -6242,7 +6042,6 @@ void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t
 //                     construction function will produce:
 //                     * importance estimates in rep.varimportances field
 //                     * variable ranks in rep.topvars field
-//
 // ALGLIB: Copyright 29.07.2019 by Sergey Bochkanov
 void dfbuildersetimportancetrngini(const decisionforestbuilder &s);
 
@@ -6297,7 +6096,6 @@ void dfbuildersetimportancetrngini(const decisionforestbuilder &s);
 //                     construction function will produce:
 //                     * importance estimates in rep.varimportances field
 //                     * variable ranks in rep.topvars field
-//
 // ALGLIB: Copyright 29.07.2019 by Sergey Bochkanov
 void dfbuildersetimportanceoobgini(const decisionforestbuilder &s);
 
@@ -6359,7 +6157,6 @@ void dfbuildersetimportanceoobgini(const decisionforestbuilder &s);
 //                     construction function will produce:
 //                     * importance estimates in rep.varimportances field
 //                     * variable ranks in rep.topvars field
-//
 // ALGLIB: Copyright 29.07.2019 by Sergey Bochkanov
 void dfbuildersetimportancepermutation(const decisionforestbuilder &s);
 
@@ -6373,13 +6170,11 @@ void dfbuildersetimportancepermutation(const decisionforestbuilder &s);
 //     S           -   decision forest builder object. Next call to the forest
 //                     construction function will result in forest being built
 //                     without variable importance estimation.
-//
 // ALGLIB: Copyright 29.07.2019 by Sergey Bochkanov
 void dfbuildersetimportancenone(const decisionforestbuilder &s);
 
 // This function is an alias for dfbuilderpeekprogress(), left in ALGLIB  for
 // backward compatibility reasons.
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 double dfbuildergetprogress(const decisionforestbuilder &s);
 
@@ -6394,7 +6189,6 @@ double dfbuildergetprogress(const decisionforestbuilder &s);
 //
 // Result:
 //     progress value, in [0,1]
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 double dfbuilderpeekprogress(const decisionforestbuilder &s);
 
@@ -6457,7 +6251,6 @@ double dfbuilderpeekprogress(const decisionforestbuilder &s);
 // * comments on dfbuildersetimportancegini function
 // * comments on dfbuildersetimportancetrngini function
 // * comments on dfbuildersetimportancepermutation function
-//
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t ntrees, decisionforest &df, dfreport &rep);
 
@@ -6495,7 +6288,6 @@ void dfbuilderbuildrandomforest(const decisionforestbuilder &s, const ae_int_t n
 // Result:
 //     compression factor (in-RAM size of the compressed model vs than of the
 //     uncompressed one), positive number larger than 1.0
-//
 // ALGLIB: Copyright 22.07.2019 by Sergey Bochkanov
 double dfbinarycompression(const decisionforest &df);
 
@@ -6519,7 +6311,6 @@ double dfbinarycompression(const decisionforest &df);
 //
 // See also DFProcessI.
 //
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 void dfprocess(const decisionforest &df, const real_1d_array &x, real_1d_array &y);
 
@@ -6536,7 +6327,6 @@ void dfprocess(const decisionforest &df, const real_1d_array &x, real_1d_array &
 //
 //            Use dftsprocess()  with  independent  thread-local  buffers  if
 //            you need thread-safe evaluation.
-//
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
 void dfprocessi(const decisionforest &df, const real_1d_array &x, real_1d_array &y);
 
@@ -6567,7 +6357,6 @@ void dfprocessi(const decisionforest &df, const real_1d_array &x, real_1d_array 
 //
 // Result:
 //     Y[0]
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double dfprocess0(const decisionforest &model, const real_1d_array &x);
 
@@ -6591,7 +6380,6 @@ double dfprocess0(const decisionforest &model, const real_1d_array &x);
 //
 // Result:
 //     class number, -1 for regression tasks
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x);
 
@@ -6616,7 +6404,6 @@ ae_int_t dfclassify(const decisionforest &model, const real_1d_array &x);
 //
 // See also DFProcessI.
 //
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, const real_1d_array &x, real_1d_array &y);
 
@@ -6630,7 +6417,6 @@ void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, cons
 // Result:
 //     percent of incorrectly classified cases.
 //     Zero if model solves regression task.
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -6644,7 +6430,6 @@ double dfrelclserror(const decisionforest &df, const real_2d_array &xy, const ae
 // Result:
 //     CrossEntropy/(NPoints*LN(2)).
 //     Zero if model solves regression task.
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -6660,7 +6445,6 @@ double dfavgce(const decisionforest &df, const real_2d_array &xy, const ae_int_t
 //     Its meaning for regression task is obvious. As for
 //     classification task, RMS error means error when estimating posterior
 //     probabilities.
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -6675,7 +6459,6 @@ double dfrmserror(const decisionforest &df, const real_2d_array &xy, const ae_in
 //     Its meaning for regression task is obvious. As for
 //     classification task, it means average error when estimating posterior
 //     probabilities.
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -6690,21 +6473,18 @@ double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_in
 //     Its meaning for regression task is obvious. As for
 //     classification task, it means average relative error when estimating
 //     posterior probability of belonging to the correct class.
-//
 // ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 
 // This subroutine builds random decision forest.
 //
 // --------- DEPRECATED VERSION! USE DECISION FOREST BUILDER OBJECT ---------
-//
 // ALGLIB: Copyright 19.02.2009 by Sergey Bochkanov
 void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
 
 // This subroutine builds random decision forest.
 //
 // --------- DEPRECATED VERSION! USE DECISION FOREST BUILDER OBJECT ---------
-//
 // ALGLIB: Copyright 19.02.2009 by Sergey Bochkanov
 void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, const ae_int_t ntrees, const ae_int_t nrndvars, const double r, ae_int_t &info, decisionforest &df, dfreport &rep);
 } // end of namespace alglib
@@ -6877,7 +6657,6 @@ void knnunserialize(const std::istream &s_in, knnmodel &obj);
 //            object is dangerous - you  may   get  integrity  check  failure
 //            (exception) because sizes of internal  arrays  do  not  fit  to
 //            dimensions of the model structure.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knncreatebuffer(const knnmodel &model, knnbuffer &buf);
 
@@ -6901,7 +6680,6 @@ void knncreatebuffer(const knnmodel &model, knnbuffer &buf);
 //
 // Outputs:
 //     S           -   KNN builder
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnbuildercreate(knnbuilder &s);
 
@@ -6926,7 +6704,6 @@ void knnbuildercreate(knnbuilder &s);
 //
 // Outputs:
 //     S           -   KNN builder
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nout);
 
@@ -6950,7 +6727,6 @@ void knnbuildersetdatasetreg(const knnbuilder &s, const real_2d_array &xy, const
 //
 // Outputs:
 //     S           -   KNN builder
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses);
 
@@ -6965,7 +6741,6 @@ void knnbuildersetdatasetcls(const knnbuilder &s, const real_2d_array &xy, const
 //
 // Outputs:
 //     S           -   decision forest builder
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype);
 
@@ -6993,7 +6768,6 @@ void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype);
 // Outputs:
 //     Model       -   KNN model
 //     Rep         -   report
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double eps, knnmodel &model, knnreport &rep);
 
@@ -7019,7 +6793,6 @@ void knnbuilderbuildknnmodel(const knnbuilder &s, const ae_int_t k, const double
 //
 // Outputs:
 //     nothing on success, exception on failure
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps);
 
@@ -7043,7 +6816,6 @@ void knnrewritekeps(const knnmodel &model, const ae_int_t k, const double eps);
 // Outputs:
 //     Y       -   result. Regression estimate when solving regression  task,
 //                 vector of posterior probabilities for classification task.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
 
@@ -7074,7 +6846,6 @@ void knnprocess(const knnmodel &model, const real_1d_array &x, real_1d_array &y)
 //
 // Result:
 //     Y[0]
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnprocess0(const knnmodel &model, const real_1d_array &x);
 
@@ -7098,7 +6869,6 @@ double knnprocess0(const knnmodel &model, const real_1d_array &x);
 //
 // Result:
 //     class number, -1 for regression tasks
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x);
 
@@ -7116,7 +6886,6 @@ ae_int_t knnclassify(const knnmodel &model, const real_1d_array &x);
 //
 //            Use knntsprocess()  with  independent  thread-local  buffers if
 //            you need thread-safe evaluation.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y);
 
@@ -7136,7 +6905,6 @@ void knnprocessi(const knnmodel &model, const real_1d_array &x, real_1d_array &y
 //     Y       -   result, array[NOut].   Regression  estimate  when  solving
 //                 regression task,  vector  of  posterior  probabilities for
 //                 a classification task.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_array &x, real_1d_array &y);
 
@@ -7154,7 +6922,6 @@ void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_arr
 // NOTE: if  you  need several different kinds of error metrics, it is better
 //       to use knnallerrors() which computes all error metric  with just one
 //       pass over dataset.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -7176,7 +6943,6 @@ double knnrelclserror(const knnmodel &model, const real_2d_array &xy, const ae_i
 // NOTE: if  you  need several different kinds of error metrics, it is better
 //       to use knnallerrors() which computes all error metric  with just one
 //       pass over dataset.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -7196,7 +6962,6 @@ double knnavgce(const knnmodel &model, const real_2d_array &xy, const ae_int_t n
 // NOTE: if  you  need several different kinds of error metrics, it is better
 //       to use knnallerrors() which computes all error metric  with just one
 //       pass over dataset.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -7216,7 +6981,6 @@ double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_
 // NOTE: if  you  need several different kinds of error metrics, it is better
 //       to use knnallerrors() which computes all error metric  with just one
 //       pass over dataset.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -7236,7 +7000,6 @@ double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_
 // NOTE: if  you  need several different kinds of error metrics, it is better
 //       to use knnallerrors() which computes all error metric  with just one
 //       pass over dataset.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 
@@ -7268,7 +7031,6 @@ double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_i
 // NOTE: the cross-entropy metric is too unstable when used to  evaluate  KNN
 //       models (such models can report exactly  zero probabilities),  so  we
 //       do not recommend using it.
-//
 // ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
 } // end of namespace alglib
@@ -7283,7 +7045,6 @@ namespace alglib {
 // k-means++ clusterization.
 // Backward compatibility function, we recommend to use CLUSTERING subpackage
 // as better replacement.
-//
 // ALGLIB: Copyright 21.03.2009 by Sergey Bochkanov
 void kmeansgenerate(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t k, const ae_int_t restarts, ae_int_t &info, real_2d_array &c, integer_1d_array &xyc);
 } // end of namespace alglib

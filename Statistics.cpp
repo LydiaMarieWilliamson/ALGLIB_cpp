@@ -18,9 +18,6 @@
 // Depends on: (AlgLibInternal) BASICSTATOPS
 // Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
-static void basestat_rankdatarec(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost);
-static void basestat_rankdatabasecase(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1);
-
 // Calculation of the distribution moments: mean, variance, skewness, kurtosis.
 //
 // Inputs:
@@ -36,7 +33,6 @@ static void basestat_rankdatabasecase(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_i
 //     Kurtosis-   kurtosis (if variance != 0; zero otherwise).
 //
 // NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemoments(RVector x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis) {
    ae_int_t i;
@@ -108,7 +104,6 @@ void samplemoments(RVector x, ae_int_t n, double *mean, double *variance, double
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Mean' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplemean(RVector x, ae_int_t n) {
    double mean;
@@ -133,7 +128,6 @@ double samplemean(RVector x, ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Variance' variable.
-//
 //
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplevariance(RVector x, ae_int_t n) {
@@ -160,7 +154,6 @@ double samplevariance(RVector x, ae_int_t n) {
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Skewness' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double sampleskewness(RVector x, ae_int_t n) {
    double skewness;
@@ -186,7 +179,6 @@ double sampleskewness(RVector x, ae_int_t n) {
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Kurtosis' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplekurtosis(RVector x, ae_int_t n) {
    double kurtosis;
@@ -209,7 +201,6 @@ double samplekurtosis(RVector x, ae_int_t n) {
 //
 // Outputs:
 //     ADev-   ADev
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void sampleadev(RVector x, ae_int_t n, double *adev) {
    ae_int_t i;
@@ -246,7 +237,6 @@ void sampleadev(RVector x, ae_int_t n, double *adev) {
 //
 // Outputs:
 //     Median
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemedian(RVector x, ae_int_t n, double *median) {
    ae_frame _frame_block;
@@ -320,12 +310,10 @@ void samplemedian(RVector x, ae_int_t n, double *median) {
          while (true) {
             do {
                i++;
-            }
-            while (x->ptr.p_double[i] < a);
+            } while (x->ptr.p_double[i] < a);
             do {
                j--;
-            }
-            while (x->ptr.p_double[j] > a);
+            } while (x->ptr.p_double[j] > a);
             if (j < i) {
                break;
             }
@@ -370,7 +358,6 @@ void samplemedian(RVector x, ae_int_t n, double *median) {
 //
 // Outputs:
 //     V   -   percentile
-//
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 void samplepercentile(RVector x, ae_int_t n, double p, double *v) {
    ae_frame _frame_block;
@@ -414,7 +401,6 @@ void samplepercentile(RVector x, ae_int_t n, double p, double *v) {
 //
 // Result:
 //     covariance (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double cov2(RVector x, RVector y, ae_int_t n) {
    ae_int_t i;
@@ -487,7 +473,6 @@ double cov2(RVector x, RVector y, ae_int_t n) {
 // Result:
 //     Pearson product-moment correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double pearsoncorr2(RVector x, RVector y, ae_int_t n) {
    ae_int_t i;
@@ -574,7 +559,6 @@ double pearsoncorr2(RVector x, RVector y, ae_int_t n) {
 // Result:
 //     Spearman's rank correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double spearmancorr2(RVector x, RVector y, ae_int_t n) {
    ae_frame _frame_block;
@@ -616,7 +600,6 @@ double spearmancorr2(RVector x, RVector y, ae_int_t n) {
 //
 // Outputs:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    ae_frame _frame_block;
@@ -696,7 +679,6 @@ void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    ae_frame _frame_block;
@@ -744,7 +726,6 @@ void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    ae_frame _frame_block;
@@ -854,7 +835,6 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c) {
    ae_frame _frame_block;
@@ -969,7 +949,6 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c) {
    ae_frame _frame_block;
@@ -1120,7 +1099,6 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c) {
    ae_frame _frame_block;
@@ -1256,6 +1234,90 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
    ae_frame_leave();
 }
 
+// Basecase code for RankData(), performs actual work on subset of data using
+// temporary buffer passed as parameter.
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Buf0    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//     Buf1    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatabasecase(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
+   ae_int_t i;
+   ae_assert(i1 >= i0, "RankDataBasecase: internal error");
+   if (buf1->ra0.cnt < nfeatures) {
+      ae_vector_set_length(&buf1->ra0, nfeatures);
+   }
+   for (i = i0; i < i1; i++) {
+      ae_v_move(buf1->ra0.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nfeatures);
+      rankx(&buf1->ra0, nfeatures, iscentered, buf0);
+      ae_v_move(xy->ptr.pp_double[i], 1, buf1->ra0.ptr.p_double, 1, nfeatures);
+   }
+}
+
+// Recurrent code for RankData(), splits problem into  subproblems  or  calls
+// basecase code (depending on problem complexity).
+//
+// Inputs:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Pool    -   shared pool which holds temporary buffers
+//                 (APBuffers structure)
+//     BasecaseCost-minimum cost of the problem which will be split
+//
+// Outputs:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+static void basestat_rankdatarec(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
+   ae_frame _frame_block;
+   double problemcost;
+   ae_int_t im;
+   ae_frame_make(&_frame_block);
+   RefObj(apbuffers, buf0);
+   RefObj(apbuffers, buf1);
+   ae_assert(i1 >= i0, "RankDataRec: internal error");
+// Try to activate parallelism
+// Parallelism was activated if: i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures)) >= smpactivationlevel()
+// Recursively split problem, if it is too large
+   problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures));
+   if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
+      im = (i1 + i0) / 2;
+      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
+      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
+      ae_frame_leave();
+      return;
+   }
+// Retrieve buffers from pool, call serial code, return buffers to pool
+   ae_shared_pool_retrieve(pool, &_buf0);
+   ae_shared_pool_retrieve(pool, &_buf1);
+   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
+   ae_shared_pool_recycle(pool, &_buf0);
+   ae_shared_pool_recycle(pool, &_buf1);
+   ae_frame_leave();
+}
+
 // This function replaces data in XY by their ranks:
 // * XY is processed row-by-row
 // * rows are processed separately
@@ -1271,7 +1333,6 @@ void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, 
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
@@ -1322,7 +1383,6 @@ void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
@@ -1357,7 +1417,6 @@ void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
 }
 
 // Obsolete function, we recommend to use PearsonCorr2().
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double pearsoncorrelation(RVector x, RVector y, ae_int_t n) {
    double result;
@@ -1366,98 +1425,11 @@ double pearsoncorrelation(RVector x, RVector y, ae_int_t n) {
 }
 
 // Obsolete function, we recommend to use SpearmanCorr2().
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double spearmanrankcorrelation(RVector x, RVector y, ae_int_t n) {
    double result;
    result = spearmancorr2(x, y, n);
    return result;
-}
-
-// Recurrent code for RankData(), splits problem into  subproblems  or  calls
-// basecase code (depending on problem complexity).
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Pool    -   shared pool which holds temporary buffers
-//                 (APBuffers structure)
-//     BasecaseCost-minimum cost of the problem which will be split
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatarec(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, ae_shared_pool *pool, ae_int_t basecasecost) {
-   ae_frame _frame_block;
-   double problemcost;
-   ae_int_t im;
-   ae_frame_make(&_frame_block);
-   RefObj(apbuffers, buf0);
-   RefObj(apbuffers, buf1);
-   ae_assert(i1 >= i0, "RankDataRec: internal error");
-// Try to activate parallelism
-// Parallelism was activated if: i1 - i0 >= 4 && rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures)) >= smpactivationlevel()
-// Recursively split problem, if it is too large
-   problemcost = rmul3((double)(i1 - i0), (double)nfeatures, logbase2((double)nfeatures));
-   if (i1 - i0 >= 2 && problemcost > spawnlevel()) {
-      im = (i1 + i0) / 2;
-      basestat_rankdatarec(xy, i0, im, nfeatures, iscentered, pool, basecasecost);
-      basestat_rankdatarec(xy, im, i1, nfeatures, iscentered, pool, basecasecost);
-      ae_frame_leave();
-      return;
-   }
-// Retrieve buffers from pool, call serial code, return buffers to pool
-   ae_shared_pool_retrieve(pool, &_buf0);
-   ae_shared_pool_retrieve(pool, &_buf1);
-   basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1);
-   ae_shared_pool_recycle(pool, &_buf0);
-   ae_shared_pool_recycle(pool, &_buf1);
-   ae_frame_leave();
-}
-
-// Basecase code for RankData(), performs actual work on subset of data using
-// temporary buffer passed as parameter.
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     I0      -   index of first row to process
-//     I1      -   index of past-the-last row to process;
-//                 this function processes half-interval [I0,I1).
-//     NFeatures-  number of features
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 within-row sum is zero
-//                 * False     -   ranks are not centered
-//     Buf0    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//     Buf1    -   temporary buffers, may be empty (this function automatically
-//                 allocates/reuses buffers).
-//
-// Outputs:
-//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-//
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
-static void basestat_rankdatabasecase(RMatrix xy, ae_int_t i0, ae_int_t i1, ae_int_t nfeatures, bool iscentered, apbuffers *buf0, apbuffers *buf1) {
-   ae_int_t i;
-   ae_assert(i1 >= i0, "RankDataBasecase: internal error");
-   if (buf1->ra0.cnt < nfeatures) {
-      ae_vector_set_length(&buf1->ra0, nfeatures);
-   }
-   for (i = i0; i < i1; i++) {
-      ae_v_move(buf1->ra0.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nfeatures);
-      rankx(&buf1->ra0, nfeatures, iscentered, buf0);
-      ae_v_move(xy->ptr.pp_double[i], 1, buf1->ra0.ptr.p_double, 1, nfeatures);
-   }
 }
 } // end of namespace alglib_impl
 
@@ -1477,7 +1449,6 @@ namespace alglib {
 //     Kurtosis-   kurtosis (if variance != 0; zero otherwise).
 //
 // NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis) {
    alglib_impl::ae_state_init();
@@ -1501,7 +1472,6 @@ void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, doubl
 //     Kurtosis-   kurtosis (if variance != 0; zero otherwise).
 //
 // NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis) {
@@ -1526,7 +1496,6 @@ void samplemoments(const real_1d_array &x, double &mean, double &variance, doubl
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Mean' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplemean(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1548,7 +1517,6 @@ double samplemean(const real_1d_array &x, const ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Mean' variable.
-//
 //
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
@@ -1575,7 +1543,6 @@ double samplemean(const real_1d_array &x) {
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Variance' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplevariance(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1597,7 +1564,6 @@ double samplevariance(const real_1d_array &x, const ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Variance' variable.
-//
 //
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
@@ -1624,7 +1590,6 @@ double samplevariance(const real_1d_array &x) {
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Skewness' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double sampleskewness(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1646,7 +1611,6 @@ double sampleskewness(const real_1d_array &x, const ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Skewness' variable.
-//
 //
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
@@ -1673,7 +1637,6 @@ double sampleskewness(const real_1d_array &x) {
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Kurtosis' variable.
 //
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1695,7 +1658,6 @@ double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Kurtosis' variable.
-//
 //
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
@@ -1719,7 +1681,6 @@ double samplekurtosis(const real_1d_array &x) {
 //
 // Outputs:
 //     ADev-   ADev
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
    alglib_impl::ae_state_init();
@@ -1738,7 +1699,6 @@ void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
 //
 // Outputs:
 //     ADev-   ADev
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void sampleadev(const real_1d_array &x, double &adev) {
@@ -1760,7 +1720,6 @@ void sampleadev(const real_1d_array &x, double &adev) {
 //
 // Outputs:
 //     Median
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
    alglib_impl::ae_state_init();
@@ -1779,7 +1738,6 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
 //
 // Outputs:
 //     Median
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplemedian(const real_1d_array &x, double &median) {
@@ -1802,7 +1760,6 @@ void samplemedian(const real_1d_array &x, double &median) {
 //
 // Outputs:
 //     V   -   percentile
-//
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v) {
    alglib_impl::ae_state_init();
@@ -1822,7 +1779,6 @@ void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, 
 //
 // Outputs:
 //     V   -   percentile
-//
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplepercentile(const real_1d_array &x, const double p, double &v) {
@@ -1845,7 +1801,6 @@ void samplepercentile(const real_1d_array &x, const double p, double &v) {
 //
 // Result:
 //     covariance (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1866,7 +1821,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
 //
 // Result:
 //     covariance (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double cov2(const real_1d_array &x, const real_1d_array &y) {
@@ -1892,7 +1846,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y) {
 // Result:
 //     Pearson product-moment correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1914,7 +1867,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int
 // Result:
 //     Pearson product-moment correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
@@ -1940,7 +1892,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
 // Result:
 //     Spearman's rank correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -1962,7 +1913,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_in
 // Result:
 //     Spearman's rank correlation coefficient
 //     (zero for N=0 or N=1)
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
@@ -1991,7 +1941,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
 //
 // Outputs:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2015,7 +1964,6 @@ void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_ar
 //
 // Outputs:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void covm(const real_2d_array &x, real_2d_array &c) {
@@ -2043,7 +1991,6 @@ void covm(const real_2d_array &x, real_2d_array &c) {
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2067,7 +2014,6 @@ void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, re
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
@@ -2095,7 +2041,6 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2119,7 +2064,6 @@ void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, r
 //
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
@@ -2153,7 +2097,6 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2183,7 +2126,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, con
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -2219,7 +2161,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2249,7 +2190,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -2285,7 +2225,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
@@ -2315,7 +2254,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int
 //
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-//
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
@@ -2345,7 +2283,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state_init();
@@ -2369,7 +2306,6 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rankdata(real_2d_array &xy) {
@@ -2399,7 +2335,6 @@ void rankdata(real_2d_array &xy) {
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state_init();
@@ -2425,7 +2360,6 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
 // Outputs:
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
-//
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rankdatacentered(real_2d_array &xy) {
@@ -2439,7 +2373,6 @@ void rankdatacentered(real_2d_array &xy) {
 #endif
 
 // Obsolete function, we recommend to use PearsonCorr2().
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -2450,7 +2383,6 @@ double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const 
 }
 
 // Obsolete function, we recommend to use SpearmanCorr2().
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
@@ -2464,242 +2396,6 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 // === WSR Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r);
-static double wsr_w5(double s);
-static double wsr_w6(double s);
-static double wsr_w7(double s);
-static double wsr_w8(double s);
-static double wsr_w9(double s);
-static double wsr_w10(double s);
-static double wsr_w11(double s);
-static double wsr_w12(double s);
-static double wsr_w13(double s);
-static double wsr_w14(double s);
-static double wsr_w15(double s);
-static double wsr_w16(double s);
-static double wsr_w17(double s);
-static double wsr_w18(double s);
-static double wsr_w19(double s);
-static double wsr_w20(double s);
-static double wsr_w21(double s);
-static double wsr_w22(double s);
-static double wsr_w23(double s);
-static double wsr_w24(double s);
-static double wsr_w25(double s);
-static double wsr_w26(double s);
-static double wsr_w27(double s);
-static double wsr_w28(double s);
-static double wsr_w29(double s);
-static double wsr_w30(double s);
-static double wsr_w40(double s);
-static double wsr_w60(double s);
-static double wsr_w120(double s);
-static double wsr_w200(double s);
-static double wsr_wsigma(double s, ae_int_t n);
-
-// Wilcoxon signed-rank test
-//
-// This test checks three hypotheses about the median  of  the  given sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis  -  the  median  is  less than or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
-//       the test could not be applied to nominal variables).
-//     * the distribution should be continuous and symmetric relative to  its
-//       median.
-//     * number of distinct values in the X array should be greater than 4
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with two decimal places in interval [0.0001, 1].
-//
-// "Two decimal places" does not sound very impressive, but in  practice  the
-// relative error of less than 1% is enough to make a decision.
-//
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-//
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
-void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t t;
-   double tmp;
-   ae_int_t tmpi;
-   ae_int_t ns;
-   double w;
-   double p;
-   double mp;
-   double s;
-   double sigma;
-   double mu;
-   ae_frame_make(&_frame_block);
-   DupVector(x);
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   NewVector(r, 0, DT_REAL);
-   NewVector(c, 0, DT_INT);
-// Prepare
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      ae_frame_leave();
-      return;
-   }
-   ns = 0;
-   for (i = 0; i < n; i++) {
-      if (x->ptr.p_double[i] == e) {
-         continue;
-      }
-      x->ptr.p_double[ns] = x->ptr.p_double[i];
-      ns++;
-   }
-   if (ns < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      ae_frame_leave();
-      return;
-   }
-   ae_vector_set_length(&r, ns);
-   ae_vector_set_length(&c, ns);
-   for (i = 0; i < ns; i++) {
-      r.ptr.p_double[i] = fabs(x->ptr.p_double[i] - e);
-      c.ptr.p_int[i] = i;
-   }
-// sort {R, C}
-   if (ns != 1) {
-      i = 2;
-      do {
-         t = i;
-         while (t != 1) {
-            k = t / 2;
-            if (r.ptr.p_double[k - 1] >= r.ptr.p_double[t - 1]) {
-               t = 1;
-            } else {
-               tmp = r.ptr.p_double[k - 1];
-               r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
-               r.ptr.p_double[t - 1] = tmp;
-               tmpi = c.ptr.p_int[k - 1];
-               c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
-               c.ptr.p_int[t - 1] = tmpi;
-               t = k;
-            }
-         }
-         i++;
-      }
-      while (i <= ns);
-      i = ns - 1;
-      do {
-         tmp = r.ptr.p_double[i];
-         r.ptr.p_double[i] = r.ptr.p_double[0];
-         r.ptr.p_double[0] = tmp;
-         tmpi = c.ptr.p_int[i];
-         c.ptr.p_int[i] = c.ptr.p_int[0];
-         c.ptr.p_int[0] = tmpi;
-         t = 1;
-         while (t != 0) {
-            k = 2 * t;
-            if (k > i) {
-               t = 0;
-            } else {
-               if (k < i) {
-                  if (r.ptr.p_double[k] > r.ptr.p_double[k - 1]) {
-                     k++;
-                  }
-               }
-               if (r.ptr.p_double[t - 1] >= r.ptr.p_double[k - 1]) {
-                  t = 0;
-               } else {
-                  tmp = r.ptr.p_double[k - 1];
-                  r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
-                  r.ptr.p_double[t - 1] = tmp;
-                  tmpi = c.ptr.p_int[k - 1];
-                  c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
-                  c.ptr.p_int[t - 1] = tmpi;
-                  t = k;
-               }
-            }
-         }
-         i--;
-      }
-      while (i >= 1);
-   }
-// compute tied ranks
-   i = 0;
-   while (i < ns) {
-      j = i + 1;
-      while (j < ns) {
-         if (r.ptr.p_double[j] != r.ptr.p_double[i]) {
-            break;
-         }
-         j++;
-      }
-      for (k = i; k < j; k++) {
-         r.ptr.p_double[k] = 1 + (double)(i + j - 1) / 2.0;
-      }
-      i = j;
-   }
-// Compute W+
-   w = 0.0;
-   for (i = 0; i < ns; i++) {
-      if (x->ptr.p_double[c.ptr.p_int[i]] > e) {
-         w += r.ptr.p_double[i];
-      }
-   }
-// Result
-   mu = rmul2((double)ns, (double)(ns + 1)) / 4;
-   sigma = sqrt(mu * (2 * ns + 1) / 6);
-   s = (w - mu) / sigma;
-   if (s <= 0.0) {
-      p = exp(wsr_wsigma(-(w - mu) / sigma, ns));
-      mp = 1 - exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns));
-   } else {
-      mp = exp(wsr_wsigma((w - mu) / sigma, ns));
-      p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns));
-   }
-   *lefttail = ae_maxreal(p, 1.0E-4);
-   *righttail = ae_maxreal(mp, 1.0E-4);
-   *bothtails = 2 * ae_minreal(*lefttail, *righttail);
-   ae_frame_leave();
-}
-
-// Sequential Chebyshev interpolation.
-static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r) {
-   double t;
-   *r += c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
-   *tj = *tj1;
-   *tj1 = t;
-}
-
 // Tail(S, 5)
 static double wsr_w5(double s) {
    ae_int_t w;
@@ -6835,6 +6531,15 @@ static double wsr_w24(double s) {
    return result;
 }
 
+// Sequential Chebyshev interpolation.
+static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r) {
+   double t;
+   *r += c * (*tj);
+   t = 2 * x * (*tj1) - (*tj);
+   *tj = *tj1;
+   *tj1 = t;
+}
+
 // Tail(S, 25)
 static double wsr_w25(double s) {
    double x;
@@ -7194,6 +6899,197 @@ static double wsr_wsigma(double s, ae_int_t n) {
    }
    return result;
 }
+
+// Wilcoxon signed-rank test
+//
+// This test checks three hypotheses about the median  of  the  given sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis  -  the  median  is  less than or
+//       equal to the given value)
+//
+// Requirements:
+//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
+//       the test could not be applied to nominal variables).
+//     * the distribution should be continuous and symmetric relative to  its
+//       median.
+//     * number of distinct values in the X array should be greater than 4
+//
+// The test is non-parametric and doesn't require distribution X to be normal
+//
+// Inputs:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with two decimal places in interval [0.0001, 1].
+//
+// "Two decimal places" does not sound very impressive, but in  practice  the
+// relative error of less than 1% is enough to make a decision.
+//
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t t;
+   double tmp;
+   ae_int_t tmpi;
+   ae_int_t ns;
+   double w;
+   double p;
+   double mp;
+   double s;
+   double sigma;
+   double mu;
+   ae_frame_make(&_frame_block);
+   DupVector(x);
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   NewVector(r, 0, DT_REAL);
+   NewVector(c, 0, DT_INT);
+// Prepare
+   if (n < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      ae_frame_leave();
+      return;
+   }
+   ns = 0;
+   for (i = 0; i < n; i++) {
+      if (x->ptr.p_double[i] == e) {
+         continue;
+      }
+      x->ptr.p_double[ns] = x->ptr.p_double[i];
+      ns++;
+   }
+   if (ns < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      ae_frame_leave();
+      return;
+   }
+   ae_vector_set_length(&r, ns);
+   ae_vector_set_length(&c, ns);
+   for (i = 0; i < ns; i++) {
+      r.ptr.p_double[i] = fabs(x->ptr.p_double[i] - e);
+      c.ptr.p_int[i] = i;
+   }
+// sort {R, C}
+   if (ns != 1) {
+      i = 2;
+      do {
+         t = i;
+         while (t != 1) {
+            k = t / 2;
+            if (r.ptr.p_double[k - 1] >= r.ptr.p_double[t - 1]) {
+               t = 1;
+            } else {
+               tmp = r.ptr.p_double[k - 1];
+               r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
+               r.ptr.p_double[t - 1] = tmp;
+               tmpi = c.ptr.p_int[k - 1];
+               c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
+               c.ptr.p_int[t - 1] = tmpi;
+               t = k;
+            }
+         }
+         i++;
+      } while (i <= ns);
+      i = ns - 1;
+      do {
+         tmp = r.ptr.p_double[i];
+         r.ptr.p_double[i] = r.ptr.p_double[0];
+         r.ptr.p_double[0] = tmp;
+         tmpi = c.ptr.p_int[i];
+         c.ptr.p_int[i] = c.ptr.p_int[0];
+         c.ptr.p_int[0] = tmpi;
+         t = 1;
+         while (t != 0) {
+            k = 2 * t;
+            if (k > i) {
+               t = 0;
+            } else {
+               if (k < i) {
+                  if (r.ptr.p_double[k] > r.ptr.p_double[k - 1]) {
+                     k++;
+                  }
+               }
+               if (r.ptr.p_double[t - 1] >= r.ptr.p_double[k - 1]) {
+                  t = 0;
+               } else {
+                  tmp = r.ptr.p_double[k - 1];
+                  r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
+                  r.ptr.p_double[t - 1] = tmp;
+                  tmpi = c.ptr.p_int[k - 1];
+                  c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
+                  c.ptr.p_int[t - 1] = tmpi;
+                  t = k;
+               }
+            }
+         }
+         i--;
+      } while (i >= 1);
+   }
+// compute tied ranks
+   i = 0;
+   while (i < ns) {
+      j = i + 1;
+      while (j < ns) {
+         if (r.ptr.p_double[j] != r.ptr.p_double[i]) {
+            break;
+         }
+         j++;
+      }
+      for (k = i; k < j; k++) {
+         r.ptr.p_double[k] = 1 + (double)(i + j - 1) / 2.0;
+      }
+      i = j;
+   }
+// Compute W+
+   w = 0.0;
+   for (i = 0; i < ns; i++) {
+      if (x->ptr.p_double[c.ptr.p_int[i]] > e) {
+         w += r.ptr.p_double[i];
+      }
+   }
+// Result
+   mu = rmul2((double)ns, (double)(ns + 1)) / 4;
+   sigma = sqrt(mu * (2 * ns + 1) / 6);
+   s = (w - mu) / sigma;
+   if (s <= 0.0) {
+      p = exp(wsr_wsigma(-(w - mu) / sigma, ns));
+      mp = 1 - exp(wsr_wsigma(-(w - 1 - mu) / sigma, ns));
+   } else {
+      mp = exp(wsr_wsigma((w - mu) / sigma, ns));
+      p = 1 - exp(wsr_wsigma((w + 1 - mu) / sigma, ns));
+   }
+   *lefttail = ae_maxreal(p, 1.0E-4);
+   *righttail = ae_maxreal(mp, 1.0E-4);
+   *bothtails = 2 * ae_minreal(*lefttail, *righttail);
+   ae_frame_leave();
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -7241,7 +7137,6 @@ namespace alglib {
 //
 // There is no approximation outside the [0.0001, 1] interval. Therefore,  if
 // the significance level outlies this interval, the test returns 0.0001.
-//
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -7289,7 +7184,6 @@ namespace alglib_impl {
 //
 // While   calculating   p-values   high-precision   binomial    distribution
 // approximation is used, so significance levels have about 15 exact digits.
-//
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void onesamplesigntest(RVector x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
@@ -7367,7 +7261,6 @@ namespace alglib {
 //
 // While   calculating   p-values   high-precision   binomial    distribution
 // approximation is used, so significance levels have about 15 exact digits.
-//
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -7381,13 +7274,6 @@ void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double me
 // Depends on: (SpecialFunctions) STUDENTTDISTR
 // Depends on: BASESTAT
 namespace alglib_impl {
-static double correlationtests_spearmantail5(double s);
-static double correlationtests_spearmantail6(double s);
-static double correlationtests_spearmantail7(double s);
-static double correlationtests_spearmantail8(double s);
-static double correlationtests_spearmantail9(double s);
-static double correlationtests_spearmantail(double t, ae_int_t n);
-
 // Pearson's correlation coefficient significance test
 //
 // This test checks hypotheses about whether X  and  Y  are  samples  of  two
@@ -7419,7 +7305,6 @@ static double correlationtests_spearmantail(double t, ae_int_t n);
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
@@ -7452,77 +7337,6 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
    *bothtails = 2 * ae_minreal(p, 1 - p);
    *lefttail = p;
    *righttail = 1 - p;
-}
-
-// Spearman's rank correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5.
-//
-// The test is non-parametric and doesn't require distributions X and Y to be
-// normal.
-//
-// Inputs:
-//     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
-   double t;
-   double p;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-// Special case
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// General case
-   if (r >= 1.0) {
-      t = 1.0E10;
-   } else {
-      if (r <= -1.0) {
-         t = -1.0E10;
-      } else {
-         t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
-      }
-   }
-   if (t < 0.0) {
-      p = correlationtests_spearmantail(t, n);
-      *bothtails = 2 * p;
-      *lefttail = p;
-      *righttail = 1 - p;
-   } else {
-      p = correlationtests_spearmantail(-t, n);
-      *bothtails = 2 * p;
-      *lefttail = 1 - p;
-      *righttail = p;
-   }
 }
 
 // Tail(S, 5)
@@ -7914,6 +7728,76 @@ static double correlationtests_spearmantail(double t, ae_int_t n) {
    result = studenttdistribution(n - 2, t);
    return result;
 }
+
+// Spearman's rank correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5.
+//
+// The test is non-parametric and doesn't require distributions X and Y to be
+// normal.
+//
+// Inputs:
+//     R   -   Spearman's rank correlation coefficient for X and Y
+//     N   -   number of elements in samples, N >= 5.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
+   double t;
+   double p;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+// Special case
+   if (n < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// General case
+   if (r >= 1.0) {
+      t = 1.0E10;
+   } else {
+      if (r <= -1.0) {
+         t = -1.0E10;
+      } else {
+         t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
+      }
+   }
+   if (t < 0.0) {
+      p = correlationtests_spearmantail(t, n);
+      *bothtails = 2 * p;
+      *lefttail = p;
+      *righttail = 1 - p;
+   } else {
+      p = correlationtests_spearmantail(-t, n);
+      *bothtails = 2 * p;
+      *lefttail = 1 - p;
+      *righttail = p;
+   }
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -7948,7 +7832,6 @@ namespace alglib {
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -7990,7 +7873,6 @@ void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bo
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -8039,7 +7921,6 @@ namespace alglib_impl {
 //       * when variance of X[] is exactly zero, p-values are set
 //         to 1.0 or 0.0, depending on difference between sample mean and
 //         value of mean being tested.
-//
 //
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void studentttest1(RVector x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail) {
@@ -8158,7 +8039,6 @@ void studentttest1(RVector x, ae_int_t n, double mean, double *bothtails, double
 //       * when N=0 or M=0, all p-values are set to 1.0
 //       * when both samples has exactly zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
-//
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void studentttest2(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
@@ -8283,7 +8163,6 @@ void studentttest2(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtai
 //         to 1.0 or 0.0, depending on difference between means.
 //       * when only one sample has zero variance, test reduces to 1-sample
 //         version.
-//
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
@@ -8438,7 +8317,6 @@ namespace alglib {
 //         to 1.0 or 0.0, depending on difference between sample mean and
 //         value of mean being tested.
 //
-//
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -8483,7 +8361,6 @@ void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, 
 //       * when N=0 or M=0, all p-values are set to 1.0
 //       * when both samples has exactly zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
-//
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -8530,7 +8407,6 @@ void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array
 //         to 1.0 or 0.0, depending on difference between means.
 //       * when only one sample has zero variance, test reduces to 1-sample
 //         version.
-//
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -8543,330 +8419,6 @@ void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1
 // === MANNWHITNEYU Package ===
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
-static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r);
-static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n);
-static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2);
-static double mannwhitneyu_utbln5n5(double s);
-static double mannwhitneyu_utbln5n6(double s);
-static double mannwhitneyu_utbln5n7(double s);
-static double mannwhitneyu_utbln5n8(double s);
-static double mannwhitneyu_utbln5n9(double s);
-static double mannwhitneyu_utbln5n10(double s);
-static double mannwhitneyu_utbln5n11(double s);
-static double mannwhitneyu_utbln5n12(double s);
-static double mannwhitneyu_utbln5n13(double s);
-static double mannwhitneyu_utbln5n14(double s);
-static double mannwhitneyu_utbln5n15(double s);
-static double mannwhitneyu_utbln5n16(double s);
-static double mannwhitneyu_utbln5n17(double s);
-static double mannwhitneyu_utbln5n18(double s);
-static double mannwhitneyu_utbln5n19(double s);
-static double mannwhitneyu_utbln5n20(double s);
-static double mannwhitneyu_utbln5n21(double s);
-static double mannwhitneyu_utbln5n22(double s);
-static double mannwhitneyu_utbln5n23(double s);
-static double mannwhitneyu_utbln5n24(double s);
-static double mannwhitneyu_utbln5n25(double s);
-static double mannwhitneyu_utbln5n26(double s);
-static double mannwhitneyu_utbln5n27(double s);
-static double mannwhitneyu_utbln5n28(double s);
-static double mannwhitneyu_utbln5n29(double s);
-static double mannwhitneyu_utbln5n30(double s);
-static double mannwhitneyu_utbln5n100(double s);
-static double mannwhitneyu_utbln6n6(double s);
-static double mannwhitneyu_utbln6n7(double s);
-static double mannwhitneyu_utbln6n8(double s);
-static double mannwhitneyu_utbln6n9(double s);
-static double mannwhitneyu_utbln6n10(double s);
-static double mannwhitneyu_utbln6n11(double s);
-static double mannwhitneyu_utbln6n12(double s);
-static double mannwhitneyu_utbln6n13(double s);
-static double mannwhitneyu_utbln6n14(double s);
-static double mannwhitneyu_utbln6n15(double s);
-static double mannwhitneyu_utbln6n30(double s);
-static double mannwhitneyu_utbln6n100(double s);
-static double mannwhitneyu_utbln7n7(double s);
-static double mannwhitneyu_utbln7n8(double s);
-static double mannwhitneyu_utbln7n9(double s);
-static double mannwhitneyu_utbln7n10(double s);
-static double mannwhitneyu_utbln7n11(double s);
-static double mannwhitneyu_utbln7n12(double s);
-static double mannwhitneyu_utbln7n13(double s);
-static double mannwhitneyu_utbln7n14(double s);
-static double mannwhitneyu_utbln7n15(double s);
-static double mannwhitneyu_utbln7n30(double s);
-static double mannwhitneyu_utbln7n100(double s);
-static double mannwhitneyu_utbln8n8(double s);
-static double mannwhitneyu_utbln8n9(double s);
-static double mannwhitneyu_utbln8n10(double s);
-static double mannwhitneyu_utbln8n11(double s);
-static double mannwhitneyu_utbln8n12(double s);
-static double mannwhitneyu_utbln8n13(double s);
-static double mannwhitneyu_utbln8n14(double s);
-static double mannwhitneyu_utbln8n15(double s);
-static double mannwhitneyu_utbln8n30(double s);
-static double mannwhitneyu_utbln8n100(double s);
-static double mannwhitneyu_utbln9n9(double s);
-static double mannwhitneyu_utbln9n10(double s);
-static double mannwhitneyu_utbln9n11(double s);
-static double mannwhitneyu_utbln9n12(double s);
-static double mannwhitneyu_utbln9n13(double s);
-static double mannwhitneyu_utbln9n14(double s);
-static double mannwhitneyu_utbln9n15(double s);
-static double mannwhitneyu_utbln9n30(double s);
-static double mannwhitneyu_utbln9n100(double s);
-static double mannwhitneyu_utbln10n10(double s);
-static double mannwhitneyu_utbln10n11(double s);
-static double mannwhitneyu_utbln10n12(double s);
-static double mannwhitneyu_utbln10n13(double s);
-static double mannwhitneyu_utbln10n14(double s);
-static double mannwhitneyu_utbln10n15(double s);
-static double mannwhitneyu_utbln10n30(double s);
-static double mannwhitneyu_utbln10n100(double s);
-static double mannwhitneyu_utbln11n11(double s);
-static double mannwhitneyu_utbln11n12(double s);
-static double mannwhitneyu_utbln11n13(double s);
-static double mannwhitneyu_utbln11n14(double s);
-static double mannwhitneyu_utbln11n15(double s);
-static double mannwhitneyu_utbln11n30(double s);
-static double mannwhitneyu_utbln11n100(double s);
-static double mannwhitneyu_utbln12n12(double s);
-static double mannwhitneyu_utbln12n13(double s);
-static double mannwhitneyu_utbln12n14(double s);
-static double mannwhitneyu_utbln12n15(double s);
-static double mannwhitneyu_utbln12n30(double s);
-static double mannwhitneyu_utbln12n100(double s);
-static double mannwhitneyu_utbln13n13(double s);
-static double mannwhitneyu_utbln13n14(double s);
-static double mannwhitneyu_utbln13n15(double s);
-static double mannwhitneyu_utbln13n30(double s);
-static double mannwhitneyu_utbln13n100(double s);
-static double mannwhitneyu_utbln14n14(double s);
-static double mannwhitneyu_utbln14n15(double s);
-static double mannwhitneyu_utbln14n30(double s);
-static double mannwhitneyu_utbln14n100(double s);
-static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2);
-
-// Mann-Whitney U-test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous distributions of the same shape  and  same  median  or  whether
-// their medians are different.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the medians are equal)
-//     * left-tailed test (null hypothesis - the median of the  first  sample
-//       is greater than or equal to the median of the second sample)
-//     * right-tailed test (null hypothesis - the median of the first  sample
-//       is less than or equal to the median of the second sample).
-//
-// Requirements:
-//     * the samples are independent
-//     * X and Y are continuous distributions (or discrete distributions well-
-//       approximating continuous distributions)
-//     * distributions of X and Y have the  same  shape.  The  only  possible
-//       difference is their position (i.e. the value of the median)
-//     * the number of elements in each sample is not less than 5
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distributions to be normal.
-//
-// Inputs:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   size of the sample. M >= 5
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-//
-// Relative precision of approximation of p-value:
-//
-// N          M          Max.err.   Rms.err.
-// 5..10      N..10      1.4e-02    6.0e-04
-// 5..10      N..100     2.2e-02    5.3e-06
-// 10..15     N..15      1.0e-02    3.2e-04
-// 10..15     N..100     1.0e-02    2.2e-05
-// 15..100    N..100     6.1e-03    2.7e-06
-//
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
-// account characteristics of asymptotic approximation used, precision should
-// not be sharply different from the values for interval [5, 100].
-//
-// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
-//       P's outside of this interval are enforced to these bounds. Say,  you
-//       may quite often get P equal to exactly 0.25 or 0.0001.
-//
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t t;
-   double tmp;
-   ae_int_t tmpi;
-   ae_int_t ns;
-   double u;
-   double p;
-   double mp;
-   double s;
-   double sigma;
-   double mu;
-   ae_int_t tiecount;
-   ae_frame_make(&_frame_block);
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   NewVector(r, 0, DT_REAL);
-   NewVector(c, 0, DT_INT);
-   NewVector(tiesize, 0, DT_INT);
-// Prepare
-   if (n <= 4 || m <= 4) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      ae_frame_leave();
-      return;
-   }
-   ns = n + m;
-   ae_vector_set_length(&r, ns);
-   ae_vector_set_length(&c, ns);
-   for (i = 0; i < n; i++) {
-      r.ptr.p_double[i] = x->ptr.p_double[i];
-      c.ptr.p_int[i] = 0;
-   }
-   for (i = 0; i < m; i++) {
-      r.ptr.p_double[n + i] = y->ptr.p_double[i];
-      c.ptr.p_int[n + i] = 1;
-   }
-// sort {R, C}
-   if (ns != 1) {
-      i = 2;
-      do {
-         t = i;
-         while (t != 1) {
-            k = t / 2;
-            if (r.ptr.p_double[k - 1] >= r.ptr.p_double[t - 1]) {
-               t = 1;
-            } else {
-               tmp = r.ptr.p_double[k - 1];
-               r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
-               r.ptr.p_double[t - 1] = tmp;
-               tmpi = c.ptr.p_int[k - 1];
-               c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
-               c.ptr.p_int[t - 1] = tmpi;
-               t = k;
-            }
-         }
-         i++;
-      }
-      while (i <= ns);
-      i = ns - 1;
-      do {
-         tmp = r.ptr.p_double[i];
-         r.ptr.p_double[i] = r.ptr.p_double[0];
-         r.ptr.p_double[0] = tmp;
-         tmpi = c.ptr.p_int[i];
-         c.ptr.p_int[i] = c.ptr.p_int[0];
-         c.ptr.p_int[0] = tmpi;
-         t = 1;
-         while (t != 0) {
-            k = 2 * t;
-            if (k > i) {
-               t = 0;
-            } else {
-               if (k < i) {
-                  if (r.ptr.p_double[k] > r.ptr.p_double[k - 1]) {
-                     k++;
-                  }
-               }
-               if (r.ptr.p_double[t - 1] >= r.ptr.p_double[k - 1]) {
-                  t = 0;
-               } else {
-                  tmp = r.ptr.p_double[k - 1];
-                  r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
-                  r.ptr.p_double[t - 1] = tmp;
-                  tmpi = c.ptr.p_int[k - 1];
-                  c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
-                  c.ptr.p_int[t - 1] = tmpi;
-                  t = k;
-               }
-            }
-         }
-         i--;
-      }
-      while (i >= 1);
-   }
-// compute tied ranks
-   i = 0;
-   tiecount = 0;
-   ae_vector_set_length(&tiesize, ns);
-   while (i < ns) {
-      j = i + 1;
-      while (j < ns) {
-         if (r.ptr.p_double[j] != r.ptr.p_double[i]) {
-            break;
-         }
-         j++;
-      }
-      for (k = i; k < j; k++) {
-         r.ptr.p_double[k] = 1 + (double)(i + j - 1) / 2.0;
-      }
-      tiesize.ptr.p_int[tiecount] = j - i;
-      tiecount++;
-      i = j;
-   }
-// Compute U
-   u = 0.0;
-   for (i = 0; i < ns; i++) {
-      if (c.ptr.p_int[i] == 0) {
-         u += r.ptr.p_double[i];
-      }
-   }
-   u = rmul2((double)n, (double)m) + rmul2((double)n, (double)(n + 1)) * 0.5 - u;
-// Result
-   mu = rmul2((double)n, (double)m) / 2;
-   tmp = ns * (ae_sqr((double)ns) - 1) / 12;
-   for (i = 0; i < tiecount; i++) {
-      tmp -= tiesize.ptr.p_int[i] * (ae_sqr((double)(tiesize.ptr.p_int[i])) - 1) / 12;
-   }
-   sigma = sqrt(rmul2((double)n, (double)m) / ns / (ns - 1) * tmp);
-   s = (u - mu) / sigma;
-   if (s <= 0.0) {
-      p = exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m));
-      mp = 1 - exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m));
-   } else {
-      mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m));
-      p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m));
-   }
-   *lefttail = boundval(ae_maxreal(mp, 1.0E-4), 0.0001, 0.2500);
-   *righttail = boundval(ae_maxreal(p, 1.0E-4), 0.0001, 0.2500);
-   *bothtails = 2 * ae_minreal(*lefttail, *righttail);
-   ae_frame_leave();
-}
-
 // Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, double *r) {
    double t;
@@ -8874,129 +8426,6 @@ static void mannwhitneyu_ucheb(double x, double c, double *tj, double *tj1, doub
    t = 2 * x * (*tj1) - (*tj);
    *tj = *tj1;
    *tj1 = t;
-}
-
-// Three-point polynomial interpolation.
-static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n) {
-   double t1;
-   double t2;
-   double t3;
-   double t;
-   double p12;
-   double p23;
-   double result;
-   t1 = 1.0 / 15.0;
-   t2 = 1.0 / 30.0;
-   t3 = 1.0 / 100.0;
-   t = 1.0 / n;
-   p12 = ((t - t2) * p1 + (t1 - t) * p2) / (t1 - t2);
-   p23 = ((t - t3) * p2 + (t2 - t) * p3) / (t2 - t3);
-   result = ((t - t3) * p12 + (t1 - t) * p23) / (t1 - t3);
-   return result;
-}
-
-// Tail(0, N1, N2)
-static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2);
-   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2);
-   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(0.75, N1, N2)
-static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(1.5, N1, N2)
-static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(2.25, N1, N2)
-static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(3.0, N1, N2)
-static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(3.33, N1, N2)
-static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(3.66, N1, N2)
-static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2);
-   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2);
-   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
-}
-
-// Tail(4.0, N1, N2)
-static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2) {
-   double p1;
-   double p2;
-   double p3;
-   double result;
-   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2);
-   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2);
-   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2);
-   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
-   return result;
 }
 
 // Tail(S, 5, 5)
@@ -11870,6 +11299,129 @@ static double mannwhitneyu_utbln14n100(double s) {
    return result;
 }
 
+// Three-point polynomial interpolation.
+static double mannwhitneyu_uninterpolate(double p1, double p2, double p3, ae_int_t n) {
+   double t1;
+   double t2;
+   double t3;
+   double t;
+   double p12;
+   double p23;
+   double result;
+   t1 = 1.0 / 15.0;
+   t2 = 1.0 / 30.0;
+   t3 = 1.0 / 100.0;
+   t = 1.0 / n;
+   p12 = ((t - t2) * p1 + (t1 - t) * p2) / (t1 - t2);
+   p23 = ((t - t3) * p2 + (t2 - t) * p3) / (t2 - t3);
+   result = ((t - t3) * p12 + (t1 - t) * p23) / (t1 - t3);
+   return result;
+}
+
+// Tail(0, N1, N2)
+static double mannwhitneyu_usigma000(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-6.76984e-01, -6.83700e-01, -6.89873e-01, n2);
+   p2 = mannwhitneyu_uninterpolate(-6.83700e-01, -6.87311e-01, -6.90957e-01, n2);
+   p3 = mannwhitneyu_uninterpolate(-6.89873e-01, -6.90957e-01, -6.92175e-01, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(0.75, N1, N2)
+static double mannwhitneyu_usigma075(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-1.44500e+00, -1.45906e+00, -1.47063e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-1.45906e+00, -1.46856e+00, -1.47644e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-1.47063e+00, -1.47644e+00, -1.48100e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(1.5, N1, N2)
+static double mannwhitneyu_usigma150(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-2.65380e+00, -2.67352e+00, -2.69011e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-2.67352e+00, -2.68591e+00, -2.69659e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-2.69011e+00, -2.69659e+00, -2.70192e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(2.25, N1, N2)
+static double mannwhitneyu_usigma225(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-4.41465e+00, -4.42260e+00, -4.43702e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-4.42260e+00, -4.41639e+00, -4.41928e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-4.43702e+00, -4.41928e+00, -4.41030e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(3.0, N1, N2)
+static double mannwhitneyu_usigma300(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-6.89839e+00, -6.83477e+00, -6.82340e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-6.83477e+00, -6.74559e+00, -6.71117e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-6.82340e+00, -6.71117e+00, -6.64929e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(3.33, N1, N2)
+static double mannwhitneyu_usigma333(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-8.31272e+00, -8.17096e+00, -8.13125e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-8.17096e+00, -8.00156e+00, -7.93245e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-8.13125e+00, -7.93245e+00, -7.82502e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(3.66, N1, N2)
+static double mannwhitneyu_usigma367(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-9.98837e+00, -9.70844e+00, -9.62087e+00, n2);
+   p2 = mannwhitneyu_uninterpolate(-9.70844e+00, -9.41156e+00, -9.28998e+00, n2);
+   p3 = mannwhitneyu_uninterpolate(-9.62087e+00, -9.28998e+00, -9.11686e+00, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
+// Tail(4.0, N1, N2)
+static double mannwhitneyu_usigma400(ae_int_t n1, ae_int_t n2) {
+   double p1;
+   double p2;
+   double p3;
+   double result;
+   p1 = mannwhitneyu_uninterpolate(-1.20250e+01, -1.14911e+01, -1.13231e+01, n2);
+   p2 = mannwhitneyu_uninterpolate(-1.14911e+01, -1.09927e+01, -1.07937e+01, n2);
+   p3 = mannwhitneyu_uninterpolate(-1.13231e+01, -1.07937e+01, -1.05285e+01, n2);
+   result = mannwhitneyu_uninterpolate(p1, p2, p3, n1);
+   return result;
+}
+
 // Tail(S, N1, N2)
 static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
    double f0;
@@ -12266,6 +11818,216 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
    }
    return result;
 }
+
+// Mann-Whitney U-test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous distributions of the same shape  and  same  median  or  whether
+// their medians are different.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the medians are equal)
+//     * left-tailed test (null hypothesis - the median of the  first  sample
+//       is greater than or equal to the median of the second sample)
+//     * right-tailed test (null hypothesis - the median of the first  sample
+//       is less than or equal to the median of the second sample).
+//
+// Requirements:
+//     * the samples are independent
+//     * X and Y are continuous distributions (or discrete distributions well-
+//       approximating continuous distributions)
+//     * distributions of X and Y have the  same  shape.  The  only  possible
+//       difference is their position (i.e. the value of the median)
+//     * the number of elements in each sample is not less than 5
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distributions to be normal.
+//
+// Inputs:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N >= 5
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   size of the sample. M >= 5
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+// Relative precision of approximation of p-value:
+//
+// N          M          Max.err.   Rms.err.
+// 5..10      N..10      1.4e-02    6.0e-04
+// 5..10      N..100     2.2e-02    5.3e-06
+// 10..15     N..15      1.0e-02    3.2e-04
+// 10..15     N..100     1.0e-02    2.2e-05
+// 15..100    N..100     6.1e-03    2.7e-06
+//
+// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// account characteristics of asymptotic approximation used, precision should
+// not be sharply different from the values for interval [5, 100].
+//
+// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
+//       P's outside of this interval are enforced to these bounds. Say,  you
+//       may quite often get P equal to exactly 0.25 or 0.0001.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t t;
+   double tmp;
+   ae_int_t tmpi;
+   ae_int_t ns;
+   double u;
+   double p;
+   double mp;
+   double s;
+   double sigma;
+   double mu;
+   ae_int_t tiecount;
+   ae_frame_make(&_frame_block);
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   NewVector(r, 0, DT_REAL);
+   NewVector(c, 0, DT_INT);
+   NewVector(tiesize, 0, DT_INT);
+// Prepare
+   if (n <= 4 || m <= 4) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      ae_frame_leave();
+      return;
+   }
+   ns = n + m;
+   ae_vector_set_length(&r, ns);
+   ae_vector_set_length(&c, ns);
+   for (i = 0; i < n; i++) {
+      r.ptr.p_double[i] = x->ptr.p_double[i];
+      c.ptr.p_int[i] = 0;
+   }
+   for (i = 0; i < m; i++) {
+      r.ptr.p_double[n + i] = y->ptr.p_double[i];
+      c.ptr.p_int[n + i] = 1;
+   }
+// sort {R, C}
+   if (ns != 1) {
+      i = 2;
+      do {
+         t = i;
+         while (t != 1) {
+            k = t / 2;
+            if (r.ptr.p_double[k - 1] >= r.ptr.p_double[t - 1]) {
+               t = 1;
+            } else {
+               tmp = r.ptr.p_double[k - 1];
+               r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
+               r.ptr.p_double[t - 1] = tmp;
+               tmpi = c.ptr.p_int[k - 1];
+               c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
+               c.ptr.p_int[t - 1] = tmpi;
+               t = k;
+            }
+         }
+         i++;
+      } while (i <= ns);
+      i = ns - 1;
+      do {
+         tmp = r.ptr.p_double[i];
+         r.ptr.p_double[i] = r.ptr.p_double[0];
+         r.ptr.p_double[0] = tmp;
+         tmpi = c.ptr.p_int[i];
+         c.ptr.p_int[i] = c.ptr.p_int[0];
+         c.ptr.p_int[0] = tmpi;
+         t = 1;
+         while (t != 0) {
+            k = 2 * t;
+            if (k > i) {
+               t = 0;
+            } else {
+               if (k < i) {
+                  if (r.ptr.p_double[k] > r.ptr.p_double[k - 1]) {
+                     k++;
+                  }
+               }
+               if (r.ptr.p_double[t - 1] >= r.ptr.p_double[k - 1]) {
+                  t = 0;
+               } else {
+                  tmp = r.ptr.p_double[k - 1];
+                  r.ptr.p_double[k - 1] = r.ptr.p_double[t - 1];
+                  r.ptr.p_double[t - 1] = tmp;
+                  tmpi = c.ptr.p_int[k - 1];
+                  c.ptr.p_int[k - 1] = c.ptr.p_int[t - 1];
+                  c.ptr.p_int[t - 1] = tmpi;
+                  t = k;
+               }
+            }
+         }
+         i--;
+      } while (i >= 1);
+   }
+// compute tied ranks
+   i = 0;
+   tiecount = 0;
+   ae_vector_set_length(&tiesize, ns);
+   while (i < ns) {
+      j = i + 1;
+      while (j < ns) {
+         if (r.ptr.p_double[j] != r.ptr.p_double[i]) {
+            break;
+         }
+         j++;
+      }
+      for (k = i; k < j; k++) {
+         r.ptr.p_double[k] = 1 + (double)(i + j - 1) / 2.0;
+      }
+      tiesize.ptr.p_int[tiecount] = j - i;
+      tiecount++;
+      i = j;
+   }
+// Compute U
+   u = 0.0;
+   for (i = 0; i < ns; i++) {
+      if (c.ptr.p_int[i] == 0) {
+         u += r.ptr.p_double[i];
+      }
+   }
+   u = rmul2((double)n, (double)m) + rmul2((double)n, (double)(n + 1)) * 0.5 - u;
+// Result
+   mu = rmul2((double)n, (double)m) / 2;
+   tmp = ns * (ae_sqr((double)ns) - 1) / 12;
+   for (i = 0; i < tiecount; i++) {
+      tmp -= tiesize.ptr.p_int[i] * (ae_sqr((double)(tiesize.ptr.p_int[i])) - 1) / 12;
+   }
+   sigma = sqrt(rmul2((double)n, (double)m) / ns / (ns - 1) * tmp);
+   s = (u - mu) / sigma;
+   if (s <= 0.0) {
+      p = exp(mannwhitneyu_usigma(-(u - mu) / sigma, n, m));
+      mp = 1 - exp(mannwhitneyu_usigma(-(u - 1 - mu) / sigma, n, m));
+   } else {
+      mp = exp(mannwhitneyu_usigma((u - mu) / sigma, n, m));
+      p = 1 - exp(mannwhitneyu_usigma((u + 1 - mu) / sigma, n, m));
+   }
+   *lefttail = boundval(ae_maxreal(mp, 1.0E-4), 0.0001, 0.2500);
+   *righttail = boundval(ae_maxreal(p, 1.0E-4), 0.0001, 0.2500);
+   *bothtails = 2 * ae_minreal(*lefttail, *righttail);
+   ae_frame_leave();
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -12332,7 +12094,6 @@ namespace alglib {
 // NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
 //       P's outside of this interval are enforced to these bounds. Say,  you
 //       may quite often get P equal to exactly 0.25 or 0.0001.
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -12344,74 +12105,59 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 
 // === JARQUEBERA Package ===
 namespace alglib_impl {
-static void jarquebera_jarqueberastatistic(RVector x, ae_int_t n, double *s);
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s);
-static double jarquebera_jbtbl5(double s);
-static double jarquebera_jbtbl6(double s);
-static double jarquebera_jbtbl7(double s);
-static double jarquebera_jbtbl8(double s);
-static double jarquebera_jbtbl9(double s);
-static double jarquebera_jbtbl10(double s);
-static double jarquebera_jbtbl11(double s);
-static double jarquebera_jbtbl12(double s);
-static double jarquebera_jbtbl13(double s);
-static double jarquebera_jbtbl14(double s);
-static double jarquebera_jbtbl15(double s);
-static double jarquebera_jbtbl16(double s);
-static double jarquebera_jbtbl17(double s);
-static double jarquebera_jbtbl18(double s);
-static double jarquebera_jbtbl19(double s);
-static double jarquebera_jbtbl20(double s);
-static double jarquebera_jbtbl30(double s);
-static double jarquebera_jbtbl50(double s);
-static double jarquebera_jbtbl65(double s);
-static double jarquebera_jbtbl100(double s);
-static double jarquebera_jbtbl130(double s);
-static double jarquebera_jbtbl200(double s);
-static double jarquebera_jbtbl301(double s);
-static double jarquebera_jbtbl501(double s);
-static double jarquebera_jbtbl701(double s);
-static double jarquebera_jbtbl1401(double s);
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r);
+static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
+   double t;
+   *r += c * (*tj);
+   t = 2 * x * (*tj1) - (*tj);
+   *tj = *tj1;
+   *tj1 = t;
+}
 
-// Jarque-Bera test
-//
-// This test checks hypotheses about the fact that a  given  sample  X  is  a
-// sample of normal random variable.
-//
-// Requirements:
-//     * the number of elements in the sample is not less than 5.
-//
-// Inputs:
-//     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//
-// Outputs:
-//     P           -   p-value for the test
-//
-// Accuracy of the approximation used (5 <= N <= 1951):
-//
-// p-value          relative error (5 <= N <= 1951)
-// [1, 0.1]            < 1%
-// [0.1, 0.01]         < 2%
-// [0.01, 0.001]       < 6%
-// [0.001, 0]          wasn't measured
-//
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
-// from table values.
-//
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-void jarqueberatest(RVector x, ae_int_t n, double *p) {
-   double s;
-   *p = 0;
-// N is too small
-   if (n < 5) {
-      *p = 1.0;
-      return;
+static double jarquebera_jbtbl5(double s) {
+   double x;
+   double tj;
+   double tj1;
+   double result;
+   result = 0.0;
+   if (s <= 0.4000) {
+      x = 2 * (s - 0.000000) / 0.400000 - 1;
+      tj = 1.0;
+      tj1 = x;
+      jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      return result;
    }
-// N is large enough
-   jarquebera_jarqueberastatistic(x, n, &s);
-   *p = jarquebera_jarqueberaapprox(n, s);
+   if (s <= 1.1000) {
+      x = 2 * (s - 0.400000) / 0.700000 - 1;
+      tj = 1.0;
+      tj1 = x;
+      jarquebera_jbcheb(x, -1.324545e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.075941e+00, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -9.772272e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.175686e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -1.576162e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.126861e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.434425e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -2.790359e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.809178e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.479704e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 3.717040e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -5.294170e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 2.880632e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result);
+      jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      return result;
+   }
+   result = -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
+   return result;
 }
 
 static void jarquebera_jarqueberastatistic(RVector x, ae_int_t n, double *s) {
@@ -12466,248 +12212,6 @@ static void jarquebera_jarqueberastatistic(RVector x, ae_int_t n, double *s) {
    }
 // Statistic
    *s = (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4);
-}
-
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
-   ae_frame _frame_block;
-   double t1;
-   double t2;
-   double t3;
-   double t;
-   double f1;
-   double f2;
-   double f3;
-   double f12;
-   double f23;
-   double x;
-   double result;
-   ae_frame_make(&_frame_block);
-   NewVector(vx, 0, DT_REAL);
-   NewVector(vy, 0, DT_REAL);
-   NewMatrix(ctbl, 0, 0, DT_REAL);
-   result = 1.0;
-   x = s;
-   if (n < 5) {
-      ae_frame_leave();
-      return result;
-   }
-// N = 5..20 are tabulated
-   if (n >= 5 && n <= 20) {
-      if (n == 5) {
-         result = exp(jarquebera_jbtbl5(x));
-      }
-      if (n == 6) {
-         result = exp(jarquebera_jbtbl6(x));
-      }
-      if (n == 7) {
-         result = exp(jarquebera_jbtbl7(x));
-      }
-      if (n == 8) {
-         result = exp(jarquebera_jbtbl8(x));
-      }
-      if (n == 9) {
-         result = exp(jarquebera_jbtbl9(x));
-      }
-      if (n == 10) {
-         result = exp(jarquebera_jbtbl10(x));
-      }
-      if (n == 11) {
-         result = exp(jarquebera_jbtbl11(x));
-      }
-      if (n == 12) {
-         result = exp(jarquebera_jbtbl12(x));
-      }
-      if (n == 13) {
-         result = exp(jarquebera_jbtbl13(x));
-      }
-      if (n == 14) {
-         result = exp(jarquebera_jbtbl14(x));
-      }
-      if (n == 15) {
-         result = exp(jarquebera_jbtbl15(x));
-      }
-      if (n == 16) {
-         result = exp(jarquebera_jbtbl16(x));
-      }
-      if (n == 17) {
-         result = exp(jarquebera_jbtbl17(x));
-      }
-      if (n == 18) {
-         result = exp(jarquebera_jbtbl18(x));
-      }
-      if (n == 19) {
-         result = exp(jarquebera_jbtbl19(x));
-      }
-      if (n == 20) {
-         result = exp(jarquebera_jbtbl20(x));
-      }
-      ae_frame_leave();
-      return result;
-   }
-// N = 20, 30, 50 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 20 && n <= 50) {
-      t1 = -1.0 / 20.0;
-      t2 = -1.0 / 30.0;
-      t3 = -1.0 / 50.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl20(x);
-      f2 = jarquebera_jbtbl30(x);
-      f3 = jarquebera_jbtbl50(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 50, 65, 100 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 50 && n <= 100) {
-      t1 = -1.0 / 50.0;
-      t2 = -1.0 / 65.0;
-      t3 = -1.0 / 100.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl50(x);
-      f2 = jarquebera_jbtbl65(x);
-      f3 = jarquebera_jbtbl100(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 100, 130, 200 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 100 && n <= 200) {
-      t1 = -1.0 / 100.0;
-      t2 = -1.0 / 130.0;
-      t3 = -1.0 / 200.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl100(x);
-      f2 = jarquebera_jbtbl130(x);
-      f3 = jarquebera_jbtbl200(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 200, 301, 501 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 200 && n <= 501) {
-      t1 = -1.0 / 200.0;
-      t2 = -1.0 / 301.0;
-      t3 = -1.0 / 501.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl200(x);
-      f2 = jarquebera_jbtbl301(x);
-      f3 = jarquebera_jbtbl501(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 501, 701, 1401 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 501 && n <= 1401) {
-      t1 = -1.0 / 501.0;
-      t2 = -1.0 / 701.0;
-      t3 = -1.0 / 1401.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl501(x);
-      f2 = jarquebera_jbtbl701(x);
-      f3 = jarquebera_jbtbl1401(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// Asymptotic expansion
-   if (n > 1401) {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-   ae_frame_leave();
-   return result;
-}
-
-static double jarquebera_jbtbl5(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   if (s <= 0.4000) {
-      x = 2 * (s - 0.000000) / 0.400000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 1.1000) {
-      x = 2 * (s - 0.400000) / 0.700000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.324545e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.075941e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.772272e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.175686e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.576162e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.126861e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.434425e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.790359e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.809178e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.479704e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.717040e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.294170e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.880632e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
-   return result;
 }
 
 static double jarquebera_jbtbl6(double s) {
@@ -14251,12 +13755,238 @@ static double jarquebera_jbtbl1401(double s) {
    return result;
 }
 
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
+static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
+   ae_frame _frame_block;
+   double t1;
+   double t2;
+   double t3;
    double t;
-   *r += c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
-   *tj = *tj1;
-   *tj1 = t;
+   double f1;
+   double f2;
+   double f3;
+   double f12;
+   double f23;
+   double x;
+   double result;
+   ae_frame_make(&_frame_block);
+   NewVector(vx, 0, DT_REAL);
+   NewVector(vy, 0, DT_REAL);
+   NewMatrix(ctbl, 0, 0, DT_REAL);
+   result = 1.0;
+   x = s;
+   if (n < 5) {
+      ae_frame_leave();
+      return result;
+   }
+// N = 5..20 are tabulated
+   if (n >= 5 && n <= 20) {
+      if (n == 5) {
+         result = exp(jarquebera_jbtbl5(x));
+      }
+      if (n == 6) {
+         result = exp(jarquebera_jbtbl6(x));
+      }
+      if (n == 7) {
+         result = exp(jarquebera_jbtbl7(x));
+      }
+      if (n == 8) {
+         result = exp(jarquebera_jbtbl8(x));
+      }
+      if (n == 9) {
+         result = exp(jarquebera_jbtbl9(x));
+      }
+      if (n == 10) {
+         result = exp(jarquebera_jbtbl10(x));
+      }
+      if (n == 11) {
+         result = exp(jarquebera_jbtbl11(x));
+      }
+      if (n == 12) {
+         result = exp(jarquebera_jbtbl12(x));
+      }
+      if (n == 13) {
+         result = exp(jarquebera_jbtbl13(x));
+      }
+      if (n == 14) {
+         result = exp(jarquebera_jbtbl14(x));
+      }
+      if (n == 15) {
+         result = exp(jarquebera_jbtbl15(x));
+      }
+      if (n == 16) {
+         result = exp(jarquebera_jbtbl16(x));
+      }
+      if (n == 17) {
+         result = exp(jarquebera_jbtbl17(x));
+      }
+      if (n == 18) {
+         result = exp(jarquebera_jbtbl18(x));
+      }
+      if (n == 19) {
+         result = exp(jarquebera_jbtbl19(x));
+      }
+      if (n == 20) {
+         result = exp(jarquebera_jbtbl20(x));
+      }
+      ae_frame_leave();
+      return result;
+   }
+// N = 20, 30, 50 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 20 && n <= 50) {
+      t1 = -1.0 / 20.0;
+      t2 = -1.0 / 30.0;
+      t3 = -1.0 / 50.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl20(x);
+      f2 = jarquebera_jbtbl30(x);
+      f3 = jarquebera_jbtbl50(x);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+// N = 50, 65, 100 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 50 && n <= 100) {
+      t1 = -1.0 / 50.0;
+      t2 = -1.0 / 65.0;
+      t3 = -1.0 / 100.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl50(x);
+      f2 = jarquebera_jbtbl65(x);
+      f3 = jarquebera_jbtbl100(x);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+// N = 100, 130, 200 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 100 && n <= 200) {
+      t1 = -1.0 / 100.0;
+      t2 = -1.0 / 130.0;
+      t3 = -1.0 / 200.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl100(x);
+      f2 = jarquebera_jbtbl130(x);
+      f3 = jarquebera_jbtbl200(x);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+// N = 200, 301, 501 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 200 && n <= 501) {
+      t1 = -1.0 / 200.0;
+      t2 = -1.0 / 301.0;
+      t3 = -1.0 / 501.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl200(x);
+      f2 = jarquebera_jbtbl301(x);
+      f3 = jarquebera_jbtbl501(x);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+// N = 501, 701, 1401 are tabulated.
+// In-between values are interpolated
+// using interpolating polynomial of the second degree.
+   if (n > 501 && n <= 1401) {
+      t1 = -1.0 / 501.0;
+      t2 = -1.0 / 701.0;
+      t3 = -1.0 / 1401.0;
+      t = -1.0 / n;
+      f1 = jarquebera_jbtbl501(x);
+      f2 = jarquebera_jbtbl701(x);
+      f3 = jarquebera_jbtbl1401(x);
+      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
+      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+// Asymptotic expansion
+   if (n > 1401) {
+      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
+      if (result > 0.0) {
+         result = 0.0;
+      }
+      result = exp(result);
+      ae_frame_leave();
+      return result;
+   }
+   ae_frame_leave();
+   return result;
+}
+
+// Jarque-Bera test
+//
+// This test checks hypotheses about the fact that a  given  sample  X  is  a
+// sample of normal random variable.
+//
+// Requirements:
+//     * the number of elements in the sample is not less than 5.
+//
+// Inputs:
+//     X   -   sample. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N >= 5
+//
+// Outputs:
+//     P           -   p-value for the test
+//
+// Accuracy of the approximation used (5 <= N <= 1951):
+//
+// p-value          relative error (5 <= N <= 1951)
+// [1, 0.1]            < 1%
+// [0.1, 0.01]         < 2%
+// [0.01, 0.001]       < 6%
+// [0.001, 0]          wasn't measured
+//
+// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// from table values.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+void jarqueberatest(RVector x, ae_int_t n, double *p) {
+   double s;
+   *p = 0;
+// N is too small
+   if (n < 5) {
+      *p = 1.0;
+      return;
+   }
+// N is large enough
+   jarquebera_jarqueberastatistic(x, n, &s);
+   *p = jarquebera_jarqueberaapprox(n, s);
 }
 } // end of namespace alglib_impl
 
@@ -14286,7 +14016,6 @@ namespace alglib {
 //
 // For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
-//
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
    alglib_impl::ae_state_init();
@@ -14331,7 +14060,6 @@ namespace alglib_impl {
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void ftest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
@@ -14417,7 +14145,6 @@ void ftest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, doub
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void onesamplevariancetest(RVector x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
@@ -14493,7 +14220,6 @@ namespace alglib {
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
@@ -14531,7 +14257,6 @@ void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, con
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-//
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();

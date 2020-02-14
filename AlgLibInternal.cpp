@@ -67,36 +67,9 @@ ae_int_t getknnserializationcode() {
 
 // === APSERV Package ===
 namespace alglib_impl {
-// The function always returns False.
-// It may be used sometimes to prevent spurious warnings.
-//
-// ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
-bool alwaysfalse() {
-   bool result;
-   result = false;
-   return result;
-}
-
-// The function "touches" integer - it is used  to  avoid  compiler  messages
-// about unused variables (in rare cases when we do NOT want to remove  these
-// variables).
-//
-// ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
-void touchint(ae_int_t *a) {
-}
-
-// The function "touches" real   -  it is used  to  avoid  compiler  messages
-// about unused variables (in rare cases when we do NOT want to remove  these
-// variables).
-//
-// ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
-void touchreal(double *a) {
-}
-
 // The function performs zero-coalescing on real value.
 //
 // NOTE: no check is performed for B != 0
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 double coalesce(double a, double b) {
    double result;
@@ -110,7 +83,6 @@ double coalesce(double a, double b) {
 // The function performs zero-coalescing on integer value.
 //
 // NOTE: no check is performed for B != 0
-//
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 ae_int_t coalescei(ae_int_t a, ae_int_t b) {
    ae_int_t result;
@@ -122,7 +94,6 @@ ae_int_t coalescei(ae_int_t a, ae_int_t b) {
 }
 
 // The function convert integer value to real value.
-//
 // ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
 double inttoreal(ae_int_t a) {
    double result;
@@ -133,7 +104,6 @@ double inttoreal(ae_int_t a) {
 // The function calculates binary logarithm.
 //
 // NOTE: it costs twice as much as Ln(x)
-//
 // ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
 double logbase2(double x) {
    double result;
@@ -145,7 +115,6 @@ double logbase2(double x) {
 // moderate Lipshitz constant (close to 1.0)
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_int_t i;
@@ -157,19 +126,19 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_vector_set_length(y, n);
    if (n > 1) {
       x->ptr.p_double[0] = a;
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
          if (i != n - 1) {
-            x->ptr.p_double[i] = a + (i + 0.2 * (2 * ae_randomreal() - 1)) * h;
+            x->ptr.p_double[i] = a + (i + 0.2 * ae_randommid()) * h;
          } else {
             x->ptr.p_double[i] = b;
          }
-         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + (2 * ae_randomreal() - 1) * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
       }
    } else {
       x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
    }
 }
 
@@ -177,7 +146,6 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
 // moderate Lipshitz constant (close to 1.0)
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_int_t i;
@@ -189,15 +157,15 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) 
    ae_vector_set_length(y, n);
    if (n > 1) {
       x->ptr.p_double[0] = a;
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
          x->ptr.p_double[i] = a + i * h;
-         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + (2 * ae_randomreal() - 1) * h;
+         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * h;
       }
    } else {
       x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
    }
 }
 
@@ -205,7 +173,6 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) 
 // moderate Lipshitz constant (close to 1.0)
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_int_t i;
@@ -218,14 +185,14 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
       for (i = 0; i < n; i++) {
          x->ptr.p_double[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * (2 * i + 1) / (2 * n));
          if (i == 0) {
-            y->ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y->ptr.p_double[i] = ae_randommid();
          } else {
-            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + (2 * ae_randomreal() - 1) * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
          }
       }
    } else {
       x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
    }
 }
 
@@ -233,7 +200,6 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
 // moderate Lipshitz constant (close to 1.0)
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_int_t i;
@@ -246,14 +212,14 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
       for (i = 0; i < n; i++) {
          x->ptr.p_double[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * i / (n - 1));
          if (i == 0) {
-            y->ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y->ptr.p_double[i] = ae_randommid();
          } else {
-            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + (2 * ae_randomreal() - 1) * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
          }
       }
    } else {
       x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      y->ptr.p_double[0] = ae_randommid();
    }
 }
 
@@ -268,7 +234,6 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
 //
 // NOTE:
 //     X[] must be sorted by ascending (subroutine ASSERT's it)
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 bool aredistinct(RVector x, ae_int_t n) {
    double a;
@@ -304,16 +269,14 @@ bool aredistinct(RVector x, ae_int_t n) {
 
 // This function checks that two boolean values are the same (both  are  True
 // or both are False).
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 bool aresameboolean(bool v1, bool v2) {
    bool result;
-   result = (v1 && v2) || (!v1 && !v2);
+   result = v1 == v2;
    return result;
 }
 
 // Resizes X and fills by zeros
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void setlengthzero(RVector x, ae_int_t n) {
    ae_int_t i;
@@ -325,7 +288,6 @@ void setlengthzero(RVector x, ae_int_t n) {
 }
 
 // If Length(X)<N, resizes X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void bvectorsetlengthatleast(BVector x, ae_int_t n) {
    if (x->cnt < n) {
@@ -334,7 +296,6 @@ void bvectorsetlengthatleast(BVector x, ae_int_t n) {
 }
 
 // If Length(X)<N, resizes X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorsetlengthatleast(ZVector x, ae_int_t n) {
    if (x->cnt < n) {
@@ -343,7 +304,6 @@ void ivectorsetlengthatleast(ZVector x, ae_int_t n) {
 }
 
 // If Length(X)<N, resizes X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorsetlengthatleast(RVector x, ae_int_t n) {
    if (x->cnt < n) {
@@ -352,7 +312,6 @@ void rvectorsetlengthatleast(RVector x, ae_int_t n) {
 }
 
 // If Cols(X)<N or Rows(X)<M, resizes X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixsetlengthatleast(RMatrix x, ae_int_t m, ae_int_t n) {
    if (m > 0 && n > 0) {
@@ -363,7 +322,6 @@ void rmatrixsetlengthatleast(RMatrix x, ae_int_t m, ae_int_t n) {
 }
 
 // If Cols(X)<N or Rows(X)<M, resizes X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void bmatrixsetlengthatleast(BMatrix x, ae_int_t m, ae_int_t n) {
    if (m > 0 && n > 0) {
@@ -378,7 +336,6 @@ void bmatrixsetlengthatleast(BMatrix x, ae_int_t m, ae_int_t n) {
 // b) new size is at least N
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void bvectorgrowto(BVector x, ae_int_t n) {
    ae_frame _frame_block;
@@ -412,7 +369,6 @@ void bvectorgrowto(BVector x, ae_int_t n) {
 // b) new size is at least N
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorgrowto(ZVector x, ae_int_t n) {
    ae_frame _frame_block;
@@ -449,7 +405,6 @@ void ivectorgrowto(ZVector x, ae_int_t n) {
 // d) new matrix has at least MinCols columns (if less than specified amount
 //    of columns is present, new columns are added with undefined contents);
 //    MinCols can be 0 or negative value = ignored
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowrowsto(RMatrix a, ae_int_t n, ae_int_t mincols) {
    ae_frame _frame_block;
@@ -489,7 +444,6 @@ void rmatrixgrowrowsto(RMatrix a, ae_int_t n, ae_int_t mincols) {
 // d) new matrix has at least MinRows row (if less than specified amount
 //    of rows is present, new rows are added with undefined contents);
 //    MinRows can be 0 or negative value = ignored
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixgrowcolsto(RMatrix a, ae_int_t n, ae_int_t minrows) {
    ae_frame _frame_block;
@@ -526,7 +480,6 @@ void rmatrixgrowcolsto(RMatrix a, ae_int_t n, ae_int_t minrows) {
 // b) new size is at least N
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorgrowto(RVector x, ae_int_t n) {
    ae_frame _frame_block;
@@ -558,7 +511,6 @@ void rvectorgrowto(RVector x, ae_int_t n) {
 // Resizes X and:
 // * preserves old contents of X
 // * fills new elements by zeros
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorresize(ZVector x, ae_int_t n) {
    ae_frame _frame_block;
@@ -582,7 +534,6 @@ void ivectorresize(ZVector x, ae_int_t n) {
 // Resizes X and:
 // * preserves old contents of X
 // * fills new elements by zeros
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rvectorresize(RVector x, ae_int_t n) {
    ae_frame _frame_block;
@@ -606,7 +557,6 @@ void rvectorresize(RVector x, ae_int_t n) {
 // Resizes X and:
 // * preserves old contents of X
 // * fills new elements by zeros
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void rmatrixresize(RMatrix x, ae_int_t m, ae_int_t n) {
    ae_frame _frame_block;
@@ -635,7 +585,6 @@ void rmatrixresize(RMatrix x, ae_int_t m, ae_int_t n) {
 // Resizes X and:
 // * preserves old contents of X
 // * fills new elements by zeros
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void imatrixresize(ZMatrix x, ae_int_t m, ae_int_t n) {
    ae_frame _frame_block;
@@ -662,7 +611,6 @@ void imatrixresize(ZMatrix x, ae_int_t m, ae_int_t n) {
 }
 
 // appends element to X
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void ivectorappend(ZVector x, ae_int_t v) {
    ae_frame _frame_block;
@@ -682,7 +630,6 @@ void ivectorappend(ZVector x, ae_int_t v) {
 
 // This function checks that length(X) is at least N and first N values  from
 // X[] are finite
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool isfinitevector(RVector x, ae_int_t n) {
    ae_int_t i;
@@ -706,7 +653,6 @@ bool isfinitevector(RVector x, ae_int_t n) {
 }
 
 // This function checks that first N values from X[] are finite
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool isfinitecvector(CVector z, ae_int_t n) {
    ae_int_t i;
@@ -724,7 +670,6 @@ bool isfinitecvector(CVector z, ae_int_t n) {
 
 // This function checks that size of X is at least MxN and values from
 // X[0..M-1,0..N-1] are finite.
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool apservisfinitematrix(RMatrix x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
@@ -753,7 +698,6 @@ bool apservisfinitematrix(RMatrix x, ae_int_t m, ae_int_t n) {
 }
 
 // This function checks that all values from X[0..M-1,0..N-1] are finite
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool apservisfinitecmatrix(CMatrix x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
@@ -775,7 +719,6 @@ bool apservisfinitecmatrix(CMatrix x, ae_int_t m, ae_int_t n) {
 
 // This function checks that size of X is at least NxN and all values from
 // upper/lower triangle of X[0..N-1,0..N-1] are finite
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool isfinitertrmatrix(RMatrix x, ae_int_t n, bool isupper) {
    ae_int_t i;
@@ -813,7 +756,6 @@ bool isfinitertrmatrix(RMatrix x, ae_int_t n, bool isupper) {
 
 // This function checks that all values from upper/lower triangle of
 // X[0..N-1,0..N-1] are finite
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool apservisfinitectrmatrix(CMatrix x, ae_int_t n, bool isupper) {
    ae_int_t i;
@@ -843,7 +785,6 @@ bool apservisfinitectrmatrix(CMatrix x, ae_int_t n, bool isupper) {
 
 // This function checks that all values from X[0..M-1,0..N-1] are  finite  or
 // NaN's.
-//
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
 bool apservisfiniteornanmatrix(RMatrix x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
@@ -864,7 +805,6 @@ bool apservisfiniteornanmatrix(RMatrix x, ae_int_t m, ae_int_t n) {
 }
 
 // Safe sqrt(x^2+y^2)
-//
 // ALGLIB: Copyright by Sergey Bochkanov
 double safepythag2(double x, double y) {
    double w;
@@ -885,7 +825,6 @@ double safepythag2(double x, double y) {
 }
 
 // Safe sqrt(x^2+y^2)
-//
 // ALGLIB: Copyright by Sergey Bochkanov
 double safepythag3(double x, double y, double z) {
    double w;
@@ -915,7 +854,6 @@ double safepythag3(double x, double y, double z) {
 //       (R contains zero; it corresponds to underflow)
 //
 // No overflow is generated in any case.
-//
 // ALGLIB: Copyright by Sergey Bochkanov
 ae_int_t saferdiv(double x, double y, double *r) {
    ae_int_t result;
@@ -973,7 +911,6 @@ ae_int_t saferdiv(double x, double y, double *r) {
 
 // This function calculates "safe" min(X/Y,V) for positive finite X, Y, V.
 // No overflow is generated in any case.
-//
 // ALGLIB: Copyright by Sergey Bochkanov
 double safeminposrv(double x, double y, double v) {
    double r;
@@ -1007,7 +944,6 @@ double safeminposrv(double x, double y, double v) {
 // * K is represented as real value, although actually it is integer
 // * T is guaranteed to be in [A,B]
 // * T replaces X
-//
 // ALGLIB: Copyright by Sergey Bochkanov
 void apperiodicmap(double *x, double a, double b, double *k) {
    *k = 0;
@@ -1027,7 +963,6 @@ void apperiodicmap(double *x, double a, double b, double *k) {
 }
 
 // Returns random normal number using low-quality system-provided generator
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 double randomnormal() {
    double u;
@@ -1035,8 +970,8 @@ double randomnormal() {
    double s;
    double result;
    while (true) {
-      u = 2 * ae_randomreal() - 1;
-      v = 2 * ae_randomreal() - 1;
+      u = ae_randommid();
+      v = ae_randommid();
       s = ae_sqr(u) + ae_sqr(v);
       if (s > 0.0 && s < 1.0) {
       // two sqrt's instead of one to
@@ -1051,7 +986,6 @@ double randomnormal() {
 
 // Generates random unit vector using low-quality system-provided generator.
 // Reallocates array if its size is too short.
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void randomunit(ae_int_t n, RVector x) {
    ae_int_t i;
@@ -1068,8 +1002,7 @@ void randomunit(ae_int_t n, RVector x) {
          x->ptr.p_double[i] = vv;
          v += vv * vv;
       }
-   }
-   while (v <= 0.0);
+   } while (v <= 0.0);
    v = 1 / sqrt(v);
    for (i = 0; i < n; i++) {
       x->ptr.p_double[i] *= v;
@@ -1180,32 +1113,6 @@ double maxreal3(double v0, double v1, double v2) {
       result = v2;
    }
    return result;
-}
-
-// This function is used to increment value of integer variable
-void inc(ae_int_t *v) {
-   ++*v;
-}
-
-// This function is used to decrement value of integer variable
-void dec(ae_int_t *v) {
-   --*v;
-}
-
-// This function is used to increment value of integer variable; name of  the
-// function suggests that increment is done in multithreaded setting  in  the
-// thread-unsafe manner (optional progress reports which do not need guaranteed
-// correctness)
-void threadunsafeinc(ae_int_t *v) {
-   ++*v;
-}
-
-// This function is used to increment value of integer variable; name of  the
-// function suggests that increment is done in multithreaded setting  in  the
-// thread-unsafe manner (optional progress reports which do not need guaranteed
-// correctness)
-void threadunsafeincby(ae_int_t *v, ae_int_t k) {
-   *v += k;
 }
 
 // This function performs two operations:
@@ -1335,7 +1242,6 @@ double rmaxabs3(double r0, double r1, double r2) {
 }
 
 // 'bounds' value: maps X to [B1,B2]
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 double boundval(double x, double b1, double b2) {
    double result;
@@ -1352,7 +1258,6 @@ double boundval(double x, double b1, double b2) {
 }
 
 // 'bounds' value: maps X to [B1,B2]
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
    ae_int_t result;
@@ -1369,7 +1274,6 @@ ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
 }
 
 // 'bounds' value: maps X to [B1,B2]
-//
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 double rboundval(double x, double b1, double b2) {
    double result;
@@ -1651,7 +1555,6 @@ void unsetrealmatrix(RMatrix a) {
 // * Task0 and Task1 are close to each other
 // * Task0 >= Task1
 // * Task0 is always divisible by TileSize
-//
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t *task1) {
    ae_int_t cc;
@@ -1678,7 +1581,6 @@ void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t 
 //
 // This function searches A (records with indices [I0,I1)) for a record with
 // header B. It returns index of this record (not offset!), or -1 on failure.
-//
 // ALGLIB: Copyright 28.03.2011 by Sergey Bochkanov
 ae_int_t recsearch(ZVector a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector b) {
    ae_int_t mididx;
@@ -1726,7 +1628,6 @@ ae_int_t recsearch(ZVector a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_i
 // * in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
 // * in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
 //   and both Task0 and Task1 are even, Task0 >= Task1
-//
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1) {
    *task0 = 0;
@@ -1760,7 +1661,6 @@ void splitlengtheven(ae_int_t tasksize, ae_int_t *task0, ae_int_t *task1) {
 //
 // Function result is equivalent to ceil(TaskSize/ChunkSize), but with guarantees
 // that rounding errors won't ruin results.
-//
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize) {
    ae_int_t result;
@@ -1815,7 +1715,6 @@ ae_int_t matrixtilesizeb() {
 // This function returns minimum cost of task which is feasible for
 // multithreaded processing. It returns real number in order to avoid overflow
 // problems.
-//
 // ALGLIB: Copyright 10.01.2018 by Sergey Bochkanov
 double smpactivationlevel() {
    double nn;
@@ -1829,7 +1728,6 @@ double smpactivationlevel() {
 // spawn (given that multithreading is active).
 //
 // It returns real number in order to avoid overflow problems.
-//
 // ALGLIB: Copyright 10.01.2018 by Sergey Bochkanov
 double spawnlevel() {
    double nn;
@@ -1850,7 +1748,6 @@ double spawnlevel() {
 // * Task0+Task1=TaskSize, Task0>0, Task1>0
 // * Task0 and Task1 are close to each other
 // * in case TaskSize>ChunkSize, Task0 is always divisible by ChunkSize
-//
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_t *task1) {
    *task0 = 0;
@@ -1868,7 +1765,6 @@ void splitlength(ae_int_t tasksize, ae_int_t chunksize, ae_int_t *task0, ae_int_
 
 void apbuffers_init(void *_p, bool make_automatic) {
    apbuffers *p = (apbuffers *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->ba0, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->ia0, 0, DT_INT, make_automatic);
    ae_vector_init(&p->ia1, 0, DT_INT, make_automatic);
@@ -1900,7 +1796,6 @@ void apbuffers_copy(void *_dst, void *_src, bool make_automatic) {
 
 void apbuffers_free(void *_p, bool make_automatic) {
    apbuffers *p = (apbuffers *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->ba0, make_automatic);
    ae_vector_free(&p->ia0, make_automatic);
    ae_vector_free(&p->ia1, make_automatic);
@@ -1915,8 +1810,6 @@ void apbuffers_free(void *_p, bool make_automatic) {
 }
 
 void sboolean_init(void *_p, bool make_automatic) {
-   sboolean *p = (sboolean *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void sboolean_copy(void *_dst, void *_src, bool make_automatic) {
@@ -1926,13 +1819,10 @@ void sboolean_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void sboolean_free(void *_p, bool make_automatic) {
-   sboolean *p = (sboolean *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void sbooleanarray_init(void *_p, bool make_automatic) {
    sbooleanarray *p = (sbooleanarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->val, 0, DT_BOOL, make_automatic);
 }
 
@@ -1944,13 +1834,10 @@ void sbooleanarray_copy(void *_dst, void *_src, bool make_automatic) {
 
 void sbooleanarray_free(void *_p, bool make_automatic) {
    sbooleanarray *p = (sbooleanarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->val, make_automatic);
 }
 
 void sinteger_init(void *_p, bool make_automatic) {
-   sinteger *p = (sinteger *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void sinteger_copy(void *_dst, void *_src, bool make_automatic) {
@@ -1960,13 +1847,10 @@ void sinteger_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void sinteger_free(void *_p, bool make_automatic) {
-   sinteger *p = (sinteger *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void sintegerarray_init(void *_p, bool make_automatic) {
    sintegerarray *p = (sintegerarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->val, 0, DT_INT, make_automatic);
 }
 
@@ -1978,13 +1862,10 @@ void sintegerarray_copy(void *_dst, void *_src, bool make_automatic) {
 
 void sintegerarray_free(void *_p, bool make_automatic) {
    sintegerarray *p = (sintegerarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->val, make_automatic);
 }
 
 void sreal_init(void *_p, bool make_automatic) {
-   sreal *p = (sreal *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void sreal_copy(void *_dst, void *_src, bool make_automatic) {
@@ -1994,13 +1875,10 @@ void sreal_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void sreal_free(void *_p, bool make_automatic) {
-   sreal *p = (sreal *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void srealarray_init(void *_p, bool make_automatic) {
    srealarray *p = (srealarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->val, 0, DT_REAL, make_automatic);
 }
 
@@ -2012,13 +1890,10 @@ void srealarray_copy(void *_dst, void *_src, bool make_automatic) {
 
 void srealarray_free(void *_p, bool make_automatic) {
    srealarray *p = (srealarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->val, make_automatic);
 }
 
 void scomplex_init(void *_p, bool make_automatic) {
-   scomplex *p = (scomplex *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void scomplex_copy(void *_dst, void *_src, bool make_automatic) {
@@ -2028,13 +1903,10 @@ void scomplex_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void scomplex_free(void *_p, bool make_automatic) {
-   scomplex *p = (scomplex *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void scomplexarray_init(void *_p, bool make_automatic) {
    scomplexarray *p = (scomplexarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->val, 0, DT_COMPLEX, make_automatic);
 }
 
@@ -2046,7 +1918,6 @@ void scomplexarray_copy(void *_dst, void *_src, bool make_automatic) {
 
 void scomplexarray_free(void *_p, bool make_automatic) {
    scomplexarray *p = (scomplexarray *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->val, make_automatic);
 }
 } // end of namespace alglib_impl
@@ -2054,10 +1925,6 @@ void scomplexarray_free(void *_p, bool make_automatic) {
 // === TSORT Package ===
 // Depends on: APSERV
 namespace alglib_impl {
-static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t i1, ae_int_t i2);
-static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t i1, ae_int_t i2);
-static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t i2);
-
 // This function sorts array of real keys by ascending.
 //
 // Its results are:
@@ -2082,7 +1949,6 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
 //     this function assumes that A[] is finite; it doesn't checks that
 //     condition. All other conditions (size of input arrays, etc.) are not
 //     checked too.
-//
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
 void tagsort(RVector a, ae_int_t n, ZVector p1, ZVector p2) {
    ae_frame _frame_block;
@@ -2101,7 +1967,6 @@ void tagsort(RVector a, ae_int_t n, ZVector p1, ZVector p2) {
 //
 // It is intended to be used in the performance-critical parts of code, where
 // additional allocations can lead to severe performance degradation
-//
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
 void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
    ae_int_t i;
@@ -2162,563 +2027,8 @@ void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
    }
 }
 
-// Same as TagSort, but optimized for real keys and integer labels.
-//
-// A is sorted, and same permutations are applied to B.
-//
-// NOTES:
-// 1.  this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
-//     They may be preallocated (which will save some time) or not, in which
-//     case function will automatically allocate memory.
-//
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t j;
-   bool isascending;
-   bool isdescending;
-   double tmpr;
-   ae_int_t tmpi;
-// Special case
-   if (n <= 1) {
-      return;
-   }
-// Test for already sorted set
-   isascending = true;
-   isdescending = true;
-   for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
-   }
-   if (isascending) {
-      return;
-   }
-   if (isdescending) {
-      for (i = 0; i < n; i++) {
-         j = n - 1 - i;
-         if (j <= i) {
-            break;
-         }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
-         tmpi = b->ptr.p_int[i];
-         b->ptr.p_int[i] = b->ptr.p_int[j];
-         b->ptr.p_int[j] = tmpi;
-      }
-      return;
-   }
-// General case
-   if (bufa->cnt < n) {
-      ae_vector_set_length(bufa, n);
-   }
-   if (bufb->cnt < n) {
-      ae_vector_set_length(bufb, n);
-   }
-   tsort_tagsortfastirec(a, b, bufa, bufb, 0, n - 1);
-}
-
-// Same as TagSort, but optimized for real keys and real labels.
-//
-// A is sorted, and same permutations are applied to B.
-//
-// NOTES:
-// 1.  this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
-//     They may be preallocated (which will save some time) or not, in which
-//     case function will automatically allocate memory.
-//
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t j;
-   bool isascending;
-   bool isdescending;
-   double tmpr;
-// Special case
-   if (n <= 1) {
-      return;
-   }
-// Test for already sorted set
-   isascending = true;
-   isdescending = true;
-   for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
-   }
-   if (isascending) {
-      return;
-   }
-   if (isdescending) {
-      for (i = 0; i < n; i++) {
-         j = n - 1 - i;
-         if (j <= i) {
-            break;
-         }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
-         tmpr = b->ptr.p_double[i];
-         b->ptr.p_double[i] = b->ptr.p_double[j];
-         b->ptr.p_double[j] = tmpr;
-      }
-      return;
-   }
-// General case
-   if (bufa->cnt < n) {
-      ae_vector_set_length(bufa, n);
-   }
-   if (bufb->cnt < n) {
-      ae_vector_set_length(bufb, n);
-   }
-   tsort_tagsortfastrrec(a, b, bufa, bufb, 0, n - 1);
-}
-
-// Same as TagSort, but optimized for real keys without labels.
-//
-// A is sorted, and that's all.
-//
-// NOTES:
-// 1.  this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-// 2.  this function uses buffer, BufA, which is N elements large. It may be
-//     preallocated (which will save some time) or not, in which case
-//     function will automatically allocate memory.
-//
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t j;
-   bool isascending;
-   bool isdescending;
-   double tmpr;
-// Special case
-   if (n <= 1) {
-      return;
-   }
-// Test for already sorted set
-   isascending = true;
-   isdescending = true;
-   for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
-   }
-   if (isascending) {
-      return;
-   }
-   if (isdescending) {
-      for (i = 0; i < n; i++) {
-         j = n - 1 - i;
-         if (j <= i) {
-            break;
-         }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
-      }
-      return;
-   }
-// General case
-   if (bufa->cnt < n) {
-      ae_vector_set_length(bufa, n);
-   }
-   tsort_tagsortfastrec(a, bufa, 0, n - 1);
-}
-
-// Sorting function optimized for integer keys and real labels, can be used
-// to sort middle of the array
-//
-// A is sorted, and same permutations are applied to B.
-//
-// NOTES:
-//     this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-//
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t k;
-   ae_int_t t;
-   ae_int_t tmp;
-   double tmpr;
-   ae_int_t p0;
-   ae_int_t p1;
-   ae_int_t at;
-   ae_int_t ak;
-   ae_int_t ak1;
-   double bt;
-// Special cases
-   if (n <= 1) {
-      return;
-   }
-// General case, N>1: sort, update B
-   for (i = 2; i <= n; i++) {
-      t = i;
-      while (t != 1) {
-         k = t / 2;
-         p0 = offset + k - 1;
-         p1 = offset + t - 1;
-         ak = a->ptr.p_int[p0];
-         at = a->ptr.p_int[p1];
-         if (ak >= at) {
-            break;
-         }
-         a->ptr.p_int[p0] = at;
-         a->ptr.p_int[p1] = ak;
-         tmpr = b->ptr.p_double[p0];
-         b->ptr.p_double[p0] = b->ptr.p_double[p1];
-         b->ptr.p_double[p1] = tmpr;
-         t = k;
-      }
-   }
-   for (i = n - 1; i >= 1; i--) {
-      p0 = offset + 0;
-      p1 = offset + i;
-      tmp = a->ptr.p_int[p1];
-      a->ptr.p_int[p1] = a->ptr.p_int[p0];
-      a->ptr.p_int[p0] = tmp;
-      at = tmp;
-      tmpr = b->ptr.p_double[p1];
-      b->ptr.p_double[p1] = b->ptr.p_double[p0];
-      b->ptr.p_double[p0] = tmpr;
-      bt = tmpr;
-      t = 0;
-      while (true) {
-         k = 2 * t + 1;
-         if (k + 1 > i) {
-            break;
-         }
-         p0 = offset + t;
-         p1 = offset + k;
-         ak = a->ptr.p_int[p1];
-         if (k + 1 < i) {
-            ak1 = a->ptr.p_int[p1 + 1];
-            if (ak1 > ak) {
-               ak = ak1;
-               p1++;
-               k++;
-            }
-         }
-         if (at >= ak) {
-            break;
-         }
-         a->ptr.p_int[p1] = at;
-         a->ptr.p_int[p0] = ak;
-         b->ptr.p_double[p0] = b->ptr.p_double[p1];
-         b->ptr.p_double[p1] = bt;
-         t = k;
-      }
-   }
-}
-
-// Sorting function optimized for integer values (only keys, no labels),  can
-// be used to sort middle of the array
-//
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t k;
-   ae_int_t t;
-   ae_int_t tmp;
-   ae_int_t p0;
-   ae_int_t p1;
-   ae_int_t at;
-   ae_int_t ak;
-   ae_int_t ak1;
-// Special cases
-   if (n <= 1) {
-      return;
-   }
-// General case, N>1: sort, update B
-   for (i = 2; i <= n; i++) {
-      t = i;
-      while (t != 1) {
-         k = t / 2;
-         p0 = offset + k - 1;
-         p1 = offset + t - 1;
-         ak = a->ptr.p_int[p0];
-         at = a->ptr.p_int[p1];
-         if (ak >= at) {
-            break;
-         }
-         a->ptr.p_int[p0] = at;
-         a->ptr.p_int[p1] = ak;
-         t = k;
-      }
-   }
-   for (i = n - 1; i >= 1; i--) {
-      p0 = offset + 0;
-      p1 = offset + i;
-      tmp = a->ptr.p_int[p1];
-      a->ptr.p_int[p1] = a->ptr.p_int[p0];
-      a->ptr.p_int[p0] = tmp;
-      at = tmp;
-      t = 0;
-      while (true) {
-         k = 2 * t + 1;
-         if (k + 1 > i) {
-            break;
-         }
-         p0 = offset + t;
-         p1 = offset + k;
-         ak = a->ptr.p_int[p1];
-         if (k + 1 < i) {
-            ak1 = a->ptr.p_int[p1 + 1];
-            if (ak1 > ak) {
-               ak = ak1;
-               p1++;
-               k++;
-            }
-         }
-         if (at >= ak) {
-            break;
-         }
-         a->ptr.p_int[p1] = at;
-         a->ptr.p_int[p0] = ak;
-         t = k;
-      }
-   }
-}
-
-// Heap operations: adds element to the heap
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap (without new element).
-//                 updated on output
-//     VA      -   value of the element being added
-//     VB      -   value of the tag
-//
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
-   ae_int_t j;
-   ae_int_t k;
-   double v;
-   if (*n < 0) {
-      return;
-   }
-// N=0 is a special case
-   if (*n == 0) {
-      a->ptr.p_double[0] = va;
-      b->ptr.p_int[0] = vb;
-      ++*n;
-      return;
-   }
-// add current point to the heap
-// (add to the bottom, then move up)
-//
-// we don't write point to the heap
-// until its final position is determined
-// (it allow us to reduce number of array access operations)
-   j = *n;
-   ++*n;
-   while (j > 0) {
-      k = (j - 1) / 2;
-      v = a->ptr.p_double[k];
-      if (v < va) {
-      // swap with higher element
-         a->ptr.p_double[j] = v;
-         b->ptr.p_int[j] = b->ptr.p_int[k];
-         j = k;
-      } else {
-      // element in its place. terminate.
-         break;
-      }
-   }
-   a->ptr.p_double[j] = va;
-   b->ptr.p_int[j] = vb;
-}
-
-// Heap operations: replaces top element with new element
-// (which is moved down)
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N-1]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap
-//     VA      -   value of the element which replaces top element
-//     VB      -   value of the tag
-//
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb) {
-   ae_int_t j;
-   ae_int_t k1;
-   ae_int_t k2;
-   double v;
-   double v1;
-   double v2;
-   if (n < 1) {
-      return;
-   }
-// N=1 is a special case
-   if (n == 1) {
-      a->ptr.p_double[0] = va;
-      b->ptr.p_int[0] = vb;
-      return;
-   }
-// move down through heap:
-// * J  -   current element
-// * K1 -   first child (always exists)
-// * K2 -   second child (may not exists)
-//
-// we don't write point to the heap
-// until its final position is determined
-// (it allow us to reduce number of array access operations)
-   j = 0;
-   k1 = 1;
-   k2 = 2;
-   while (k1 < n) {
-      if (k2 >= n) {
-      // only one child.
-      //
-      // swap and terminate (because this child
-      // have no siblings due to heap structure)
-         v = a->ptr.p_double[k1];
-         if (v > va) {
-            a->ptr.p_double[j] = v;
-            b->ptr.p_int[j] = b->ptr.p_int[k1];
-            j = k1;
-         }
-         break;
-      } else {
-      // two childs
-         v1 = a->ptr.p_double[k1];
-         v2 = a->ptr.p_double[k2];
-         if (v1 > v2) {
-            if (va < v1) {
-               a->ptr.p_double[j] = v1;
-               b->ptr.p_int[j] = b->ptr.p_int[k1];
-               j = k1;
-            } else {
-               break;
-            }
-         } else {
-            if (va < v2) {
-               a->ptr.p_double[j] = v2;
-               b->ptr.p_int[j] = b->ptr.p_int[k2];
-               j = k2;
-            } else {
-               break;
-            }
-         }
-         k1 = 2 * j + 1;
-         k2 = 2 * j + 2;
-      }
-   }
-   a->ptr.p_double[j] = va;
-   b->ptr.p_int[j] = vb;
-}
-
-// Heap operations: pops top element from the heap
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N-1]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap, N >= 1
-//
-// On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
-// decreased by 1.
-//
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappopi(RVector a, ZVector b, ae_int_t *n) {
-   double va;
-   ae_int_t vb;
-   if (*n < 1) {
-      return;
-   }
-// N=1 is a special case
-   if (*n == 1) {
-      *n = 0;
-      return;
-   }
-// swap top element and last element,
-// then reorder heap
-   va = a->ptr.p_double[*n - 1];
-   vb = b->ptr.p_int[*n - 1];
-   a->ptr.p_double[*n - 1] = a->ptr.p_double[0];
-   b->ptr.p_int[*n - 1] = b->ptr.p_int[0];
-   --*n;
-   tagheapreplacetopi(a, b, *n, va, vb);
-}
-
-// Search first element less than T in sorted array.
-//
-// PARAMETERS:
-//     A - sorted array by ascending from 0 to N-1
-//     N - number of elements in array
-//     T - the desired element
-//
-// Result:
-//     The very first element's index, which isn't less than T.
-// In the case when there aren't such elements, returns N.
-ae_int_t lowerbound(RVector a, ae_int_t n, double t) {
-   ae_int_t l;
-   ae_int_t half;
-   ae_int_t first;
-   ae_int_t middle;
-   ae_int_t result;
-   l = n;
-   first = 0;
-   while (l > 0) {
-      half = l / 2;
-      middle = first + half;
-      if (a->ptr.p_double[middle] < t) {
-         first = middle + 1;
-         l -= half + 1;
-      } else {
-         l = half;
-      }
-   }
-   result = first;
-   return result;
-}
-
-// Search first element more than T in sorted array.
-//
-// PARAMETERS:
-//     A - sorted array by ascending from 0 to N-1
-//     N - number of elements in array
-//     T - the desired element
-//
-// Result:
-//     The very first element's index, which more than T.
-// In the case when there aren't such elements, returns N.
-ae_int_t upperbound(RVector a, ae_int_t n, double t) {
-   ae_int_t l;
-   ae_int_t half;
-   ae_int_t first;
-   ae_int_t middle;
-   ae_int_t result;
-   l = n;
-   first = 0;
-   while (l > 0) {
-      half = l / 2;
-      middle = first + half;
-      if (t < a->ptr.p_double[middle]) {
-         l = half;
-      } else {
-         first = middle + 1;
-         l -= half + 1;
-      }
-   }
-   result = first;
-   return result;
-}
-
 // Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
-//
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
 static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t i1, ae_int_t i2) {
    ae_int_t i;
@@ -2840,9 +2150,66 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
    tsort_tagsortfastirec(a, b, bufa, bufb, i1 + cntless + cnteq, i2);
 }
 
+// Same as TagSort, but optimized for real keys and integer labels.
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
+//     They may be preallocated (which will save some time) or not, in which
+//     case function will automatically allocate memory.
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   bool isascending;
+   bool isdescending;
+   double tmpr;
+   ae_int_t tmpi;
+// Special case
+   if (n <= 1) {
+      return;
+   }
+// Test for already sorted set
+   isascending = true;
+   isdescending = true;
+   for (i = 1; i < n; i++) {
+      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
+      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+   }
+   if (isascending) {
+      return;
+   }
+   if (isdescending) {
+      for (i = 0; i < n; i++) {
+         j = n - 1 - i;
+         if (j <= i) {
+            break;
+         }
+         tmpr = a->ptr.p_double[i];
+         a->ptr.p_double[i] = a->ptr.p_double[j];
+         a->ptr.p_double[j] = tmpr;
+         tmpi = b->ptr.p_int[i];
+         b->ptr.p_int[i] = b->ptr.p_int[j];
+         b->ptr.p_int[j] = tmpi;
+      }
+      return;
+   }
+// General case
+   if (bufa->cnt < n) {
+      ae_vector_set_length(bufa, n);
+   }
+   if (bufb->cnt < n) {
+      ae_vector_set_length(bufb, n);
+   }
+   tsort_tagsortfastirec(a, b, bufa, bufb, 0, n - 1);
+}
+
 // Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
-//
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
 static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t i1, ae_int_t i2) {
    ae_int_t i;
@@ -2965,9 +2332,65 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
    tsort_tagsortfastrrec(a, b, bufa, bufb, i1 + cntless + cnteq, i2);
 }
 
+// Same as TagSort, but optimized for real keys and real labels.
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
+//     They may be preallocated (which will save some time) or not, in which
+//     case function will automatically allocate memory.
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   bool isascending;
+   bool isdescending;
+   double tmpr;
+// Special case
+   if (n <= 1) {
+      return;
+   }
+// Test for already sorted set
+   isascending = true;
+   isdescending = true;
+   for (i = 1; i < n; i++) {
+      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
+      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+   }
+   if (isascending) {
+      return;
+   }
+   if (isdescending) {
+      for (i = 0; i < n; i++) {
+         j = n - 1 - i;
+         if (j <= i) {
+            break;
+         }
+         tmpr = a->ptr.p_double[i];
+         a->ptr.p_double[i] = a->ptr.p_double[j];
+         a->ptr.p_double[j] = tmpr;
+         tmpr = b->ptr.p_double[i];
+         b->ptr.p_double[i] = b->ptr.p_double[j];
+         b->ptr.p_double[j] = tmpr;
+      }
+      return;
+   }
+// General case
+   if (bufa->cnt < n) {
+      ae_vector_set_length(bufa, n);
+   }
+   if (bufb->cnt < n) {
+      ae_vector_set_length(bufb, n);
+   }
+   tsort_tagsortfastrrec(a, b, bufa, bufb, 0, n - 1);
+}
+
 // Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
-//
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
 static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t i2) {
    ae_int_t cntless;
@@ -3079,6 +2502,437 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
 // Sort left and right parts of the array (ignoring middle part)
    tsort_tagsortfastrec(a, bufa, i1, i1 + cntless - 1);
    tsort_tagsortfastrec(a, bufa, i1 + cntless + cnteq, i2);
+}
+
+// Same as TagSort, but optimized for real keys without labels.
+//
+// A is sorted, and that's all.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses buffer, BufA, which is N elements large. It may be
+//     preallocated (which will save some time) or not, in which case
+//     function will automatically allocate memory.
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   bool isascending;
+   bool isdescending;
+   double tmpr;
+// Special case
+   if (n <= 1) {
+      return;
+   }
+// Test for already sorted set
+   isascending = true;
+   isdescending = true;
+   for (i = 1; i < n; i++) {
+      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
+      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+   }
+   if (isascending) {
+      return;
+   }
+   if (isdescending) {
+      for (i = 0; i < n; i++) {
+         j = n - 1 - i;
+         if (j <= i) {
+            break;
+         }
+         tmpr = a->ptr.p_double[i];
+         a->ptr.p_double[i] = a->ptr.p_double[j];
+         a->ptr.p_double[j] = tmpr;
+      }
+      return;
+   }
+// General case
+   if (bufa->cnt < n) {
+      ae_vector_set_length(bufa, n);
+   }
+   tsort_tagsortfastrec(a, bufa, 0, n - 1);
+}
+
+// Sorting function optimized for integer keys and real labels, can be used
+// to sort middle of the array
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t t;
+   ae_int_t tmp;
+   double tmpr;
+   ae_int_t p0;
+   ae_int_t p1;
+   ae_int_t at;
+   ae_int_t ak;
+   ae_int_t ak1;
+   double bt;
+// Special cases
+   if (n <= 1) {
+      return;
+   }
+// General case, N>1: sort, update B
+   for (i = 2; i <= n; i++) {
+      t = i;
+      while (t != 1) {
+         k = t / 2;
+         p0 = offset + k - 1;
+         p1 = offset + t - 1;
+         ak = a->ptr.p_int[p0];
+         at = a->ptr.p_int[p1];
+         if (ak >= at) {
+            break;
+         }
+         a->ptr.p_int[p0] = at;
+         a->ptr.p_int[p1] = ak;
+         tmpr = b->ptr.p_double[p0];
+         b->ptr.p_double[p0] = b->ptr.p_double[p1];
+         b->ptr.p_double[p1] = tmpr;
+         t = k;
+      }
+   }
+   for (i = n - 1; i >= 1; i--) {
+      p0 = offset + 0;
+      p1 = offset + i;
+      tmp = a->ptr.p_int[p1];
+      a->ptr.p_int[p1] = a->ptr.p_int[p0];
+      a->ptr.p_int[p0] = tmp;
+      at = tmp;
+      tmpr = b->ptr.p_double[p1];
+      b->ptr.p_double[p1] = b->ptr.p_double[p0];
+      b->ptr.p_double[p0] = tmpr;
+      bt = tmpr;
+      t = 0;
+      while (true) {
+         k = 2 * t + 1;
+         if (k + 1 > i) {
+            break;
+         }
+         p0 = offset + t;
+         p1 = offset + k;
+         ak = a->ptr.p_int[p1];
+         if (k + 1 < i) {
+            ak1 = a->ptr.p_int[p1 + 1];
+            if (ak1 > ak) {
+               ak = ak1;
+               p1++;
+               k++;
+            }
+         }
+         if (at >= ak) {
+            break;
+         }
+         a->ptr.p_int[p1] = at;
+         a->ptr.p_int[p0] = ak;
+         b->ptr.p_double[p0] = b->ptr.p_double[p1];
+         b->ptr.p_double[p1] = bt;
+         t = k;
+      }
+   }
+}
+
+// Sorting function optimized for integer values (only keys, no labels),  can
+// be used to sort middle of the array
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t k;
+   ae_int_t t;
+   ae_int_t tmp;
+   ae_int_t p0;
+   ae_int_t p1;
+   ae_int_t at;
+   ae_int_t ak;
+   ae_int_t ak1;
+// Special cases
+   if (n <= 1) {
+      return;
+   }
+// General case, N>1: sort, update B
+   for (i = 2; i <= n; i++) {
+      t = i;
+      while (t != 1) {
+         k = t / 2;
+         p0 = offset + k - 1;
+         p1 = offset + t - 1;
+         ak = a->ptr.p_int[p0];
+         at = a->ptr.p_int[p1];
+         if (ak >= at) {
+            break;
+         }
+         a->ptr.p_int[p0] = at;
+         a->ptr.p_int[p1] = ak;
+         t = k;
+      }
+   }
+   for (i = n - 1; i >= 1; i--) {
+      p0 = offset + 0;
+      p1 = offset + i;
+      tmp = a->ptr.p_int[p1];
+      a->ptr.p_int[p1] = a->ptr.p_int[p0];
+      a->ptr.p_int[p0] = tmp;
+      at = tmp;
+      t = 0;
+      while (true) {
+         k = 2 * t + 1;
+         if (k + 1 > i) {
+            break;
+         }
+         p0 = offset + t;
+         p1 = offset + k;
+         ak = a->ptr.p_int[p1];
+         if (k + 1 < i) {
+            ak1 = a->ptr.p_int[p1 + 1];
+            if (ak1 > ak) {
+               ak = ak1;
+               p1++;
+               k++;
+            }
+         }
+         if (at >= ak) {
+            break;
+         }
+         a->ptr.p_int[p1] = at;
+         a->ptr.p_int[p0] = ak;
+         t = k;
+      }
+   }
+}
+
+// Heap operations: adds element to the heap
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap (without new element).
+//                 updated on output
+//     VA      -   value of the element being added
+//     VB      -   value of the tag
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
+   ae_int_t j;
+   ae_int_t k;
+   double v;
+   if (*n < 0) {
+      return;
+   }
+// N=0 is a special case
+   if (*n == 0) {
+      a->ptr.p_double[0] = va;
+      b->ptr.p_int[0] = vb;
+      ++*n;
+      return;
+   }
+// add current point to the heap
+// (add to the bottom, then move up)
+//
+// we don't write point to the heap
+// until its final position is determined
+// (it allow us to reduce number of array access operations)
+   j = *n;
+   ++*n;
+   while (j > 0) {
+      k = (j - 1) / 2;
+      v = a->ptr.p_double[k];
+      if (v < va) {
+      // swap with higher element
+         a->ptr.p_double[j] = v;
+         b->ptr.p_int[j] = b->ptr.p_int[k];
+         j = k;
+      } else {
+      // element in its place. terminate.
+         break;
+      }
+   }
+   a->ptr.p_double[j] = va;
+   b->ptr.p_int[j] = vb;
+}
+
+// Heap operations: replaces top element with new element
+// (which is moved down)
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap
+//     VA      -   value of the element which replaces top element
+//     VB      -   value of the tag
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb) {
+   ae_int_t j;
+   ae_int_t k1;
+   ae_int_t k2;
+   double v;
+   double v1;
+   double v2;
+   if (n < 1) {
+      return;
+   }
+// N=1 is a special case
+   if (n == 1) {
+      a->ptr.p_double[0] = va;
+      b->ptr.p_int[0] = vb;
+      return;
+   }
+// move down through heap:
+// * J  -   current element
+// * K1 -   first child (always exists)
+// * K2 -   second child (may not exists)
+//
+// we don't write point to the heap
+// until its final position is determined
+// (it allow us to reduce number of array access operations)
+   j = 0;
+   k1 = 1;
+   k2 = 2;
+   while (k1 < n) {
+      if (k2 >= n) {
+      // only one child.
+      //
+      // swap and terminate (because this child
+      // have no siblings due to heap structure)
+         v = a->ptr.p_double[k1];
+         if (v > va) {
+            a->ptr.p_double[j] = v;
+            b->ptr.p_int[j] = b->ptr.p_int[k1];
+            j = k1;
+         }
+         break;
+      } else {
+      // two childs
+         v1 = a->ptr.p_double[k1];
+         v2 = a->ptr.p_double[k2];
+         if (v1 > v2) {
+            if (va < v1) {
+               a->ptr.p_double[j] = v1;
+               b->ptr.p_int[j] = b->ptr.p_int[k1];
+               j = k1;
+            } else {
+               break;
+            }
+         } else {
+            if (va < v2) {
+               a->ptr.p_double[j] = v2;
+               b->ptr.p_int[j] = b->ptr.p_int[k2];
+               j = k2;
+            } else {
+               break;
+            }
+         }
+         k1 = 2 * j + 1;
+         k2 = 2 * j + 2;
+      }
+   }
+   a->ptr.p_double[j] = va;
+   b->ptr.p_int[j] = vb;
+}
+
+// Heap operations: pops top element from the heap
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap, N >= 1
+//
+// On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
+// decreased by 1.
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheappopi(RVector a, ZVector b, ae_int_t *n) {
+   double va;
+   ae_int_t vb;
+   if (*n < 1) {
+      return;
+   }
+// N=1 is a special case
+   if (*n == 1) {
+      *n = 0;
+      return;
+   }
+// swap top element and last element,
+// then reorder heap
+   va = a->ptr.p_double[*n - 1];
+   vb = b->ptr.p_int[*n - 1];
+   a->ptr.p_double[*n - 1] = a->ptr.p_double[0];
+   b->ptr.p_int[*n - 1] = b->ptr.p_int[0];
+   --*n;
+   tagheapreplacetopi(a, b, *n, va, vb);
+}
+
+// Search first element less than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+// Result:
+//     The very first element's index, which isn't less than T.
+// In the case when there aren't such elements, returns N.
+ae_int_t lowerbound(RVector a, ae_int_t n, double t) {
+   ae_int_t l;
+   ae_int_t half;
+   ae_int_t first;
+   ae_int_t middle;
+   ae_int_t result;
+   l = n;
+   first = 0;
+   while (l > 0) {
+      half = l / 2;
+      middle = first + half;
+      if (a->ptr.p_double[middle] < t) {
+         first = middle + 1;
+         l -= half + 1;
+      } else {
+         l = half;
+      }
+   }
+   result = first;
+   return result;
+}
+
+// Search first element more than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+// Result:
+//     The very first element's index, which more than T.
+// In the case when there aren't such elements, returns N.
+ae_int_t upperbound(RVector a, ae_int_t n, double t) {
+   ae_int_t l;
+   ae_int_t half;
+   ae_int_t first;
+   ae_int_t middle;
+   ae_int_t result;
+   l = n;
+   first = 0;
+   while (l > 0) {
+      half = l / 2;
+      middle = first + half;
+      if (t < a->ptr.p_double[middle]) {
+         l = half;
+      } else {
+         first = middle + 1;
+         l -= half + 1;
+      }
+   }
+   result = first;
+   return result;
 }
 } // end of namespace alglib_impl
 
@@ -3906,23 +3760,19 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
                offsa++;
                offsb++;
             }
-            v00.x = v00x;
-            v00.y = v00y;
-            v10.x = v10x;
-            v10.y = v10y;
-            v01.x = v01x;
-            v01.y = v01y;
-            v11.x = v11x;
-            v11.y = v11y;
+            v00 = ae_complex_from_d(v00x, v00y);
+            v10 = ae_complex_from_d(v10x, v10y);
+            v01 = ae_complex_from_d(v01x, v01y);
+            v11 = ae_complex_from_d(v11x, v11y);
             if (ae_c_eq_d(beta, 0.0)) {
-               c->ptr.pp_complex[ic + i + 0][jc + j + 0] = ae_c_mul(alpha, v00);
-               c->ptr.pp_complex[ic + i + 0][jc + j + 1] = ae_c_mul(alpha, v01);
-               c->ptr.pp_complex[ic + i + 1][jc + j + 0] = ae_c_mul(alpha, v10);
+               c->ptr.pp_complex[ic + i][jc + j] = ae_c_mul(alpha, v00);
+               c->ptr.pp_complex[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
+               c->ptr.pp_complex[ic + i + 1][jc + j] = ae_c_mul(alpha, v10);
                c->ptr.pp_complex[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
             } else {
-               c->ptr.pp_complex[ic + i + 0][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 0][jc + j + 0]), ae_c_mul(alpha, v00));
-               c->ptr.pp_complex[ic + i + 0][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 0][jc + j + 1]), ae_c_mul(alpha, v01));
-               c->ptr.pp_complex[ic + i + 1][jc + j + 0] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 1][jc + j + 0]), ae_c_mul(alpha, v10));
+               c->ptr.pp_complex[ic + i][jc + j] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i][jc + j]), ae_c_mul(alpha, v00));
+               c->ptr.pp_complex[ic + i][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i][jc + j + 1]), ae_c_mul(alpha, v01));
+               c->ptr.pp_complex[ic + i + 1][jc + j] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 1][jc + j]), ae_c_mul(alpha, v10));
                c->ptr.pp_complex[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
             }
          } else {
@@ -4213,36 +4063,36 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -4415,36 +4265,36 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -4617,36 +4467,36 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -4820,36 +4670,36 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i + 0][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 0] + alpha * v00;
-               c->ptr.pp_double[ic + i + 0][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i + 0][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i + 0][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 0][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 0] + alpha * v10;
+               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
+               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
+               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
+               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
+               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
                c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
                c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
                c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 0] + alpha * v20;
+               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
                c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
                c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
                c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j + 0] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 0] + alpha * v30;
+               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
                c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
                c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
                c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
@@ -5497,7 +5347,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
             grow = 1 / ae_maxreal(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -5523,7 +5373,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
             grow = ae_minreal(1.0, 1 / ae_maxreal(xbnd, smlnum));
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -5556,7 +5406,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
             grow = 1 / ae_maxreal(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -5580,7 +5430,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
             grow = ae_minreal(1.0, 1 / ae_maxreal(xbnd, smlnum));
             j = jfirst;
-            while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+            while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
                if (grow <= smlnum) {
                   break;
@@ -5596,7 +5446,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
    if (grow * tscal > smlnum) {
    // Use the Level 2 BLAS solve if the reciprocal of the bound on
    // elements of X is not too small.
-      if (upper? notran: !notran) {
+      if (upper == notran) {
          if (nounit) {
             vd = a->ptr.pp_double[n][n];
          } else {
@@ -5651,7 +5501,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
       if (notran) {
       // Solve A * x = b
          j = jfirst;
-         while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+         while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) / A(j,j), scaling x if necessary.
             xj = fabs(x->ptr.p_double[j]);
             flg = 0;
@@ -5762,7 +5612,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
       } else {
       // Solve A' * x = b
          j = jfirst;
-         while ((jinc > 0 && j <= jlast) || (jinc < 0 && j >= jlast)) {
+         while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) - sum A(k,j)*x(k).
          //   k != j
             xj = fabs(x->ptr.p_double[j]);
@@ -5894,7 +5744,52 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
 
 // === SAFESOLVE Package ===
 namespace alglib_impl {
-static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x);
+// complex basic solver-updater for reduced linear system
+//
+//     alpha*x[i] = beta
+//
+// solves this equation and updates it in overlfow-safe manner (keeping track
+// of relative growth of solution).
+//
+// Parameters:
+//     Alpha   -   alpha
+//     Beta    -   beta
+//     LnMax   -   precomputed Ln(MaxRealNumber)
+//     BNorm   -   inf-norm of b (right part of original system)
+//     MaxGrowth-  maximum growth of norm(x) relative to norm(b)
+//     XNorm   -   inf-norm of other components of X (which are already processed)
+//                 it is updated by CBasicSolveAndUpdate.
+//     X       -   solution
+//
+// ALGLIB Routine: Copyright 26.01.2009 by Sergey Bochkanov
+static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x) {
+   double v;
+   bool result;
+   x->x = 0;
+   x->y = 0;
+   result = false;
+   if (ae_c_eq_d(alpha, 0.0)) {
+      return result;
+   }
+   if (ae_c_neq_d(beta, 0.0)) {
+   // alpha*x[i]=beta
+      v = log(ae_c_abs(beta)) - log(ae_c_abs(alpha));
+      if (v > lnmax) {
+         return result;
+      }
+      *x = ae_c_div(beta, alpha);
+   } else {
+   // alpha*x[i]=0
+      *x = ae_complex_from_i(0);
+   }
+// update NrmX, test growth limit
+   *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x));
+   if (*xnorm > maxgrowth * bnorm) {
+      return result;
+   }
+   result = true;
+   return result;
+}
 
 // Real implementation of CMatrixScaledTRSafeSolve
 //
@@ -6070,7 +5965,7 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
    ae_frame_make(&_frame_block);
    NewVector(tmp, 0, DT_COMPLEX);
    ae_assert(n > 0, "CMatrixTRSafeSolve: incorrect N!");
-   ae_assert((trans == 0 || trans == 1) || trans == 2, "CMatrixTRSafeSolve: incorrect Trans!");
+   ae_assert(trans == 0 || trans == 1 || trans == 2, "CMatrixTRSafeSolve: incorrect Trans!");
    result = true;
    lnmax = log(ae_maxrealnumber);
 // Quick return if possible
@@ -6249,53 +6144,6 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
    ae_frame_leave();
    return result;
 }
-
-// complex basic solver-updater for reduced linear system
-//
-//     alpha*x[i] = beta
-//
-// solves this equation and updates it in overlfow-safe manner (keeping track
-// of relative growth of solution).
-//
-// Parameters:
-//     Alpha   -   alpha
-//     Beta    -   beta
-//     LnMax   -   precomputed Ln(MaxRealNumber)
-//     BNorm   -   inf-norm of b (right part of original system)
-//     MaxGrowth-  maximum growth of norm(x) relative to norm(b)
-//     XNorm   -   inf-norm of other components of X (which are already processed)
-//                 it is updated by CBasicSolveAndUpdate.
-//     X       -   solution
-//
-// ALGLIB Routine: Copyright 26.01.2009 by Sergey Bochkanov
-static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x) {
-   double v;
-   bool result;
-   x->x = 0;
-   x->y = 0;
-   result = false;
-   if (ae_c_eq_d(alpha, 0.0)) {
-      return result;
-   }
-   if (ae_c_neq_d(beta, 0.0)) {
-   // alpha*x[i]=beta
-      v = log(ae_c_abs(beta)) - log(ae_c_abs(alpha));
-      if (v > lnmax) {
-         return result;
-      }
-      *x = ae_c_div(beta, alpha);
-   } else {
-   // alpha*x[i]=0
-      *x = ae_complex_from_i(0);
-   }
-// update NrmX, test growth limit
-   *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x));
-   if (*xnorm > maxgrowth * bnorm) {
-      return result;
-   }
-   result = true;
-   return result;
-}
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===
@@ -6394,7 +6242,6 @@ namespace alglib_impl {
 void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVector x, double alpha, RVector y) {
    ae_int_t i;
    ae_int_t ba1;
-   ae_int_t ba2;
    ae_int_t by1;
    ae_int_t by2;
    ae_int_t bx1;
@@ -6424,13 +6271,11 @@ void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_
          by1 = i - i1 + 2;
          by2 = n;
          ba1 = i + 1;
-         ba2 = i2;
          ae_v_addd(&y->ptr.p_double[by1], 1, &a->ptr.pp_double[i][ba1], 1, by2 - by1 + 1, v);
       // Add U*x to the result
          bx1 = i - i1 + 2;
          bx2 = n;
          ba1 = i + 1;
-         ba2 = i2;
          v = ae_v_dotproduct(&x->ptr.p_double[bx1], 1, &a->ptr.pp_double[i][ba1], 1, bx2 - bx1 + 1);
          y->ptr.p_double[i - i1 + 1] += v;
       }
@@ -6440,7 +6285,6 @@ void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_
          bx1 = 1;
          bx2 = i - i1;
          ba1 = i1;
-         ba2 = i - 1;
          v = ae_v_dotproduct(&x->ptr.p_double[bx1], 1, &a->ptr.pp_double[i][ba1], 1, bx2 - bx1 + 1);
          y->ptr.p_double[i - i1 + 1] += v;
       // Add U*x to the result
@@ -6448,12 +6292,10 @@ void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_
          by1 = 1;
          by2 = i - i1;
          ba1 = i1;
-         ba2 = i - 1;
          ae_v_addd(&y->ptr.p_double[by1], 1, &a->ptr.pp_double[i][ba1], 1, by2 - by1 + 1, v);
       }
    }
    ae_v_muld(&y->ptr.p_double[1], 1, n, alpha);
-   touchint(&ba2);
 }
 
 void symmetricrank2update(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVector x, RVector y, RVector t, double alpha) {
@@ -6816,16 +6658,14 @@ void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, a
 // === LINMIN Package ===
 namespace alglib_impl {
 static const double linmin_ftol = 0.001;
-static const double linmin_xtol = 100.0 *ae_machineepsilon;
+static const double linmin_xtol = 100.0 * ae_machineepsilon;
 static const ae_int_t linmin_maxfev = 20;
 static const double linmin_stpmin = 1.0E-50;
 static const double linmin_defstpmax = 1.0E+50;
 static const double linmin_armijofactor = 1.3;
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info);
 
 // Normalizes direction/step pair: makes |D|=1, scales Stp.
 // If |D|=0, it returns, leavind D/Stp unchanged.
-//
 // ALGLIB: Copyright 01.04.2010 by Sergey Bochkanov
 void linminnormalized(RVector d, double *stp, ae_int_t n) {
    double mx;
@@ -6847,6 +6687,178 @@ void linminnormalized(RVector d, double *stp, ae_int_t n) {
    s = 1 / sqrt(s);
    ae_v_muld(d->ptr.p_double, 1, n, s);
    *stp /= s;
+}
+
+static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info) {
+   bool bound;
+   double gamma;
+   double p;
+   double q;
+   double r;
+   double s;
+   double sgnd;
+   double stpc;
+   double stpf;
+   double stpq;
+   double theta;
+   *info = 0;
+// CHECK THE INPUT PARAMETERS FOR ERRORS.
+   if (*brackt && (*stp <= ae_minreal(*stx, *sty) || *stp >= ae_maxreal(*stx, *sty)) || *dx * (*stp - *stx) >= 0.0 || stmax < stmin) {
+      return;
+   }
+// DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
+   sgnd = dp * (*dx / fabs(*dx));
+// FIRST CASE. A HIGHER FUNCTION VALUE.
+// THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
+// TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
+// ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
+   if (fp > *fx) {
+      *info = 1;
+      bound = true;
+      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+      s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+      gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
+      if (*stp < *stx) {
+         gamma = -gamma;
+      }
+      p = gamma - (*dx) + theta;
+      q = gamma - (*dx) + gamma + dp;
+      r = p / q;
+      stpc = *stx + r * (*stp - (*stx));
+      stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
+      if (fabs(stpc - (*stx)) < fabs(stpq - (*stx))) {
+         stpf = stpc;
+      } else {
+         stpf = stpc + (stpq - stpc) / 2;
+      }
+      *brackt = true;
+   } else {
+      if (sgnd < 0.0) {
+      // SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
+      // OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
+      // STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
+      // THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
+         *info = 2;
+         bound = false;
+         theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+         s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+         gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
+         if (*stp > *stx) {
+            gamma = -gamma;
+         }
+         p = gamma - dp + theta;
+         q = gamma - dp + gamma + (*dx);
+         r = p / q;
+         stpc = *stp + r * (*stx - (*stp));
+         stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+         if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+            stpf = stpc;
+         } else {
+            stpf = stpq;
+         }
+         *brackt = true;
+      } else {
+         if (fabs(dp) < fabs(*dx)) {
+         // THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+         // SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
+         // THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
+         // IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
+         // IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
+         // EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
+         // COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
+         // CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
+            *info = 3;
+            bound = true;
+            theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
+            s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+         // THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
+         // TO INFINITY IN THE DIRECTION OF THE STEP.
+            gamma = s * sqrt(ae_maxreal(0.0, ae_sqr(theta / s) - *dx / s * (dp / s)));
+            if (*stp > *stx) {
+               gamma = -gamma;
+            }
+            p = gamma - dp + theta;
+            q = gamma + (*dx - dp) + gamma;
+            r = p / q;
+            if (r < 0.0 && gamma != 0.0) {
+               stpc = *stp + r * (*stx - (*stp));
+            } else {
+               if (*stp > *stx) {
+                  stpc = stmax;
+               } else {
+                  stpc = stmin;
+               }
+            }
+            stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
+            if (*brackt) {
+               if (fabs(*stp - stpc) < fabs(*stp - stpq)) {
+                  stpf = stpc;
+               } else {
+                  stpf = stpq;
+               }
+            } else {
+               if (fabs(*stp - stpc) > fabs(*stp - stpq)) {
+                  stpf = stpc;
+               } else {
+                  stpf = stpq;
+               }
+            }
+         } else {
+         // FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+         // SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
+         // NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
+         // IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
+            *info = 4;
+            bound = false;
+            if (*brackt) {
+               theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
+               s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dy), fabs(dp)));
+               gamma = s * sqrt(ae_sqr(theta / s) - *dy / s * (dp / s));
+               if (*stp > *sty) {
+                  gamma = -gamma;
+               }
+               p = gamma - dp + theta;
+               q = gamma - dp + gamma + (*dy);
+               r = p / q;
+               stpc = *stp + r * (*sty - (*stp));
+               stpf = stpc;
+            } else {
+               if (*stp > *stx) {
+                  stpf = stmax;
+               } else {
+                  stpf = stmin;
+               }
+            }
+         }
+      }
+   }
+// UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
+// DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
+   if (fp > *fx) {
+      *sty = *stp;
+      *fy = fp;
+      *dy = dp;
+   } else {
+      if (sgnd < 0.0) {
+         *sty = *stx;
+         *fy = *fx;
+         *dy = *dx;
+      }
+      *stx = *stp;
+      *fx = fp;
+      *dx = dp;
+   }
+// COMPUTE THE NEW STEP AND SAFEGUARD IT.
+   stpf = ae_minreal(stmax, stpf);
+   stpf = ae_maxreal(stmin, stpf);
+   *stp = stpf;
+   if (*brackt && bound) {
+      if (*sty > *stx) {
+         *stp = ae_minreal(*stx + 0.66 * (*sty - (*stx)), *stp);
+      } else {
+         *stp = ae_maxreal(*stx + 0.66 * (*sty - (*stx)), *stp);
+      }
+   }
 }
 
 // THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
@@ -7153,11 +7165,11 @@ Spawn:
    // NEXT.
       *stage = 3;
    }
-Pause:
-   return true;
 Exit:
    *stage = 0;
    return false;
+Pause:
+   return true;
 }
 
 // These functions perform Armijo line search using  at  most  FMAX  function
@@ -7180,7 +7192,6 @@ Exit:
 //     STPMAX  -   maximum value for STP or zero (if no limit is imposed)
 //     FMAX    -   maximum number of function evaluations
 //     State   -   optimization state
-//
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
 void armijocreate(ae_int_t n, RVector x, double f, RVector s, double stp, double stpmax, ae_int_t fmax, armijostate *state) {
    if (state->x.cnt < n) {
@@ -7203,7 +7214,6 @@ void armijocreate(ae_int_t n, RVector x, double f, RVector s, double stp, double
 }
 
 // This is rcomm-based search function
-//
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
 bool armijoiteration(armijostate *state) {
    AutoS double v;
@@ -7218,8 +7228,6 @@ bool armijoiteration(armijostate *state) {
       default: goto Exit;
    }
 Spawn:
-   n = 359;
-   v = -58;
    if (state->stplen <= 0.0 || state->stpmax < 0.0 || state->fmax < 2) {
       state->info = 0;
       goto Exit;
@@ -7314,12 +7322,11 @@ Spawn:
    }
 // Nothing to be done
    state->info = 1;
-   goto Exit;
-Pause:
-   return true;
 Exit:
    state->PQ = -1;
    return false;
+Pause:
+   return true;
 }
 
 // Results of Armijo search
@@ -7334,7 +7341,6 @@ Exit:
 //                 * 5     step is at upper bound
 //     STP     -   step length (in case of failure it is still returned)
 //     F       -   function value (in case of failure it is still returned)
-//
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
 void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f) {
    *info = state->info;
@@ -7342,181 +7348,7 @@ void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f) {
    *f = state->fcur;
 }
 
-static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, double *fy, double *dy, double *stp, double fp, double dp, bool *brackt, double stmin, double stmax, ae_int_t *info) {
-   bool bound;
-   double gamma;
-   double p;
-   double q;
-   double r;
-   double s;
-   double sgnd;
-   double stpc;
-   double stpf;
-   double stpq;
-   double theta;
-   *info = 0;
-// CHECK THE INPUT PARAMETERS FOR ERRORS.
-   if (*brackt && (*stp <= ae_minreal(*stx, *sty) || *stp >= ae_maxreal(*stx, *sty)) || *dx * (*stp - *stx) >= 0.0 || stmax < stmin) {
-      return;
-   }
-// DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
-   sgnd = dp * (*dx / fabs(*dx));
-// FIRST CASE. A HIGHER FUNCTION VALUE.
-// THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
-// TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
-// ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
-   if (fp > *fx) {
-      *info = 1;
-      bound = true;
-      theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-      s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
-      gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
-      if (*stp < *stx) {
-         gamma = -gamma;
-      }
-      p = gamma - (*dx) + theta;
-      q = gamma - (*dx) + gamma + dp;
-      r = p / q;
-      stpc = *stx + r * (*stp - (*stx));
-      stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
-      if (fabs(stpc - (*stx)) < fabs(stpq - (*stx))) {
-         stpf = stpc;
-      } else {
-         stpf = stpc + (stpq - stpc) / 2;
-      }
-      *brackt = true;
-   } else {
-      if (sgnd < 0.0) {
-      // SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
-      // OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
-      // STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
-      // THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
-         *info = 2;
-         bound = false;
-         theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-         s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
-         gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
-         if (*stp > *stx) {
-            gamma = -gamma;
-         }
-         p = gamma - dp + theta;
-         q = gamma - dp + gamma + (*dx);
-         r = p / q;
-         stpc = *stp + r * (*stx - (*stp));
-         stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-         if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
-            stpf = stpc;
-         } else {
-            stpf = stpq;
-         }
-         *brackt = true;
-      } else {
-         if (fabs(dp) < fabs(*dx)) {
-         // THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         // SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
-         // THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
-         // IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
-         // IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
-         // EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
-         // COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
-         // CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
-            *info = 3;
-            bound = true;
-            theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-            s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
-         // THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
-         // TO INFINITY IN THE DIRECTION OF THE STEP.
-            gamma = s * sqrt(ae_maxreal(0.0, ae_sqr(theta / s) - *dx / s * (dp / s)));
-            if (*stp > *stx) {
-               gamma = -gamma;
-            }
-            p = gamma - dp + theta;
-            q = gamma + (*dx - dp) + gamma;
-            r = p / q;
-            if (r < 0.0 && gamma != 0.0) {
-               stpc = *stp + r * (*stx - (*stp));
-            } else {
-               if (*stp > *stx) {
-                  stpc = stmax;
-               } else {
-                  stpc = stmin;
-               }
-            }
-            stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-            if (*brackt) {
-               if (fabs(*stp - stpc) < fabs(*stp - stpq)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            } else {
-               if (fabs(*stp - stpc) > fabs(*stp - stpq)) {
-                  stpf = stpc;
-               } else {
-                  stpf = stpq;
-               }
-            }
-         } else {
-         // FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-         // SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
-         // NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
-         // IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
-            *info = 4;
-            bound = false;
-            if (*brackt) {
-               theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
-               s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dy), fabs(dp)));
-               gamma = s * sqrt(ae_sqr(theta / s) - *dy / s * (dp / s));
-               if (*stp > *sty) {
-                  gamma = -gamma;
-               }
-               p = gamma - dp + theta;
-               q = gamma - dp + gamma + (*dy);
-               r = p / q;
-               stpc = *stp + r * (*sty - (*stp));
-               stpf = stpc;
-            } else {
-               if (*stp > *stx) {
-                  stpf = stmax;
-               } else {
-                  stpf = stmin;
-               }
-            }
-         }
-      }
-   }
-// UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
-// DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
-   if (fp > *fx) {
-      *sty = *stp;
-      *fy = fp;
-      *dy = dp;
-   } else {
-      if (sgnd < 0.0) {
-         *sty = *stx;
-         *fy = *fx;
-         *dy = *dx;
-      }
-      *stx = *stp;
-      *fx = fp;
-      *dx = dp;
-   }
-// COMPUTE THE NEW STEP AND SAFEGUARD IT.
-   stpf = ae_minreal(stmax, stpf);
-   stpf = ae_maxreal(stmin, stpf);
-   *stp = stpf;
-   if (*brackt && bound) {
-      if (*sty > *stx) {
-         *stp = ae_minreal(*stx + 0.66 * (*sty - (*stx)), *stp);
-      } else {
-         *stp = ae_maxreal(*stx + 0.66 * (*sty - (*stx)), *stp);
-      }
-   }
-}
-
 void linminstate_init(void *_p, bool make_automatic) {
-   linminstate *p = (linminstate *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void linminstate_copy(void *_dst, void *_src, bool make_automatic) {
@@ -7550,13 +7382,10 @@ void linminstate_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void linminstate_free(void *_p, bool make_automatic) {
-   linminstate *p = (linminstate *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 void armijostate_init(void *_p, bool make_automatic) {
    armijostate *p = (armijostate *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->s, 0, DT_REAL, make_automatic);
@@ -7582,7 +7411,6 @@ void armijostate_copy(void *_dst, void *_src, bool make_automatic) {
 
 void armijostate_free(void *_p, bool make_automatic) {
    armijostate *p = (armijostate *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->x, make_automatic);
    ae_vector_free(&p->xbase, make_automatic);
    ae_vector_free(&p->s, make_automatic);
@@ -7591,126 +7419,26 @@ void armijostate_free(void *_p, bool make_automatic) {
 
 // === XBLAS Package ===
 namespace alglib_impl {
-static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr);
-static double xblas_xfastpow(double r, ae_int_t n);
-
-// More precise dot-product. Absolute error of  subroutine  result  is  about
-// 1 ulp of max(MX,V), where:
-//     MX = max( |a[i]*b[i]| )
-//     V  = |(a,b)|
-//
-// Inputs:
-//     A       -   array[0..N-1], vector 1
-//     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..N-1], pre-allocated temporary storage
-//
-// Outputs:
-//     R       -   (A,B)
-//     RErr    -   estimate of error. This estimate accounts for both  errors
-//                 during  calculation  of  (A,B)  and  errors  introduced by
-//                 rounding of A and B to fit in double (about 1 ulp).
-//
+// Fast pow
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-void xdot(RVector a, RVector b, ae_int_t n, RVector temp, double *r, double *rerr) {
-   ae_int_t i;
-   double mx;
-   double v;
-   *r = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
+static double xblas_xfastpow(double r, ae_int_t n) {
+   double result;
+   result = 0.0;
+   if (n > 0) {
+      if (n % 2 == 0) {
+         result = ae_sqr(xblas_xfastpow(r, n / 2));
+      } else {
+         result = r * xblas_xfastpow(r, n - 1);
+      }
+      return result;
+   }
    if (n == 0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
+      result = 1.0;
    }
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->ptr.p_double[i] * b->ptr.p_double[i];
-      temp->ptr.p_double[i] = v;
-      mx = ae_maxreal(mx, fabs(v));
+   if (n < 0) {
+      result = xblas_xfastpow(1 / r, -n);
    }
-   if (mx == 0.0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   xblas_xsum(temp, mx, n, r, rerr);
-}
-
-// More precise complex dot-product. Absolute error of  subroutine  result is
-// about 1 ulp of max(MX,V), where:
-//     MX = max( |a[i]*b[i]| )
-//     V  = |(a,b)|
-//
-// Inputs:
-//     A       -   array[0..N-1], vector 1
-//     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
-//
-// Outputs:
-//     R       -   (A,B)
-//     RErr    -   estimate of error. This estimate accounts for both  errors
-//                 during  calculation  of  (A,B)  and  errors  introduced by
-//                 rounding of A and B to fit in double (about 1 ulp).
-//
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double *rerr) {
-   ae_int_t i;
-   double mx;
-   double v;
-   double rerrx;
-   double rerry;
-   r->x = 0;
-   r->y = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
-   if (n == 0) {
-      *r = ae_complex_from_i(0);
-      *rerr = 0.0;
-      return;
-   }
-// calculate real part
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].x;
-      temp->ptr.p_double[2 * i + 0] = v;
-      mx = ae_maxreal(mx, fabs(v));
-      v = -a->ptr.p_complex[i].y * b->ptr.p_complex[i].y;
-      temp->ptr.p_double[2 * i + 1] = v;
-      mx = ae_maxreal(mx, fabs(v));
-   }
-   if (mx == 0.0) {
-      r->x = 0.0;
-      rerrx = 0.0;
-   } else {
-      xblas_xsum(temp, mx, 2 * n, &r->x, &rerrx);
-   }
-// calculate imaginary part
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].y;
-      temp->ptr.p_double[2 * i + 0] = v;
-      mx = ae_maxreal(mx, fabs(v));
-      v = a->ptr.p_complex[i].y * b->ptr.p_complex[i].x;
-      temp->ptr.p_double[2 * i + 1] = v;
-      mx = ae_maxreal(mx, fabs(v));
-   }
-   if (mx == 0.0) {
-      r->y = 0.0;
-      rerry = 0.0;
-   } else {
-      xblas_xsum(temp, mx, 2 * n, &r->y, &rerry);
-   }
-// total error
-   if (rerrx == 0.0 && rerry == 0.0) {
-      *rerr = 0.0;
-   } else {
-      *rerr = ae_maxreal(rerrx, rerry) * sqrt(1 + ae_sqr(ae_minreal(rerrx, rerry) / ae_maxreal(rerrx, rerry)));
-   }
+   return result;
 }
 
 // Internal subroutine for extra-precise calculation of SUM(w[i]).
@@ -7724,7 +7452,6 @@ void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double
 // Outputs:
 //     R   -   SUM(w[i])
 //     RErr-   error estimate for R
-//
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
 static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr) {
    ae_int_t i;
@@ -7814,27 +7541,121 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
    *rerr = ae_maxreal(*rerr, fabs(*r) * ae_machineepsilon);
 }
 
-// Fast pow
+// More precise dot-product. Absolute error of  subroutine  result  is  about
+// 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
 //
+// Inputs:
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..N-1], pre-allocated temporary storage
+//
+// Outputs:
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static double xblas_xfastpow(double r, ae_int_t n) {
-   double result;
-   result = 0.0;
-   if (n > 0) {
-      if (n % 2 == 0) {
-         result = ae_sqr(xblas_xfastpow(r, n / 2));
-      } else {
-         result = r * xblas_xfastpow(r, n - 1);
-      }
-      return result;
-   }
+void xdot(RVector a, RVector b, ae_int_t n, RVector temp, double *r, double *rerr) {
+   ae_int_t i;
+   double mx;
+   double v;
+   *r = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
    if (n == 0) {
-      result = 1.0;
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
    }
-   if (n < 0) {
-      result = xblas_xfastpow(1 / r, -n);
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->ptr.p_double[i] * b->ptr.p_double[i];
+      temp->ptr.p_double[i] = v;
+      mx = ae_maxreal(mx, fabs(v));
    }
-   return result;
+   if (mx == 0.0) {
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
+   }
+   xblas_xsum(temp, mx, n, r, rerr);
+}
+
+// More precise complex dot-product. Absolute error of  subroutine  result is
+// about 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
+//
+// Inputs:
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
+//
+// Outputs:
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double *rerr) {
+   ae_int_t i;
+   double mx;
+   double v;
+   double rerrx;
+   double rerry;
+   r->x = 0;
+   r->y = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
+   if (n == 0) {
+      *r = ae_complex_from_i(0);
+      *rerr = 0.0;
+      return;
+   }
+// calculate real part
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].x;
+      temp->ptr.p_double[2 * i] = v;
+      mx = ae_maxreal(mx, fabs(v));
+      v = -a->ptr.p_complex[i].y * b->ptr.p_complex[i].y;
+      temp->ptr.p_double[2 * i + 1] = v;
+      mx = ae_maxreal(mx, fabs(v));
+   }
+   if (mx == 0.0) {
+      r->x = 0.0;
+      rerrx = 0.0;
+   } else {
+      xblas_xsum(temp, mx, 2 * n, &r->x, &rerrx);
+   }
+// calculate imaginary part
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].y;
+      temp->ptr.p_double[2 * i] = v;
+      mx = ae_maxreal(mx, fabs(v));
+      v = a->ptr.p_complex[i].y * b->ptr.p_complex[i].x;
+      temp->ptr.p_double[2 * i + 1] = v;
+      mx = ae_maxreal(mx, fabs(v));
+   }
+   if (mx == 0.0) {
+      r->y = 0.0;
+      rerry = 0.0;
+   } else {
+      xblas_xsum(temp, mx, 2 * n, &r->y, &rerry);
+   }
+// total error
+   if (rerrx == 0.0 && rerry == 0.0) {
+      *rerr = 0.0;
+   } else {
+      *rerr = ae_maxreal(rerrx, rerry) * sqrt(1 + ae_sqr(ae_minreal(rerrx, rerry) / ae_maxreal(rerrx, rerry)));
+   }
 }
 } // end of namespace alglib_impl
 
@@ -7955,8 +7776,18 @@ void rankxuntied(RVector x, ae_int_t n, apbuffers *buf) {
 
 // === HPCCORES Package ===
 namespace alglib_impl {
-static bool hpccores_hpcpreparechunkedgradientx(RVector weights, ae_int_t wcount, RVector hpcbuf);
-static bool hpccores_hpcfinalizechunkedgradientx(RVector buf, ae_int_t wcount, RVector grad);
+// Stub function.
+//
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcpreparechunkedgradientx(RVector weights, ae_int_t wcount, RVector hpcbuf) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
+#endif
+}
 
 // Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
 // You  have to call this function  before  calling  HPCChunkedGradient() for
@@ -8014,6 +7845,19 @@ void hpcpreparechunkedgradient(RVector weights, ae_int_t wcount, ae_int_t ntotal
    buf->chunksize = chunksize;
 }
 
+// Stub function.
+//
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcfinalizechunkedgradientx(RVector buf, ae_int_t wcount, RVector grad) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
+#endif
+}
+
 // Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
 // You  have to call this function  after  calling  HPCChunkedGradient()  for
 // a new set of weights. You have to call it only once, see example below:
@@ -8058,35 +7902,8 @@ bool hpcchunkedprocess(RVector weights, ZVector structinfo, RVector columnmeans,
 #endif
 }
 
-// Stub function.
-//
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcpreparechunkedgradientx(RVector weights, ae_int_t wcount, RVector hpcbuf) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
-#endif
-}
-
-// Stub function.
-//
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcfinalizechunkedgradientx(RVector buf, ae_int_t wcount, RVector grad) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
-#endif
-}
-
 void mlpbuffers_init(void *_p, bool make_automatic) {
    mlpbuffers *p = (mlpbuffers *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->batch4buf, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->hpcbuf, 0, DT_REAL, make_automatic);
    ae_matrix_init(&p->xy, 0, 0, DT_REAL, make_automatic);
@@ -8122,7 +7939,6 @@ void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic) {
 
 void mlpbuffers_free(void *_p, bool make_automatic) {
    mlpbuffers *p = (mlpbuffers *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->batch4buf, make_automatic);
    ae_vector_free(&p->hpcbuf, make_automatic);
    ae_matrix_free(&p->xy, make_automatic);
@@ -8138,9 +7954,110 @@ void mlpbuffers_free(void *_p, bool make_automatic) {
 
 // === NTHEORY Package ===
 namespace alglib_impl {
-static bool ntheory_isprime(ae_int_t n);
-static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n);
-static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n);
+static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
+   ae_int_t t;
+   double ra;
+   double rb;
+   ae_int_t result;
+   ae_assert(a >= 0 && a < n, "ModMul: A<0 or A >= N");
+   ae_assert(b >= 0 && b < n, "ModMul: B<0 or B >= N");
+// Base cases
+   ra = (double)a;
+   rb = (double)b;
+   if (b == 0 || a == 0) {
+      result = 0;
+      return result;
+   }
+   if (b == 1 || a == 1) {
+      result = a * b;
+      return result;
+   }
+   if (ra * rb == (double)(a * b)) {
+      result = a * b % n;
+      return result;
+   }
+// Non-base cases
+   if (b % 2 == 0) {
+   // A*B = (A*(B/2)) * 2
+   //
+   // Product T=A*(B/2) is calculated recursively, product T*2 is
+   // calculated as follows:
+   // * result:=T-N
+   // * result:=result+T
+   // * if result<0 then result:=result+N
+   //
+   // In case integer result overflows, we generate exception
+      t = ntheory_modmul(a, b / 2, n);
+      result = t - n;
+      result += t;
+      if (result < 0) {
+         result += n;
+      }
+   } else {
+   // A*B = (A*(B div 2)) * 2 + A
+   //
+   // Product T=A*(B/2) is calculated recursively, product T*2 is
+   // calculated as follows:
+   // * result:=T-N
+   // * result:=result+T
+   // * if result<0 then result:=result+N
+   //
+   // In case integer result overflows, we generate exception
+      t = ntheory_modmul(a, b / 2, n);
+      result = t - n;
+      result += t;
+      if (result < 0) {
+         result += n;
+      }
+      result -= n;
+      result += a;
+      if (result < 0) {
+         result += n;
+      }
+   }
+   return result;
+}
+
+static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n) {
+   ae_int_t t;
+   ae_int_t result;
+   ae_assert(a >= 0 && a < n, "ModExp: A<0 or A >= N");
+   ae_assert(b >= 0, "ModExp: B<0");
+// Base cases
+   if (b == 0) {
+      result = 1;
+      return result;
+   }
+   if (b == 1) {
+      result = a;
+      return result;
+   }
+// Non-base cases
+   if (b % 2 == 0) {
+      t = ntheory_modmul(a, a, n);
+      result = ntheory_modexp(t, b / 2, n);
+   } else {
+      t = ntheory_modmul(a, a, n);
+      result = ntheory_modexp(t, b / 2, n);
+      result = ntheory_modmul(result, a, n);
+   }
+   return result;
+}
+
+static bool ntheory_isprime(ae_int_t n) {
+   ae_int_t p;
+   bool result;
+   result = false;
+   p = 2;
+   while (p * p <= n) {
+      if (n % p == 0) {
+         return result;
+      }
+      p++;
+   }
+   result = true;
+   return result;
+}
 
 void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot) {
    ae_int_t candroot;
@@ -8237,111 +8154,6 @@ void findprimitiverootandinverse(ae_int_t n, ae_int_t *proot, ae_int_t *invproot
    ae_assert(*proot * (*invproot) / (*invproot) == (*proot), "FindPrimitiveRoot: internal error");
    ae_assert(*proot * (*invproot) % n == 1, "FindPrimitiveRoot: internal error");
 }
-
-static bool ntheory_isprime(ae_int_t n) {
-   ae_int_t p;
-   bool result;
-   result = false;
-   p = 2;
-   while (p * p <= n) {
-      if (n % p == 0) {
-         return result;
-      }
-      p++;
-   }
-   result = true;
-   return result;
-}
-
-static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
-   ae_int_t t;
-   double ra;
-   double rb;
-   ae_int_t result;
-   ae_assert(a >= 0 && a < n, "ModMul: A<0 or A >= N");
-   ae_assert(b >= 0 && b < n, "ModMul: B<0 or B >= N");
-// Base cases
-   ra = (double)a;
-   rb = (double)b;
-   if (b == 0 || a == 0) {
-      result = 0;
-      return result;
-   }
-   if (b == 1 || a == 1) {
-      result = a * b;
-      return result;
-   }
-   if (ra * rb == (double)(a * b)) {
-      result = a * b % n;
-      return result;
-   }
-// Non-base cases
-   if (b % 2 == 0) {
-   // A*B = (A*(B/2)) * 2
-   //
-   // Product T=A*(B/2) is calculated recursively, product T*2 is
-   // calculated as follows:
-   // * result:=T-N
-   // * result:=result+T
-   // * if result<0 then result:=result+N
-   //
-   // In case integer result overflows, we generate exception
-      t = ntheory_modmul(a, b / 2, n);
-      result = t - n;
-      result += t;
-      if (result < 0) {
-         result += n;
-      }
-   } else {
-   // A*B = (A*(B div 2)) * 2 + A
-   //
-   // Product T=A*(B/2) is calculated recursively, product T*2 is
-   // calculated as follows:
-   // * result:=T-N
-   // * result:=result+T
-   // * if result<0 then result:=result+N
-   //
-   // In case integer result overflows, we generate exception
-      t = ntheory_modmul(a, b / 2, n);
-      result = t - n;
-      result += t;
-      if (result < 0) {
-         result += n;
-      }
-      result -= n;
-      result += a;
-      if (result < 0) {
-         result += n;
-      }
-   }
-   return result;
-}
-
-static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n) {
-   ae_int_t t;
-   ae_int_t result;
-   ae_assert(a >= 0 && a < n, "ModExp: A<0 or A >= N");
-   ae_assert(b >= 0, "ModExp: B<0");
-// Base cases
-   if (b == 0) {
-      result = 1;
-      return result;
-   }
-   if (b == 1) {
-      result = a;
-      return result;
-   }
-// Non-base cases
-   if (b % 2 == 0) {
-      t = ntheory_modmul(a, a, n);
-      result = ntheory_modexp(t, b / 2, n);
-   } else {
-      t = ntheory_modmul(a, a, n);
-      result = ntheory_modexp(t, b / 2, n);
-      result = ntheory_modmul(result, a, n);
-   }
-   return result;
-}
 } // end of namespace alglib_impl
 
 // === FTBASE Package ===
@@ -8374,272 +8186,266 @@ static const ae_int_t ftbase_raderthreshold = 19;
 static const ae_int_t ftbase_ftbasecodeletrecommended = 5;
 static const double ftbase_ftbaseinefficiencyfactor = 1.3;
 static const ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
-static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize);
-static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan);
-static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0);
-static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1);
-static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3);
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt);
-static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector buf);
-static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize);
-static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize);
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector precr, ae_int_t offs);
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector bufa, RVector bufb, RVector bufc, RVector bufd);
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector precr, ae_int_t offs);
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector buf);
-static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2);
-static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n);
-static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2);
-static void ftbase_internalcomplexlintranspose(RVector a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector buf);
-static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n);
-static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n);
-static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best);
 
-// This subroutine generates FFT plan for K complex FFT's with length N each.
+// Same as FTPushEntry(), but sets Param0 AND Param1.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
 //
 // Inputs:
-//     N           -   FFT length (in complex numbers), N >= 1
-//     K           -   number of repetitions, K >= 1
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
 //
 // Outputs:
-//     Plan        -   plan
-//
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
-   ae_frame _frame_block;
-   ae_int_t rowptr;
-   ae_int_t bluesteinsize;
-   ae_int_t precrptr;
-   ae_int_t preciptr;
-   ae_int_t precrsize;
-   ae_int_t precisize;
-   ae_frame_make(&_frame_block);
-   SetObj(fasttransformplan, plan);
-   NewObj(srealarray, bluesteinbuf);
-// Initial check for parameters
-   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0");
-   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0");
-// Determine required sizes of precomputed real and integer
-// buffers. This stage of code is highly dependent on internals
-// of FTComplexFFTPlanRec() and must be kept synchronized with
-// possible changes in internals of plan generation function.
+static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1) {
+   if (*rowptr >= plan->entries.rows) {
+      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+   }
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = 0;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = 0;
+   ++*rowptr;
+}
+
+// This function pushes one more entry to the plan. It resizes Entries matrix
+// if needed.
 //
-// Buffer size is determined as follows:
-// * N is factorized
-// * we factor out anything which is less or equal to MaxRadix
-// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-//   real entries to store precomputed Quantities for Bluestein's
-//   transformation
-// * prime factor F <= RaderThreshold does NOT require
-//   precomputed storage
-   precrsize = 0;
-   precisize = 0;
-   ftbase_ftdeterminespacerequirements(n, &precrsize, &precisize);
-   if (precrsize > 0) {
-      ae_vector_set_length(&plan->precr, precrsize);
+// Inputs:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//
+// Outputs:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+//
+// NOTE: Param1 is set to -1.
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0) {
+   ftbase_ftpushentry2(plan, rowptr, etype, eopcnt, eopsize, emcvsize, eparam0, -1);
+}
+
+// Forward declaration for indirect recursion.
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt);
+
+// This subroutine precomputes data for complex Bluestein's  FFT  and  writes
+// them to array PrecR[] at specified offset. It  is  responsibility  of  the
+// caller to make sure that PrecR[] is large enough.
+//
+// Inputs:
+//     N           -   original size of the transform
+//     M           -   size of the "padded" Bluestein's transform
+//     PrecR       -   preallocated array
+//     Offs        -   offset
+//
+// Outputs:
+//     PrecR       -   data at Offs:Offs+4*M-1 are modified:
+//                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
+//                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
+//                     Other parts of PrecR are unchanged.
+//
+// NOTE: this function performs internal M-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
+static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector precr, ae_int_t offs) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   double bx;
+   double by;
+   ae_frame_make(&_frame_block);
+   NewObj(fasttransformplan, plan);
+// Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
+   for (i = 0; i < 2 * m; i++) {
+      precr->ptr.p_double[offs + i] = 0.0;
    }
-   if (precisize > 0) {
-      ae_vector_set_length(&plan->preci, precisize);
+   for (i = 0; i < n; i++) {
+      bx = cos(ae_pi / n * i * i);
+      by = sin(ae_pi / n * i * i);
+      precr->ptr.p_double[offs + 2 * i] = bx;
+      precr->ptr.p_double[offs + 2 * i + 1] = by;
+      precr->ptr.p_double[offs + 2 * ((m - i) % m)] = bx;
+      precr->ptr.p_double[offs + 2 * ((m - i) % m) + 1] = by;
    }
-// Generate plan
-   rowptr = 0;
-   precrptr = 0;
-   preciptr = 0;
-   bluesteinsize = 1;
-   ae_vector_set_length(&plan->buffer, 2 * n * k);
-   ftbase_ftcomplexfftplanrec(n, k, true, true, &rowptr, &bluesteinsize, &precrptr, &preciptr, plan);
-   ae_vector_set_length(&bluesteinbuf.val, bluesteinsize);
-   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), srealarray_init, srealarray_copy, srealarray_free);
-// Check that actual amount of precomputed space used by transformation
-// plan is EXACTLY equal to amount of space allocated by us.
-   ae_assert(precrptr == precrsize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)");
-   ae_assert(preciptr == precisize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)");
+// Precomputed FFT
+   ftcomplexfftplan(m, 1, &plan);
+   for (i = 0; i < 2 * m; i++) {
+      precr->ptr.p_double[offs + 2 * m + i] = precr->ptr.p_double[offs + i];
+   }
+   ftbase_ftapplysubplan(&plan, 0, precr, offs + 2 * m, 0, &plan.buffer, 1);
    ae_frame_leave();
 }
 
-// This subroutine applies transformation plan to input/output array A.
+// This subroutine precomputes data for complex Rader's FFT and  writes  them
+// to array PrecR[] at specified offset. It  is  responsibility of the caller
+// to make sure that PrecR[] is large enough.
 //
 // Inputs:
-//     Plan        -   transformation plan
-//     A           -   array, must be large enough for plan to work
-//     OffsA       -   offset of the subarray to process
-//     RepCnt      -   repetition count (transformation is repeatedly applied
-//                     to subsequent subarrays)
+//     N           -   original size of the transform (before reduction to N-1)
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecR       -   preallocated array
+//     Offs        -   offset
 //
 // Outputs:
-//     Plan        -   plan (temporary buffers can be modified, plan itself
-//                     is unchanged and can be reused)
-//     A           -   transformed array
+//     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
+//                     other parts of PrecR are unchanged.
 //
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-void ftapplyplan(fasttransformplan *plan, RVector a, ae_int_t offsa, ae_int_t repcnt) {
-   ae_int_t plansize;
-   ae_int_t i;
-   plansize = plan->entries.ptr.pp_int[0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[0][ftbase_colmicrovectorsize];
-   for (i = 0; i < repcnt; i++) {
-      ftbase_ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, &plan->buffer, 1);
+// NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
+static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector precr, ae_int_t offs) {
+   ae_frame _frame_block;
+   ae_int_t q;
+   ae_int_t kiq;
+   double v;
+   ae_frame_make(&_frame_block);
+   NewObj(fasttransformplan, plan);
+// Fill PrecR with Rader factors, perform FFT
+   kiq = 1;
+   for (q = 0; q < n - 1; q++) {
+      v = -2 * ae_pi * kiq / n;
+      precr->ptr.p_double[offs + 2 * q] = cos(v);
+      precr->ptr.p_double[offs + 2 * q + 1] = sin(v);
+      kiq = kiq * riq % n;
    }
+   ftcomplexfftplan(n - 1, 1, &plan);
+   ftbase_ftapplysubplan(&plan, 0, precr, offs, 0, &plan.buffer, 1);
+   ae_frame_leave();
 }
 
-// Returns good factorization N=N1*N2.
+// Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
 //
-// Usually N1 <= N2 (but not always - small N's may be exception).
-// if N1 != 1 then N2 != 1.
+// Inputs:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
+//     EParam2     -   parameter 2
+//     EParam3     -   parameter 3
 //
-// Factorization is chosen depending on task type and codelets we have.
+// Outputs:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3) {
+   if (*rowptr >= plan->entries.rows) {
+      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+   }
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = eparam2;
+   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = eparam3;
+   ++*rowptr;
+}
+
+// Factorizes task size N into product of two smaller sizes N1 and N2
 //
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2) {
+// Inputs:
+//     N       -   task size, N>0
+//     IsRoot  -   whether taks is root task (first one in a sequence)
+//
+// Outputs:
+//     N1, N2  -   such numbers that:
+//                 * for prime N:                  N1=N2=0
+//                 * for composite N <= MaxRadix:    N1=N2=0
+//                 * for composite N>MaxRadix:     1 <= N1 <= N2, N1*N2=N
+// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
+static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2) {
    ae_int_t j;
+   ae_int_t k;
    *n1 = 0;
    *n2 = 0;
+   ae_assert(n > 0, "FTFactorize: N <= 0");
    *n1 = 0;
    *n2 = 0;
-// try to find good codelet
+// Small N
+   if (n <= ftbase_maxradix) {
+      return;
+   }
+// Large N, recursive split
+   if (n > ftbase_recursivethreshold) {
+      k = CeilZ(sqrt((double)n)) + 1;
+      ae_assert(k * k >= n, "FTFactorize: internal error during recursive factorization");
+      for (j = k; j >= 2; j--) {
+         if (n % j == 0) {
+            *n1 = ae_minint(n / j, j);
+            *n2 = ae_maxint(n / j, j);
+            return;
+         }
+      }
+   }
+// N>MaxRadix, try to find good codelet
+   for (j = ftbase_maxradix; j >= 2; j--) {
+      if (n % j == 0) {
+         *n1 = j;
+         *n2 = n / j;
+         break;
+      }
+   }
+// In case no good codelet was found,
+// try to factorize N into product of ANY primes.
    if (*n1 * (*n2) != n) {
-      for (j = ftbase_ftbasecodeletrecommended; j >= 2; j--) {
+      for (j = 2; j < n; j++) {
          if (n % j == 0) {
             *n1 = j;
             *n2 = n / j;
             break;
          }
-      }
-   }
-// try to factorize N
-   if (*n1 * (*n2) != n) {
-      for (j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) {
-         if (n % j == 0) {
-            *n1 = j;
-            *n2 = n / j;
+         if (j * j > n) {
             break;
          }
       }
-   }
-// looks like N is prime :(
-   if (*n1 * (*n2) != n) {
-      *n1 = 1;
-      *n2 = n;
    }
 // normalize
-   if (*n2 == 1 && *n1 != 1) {
-      *n2 = *n1;
-      *n1 = 1;
+   if (*n1 > (*n2)) {
+      j = *n1;
+      *n1 = *n2;
+      *n2 = j;
    }
 }
 
-// Is number smooth?
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-bool ftbaseissmooth(ae_int_t n) {
-   ae_int_t i;
-   bool result;
-   for (i = 2; i <= ftbase_ftbasemaxsmoothfactor; i++) {
-      while (n % i == 0) {
-         n /= i;
-      }
-   }
-   result = n == 1;
-   return result;
-}
-
-// Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
-// than or equal to max(N,2)
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-ae_int_t ftbasefindsmooth(ae_int_t n) {
-   ae_int_t best;
-   ae_int_t result;
-   best = 2;
-   while (best < n) {
-      best *= 2;
-   }
-   ftbase_ftbasefindsmoothrec(n, 1, 2, &best);
-   result = best;
-   return result;
-}
-
-// Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
-// greater than or equal to max(N,2)
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-ae_int_t ftbasefindsmootheven(ae_int_t n) {
-   ae_int_t best;
-   ae_int_t result;
-   best = 2;
-   while (best < n) {
-      best *= 2;
-   }
-   ftbase_ftbasefindsmoothrec(n, 2, 2, &best);
-   result = best;
-   return result;
-}
-
-// Returns estimate of FLOP count for the FFT.
-//
-// It is only an estimate based on operations count for the PERFECT FFT
-// and relative inefficiency of the algorithm actually used.
-//
-// N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-double ftbasegetflopestimate(ae_int_t n) {
-   double result;
-   result = ftbase_ftbaseinefficiencyfactor * (4 * n * log((double)n) / log(2.0) - 6 * n + 8);
-   return result;
-}
-
-// This function returns EXACT estimate of the space requirements for N-point
-// FFT. Internals of this function are highly dependent on details of different
-// FFTs employed by this unit, so every time algorithm is changed this function
-// has to be rewritten.
+// Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
 //
 // Inputs:
-//     N           -   transform length
-//     PrecRSize   -   must be set to zero
-//     PrecISize   -   must be set to zero
+//     N       -   task size, N>0
 //
-// Outputs:
-//     PrecRSize   -   number of real temporaries required for transformation
-//     PrecISize   -   number of integer temporaries required for transformation
+// RESULU:
+//     cost in UNITs, rounded down to nearest integer
 //
-//
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize) {
-   ae_int_t ncur;
-   ae_int_t f;
-   ae_int_t i;
-// Determine required sizes of precomputed real and integer
-// buffers. This stage of code is highly dependent on internals
-// of FTComplexFFTPlanRec() and must be kept synchronized with
-// possible changes in internals of plan generation function.
-//
-// Buffer size is determined as follows:
-// * N is factorized
-// * we factor out anything which is less or equal to MaxRadix
-// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-//   real entries to store precomputed Quantities for Bluestein's
-//   transformation
-// * prime factor F <= RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
-//   precomputed storage
-   ncur = n;
-   for (i = 2; i <= ftbase_maxradix; i++) {
-      while (ncur % i == 0) {
-         ncur /= i;
-      }
-   }
-   f = 2;
-   while (f <= ncur) {
-      while (ncur % f == 0) {
-         if (f > ftbase_raderthreshold) {
-            *precrsize += 4 * ftbasefindsmooth(2 * f - 1);
-         } else {
-            *precrsize += 2 * (f - 1);
-            ftbase_ftdeterminespacerequirements(f - 1, precrsize, precisize);
-         }
-         ncur /= f;
-      }
-      f++;
-   }
+// NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
+// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
+static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n) {
+   ae_int_t result;
+   ae_assert(n > 0, "FTOptimisticEstimate: N <= 0");
+   result = FloorZ(1.0E-5 * 5 * n * log((double)n) / log(2.0));
+   return result;
 }
 
 // Recurrent function called by FTComplexFFTPlan() and other functions. It
@@ -8680,7 +8486,6 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize,
 //                     (may be increased, but may never be decreased)
 //
 // NOTE: in case TopmostPlan is True, ChildPlan is also must be True.
-//
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, bool topmostplan, ae_int_t *rowptr, ae_int_t *bluesteinsize, ae_int_t *precrptr, ae_int_t *preciptr, fasttransformplan *plan) {
    ae_frame _frame_block;
@@ -8867,113 +8672,126 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
    ae_frame_leave();
 }
 
-// This function pushes one more entry to the plan. It resizes Entries matrix
-// if needed.
+// This function returns EXACT estimate of the space requirements for N-point
+// FFT. Internals of this function are highly dependent on details of different
+// FFTs employed by this unit, so every time algorithm is changed this function
+// has to be rewritten.
 //
 // Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
+//     N           -   transform length
+//     PrecRSize   -   must be set to zero
+//     PrecISize   -   must be set to zero
 //
 // Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-//
-// NOTE: Param1 is set to -1.
+//     PrecRSize   -   number of real temporaries required for transformation
+//     PrecISize   -   number of integer temporaries required for transformation
 //
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0) {
-   ftbase_ftpushentry2(plan, rowptr, etype, eopcnt, eopsize, emcvsize, eparam0, -1);
-}
-
-// Same as FTPushEntry(), but sets Param0 AND Param1.
-// This function pushes one more entry to the plan. It resized Entries matrix
-// if needed.
+static void ftbase_ftdeterminespacerequirements(ae_int_t n, ae_int_t *precrsize, ae_int_t *precisize) {
+   ae_int_t ncur;
+   ae_int_t f;
+   ae_int_t i;
+// Determine required sizes of precomputed real and integer
+// buffers. This stage of code is highly dependent on internals
+// of FTComplexFFTPlanRec() and must be kept synchronized with
+// possible changes in internals of plan generation function.
 //
-// Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
-//     EParam1     -   parameter 1
-//
-// Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-//
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1) {
-   if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+// Buffer size is determined as follows:
+// * N is factorized
+// * we factor out anything which is less or equal to MaxRadix
+// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+//   real entries to store precomputed Quantities for Bluestein's
+//   transformation
+// * prime factor F <= RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
+//   precomputed storage
+   ncur = n;
+   for (i = 2; i <= ftbase_maxradix; i++) {
+      while (ncur % i == 0) {
+         ncur /= i;
+      }
    }
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = 0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = 0;
-   ++*rowptr;
+   f = 2;
+   while (f <= ncur) {
+      while (ncur % f == 0) {
+         if (f > ftbase_raderthreshold) {
+            *precrsize += 4 * ftbasefindsmooth(2 * f - 1);
+         } else {
+            *precrsize += 2 * (f - 1);
+            ftbase_ftdeterminespacerequirements(f - 1, precrsize, precisize);
+         }
+         ncur /= f;
+      }
+      f++;
+   }
 }
 
-// Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
-// This function pushes one more entry to the plan. It resized Entries matrix
-// if needed.
+// This subroutine generates FFT plan for K complex FFT's with length N each.
 //
 // Inputs:
-//     Plan        -   plan (generated so far)
-//     RowPtr      -   index which points to past-the-last entry generated so far
-//     EType       -   entry type
-//     EOpCnt      -   operands count
-//     EOpSize     -   operand size
-//     EMcvSize    -   microvector size
-//     EParam0     -   parameter 0
-//     EParam1     -   parameter 1
-//     EParam2     -   parameter 2
-//     EParam3     -   parameter 3
+//     N           -   FFT length (in complex numbers), N >= 1
+//     K           -   number of repetitions, K >= 1
 //
 // Outputs:
-//     Plan        -   updated plan
-//     RowPtr      -   updated pointer
-//
+//     Plan        -   plan
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3) {
-   if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
+   ae_frame _frame_block;
+   ae_int_t rowptr;
+   ae_int_t bluesteinsize;
+   ae_int_t precrptr;
+   ae_int_t preciptr;
+   ae_int_t precrsize;
+   ae_int_t precisize;
+   ae_frame_make(&_frame_block);
+   SetObj(fasttransformplan, plan);
+   NewObj(srealarray, bluesteinbuf);
+// Initial check for parameters
+   ae_assert(n > 0, "FTComplexFFTPlan: N <= 0");
+   ae_assert(k > 0, "FTComplexFFTPlan: K <= 0");
+// Determine required sizes of precomputed real and integer
+// buffers. This stage of code is highly dependent on internals
+// of FTComplexFFTPlanRec() and must be kept synchronized with
+// possible changes in internals of plan generation function.
+//
+// Buffer size is determined as follows:
+// * N is factorized
+// * we factor out anything which is less or equal to MaxRadix
+// * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+//   real entries to store precomputed Quantities for Bluestein's
+//   transformation
+// * prime factor F <= RaderThreshold does NOT require
+//   precomputed storage
+   precrsize = 0;
+   precisize = 0;
+   ftbase_ftdeterminespacerequirements(n, &precrsize, &precisize);
+   if (precrsize > 0) {
+      ae_vector_set_length(&plan->precr, precrsize);
    }
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = eparam2;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = eparam3;
-   ++*rowptr;
+   if (precisize > 0) {
+      ae_vector_set_length(&plan->preci, precisize);
+   }
+// Generate plan
+   rowptr = 0;
+   precrptr = 0;
+   preciptr = 0;
+   bluesteinsize = 1;
+   ae_vector_set_length(&plan->buffer, 2 * n * k);
+   ftbase_ftcomplexfftplanrec(n, k, true, true, &rowptr, &bluesteinsize, &precrptr, &preciptr, plan);
+   ae_vector_set_length(&bluesteinbuf.val, bluesteinsize);
+   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), srealarray_init, srealarray_copy, srealarray_free);
+// Check that actual amount of precomputed space used by transformation
+// plan is EXACTLY equal to amount of space allocated by us.
+   ae_assert(precrptr == precrsize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)");
+   ae_assert(preciptr == precisize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)");
+   ae_frame_leave();
 }
 
-// This subroutine applies subplan to input/output array A.
+// This subroutine applies transformation plan to input/output array A.
 //
 // Inputs:
 //     Plan        -   transformation plan
-//     SubPlan     -   subplan index
 //     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     Buf         -   temporary buffer whose length is equal to plan length
-//                     (without taking into account RepCnt) or larger.
-//     OffsBuf     -   offset in the buffer array
+//     OffsA       -   offset of the subarray to process
 //     RepCnt      -   repetition count (transformation is repeatedly applied
 //                     to subsequent subarrays)
 //
@@ -8981,132 +8799,462 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 //     Plan        -   plan (temporary buffers can be modified, plan itself
 //                     is unchanged and can be reused)
 //     A           -   transformed array
-//
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt) {
-   ae_frame _frame_block;
-   ae_int_t rowidx;
+void ftapplyplan(fasttransformplan *plan, RVector a, ae_int_t offsa, ae_int_t repcnt) {
+   ae_int_t plansize;
    ae_int_t i;
-   ae_int_t n1;
-   ae_int_t n2;
-   ae_int_t operation;
-   ae_int_t operandscnt;
-   ae_int_t operandsize;
-   ae_int_t microvectorsize;
-   ae_int_t param0;
-   ae_int_t param1;
-   ae_int_t parentsize;
-   ae_int_t childsize;
-   ae_int_t chunksize;
-   ae_int_t lastchunksize;
-   ae_frame_make(&_frame_block);
-   RefObj(srealarray, bufa);
-   RefObj(srealarray, bufb);
-   RefObj(srealarray, bufc);
-   RefObj(srealarray, bufd);
-   ae_assert(plan->entries.ptr.pp_int[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header");
-   rowidx = subplan + 1;
-   while (plan->entries.ptr.pp_int[rowidx][ftbase_coltype] != ftbase_opend) {
-      operation = plan->entries.ptr.pp_int[rowidx][ftbase_coltype];
-      operandscnt = repcnt * plan->entries.ptr.pp_int[rowidx][ftbase_coloperandscnt];
-      operandsize = plan->entries.ptr.pp_int[rowidx][ftbase_coloperandsize];
-      microvectorsize = plan->entries.ptr.pp_int[rowidx][ftbase_colmicrovectorsize];
-      param0 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
-      param1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam1];
-      touchint(&param1);
-   // Process "jump" operation
-      if (operation == ftbase_opjmp) {
-         rowidx += plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
-         continue;
-      }
-   // Process "parallel call" operation:
-   // * we perform initial check for consistency between parent and child plans
-   // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
-   //   several parallel tasks
-      if (operation == ftbase_opparallelcall) {
-         parentsize = operandsize * microvectorsize;
-         childsize = plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_colmicrovectorsize];
-         ae_assert(plan->entries.ptr.pp_int[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header");
-         ae_assert(parentsize == childsize, "FTApplySubPlan: incorrect child subplan header");
-         chunksize = ae_maxint(ftbase_recursivethreshold / childsize, 1);
-         lastchunksize = operandscnt % chunksize;
-         if (lastchunksize == 0) {
-            lastchunksize = chunksize;
-         }
-         i = 0;
-         while (i < operandscnt) {
-            chunksize = ae_minint(chunksize, operandscnt - i);
-            ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize);
-            i += chunksize;
-         }
-         rowidx++;
-         continue;
-      }
-   // Process "reference complex FFT" operation
-      if (operation == ftbase_opcomplexreffft) {
-         ftbase_ftapplycomplexreffft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, buf);
-         rowidx++;
-         continue;
-      }
-   // Process "codelet FFT" operation
-      if (operation == ftbase_opcomplexcodeletfft) {
-         ftbase_ftapplycomplexcodeletfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize);
-         rowidx++;
-         continue;
-      }
-   // Process "integrated codelet FFT" operation
-      if (operation == ftbase_opcomplexcodelettwfft) {
-         ftbase_ftapplycomplexcodelettwfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize);
-         rowidx++;
-         continue;
-      }
-   // Process Bluestein's FFT operation
-      if (operation == ftbase_opbluesteinsfft) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize != 2 for Bluesteins FFT");
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufa);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc);
-         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufd);
-         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], &bufa->val, &bufb->val, &bufc->val, &bufd->val);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufa);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc);
-         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufd);
-         rowidx++;
-         continue;
-      }
-   // Process Rader's FFT
-      if (operation == ftbase_opradersfft) {
-         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], plan->entries.ptr.pp_int[rowidx][ftbase_colparam3], buf);
-         rowidx++;
-         continue;
-      }
-   // Process "complex twiddle factors" operation
-      if (operation == ftbase_opcomplexfftfactors) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
-         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
-         n2 = operandsize / n1;
-         for (i = 0; i < operandscnt; i++) {
-            ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2);
-         }
-         rowidx++;
-         continue;
-      }
-   // Process "complex transposition" operation
-      if (operation == ftbase_opcomplextranspose) {
-         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
-         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
-         n2 = operandsize / n1;
-         for (i = 0; i < operandscnt; i++) {
-            ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf);
-         }
-         rowidx++;
-         continue;
-      }
-   // Error
-      ae_assert(false, "FTApplySubPlan: unexpected plan type");
+   plansize = plan->entries.ptr.pp_int[0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[0][ftbase_colmicrovectorsize];
+   for (i = 0; i < repcnt; i++) {
+      ftbase_ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, &plan->buffer, 1);
    }
-   ae_frame_leave();
+}
+
+// Returns good factorization N=N1*N2.
+//
+// Usually N1 <= N2 (but not always - small N's may be exception).
+// if N1 != 1 then N2 != 1.
+//
+// Factorization is chosen depending on task type and codelets we have.
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+void ftbasefactorize(ae_int_t n, ae_int_t tasktype, ae_int_t *n1, ae_int_t *n2) {
+   ae_int_t j;
+   *n1 = 0;
+   *n2 = 0;
+   *n1 = 0;
+   *n2 = 0;
+// try to find good codelet
+   if (*n1 * (*n2) != n) {
+      for (j = ftbase_ftbasecodeletrecommended; j >= 2; j--) {
+         if (n % j == 0) {
+            *n1 = j;
+            *n2 = n / j;
+            break;
+         }
+      }
+   }
+// try to factorize N
+   if (*n1 * (*n2) != n) {
+      for (j = ftbase_ftbasecodeletrecommended + 1; j < n; j++) {
+         if (n % j == 0) {
+            *n1 = j;
+            *n2 = n / j;
+            break;
+         }
+      }
+   }
+// looks like N is prime :(
+   if (*n1 * (*n2) != n) {
+      *n1 = 1;
+      *n2 = n;
+   }
+// normalize
+   if (*n2 == 1 && *n1 != 1) {
+      *n2 = *n1;
+      *n1 = 1;
+   }
+}
+
+// Is number smooth?
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+bool ftbaseissmooth(ae_int_t n) {
+   ae_int_t i;
+   bool result;
+   for (i = 2; i <= ftbase_ftbasemaxsmoothfactor; i++) {
+      while (n % i == 0) {
+         n /= i;
+      }
+   }
+   result = n == 1;
+   return result;
+}
+
+// recurrent subroutine for FFTFindSmoothRec
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best) {
+   ae_assert(ftbase_ftbasemaxsmoothfactor <= 5, "FTBaseFindSmoothRec: internal error!");
+   if (seed >= n) {
+      *best = ae_minint(*best, seed);
+      return;
+   }
+   if (leastfactor <= 2) {
+      ftbase_ftbasefindsmoothrec(n, seed * 2, 2, best);
+   }
+   if (leastfactor <= 3) {
+      ftbase_ftbasefindsmoothrec(n, seed * 3, 3, best);
+   }
+   if (leastfactor <= 5) {
+      ftbase_ftbasefindsmoothrec(n, seed * 5, 5, best);
+   }
+}
+
+// Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
+// than or equal to max(N,2)
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+ae_int_t ftbasefindsmooth(ae_int_t n) {
+   ae_int_t best;
+   ae_int_t result;
+   best = 2;
+   while (best < n) {
+      best *= 2;
+   }
+   ftbase_ftbasefindsmoothrec(n, 1, 2, &best);
+   result = best;
+   return result;
+}
+
+// Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
+// greater than or equal to max(N,2)
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+ae_int_t ftbasefindsmootheven(ae_int_t n) {
+   ae_int_t best;
+   ae_int_t result;
+   best = 2;
+   while (best < n) {
+      best *= 2;
+   }
+   ftbase_ftbasefindsmoothrec(n, 2, 2, &best);
+   result = best;
+   return result;
+}
+
+// Returns estimate of FLOP count for the FFT.
+//
+// It is only an estimate based on operations count for the PERFECT FFT
+// and relative inefficiency of the algorithm actually used.
+//
+// N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+double ftbasegetflopestimate(ae_int_t n) {
+   double result;
+   result = ftbase_ftbaseinefficiencyfactor * (4 * n * log((double)n) / log(2.0) - 6 * n + 8);
+   return result;
+}
+
+// This subroutine applies complex Bluestein's FFT to input/output array A.
+//
+// Inputs:
+//     Plan        -   transformation plan
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     M           -   padded data length (measured in complex numbers)
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     SubPlan     -   position of the length-M FFT subplan which is used by
+//                     transformation
+//     BufA        -   temporary buffer, at least 2*M elements
+//     BufB        -   temporary buffer, at least 2*M elements
+//     BufC        -   temporary buffer, at least 2*M elements
+//     BufD        -   temporary buffer, at least 2*M elements
+//
+// Outputs:
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector bufa, RVector bufb, RVector bufc, RVector bufd) {
+   ae_int_t op;
+   ae_int_t i;
+   double x;
+   double y;
+   double bx;
+   double by;
+   double ax;
+   double ay;
+   double rx;
+   double ry;
+   ae_int_t p0;
+   ae_int_t p1;
+   ae_int_t p2;
+   for (op = 0; op < operandscnt; op++) {
+   // Multiply A by conj(Z), store to buffer.
+   // Pad A by zeros.
+   //
+   // NOTE: Z[k]=exp(i*pi*k^2/N)
+      p0 = abase + aoffset + op * 2 * n;
+      p1 = precoffs;
+      for (i = 0; i < n; i++) {
+         x = a->ptr.p_double[p0];
+         y = a->ptr.p_double[p0 + 1];
+         bx = plan->precr.ptr.p_double[p1];
+         by = -plan->precr.ptr.p_double[p1 + 1];
+         bufa->ptr.p_double[2 * i] = x * bx - y * by;
+         bufa->ptr.p_double[2 * i + 1] = x * by + y * bx;
+         p0 += 2;
+         p1 += 2;
+      }
+      for (i = 2 * n; i < 2 * m; i++) {
+         bufa->ptr.p_double[i] = 0.0;
+      }
+   // Perform convolution of A and Z (using precomputed
+   // FFT of Z stored in Plan structure).
+      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1);
+      p0 = 0;
+      p1 = precoffs + 2 * m;
+      for (i = 0; i < m; i++) {
+         ax = bufa->ptr.p_double[p0];
+         ay = bufa->ptr.p_double[p0 + 1];
+         bx = plan->precr.ptr.p_double[p1];
+         by = plan->precr.ptr.p_double[p1 + 1];
+         bufa->ptr.p_double[p0] = ax * bx - ay * by;
+         bufa->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
+         p0 += 2;
+         p1 += 2;
+      }
+      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1);
+   // Post processing:
+   //     A:=conj(Z)*conj(A)/M
+   // Here conj(A)/M corresponds to last stage of inverse DFT,
+   // and conj(Z) comes from Bluestein's FFT algorithm.
+      p0 = precoffs;
+      p1 = 0;
+      p2 = abase + aoffset + op * 2 * n;
+      for (i = 0; i < n; i++) {
+         bx = plan->precr.ptr.p_double[p0];
+         by = plan->precr.ptr.p_double[p0 + 1];
+         rx = bufa->ptr.p_double[p1] / m;
+         ry = -bufa->ptr.p_double[p1 + 1] / m;
+         a->ptr.p_double[p2] = rx * bx - ry * (-by);
+         a->ptr.p_double[p2 + 1] = rx * (-by) + ry * bx;
+         p0 += 2;
+         p1 += 2;
+         p2 += 2;
+      }
+   }
+}
+
+// This subroutine applies complex Rader's FFT to input/output array A.
+//
+// Inputs:
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     SubPlan     -   position of the (N-1)-point FFT subplan which is used
+//                     by transformation
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     Buf         -   temporary array
+//
+// Outputs:
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector buf) {
+   ae_int_t opidx;
+   ae_int_t i;
+   ae_int_t q;
+   ae_int_t kq;
+   ae_int_t kiq;
+   double x0;
+   double y0;
+   ae_int_t p0;
+   ae_int_t p1;
+   double ax;
+   double ay;
+   double bx;
+   double by;
+   double rx;
+   double ry;
+   ae_assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1");
+// Process operands
+   for (opidx = 0; opidx < operandscnt; opidx++) {
+   // fill QA
+      kq = 1;
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      rx = a->ptr.p_double[p0];
+      ry = a->ptr.p_double[p0 + 1];
+      x0 = rx;
+      y0 = ry;
+      for (q = 0; q < n - 1; q++) {
+         ax = a->ptr.p_double[p0 + 2 * kq];
+         ay = a->ptr.p_double[p0 + 2 * kq + 1];
+         buf->ptr.p_double[p1] = ax;
+         buf->ptr.p_double[p1 + 1] = ay;
+         rx += ax;
+         ry += ay;
+         kq = kq * rq % n;
+         p1 += 2;
+      }
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      for (q = 0; q < n - 1; q++) {
+         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
+         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
+         p0 += 2;
+         p1 += 2;
+      }
+   // Convolution
+      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = precoffs;
+      for (i = 0; i < n - 1; i++) {
+         ax = a->ptr.p_double[p0];
+         ay = a->ptr.p_double[p0 + 1];
+         bx = plan->precr.ptr.p_double[p1];
+         by = plan->precr.ptr.p_double[p1 + 1];
+         a->ptr.p_double[p0] = ax * bx - ay * by;
+         a->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
+         p0 += 2;
+         p1 += 2;
+      }
+      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
+      p0 = abase + aoffset + opidx * n * 2;
+      for (i = 0; i < n - 1; i++) {
+         a->ptr.p_double[p0] /= n - 1;
+         a->ptr.p_double[p0 + 1] /= -(n - 1);
+         p0 += 2;
+      }
+   // Result
+      buf->ptr.p_double[aoffset + opidx * n * 2] = rx;
+      buf->ptr.p_double[aoffset + opidx * n * 2 + 1] = ry;
+      kiq = 1;
+      p0 = aoffset + opidx * n * 2;
+      p1 = abase + aoffset + opidx * n * 2;
+      for (q = 0; q < n - 1; q++) {
+         buf->ptr.p_double[p0 + 2 * kiq] = x0 + a->ptr.p_double[p1];
+         buf->ptr.p_double[p0 + 2 * kiq + 1] = y0 + a->ptr.p_double[p1 + 1];
+         kiq = kiq * riq % n;
+         p1 += 2;
+      }
+      p0 = abase + aoffset + opidx * n * 2;
+      p1 = aoffset + opidx * n * 2;
+      for (q = 0; q < n; q++) {
+         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
+         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
+         p0 += 2;
+         p1 += 2;
+      }
+   }
+}
+
+#if 0
+// Recurrent subroutine for a InternalRealLinTranspose
+//
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t idx1;
+   ae_int_t idx2;
+   ae_int_t m1;
+   ae_int_t n1;
+   if (m == 0 || n == 0) {
+      return;
+   }
+   if (ae_maxint(m, n) <= 8) {
+      for (i = 0; i < m; i++) {
+         idx1 = bstart + i;
+         idx2 = astart + i * astride;
+         for (j = 0; j < n; j++) {
+            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
+            idx1 += bstride;
+            idx2++;
+         }
+      }
+      return;
+   }
+   if (n > m) {
+   // New partition:
+   //
+   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
+   //                                  ( B2 )
+      n1 = n / 2;
+      if (n - n1 >= 8 && n1 % 8 != 0) {
+         n1 += 8 - n1 % 8;
+      }
+      ae_assert(n - n1 > 0, "Assertion failed");
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n1);
+      ftbase_fftirltrec(a, astart + n1, astride, b, bstart + n1 * bstride, bstride, m, n - n1);
+   } else {
+   // New partition:
+   //
+   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
+   //                     ( A2 )
+      m1 = m / 2;
+      if (m - m1 >= 8 && m1 % 8 != 0) {
+         m1 += 8 - m1 % 8;
+      }
+      ae_assert(m - m1 > 0, "Assertion failed");
+      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m1, n);
+      ftbase_fftirltrec(a, astart + m1 * astride, astride, b, bstart + m1, bstride, m - m1, n);
+   }
+}
+#endif
+
+// Recurrent subroutine for a InternalComplexLinTranspose
+//
+// Write A^T to B, where:
+// * A is m*n complex matrix stored in array A as pairs of real/image values,
+//   beginning from AStart position, with AStride stride
+// * B is n*m complex matrix stored in array B as pairs of real/image values,
+//   beginning from BStart position, with BStride stride
+// stride is measured in complex numbers, i.e. in real/image pairs.
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t idx1;
+   ae_int_t idx2;
+   ae_int_t m2;
+   ae_int_t m1;
+   ae_int_t n1;
+   if (m == 0 || n == 0) {
+      return;
+   }
+   if (ae_maxint(m, n) <= 8) {
+      m2 = 2 * bstride;
+      for (i = 0; i < m; i++) {
+         idx1 = bstart + 2 * i;
+         idx2 = astart + 2 * i * astride;
+         for (j = 0; j < n; j++) {
+            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
+            b->ptr.p_double[idx1 + 1] = a->ptr.p_double[idx2 + 1];
+            idx1 += m2;
+            idx2 += 2;
+         }
+      }
+      return;
+   }
+   if (n > m) {
+   // New partition:
+   //
+   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
+   //                                  ( B2 )
+      n1 = n / 2;
+      if (n - n1 >= 8 && n1 % 8 != 0) {
+         n1 += 8 - n1 % 8;
+      }
+      ae_assert(n - n1 > 0, "Assertion failed");
+      ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n1);
+      ftbase_ffticltrec(a, astart + 2 * n1, astride, b, bstart + 2 * n1 * bstride, bstride, m, n - n1);
+   } else {
+   // New partition:
+   //
+   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
+   //                     ( A2 )
+      m1 = m / 2;
+      if (m - m1 >= 8 && m1 % 8 != 0) {
+         m1 += 8 - m1 % 8;
+      }
+      ae_assert(m - m1 > 0, "Assertion failed");
+      ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m1, n);
+      ftbase_ffticltrec(a, astart + 2 * m1 * astride, astride, b, bstart + 2 * m1, bstride, m - m1, n);
+   }
+}
+
+// Linear transpose: transpose complex matrix stored in 1-dimensional array
+// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
+static void ftbase_internalcomplexlintranspose(RVector a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector buf) {
+   ftbase_ffticltrec(a, astart, n, buf, 0, m, m, n);
+   ae_v_move(&a->ptr.p_double[astart], 1, buf->ptr.p_double, 1, 2 * m * n);
 }
 
 // This subroutine applies complex reference FFT to input/output array A.
@@ -9123,7 +9271,6 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
 //
 // Outputs:
 //     A           -   transformed array
-//
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector buf) {
    ae_int_t opidx;
@@ -9145,14 +9292,14 @@ static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t opera
          hre = 0.0;
          him = 0.0;
          for (k = 0; k < n; k++) {
-            re = a->ptr.p_double[offs + opidx * operandsize * 2 + 2 * k + 0];
+            re = a->ptr.p_double[offs + opidx * operandsize * 2 + 2 * k];
             im = a->ptr.p_double[offs + opidx * operandsize * 2 + 2 * k + 1];
             c = cos(-2 * ae_pi * k * i / n);
             s = sin(-2 * ae_pi * k * i / n);
             hre += c * re - s * im;
             him += c * im + s * re;
          }
-         buf->ptr.p_double[2 * i + 0] = hre;
+         buf->ptr.p_double[2 * i] = hre;
          buf->ptr.p_double[2 * i + 1] = him;
       }
       for (i = 0; i < operandsize * 2; i++) {
@@ -9172,7 +9319,6 @@ static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t opera
 //
 // Outputs:
 //     A           -   transformed array
-//
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
    ae_int_t opidx;
@@ -9239,7 +9385,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
    if (n == 2) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset + 0];
+         a0x = a->ptr.p_double[aoffset];
          a0y = a->ptr.p_double[aoffset + 1];
          a1x = a->ptr.p_double[aoffset + 2];
          a1y = a->ptr.p_double[aoffset + 3];
@@ -9247,7 +9393,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          v1 = a0y + a1y;
          v2 = a0x - a1x;
          v3 = a0y - a1y;
-         a->ptr.p_double[aoffset + 0] = v0;
+         a->ptr.p_double[aoffset] = v0;
          a->ptr.p_double[aoffset + 1] = v1;
          a->ptr.p_double[aoffset + 2] = v2;
          a->ptr.p_double[aoffset + 3] = v3;
@@ -9259,7 +9405,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
       c2 = sin(2 * ae_pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset + 0];
+         a0x = a->ptr.p_double[aoffset];
          a0y = a->ptr.p_double[aoffset + 1];
          a1x = a->ptr.p_double[aoffset + 2];
          a1y = a->ptr.p_double[aoffset + 3];
@@ -9279,7 +9425,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          a1y = s1y + m2y;
          a2x = s1x - m2x;
          a2y = s1y - m2y;
-         a->ptr.p_double[aoffset + 0] = a0x;
+         a->ptr.p_double[aoffset] = a0x;
          a->ptr.p_double[aoffset + 1] = a0y;
          a->ptr.p_double[aoffset + 2] = a1x;
          a->ptr.p_double[aoffset + 3] = a1y;
@@ -9291,7 +9437,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
    if (n == 4) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset + 0];
+         a0x = a->ptr.p_double[aoffset];
          a0y = a->ptr.p_double[aoffset + 1];
          a1x = a->ptr.p_double[aoffset + 2];
          a1y = a->ptr.p_double[aoffset + 3];
@@ -9307,7 +9453,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          m2y = a0y - a2y;
          m3x = a1y - a3y;
          m3y = a3x - a1x;
-         a->ptr.p_double[aoffset + 0] = t1x + t2x;
+         a->ptr.p_double[aoffset] = t1x + t2x;
          a->ptr.p_double[aoffset + 1] = t1y + t2y;
          a->ptr.p_double[aoffset + 4] = t1x - t2x;
          a->ptr.p_double[aoffset + 5] = t1y - t2y;
@@ -9337,7 +9483,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          t4y = a->ptr.p_double[aoffset + 7] - a->ptr.p_double[aoffset + 5];
          t5x = t1x + t2x;
          t5y = t1y + t2y;
-         a->ptr.p_double[aoffset + 0] += t5x;
+         a->ptr.p_double[aoffset] += t5x;
          a->ptr.p_double[aoffset + 1] += t5y;
          m1x = c1 * t5x;
          m1y = c1 * t5y;
@@ -9353,7 +9499,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          s3y = m3y - m4y;
          s5x = m3x + m5x;
          s5y = m3y + m5y;
-         s1x = a->ptr.p_double[aoffset + 0] + m1x;
+         s1x = a->ptr.p_double[aoffset] + m1x;
          s1y = a->ptr.p_double[aoffset + 1] + m1y;
          s2x = s1x + m2x;
          s2y = s1y + m2y;
@@ -9377,7 +9523,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
       c4 = sin(-ae_pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset + 0];
+         a0x = a->ptr.p_double[aoffset];
          a0y = a->ptr.p_double[aoffset + 1];
          a1x = a->ptr.p_double[aoffset + 2];
          a1y = a->ptr.p_double[aoffset + 3];
@@ -9443,7 +9589,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          a4y = s1y + m2y;
          a5x = s1x - m2x;
          a5y = s1y - m2y;
-         a->ptr.p_double[aoffset + 0] = a0x;
+         a->ptr.p_double[aoffset] = a0x;
          a->ptr.p_double[aoffset + 1] = a0y;
          a->ptr.p_double[aoffset + 2] = a3x;
          a->ptr.p_double[aoffset + 3] = a3y;
@@ -9476,7 +9622,6 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
 //
 // Outputs:
 //     A           -   transformed array
-//
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
    ae_int_t opidx;
@@ -9856,17 +10001,17 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0 + 0];
+            a0x = a->ptr.p_double[aoffset0];
             a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2 + 0];
+            a1x = a->ptr.p_double[aoffset2];
             a1y = a->ptr.p_double[aoffset2 + 1];
-            a2x = a->ptr.p_double[aoffset4 + 0];
+            a2x = a->ptr.p_double[aoffset4];
             a2y = a->ptr.p_double[aoffset4 + 1];
-            a3x = a->ptr.p_double[aoffset6 + 0];
+            a3x = a->ptr.p_double[aoffset6];
             a3y = a->ptr.p_double[aoffset6 + 1];
-            a4x = a->ptr.p_double[aoffset8 + 0];
+            a4x = a->ptr.p_double[aoffset8];
             a4y = a->ptr.p_double[aoffset8 + 1];
-            a5x = a->ptr.p_double[aoffset10 + 0];
+            a5x = a->ptr.p_double[aoffset10];
             a5y = a->ptr.p_double[aoffset10 + 1];
             v0 = a0x;
             v1 = a0y;
@@ -9930,17 +10075,17 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
             tw4y = 2 * tw2x * tw2y;
             tw5x = tw3x * tw2x - tw3y * tw2y;
             tw5y = tw3x * tw2y + tw3y * tw2x;
-            a->ptr.p_double[aoffset0 + 0] = a0x;
+            a->ptr.p_double[aoffset0] = a0x;
             a->ptr.p_double[aoffset0 + 1] = a0y;
-            a->ptr.p_double[aoffset2 + 0] = a3x * twx - a3y * twy;
+            a->ptr.p_double[aoffset2] = a3x * twx - a3y * twy;
             a->ptr.p_double[aoffset2 + 1] = a3y * twx + a3x * twy;
-            a->ptr.p_double[aoffset4 + 0] = a1x * tw2x - a1y * tw2y;
+            a->ptr.p_double[aoffset4] = a1x * tw2x - a1y * tw2y;
             a->ptr.p_double[aoffset4 + 1] = a1y * tw2x + a1x * tw2y;
-            a->ptr.p_double[aoffset6 + 0] = a4x * tw3x - a4y * tw3y;
+            a->ptr.p_double[aoffset6] = a4x * tw3x - a4y * tw3y;
             a->ptr.p_double[aoffset6 + 1] = a4y * tw3x + a4x * tw3y;
-            a->ptr.p_double[aoffset8 + 0] = a2x * tw4x - a2y * tw4y;
+            a->ptr.p_double[aoffset8] = a2x * tw4x - a2y * tw4y;
             a->ptr.p_double[aoffset8 + 1] = a2y * tw4x + a2x * tw4y;
-            a->ptr.p_double[aoffset10 + 0] = a5x * tw5x - a5y * tw5y;
+            a->ptr.p_double[aoffset10] = a5x * tw5x - a5y * tw5y;
             a->ptr.p_double[aoffset10 + 1] = a5y * tw5x + a5x * tw5y;
             aoffset0 += 2;
             aoffset2 += 2;
@@ -9966,387 +10111,7 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
    }
 }
 
-// This subroutine precomputes data for complex Bluestein's  FFT  and  writes
-// them to array PrecR[] at specified offset. It  is  responsibility  of  the
-// caller to make sure that PrecR[] is large enough.
-//
-// Inputs:
-//     N           -   original size of the transform
-//     M           -   size of the "padded" Bluestein's transform
-//     PrecR       -   preallocated array
-//     Offs        -   offset
-//
-// Outputs:
-//     PrecR       -   data at Offs:Offs+4*M-1 are modified:
-//                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
-//                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
-//                     Other parts of PrecR are unchanged.
-//
-// NOTE: this function performs internal M-point FFT. It allocates temporary
-//       plan which is destroyed after leaving this function.
-//
-// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector precr, ae_int_t offs) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   double bx;
-   double by;
-   ae_frame_make(&_frame_block);
-   NewObj(fasttransformplan, plan);
-// Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
-   for (i = 0; i < 2 * m; i++) {
-      precr->ptr.p_double[offs + i] = 0.0;
-   }
-   for (i = 0; i < n; i++) {
-      bx = cos(ae_pi / n * i * i);
-      by = sin(ae_pi / n * i * i);
-      precr->ptr.p_double[offs + 2 * i + 0] = bx;
-      precr->ptr.p_double[offs + 2 * i + 1] = by;
-      precr->ptr.p_double[offs + 2 * ((m - i) % m) + 0] = bx;
-      precr->ptr.p_double[offs + 2 * ((m - i) % m) + 1] = by;
-   }
-// Precomputed FFT
-   ftcomplexfftplan(m, 1, &plan);
-   for (i = 0; i < 2 * m; i++) {
-      precr->ptr.p_double[offs + 2 * m + i] = precr->ptr.p_double[offs + i];
-   }
-   ftbase_ftapplysubplan(&plan, 0, precr, offs + 2 * m, 0, &plan.buffer, 1);
-   ae_frame_leave();
-}
-
-// This subroutine applies complex Bluestein's FFT to input/output array A.
-//
-// Inputs:
-//     Plan        -   transformation plan
-//     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     OperandsCnt -   number of repeated operands (length N each)
-//     N           -   original data length (measured in complex numbers)
-//     M           -   padded data length (measured in complex numbers)
-//     PrecOffs    -   offset of the precomputed data for the plan
-//     SubPlan     -   position of the length-M FFT subplan which is used by
-//                     transformation
-//     BufA        -   temporary buffer, at least 2*M elements
-//     BufB        -   temporary buffer, at least 2*M elements
-//     BufC        -   temporary buffer, at least 2*M elements
-//     BufD        -   temporary buffer, at least 2*M elements
-//
-// Outputs:
-//     A           -   transformed array
-//
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector bufa, RVector bufb, RVector bufc, RVector bufd) {
-   ae_int_t op;
-   ae_int_t i;
-   double x;
-   double y;
-   double bx;
-   double by;
-   double ax;
-   double ay;
-   double rx;
-   double ry;
-   ae_int_t p0;
-   ae_int_t p1;
-   ae_int_t p2;
-   for (op = 0; op < operandscnt; op++) {
-   // Multiply A by conj(Z), store to buffer.
-   // Pad A by zeros.
-   //
-   // NOTE: Z[k]=exp(i*pi*k^2/N)
-      p0 = abase + aoffset + op * 2 * n;
-      p1 = precoffs;
-      for (i = 0; i < n; i++) {
-         x = a->ptr.p_double[p0 + 0];
-         y = a->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1 + 0];
-         by = -plan->precr.ptr.p_double[p1 + 1];
-         bufa->ptr.p_double[2 * i + 0] = x * bx - y * by;
-         bufa->ptr.p_double[2 * i + 1] = x * by + y * bx;
-         p0 += 2;
-         p1 += 2;
-      }
-      for (i = 2 * n; i < 2 * m; i++) {
-         bufa->ptr.p_double[i] = 0.0;
-      }
-   // Perform convolution of A and Z (using precomputed
-   // FFT of Z stored in Plan structure).
-      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1);
-      p0 = 0;
-      p1 = precoffs + 2 * m;
-      for (i = 0; i < m; i++) {
-         ax = bufa->ptr.p_double[p0 + 0];
-         ay = bufa->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1 + 0];
-         by = plan->precr.ptr.p_double[p1 + 1];
-         bufa->ptr.p_double[p0 + 0] = ax * bx - ay * by;
-         bufa->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
-         p0 += 2;
-         p1 += 2;
-      }
-      ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1);
-   // Post processing:
-   //     A:=conj(Z)*conj(A)/M
-   // Here conj(A)/M corresponds to last stage of inverse DFT,
-   // and conj(Z) comes from Bluestein's FFT algorithm.
-      p0 = precoffs;
-      p1 = 0;
-      p2 = abase + aoffset + op * 2 * n;
-      for (i = 0; i < n; i++) {
-         bx = plan->precr.ptr.p_double[p0 + 0];
-         by = plan->precr.ptr.p_double[p0 + 1];
-         rx = bufa->ptr.p_double[p1 + 0] / m;
-         ry = -bufa->ptr.p_double[p1 + 1] / m;
-         a->ptr.p_double[p2 + 0] = rx * bx - ry * (-by);
-         a->ptr.p_double[p2 + 1] = rx * (-by) + ry * bx;
-         p0 += 2;
-         p1 += 2;
-         p2 += 2;
-      }
-   }
-}
-
-// This subroutine precomputes data for complex Rader's FFT and  writes  them
-// to array PrecR[] at specified offset. It  is  responsibility of the caller
-// to make sure that PrecR[] is large enough.
-//
-// Inputs:
-//     N           -   original size of the transform (before reduction to N-1)
-//     RQ          -   primitive root modulo N
-//     RIQ         -   inverse of primitive root modulo N
-//     PrecR       -   preallocated array
-//     Offs        -   offset
-//
-// Outputs:
-//     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
-//                     other parts of PrecR are unchanged.
-//
-// NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
-//       plan which is destroyed after leaving this function.
-//
-// ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector precr, ae_int_t offs) {
-   ae_frame _frame_block;
-   ae_int_t q;
-   ae_int_t kiq;
-   double v;
-   ae_frame_make(&_frame_block);
-   NewObj(fasttransformplan, plan);
-// Fill PrecR with Rader factors, perform FFT
-   kiq = 1;
-   for (q = 0; q < n - 1; q++) {
-      v = -2 * ae_pi * kiq / n;
-      precr->ptr.p_double[offs + 2 * q + 0] = cos(v);
-      precr->ptr.p_double[offs + 2 * q + 1] = sin(v);
-      kiq = kiq * riq % n;
-   }
-   ftcomplexfftplan(n - 1, 1, &plan);
-   ftbase_ftapplysubplan(&plan, 0, precr, offs, 0, &plan.buffer, 1);
-   ae_frame_leave();
-}
-
-// This subroutine applies complex Rader's FFT to input/output array A.
-//
-// Inputs:
-//     A           -   array, must be large enough for plan to work
-//     ABase       -   base offset in array A, this value points to start of
-//                     subarray whose length is equal to length of the plan
-//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
-//                     This is an offset within large PlanLength-subarray of
-//                     the chunk to process.
-//     OperandsCnt -   number of repeated operands (length N each)
-//     N           -   original data length (measured in complex numbers)
-//     SubPlan     -   position of the (N-1)-point FFT subplan which is used
-//                     by transformation
-//     RQ          -   primitive root modulo N
-//     RIQ         -   inverse of primitive root modulo N
-//     PrecOffs    -   offset of the precomputed data for the plan
-//     Buf         -   temporary array
-//
-// Outputs:
-//     A           -   transformed array
-//
-// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector buf) {
-   ae_int_t opidx;
-   ae_int_t i;
-   ae_int_t q;
-   ae_int_t kq;
-   ae_int_t kiq;
-   double x0;
-   double y0;
-   ae_int_t p0;
-   ae_int_t p1;
-   double ax;
-   double ay;
-   double bx;
-   double by;
-   double rx;
-   double ry;
-   ae_assert(operandscnt >= 1, "FTApplyComplexRefFFT: OperandsCnt<1");
-// Process operands
-   for (opidx = 0; opidx < operandscnt; opidx++) {
-   // fill QA
-      kq = 1;
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      rx = a->ptr.p_double[p0 + 0];
-      ry = a->ptr.p_double[p0 + 1];
-      x0 = rx;
-      y0 = ry;
-      for (q = 0; q < n - 1; q++) {
-         ax = a->ptr.p_double[p0 + 2 * kq + 0];
-         ay = a->ptr.p_double[p0 + 2 * kq + 1];
-         buf->ptr.p_double[p1 + 0] = ax;
-         buf->ptr.p_double[p1 + 1] = ay;
-         rx += ax;
-         ry += ay;
-         kq = kq * rq % n;
-         p1 += 2;
-      }
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      for (q = 0; q < n - 1; q++) {
-         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
-         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
-         p0 += 2;
-         p1 += 2;
-      }
-   // Convolution
-      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = precoffs;
-      for (i = 0; i < n - 1; i++) {
-         ax = a->ptr.p_double[p0 + 0];
-         ay = a->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1 + 0];
-         by = plan->precr.ptr.p_double[p1 + 1];
-         a->ptr.p_double[p0 + 0] = ax * bx - ay * by;
-         a->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
-         p0 += 2;
-         p1 += 2;
-      }
-      ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
-      p0 = abase + aoffset + opidx * n * 2;
-      for (i = 0; i < n - 1; i++) {
-         a->ptr.p_double[p0 + 0] /= n - 1;
-         a->ptr.p_double[p0 + 1] /= -(n - 1);
-         p0 += 2;
-      }
-   // Result
-      buf->ptr.p_double[aoffset + opidx * n * 2 + 0] = rx;
-      buf->ptr.p_double[aoffset + opidx * n * 2 + 1] = ry;
-      kiq = 1;
-      p0 = aoffset + opidx * n * 2;
-      p1 = abase + aoffset + opidx * n * 2;
-      for (q = 0; q < n - 1; q++) {
-         buf->ptr.p_double[p0 + 2 * kiq + 0] = x0 + a->ptr.p_double[p1 + 0];
-         buf->ptr.p_double[p0 + 2 * kiq + 1] = y0 + a->ptr.p_double[p1 + 1];
-         kiq = kiq * riq % n;
-         p1 += 2;
-      }
-      p0 = abase + aoffset + opidx * n * 2;
-      p1 = aoffset + opidx * n * 2;
-      for (q = 0; q < n; q++) {
-         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
-         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
-         p0 += 2;
-         p1 += 2;
-      }
-   }
-}
-
-// Factorizes task size N into product of two smaller sizes N1 and N2
-//
-// Inputs:
-//     N       -   task size, N>0
-//     IsRoot  -   whether taks is root task (first one in a sequence)
-//
-// Outputs:
-//     N1, N2  -   such numbers that:
-//                 * for prime N:                  N1=N2=0
-//                 * for composite N <= MaxRadix:    N1=N2=0
-//                 * for composite N>MaxRadix:     1 <= N1 <= N2, N1*N2=N
-//
-// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
-static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *n2) {
-   ae_int_t j;
-   ae_int_t k;
-   *n1 = 0;
-   *n2 = 0;
-   ae_assert(n > 0, "FTFactorize: N <= 0");
-   *n1 = 0;
-   *n2 = 0;
-// Small N
-   if (n <= ftbase_maxradix) {
-      return;
-   }
-// Large N, recursive split
-   if (n > ftbase_recursivethreshold) {
-      k = CeilZ(sqrt((double)n)) + 1;
-      ae_assert(k * k >= n, "FTFactorize: internal error during recursive factorization");
-      for (j = k; j >= 2; j--) {
-         if (n % j == 0) {
-            *n1 = ae_minint(n / j, j);
-            *n2 = ae_maxint(n / j, j);
-            return;
-         }
-      }
-   }
-// N>MaxRadix, try to find good codelet
-   for (j = ftbase_maxradix; j >= 2; j--) {
-      if (n % j == 0) {
-         *n1 = j;
-         *n2 = n / j;
-         break;
-      }
-   }
-// In case no good codelet was found,
-// try to factorize N into product of ANY primes.
-   if (*n1 * (*n2) != n) {
-      for (j = 2; j < n; j++) {
-         if (n % j == 0) {
-            *n1 = j;
-            *n2 = n / j;
-            break;
-         }
-         if (j * j > n) {
-            break;
-         }
-      }
-   }
-// normalize
-   if (*n1 > (*n2)) {
-      j = *n1;
-      *n1 = *n2;
-      *n2 = j;
-   }
-}
-
-// Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
-//
-// Inputs:
-//     N       -   task size, N>0
-//
-// RESULU:
-//     cost in UNITs, rounded down to nearest integer
-//
-// NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
-//
-// ALGLIB: Copyright 08.04.2013 by Sergey Bochkanov
-static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n) {
-   ae_int_t result;
-   ae_assert(n > 0, "FTOptimisticEstimate: N <= 0");
-   result = FloorZ(1.0E-5 * 5 * n * log((double)n) / log(2.0));
-   return result;
-}
-
 // Twiddle factors calculation
-//
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2) {
    ae_int_t i;
@@ -10429,11 +10194,11 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
       // * update twiddle factor (unconditional update)
       // * process second element
       // * conditional update of the twiddle factor
-         x = a->ptr.p_double[offs + 0];
+         x = a->ptr.p_double[offs];
          y = a->ptr.p_double[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->ptr.p_double[offs + 0] = tmpx;
+         a->ptr.p_double[offs] = tmpx;
          a->ptr.p_double[offs + 1] = tmpy;
          tmpx = (1 + twxm1) * twrowxm1 - twy * twrowy;
          twy += (1 + twxm1) * twrowy + twy * twrowxm1;
@@ -10460,11 +10225,11 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
       }
       if (n1 % 2 == 1) {
       // Handle residual chunk
-         x = a->ptr.p_double[offs + 0];
+         x = a->ptr.p_double[offs];
          y = a->ptr.p_double[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->ptr.p_double[offs + 0] = tmpx;
+         a->ptr.p_double[offs] = tmpx;
          a->ptr.p_double[offs + 1] = tmpy;
          offs += 2;
       }
@@ -10485,152 +10250,154 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
    }
 }
 
-// Linear transpose: transpose complex matrix stored in 1-dimensional array
+// This subroutine applies subplan to input/output array A.
 //
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_internalcomplexlintranspose(RVector a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector buf) {
-   ftbase_ffticltrec(a, astart, n, buf, 0, m, m, n);
-   ae_v_move(&a->ptr.p_double[astart], 1, buf->ptr.p_double, 1, 2 * m * n);
-}
-
-// Recurrent subroutine for a InternalComplexLinTranspose
+// Inputs:
+//     Plan        -   transformation plan
+//     SubPlan     -   subplan index
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0 <= AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     Buf         -   temporary buffer whose length is equal to plan length
+//                     (without taking into account RepCnt) or larger.
+//     OffsBuf     -   offset in the buffer array
+//     RepCnt      -   repetition count (transformation is repeatedly applied
+//                     to subsequent subarrays)
 //
-// Write A^T to B, where:
-// * A is m*n complex matrix stored in array A as pairs of real/image values,
-//   beginning from AStart position, with AStride stride
-// * B is n*m complex matrix stored in array B as pairs of real/image values,
-//   beginning from BStart position, with BStride stride
-// stride is measured in complex numbers, i.e. in real/image pairs.
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
+// Outputs:
+//     Plan        -   plan (temporary buffers can be modified, plan itself
+//                     is unchanged and can be reused)
+//     A           -   transformed array
+// ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt) {
+   ae_frame _frame_block;
+   ae_int_t rowidx;
    ae_int_t i;
-   ae_int_t j;
-   ae_int_t idx1;
-   ae_int_t idx2;
-   ae_int_t m2;
-   ae_int_t m1;
    ae_int_t n1;
-   if (m == 0 || n == 0) {
-      return;
-   }
-   if (ae_maxint(m, n) <= 8) {
-      m2 = 2 * bstride;
-      for (i = 0; i < m; i++) {
-         idx1 = bstart + 2 * i;
-         idx2 = astart + 2 * i * astride;
-         for (j = 0; j < n; j++) {
-            b->ptr.p_double[idx1 + 0] = a->ptr.p_double[idx2 + 0];
-            b->ptr.p_double[idx1 + 1] = a->ptr.p_double[idx2 + 1];
-            idx1 += m2;
-            idx2 += 2;
+   ae_int_t n2;
+   ae_int_t operation;
+   ae_int_t operandscnt;
+   ae_int_t operandsize;
+   ae_int_t microvectorsize;
+   ae_int_t param0;
+   ae_int_t parentsize;
+   ae_int_t childsize;
+   ae_int_t chunksize;
+   ae_int_t lastchunksize;
+   ae_frame_make(&_frame_block);
+   RefObj(srealarray, bufa);
+   RefObj(srealarray, bufb);
+   RefObj(srealarray, bufc);
+   RefObj(srealarray, bufd);
+   ae_assert(plan->entries.ptr.pp_int[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header");
+   rowidx = subplan + 1;
+   while (plan->entries.ptr.pp_int[rowidx][ftbase_coltype] != ftbase_opend) {
+      operation = plan->entries.ptr.pp_int[rowidx][ftbase_coltype];
+      operandscnt = repcnt * plan->entries.ptr.pp_int[rowidx][ftbase_coloperandscnt];
+      operandsize = plan->entries.ptr.pp_int[rowidx][ftbase_coloperandsize];
+      microvectorsize = plan->entries.ptr.pp_int[rowidx][ftbase_colmicrovectorsize];
+      param0 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+   // ae_int_t param1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam1]; //(@) Unused.
+   // Process "jump" operation
+      if (operation == ftbase_opjmp) {
+         rowidx += plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         continue;
+      }
+   // Process "parallel call" operation:
+   // * we perform initial check for consistency between parent and child plans
+   // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
+   //   several parallel tasks
+      if (operation == ftbase_opparallelcall) {
+         parentsize = operandsize * microvectorsize;
+         childsize = plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_colmicrovectorsize];
+         ae_assert(plan->entries.ptr.pp_int[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header");
+         ae_assert(parentsize == childsize, "FTApplySubPlan: incorrect child subplan header");
+         chunksize = ae_maxint(ftbase_recursivethreshold / childsize, 1);
+         lastchunksize = operandscnt % chunksize;
+         if (lastchunksize == 0) {
+            lastchunksize = chunksize;
          }
-      }
-      return;
-   }
-   if (n > m) {
-   // New partition:
-   //
-   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
-   //                                  ( B2 )
-      n1 = n / 2;
-      if (n - n1 >= 8 && n1 % 8 != 0) {
-         n1 += 8 - n1 % 8;
-      }
-      ae_assert(n - n1 > 0, "Assertion failed");
-      ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n1);
-      ftbase_ffticltrec(a, astart + 2 * n1, astride, b, bstart + 2 * n1 * bstride, bstride, m, n - n1);
-   } else {
-   // New partition:
-   //
-   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
-   //                     ( A2 )
-      m1 = m / 2;
-      if (m - m1 >= 8 && m1 % 8 != 0) {
-         m1 += 8 - m1 % 8;
-      }
-      ae_assert(m - m1 > 0, "Assertion failed");
-      ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m1, n);
-      ftbase_ffticltrec(a, astart + 2 * m1 * astride, astride, b, bstart + 2 * m1, bstride, m - m1, n);
-   }
-}
-
-// Recurrent subroutine for a InternalRealLinTranspose
-//
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t idx1;
-   ae_int_t idx2;
-   ae_int_t m1;
-   ae_int_t n1;
-   if (m == 0 || n == 0) {
-      return;
-   }
-   if (ae_maxint(m, n) <= 8) {
-      for (i = 0; i < m; i++) {
-         idx1 = bstart + i;
-         idx2 = astart + i * astride;
-         for (j = 0; j < n; j++) {
-            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
-            idx1 += bstride;
-            idx2++;
+         i = 0;
+         while (i < operandscnt) {
+            chunksize = ae_minint(chunksize, operandscnt - i);
+            ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize);
+            i += chunksize;
          }
+         rowidx++;
+         continue;
       }
-      return;
-   }
-   if (n > m) {
-   // New partition:
-   //
-   // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
-   //                                  ( B2 )
-      n1 = n / 2;
-      if (n - n1 >= 8 && n1 % 8 != 0) {
-         n1 += 8 - n1 % 8;
+   // Process "reference complex FFT" operation
+      if (operation == ftbase_opcomplexreffft) {
+         ftbase_ftapplycomplexreffft(a, abase + aoffset, operandscnt, operandsize, microvectorsize, buf);
+         rowidx++;
+         continue;
       }
-      ae_assert(n - n1 > 0, "Assertion failed");
-      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n1);
-      ftbase_fftirltrec(a, astart + n1, astride, b, bstart + n1 * bstride, bstride, m, n - n1);
-   } else {
-   // New partition:
-   //
-   // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
-   //                     ( A2 )
-      m1 = m / 2;
-      if (m - m1 >= 8 && m1 % 8 != 0) {
-         m1 += 8 - m1 % 8;
+   // Process "codelet FFT" operation
+      if (operation == ftbase_opcomplexcodeletfft) {
+         ftbase_ftapplycomplexcodeletfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize);
+         rowidx++;
+         continue;
       }
-      ae_assert(m - m1 > 0, "Assertion failed");
-      ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m1, n);
-      ftbase_fftirltrec(a, astart + m1 * astride, astride, b, bstart + m1, bstride, m - m1, n);
+   // Process "integrated codelet FFT" operation
+      if (operation == ftbase_opcomplexcodelettwfft) {
+         ftbase_ftapplycomplexcodelettwfft(a, abase + aoffset, operandscnt, operandsize, microvectorsize);
+         rowidx++;
+         continue;
+      }
+   // Process Bluestein's FFT operation
+      if (operation == ftbase_opbluesteinsfft) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: microvectorsize != 2 for Bluesteins FFT");
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufa);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc);
+         ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufd);
+         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], &bufa->val, &bufb->val, &bufc->val, &bufd->val);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufa);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc);
+         ae_shared_pool_recycle(&plan->bluesteinpool, &_bufd);
+         rowidx++;
+         continue;
+      }
+   // Process Rader's FFT
+      if (operation == ftbase_opradersfft) {
+         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], plan->entries.ptr.pp_int[rowidx][ftbase_colparam3], buf);
+         rowidx++;
+         continue;
+      }
+   // Process "complex twiddle factors" operation
+      if (operation == ftbase_opcomplexfftfactors) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
+         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         n2 = operandsize / n1;
+         for (i = 0; i < operandscnt; i++) {
+            ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2);
+         }
+         rowidx++;
+         continue;
+      }
+   // Process "complex transposition" operation
+      if (operation == ftbase_opcomplextranspose) {
+         ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
+         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         n2 = operandsize / n1;
+         for (i = 0; i < operandscnt; i++) {
+            ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf);
+         }
+         rowidx++;
+         continue;
+      }
+   // Error
+      ae_assert(false, "FTApplySubPlan: unexpected plan type");
    }
-}
-
-// recurrent subroutine for FFTFindSmoothRec
-//
-// ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best) {
-   ae_assert(ftbase_ftbasemaxsmoothfactor <= 5, "FTBaseFindSmoothRec: internal error!");
-   if (seed >= n) {
-      *best = ae_minint(*best, seed);
-      return;
-   }
-   if (leastfactor <= 2) {
-      ftbase_ftbasefindsmoothrec(n, seed * 2, 2, best);
-   }
-   if (leastfactor <= 3) {
-      ftbase_ftbasefindsmoothrec(n, seed * 3, 3, best);
-   }
-   if (leastfactor <= 5) {
-      ftbase_ftbasefindsmoothrec(n, seed * 5, 5, best);
-   }
+   ae_frame_leave();
 }
 
 void fasttransformplan_init(void *_p, bool make_automatic) {
    fasttransformplan *p = (fasttransformplan *) _p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->entries, 0, 0, DT_INT, make_automatic);
    ae_vector_init(&p->buffer, 0, DT_REAL, make_automatic);
    ae_vector_init(&p->precr, 0, DT_REAL, make_automatic);
@@ -10650,7 +10417,6 @@ void fasttransformplan_copy(void *_dst, void *_src, bool make_automatic) {
 
 void fasttransformplan_free(void *_p, bool make_automatic) {
    fasttransformplan *p = (fasttransformplan *) _p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->entries, make_automatic);
    ae_vector_free(&p->buffer, make_automatic);
    ae_vector_free(&p->precr, make_automatic);

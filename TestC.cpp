@@ -12,7 +12,6 @@ using namespace alglib_impl;
 // This function compares two numbers for approximate equality, with tolerance
 // to errors as large as tol.
 //
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 Local bool approxequal(double a, double b, double tol) {
    bool result;
@@ -23,7 +22,6 @@ Local bool approxequal(double a, double b, double tol) {
 // This function compares two numbers for approximate equality, with tolerance
 // to errors as large as max(|a|,|b|)*tol.
 //
-//
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 Local bool approxequalrel(double a, double b, double tol) {
    bool result;
@@ -31,8 +29,8 @@ Local bool approxequalrel(double a, double b, double tol) {
    return result;
 }
 
-// Error tracking facilities; this fields are modified every time ae_set_error_flag()
-// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
+// Error tracking facilities; these fields are modified every time ae_set_error_flag() is called with non-zero cond.
+// Thread unsafe access, but it does not matter actually.
 // The file name for the last call of ae_set_error_flag() with non-zero cond parameter.
 static const char *sef_file = "";
 
@@ -42,9 +40,9 @@ static int sef_line = 0;
 // The current test for the last call of ae_set_error_flag() with non-zero cond parameter.
 static const char *sef_test = "";
 
-Local void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *test) {
+Local void ae_set_error_flag(bool *p_flag, bool cond, const char *file, int line, const char *test) {
    if (cond)
-      *p_flag = true, sef_file = filename, sef_line = lineno, sef_test = test;
+      *p_flag = true, sef_file = file, sef_line = line, sef_test = test;
 }
 
 // Internally calls ae_set_error_flag() with condition:
@@ -198,7 +196,7 @@ bool testtsort(bool silent) {
             }
             tagsortmiddleir(&a4, &ar2, 0, n);
             for (i = 0; i < n; i++) {
-               waserrors = (waserrors || (double)(a4.ptr.p_int[i]) != a0.ptr.p_double[i]) || ar2.ptr.p_double[i] != (double)(p1.ptr.p_int[i]);
+               waserrors = waserrors || (double)(a4.ptr.p_int[i]) != a0.ptr.p_double[i] || ar2.ptr.p_double[i] != (double)(p1.ptr.p_int[i]);
             }
             sortmiddlei(&a5, 0, n);
             for (i = 0; i < n; i++) {
@@ -531,18 +529,18 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
 //   then all points not in result must be not closer than R.
    for (q = 1; q <= qcount; q++) {
    // Select K: 1..N
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          k = 1 + ae_randominteger(n);
       } else {
          k = 1;
       }
    // Select point (either one of the points, or random)
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          i = ae_randominteger(n);
          ae_v_move(ptx.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            ptx.ptr.p_double[i] = ae_randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -750,7 +748,7 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
 //   then all points not in result must be not closer than R/(1+Eps).
    for (q = 1; q <= qcount; q++) {
    // Select K: 1..N
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          k = 1 + ae_randominteger(n);
       } else {
          k = 1;
@@ -758,12 +756,12 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
    // Select Eps
       eps = 0.5 + ae_randomreal();
    // Select point (either one of the points, or random)
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          i = ae_randominteger(n);
          ae_v_move(ptx.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            ptx.ptr.p_double[i] = ae_randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -886,20 +884,20 @@ static void testnearestneighborunit_testkdtuniform(RMatrix xy, ae_int_t n, ae_in
 //   then all points not in result must be not closer than R.
    for (q = 1; q <= qcount; q++) {
    // Use ordering?
-      orderedrnn = ae_randomreal() > 0.5;
+      orderedrnn = ae_randombool();
    // Select R
-      if (ae_randomreal() > 0.3) {
-         r = ae_maxreal(ae_randomreal(), ae_machineepsilon);
-      } else {
+      if (ae_randombool(0.3)) {
          r = ae_machineepsilon;
+      } else {
+         r = ae_maxreal(ae_randomreal(), ae_machineepsilon);
       }
    // Select point (either one of the points, or random)
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          i = ae_randominteger(n);
          ae_v_move(ptx.ptr.p_double, 1, xy->ptr.pp_double[i], 1, nx);
       } else {
          for (i = 0; i < nx; i++) {
-            ptx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            ptx.ptr.p_double[i] = ae_randommid();
          }
       }
    // Test functions which use internal buffer:
@@ -1299,7 +1297,7 @@ static bool testnearestneighborunit_testspecialcases() {
       for (ny = 0; ny <= 3; ny++) {
          for (normtype = 0; normtype <= 2; normtype++) {
          // Build tree
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                kdtreebuildtagged(&xy, &tags, 0, nx, ny, normtype, &kdt);
             } else {
                kdtreebuild(&xy, 0, nx, ny, normtype, &kdt);
@@ -1382,7 +1380,7 @@ bool testnearestneighbor(bool silent) {
             ae_matrix_set_length(&xy, largen, nx + ny);
             for (i = 0; i < largen; i++) {
                for (j = 0; j < nx + ny; j++) {
-                  xy.ptr.pp_double[i][j] = 10 * ae_randomreal() - 5;
+                  xy.ptr.pp_double[i][j] = 5.0 * ae_randommid();
                }
             }
             for (n = 1; n <= 10; n++) {
@@ -1393,8 +1391,8 @@ bool testnearestneighbor(bool silent) {
             ae_matrix_set_length(&xy, 2 * smalln, nx + ny);
             for (i = 0; i < smalln; i++) {
                for (j = 0; j < nx + ny; j++) {
-                  xy.ptr.pp_double[2 * i + 0][j] = 10 * ae_randomreal() - 5;
-                  xy.ptr.pp_double[2 * i + 1][j] = xy.ptr.pp_double[2 * i + 0][j];
+                  xy.ptr.pp_double[2 * i][j] = 5.0 * ae_randommid();
+                  xy.ptr.pp_double[2 * i + 1][j] = xy.ptr.pp_double[2 * i][j];
                }
             }
             testnearestneighborunit_testkdtuniform(&xy, 2 * smalln, nx, ae_randominteger(ny + 1), normtype, &kdterrors);
@@ -1407,7 +1405,7 @@ bool testnearestneighbor(bool silent) {
                }
             }
             for (j = 0; j < nx + ny; j++) {
-               xy.ptr.pp_double[smalln - 1][j] = 10 * ae_randomreal() - 5;
+               xy.ptr.pp_double[smalln - 1][j] = 5.0 * ae_randommid();
             }
             testnearestneighborunit_testkdtuniform(&xy, smalln, nx, ae_randominteger(ny + 1), normtype, &kdterrors);
          }
@@ -1474,17 +1472,17 @@ Local bool hqrndcontinuoustest(bool silent) {
       nb = 3 * (samplesize - 1);
       sigma = sqrt(xp * (1.0 / (double)nb) * (1 - 1.0 / (double)nb));
       ae_vector_set_length(&sample, samplesize);
-      sample.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      sample.ptr.p_double[0] = ae_randommid();
       for (i = 0; i < samplesize - 1; i++) {
          sample.ptr.p_double[i + 1] = sample.ptr.p_double[i] + 0.1 + ae_randomreal();
       }
       ae_vector_set_length(&bins, nb);
       ae_vector_set_length(&binbounds, nb + 1);
       for (i = 0; i < samplesize - 1; i++) {
-         bins.ptr.p_int[3 * i + 0] = 0;
+         bins.ptr.p_int[3 * i] = 0;
          bins.ptr.p_int[3 * i + 1] = 0;
          bins.ptr.p_int[3 * i + 2] = 0;
-         binbounds.ptr.p_double[3 * i + 0] = sample.ptr.p_double[i];
+         binbounds.ptr.p_double[3 * i] = sample.ptr.p_double[i];
          binbounds.ptr.p_double[3 * i + 1] = sample.ptr.p_double[i] + (sample.ptr.p_double[i + 1] - sample.ptr.p_double[i]) / 3;
          binbounds.ptr.p_double[3 * i + 2] = sample.ptr.p_double[i] + (sample.ptr.p_double[i + 1] - sample.ptr.p_double[i]) * 2 / 3;
       }
@@ -1843,7 +1841,7 @@ bool testhqrnd(bool silent) {
    discreteerr = hqrnddiscretetest(true);
    continuouserr = hqrndcontinuoustest(true);
 // Final report
-   waserrors = ((((((seederrors || urerrors) || uierrors) || normerrors) || unit2errors) || experrors) || discreteerr) || continuouserr;
+   waserrors = seederrors || urerrors || uierrors || normerrors || unit2errors || experrors || discreteerr || continuouserr;
    if (!silent || waserrors) {
       printf("RNG TEST\n");
       printf("SEED TEST:                               ");
@@ -1947,7 +1945,7 @@ bool testodesolver(bool silent) {
          }
          ae_vector_set_length(&y, 2);
          for (i = 0; i <= 1; i++) {
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
          }
          m = 2 + ae_randominteger(10);
          ae_vector_set_length(&xg, m);
@@ -1957,7 +1955,7 @@ bool testodesolver(bool silent) {
          }
          v = 2 * ae_pi / (xg.ptr.p_double[m - 1] - xg.ptr.p_double[0]);
          ae_v_muld(xg.ptr.p_double, 1, m, v);
-         if (ae_randomreal() > 0.5) {
+         if (ae_randombool()) {
             ae_v_muld(xg.ptr.p_double, 1, m, -1);
          }
          mynfev = 0;
@@ -2065,9 +2063,9 @@ typedef struct {
    hqrndstate rs;
    ae_int_t PQ;
 } sparsegenerator;
+
 Local void sparsegenerator_init(void *_p, bool make_automatic) {
    sparsegenerator *p = (sparsegenerator *) _p;
-   ae_touch_ptr((void *)p);
    ae_matrix_init(&p->bufa, 0, 0, DT_REAL, make_automatic);
    hqrndstate_init(&p->rs, make_automatic);
 }
@@ -2086,7 +2084,6 @@ Local void sparsegenerator_copy(void *_dst, void *_src, bool make_automatic) {
 
 Local void sparsegenerator_free(void *_p, bool make_automatic) {
    sparsegenerator *p = (sparsegenerator *) _p;
-   ae_touch_ptr((void *)p);
    ae_matrix_free(&p->bufa, make_automatic);
    hqrndstate_free(&p->rs, make_automatic);
 }
@@ -2316,7 +2313,7 @@ Local bool skstest() {
                ae_set_error_flag(&result, v0 != v1, __FILE__, __LINE__, "testsparseunit");
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -2437,7 +2434,7 @@ Local void crstest(bool *errorflag) {
                ae_frame_leave();
                return;
             }
-         // Increase problem sparcity and try one more time.
+         // Increase problem sparsity and try one more time.
          // Stop after testing NZ=0.
             if (nz == 0) {
                break;
@@ -2479,10 +2476,10 @@ Local bool basicfunctest() {
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
                if (j1 > i1) {
-                  inc(&uppercnt);
+                  uppercnt++;
                }
                if (j1 < i1) {
-                  inc(&lowercnt);
+                  lowercnt++;
                }
                a.ptr.pp_double[i1][j1] = i1 + j1 + (double)((i + j) * (m + n)) / 2.0;
                a.ptr.pp_double[i1][j1]++;
@@ -2622,7 +2619,7 @@ Spawn:
             }
          }
          g->PQ = 0; goto Pause; Resume0:
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -2644,8 +2641,7 @@ Spawn:
                if (i == j) {
                   do {
                      g->bufa.ptr.pp_double[i][i] = hqrnduniformr(&g->rs) - 0.5;
-                  }
-                  while (g->bufa.ptr.pp_double[i][i] == 0.0);
+                  } while (g->bufa.ptr.pp_double[i][i] == 0.0);
                   g->bufa.ptr.pp_double[i][i] += 1.5 * ae_sign(g->bufa.ptr.pp_double[i][i]);
                   continue;
                }
@@ -2670,19 +2666,18 @@ Spawn:
             }
          }
          g->PQ = 1; goto Pause; Resume1:
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
          }
       }
    } else ae_assert(false, "Assertion failed");
-   goto Exit;
-Pause:
-   return true;
 Exit:
    g->PQ = -1;
    return false;
+Pause:
+   return true;
 }
 
 // Function for testing Level 2 unsymmetric linear algebra functions.
@@ -3600,7 +3595,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
             i = ae_randominteger(m);
             j = ae_randominteger(n);
             v = (double)(ae_randominteger(17) - 8) / 8.0;
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                da->ptr.pp_double[i][j] = v;
                sparseset(sa, i, j, v);
             } else {
@@ -3655,8 +3650,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
          for (j = ae_maxint(i - p0, 0); j <= i + p1 && j < n; j++) {
             do {
                da->ptr.pp_double[i][j] = (double)(ae_randominteger(17) - 8) / 8.0;
-            }
-            while (da->ptr.pp_double[i][j] == 0.0);
+            } while (da->ptr.pp_double[i][j] == 0.0);
          }
          rowsizes.ptr.p_int[i] = ae_maxint(ae_minint(i + p1, n - 1) - ae_maxint(i - p0, 0) + 1, 0);
       }
@@ -3697,8 +3691,7 @@ static void testsparseunit_createrandom(ae_int_t m, ae_int_t n, ae_int_t pkind, 
          for (j = c0.ptr.p_int[i]; j < c1.ptr.p_int[i]; j++) {
             do {
                da->ptr.pp_double[i][j] = (double)(ae_randominteger(17) - 8) / 8.0;
-            }
-            while (da->ptr.pp_double[i][j] == 0.0);
+            } while (da->ptr.pp_double[i][j] == 0.0);
          }
       }
       if (ckind == 0) {
@@ -4531,7 +4524,7 @@ static bool testsparseunit_enumeratetest() {
                if (c == 0) {
                   a.ptr.pp_double[i][j] = 0.0;
                } else {
-                  a.ptr.pp_double[i][j] = r * (2 * ae_randomreal() - 1);
+                  a.ptr.pp_double[i][j] = r * ae_randommid();
                // Number of non-zero elements
                   ne++;
                }
@@ -4609,7 +4602,7 @@ static bool testsparseunit_rewriteexistingtest() {
          ae_matrix_set_length(&a, m, n);
          ae_matrix_set_length(&ta, m, n);
          for (hashcrs = 0; hashcrs <= 1; hashcrs++) {
-            v = r * (2 * ae_randomreal() - 1);
+            v = r * ae_randommid();
          // Creating and filling of the matrix
             ne = 0;
             sparsecreate(m, n, m * n, &spa);
@@ -4621,9 +4614,8 @@ static bool testsparseunit_rewriteexistingtest() {
                   }
                   if (c == 1) {
                      do {
-                        a.ptr.pp_double[i][j] = r * (2 * ae_randomreal() - 1);
-                     }
-                     while (a.ptr.pp_double[i][j] == 0.0);
+                        a.ptr.pp_double[i][j] = r * ae_randommid();
+                     } while (a.ptr.pp_double[i][j] == 0.0);
                      sparseset(&spa, i, j, a.ptr.pp_double[i][j]);
                      ne++;
                   }
@@ -4752,7 +4744,7 @@ static void testsparseunit_testgetrow(bool *err) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (ae_randominteger(5) == 3) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                      sparseset(&s, i, j, a.ptr.pp_double[i][j]);
                   } else {
                      a.ptr.pp_double[i][j] = 0.0;
@@ -4846,7 +4838,7 @@ static bool testsparseunit_testconvertsm() {
                for (j = 0; j < n; j++) {
                   if (ae_randominteger(5) == 3) {
                      ner.ptr.p_int[i]++;
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   } else {
                      a.ptr.pp_double[i][j] = 0.0;
                   }
@@ -4857,7 +4849,7 @@ static bool testsparseunit_testconvertsm() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   if (a.ptr.pp_double[i][j] != 0.0) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                      sparseset(&s, i, j, a.ptr.pp_double[i][j]);
                   }
                }
@@ -4885,11 +4877,11 @@ static bool testsparseunit_testconvertsm() {
          // Change some elements in row
             if (vartf != 2) {
                for (i = 0; i < m; i++) {
-                  tmp = 2 * ae_randomreal() - 1;
+                  tmp = ae_randommid();
                   j = ae_randominteger(n);
                   a.ptr.pp_double[i][j] = tmp;
                   sparseset(&cs, i, j, tmp);
-                  tmp = 2 * ae_randomreal() - 1;
+                  tmp = ae_randommid();
                   j = ae_randominteger(n);
                   a.ptr.pp_double[i][j] += tmp;
                   sparseadd(&cs, i, j, tmp);
@@ -5008,7 +5000,7 @@ bool testsparse(bool silent) {
    rewriteexistingerr = testsparseunit_rewriteexistingtest();
    testsparseunit_testgetrow(&getrowerrors);
 // report
-   waserrors = ((((((((((((((((skserrors || crserrors) || getrowerrors) || basicerrors) || linearerrors) || basicrnderrors) || level2unsymmetricerrors) || level2symmetricerrors) || level2triangularerrors) || level3unsymmetricerrors) || level3symmetricerrors) || linearserrors) || linearmmerrors) || linearsmmerrors) || copyerrors) || basiccopyerrors) || enumerateerrors) || rewriteexistingerr;
+   waserrors = skserrors || crserrors || getrowerrors || basicerrors || linearerrors || basicrnderrors || level2unsymmetricerrors || level2symmetricerrors || level2triangularerrors || level3unsymmetricerrors || level3symmetricerrors || linearserrors || linearmmerrors || linearsmmerrors || copyerrors || basiccopyerrors || enumerateerrors || rewriteexistingerr;
    if (!silent || waserrors) {
       printf("TESTING SPARSE\n");
       printf("STORAGE FORMAT SPECIFICS:\n");
@@ -5654,7 +5646,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       m = 1 + ae_randominteger(mx);
       n = 1 + ae_randominteger(mx);
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          m = mx;
       } else {
          n = mx;
@@ -5668,7 +5660,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refra, 2 * m, 2 * m);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
-            refra.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+            refra.ptr.pp_double[i][j] = 0.1 * ae_randommid();
          }
       }
       for (i = 0; i < m; i++) {
@@ -5684,13 +5676,11 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refca, 2 * m, 2 * m);
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
-            refca.ptr.pp_complex[i][j].x = 0.2 * ae_randomreal() - 0.1;
-            refca.ptr.pp_complex[i][j].y = 0.2 * ae_randomreal() - 0.1;
+            refca.ptr.pp_complex[i][j] = ae_complex_from_d(0.1 * ae_randommid(), 0.1 * ae_randommid());
          }
       }
       for (i = 0; i < m; i++) {
-         refca.ptr.pp_complex[i][i].x = (2 * ae_randominteger(2) - 1) * (2 * m + ae_randomreal());
-         refca.ptr.pp_complex[i][i].y = (2 * ae_randominteger(2) - 1) * (2 * m + ae_randomreal());
+         refca.ptr.pp_complex[i][i] = ae_complex_from_d((2 * ae_randominteger(2) - 1) * (2 * m + ae_randomreal()), (2 * ae_randominteger(2) - 1) * (2 * m + ae_randomreal()));
       }
       for (i = 0; i < m; i++) {
          for (j = 0; j < m; j++) {
@@ -5706,27 +5696,25 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refrxr, n, m);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            refrxr.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            refrxr.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       ae_matrix_set_length(&refrxl, m, n);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            refrxl.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            refrxl.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       ae_matrix_set_length(&refcxr, n, m);
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            refcxr.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcxr.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refcxr.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       ae_matrix_set_length(&refcxl, m, n);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            refcxl.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcxl.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refcxl.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -5988,7 +5976,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
       k = 1 + ae_randominteger(mx);
       n = 1 + ae_randominteger(mx);
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          k = mx;
       } else {
          n = mx;
@@ -6001,12 +5989,11 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refra, 2 * n, 2 * n);
       ae_matrix_set_length(&refca, 2 * n, 2 * n);
       for (i = 0; i < n; i++) {
-         refra.ptr.pp_double[i][i] = 2 * ae_randomreal() - 1;
-         refca.ptr.pp_complex[i][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         refra.ptr.pp_double[i][i] = ae_randommid();
+         refca.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
          for (j = i + 1; j < n; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
+            refca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             refra.ptr.pp_double[j][i] = refra.ptr.pp_double[i][j];
             refca.ptr.pp_complex[j][i] = ae_c_conj(refca.ptr.pp_complex[i][j]);
          }
@@ -6025,9 +6012,8 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refcc, n, k);
       for (i = 0; i < n; i++) {
          for (j = 0; j < k; j++) {
-            refrc.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refcc.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcc.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refrc.ptr.pp_double[i][j] = ae_randommid();
+            refcc.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -6052,8 +6038,8 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       betatype = ae_randominteger(2);
       aoffsi = n * aoffsitype;
       aoffsj = n * aoffsjtype;
-      alpha = alphatype * (2 * ae_randomreal() - 1);
-      beta = betatype * (2 * ae_randomreal() - 1);
+      alpha = alphatype * ae_randommid();
+      beta = betatype * ae_randommid();
    // copy A, C (fill unused parts with random garbage)
       for (i = 0; i < 2 * n; i++) {
          for (j = 0; j < 2 * n; j++) {
@@ -6087,7 +6073,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
    // Test complex
    // Only one of transform types is selected and tested
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          cmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca1, aoffsi, aoffsj, uppertype == 0);
          testablasunit_refcmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca2, aoffsi, aoffsj, uppertype == 0);
       } else {
@@ -6101,7 +6087,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
    // Test old version of HERK (named SYRK)
    // Only one of transform types is selected and tested
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          cmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca1, aoffsi, aoffsj, uppertype == 0);
          testablasunit_refcmatrixherk(n - xoffsi, k - xoffsj, alpha, &cc, xoffsi, xoffsj, 0, beta, &ca2, aoffsi, aoffsj, uppertype == 0);
       } else {
@@ -6115,7 +6101,7 @@ static bool testablasunit_testsyrk(ae_int_t minn, ae_int_t maxn) {
       }
    // Test real
    // Only one of transform types is selected and tested
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          rmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &rc, xoffsi, xoffsj, 0, beta, &ra1, aoffsi, aoffsj, uppertype == 0);
          testablasunit_refrmatrixsyrk(n - xoffsi, k - xoffsj, alpha, &rc, xoffsi, xoffsj, 0, beta, &ra2, aoffsi, aoffsj, uppertype == 0);
       } else {
@@ -6292,15 +6278,12 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refcc, maxn + 1, maxn + 1);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refrb.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refrc.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-            refcb.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcb.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-            refcc.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcc.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
+            refrb.ptr.pp_double[i][j] = ae_randommid();
+            refrc.ptr.pp_double[i][j] = ae_randommid();
+            refca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
+            refcb.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
+            refcc.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
    // test different types of operations, offsets, and so on...
@@ -6322,17 +6305,15 @@ static bool testablasunit_testgemm(ae_int_t minn, ae_int_t maxn) {
       boptyper = ae_randominteger(2);
       coffsi = ae_randominteger(2);
       coffsj = ae_randominteger(2);
-      alphar = ae_randominteger(2) * (2 * ae_randomreal() - 1);
-      betar = ae_randominteger(2) * (2 * ae_randomreal() - 1);
-      if (ae_randomreal() > 0.5) {
-         alphac.x = 2 * ae_randomreal() - 1;
-         alphac.y = 2 * ae_randomreal() - 1;
+      alphar = ae_randominteger(2) * ae_randommid();
+      betar = ae_randominteger(2) * ae_randommid();
+      if (ae_randombool()) {
+         alphac = ae_complex_from_d(ae_randommid(), ae_randommid());
       } else {
          alphac = ae_complex_from_i(0);
       }
-      if (ae_randomreal() > 0.5) {
-         betac.x = 2 * ae_randomreal() - 1;
-         betac.y = 2 * ae_randomreal() - 1;
+      if (ae_randombool()) {
+         betac = ae_complex_from_d(ae_randommid(), ae_randommid());
       } else {
          betac = ae_complex_from_i(0);
       }
@@ -6412,9 +6393,8 @@ static bool testablasunit_testtrans(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refcb, maxn + 1, maxn + 1);
       for (i = 0; i <= maxn; i++) {
          for (j = 0; j <= maxn; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
+            refca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             refrb.ptr.pp_double[i][j] = i * v1 + j * v2;
             refcb.ptr.pp_complex[i][j] = ae_complex_from_d(i * v1 + j * v2);
          }
@@ -6498,24 +6478,21 @@ static bool testablasunit_testrank1(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refcb, maxn + maxn, maxn + maxn);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refrb.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refcb.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refcb.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refrb.ptr.pp_double[i][j] = ae_randommid();
+            refcb.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       ae_vector_set_length(&ru, 2 * m);
       ae_vector_set_length(&cu, 2 * m);
       for (i = 0; i < 2 * m; i++) {
-         ru.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         cu.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         cu.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         ru.ptr.p_double[i] = ae_randommid();
+         cu.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
       ae_vector_set_length(&rv, 2 * n);
       ae_vector_set_length(&cv, 2 * n);
       for (i = 0; i < 2 * n; i++) {
-         rv.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         cv.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         cv.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         rv.ptr.p_double[i] = ae_randommid();
+         cv.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
    // Generate random offsets of all operands and random coefficients.
       aoffsi = ae_randominteger(maxn);
@@ -6624,9 +6601,8 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&refca, maxn + maxn, maxn + maxn);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            refca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
+            refca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       ae_vector_set_length(&rx, 2 * maxn);
@@ -6634,9 +6610,8 @@ static bool testablasunit_testgemv(ae_int_t minn, ae_int_t maxn) {
       ae_vector_set_length(&ry, 2 * maxn);
       ae_vector_set_length(&cy, 2 * maxn);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         cx.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         cx.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         rx.ptr.p_double[i] = ae_randommid();
+         cx.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
    // Select random offsets and operations.
    //
@@ -6824,14 +6799,14 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       ae_matrix_set_length(&refra, maxn + maxn, maxn + maxn);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       ae_vector_set_length(&rx, 2 * maxn);
       ae_vector_set_length(&ry, 2 * maxn);
       ae_vector_set_length(&rz, 2 * maxn);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         rx.ptr.p_double[i] = ae_randommid();
       }
    // Select random offsets and operations.
    //
@@ -6842,7 +6817,7 @@ static void testablasunit_testsymv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       aoffsj = ae_randominteger(maxn);
       xoffs = ae_randominteger(maxn);
       yoffs = ae_randominteger(maxn);
-      isuppera = ae_randomreal() > 0.5;
+      isuppera = ae_randombool();
       ralpha = (ae_randomreal() - 0.5) * ae_randominteger(2);
       rbeta = (ae_randomreal() - 0.5) * ae_randominteger(2);
    // Test RMatrixSYMV()
@@ -6897,13 +6872,13 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       ae_matrix_set_length(&refra, maxn + maxn, maxn + maxn);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            refra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            refra.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       ae_vector_set_length(&rx, 2 * maxn);
       ae_vector_set_length(&ry, 2 * maxn);
       for (i = 0; i < 2 * maxn; i++) {
-         rx.ptr.p_double[i] = (2 * ae_randomreal() - 1) * ae_randominteger(3);
+         rx.ptr.p_double[i] = ae_randommid() * ae_randominteger(3);
       }
    // Select random offsets and operations.
    //
@@ -6916,8 +6891,8 @@ static void testablasunit_testtrsv(ae_int_t minn, ae_int_t maxn, bool *errorflag
       aoffsi = ae_randominteger(maxn);
       aoffsj = ae_randominteger(maxn);
       xoffs = ae_randominteger(maxn);
-      isuppera = ae_randomreal() > 0.5;
-      isunita = ae_randomreal() > 0.5;
+      isuppera = ae_randombool();
+      isunita = ae_randombool();
       opa = ae_randominteger(2);
       for (i = 0; i < n; i++) {
          refra.ptr.pp_double[aoffsi + i][aoffsj + i] += 10;
@@ -6992,14 +6967,14 @@ static void testablasunit_spectest(bool *errorflag) {
       rmatrixgemm(n, n, n, 0.0, &emptyr2, 35345, 23453, ae_randominteger(2), &emptyr2, 74764, 26845, ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0);
       cmatrixgemm(n, n, 0, ae_complex_from_d(1.0), &emptyc2, 35345, 23453, ae_randominteger(3), &emptyc2, 74764, 26845, ae_randominteger(3), ae_complex_from_d(1.0 + ae_randominteger(2)), &outputc2, 0, 0);
       cmatrixgemm(n, n, n, ae_complex_from_d(0.0), &emptyc2, 35345, 23453, ae_randominteger(3), &emptyc2, 74764, 26845, ae_randominteger(3), ae_complex_from_d(1.0 + ae_randominteger(2)), &outputc2, 0, 0);
-      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randomreal() > 0.5);
-      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randomreal() > 0.5);
-      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randomreal() > 0.5);
-      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randomreal() > 0.5);
-      rmatrixrighttrsm(0, 0, &emptyr2, 63463, 36345, ae_randomreal() > 0.5, ae_randomreal() > 0.5, ae_randominteger(2), &outputr2, 0, 0);
-      rmatrixlefttrsm(0, 0, &emptyr2, 63463, 36345, ae_randomreal() > 0.5, ae_randomreal() > 0.5, ae_randominteger(2), &outputr2, 0, 0);
-      cmatrixrighttrsm(0, 0, &emptyc2, 63463, 36345, ae_randomreal() > 0.5, ae_randomreal() > 0.5, ae_randominteger(3), &outputc2, 0, 0);
-      cmatrixlefttrsm(0, 0, &emptyc2, 63463, 36345, ae_randomreal() > 0.5, ae_randomreal() > 0.5, ae_randominteger(3), &outputc2, 0, 0);
+      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
+      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
+      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
+      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
+      rmatrixrighttrsm(0, 0, &emptyr2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(2), &outputr2, 0, 0);
+      rmatrixlefttrsm(0, 0, &emptyr2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(2), &outputr2, 0, 0);
+      cmatrixrighttrsm(0, 0, &emptyc2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(3), &outputc2, 0, 0);
+      cmatrixlefttrsm(0, 0, &emptyc2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(3), &outputc2, 0, 0);
    }
    ae_frame_leave();
 }
@@ -7045,9 +7020,8 @@ static bool testablasunit_testcopy(ae_int_t minn, ae_int_t maxn) {
       ae_matrix_set_length(&cb, maxn + maxn, maxn + maxn);
       for (i = 0; i < 2 * maxn; i++) {
          for (j = 0; j < 2 * maxn; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             rb.ptr.pp_double[i][j] = (double)(1 + 2 * i + 3 * j);
             cb.ptr.pp_complex[i][j] = ae_complex_from_i(1 + 2 * i + 3 * j);
          }
@@ -7143,7 +7117,7 @@ static void testablasunit_testreflections(bool *errorflag) {
                xscale = 1.0;
                if (tasktype == 0) {
                   for (i = 1; i <= n; i++) {
-                     x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                     x.ptr.p_double[i] = ae_randommid();
                   }
                }
                if (tasktype == 1) {
@@ -7152,7 +7126,7 @@ static void testablasunit_testreflections(bool *errorflag) {
                   }
                }
                if (tasktype == 2) {
-                  x.ptr.p_double[1] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[1] = ae_randommid();
                   for (i = 2; i <= n; i++) {
                      x.ptr.p_double[i] = 0.0;
                   }
@@ -7165,7 +7139,7 @@ static void testablasunit_testreflections(bool *errorflag) {
                }
                if (tasktype == 4) {
                   for (i = 1; i <= n; i++) {
-                     x.ptr.p_double[i] = (2 * ae_randomreal() - 1) * ae_maxrealnumber;
+                     x.ptr.p_double[i] = ae_randommid() * ae_maxrealnumber;
                   }
                   xscale = ae_maxrealnumber;
                }
@@ -7195,12 +7169,12 @@ static void testablasunit_testreflections(bool *errorflag) {
             }
          // ApplyReflectionFromTheLeft
             for (i = 1; i <= m; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
                v.ptr.p_double[i] = x.ptr.p_double[i];
             }
             for (i = 1; i <= m; i++) {
                for (j = 1; j <= n; j++) {
-                  a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  a.ptr.pp_double[i][j] = ae_randommid();
                   b.ptr.pp_double[i][j] = a.ptr.pp_double[i][j];
                }
             }
@@ -7232,12 +7206,12 @@ static void testablasunit_testreflections(bool *errorflag) {
             mel = ae_maxreal(mel, err);
          // ApplyReflectionFromTheRight
             for (i = 1; i <= n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
                v.ptr.p_double[i] = x.ptr.p_double[i];
             }
             for (i = 1; i <= m; i++) {
                for (j = 1; j <= n; j++) {
-                  a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  a.ptr.pp_double[i][j] = ae_randommid();
                   b.ptr.pp_double[i][j] = a.ptr.pp_double[i][j];
                }
             }
@@ -7274,7 +7248,7 @@ static void testablasunit_testreflections(bool *errorflag) {
    ae_vector_set_length(&x, 10 + 1);
    ae_vector_set_length(&v, 10 + 1);
    for (i = 1; i <= 10; i++) {
-      v.ptr.p_double[i] = ae_maxrealnumber * 0.01 * (2 * ae_randomreal() - 1);
+      v.ptr.p_double[i] = ae_maxrealnumber * 0.01 * ae_randommid();
    }
    generatereflection(&v, 10, &tau);
 // Result
@@ -7330,7 +7304,7 @@ bool testablas(bool silent) {
    trsmerrors = trsmerrors || testablasunit_testtrsm(n0, n1);
    syrkerrors = syrkerrors || testablasunit_testsyrk(n0, n1);
 // report
-   waserrors = (((((((((trsmerrors || syrkerrors) || gemmerrors) || transerrors) || rank1errors) || gemverrors) || symverrors) || trsverrors) || reflerrors) || copyerrors) || specerrors;
+   waserrors = trsmerrors || syrkerrors || gemmerrors || transerrors || rank1errors || gemverrors || symverrors || trsverrors || reflerrors || copyerrors || specerrors;
    if (!silent || waserrors) {
       printf("TESTING ABLAS\n");
       printf("LEVEL 3 FUNCTIONS:\n");
@@ -7461,8 +7435,7 @@ bool testcreflections(bool silent) {
       ae_matrix_set_length(&c, maxmn + 1, maxmn + 1);
    // GenerateReflection
       for (i = 1; i <= n; i++) {
-         x.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         x.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         x.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          v.ptr.p_complex[i] = x.ptr.p_complex[i];
       }
       complexgeneratereflection(&v, n, &tau);
@@ -7490,14 +7463,12 @@ bool testcreflections(bool silent) {
       meg = ae_maxreal(meg, err);
    // ApplyReflectionFromTheLeft
       for (i = 1; i <= m; i++) {
-         x.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         x.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         x.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          v.ptr.p_complex[i] = x.ptr.p_complex[i];
       }
       for (i = 1; i <= m; i++) {
          for (j = 1; j <= n; j++) {
-            a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             b.ptr.pp_complex[i][j] = a.ptr.pp_complex[i][j];
          }
       }
@@ -7529,12 +7500,12 @@ bool testcreflections(bool silent) {
       mel = ae_maxreal(mel, err);
    // ApplyReflectionFromTheRight
       for (i = 1; i <= n; i++) {
-         x.ptr.p_complex[i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         x.ptr.p_complex[i] = ae_complex_from_d(ae_randommid());
          v.ptr.p_complex[i] = x.ptr.p_complex[i];
       }
       for (i = 1; i <= m; i++) {
          for (j = 1; j <= n; j++) {
-            a.ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+            a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
             b.ptr.pp_complex[i][j] = a.ptr.pp_complex[i][j];
          }
       }
@@ -7569,7 +7540,7 @@ bool testcreflections(bool silent) {
    ae_vector_set_length(&x, 10 + 1);
    ae_vector_set_length(&v, 10 + 1);
    for (i = 1; i <= 10; i++) {
-      v.ptr.p_complex[i] = ae_complex_from_d(ae_maxrealnumber * 0.01 * (2 * ae_randomreal() - 1));
+      v.ptr.p_complex[i] = ae_complex_from_d(ae_maxrealnumber * 0.01 * ae_randommid());
    }
    complexgeneratereflection(&v, 10, &tau);
 // report
@@ -7599,13 +7570,13 @@ static const ae_int_t testmatgenunit_maxsvditerations = 60;
 // Unsets 2D array.
 static void testmatgenunit_unset2d(RMatrix a) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1);
-   a->ptr.pp_double[0][0] = 2 * ae_randomreal() - 1;
+   a->ptr.pp_double[0][0] = ae_randommid();
 }
 
 // Unsets 2D array.
 static void testmatgenunit_unset2dc(CMatrix a) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1);
-   a->ptr.pp_complex[0][0] = ae_complex_from_d(2 * ae_randomreal() - 1);
+   a->ptr.pp_complex[0][0] = ae_complex_from_d(ae_randommid());
 }
 
 // Test whether matrix is SPD
@@ -7741,7 +7712,7 @@ static bool testmatgenunit_testeult() {
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(b, 0, 0, DT_COMPLEX);
    eps = 2 * ae_machineepsilon;
-   range = 100 * (2 * ae_randomreal() - 1);
+   range = 100 * ae_randommid();
    for (n = 1; n <= 15; n++) {
       c = 900 * ae_randomreal() + 100;
    // Generate symmetric matrix and check it
@@ -7788,7 +7759,7 @@ static bool testmatgenunit_testeult() {
    // Prepare symmetric matrix with real values
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            a.ptr.pp_double[i][j] = range * (2 * ae_randomreal() - 1);
+            a.ptr.pp_double[i][j] = range * ae_randommid();
          }
       }
       for (i = 0; i < n - 1; i++) {
@@ -7809,18 +7780,12 @@ static bool testmatgenunit_testeult() {
    // Prepare symmetric matrix with complex values
       for (i = 0; i < n; i++) {
          for (j = i; j < n; j++) {
-            b.ptr.pp_complex[i][j].x = range * (2 * ae_randomreal() - 1);
-            if (i != j) {
-               b.ptr.pp_complex[i][j].y = range * (2 * ae_randomreal() - 1);
-            } else {
-               b.ptr.pp_complex[i][j].y = 0.0;
-            }
+            b.ptr.pp_complex[i][j] = ae_complex_from_d(range * ae_randommid(), i == j? 0.0: range * ae_randommid());
          }
       }
       for (i = 0; i < n; i++) {
          for (j = i + 1; j < n; j++) {
-            b.ptr.pp_complex[i][j].x = b.ptr.pp_complex[j][i].x;
-            b.ptr.pp_complex[i][j].y = -b.ptr.pp_complex[j][i].y;
+            b.ptr.pp_complex[i][j] = ae_complex_from_d(b.ptr.pp_complex[j][i].x, -b.ptr.pp_complex[j][i].y);
          }
       }
       hmatrixrndmultiply(&b, n);
@@ -8331,7 +8296,7 @@ bool testmatgen(bool silent) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               r2.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               r2.ptr.pp_double[i][j] = ae_randommid();
                r2.ptr.pp_double[i + n][j] = r2.ptr.pp_double[i][j];
             }
          }
@@ -8382,7 +8347,7 @@ bool testmatgen(bool silent) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               r1.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               r1.ptr.pp_double[i][j] = ae_randommid();
                r1.ptr.pp_double[i][j + n] = r1.ptr.pp_double[i][j];
             }
          }
@@ -8431,7 +8396,7 @@ bool testmatgen(bool silent) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               c2.ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+               c2.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
                c2.ptr.pp_complex[i + n][j] = c2.ptr.pp_complex[i][j];
             }
          }
@@ -8480,7 +8445,7 @@ bool testmatgen(bool silent) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               c1.ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+               c1.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
                c1.ptr.pp_complex[i][j + n] = c1.ptr.pp_complex[i][j];
             }
          }
@@ -8623,7 +8588,7 @@ bool testmatgen(bool silent) {
 // Test for symmetric matrices
    eulerr = testmatgenunit_testeult();
 // report
-   waserrors = (((((rerr || cerr) || serr) || spderr) || herr) || hpderr) || eulerr;
+   waserrors = rerr || cerr || serr || spderr || herr || hpderr || eulerr;
    if (!silent || waserrors) {
       printf("TESTING MATRIX GENERATOR\n");
       printf("REAL TEST:                               ");
@@ -8725,7 +8690,7 @@ Local bool sparserealcholeskytest() {
    offscale = 1.0E-3;
    tol = 1.0E-8;
 // SparseCholeskyX test: performed for matrices
-// of all sizes in 1..20 and all sparcity percentages.
+// of all sizes in 1..20 and all sparsity percentages.
    for (n = 1; n <= 20; n++) {
       nz = n * n - n;
       while (true) {
@@ -8754,7 +8719,7 @@ Local bool sparserealcholeskytest() {
             }
          }
       // Problem statement
-         isupper = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
          cfmt = ae_randominteger(maxfmt + 1);
          cord = ae_randominteger(maxord + 1 - minord) + minord;
       // Create matrix is hash-based storage format, convert it to random storage format.
@@ -8836,7 +8801,7 @@ Local bool sparserealcholeskytest() {
                }
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -8845,7 +8810,7 @@ Local bool sparserealcholeskytest() {
       }
    }
 // SparseCholeskySkyline test: performed for matrices
-// of all sizes in 1..20 and all sparcity percentages.
+// of all sizes in 1..20 and all sparsity percentages.
    for (n = 1; n <= 20; n++) {
       nz = n * n - n;
       while (true) {
@@ -8858,7 +8823,7 @@ Local bool sparserealcholeskytest() {
       //
       // Additionally, we create A1 - same as A, but one of the triangles is
       // asymmetrically spoiled. If IsUpper is True, we spoil lower one, or vice versa.
-         isupper = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
          if (n > 1) {
             pnz = (double)nz / (double)(n * n - n);
          } else {
@@ -8976,7 +8941,7 @@ Local bool sparserealcholeskytest() {
                }
             }
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -9056,7 +9021,7 @@ Local void sparsereallutest(bool *err) {
                return;
             }
             for (i = 0; i < n; i++) {
-               ae_set_error_flag(err, ((pivr.ptr.p_int[i] < 0 || pivr.ptr.p_int[i] >= n) || pivc.ptr.p_int[i] < 0) || pivc.ptr.p_int[i] >= n, __FILE__, __LINE__, "testtrfacunit");
+               ae_set_error_flag(err, pivr.ptr.p_int[i] < 0 || pivr.ptr.p_int[i] >= n || pivc.ptr.p_int[i] < 0 || pivc.ptr.p_int[i] >= n, __FILE__, __LINE__, "testtrfacunit");
             }
             for (i = 0; i < n; i++) {
                ae_set_error_flag(err, pivottype == 1 && pivc.ptr.p_int[i] != i, __FILE__, __LINE__, "testtrfacunit");
@@ -9103,9 +9068,9 @@ Local void sparsereallutest(bool *err) {
                   ae_set_error_flag(err, fabs(c.ptr.pp_double[i][j] - a.ptr.pp_double[i][j]) > tol, __FILE__, __LINE__, "testtrfacunit");
                }
             }
-            ae_set_error_flag(err, (success && haszero) || (!haszero && !success), __FILE__, __LINE__, "testtrfacunit");
+            ae_set_error_flag(err, success == haszero, __FILE__, __LINE__, "testtrfacunit");
          }
-      // Increase problem sparcity and try one more time.
+      // Increase problem sparsity and try one more time.
       // Stop after testing NZ=0.
          if (nz == 0) {
             break;
@@ -9572,7 +9537,7 @@ bool testtrfac(bool silent) {
    // at least one of them is exactly equal to MX
       n = 1 + ae_randominteger(mx);
       m = 1 + ae_randominteger(mx);
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -9744,11 +9709,11 @@ bool testtrfac(bool silent) {
       }
       ra.ptr.pp_double[n / 2][n / 2] = -1.0;
       ca.ptr.pp_complex[n / 2][n / 2] = ae_complex_from_d(-1.0);
-      ae_set_error_flag(&dspderr, spdmatrixcholesky(&ra, n, ae_randomreal() > 0.5), __FILE__, __LINE__, "testtrfacunit");
-      ae_set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, ae_randomreal() > 0.5), __FILE__, __LINE__, "testtrfacunit");
+      ae_set_error_flag(&dspderr, spdmatrixcholesky(&ra, n, ae_randombool()), __FILE__, __LINE__, "testtrfacunit");
+      ae_set_error_flag(&hpderr, hpdmatrixcholesky(&ca, n, ae_randombool()), __FILE__, __LINE__, "testtrfacunit");
    }
 // report
-   waserrors = ((((((rerr || srerr) || dspderr) || sspderr) || cerr) || hpderr) || properr) || dspdupderr;
+   waserrors = rerr || srerr || dspderr || sspderr || cerr || hpderr || properr || dspdupderr;
    if (!silent || waserrors) {
       printf("TESTING TRIANGULAR FACTORIZATIONS\n");
       printf("* REAL (dense):                          ");
@@ -9873,7 +9838,7 @@ bool testtrlinsolve(bool silent) {
                      if (isupper) {
                         for (i = 0; i < n; i++) {
                            for (j = i; j < n; j++) {
-                              aeffective.ptr.pp_double[i][j] = 0.9 * (2 * ae_randomreal() - 1);
+                              aeffective.ptr.pp_double[i][j] = 0.9 * ae_randommid();
                               aparam.ptr.pp_double[i][j] = aeffective.ptr.pp_double[i][j];
                            }
                            aeffective.ptr.pp_double[i][i] = (2 * ae_randominteger(2) - 1) * (0.8 + ae_randomreal());
@@ -9882,7 +9847,7 @@ bool testtrlinsolve(bool silent) {
                      } else {
                         for (i = 0; i < n; i++) {
                            for (j = 0; j <= i; j++) {
-                              aeffective.ptr.pp_double[i][j] = 0.9 * (2 * ae_randomreal() - 1);
+                              aeffective.ptr.pp_double[i][j] = 0.9 * ae_randommid();
                               aparam.ptr.pp_double[i][j] = aeffective.ptr.pp_double[i][j];
                            }
                            aeffective.ptr.pp_double[i][i] = (2 * ae_randominteger(2) - 1) * (0.8 + ae_randomreal());
@@ -9914,7 +9879,7 @@ bool testtrlinsolve(bool silent) {
                      }
                   // Prepare task, solve, compare
                      for (i = 0; i < n; i++) {
-                        xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                        xe.ptr.p_double[i] = ae_randommid();
                      }
                      for (i = 0; i < n; i++) {
                         v = ae_v_dotproduct(aeffective.ptr.pp_double[i], 1, xe.ptr.p_double, 1, n);
@@ -10019,19 +9984,17 @@ bool testsafesolve(bool silent) {
    // 2. generate 'effective' A
    // 3. prepare task (exact X is stored in CXE, right part - in CXS),
    //    solve and compare CXS and CXE
-      isupper = ae_randomreal() > 0.5;
+      isupper = ae_randombool();
       trans = ae_randominteger(3);
-      isunit = ae_randomreal() > 0.5;
+      isunit = ae_randombool();
       scalea = ae_randomreal() + 0.5;
       ae_matrix_set_length(&ca, n, n);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
             if (i == j) {
-               ca.ptr.pp_complex[i][j].x = (2 * ae_randominteger(2) - 1) * (5 + ae_randomreal());
-               ca.ptr.pp_complex[i][j].y = (2 * ae_randominteger(2) - 1) * (5 + ae_randomreal());
+               ca.ptr.pp_complex[i][j] = ae_complex_from_d((2 * ae_randominteger(2) - 1) * (5 + ae_randomreal()), (2 * ae_randominteger(2) - 1) * (5 + ae_randomreal()));
             } else {
-               ca.ptr.pp_complex[i][j].x = 0.2 * ae_randomreal() - 0.1;
-               ca.ptr.pp_complex[i][j].y = 0.2 * ae_randomreal() - 0.1;
+               ca.ptr.pp_complex[i][j] = ae_complex_from_d(0.1 * ae_randommid(), 0.1 * ae_randommid());
             }
          }
       }
@@ -10065,8 +10028,7 @@ bool testsafesolve(bool silent) {
       }
       ae_vector_set_length(&cxe, n);
       for (i = 0; i < n; i++) {
-         cxe.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         cxe.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         cxe.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
       ae_vector_set_length(&cxs, n);
       for (i = 0; i < n; i++) {
@@ -10081,9 +10043,9 @@ bool testsafesolve(bool silent) {
          cerrors = true;
       }
    // same with real
-      isupper = ae_randomreal() > 0.5;
+      isupper = ae_randombool();
       trans = ae_randominteger(2);
-      isunit = ae_randomreal() > 0.5;
+      isunit = ae_randombool();
       scalea = ae_randomreal() + 0.5;
       ae_matrix_set_length(&ra, n, n);
       for (i = 0; i < n; i++) {
@@ -10091,7 +10053,7 @@ bool testsafesolve(bool silent) {
             if (i == j) {
                ra.ptr.pp_double[i][j] = (2 * ae_randominteger(2) - 1) * (5 + ae_randomreal());
             } else {
-               ra.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+               ra.ptr.pp_double[i][j] = 0.1 * ae_randommid();
             }
          }
       }
@@ -10122,7 +10084,7 @@ bool testsafesolve(bool silent) {
       }
       ae_vector_set_length(&rxe, n);
       for (i = 0; i < n; i++) {
-         rxe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         rxe.ptr.p_double[i] = ae_randommid();
       }
       ae_vector_set_length(&rxs, n);
       for (i = 0; i < n; i++) {
@@ -10153,8 +10115,8 @@ bool testsafesolve(bool silent) {
    ae_vector_set_length(&cxs, n);
    cxs.ptr.p_complex[0] = ae_complex_from_d(1.0);
    cxs.ptr.p_complex[1] = ae_complex_from_d(0.5);
-   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randomreal() > 0.5, ae_randominteger(3), false, 1.05 * ae_maxreal(ae_c_abs(cxs.ptr.p_complex[1]) * growth, 1.0));
-   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randomreal() > 0.5, ae_randominteger(3), false, 0.95 * ae_maxreal(ae_c_abs(cxs.ptr.p_complex[1]) * growth, 1.0));
+   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randombool(), ae_randominteger(3), false, 1.05 * ae_maxreal(ae_c_abs(cxs.ptr.p_complex[1]) * growth, 1.0));
+   cerrors = cerrors || !cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randombool(), ae_randominteger(3), false, 0.95 * ae_maxreal(ae_c_abs(cxs.ptr.p_complex[1]) * growth, 1.0));
    ae_matrix_set_length(&ra, n, n);
    ra.ptr.pp_double[0][0] = 1.0;
    ra.ptr.pp_double[0][1] = 0.0;
@@ -10163,8 +10125,8 @@ bool testsafesolve(bool silent) {
    ae_vector_set_length(&rxs, n);
    rxs.ptr.p_double[0] = 1.0;
    rxs.ptr.p_double[1] = 0.5;
-   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randomreal() > 0.5, ae_randominteger(2), false, 1.05 * ae_maxreal(fabs(rxs.ptr.p_double[1]) * growth, 1.0));
-   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randomreal() > 0.5, ae_randominteger(2), false, 0.95 * ae_maxreal(fabs(rxs.ptr.p_double[1]) * growth, 1.0));
+   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randombool(), ae_randominteger(2), false, 1.05 * ae_maxreal(fabs(rxs.ptr.p_double[1]) * growth, 1.0));
+   rerrors = rerrors || !rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randombool(), ae_randominteger(2), false, 0.95 * ae_maxreal(fabs(rxs.ptr.p_double[1]) * growth, 1.0));
 // Special test with diagonal degenerate matrix:
 // * ability to solve it when resulting growth is less than threshold
 // * ability to stop solve when resulting growth is greater than threshold
@@ -10180,7 +10142,7 @@ bool testsafesolve(bool silent) {
    ae_vector_set_length(&cxs, n);
    cxs.ptr.p_complex[0] = ae_complex_from_d(1.0);
    cxs.ptr.p_complex[1] = ae_complex_from_d(0.5);
-   cerrors = cerrors || cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randomreal() > 0.5, ae_randominteger(3), false, sqrt(ae_maxrealnumber));
+   cerrors = cerrors || cmatrixscaledtrsafesolve(&ca, 1.0, n, &cxs, ae_randombool(), ae_randominteger(3), false, sqrt(ae_maxrealnumber));
    ae_matrix_set_length(&ra, n, n);
    ra.ptr.pp_double[0][0] = 1.0;
    ra.ptr.pp_double[0][1] = 0.0;
@@ -10189,7 +10151,7 @@ bool testsafesolve(bool silent) {
    ae_vector_set_length(&rxs, n);
    rxs.ptr.p_double[0] = 1.0;
    rxs.ptr.p_double[1] = 0.5;
-   rerrors = rerrors || rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randomreal() > 0.5, ae_randominteger(2), false, sqrt(ae_maxrealnumber));
+   rerrors = rerrors || rmatrixscaledtrsafesolve(&ra, 1.0, n, &rxs, ae_randombool(), ae_randominteger(2), false, sqrt(ae_maxrealnumber));
 // report
    waserrors = rerrors || cerrors;
    if (!silent || waserrors) {
@@ -10744,8 +10706,8 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
    for (n = 1; n <= maxn; n++) {
    // special test for zero matrix
       testrcondunit_rmatrixgenzero(&a, n);
-      errspec = errspec || rmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-      errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+      errspec = errspec || rmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+      errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
    // general test
       ae_matrix_set_length(&a, n, n);
       for (i = 0; i <= 1; i++) {
@@ -10753,8 +10715,8 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          q90.ptr.p_double[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         isupper = ae_randomreal() > 0.5;
-         isunit = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
+         isunit = ae_randombool();
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                a.ptr.pp_double[i][j] = ae_randomreal() - 0.5;
@@ -10813,8 +10775,8 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          a.ptr.pp_double[0][0] = 1.0;
          a.ptr.pp_double[n - 1][n - 1] = 1.0;
-         errspec = errspec || rmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-         errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+         errspec = errspec || rmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+         errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
       }
    // near-degenerate matrix test
       if (n >= 2) {
@@ -10829,12 +10791,12 @@ static bool testrcondunit_testrmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          i = ae_randominteger(n);
          a.ptr.pp_double[i][i] = 0.1 * ae_maxrealnumber;
-         errspec = errspec || rmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-         errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+         errspec = errspec || rmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+         errspec = errspec || rmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -10873,8 +10835,8 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
    for (n = 1; n <= maxn; n++) {
    // special test for zero matrix
       testrcondunit_cmatrixgenzero(&a, n);
-      errspec = errspec || cmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-      errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+      errspec = errspec || cmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+      errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
    // general test
       ae_matrix_set_length(&a, n, n);
       for (i = 0; i <= 1; i++) {
@@ -10882,17 +10844,15 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          q90.ptr.p_double[i] = 0.0;
       }
       for (pass = 1; pass <= passcount; pass++) {
-         isupper = ae_randomreal() > 0.5;
-         isunit = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
+         isunit = ae_randombool();
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_complex[i][j].x = ae_randomreal() - 0.5;
-               a.ptr.pp_complex[i][j].y = ae_randomreal() - 0.5;
+               a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randomreal() - 0.5, ae_randomreal() - 0.5);
             }
          }
          for (i = 0; i < n; i++) {
-            a.ptr.pp_complex[i][i].x = 1 + ae_randomreal();
-            a.ptr.pp_complex[i][i].y = 1 + ae_randomreal();
+            a.ptr.pp_complex[i][i] = ae_complex_from_d(1 + ae_randomreal(), 1 + ae_randomreal());
          }
          testrcondunit_cmatrixmakeacopy(&a, n, n, &ea);
          for (i = 0; i < n; i++) {
@@ -10944,8 +10904,8 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          a.ptr.pp_complex[0][0] = ae_complex_from_i(1);
          a.ptr.pp_complex[n - 1][n - 1] = ae_complex_from_i(1);
-         errspec = errspec || cmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-         errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+         errspec = errspec || cmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+         errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
       }
    // near-degenerate matrix test
       if (n >= 2) {
@@ -10960,12 +10920,12 @@ static bool testrcondunit_testcmatrixtrrcond(ae_int_t maxn, ae_int_t passcount) 
          }
          i = ae_randominteger(n);
          a.ptr.pp_complex[i][i] = ae_complex_from_d(0.1 * ae_maxrealnumber);
-         errspec = errspec || cmatrixtrrcond1(&a, n, ae_randomreal() > 0.5, false) != 0.0;
-         errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randomreal() > 0.5, false) != 0.0;
+         errspec = errspec || cmatrixtrrcond1(&a, n, ae_randombool(), false) != 0.0;
+         errspec = errspec || cmatrixtrrcondinf(&a, n, ae_randombool(), false) != 0.0;
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -11093,7 +11053,7 @@ static bool testrcondunit_testrmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -11127,7 +11087,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
    ae_vector_set_length(&q50, 2);
    ae_vector_set_length(&q90, 2);
    for (n = 1; n <= maxn; n++) {
-      isupper = ae_randomreal() > 0.5;
+      isupper = ae_randombool();
    // general test
       ae_matrix_set_length(&a, n, n);
       for (i = 0; i <= 1; i++) {
@@ -11194,7 +11154,7 @@ static bool testrcondunit_testspdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -11323,7 +11283,7 @@ static bool testrcondunit_testcmatrixrcond(ae_int_t maxn, ae_int_t passcount) {
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -11357,7 +11317,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
    ae_vector_set_length(&q50, 2);
    ae_vector_set_length(&q90, 2);
    for (n = 1; n <= maxn; n++) {
-      isupper = ae_randomreal() > 0.5;
+      isupper = ae_randombool();
    // general test
       ae_matrix_set_length(&a, n, n);
       for (i = 0; i <= 1; i++) {
@@ -11424,7 +11384,7 @@ static bool testrcondunit_testhpdmatrixrcond(ae_int_t maxn, ae_int_t passcount) 
       }
    }
 // report
-   result = !(((err50 || err90) || errless) || errspec);
+   result = !(err50 || err90 || errless || errspec);
    ae_frame_leave();
    return result;
 }
@@ -11449,7 +11409,7 @@ bool testrcond(bool silent) {
    cerr = !testrcondunit_testcmatrixrcond(maxn, passcount);
    spderr = !testrcondunit_testspdmatrixrcond(maxn, passcount);
    hpderr = !testrcondunit_testhpdmatrixrcond(maxn, passcount);
-   waserrors = ((((rtrerr || ctrerr) || rerr) || cerr) || spderr) || hpderr;
+   waserrors = rtrerr || ctrerr || rerr || cerr || spderr || hpderr;
    if (!silent || waserrors) {
       printf("TESTING RCOND\n");
       printf("REAL TRIANGULAR:                         ");
@@ -11763,7 +11723,7 @@ static void testmatinvunit_testrtrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                   if (i == j) {
                      a.ptr.pp_double[i][i] = 1 + ae_randomreal();
                   } else {
-                     a.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+                     a.ptr.pp_double[i][j] = 0.1 * ae_randommid();
                   }
                   b.ptr.pp_double[i][j] = a.ptr.pp_double[i][j];
                }
@@ -11855,11 +11815,9 @@ static void testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
                   if (i == j) {
-                     a.ptr.pp_complex[i][i].x = 1 + ae_randomreal();
-                     a.ptr.pp_complex[i][i].y = 1 + ae_randomreal();
+                     a.ptr.pp_complex[i][i] = ae_complex_from_d(1 + ae_randomreal(), 1 + ae_randomreal());
                   } else {
-                     a.ptr.pp_complex[i][j].x = 0.2 * ae_randomreal() - 0.1;
-                     a.ptr.pp_complex[i][j].y = 0.2 * ae_randomreal() - 0.1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(0.1 * ae_randommid(), 0.1 * ae_randommid());
                   }
                   b.ptr.pp_complex[i][j] = a.ptr.pp_complex[i][j];
                }
@@ -11925,7 +11883,7 @@ static void testmatinvunit_testctrinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // Unsets real matrix
 static void testmatinvunit_unset2d(RMatrix x) {
    ae_matrix_set_length(x, 1, 1);
-   x->ptr.pp_double[0][0] = 2 * ae_randomreal() - 1;
+   x->ptr.pp_double[0][0] = ae_randommid();
 }
 
 // Unsets report
@@ -12005,7 +11963,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = ae_randominteger(n);
@@ -12016,7 +11974,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = ae_randominteger(n);
@@ -12030,7 +11988,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = 1 + ae_randominteger(n - 1);
@@ -12044,7 +12002,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = 1 + ae_randominteger(n - 1);
@@ -12069,7 +12027,7 @@ static void testmatinvunit_testrinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
 // Unsets real matrix
 static void testmatinvunit_cunset2d(CMatrix x) {
    ae_matrix_set_length(x, 1, 1);
-   x->ptr.pp_complex[0][0] = ae_complex_from_d(2 * ae_randomreal() - 1);
+   x->ptr.pp_complex[0][0] = ae_complex_from_d(ae_randommid());
 }
 
 // Complex test
@@ -12143,8 +12101,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = ae_randominteger(n);
@@ -12155,8 +12112,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = ae_randominteger(n);
@@ -12170,8 +12126,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = 1 + ae_randominteger(n - 1);
@@ -12185,8 +12140,7 @@ static void testmatinvunit_testcinv(ae_int_t minn, ae_int_t maxn, ae_int_t passc
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = 1 + ae_randominteger(n - 1);
@@ -12230,7 +12184,7 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // * test least squares solver
    for (pass = 1; pass <= passcount; pass++) {
       for (n = minn; n <= maxn; n++) {
-         isupper = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
       // ********************************************************
       // WELL CONDITIONED TASKS
       // ability to find correct solution is tested
@@ -12282,7 +12236,7 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = ae_randominteger(n);
@@ -12293,7 +12247,7 @@ static void testmatinvunit_testspdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                k = ae_randominteger(n);
@@ -12336,7 +12290,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
 // * test least squares solver
    for (pass = 1; pass <= passcount; pass++) {
       for (n = minn; n <= maxn; n++) {
-         isupper = ae_randomreal() > 0.5;
+         isupper = ae_randombool();
       // ********************************************************
       // WELL CONDITIONED TASKS
       // ability to find correct solution is tested
@@ -12388,8 +12342,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = ae_randominteger(n);
@@ -12401,8 +12354,7 @@ static void testmatinvunit_testhpdinv(ae_int_t minn, ae_int_t maxn, ae_int_t pas
                ae_matrix_set_length(&a, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                     a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                   }
                }
                k = ae_randominteger(n);
@@ -12462,7 +12414,7 @@ bool testmatinv(bool silent) {
    testmatinvunit_testspdinv(largen, largen, passcount, threshold, &spderrors);
    testmatinvunit_testcinv(largen, largen, passcount, threshold, &cerrors);
    testmatinvunit_testhpdinv(largen, largen, passcount, threshold, &hpderrors);
-   waserrors = ((((rtrerrors || ctrerrors) || rerrors) || cerrors) || spderrors) || hpderrors;
+   waserrors = rtrerrors || ctrerrors || rerrors || cerrors || spderrors || hpderrors;
    if (!silent || waserrors) {
       printf("TESTING MATINV\n");
       printf("* REAL TRIANGULAR:                        ");
@@ -12549,11 +12501,9 @@ bool testhblas(bool silent) {
       ae_vector_set_length(&y3, n + 1);
    // fill A, UA, LA
       for (i = 1; i <= n; i++) {
-         a.ptr.pp_complex[i][i].x = 2 * ae_randomreal() - 1;
-         a.ptr.pp_complex[i][i].y = 0.0;
+         a.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
          for (j = i + 1; j <= n; j++) {
-            a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             a.ptr.pp_complex[j][i] = ae_c_conj(a.ptr.pp_complex[i][j]);
          }
       }
@@ -12582,11 +12532,9 @@ bool testhblas(bool silent) {
          for (i2 = i1; i2 <= n; i2++) {
          // Fill X, choose Alpha
             for (i = 1; i <= i2 - i1 + 1; i++) {
-               x.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-               x.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+               x.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
             }
-            alpha.x = 2 * ae_randomreal() - 1;
-            alpha.y = 2 * ae_randomreal() - 1;
+            alpha = ae_complex_from_d(ae_randommid(), ae_randommid());
          // calculate A*x, UA*x, LA*x
             for (i = i1; i <= i2; i++) {
                v = ae_v_cdotproduct(&a.ptr.pp_complex[i][i1], 1, "N", &x.ptr.p_complex[1], 1, "N", i2 - i1 + 1);
@@ -12660,9 +12608,9 @@ bool testsblas(bool silent) {
       ae_vector_set_length(&y3, n + 1);
    // fill A, UA, LA
       for (i = 1; i <= n; i++) {
-         a.ptr.pp_double[i][i] = 2 * ae_randomreal() - 1;
+         a.ptr.pp_double[i][i] = ae_randommid();
          for (j = i + 1; j <= n; j++) {
-            a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            a.ptr.pp_double[i][j] = ae_randommid();
             a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
          }
       }
@@ -12691,9 +12639,9 @@ bool testsblas(bool silent) {
          for (i2 = i1; i2 <= n; i2++) {
          // Fill X, choose Alpha
             for (i = 1; i <= i2 - i1 + 1; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
-            alpha = 2 * ae_randomreal() - 1;
+            alpha = ae_randommid();
          // calculate A*x, UA*x, LA*x
             for (i = i1; i <= i2; i++) {
                v = ae_v_dotproduct(&a.ptr.pp_double[i][i1], 1, &x.ptr.p_double[1], 1, i2 - i1 + 1);
@@ -12771,31 +12719,30 @@ static void testortfacunit_cmatrixmakeacopy(CMatrix a, ae_int_t m, ae_int_t n, C
 }
 
 // Sparse fill
-static void testortfacunit_rmatrixfillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparcity) {
+static void testortfacunit_rmatrixfillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparsity) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (ae_randomreal() >= sparcity) {
-            a->ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-         } else {
+         if (ae_randombool(sparsity)) {
             a->ptr.pp_double[i][j] = 0.0;
+         } else {
+            a->ptr.pp_double[i][j] = ae_randommid();
          }
       }
    }
 }
 
 // Sparse fill
-static void testortfacunit_cmatrixfillsparsea(CMatrix a, ae_int_t m, ae_int_t n, double sparcity) {
+static void testortfacunit_cmatrixfillsparsea(CMatrix a, ae_int_t m, ae_int_t n, double sparsity) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (ae_randomreal() >= sparcity) {
-            a->ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            a->ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-         } else {
+         if (ae_randombool(sparsity)) {
             a->ptr.pp_complex[i][j] = ae_complex_from_i(0);
+         } else {
+            a->ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
    }
@@ -13241,7 +13188,7 @@ static void testortfacunit_testrbdproblem(RMatrix a, ae_int_t m, ae_int_t n, dou
    ae_matrix_set_length(&r2, ae_maxint(m, n), ae_maxint(m, n));
    for (i = 0; i < ae_maxint(m, n); i++) {
       for (j = 0; j < ae_maxint(m, n); j++) {
-         x.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         x.ptr.pp_double[i][j] = ae_randommid();
       }
    }
    mtsize = 1 + ae_randominteger(ae_maxint(m, n));
@@ -13626,7 +13573,7 @@ bool testortfac(bool silent) {
    // Matrix types: zero, dense, sparse
       n = 1 + ae_randominteger(mx);
       m = 1 + ae_randominteger(mx);
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -13646,9 +13593,8 @@ bool testortfac(bool silent) {
       testortfacunit_testrbdproblem(&ra, m, n, threshold, &rbderrors);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors);
@@ -13676,9 +13622,8 @@ bool testortfac(bool silent) {
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors);
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors);
@@ -13699,15 +13644,14 @@ bool testortfac(bool silent) {
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors);
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             ra.ptr.pp_double[j][i] = ra.ptr.pp_double[i][j];
             ca.ptr.pp_complex[j][i] = ae_c_conj(ca.ptr.pp_complex[i][j]);
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.ptr.pp_complex[i][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         ca.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors);
@@ -13720,7 +13664,7 @@ bool testortfac(bool silent) {
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.ptr.pp_complex[i][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         ca.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors);
@@ -13731,7 +13675,7 @@ bool testortfac(bool silent) {
    // Matrix types: dense
       n = 1 + ae_randominteger(mx);
       m = 1 + ae_randominteger(mx);
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          n = mx;
       } else {
          m = mx;
@@ -13740,9 +13684,8 @@ bool testortfac(bool silent) {
       ae_matrix_set_length(&ca, m, n);
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       testortfacunit_testrqrproblem(&ra, m, n, threshold, &rqrerrors);
@@ -13756,9 +13699,8 @@ bool testortfac(bool silent) {
       ae_matrix_set_length(&ca, mx, mx);
       for (i = 0; i < mx; i++) {
          for (j = 0; j < mx; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
       testortfacunit_testrhessproblem(&ra, mx, threshold, &rhesserrors);
@@ -13768,21 +13710,20 @@ bool testortfac(bool silent) {
       ae_matrix_set_length(&ca, mx, mx);
       for (i = 0; i < mx; i++) {
          for (j = i; j < mx; j++) {
-            ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            ra.ptr.pp_double[i][j] = ae_randommid();
+            ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
             ra.ptr.pp_double[j][i] = ra.ptr.pp_double[i][j];
             ca.ptr.pp_complex[j][i] = ae_c_conj(ca.ptr.pp_complex[i][j]);
          }
       }
       for (i = 0; i < mx; i++) {
-         ca.ptr.pp_complex[i][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         ca.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
       }
       testortfacunit_testrtdproblem(&ra, mx, threshold, &rtderrors);
       testortfacunit_testctdproblem(&ca, mx, threshold, &ctderrors);
    }
 // report
-   waserrors = ((((((rqrerrors || rlqerrors) || cqrerrors) || clqerrors) || rbderrors) || rhesserrors) || rtderrors) || ctderrors;
+   waserrors = rqrerrors || rlqerrors || cqrerrors || clqerrors || rbderrors || rhesserrors || rtderrors || ctderrors;
    if (!silent || waserrors) {
       printf("TESTING ORTFAC UNIT\n");
       printf("RQR ERRORS:                              ");
@@ -13902,13 +13843,13 @@ bool testfbls(bool silent) {
       // X is initialized in such way that is has no chances to be equal to XE.
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          alpha = ae_randomreal() + 0.1;
          for (i = 0; i < n; i++) {
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
+            xe.ptr.p_double[i] = ae_randommid();
             x.ptr.p_double[i] = (2 * ae_randominteger(2) - 1) * (2 + ae_randomreal());
          }
       // Test dense CG (which solves A'A*x=b and accepts dense A)
@@ -13975,18 +13916,18 @@ bool testfbls(bool silent) {
          ae_matrix_set_length(&a, m, n);
          for (i = 0; i < m - n; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          for (i = m - n; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 0.01 * (2 * ae_randomreal() - 1);
+               a.ptr.pp_double[i][j] = 0.01 * ae_randommid();
             }
             a.ptr.pp_double[i][i - (m - n)] = 1.0;
          }
          ae_vector_set_length(&xe, n);
          for (i = 0; i < n; i++) {
-            xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xe.ptr.p_double[i] = ae_randommid();
          }
          ae_vector_set_length(&b, m);
          for (i = 0; i < m; i++) {
@@ -14010,13 +13951,13 @@ bool testfbls(bool silent) {
       ae_vector_set_length(&buf, n);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.ptr.pp_double[i][j] = 0.01 * (ae_randomreal() - 0.5);
+            a.ptr.pp_double[i][j] = 0.005 * ae_randommid();
          }
          a.ptr.pp_double[i][i] = 1 + ae_randomreal();
          xe.ptr.p_double[i] = ae_randomreal() - 0.5;
       }
       scalea = pow(10.0, ae_randomreal() * 4 - 2);
-      uppera = ae_randomreal() > 0.5;
+      uppera = ae_randombool();
       for (i = 0; i < n; i++) {
          if (uppera) {
             for (j = 0; j < i; j++) {
@@ -14149,23 +14090,23 @@ bool testcqmodels(bool silent) {
          tau = ae_randomreal() * ae_randominteger(2);
          for (i = 0; i < n; i++) {
             a.ptr.pp_double[i][i] = 10 * (1 + ae_randomreal());
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
             d.ptr.p_double[i] = ae_randomreal() + 1;
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * ae_randomreal() - 0.05;
+               v = 0.05 * ae_randommid();
                a.ptr.pp_double[i][j] = v;
                a.ptr.pp_double[j][i] = v;
             }
             for (j = 0; j < k; j++) {
-               q.ptr.pp_double[j][i] = 2 * ae_randomreal() - 1;
+               q.ptr.pp_double[j][i] = ae_randommid();
             }
          }
          for (i = 0; i < k; i++) {
-            r.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            r.ptr.p_double[i] = ae_randommid();
          }
       // Build model
          cqminit(n, &s);
-         cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+         cqmseta(&s, &a, ae_randombool(), alpha);
          cqmsetb(&s, &b);
          cqmsetq(&s, &q, &r, k, theta);
          cqmsetd(&s, &d, tau);
@@ -14176,7 +14117,7 @@ bool testcqmodels(bool silent) {
       // * ADXE       -   (alpha*A+tau*D)*x
       // * V          -   model value at X
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
             ge.ptr.p_double[i] = 0.0;
          }
          v = 0.0;
@@ -14243,29 +14184,29 @@ bool testcqmodels(bool silent) {
          theta = ae_randomreal() + 1.0;
          for (i = 0; i < n; i++) {
             a.ptr.pp_double[i][i] = 10 * (1 + ae_randomreal());
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            activeset.ptr.p_bool[i] = ae_randomreal() > 0.5;
+            b.ptr.p_double[i] = ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            activeset.ptr.p_bool[i] = ae_randombool();
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * ae_randomreal() - 0.05;
+               v = 0.05 * ae_randommid();
                a.ptr.pp_double[i][j] = v;
                a.ptr.pp_double[j][i] = v;
             }
             for (j = 0; j < k; j++) {
-               q.ptr.pp_double[j][i] = 2 * ae_randomreal() - 1;
+               q.ptr.pp_double[j][i] = ae_randommid();
             }
          }
          for (i = 0; i < k; i++) {
-            r.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            r.ptr.p_double[i] = ae_randommid();
          }
       // Build model, evaluate at random point X, compare
          cqminit(n, &s);
-         cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+         cqmseta(&s, &a, ae_randombool(), alpha);
          cqmsetb(&s, &b);
          cqmsetq(&s, &q, &r, k, theta);
          cqmsetactiveset(&s, &xc, &activeset);
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
             if (!activeset.ptr.p_bool[i]) {
                xc.ptr.p_double[i] = x.ptr.p_double[i];
             }
@@ -14311,7 +14252,7 @@ bool testcqmodels(bool silent) {
          activeset.ptr.p_bool[i] = false;
          d.ptr.p_double[i] = 1.0;
          b.ptr.p_double[i] = 0.0;
-         xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         xc.ptr.p_double[i] = ae_randommid();
          for (j = 0; j < n; j++) {
             a.ptr.pp_double[i][j] = 0.0;
          }
@@ -14339,14 +14280,14 @@ bool testcqmodels(bool silent) {
                   alpha = 1.0 + ae_randomreal();
                   for (i = 0; i < n; i++) {
                      for (j = i + 1; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+                        a.ptr.pp_double[i][j] = 0.1 * ae_randommid();
                         a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      }
                   }
                   for (i = 0; i < n; i++) {
                      a.ptr.pp_double[i][i] = 4 + 2 * ae_randomreal();
                   }
-                  cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+                  cqmseta(&s, &a, ae_randombool(), alpha);
                }
                tau = 0.0;
                for (i = 0; i < n; i++) {
@@ -14359,14 +14300,14 @@ bool testcqmodels(bool silent) {
                   alpha = 1.0 + ae_randomreal();
                   for (i = 0; i < n; i++) {
                      for (j = i + 1; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+                        a.ptr.pp_double[i][j] = 0.1 * ae_randommid();
                         a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      }
                   }
                   for (i = 0; i < n; i++) {
                      a.ptr.pp_double[i][i] = 4 + 2 * ae_randomreal();
                   }
-                  cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+                  cqmseta(&s, &a, ae_randombool(), alpha);
                } else {
                   if (mkind == 3.0) {
                   // Set zero A.
@@ -14384,12 +14325,12 @@ bool testcqmodels(bool silent) {
                            a.ptr.pp_double[i][j] = 0.0;
                         }
                      }
-                     cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+                     cqmseta(&s, &a, ae_randombool(), alpha);
                   } else {
                      if (mkind == 4.0) {
                      // Set B.
                         for (i = 0; i < n; i++) {
-                           b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                           b.ptr.p_double[i] = ae_randommid();
                         }
                         cqmsetb(&s, &b);
                      } else {
@@ -14398,9 +14339,9 @@ bool testcqmodels(bool silent) {
                            k = ae_randominteger(kmax + 1);
                            theta = 1.0 + ae_randomreal();
                            for (i = 0; i < k; i++) {
-                              r.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                              r.ptr.p_double[i] = ae_randommid();
                               for (j = 0; j < n; j++) {
-                                 q.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                                 q.ptr.pp_double[i][j] = ae_randommid();
                               }
                            }
                            cqmsetq(&s, &q, &r, k, theta);
@@ -14408,8 +14349,8 @@ bool testcqmodels(bool silent) {
                            if (mkind == 6.0) {
                            // Set active set
                               for (i = 0; i < n; i++) {
-                                 activeset.ptr.p_bool[i] = ae_randomreal() > 0.5;
-                                 xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                                 activeset.ptr.p_bool[i] = ae_randombool();
+                                 xc.ptr.p_double[i] = ae_randommid();
                               }
                               cqmsetactiveset(&s, &xc, &activeset);
                            } else {
@@ -14434,7 +14375,7 @@ bool testcqmodels(bool silent) {
       // generate random point with respect to constraints,
       // test model at this point
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
             if (activeset.ptr.p_bool[i]) {
                x.ptr.p_double[i] = xc.ptr.p_double[i];
             }
@@ -14489,10 +14430,10 @@ bool testcqmodels(bool silent) {
       //        = 0.5*x'*A*x + (-x0'*A)*x + 0.5*x0'*A*x0'
          alpha = ae_randomreal() + 1.0;
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
             a.ptr.pp_double[i][i] = 10 * (1 + ae_randomreal());
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * ae_randomreal() - 0.05;
+               v = 0.05 * ae_randommid();
                a.ptr.pp_double[i][j] = v;
                a.ptr.pp_double[j][i] = v;
             }
@@ -14504,14 +14445,14 @@ bool testcqmodels(bool silent) {
          theta = ae_randomreal() + 1.0;
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               q.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               q.ptr.pp_double[i][j] = ae_randommid();
             }
             v = ae_v_dotproduct(q.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             r.ptr.p_double[i] = v;
          }
       // Build model, evaluate at random point X, compare
          cqminit(n, &s);
-         cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+         cqmseta(&s, &a, ae_randombool(), alpha);
          cqmsetb(&s, &b);
          cqmsetq(&s, &q, &r, k, theta);
          cqmconstrainedoptimum(&s, &x);
@@ -14540,11 +14481,11 @@ bool testcqmodels(bool silent) {
          alpha = ae_randomreal() + 1.0;
          for (i = 0; i < n; i++) {
             a.ptr.pp_double[i][i] = 10 * (1 + ae_randomreal());
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            activeset.ptr.p_bool[i] = ae_randomreal() > 0.5;
+            b.ptr.p_double[i] = ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            activeset.ptr.p_bool[i] = ae_randombool();
             for (j = i + 1; j < n; j++) {
-               v = 0.1 * ae_randomreal() - 0.05;
+               v = 0.05 * ae_randommid();
                a.ptr.pp_double[i][j] = v;
                a.ptr.pp_double[j][i] = v;
             }
@@ -14552,13 +14493,13 @@ bool testcqmodels(bool silent) {
          theta = ae_randomreal() + 1.0;
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               q.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               q.ptr.pp_double[i][j] = ae_randommid();
             }
-            r.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            r.ptr.p_double[i] = ae_randommid();
          }
       // Build model, find solution
          cqminit(n, &s);
-         cqmseta(&s, &a, ae_randomreal() > 0.5, alpha);
+         cqmseta(&s, &a, ae_randombool(), alpha);
          cqmsetb(&s, &b);
          cqmsetq(&s, &q, &r, k, theta);
          cqmsetactiveset(&s, &xc, &activeset);
@@ -14567,7 +14508,7 @@ bool testcqmodels(bool silent) {
          // and that solution is true optimum
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
-               newton1errors = newton1errors || (activeset.ptr.p_bool[i] && x.ptr.p_double[i] != xc.ptr.p_double[i]);
+               newton1errors = newton1errors || activeset.ptr.p_bool[i] && x.ptr.p_double[i] != xc.ptr.p_double[i];
                if (!activeset.ptr.p_bool[i]) {
                   v = x.ptr.p_double[i];
                   x.ptr.p_double[i] = v + h;
@@ -14612,15 +14553,15 @@ bool testcqmodels(bool silent) {
          tau = 1 + ae_randomreal();
          theta = 1 + ae_randomreal();
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
             d.ptr.p_double[i] = 1 + ae_randomreal();
             b.ptr.p_double[i] = -x0.ptr.p_double[i] * tau * d.ptr.p_double[i];
-            activeset.ptr.p_bool[i] = ae_randomreal() > 0.5;
+            activeset.ptr.p_bool[i] = ae_randombool();
          }
          for (i = 0; i < k; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               q.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               q.ptr.pp_double[i][j] = ae_randommid();
                v += q.ptr.pp_double[i][j] * x0.ptr.p_double[j];
             }
             r.ptr.p_double[i] = v;
@@ -14636,15 +14577,15 @@ bool testcqmodels(bool silent) {
          // and that solution is true optimum
             f0 = cqmeval(&s, &x);
             for (i = 0; i < n; i++) {
-               newton2errors = newton2errors || (activeset.ptr.p_bool[i] && x.ptr.p_double[i] != x0.ptr.p_double[i]);
-               newton2errors = newton2errors || (!activeset.ptr.p_bool[i] && fabs(x.ptr.p_double[i] - x0.ptr.p_double[i]) > 1000 * ae_machineepsilon);
+               newton2errors = newton2errors || activeset.ptr.p_bool[i] && x.ptr.p_double[i] != x0.ptr.p_double[i];
+               newton2errors = newton2errors || !activeset.ptr.p_bool[i] && fabs(x.ptr.p_double[i] - x0.ptr.p_double[i]) > 1000 * ae_machineepsilon;
             }
          // Check that constrained evaluation at some point gives correct results
             for (i = 0; i < n; i++) {
                if (activeset.ptr.p_bool[i]) {
                   x.ptr.p_double[i] = x0.ptr.p_double[i];
                } else {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                }
             }
             v = 0.0;
@@ -14734,22 +14675,22 @@ static void testbdsvdunit_fillidentity(RMatrix a, ae_int_t n) {
    }
 }
 
-static void testbdsvdunit_fillsparsede(RVector d, RVector e, ae_int_t n, double sparcity) {
+static void testbdsvdunit_fillsparsede(RVector d, RVector e, ae_int_t n, double sparsity) {
    ae_int_t i;
    ae_vector_set_length(d, n);
    ae_vector_set_length(e, ae_maxint(0, n - 2) + 1);
    for (i = 0; i < n; i++) {
-      if (ae_randomreal() >= sparcity) {
-         d->ptr.p_double[i] = 2 * ae_randomreal() - 1;
-      } else {
+      if (ae_randombool(sparsity)) {
          d->ptr.p_double[i] = 0.0;
+      } else {
+         d->ptr.p_double[i] = ae_randommid();
       }
    }
    for (i = 0; i < n - 1; i++) {
-      if (ae_randomreal() >= sparcity) {
-         e->ptr.p_double[i] = 2 * ae_randomreal() - 1;
-      } else {
+      if (ae_randombool(sparsity)) {
          e->ptr.p_double[i] = 0.0;
+      } else {
+         e->ptr.p_double[i] = ae_randommid();
       }
    }
 }
@@ -15083,10 +15024,10 @@ bool testbdsvd(bool silent) {
    for (n = 1; n <= maxn; n++) {
       for (pass = 1; pass <= 10; pass++) {
          for (i = 0; i < maxn; i++) {
-            d.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            d.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < maxn - 1; i++) {
-            e.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            e.ptr.p_double[i] = ae_randommid();
          }
          testbdsvdunit_testbdsvdproblem(&d, &e, n, &materr, &orterr, &wsorted, &wfailed, &failcount, &succcount);
       }
@@ -15106,7 +15047,7 @@ bool testbdsvd(bool silent) {
    }
 // report
    failr = (double)failcount / (double)(succcount + failcount);
-   waserrors = ((wfailed || materr > threshold) || orterr > threshold) || !wsorted;
+   waserrors = wfailed || materr > threshold || orterr > threshold || !wsorted;
    if (!silent || waserrors) {
       printf("TESTING BIDIAGONAL SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", (double)materr);
@@ -15275,7 +15216,7 @@ bool testblas(bool silent) {
       ae_vector_set_length(&x1, i2 + 1);
       ae_vector_set_length(&x2, i2 + 1);
       for (i = i1; i <= i2; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
       }
       v = 0.0;
       for (i = i1; i <= i2; i++) {
@@ -15308,7 +15249,7 @@ bool testblas(bool silent) {
    ae_matrix_set_length(&a, n + 1, n + 1);
    for (i = 1; i <= n; i++) {
       for (j = 1; j <= n; j++) {
-         a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         a.ptr.pp_double[i][j] = ae_randommid();
       }
    }
    was1 = false;
@@ -15456,8 +15397,8 @@ bool testblas(bool silent) {
       j2 = 1 + ae_randominteger(n);
       i3 = 1 + ae_randominteger(n);
       j3 = 1 + ae_randominteger(n);
-      trans1 = ae_randomreal() > 0.5;
-      trans2 = ae_randomreal() > 0.5;
+      trans1 = ae_randombool();
+      trans2 = ae_randombool();
       if (trans1) {
          col1 = l;
          row1 = k;
@@ -15489,7 +15430,7 @@ bool testblas(bool silent) {
    }
    mmerrors = was1;
 // report
-   waserrors = (((((n2errors || amaxerrors) || hsnerrors) || mverrors) || iterrors) || cterrors) || mmerrors;
+   waserrors = n2errors || amaxerrors || hsnerrors || mverrors || iterrors || cterrors || mmerrors;
    if (!silent || waserrors) {
       printf("TESTING BLAS\n");
       printf("VectorNorm2:                             ");
@@ -15547,15 +15488,15 @@ bool testblas(bool silent) {
 }
 
 // === svd testing unit ===
-static void testsvdunit_fillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparcity) {
+static void testsvdunit_fillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparsity) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (ae_randomreal() >= sparcity) {
-            a->ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-         } else {
+         if (ae_randombool(sparsity)) {
             a->ptr.pp_double[i][j] = 0.0;
+         } else {
+            a->ptr.pp_double[i][j] = ae_randommid();
          }
       }
    }
@@ -15727,7 +15668,7 @@ bool testsvd(bool silent) {
    // Long dense matrix
       for (i = 0; i < maxmn; i++) {
          for (j = 0; j < ae_minint(5, maxmn); j++) {
-            a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            a.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       for (i = 1; i <= maxmn; i++) {
@@ -15737,7 +15678,7 @@ bool testsvd(bool silent) {
       }
       for (i = 0; i < ae_minint(5, maxmn); i++) {
          for (j = 0; j < maxmn; j++) {
-            a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            a.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       for (i = 1; i <= ae_minint(5, maxmn); i++) {
@@ -15750,7 +15691,7 @@ bool testsvd(bool silent) {
          for (n = 1; n <= ae_minint(10, maxmn); n++) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  a.ptr.pp_double[i][j] = ae_randommid();
                }
             }
             testsvdunit_testsvdproblem(&a, m, n, &materr, &orterr, &othererr, &wsorted, &wfailed, &failcount, &succcount);
@@ -15772,7 +15713,7 @@ bool testsvd(bool silent) {
    }
 // report
    failr = (double)failcount / (double)(succcount + failcount);
-   waserrors = (((wfailed || materr > threshold) || orterr > threshold) || othererr > threshold) || !wsorted;
+   waserrors = wfailed || materr > threshold || orterr > threshold || othererr > threshold || !wsorted;
    if (!silent || waserrors) {
       printf("TESTING SVD DECOMPOSITION\n");
       printf("SVD decomposition error:                 %5.3e\n", (double)materr);
@@ -16219,7 +16160,7 @@ bool testsnnls(bool silent) {
                ae_matrix_set_length(&densea, nr, nd);
                for (i = 0; i < nr; i++) {
                   for (j = 0; j < nd; j++) {
-                     densea.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     densea.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
             }
@@ -16239,11 +16180,11 @@ bool testsnnls(bool silent) {
             }
             ae_vector_set_length(&b, nr);
             for (i = 0; i < nr; i++) {
-               b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               b.ptr.p_double[i] = ae_randommid();
             }
             ae_vector_set_length(&isconstrained, ns + nd);
             for (i = 0; i < ns + nd; i++) {
-               isconstrained.ptr.p_bool[i] = ae_randomreal() > 0.5;
+               isconstrained.ptr.p_bool[i] = ae_randombool();
             }
          // Solve with SNNLS solver
             snnlsinit(0, 0, 0, &s);
@@ -16449,7 +16390,7 @@ bool testsnnls(bool silent) {
       }
    }
 // report
-   waserrors = ((test0errors || test1errors) || test2errors) || testnewtonerrors;
+   waserrors = test0errors || test1errors || test2errors || testnewtonerrors;
    if (!silent || waserrors) {
       printf("TESTING SPECIAL NNLS SOLVER\n");
       printf("TEST 0:                                   ");
@@ -16732,15 +16673,15 @@ bool testxblas(bool silent) {
          ae_vector_set_length(&ry, n);
          ae_vector_set_length(&temp, n);
          for (i = 0; i < n; i++) {
-            if (ae_randomreal() > 0.2) {
-               rx.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            } else {
+            if (ae_randombool(0.2)) {
                rx.ptr.p_double[i] = 0.0;
-            }
-            if (ae_randomreal() > 0.2) {
-               ry.ptr.p_double[i] = 2 * ae_randomreal() - 1;
             } else {
+               rx.ptr.p_double[i] = ae_randommid();
+            }
+            if (ae_randombool(0.2)) {
                ry.ptr.p_double[i] = 0.0;
+            } else {
+               ry.ptr.p_double[i] = ae_randommid();
             }
          }
          rv1 = ae_v_dotproduct(rx.ptr.p_double, 1, ry.ptr.p_double, 1, n);
@@ -16751,17 +16692,15 @@ bool testxblas(bool silent) {
          ae_vector_set_length(&cy, n);
          ae_vector_set_length(&temp, 2 * n);
          for (i = 0; i < n; i++) {
-            if (ae_randomreal() > 0.2) {
-               cx.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-               cx.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
-            } else {
+            if (ae_randombool(0.2)) {
                cx.ptr.p_complex[i] = ae_complex_from_i(0);
-            }
-            if (ae_randomreal() > 0.2) {
-               cy.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-               cy.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
             } else {
+               cx.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
+            }
+            if (ae_randombool(0.2)) {
                cy.ptr.p_complex[i] = ae_complex_from_i(0);
+            } else {
+               cy.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
             }
          }
          cv1 = ae_v_cdotproduct(cx.ptr.p_complex, 1, "N", cy.ptr.p_complex, 1, "N", n);
@@ -16781,7 +16720,7 @@ bool testxblas(bool silent) {
       if (pass == passcount - 1 && pass > 1) {
          s = ae_maxrealnumber;
       }
-      ry.ptr.p_double[0] = (2 * ae_randomreal() - 1) * s * sqrt(2 * ae_randomreal());
+      ry.ptr.p_double[0] = ae_randommid() * s * sqrt(2 * ae_randomreal());
       for (i = 1; i < n; i++) {
          ry.ptr.p_double[i] = ry.ptr.p_double[0];
       }
@@ -16801,7 +16740,7 @@ bool testxblas(bool silent) {
       if (pass == passcount - 1 && pass > 1) {
          s = ae_maxrealnumber;
       }
-      ry.ptr.p_double[0] = (2 * ae_randomreal() - 1) * s * sqrt(2 * ae_randomreal());
+      ry.ptr.p_double[0] = ae_randommid() * s * sqrt(2 * ae_randomreal());
       for (i = 1; i < n; i++) {
          ry.ptr.p_double[i] = ry.ptr.p_double[0];
       }
@@ -16825,8 +16764,7 @@ bool testxblas(bool silent) {
       if (pass == passcount - 1 && pass > 1) {
          s = ae_maxrealnumber;
       }
-      cy.ptr.p_complex[0].x = (2 * ae_randomreal() - 1) * s * sqrt(2 * ae_randomreal());
-      cy.ptr.p_complex[0].y = (2 * ae_randomreal() - 1) * s * sqrt(2 * ae_randomreal());
+      cy.ptr.p_complex[0] = ae_complex_from_d(ae_randommid() * s * sqrt(2 * ae_randomreal()), ae_randommid() * s * sqrt(2 * ae_randomreal()));
       for (i = 1; i < n; i++) {
          cy.ptr.p_complex[i] = cy.ptr.p_complex[0];
       }
@@ -16846,7 +16784,7 @@ bool testxblas(bool silent) {
       if (pass == passcount - 1 && pass > 1) {
          s = ae_maxrealnumber;
       }
-      cy.ptr.p_complex[0] = ae_complex_from_d((2 * ae_randomreal() - 1) * s * sqrt(2 * ae_randomreal()));
+      cy.ptr.p_complex[0] = ae_complex_from_d(ae_randommid() * s * sqrt(2 * ae_randomreal()));
       for (i = 1; i < n; i++) {
          cy.ptr.p_complex[i] = cy.ptr.p_complex[0];
       }
@@ -17227,13 +17165,13 @@ static void testdirectdensesolversunit_cmatrixdrophalf(CMatrix a, ae_int_t n, bo
 // Unsets real vector
 static void testdirectdensesolversunit_unset1d(RVector x) {
    ae_vector_set_length(x, 1);
-   x->ptr.p_double[0] = 2 * ae_randomreal() - 1;
+   x->ptr.p_double[0] = ae_randommid();
 }
 
 // Unsets real matrix
 static void testdirectdensesolversunit_unset2d(RMatrix x) {
    ae_matrix_set_length(x, 1, 1);
-   x->ptr.pp_double[0][0] = 2 * ae_randomreal() - 1;
+   x->ptr.pp_double[0][0] = ae_randommid();
 }
 
 // Unsets report
@@ -17298,7 +17236,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             ae_matrix_set_length(&xe, n, m);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  xe.ptr.pp_double[i][j] = ae_randommid();
                }
             }
             ae_matrix_set_length(&b, n, m);
@@ -17312,7 +17250,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_unset2d(&x);
-            rmatrixsolvem(&a, n, &b, m, ae_randomreal() > 0.5, &info, &rep, &x);
+            rmatrixsolvem(&a, n, &b, m, ae_randombool(), &info, &rep, &x);
             *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksolutionm(&xe, n, m, threshold, info, &rep, &x);
             info = 0;
             ae_matrix_set_length(&x, n, m);
@@ -17465,7 +17403,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                      }
                   }
                   k = ae_randominteger(n);
@@ -17476,7 +17414,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                      }
                   }
                   k = ae_randominteger(n);
@@ -17490,7 +17428,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                      }
                   }
                   k = 1 + ae_randominteger(n - 1);
@@ -17504,7 +17442,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                      }
                   }
                   k = 1 + ae_randominteger(n - 1);
@@ -17513,7 +17451,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                ae_matrix_set_length(&xe, n, m);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     xe.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                ae_matrix_set_length(&b, n, m);
@@ -17529,7 +17467,7 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
                info = 0;
                testdirectdensesolversunit_unsetrep(&rep);
                testdirectdensesolversunit_unset2d(&x);
-               rmatrixsolvem(&a, n, &b, m, ae_randomreal() > 0.5, &info, &rep, &x);
+               rmatrixsolvem(&a, n, &b, m, ae_randombool(), &info, &rep, &x);
                *rerrors = *rerrors || !testdirectdensesolversunit_rmatrixchecksingularm(n, m, info, &rep, &x);
             // Test RMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
@@ -17631,11 +17569,11 @@ static void testdirectdensesolversunit_testrsolver(ae_int_t maxn, ae_int_t maxm,
       ae_vector_set_length(&xv, n);
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
-         xv.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         xv.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            a.ptr.pp_double[i][j] = ae_randommid();
          }
          ae_v_move(y.ptr.p_double, 1, a.ptr.pp_double[i], 1, n);
          xdot(&y, &xv, n, &tx, &v, &verr);
@@ -17725,7 +17663,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
          // 2. generate random solution vector xe
          // 3. generate right part b=A*xe
          // 4. test different methods on original A
-            isupper = ae_randomreal() > 0.5;
+            isupper = ae_randombool();
             spdmatrixrndcond(n, 1000.0, &a);
             testdirectdensesolversunit_rmatrixmakeacopy(&a, n, n, &cha);
             if (!spdmatrixcholesky(&cha, n, isupper)) {
@@ -17736,7 +17674,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
             ae_matrix_set_length(&xe, n, m);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  xe.ptr.pp_double[i][j] = ae_randommid();
                }
             }
             ae_matrix_set_length(&b, n, m);
@@ -17830,7 +17768,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                         a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      }
                   }
@@ -17843,7 +17781,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                         a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      }
                   }
@@ -17859,7 +17797,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_double[i][j] = ae_randommid();
                         a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      }
                   }
@@ -17870,7 +17808,7 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
                ae_matrix_set_length(&xe, n, m);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     xe.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                ae_matrix_set_length(&b, n, m);
@@ -17962,13 +17900,13 @@ static void testdirectdensesolversunit_testspdsolver(ae_int_t maxn, ae_int_t max
 // Unsets real vector
 static void testdirectdensesolversunit_cunset1d(CVector x) {
    ae_vector_set_length(x, 1);
-   x->ptr.p_complex[0] = ae_complex_from_d(2 * ae_randomreal() - 1);
+   x->ptr.p_complex[0] = ae_complex_from_d(ae_randommid());
 }
 
 // Unsets real matrix
 static void testdirectdensesolversunit_cunset2d(CMatrix x) {
    ae_matrix_set_length(x, 1, 1);
-   x->ptr.pp_complex[0][0] = ae_complex_from_d(2 * ae_randomreal() - 1);
+   x->ptr.pp_complex[0][0] = ae_complex_from_d(ae_randommid());
 }
 
 // Real test
@@ -18019,8 +17957,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             ae_matrix_set_length(&xe, n, m);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                  xe.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                  xe.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                }
             }
             ae_matrix_set_length(&b, n, m);
@@ -18034,7 +17971,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
             info = 0;
             testdirectdensesolversunit_unsetrep(&rep);
             testdirectdensesolversunit_cunset2d(&x);
-            cmatrixsolvem(&a, n, &b, m, ae_randomreal() > 0.5, &info, &rep, &x);
+            cmatrixsolvem(&a, n, &b, m, ae_randombool(), &info, &rep, &x);
             *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksolutionm(&xe, n, m, threshold, info, &rep, &x);
             info = 0;
             ae_matrix_set_length(&x, n, m);
@@ -18124,8 +18061,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                      }
                   }
                   k = ae_randominteger(n);
@@ -18136,8 +18072,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                      }
                   }
                   k = ae_randominteger(n);
@@ -18151,8 +18086,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                      }
                   }
                   k = 1 + ae_randominteger(n - 1);
@@ -18166,8 +18100,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                        a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                      }
                   }
                   k = 1 + ae_randominteger(n - 1);
@@ -18176,7 +18109,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                ae_matrix_set_length(&xe, n, m);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+                     xe.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
                   }
                }
                ae_matrix_set_length(&b, n, m);
@@ -18192,7 +18125,7 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
                info = 0;
                testdirectdensesolversunit_unsetrep(&rep);
                testdirectdensesolversunit_cunset2d(&x);
-               cmatrixsolvem(&a, n, &b, m, ae_randomreal() > 0.5, &info, &rep, &x);
+               cmatrixsolvem(&a, n, &b, m, ae_randombool(), &info, &rep, &x);
                *cerrors = *cerrors || !testdirectdensesolversunit_cmatrixchecksingularm(n, m, info, &rep, &x);
             // Test CMatrixSolveMFast(); performed only for matrices
             // with zero rows or columns
@@ -18291,13 +18224,11 @@ static void testdirectdensesolversunit_testcsolver(ae_int_t maxn, ae_int_t maxm,
       ae_vector_set_length(&xv, n);
       ae_vector_set_length(&y, n);
       for (i = 0; i < n; i++) {
-         xv.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         xv.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         xv.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+            a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
          ae_v_cmove(y.ptr.p_complex, 1, a.ptr.pp_complex[i], 1, "N", n);
          xcdot(&y, &xv, n, &tx, &v, &verr);
@@ -18377,7 +18308,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
          // 2. generate random solution vector xe
          // 3. generate right part b=A*xe
          // 4. test different methods on original A
-            isupper = ae_randomreal() > 0.5;
+            isupper = ae_randombool();
             hpdmatrixrndcond(n, 1000.0, &a);
             testdirectdensesolversunit_cmatrixmakeacopy(&a, n, n, &cha);
             if (!hpdmatrixcholesky(&cha, n, isupper)) {
@@ -18388,8 +18319,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
             ae_matrix_set_length(&xe, n, m);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  xe.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                  xe.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+                  xe.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
                }
             }
             ae_matrix_set_length(&b, n, m);
@@ -18483,12 +18413,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-                        if (i == j) {
-                           a.ptr.pp_complex[i][j].y = 0.0;
-                        }
-                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j];
+                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), i == j? 0.0: ae_randommid());
                      }
                   }
                   k = ae_randominteger(n);
@@ -18500,12 +18425,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-                        if (i == j) {
-                           a.ptr.pp_complex[i][j].y = 0.0;
-                        }
-                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j];
+                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), i == j? 0.0: ae_randommid());
                      }
                   }
                   k = ae_randominteger(n);
@@ -18520,12 +18440,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                   ae_matrix_set_length(&a, n, n);
                   for (i = 0; i < n; i++) {
                      for (j = i; j < n; j++) {
-                        a.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-                        a.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-                        if (i == j) {
-                           a.ptr.pp_complex[i][j].y = 0.0;
-                        }
-                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j];
+                        a.ptr.pp_complex[j][i] = a.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), i == j? 0.0: ae_randommid());
                      }
                   }
                   k = 1 + ae_randominteger(n - 1);
@@ -18535,7 +18450,7 @@ static void testdirectdensesolversunit_testhpdsolver(ae_int_t maxn, ae_int_t max
                ae_matrix_set_length(&xe, n, m);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < m; j++) {
-                     xe.ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+                     xe.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
                   }
                }
                ae_matrix_set_length(&b, n, m);
@@ -18649,7 +18564,7 @@ bool testdirectdensesolvers(bool silent) {
    testdirectdensesolversunit_testspdsolver(maxn, maxm, passcount, threshold, &spderrors, &rfserrors);
    testdirectdensesolversunit_testcsolver(maxn, maxm, passcount, threshold, &cerrors, &rfserrors);
    testdirectdensesolversunit_testhpdsolver(maxn, maxm, passcount, threshold, &hpderrors, &rfserrors);
-   waserrors = (((rerrors || cerrors) || spderrors) || hpderrors) || rfserrors;
+   waserrors = rerrors || cerrors || spderrors || hpderrors || rfserrors;
    if (!silent || waserrors) {
       printf("TESTING DENSE SOLVER\n");
       printf("* REAL:                                   ");
@@ -18846,7 +18761,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntb1 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -18871,7 +18786,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntb2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -18889,7 +18804,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
                a.ptr.pp_double[i][i] = (i * i + 1) * (0.8 + 0.4 * ae_randomreal());
             } else {
                if (pkind == 0 && j > i || pkind == 1 && j < i) {
-                  a.ptr.pp_double[i][j] = 0.1 * ae_randomreal() - 0.05;
+                  a.ptr.pp_double[i][j] = 0.05 * ae_randommid();
                } else {
                   a.ptr.pp_double[i][j] = NAN;
                }
@@ -18900,7 +18815,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntg1 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -18919,7 +18834,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntg2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -18957,7 +18872,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntb2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -18972,7 +18887,7 @@ static void testminlbfgsunit_testpreconditioning(bool *err) {
       cntg2 = 0;
       for (pass = 0; pass < k; pass++) {
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlbfgsrestartfrom(&state, &x);
          while (minlbfgsiteration(&state)) {
@@ -19184,9 +19099,9 @@ static void testminlbfgsunit_testother(bool *err) {
          ae_vector_set_length(&h, n);
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = ae_randomreal() + 1;
-            a.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
-            s.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
-            h.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
+            a.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
+            s.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
+            h.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
          }
          minlbfgscreate(n, m, &x, &state);
          minlbfgssetscale(&state, &s);
@@ -19380,7 +19295,7 @@ static void testminlbfgsunit_testother(bool *err) {
             continue;
          }
          if (state.xupdated) {
-            inc(&k);
+            k++;
             continue;
          }
          ae_assert(false, "Assertion failed");
@@ -19417,7 +19332,7 @@ static void testminlbfgsunit_testother(bool *err) {
                minlbfgsrequesttermination(&state);
                terminationrequested = true;
             }
-            inc(&callidx);
+            callidx++;
             continue;
          }
          if (state.xupdated) {
@@ -19937,7 +19852,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    // Check C1 continuity test #0
       minlbfgsoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -19956,7 +19871,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit");
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminlbfgsunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         inc(&c1test0fails);
+         c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
          ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminlbfgsunit");
@@ -19972,7 +19887,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminlbfgsunit");
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminlbfgsunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         inc(&c1test1fails);
+         c1test1fails++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminlbfgsunit");
@@ -20053,7 +19968,7 @@ static void testminlbfgsunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminlbfgsunit");
@@ -20149,9 +20064,9 @@ bool testminlbfgs(bool silent) {
       ae_vector_set_length(&x, 3);
       n = 3;
       m = 2;
-      x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
-      x.ptr.p_double[1] = 100 * ae_randomreal() - 50;
-      x.ptr.p_double[2] = 100 * ae_randomreal() - 50;
+      x.ptr.p_double[0] = 50.0 * ae_randommid();
+      x.ptr.p_double[1] = 50.0 * ae_randommid();
+      x.ptr.p_double[2] = 50.0 * ae_randommid();
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
       }
@@ -20170,7 +20085,7 @@ bool testminlbfgs(bool silent) {
          }
       }
       minlbfgsresults(&state, &x, &rep);
-      referror = (((referror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - 2) > 0.001) || fabs(x.ptr.p_double[1]) > 0.001) || fabs(x.ptr.p_double[2] - 2) > 0.001;
+      referror = referror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - 2) > 0.001 || fabs(x.ptr.p_double[1]) > 0.001 || fabs(x.ptr.p_double[2] - 2) > 0.001;
    }
 // nonconvex problems with complex surface: we start from point with very small
 // gradient, but we need ever smaller gradient in the next step due to
@@ -20238,7 +20153,7 @@ bool testminlbfgs(bool silent) {
          testminlbfgsunit_testfunc2(&state);
       }
       minlbfgsresults(&state, &x, &rep);
-      restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01) || fabs(x.ptr.p_double[1]) > 0.01) || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01 || fabs(x.ptr.p_double[1]) > 0.01 || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
       x.ptr.p_double[0] = 10 + 10 * ae_randomreal();
       x.ptr.p_double[1] = 10 + 10 * ae_randomreal();
       x.ptr.p_double[2] = 10 + 10 * ae_randomreal();
@@ -20247,7 +20162,7 @@ bool testminlbfgs(bool silent) {
          testminlbfgsunit_testfunc2(&state);
       }
       minlbfgsresults(&state, &x, &rep);
-      restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01) || fabs(x.ptr.p_double[1]) > 0.01) || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
+      restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01 || fabs(x.ptr.p_double[1]) > 0.01 || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
    }
 // Linear equations
    diffstep = 1.0E-6;
@@ -20258,11 +20173,11 @@ bool testminlbfgs(bool silent) {
       ae_vector_set_length(&xe, n);
       ae_vector_set_length(&b, n);
       for (i = 0; i < n; i++) {
-         xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         xe.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
-            a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            a.ptr.pp_double[i][j] = ae_randommid();
          }
          a.ptr.pp_double[i][i] += 3 * ae_sign(a.ptr.pp_double[i][i]);
       }
@@ -20275,7 +20190,7 @@ bool testminlbfgs(bool silent) {
          for (dkind = 0; dkind <= 1; dkind++) {
          // Solve task
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             if (dkind == 0) {
                minlbfgscreate(n, m, &x, &state);
@@ -20320,7 +20235,7 @@ bool testminlbfgs(bool silent) {
       n = 3;
       m = 2;
       for (i = 0; i <= 2; i++) {
-         x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+         x.ptr.p_double[i] = 3.0 * ae_randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
@@ -20335,7 +20250,7 @@ bool testminlbfgs(bool silent) {
       minlbfgsresults(&state, &x, &rep);
       converror = converror || rep.terminationtype != 4;
       for (i = 0; i <= 2; i++) {
-         x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+         x.ptr.p_double[i] = 3.0 * ae_randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
@@ -20350,7 +20265,7 @@ bool testminlbfgs(bool silent) {
       minlbfgsresults(&state, &x, &rep);
       converror = converror || rep.terminationtype != 1;
       for (i = 0; i <= 2; i++) {
-         x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+         x.ptr.p_double[i] = 3.0 * ae_randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
@@ -20365,7 +20280,7 @@ bool testminlbfgs(bool silent) {
       minlbfgsresults(&state, &x, &rep);
       converror = converror || rep.terminationtype != 2;
       for (i = 0; i <= 2; i++) {
-         x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x.ptr.p_double[i] = ae_randommid();
       }
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
@@ -20387,7 +20302,7 @@ bool testminlbfgs(bool silent) {
    m = 2;
    maxits = 10000;
    for (i = 0; i <= 2; i++) {
-      x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+      x.ptr.p_double[i] = 3.0 * ae_randommid();
    }
    minlbfgscreate(n, m, &x, &state);
    minlbfgssetcond(&state, 0.0, 0.0, 0.0, maxits);
@@ -20403,7 +20318,7 @@ bool testminlbfgs(bool silent) {
    optguarderr = false;
    testminlbfgsunit_testoptguard(&optguarderr);
 // end
-   waserrors = (((((((referror || nonconverror) || eqerror) || converror) || crashtest) || othererrors) || restartserror) || precerror) || optguarderr;
+   waserrors = referror || nonconverror || eqerror || converror || crashtest || othererrors || restartserror || precerror || optguarderr;
    if (!silent || waserrors) {
       printf("TESTING L-BFGS OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
@@ -20513,7 +20428,7 @@ bool testnormestimator(bool silent) {
          waserrors = waserrors || enorm != 0.0;
       // Choose random norm, try with non-zero matrix
       // with specified norm.
-         snorm = exp(10 * ae_randomreal() - 5);
+         snorm = exp(5.0 * ae_randommid());
          sparsecreate(m, n, 1, &s);
          if (m >= n) {
          // Generate random orthogonal M*M matrix,
@@ -20562,7 +20477,7 @@ bool testnormestimator(bool silent) {
    passcount = 2000;
    sigma = 5.0;
    for (pass = 1; pass <= passcount; pass++) {
-      snorm = pow(10.0, 2 * ae_randomreal() - 1);
+      snorm = pow(10.0, ae_randommid());
       sparsecreate(n, n, 1, &s);
       rmatrixrndcond(n, 2.0, &a);
       for (i = 0; i < n; i++) {
@@ -20590,7 +20505,7 @@ bool testnormestimator(bool silent) {
    passcount = 2000;
    sigma = 5.0;
    for (pass = 1; pass <= passcount; pass++) {
-      snorm = pow(10.0, 2 * ae_randomreal() - 1);
+      snorm = pow(10.0, ae_randommid());
       sparsecreate(n, n, 1, &s);
       rmatrixrndcond(n, 2.0, &a);
       for (i = 0; i < n; i++) {
@@ -20783,7 +20698,6 @@ static bool testlinlsqrunit_isitgoodsolution(RMatrix a, RVector b, ae_int_t m, a
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_svdtest(bool silent) {
    ae_frame _frame_block;
@@ -20811,7 +20725,7 @@ static bool testlinlsqrunit_svdtest(bool silent) {
          ae_matrix_set_length(&a, m, n);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          sparsecreate(m, n, 1, &spa);
@@ -20823,7 +20737,7 @@ static bool testlinlsqrunit_svdtest(bool silent) {
          sparseconverttocrs(&spa);
          ae_vector_set_length(&b, m);
          for (i = 0; i < m; i++) {
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
          }
       // Solve by calling LinLSQRIteration
          linlsqrcreate(m, n, &s);
@@ -20882,7 +20796,6 @@ static bool testlinlsqrunit_svdtest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function does not outputs results to console
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
    ae_frame _frame_block;
@@ -20943,12 +20856,11 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
                   do {
                      bnorm = 0.0;
                      for (i = 0; i < m; i++) {
-                        b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                        b.ptr.p_double[i] = ae_randommid();
                         bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                      }
                      bnorm = sqrt(bnorm);
-                  }
-                  while (bnorm <= testlinlsqrunit_e0);
+                  } while (bnorm <= testlinlsqrunit_e0);
                   for (i = 0; i < m; i++) {
                      b.ptr.p_double[i] = b.ptr.p_double[i] * s1 / bnorm;
                   }
@@ -20997,7 +20909,6 @@ static bool testlinlsqrunit_mwcranksvdtest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
    ae_frame _frame_block;
@@ -21062,12 +20973,11 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
                      do {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
-                           b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                           b.ptr.p_double[i] = ae_randommid();
                            bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                         }
                         bnorm = sqrt(bnorm);
-                     }
-                     while (bnorm <= testlinlsqrunit_e0);
+                     } while (bnorm <= testlinlsqrunit_e0);
                      for (i = 0; i < m; i++) {
                         b.ptr.p_double[i] = b.ptr.p_double[i] * s1 / bnorm;
                      }
@@ -21121,7 +21031,6 @@ static bool testlinlsqrunit_mwicranksvdtest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_bidiagonaltest(bool silent) {
    ae_frame _frame_block;
@@ -21138,7 +21047,7 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
    ae_int_t j;
    ae_int_t p;
    ae_int_t diag;
-   double pz;
+   double pnz;
    bool result;
    ae_frame_make(&_frame_block);
    NewObj(linlsqrstate, s);
@@ -21159,15 +21068,15 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                   // * bidiagonal A, with probability of having zero element at diagonal equal to PZ
                      s0 = pow(10.0, (double)(10 * ns0));
                      s1 = pow(10.0, (double)(10 * ns1));
-                     pz = 0.0;
+                     pnz = 1.0;
                      if (p == 0) {
-                        pz = 0.25;
+                        pnz = 0.75;
                      }
                      if (p == 1) {
-                        pz = 0.5;
+                        pnz = 0.5;
                      }
                      if (p == 2) {
-                        pz = 0.75;
+                        pnz = 0.25;
                      }
                      ae_matrix_set_length(&a, m, n);
                      for (i = 0; i < m; i++) {
@@ -21176,17 +21085,17 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                         }
                      }
                      for (i = 0; i < minmn; i++) {
-                        if (ae_randomreal() >= pz) {
-                           a.ptr.pp_double[i][i] = 2 * ae_randomreal() - 1;
+                        if (ae_randombool(pnz)) {
+                           a.ptr.pp_double[i][i] = ae_randommid();
                         }
                      }
                      for (i = 1; i < minmn; i++) {
-                        if (ae_randomreal() >= pz) {
+                        if (ae_randombool(pnz)) {
                            if (diag == 0) {
-                              a.ptr.pp_double[i - 1][i] = 2 * ae_randomreal() - 1;
+                              a.ptr.pp_double[i - 1][i] = ae_randommid();
                            }
                            if (diag == 1) {
-                              a.ptr.pp_double[i][i - 1] = 2 * ae_randomreal() - 1;
+                              a.ptr.pp_double[i][i - 1] = ae_randommid();
                            }
                         }
                      }
@@ -21199,12 +21108,11 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
                      do {
                         bnorm = 0.0;
                         for (i = 0; i < m; i++) {
-                           b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                           b.ptr.p_double[i] = ae_randommid();
                            bnorm += b.ptr.p_double[i] * b.ptr.p_double[i];
                         }
                         bnorm = sqrt(bnorm);
-                     }
-                     while (bnorm <= testlinlsqrunit_e0);
+                     } while (bnorm <= testlinlsqrunit_e0);
                      for (i = 0; i < m; i++) {
                         b.ptr.p_double[i] = b.ptr.p_double[i] * s1 / bnorm;
                      }
@@ -21256,7 +21164,6 @@ static bool testlinlsqrunit_bidiagonaltest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_zeromatrixtest(bool silent) {
    ae_frame _frame_block;
@@ -21343,7 +21250,6 @@ static bool testlinlsqrunit_zeromatrixtest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
    ae_frame _frame_block;
@@ -21508,7 +21414,6 @@ static bool testlinlsqrunit_reportcorrectnesstest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
    ae_frame _frame_block;
@@ -21761,7 +21666,6 @@ static bool testlinlsqrunit_stoppingcriteriatest(bool silent) {
 //
 // INPUT:
 //     Silent   -   if true then function does not output report
-//
 // ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_analytictest(bool silent) {
    ae_frame _frame_block;
@@ -21802,9 +21706,9 @@ static bool testlinlsqrunit_analytictest(bool silent) {
          ae_vector_set_length(&b, m);
          for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
             }
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n; i++) {
             a.ptr.pp_double[i][i] = 10 * (1 + ae_randomreal());
@@ -21904,7 +21808,6 @@ static bool testlinlsqrunit_analytictest(bool silent) {
 // This test checks behavior of the termination requests. Sets error flag  on
 // failure, leaves it unchanged on success.
 //
-//
 // ALGLIB: Copyright 16.11.2018 by Sergey Bochkanov
 static void testlinlsqrunit_testterminationrequests(bool *err) {
    ae_frame _frame_block;
@@ -21953,7 +21856,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
                }
             }
             if (firstpointreported) {
-               dec(&callsleft);
+               callsleft--;
             }
             if (callsleft == 0) {
                linlsqrrequesttermination(&s);
@@ -21967,7 +21870,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
                }
             }
             if (firstpointreported) {
-               dec(&callsleft);
+               callsleft--;
             }
             if (callsleft == 0) {
                linlsqrrequesttermination(&s);
@@ -21976,7 +21879,7 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
          if (s.xupdated) {
             firstpointreported = true;
             if (callsleft <= 0) {
-               inc(&reportsafterrequest);
+               reportsafterrequest++;
             }
          }
       }
@@ -21989,7 +21892,6 @@ static void testlinlsqrunit_testterminationrequests(bool *err) {
 }
 
 // Function for testing preconditioned LSQR method.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlinlsqrunit_preconditionertest() {
    ae_frame _frame_block;
@@ -22042,7 +21944,7 @@ static bool testlinlsqrunit_preconditionertest() {
    }
    ae_vector_set_length(&d, n);
    for (i = 0; i < n; i++) {
-      d.ptr.p_double[i] = pow(10.0, 100 * ae_randomreal() - 50);
+      d.ptr.p_double[i] = pow(10.0, 50.0 * ae_randommid());
    }
    ae_matrix_set_length(&a, n, n);
    sparsecreate(n, n, n * n, &sa);
@@ -22130,7 +22032,7 @@ bool testlinlsqr(bool silent) {
    prectesterrors = testlinlsqrunit_preconditionertest();
    testlinlsqrunit_testterminationrequests(&termreqerrors);
 // report
-   waserrors = ((((((((svdtesterrors || mwcranksvderr) || mwicranksvderr) || bidiagonalerr) || zeromatrixerr) || reportcorrectnesserr) || stoppingcriteriaerr) || analytictesterrors) || prectesterrors) || termreqerrors;
+   waserrors = svdtesterrors || mwcranksvderr || mwicranksvderr || bidiagonalerr || zeromatrixerr || reportcorrectnesserr || stoppingcriteriaerr || analytictesterrors || prectesterrors || termreqerrors;
    if (!silent || waserrors) {
       printf("TESTING LinLSQR\n");
       printf("Different matrix types:\n");
@@ -22242,7 +22144,7 @@ static void testminbleicunit_setrandompreconditioner(minbleicstate *state, ae_in
    if (preckind == 1) {
       ae_vector_set_length(&p, n);
       for (i = 0; i < n; i++) {
-         p.ptr.p_double[i] = exp(6 * ae_randomreal() - 3);
+         p.ptr.p_double[i] = exp(3.0 * ae_randommid());
       }
       minbleicsetprecdiag(state, &p);
    } else {
@@ -22335,9 +22237,9 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&ct, 1);
                   c.ptr.pp_double[0][n] = 0.0;
                   for (i = 0; i < n; i++) {
-                     x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                     c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
-                     v = 2 * ae_randomreal() - 1;
+                     x.ptr.p_double[i] = ae_randommid();
+                     c.ptr.pp_double[0][i] = ae_randommid();
+                     v = ae_randommid();
                      c.ptr.pp_double[0][n] += c.ptr.pp_double[0][i] * v;
                   }
                   ct.ptr.p_int[0] = 0;
@@ -22435,21 +22337,20 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&ct, k);
                   c.ptr.pp_double[0][n] = 0.0;
                   for (i = 0; i < n; i++) {
-                     x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                     xs.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                     x.ptr.p_double[i] = ae_randommid();
+                     xs.ptr.p_double[i] = ae_randommid();
                   }
                   do {
                      for (i = 0; i < k; i++) {
                         for (j = 0; j < n; j++) {
-                           c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                           c.ptr.pp_double[i][j] = ae_randommid();
                         }
                         v = ae_v_dotproduct(c.ptr.pp_double[i], 1, xs.ptr.p_double, 1, n);
                         c.ptr.pp_double[i][n] = v;
                         ct.ptr.p_int[i] = 0;
                      }
                      ae_set_error_flag(feaserr, !rmatrixsvd(&c, k, n, 0, 0, 0, &svdw, &svdu, &svdvt), __FILE__, __LINE__, "testminbleicunit");
-                  }
-                  while (!(svdw.ptr.p_double[0] > 0.0 && svdw.ptr.p_double[k - 1] > 0.001 * svdw.ptr.p_double[0]));
+                  } while (!(svdw.ptr.p_double[0] > 0.0 && svdw.ptr.p_double[k - 1] > 0.001 * svdw.ptr.p_double[0]));
                   ae_v_move(x0.ptr.p_double, 1, xs.ptr.p_double, 1, n);
                   ae_v_add(x0.ptr.p_double, 1, c.ptr.pp_double[0], 1, n);
                // Create and optimize
@@ -22600,7 +22501,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   ae_vector_set_length(&x, n);
                   ae_vector_set_length(&x0, n);
                   for (i = 0; i < n; i++) {
-                     if (ae_randomreal() > 0.5) {
+                     if (ae_randombool()) {
                         bl.ptr.p_double[i] = 0.0;
                         bu.ptr.p_double[i] = 1.0;
                      } else {
@@ -22685,12 +22586,12 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   x.ptr.p_double[i] = ae_randomreal();
                   x0.ptr.p_double[i] = 3 * ae_randomreal() - 1;
                   for (j = 0; j <= n; j++) {
-                     c.ptr.pp_double[2 * i + 0][j] = 0.0;
+                     c.ptr.pp_double[2 * i][j] = 0.0;
                      c.ptr.pp_double[2 * i + 1][j] = 0.0;
                   }
-                  c.ptr.pp_double[2 * i + 0][i] = 1.0;
-                  c.ptr.pp_double[2 * i + 0][n] = 0.0;
-                  ct.ptr.p_int[2 * i + 0] = 1;
+                  c.ptr.pp_double[2 * i][i] = 1.0;
+                  c.ptr.pp_double[2 * i][n] = 0.0;
+                  ct.ptr.p_int[2 * i] = 1;
                   c.ptr.pp_double[2 * i + 1][i] = 1.0;
                   c.ptr.pp_double[2 * i + 1][n] = 1.0;
                   ct.ptr.p_int[2 * i + 1] = -1;
@@ -22774,7 +22675,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   for (i = 0; i < k; i++) {
                      c.ptr.pp_double[i][n] = 0.0;
                      for (j = 0; j < n; j++) {
-                        c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        c.ptr.pp_double[i][j] = ae_randommid();
                         c.ptr.pp_double[i][n] += c.ptr.pp_double[i][j] * xc.ptr.p_double[j];
                      }
                      ct.ptr.p_int[i] = ae_randominteger(3) - 1;
@@ -22910,7 +22811,7 @@ static void testminbleicunit_testfeasibility(bool *feaserr, bool *converr, bool 
                   }
                   for (i = 0; i < k; i++) {
                      for (j = 0; j <= n; j++) {
-                        c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        c.ptr.pp_double[i][j] = ae_randommid();
                      }
                      ct.ptr.p_int[i] = 0;
                   }
@@ -23095,7 +22996,7 @@ static void testminbleicunit_testother(bool *err) {
       ae_vector_set_length(&bu, n);
       for (i = 0; i < n; i++) {
          x.ptr.p_double[i] = 10.0;
-         bl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         bl.ptr.p_double[i] = ae_randommid();
          bu.ptr.p_double[i] = +INFINITY;
       }
       minbleiccreate(n, &x, &state);
@@ -23202,7 +23103,7 @@ static void testminbleicunit_testother(bool *err) {
       ae_vector_set_length(&bl, n);
       ae_vector_set_length(&bu, n);
       x.ptr.p_double[0] = 100.0;
-      bl.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      bl.ptr.p_double[0] = ae_randommid();
       bu.ptr.p_double[0] = +INFINITY;
       stpmax = 0.05 + 0.05 * ae_randomreal();
       minbleiccreate(n, &x, &state);
@@ -23282,9 +23183,9 @@ static void testminbleicunit_testother(bool *err) {
                   bl.ptr.p_double[i] = -100000.0;
                   bu.ptr.p_double[i] = 100000.0;
                   c.ptr.pp_double[0][i] = 0.0;
-                  a.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
-                  s.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
-                  h.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
+                  a.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
+                  s.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
+                  h.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
                }
                minbleiccreate(n, &x, &state);
                if (ckind == 1 || ckind == 3) {
@@ -23568,7 +23469,7 @@ static void testminbleicunit_testother(bool *err) {
             continue;
          }
          if (state.xupdated) {
-            inc(&k);
+            k++;
             continue;
          }
          ae_assert(false, "Assertion failed");
@@ -23613,7 +23514,7 @@ static void testminbleicunit_testother(bool *err) {
                minbleicrequesttermination(&state);
                terminationrequested = true;
             }
-            inc(&callidx);
+            callidx++;
             continue;
          }
          if (state.xupdated) {
@@ -23857,8 +23758,8 @@ static void testminbleicunit_testconv(bool *err) {
    ct.ptr.p_int[3] = -1;
    for (pass = 1; pass <= passcount; pass++) {
    // f0
-      x.ptr.p_double[0] = 0.2 * ae_randomreal() - 0.1;
-      x.ptr.p_double[1] = 0.2 * ae_randomreal() - 0.1;
+      x.ptr.p_double[0] = 0.1 * ae_randommid();
+      x.ptr.p_double[1] = 0.1 * ae_randommid();
       minbleiccreate(2, &x, &state);
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
@@ -23878,8 +23779,8 @@ static void testminbleicunit_testconv(bool *err) {
          *err = true;
       }
    // f1
-      x.ptr.p_double[0] = 0.2 * ae_randomreal() - 0.1;
-      x.ptr.p_double[1] = 0.2 * ae_randomreal() - 0.1;
+      x.ptr.p_double[0] = 0.1 * ae_randommid();
+      x.ptr.p_double[1] = 0.1 * ae_randommid();
       minbleiccreate(2, &x, &state);
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
@@ -23899,8 +23800,8 @@ static void testminbleicunit_testconv(bool *err) {
          *err = true;
       }
    // f2
-      x.ptr.p_double[0] = 0.2 * ae_randomreal() - 0.1;
-      x.ptr.p_double[1] = 0.2 * ae_randomreal() - 0.1;
+      x.ptr.p_double[0] = 0.1 * ae_randommid();
+      x.ptr.p_double[1] = 0.1 * ae_randommid();
       minbleiccreate(2, &x, &state);
       minbleicsetbc(&state, &bl, &bu);
       minbleicsetlc(&state, &c, &ct, 4);
@@ -24375,7 +24276,7 @@ static void testminbleicunit_testconv(bool *err) {
                   }
                   ce.ptr.pp_double[i][k] = 1.0;
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
                if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr) {
@@ -24384,7 +24285,7 @@ static void testminbleicunit_testconv(bool *err) {
                   }
                   ce.ptr.pp_double[i][k] = -1.0;
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
             }
@@ -24399,7 +24300,7 @@ static void testminbleicunit_testconv(bool *err) {
                      ce.ptr.pp_double[j][k] = c.ptr.pp_double[i][j];
                   }
                   nonnegative.ptr.p_bool[k] = false;
-                  inc(&k);
+                  k++;
                   continue;
                }
                if (ct.ptr.p_int[i] > 0 && v <= tolconstr || ct.ptr.p_int[i] < 0 && v >= -tolconstr) {
@@ -24407,7 +24308,7 @@ static void testminbleicunit_testconv(bool *err) {
                      ce.ptr.pp_double[j][k] = ae_sign((double)(ct.ptr.p_int[i])) * c.ptr.pp_double[i][j];
                   }
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
             }
@@ -24511,7 +24412,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
             ae_vector_set_length(&ct, 1);
             ct.ptr.p_int[0] = ae_randominteger(3) - 1;
             for (i = 0; i < n; i++) {
-               c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[0][i] = ae_randommid();
             }
             c.ptr.pp_double[0][n] = 0.0;
             minbleicsetlc(&state, &c, &ct, 1);
@@ -24522,7 +24423,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbleicrestartfrom(&state, &x);
             while (minbleiciteration(&state)) {
@@ -24541,7 +24442,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbleicrestartfrom(&state, &x);
             while (minbleiciteration(&state)) {
@@ -24562,7 +24463,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbleicrestartfrom(&state, &x);
             while (minbleiciteration(&state)) {
@@ -24577,7 +24478,7 @@ static void testminbleicunit_testpreconditioning(bool *err) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbleicrestartfrom(&state, &x);
             while (minbleiciteration(&state)) {
@@ -24701,7 +24602,7 @@ static void testminbleicunit_testbugs(bool *err) {
       for (i = 0; i <= 1; i++) {
          c.ptr.pp_double[i][9] = 0.0;
          for (j = 0; j < 9; j++) {
-            c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            c.ptr.pp_double[i][j] = ae_randommid();
             c.ptr.pp_double[i][9] += c.ptr.pp_double[i][j] * (1.0 / 9.0);
          }
       }
@@ -25294,7 +25195,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    // Check C1 continuity test #0
       minbleicoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -25313,7 +25214,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbleicunit");
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbleicunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         inc(&c1test0fails);
+         c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
          ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbleicunit");
@@ -25329,7 +25230,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbleicunit");
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbleicunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         inc(&c1test1fails);
+         c1test1fails++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbleicunit");
@@ -25409,7 +25310,7 @@ static void testminbleicunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbleicunit");
@@ -25482,7 +25383,7 @@ bool testminbleic(bool silent) {
    testminbleicunit_testpreconditioning(&precerrors);
    testminbleicunit_testoptguard(&optguarderrors);
 // end
-   waserrors = (((((feasibilityerrors || othererrors) || converrors) || interrors) || precerrors) || optguarderrors) || bugs;
+   waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors || bugs;
    if (!silent || waserrors) {
       printf("TESTING BLEIC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
@@ -25720,7 +25621,7 @@ Local bool functest1() {
          testminqpunit_setrandomalgobc(&state);
          minqpsetquadraticterm(&state, &a, false);
          for (j = 0; j < sn; j++) {
-            xoric.ptr.p_double[j] = 2 * ae_randomreal() - 1;
+            xoric.ptr.p_double[j] = ae_randommid();
          }
       // create linear part
          for (j = 0; j < sn; j++) {
@@ -25734,13 +25635,13 @@ Local bool functest1() {
       // initial value for 'XORi'
       // and searching true results
          for (j = 0; j < sn; j++) {
-            xori.ptr.p_double[j] = 2 * ae_randomreal() - 1;
+            xori.ptr.p_double[j] = ae_randommid();
             tx.ptr.p_double[j] = xori.ptr.p_double[j] + xoric.ptr.p_double[j];
          }
          minqpsetorigin(&state, &xori);
       // initialization for starting point
          for (j = 0; j < sn; j++) {
-            stx.ptr.p_double[j] = 2 * ae_randomreal() - 1;
+            stx.ptr.p_double[j] = ae_randommid();
          }
          minqpsetstartingpoint(&state, &stx);
       // optimize and get result
@@ -26478,8 +26379,7 @@ Local bool quickqptests() {
          for (i = 0; i < n; i++) {
             do {
                b.ptr.p_double[i] = hqrndnormal(&rs);
-            }
-            while (b.ptr.p_double[i] == 0.0);
+            } while (b.ptr.p_double[i] == 0.0);
             bndl.ptr.p_double[i] = -1.0;
             bndu.ptr.p_double[i] = 1.0;
             x0.ptr.p_double[i] = 2 * hqrnduniformr(&rs) - 1;
@@ -26562,8 +26462,7 @@ Local bool quickqptests() {
          for (i = 0; i < n; i++) {
             do {
                b.ptr.p_double[i] = hqrndnormal(&rs);
-            }
-            while (b.ptr.p_double[i] == 0.0);
+            } while (b.ptr.p_double[i] == 0.0);
             bndl.ptr.p_double[i] = -1.0;
             bndu.ptr.p_double[i] = 1.0;
             x0.ptr.p_double[i] = 2 * hqrnduniformr(&rs) - 1;
@@ -26788,7 +26687,7 @@ Local bool quickqptests() {
    eps = 1.0E-3;
    itscnt = 1;
    n = 20;
-   isupper = ae_randomreal() > 0.5;
+   isupper = ae_randombool();
    spdmatrixrndcond(n, 1.0E3, &za);
    sparsecreate(n, n, 0, &sa);
    ae_matrix_set_length(&a, n, n);
@@ -26959,7 +26858,7 @@ Local bool bleictests() {
    eps = 1.0E-3;
    itscnt = 5;
    n = 20;
-   isupper = ae_randomreal() > 0.5;
+   isupper = ae_randombool();
    spdmatrixrndcond(n, 1.0E3, &za);
    sparsecreate(n, n, 0, &sa);
    ae_matrix_set_length(&a, n, n);
@@ -27129,8 +27028,7 @@ Local bool bleictests() {
          for (i = 0; i < n; i++) {
             do {
                b.ptr.p_double[i] = hqrndnormal(&rs);
-            }
-            while (b.ptr.p_double[i] == 0.0);
+            } while (b.ptr.p_double[i] == 0.0);
             bndl.ptr.p_double[i] = -1.0;
             bndu.ptr.p_double[i] = 1.0;
             x0.ptr.p_double[i] = 2 * hqrnduniformr(&rs) - 1;
@@ -27261,12 +27159,12 @@ Local bool bleictests() {
    ae_vector_set_length(&ct, 2 * n);
    for (i = 0; i < n; i++) {
       for (j = 0; j <= n; j++) {
-         c.ptr.pp_double[2 * i + 0][j] = 0.0;
+         c.ptr.pp_double[2 * i][j] = 0.0;
          c.ptr.pp_double[2 * i + 1][j] = 0.0;
       }
-      c.ptr.pp_double[2 * i + 0][i] = 1.0;
-      c.ptr.pp_double[2 * i + 0][n] = 1.0;
-      ct.ptr.p_int[2 * i + 0] = -1;
+      c.ptr.pp_double[2 * i][i] = 1.0;
+      c.ptr.pp_double[2 * i][n] = 1.0;
+      ct.ptr.p_int[2 * i] = -1;
       c.ptr.pp_double[2 * i + 1][i] = 1.0;
       c.ptr.pp_double[2 * i + 1][n] = -1.0;
       ct.ptr.p_int[2 * i + 1] = 1;
@@ -27455,7 +27353,7 @@ static ae_int_t testminqpunit_setrandomalgoallmodern(minqpstate *s, double *bcto
    *lctol = 0;
    result = ae_randominteger(5) - 1;
    if (result == -1) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randomreal() > 0.5);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randombool());
       *bctol = 0.0;
       *lctol = 0.0;
    }
@@ -27490,7 +27388,7 @@ static void testminqpunit_setrandomalgononconvex(minqpstate *s) {
       minqpsetalgobleic(s, 1.0E-12, 0.0, 0.0, 0);
    }
    if (i == 2) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randomreal() > 0.5);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randombool());
    }
 }
 
@@ -27506,7 +27404,7 @@ static void testminqpunit_setrandomalgosemidefinite(minqpstate *s, double *bctol
       *lctol = 1.0E-8;
    }
    if (i == 2) {
-      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randomreal() > 0.5);
+      minqpsetalgoquickqp(s, 1.0E-12, 0.0, 0.0, 0, ae_randombool());
       *bctol = 0.0;
       *lctol = 0.0;
    }
@@ -28008,8 +27906,7 @@ static void testminqpunit_bcqptest(bool *wereerrors) {
          for (i = 0; i < n; i++) {
             do {
                b.ptr.p_double[i] = hqrndnormal(&rs);
-            }
-            while (b.ptr.p_double[i] == 0.0);
+            } while (b.ptr.p_double[i] == 0.0);
             bndl.ptr.p_double[i] = -1.0;
             bndu.ptr.p_double[i] = 1.0;
             x0.ptr.p_double[i] = 2 * hqrnduniformr(&rs) - 1;
@@ -28142,16 +28039,16 @@ static bool testminqpunit_ecqptest() {
          ae_matrix_set_length(&c, k, n + 1);
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
             x1.ptr.p_double[i] = x0.ptr.p_double[i];
-            xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xstart.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
             v = ae_v_dotproduct(q.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             c.ptr.pp_double[i][n] = v;
             ct.ptr.p_int[i] = 0;
-            v = 2 * ae_randomreal() - 1;
+            v = ae_randommid();
             ae_v_addd(x1.ptr.p_double, 1, q.ptr.pp_double[i], 1, n, v);
          }
          for (i = 0; i < n; i++) {
@@ -28162,7 +28059,7 @@ static bool testminqpunit_ecqptest() {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetlc(&state, &c, &ct, k);
          minqpoptimize(&state);
@@ -28200,9 +28097,9 @@ static bool testminqpunit_ecqptest() {
          ae_matrix_set_length(&c, k, n + 1);
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
+            x1.ptr.p_double[i] = ae_randommid();
+            xstart.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
@@ -28218,7 +28115,7 @@ static bool testminqpunit_ecqptest() {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetlc(&state, &c, &ct, k);
          minqpoptimize(&state);
@@ -28289,14 +28186,14 @@ static bool testminqpunit_ecqptest() {
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = ae_randomreal();
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[i][j] = ae_randommid();
             }
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             c.ptr.pp_double[i][n] = v;
@@ -28310,7 +28207,7 @@ static bool testminqpunit_ecqptest() {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetbc(&state, &bndl, &bndu);
          minqpsetlc(&state, &c, &ct, k);
@@ -28347,7 +28244,7 @@ static bool testminqpunit_ecqptest() {
          }
          minqpcreate(n, &state2);
          testminqpunit_setrandomalgoconvexlc(&state);
-         minqpsetquadraticterm(&state2, &a2, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state2, &a2, ae_randombool());
          minqpsetstartingpoint(&state2, &xstart);
          minqpsetbc(&state2, &bndl, &bndu);
          for (i = 1; i <= aulits; i++) {
@@ -28425,11 +28322,11 @@ static bool testminqpunit_ecqptest() {
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
-            xorigin.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xorigin.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
@@ -28445,7 +28342,7 @@ static bool testminqpunit_ecqptest() {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetorigin(&state, &xorigin);
          minqpsetbc(&state, &bndl, &bndu);
@@ -28460,7 +28357,7 @@ static bool testminqpunit_ecqptest() {
          minqpcreate(n, &state2);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state2, &b2);
-         minqpsetquadraticterm(&state2, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state2, &a, ae_randombool());
          minqpsetstartingpoint(&state2, &xstart);
          minqpsetbc(&state2, &bndl, &bndu);
          minqpsetlc(&state2, &c, &ct, k);
@@ -28508,27 +28405,27 @@ static bool testminqpunit_ecqptest() {
       ae_vector_set_length(&ct, k);
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          bndl.ptr.p_double[i] = 0.0;
          bndu.ptr.p_double[i] = 1.0;
          xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            c.ptr.pp_double[i][j] = ae_randommid();
          }
          v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
          c.ptr.pp_double[i][n] = v;
          ct.ptr.p_int[i] = 0;
       }
       for (i = 0; i < n; i++) {
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         b.ptr.p_double[i] = ae_randommid();
       }
    // Create optimizer, solve
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
@@ -28578,15 +28475,15 @@ static bool testminqpunit_ecqptest() {
       ae_vector_set_length(&ct, k);
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         b.ptr.p_double[i] = ae_randommid();
          bndl.ptr.p_double[i] = 0.0;
          bndu.ptr.p_double[i] = 1.0;
-         xstart.ptr.p_double[i] = 4 * ae_randomreal() - 2;
-         xstart2.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+         xstart.ptr.p_double[i] = 2.0 * ae_randommid();
+         xstart2.ptr.p_double[i] = 2.0 * ae_randommid();
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            c.ptr.pp_double[i][j] = ae_randommid();
          }
          v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
          c.ptr.pp_double[i][n] = v;
@@ -28596,7 +28493,7 @@ static bool testminqpunit_ecqptest() {
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
@@ -28791,18 +28688,17 @@ static void testminqpunit_icqptest(bool *err) {
          ae_matrix_set_length(&c, 1, n + 1);
          ae_vector_set_length(&ct, 1);
          for (i = 0; i < n; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            xstart.ptr.p_double[i] = ae_randommid();
          }
          do {
             v = 0.0;
             for (i = 0; i < n; i++) {
-               c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[0][i] = ae_randommid();
                v += ae_sqr(c.ptr.pp_double[0][i]);
             }
             v = sqrt(v);
-         }
-         while (v == 0.0);
+         } while (v == 0.0);
          for (i = 0; i < n; i++) {
             c.ptr.pp_double[0][i] /= v;
          }
@@ -28816,7 +28712,7 @@ static void testminqpunit_icqptest(bool *err) {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetlc(&state, &c, &ct, 1);
          minqpoptimize(&state);
@@ -28888,11 +28784,11 @@ static void testminqpunit_icqptest(bool *err) {
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
-            xorigin.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xorigin.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < k; i++) {
             ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
@@ -28908,7 +28804,7 @@ static void testminqpunit_icqptest(bool *err) {
          minqpcreate(n, &state);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state, &b);
-         minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state, &a, ae_randombool());
          minqpsetstartingpoint(&state, &xstart);
          minqpsetorigin(&state, &xorigin);
          minqpsetbc(&state, &bndl, &bndu);
@@ -28923,7 +28819,7 @@ static void testminqpunit_icqptest(bool *err) {
          minqpcreate(n, &state2);
          testminqpunit_setrandomalgoconvexlc(&state);
          minqpsetlinearterm(&state2, &b2);
-         minqpsetquadraticterm(&state2, &a, ae_randomreal() > 0.5);
+         minqpsetquadraticterm(&state2, &a, ae_randombool());
          minqpsetstartingpoint(&state2, &xstart);
          minqpsetbc(&state2, &bndl, &bndu);
          minqpsetlc(&state2, &c, &ct, k);
@@ -28989,17 +28885,17 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&bndl, n);
       ae_vector_set_length(&bndu, n);
       for (i = 0; i < n; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          xstart.ptr.p_double[i] = 3 * ae_randomreal() - 1;
          bndl.ptr.p_double[i] = -(0.1 + 0.9 * ae_randomreal());
          bndu.ptr.p_double[i] = 0.1 + 0.9 * ae_randomreal();
          for (j = 0; j < n; j++) {
-            c.ptr.pp_double[2 * i + 0][j] = 0.0;
+            c.ptr.pp_double[2 * i][j] = 0.0;
             c.ptr.pp_double[2 * i + 1][j] = 0.0;
          }
-         c.ptr.pp_double[2 * i + 0][i] = 1.0;
-         c.ptr.pp_double[2 * i + 0][n] = bndl.ptr.p_double[i];
-         ct.ptr.p_int[2 * i + 0] = 1;
+         c.ptr.pp_double[2 * i][i] = 1.0;
+         c.ptr.pp_double[2 * i][n] = bndl.ptr.p_double[i];
+         ct.ptr.p_int[2 * i] = 1;
          c.ptr.pp_double[2 * i + 1][i] = 1.0;
          c.ptr.pp_double[2 * i + 1][n] = bndu.ptr.p_double[i];
          ct.ptr.p_int[2 * i + 1] = -1;
@@ -29012,7 +28908,7 @@ static void testminqpunit_icqptest(bool *err) {
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetlc(&state, &c, &ct, 2 * n);
       minqpoptimize(&state);
@@ -29021,7 +28917,7 @@ static void testminqpunit_icqptest(bool *err) {
       minqpcreate(n, &state2);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state2, &b);
-      minqpsetquadraticterm(&state2, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state2, &a, ae_randombool());
       minqpsetstartingpoint(&state2, &xstart);
       minqpsetbc(&state2, &bndl, &bndu);
       minqpoptimize(&state2);
@@ -29065,12 +28961,12 @@ static void testminqpunit_icqptest(bool *err) {
          x0.ptr.p_double[i] = 3 * ae_randomreal() - 1;
          b.ptr.p_double[i] = -x0.ptr.p_double[i];
          for (j = 0; j <= n; j++) {
-            c.ptr.pp_double[2 * i + 0][j] = 0.0;
+            c.ptr.pp_double[2 * i][j] = 0.0;
             c.ptr.pp_double[2 * i + 1][j] = 0.0;
          }
-         c.ptr.pp_double[2 * i + 0][i] = 1.0;
-         c.ptr.pp_double[2 * i + 0][n] = 0.0;
-         ct.ptr.p_int[2 * i + 0] = 1;
+         c.ptr.pp_double[2 * i][i] = 1.0;
+         c.ptr.pp_double[2 * i][n] = 0.0;
+         ct.ptr.p_int[2 * i] = 1;
          c.ptr.pp_double[2 * i + 1][i] = 1.0;
          c.ptr.pp_double[2 * i + 1][n] = 1.0;
          ct.ptr.p_int[2 * i + 1] = -1;
@@ -29089,7 +28985,7 @@ static void testminqpunit_icqptest(bool *err) {
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlc(&state, &c, &ct, 2 * n);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpoptimize(&state);
       minqpresults(&state, &xend, &rep);
@@ -29131,14 +29027,14 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&ct, k);
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          bndl.ptr.p_double[i] = 0.0;
          bndu.ptr.p_double[i] = 1.0;
          xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            c.ptr.pp_double[i][j] = ae_randommid();
          }
          v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
          ct.ptr.p_int[i] = ae_randominteger(3) - 1;
@@ -29153,13 +29049,13 @@ static void testminqpunit_icqptest(bool *err) {
          }
       }
       for (i = 0; i < n; i++) {
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         b.ptr.p_double[i] = ae_randommid();
       }
    // Create optimizer, solve
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
@@ -29207,16 +29103,16 @@ static void testminqpunit_icqptest(bool *err) {
       ae_matrix_set_length(&c, n, n + 1);
       ae_vector_set_length(&ct, n);
       for (i = 0; i < n; i++) {
-         da.ptr.p_double[i] = exp(8 * ae_randomreal() - 4);
+         da.ptr.p_double[i] = exp(4.0 * ae_randommid());
          for (j = 0; j < n; j++) {
             a.ptr.pp_double[i][j] = 0.0;
          }
          a.ptr.pp_double[i][i] = da.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
+         b.ptr.p_double[i] = ae_randommid();
+         xstart.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < n; i++) {
          ae_v_move(c.ptr.pp_double[i], 1, t2.ptr.pp_double[i], 1, n);
@@ -29228,7 +29124,7 @@ static void testminqpunit_icqptest(bool *err) {
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetlc(&state, &c, &ct, n);
       minqpoptimize(&state);
@@ -29322,15 +29218,15 @@ static void testminqpunit_icqptest(bool *err) {
       ae_vector_set_length(&ct, k);
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         b.ptr.p_double[i] = ae_randommid();
          bndl.ptr.p_double[i] = 0.0;
          bndu.ptr.p_double[i] = 1.0;
-         xstart.ptr.p_double[i] = 4 * ae_randomreal() - 2;
-         xstart2.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+         xstart.ptr.p_double[i] = 2.0 * ae_randommid();
+         xstart2.ptr.p_double[i] = 2.0 * ae_randommid();
       }
       for (i = 0; i < k; i++) {
          for (j = 0; j < n; j++) {
-            c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            c.ptr.pp_double[i][j] = ae_randommid();
          }
          v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
          c.ptr.pp_double[i][n] = v;
@@ -29346,7 +29242,7 @@ static void testminqpunit_icqptest(bool *err) {
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
-      minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+      minqpsetquadraticterm(&state, &a, ae_randombool());
       minqpsetstartingpoint(&state, &xstart);
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
@@ -29499,7 +29395,7 @@ static void testminqpunit_icqptest(bool *err) {
                minqpsetbc(&state, &bl, &bu);
                minqpsetlc(&state, &c, &ct, ccnt);
                minqpsetlinearterm(&state, &b);
-               minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+               minqpsetquadraticterm(&state, &a, ae_randombool());
                minqpoptimize(&state);
                minqpresults(&state, &xs0, &rep);
                ae_set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit");
@@ -29640,7 +29536,7 @@ static void testminqpunit_icqptest(bool *err) {
             minqpsetbc(&state, &bl, &bu);
             minqpsetlc(&state, &c, &ct, ccnt);
             minqpsetlinearterm(&state, &b);
-            minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+            minqpsetquadraticterm(&state, &a, ae_randombool());
             minqpoptimize(&state);
             minqpresults(&state, &xs0, &rep);
             ae_set_error_flag(err, rep.terminationtype <= 0, __FILE__, __LINE__, "testminqpunit");
@@ -29676,7 +29572,7 @@ static void testminqpunit_icqptest(bool *err) {
                   }
                   ce.ptr.pp_double[i][k] = 1.0;
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
                if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr) {
@@ -29685,7 +29581,7 @@ static void testminqpunit_icqptest(bool *err) {
                   }
                   ce.ptr.pp_double[i][k] = -1.0;
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
             }
@@ -29700,7 +29596,7 @@ static void testminqpunit_icqptest(bool *err) {
                      ce.ptr.pp_double[j][k] = c.ptr.pp_double[i][j];
                   }
                   nonnegative.ptr.p_bool[k] = false;
-                  inc(&k);
+                  k++;
                   continue;
                }
                if (ct.ptr.p_int[i] > 0 && v <= tolconstr || ct.ptr.p_int[i] < 0 && v >= -tolconstr) {
@@ -29708,7 +29604,7 @@ static void testminqpunit_icqptest(bool *err) {
                      ce.ptr.pp_double[j][k] = ae_sign((double)(ct.ptr.p_int[i])) * c.ptr.pp_double[i][j];
                   }
                   nonnegative.ptr.p_bool[k] = true;
-                  inc(&k);
+                  k++;
                   continue;
                }
             }
@@ -29982,7 +29878,6 @@ static double testminqpunit_getconstraintrcond(RMatrix c, ae_int_t k, ae_int_t n
 }
 
 // Computes target function 0.5*x'*H*x+c'*x
-//
 // ALGLIB: Copyright 01.11.2019 by Sergey Bochkanov
 static double testminqpunit_quadratictarget(RMatrix a, RVector b, ae_int_t n, RVector x) {
    ae_int_t i;
@@ -30254,8 +30149,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                constraintsrcond = 1.0;
             }
          // Check RCond
-         }
-         while (!(constraintsrcond >= 0.01 && nactive < n));
+         } while (!(constraintsrcond >= 0.01 && nactive < n));
       // Create optimizer, solve
          minqpcreate(n, &state);
          if (solvertype == 0) {
@@ -30329,18 +30223,17 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             ae_matrix_set_length(&rawc, 1, n + 1);
             ae_vector_set_length(&rawct, 1);
             for (i = 0; i < n; i++) {
-               xs.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-               xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               xs.ptr.p_double[i] = ae_randommid();
+               xstart.ptr.p_double[i] = ae_randommid();
             }
             do {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  rawc.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+                  rawc.ptr.pp_double[0][i] = ae_randommid();
                   v += ae_sqr(rawc.ptr.pp_double[0][i]);
                }
                v = sqrt(v);
-            }
-            while (v == 0.0);
+            } while (v == 0.0);
             for (i = 0; i < n; i++) {
                rawc.ptr.pp_double[0][i] /= v;
             }
@@ -30431,17 +30324,17 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
          for (i = 0; i < n; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             xstart.ptr.p_double[i] = 3 * ae_randomreal() - 1;
             bndl.ptr.p_double[i] = -(0.1 + 0.9 * ae_randomreal());
             bndu.ptr.p_double[i] = 0.1 + 0.9 * ae_randomreal();
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[2 * i + 0][j] = 0.0;
+               rawc.ptr.pp_double[2 * i][j] = 0.0;
                rawc.ptr.pp_double[2 * i + 1][j] = 0.0;
             }
-            rawc.ptr.pp_double[2 * i + 0][i] = 1.0;
-            rawc.ptr.pp_double[2 * i + 0][n] = bndl.ptr.p_double[i];
-            rawct.ptr.p_int[2 * i + 0] = 1;
+            rawc.ptr.pp_double[2 * i][i] = 1.0;
+            rawc.ptr.pp_double[2 * i][n] = bndl.ptr.p_double[i];
+            rawct.ptr.p_int[2 * i] = 1;
             rawc.ptr.pp_double[2 * i + 1][i] = 1.0;
             rawc.ptr.pp_double[2 * i + 1][n] = bndu.ptr.p_double[i];
             rawct.ptr.p_int[2 * i + 1] = -1;
@@ -30637,8 +30530,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                         rawc.ptr.pp_double[i][j] = hqrnduniformr(&rs) - 0.5;
                      }
                   }
-               }
-               while (testminqpunit_getconstraintrcond(&rawc, rawccnt, n) <= 0.01);
+               } while (testminqpunit_getconstraintrcond(&rawc, rawccnt, n) <= 0.01);
             // Create and optimize
                minqpcreate(n, &state);
                minqpsetstartingpoint(&state, &xstart);
@@ -30698,7 +30590,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      }
                      ce.ptr.pp_double[i][k] = 1.0;
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                   if (x1.ptr.p_double[i] >= bndu.ptr.p_double[i] - tolconstr) {
@@ -30707,7 +30599,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                      }
                      ce.ptr.pp_double[i][k] = -1.0;
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                }
@@ -30722,7 +30614,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                         ce.ptr.pp_double[j][k] = rawc.ptr.pp_double[i][j];
                      }
                      nonnegative.ptr.p_bool[k] = false;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                   if (rawct.ptr.p_int[i] > 0 && v <= tolconstr || rawct.ptr.p_int[i] < 0 && v >= -tolconstr) {
@@ -30730,7 +30622,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
                         ce.ptr.pp_double[j][k] = ae_sign((double)(rawct.ptr.p_int[i])) * rawc.ptr.pp_double[i][j];
                      }
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                }
@@ -30803,11 +30695,11 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             ae_vector_set_length(&rawct, k);
             for (i = 0; i < n; i++) {
                x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-               b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               b.ptr.p_double[i] = ae_randommid();
                bndl.ptr.p_double[i] = 0.0;
                bndu.ptr.p_double[i] = 1.0;
                xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
-               xorigin.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               xorigin.ptr.p_double[i] = ae_randommid();
             }
             for (i = 0; i < k; i++) {
                ae_v_move(rawc.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
@@ -31059,10 +30951,10 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             }
             minqpsetlinearterm(&state, &b);
             if (akind == 0) {
-               minqpsetquadraticterm(&state, &a, ae_randomreal() > 0.5);
+               minqpsetquadraticterm(&state, &a, ae_randombool());
             }
             if (akind == 1) {
-               minqpsetquadratictermsparse(&state, &sa, ae_randomreal() > 0.5);
+               minqpsetquadratictermsparse(&state, &sa, ae_randombool());
             }
             minqpsetstartingpoint(&state, &xstart);
             minqpsetorigin(&state, &xorigin);
@@ -31119,16 +31011,16 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_matrix_set_length(&rawc, n, n + 1);
          ae_vector_set_length(&rawct, n);
          for (i = 0; i < n; i++) {
-            da.ptr.p_double[i] = exp(6 * ae_randomreal() - 3);
+            da.ptr.p_double[i] = exp(3.0 * ae_randommid());
             for (j = 0; j < n; j++) {
                a.ptr.pp_double[i][j] = 0.0;
             }
             a.ptr.pp_double[i][i] = da.ptr.p_double[i];
          }
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
+            b.ptr.p_double[i] = ae_randommid();
+            xstart.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n; i++) {
             ae_v_move(rawc.ptr.pp_double[i], 1, t2.ptr.pp_double[i], 1, n);
@@ -31254,14 +31146,14 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          ae_vector_set_length(&rawct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               rawc.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               rawc.ptr.pp_double[i][j] = ae_randommid();
             }
             v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             rawct.ptr.p_int[i] = ae_randominteger(3) - 1;
@@ -31276,7 +31168,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             }
          }
          for (i = 0; i < n; i++) {
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
          }
       // Create optimizer, solve
          minqpcreate(n, &state);
@@ -31355,12 +31247,12 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
             x0.ptr.p_double[i] = 3 * ae_randomreal() - 1;
             b.ptr.p_double[i] = -x0.ptr.p_double[i];
             for (j = 0; j <= n; j++) {
-               rawc.ptr.pp_double[2 * i + 0][j] = 0.0;
+               rawc.ptr.pp_double[2 * i][j] = 0.0;
                rawc.ptr.pp_double[2 * i + 1][j] = 0.0;
             }
-            rawc.ptr.pp_double[2 * i + 0][i] = 1.0;
-            rawc.ptr.pp_double[2 * i + 0][n] = 0.0;
-            rawct.ptr.p_int[2 * i + 0] = 1;
+            rawc.ptr.pp_double[2 * i][i] = 1.0;
+            rawc.ptr.pp_double[2 * i][n] = 0.0;
+            rawct.ptr.p_int[2 * i] = 1;
             rawc.ptr.pp_double[2 * i + 1][i] = 1.0;
             rawc.ptr.pp_double[2 * i + 1][n] = 1.0;
             rawct.ptr.p_int[2 * i + 1] = -1;
@@ -31761,7 +31653,7 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
          // * for overconstrained DENSE-AUL
             skiptest = false;
             skiptest = skiptest || solvertype == 0;
-            skiptest = skiptest || (solvertype == 1 && (double)nactive > 0.5 * (n - 1));
+            skiptest = skiptest || solvertype == 1 && (double)nactive > 0.5 * (n - 1);
             if (!skiptest) {
                ae_vector_set_length(&gtrial, n);
                for (i = 0; i < n; i++) {
@@ -31817,9 +31709,9 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       ae_matrix_set_length(&rawc, rawccnt, n + 1);
       ae_vector_set_length(&rawct, rawccnt);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
+         b.ptr.p_double[i] = ae_randommid();
+         xstart.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < rawccnt; i++) {
          ae_v_move(rawc.ptr.pp_double[i], 1, t2.ptr.pp_double[i], 1, n);
@@ -31911,16 +31803,16 @@ static void testminqpunit_generallcqptest(bool *errorflag) {
       ae_matrix_set_length(&rawc, rawccnt, n + 1);
       ae_vector_set_length(&rawct, rawccnt);
       for (i = 0; i < n; i++) {
-         da.ptr.p_double[i] = exp(8 * ae_randomreal() - 4);
+         da.ptr.p_double[i] = exp(4.0 * ae_randommid());
          for (j = 0; j < n; j++) {
             a.ptr.pp_double[i][j] = 0.0;
          }
          a.ptr.pp_double[i][i] = da.ptr.p_double[i];
       }
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
+         b.ptr.p_double[i] = ae_randommid();
+         xstart.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < rawccnt; i++) {
          ae_v_move(rawc.ptr.pp_double[i], 1, t2.ptr.pp_double[i], 1, n);
@@ -32745,14 +32637,14 @@ static void testminqpunit_denseaultests(bool *errorflag) {
       ae_vector_set_length(&rawct, 2 * n);
       for (i = 0; i < n; i++) {
          for (j = 0; j <= n; j++) {
-            rawc.ptr.pp_double[2 * i + 0][j] = 0.0;
+            rawc.ptr.pp_double[2 * i][j] = 0.0;
             rawc.ptr.pp_double[2 * i + 1][j] = 0.0;
          }
-         rawc.ptr.pp_double[2 * i + 0][i] = 1.0;
+         rawc.ptr.pp_double[2 * i][i] = 1.0;
          rawc.ptr.pp_double[2 * i + 1][i] = 1.0;
-         rawc.ptr.pp_double[2 * i + 0][n] = -1.0;
+         rawc.ptr.pp_double[2 * i][n] = -1.0;
          rawc.ptr.pp_double[2 * i + 1][n] = 1.0;
-         rawct.ptr.p_int[2 * i + 0] = 1;
+         rawct.ptr.p_int[2 * i] = 1;
          rawct.ptr.p_int[2 * i + 1] = -1;
       }
    // Create optimizer, solve
@@ -33295,7 +33187,7 @@ bool testminqp(bool silent) {
    specerrors = false;
    testminqpunit_spectests(&specerrors);
 // report
-   waserrors = ((((((((((simpleerrors || func1errors) || func2errors) || bcqperrors) || ecqperrors) || icqperrors) || lcqperrors) || quickqperrors) || bleicerrors) || denseaulerrors) || ipmerrors) || specerrors;
+   waserrors = simpleerrors || func1errors || func2errors || bcqperrors || ecqperrors || icqperrors || lcqperrors || quickqperrors || bleicerrors || denseaulerrors || ipmerrors || specerrors;
    if (!silent || waserrors) {
       printf("TESTING MinQP\n");
       printf("BASIC TESTS:\n");
@@ -33642,8 +33534,7 @@ static void testminlpunit_basictests(bool *err) {
          for (i = 0; i < n; i++) {
             do {
                c.ptr.p_double[i] = hqrndnormal(&rs);
-            }
-            while (c.ptr.p_double[i] == 0.0);
+            } while (c.ptr.p_double[i] == 0.0);
             bndl.ptr.p_double[i] = hqrndnormal(&rs);
             bndu.ptr.p_double[i] = bndl.ptr.p_double[i] + hqrnduniformi(&rs, 3);
          }
@@ -33802,7 +33693,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix a, RVec
       ccnt = 0;
       for (i = 0; i < m; i++) {
          for (j = 0; j < n; j++) {
-            a1.ptr.pp_double[ccnt + 0][j] = a->ptr.pp_double[i][j];
+            a1.ptr.pp_double[ccnt][j] = a->ptr.pp_double[i][j];
             a1.ptr.pp_double[ccnt + 1][j] = a->ptr.pp_double[i][j];
          }
          if (isfinite(al->ptr.p_double[i]) && isfinite(au->ptr.p_double[i]) && al->ptr.p_double[i] == au->ptr.p_double[i]) {
@@ -33899,9 +33790,9 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix a, RVec
             for (j = 0; j < ndup; j++) {
                k = hqrnduniformi(rs, n);
                v = hqrndnormal(rs);
-               idxi.ptr.p_int[nz + nadd + 2 * j + 0] = k;
+               idxi.ptr.p_int[nz + nadd + 2 * j] = k;
                idxi.ptr.p_int[nz + nadd + 2 * j + 1] = k;
-               ai.ptr.p_double[nz + nadd + 2 * j + 0] = v;
+               ai.ptr.p_double[nz + nadd + 2 * j] = v;
                ai.ptr.p_double[nz + nadd + 2 * j + 1] = -v;
             }
             nzmod = nz + nadd + 2 * ndup;
@@ -34287,8 +34178,7 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
       i = hqrnduniformi(rs, n);
       do {
          c->ptr.p_double[i] = hqrndnormal(rs);
-      }
-      while (c->ptr.p_double[i] == 0.0);
+      } while (c->ptr.p_double[i] == 0.0);
       v = pow(q, hqrndnormal(rs)) - pow(q, hqrndnormal(rs));
       if (c->ptr.p_double[i] < 0.0) {
          bndl->ptr.p_double[i] = v;
@@ -35131,16 +35021,16 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                ae_matrix_set_length(&c, k, n + 1);
                ae_vector_set_length(&ct, k);
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x0.ptr.p_double[i] = ae_randommid();
                   xm.ptr.p_double[i] = x0.ptr.p_double[i];
-                  xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  xstart.ptr.p_double[i] = ae_randommid();
                }
                for (i = 0; i < k; i++) {
                   ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
                   v = ae_v_dotproduct(q.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
                   c.ptr.pp_double[i][n] = v;
                   ct.ptr.p_int[i] = 0;
-                  v = 2 * ae_randomreal() - 1;
+                  v = ae_randommid();
                   ae_v_addd(xm.ptr.p_double, 1, q.ptr.pp_double[i], 1, n, v);
                }
                for (i = 0; i < n; i++) {
@@ -35261,18 +35151,17 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             ae_matrix_set_length(&c, 1, n + 1);
             ae_vector_set_length(&ct, 1);
             for (i = 0; i < n; i++) {
-               xm.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-               xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               xm.ptr.p_double[i] = ae_randommid();
+               xstart.ptr.p_double[i] = ae_randommid();
             }
             do {
                v = 0.0;
                for (i = 0; i < n; i++) {
-                  c.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+                  c.ptr.pp_double[0][i] = ae_randommid();
                   v += ae_sqr(c.ptr.pp_double[0][i]);
                }
                v = sqrt(v);
-            }
-            while (v == 0.0);
+            } while (v == 0.0);
             for (i = 0; i < n; i++) {
                c.ptr.pp_double[0][i] /= v;
             }
@@ -35409,9 +35298,9 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             ae_matrix_set_length(&c, k, n + 1);
             ae_vector_set_length(&ct, k);
             for (i = 0; i < n; i++) {
-               x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-               xm.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-               xstart.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x0.ptr.p_double[i] = ae_randommid();
+               xm.ptr.p_double[i] = ae_randommid();
+               xstart.ptr.p_double[i] = ae_randommid();
             }
             for (i = 0; i < k; i++) {
                ae_v_move(c.ptr.pp_double[i], 1, q.ptr.pp_double[i], 1, n);
@@ -35521,17 +35410,17 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
          for (i = 0; i < n; i++) {
-            xm.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xm.ptr.p_double[i] = ae_randommid();
             x0.ptr.p_double[i] = 3 * ae_randomreal() - 1;
             bndl.ptr.p_double[i] = -(0.1 + 0.9 * ae_randomreal());
             bndu.ptr.p_double[i] = 0.1 + 0.9 * ae_randomreal();
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[2 * i + 0][j] = 0.0;
+               c.ptr.pp_double[2 * i][j] = 0.0;
                c.ptr.pp_double[2 * i + 1][j] = 0.0;
             }
-            c.ptr.pp_double[2 * i + 0][i] = 1.0;
-            c.ptr.pp_double[2 * i + 0][n] = bndl.ptr.p_double[i];
-            ct.ptr.p_int[2 * i + 0] = 1;
+            c.ptr.pp_double[2 * i][i] = 1.0;
+            c.ptr.pp_double[2 * i][n] = bndl.ptr.p_double[i];
+            ct.ptr.p_int[2 * i] = 1;
             c.ptr.pp_double[2 * i + 1][i] = 1.0;
             c.ptr.pp_double[2 * i + 1][n] = bndu.ptr.p_double[i];
             ct.ptr.p_int[2 * i + 1] = -1;
@@ -35664,21 +35553,21 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-            xm.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            xm.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             xstart.ptr.p_double[i] = (double)(ae_randominteger(2));
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[i][j] = ae_randommid();
             }
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
             c.ptr.pp_double[i][n] = v;
             ct.ptr.p_int[i] = 0;
          }
          for (i = 0; i < n; i++) {
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
          }
       // Create optimizer, solve
          minnlccreate(n, &xstart, &state);
@@ -35765,7 +35654,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
             x0.ptr.p_double[i] = (double)(ae_randominteger(2));
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n / 2; i++) {
             v = 0.0;
@@ -35888,13 +35777,13 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          ae_vector_set_length(&ct, k);
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = 0.1 + 0.8 * ae_randomreal();
-            b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            b.ptr.p_double[i] = ae_randommid();
             bndl.ptr.p_double[i] = 0.0;
             bndu.ptr.p_double[i] = 1.0;
          }
          for (i = 0; i < k; i++) {
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[i][j] = ae_randommid();
             }
             c.ptr.pp_double[i][i] += 4;
             v = ae_v_dotproduct(c.ptr.pp_double[i], 1, x0.ptr.p_double, 1, n);
@@ -35903,7 +35792,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          }
       // Start from first point
          for (i = 0; i < n; i++) {
-            xstart.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+            xstart.ptr.p_double[i] = 2.0 * ae_randommid();
          }
          minnlccreate(n, &xstart, &state);
          if (solvertype == 0) {
@@ -35953,7 +35842,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
          }
       // Start from another point
          for (i = 0; i < n; i++) {
-            xstart.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+            xstart.ptr.p_double[i] = 2.0 * ae_randommid();
          }
          minnlcrestartfrom(&state, &xstart);
          while (minnlciteration(&state)) {
@@ -36300,7 +36189,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                      }
                      ce.ptr.pp_double[i][k] = 1.0;
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                   if (xs0.ptr.p_double[i] >= bu.ptr.p_double[i] - tolconstr) {
@@ -36309,7 +36198,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                      }
                      ce.ptr.pp_double[i][k] = -1.0;
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                }
@@ -36324,7 +36213,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                         ce.ptr.pp_double[j][k] = c.ptr.pp_double[i][j];
                      }
                      nonnegative.ptr.p_bool[k] = false;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                   if (ct.ptr.p_int[i] > 0 && v <= tolconstr || ct.ptr.p_int[i] < 0 && v >= -tolconstr) {
@@ -36332,7 +36221,7 @@ static void testminnlcunit_testlc(bool *wereerrors) {
                         ce.ptr.pp_double[j][k] = ae_sign((double)(ct.ptr.p_int[i])) * c.ptr.pp_double[i][j];
                      }
                      nonnegative.ptr.p_bool[k] = true;
-                     inc(&k);
+                     k++;
                      continue;
                   }
                }
@@ -36420,7 +36309,7 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
       n = 2;
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
       }
       minnlccreate(n, &x0, &state);
       if (solvertype == 0) {
@@ -36584,8 +36473,8 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                // Inequality constraints
                   for (i = 0; i < cntnlic; i++) {
                      k = cntnlec + i;
-                     state.fi.ptr.p_double[1 + cntnlec + 2 * i + 0] = (bndl.ptr.p_double[k] - state.x.ptr.p_double[k]) / s.ptr.p_double[k];
-                     state.j.ptr.pp_double[1 + cntnlec + 2 * i + 0][k] = -1 / s.ptr.p_double[k];
+                     state.fi.ptr.p_double[1 + cntnlec + 2 * i] = (bndl.ptr.p_double[k] - state.x.ptr.p_double[k]) / s.ptr.p_double[k];
+                     state.j.ptr.pp_double[1 + cntnlec + 2 * i][k] = -1 / s.ptr.p_double[k];
                      state.fi.ptr.p_double[1 + cntnlec + 2 * i + 1] = (state.x.ptr.p_double[k] - bndu.ptr.p_double[k]) / s.ptr.p_double[k];
                      state.j.ptr.pp_double[1 + cntnlec + 2 * i + 1][k] = 1 / s.ptr.p_double[k];
                   }
@@ -36684,20 +36573,20 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
                if (ckind.ptr.p_int[i] == 1) {
                // Bound equality constrained
-                  bndl.ptr.p_double[2 * i + 0] = hqrnduniformr(&rs) - 0.5;
-                  bndu.ptr.p_double[2 * i + 0] = bndl.ptr.p_double[2 * i + 0];
+                  bndl.ptr.p_double[2 * i] = hqrnduniformr(&rs) - 0.5;
+                  bndu.ptr.p_double[2 * i] = bndl.ptr.p_double[2 * i];
                   bndl.ptr.p_double[2 * i + 1] = hqrnduniformr(&rs) - 0.5;
                   bndu.ptr.p_double[2 * i + 1] = bndl.ptr.p_double[2 * i + 1];
-                  inc(&cntbc);
+                  cntbc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 2) {
                // Bound inequality constrained
-                  bndl.ptr.p_double[2 * i + 0] = hqrnduniformr(&rs) - 0.5;
-                  bndu.ptr.p_double[2 * i + 0] = bndl.ptr.p_double[2 * i + 0] + 0.5;
+                  bndl.ptr.p_double[2 * i] = hqrnduniformr(&rs) - 0.5;
+                  bndu.ptr.p_double[2 * i] = bndl.ptr.p_double[2 * i] + 0.5;
                   bndl.ptr.p_double[2 * i + 1] = hqrnduniformr(&rs) - 0.5;
                   bndu.ptr.p_double[2 * i + 1] = bndl.ptr.p_double[2 * i + 1] + 0.5;
-                  inc(&cntbc);
+                  cntbc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 3) {
@@ -36707,11 +36596,11 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   }
                   vx = hqrnduniformr(&rs) - 0.5;
                   vy = hqrnduniformr(&rs) - 0.5;
-                  c.ptr.pp_double[cntlc][2 * i + 0] = vx;
+                  c.ptr.pp_double[cntlc][2 * i] = vx;
                   c.ptr.pp_double[cntlc][2 * i + 1] = vy;
                   c.ptr.pp_double[cntlc][n] = hqrnduniformr(&rs) - 0.5;
                   ct.ptr.p_int[cntlc] = 0;
-                  inc(&cntlc);
+                  cntlc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 4) {
@@ -36721,23 +36610,23 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                   }
                   vx = hqrnduniformr(&rs) - 0.5;
                   vy = hqrnduniformr(&rs) - 0.5;
-                  c.ptr.pp_double[cntlc][2 * i + 0] = vx;
+                  c.ptr.pp_double[cntlc][2 * i] = vx;
                   c.ptr.pp_double[cntlc][2 * i + 1] = vy;
                   c.ptr.pp_double[cntlc][n] = hqrnduniformr(&rs) - 0.5;
                   ct.ptr.p_int[cntlc] = -1;
-                  inc(&cntlc);
+                  cntlc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 5) {
                // Nonlinear equality constrained
                   rnlc.ptr.p_double[i] = 0.5 + hqrnduniformr(&rs);
-                  inc(&cntnlec);
+                  cntnlec++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 6) {
                // Nonlinear inequality constrained
                   rnlc.ptr.p_double[i] = 0.5 + hqrnduniformr(&rs);
-                  inc(&cntnlic);
+                  cntnlic++;
                   continue;
                }
                ae_assert(false, "Assertion failed");
@@ -36796,10 +36685,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                         for (j = 0; j < n; j++) {
                            state.j.ptr.pp_double[knlec][j] = 0.0;
                         }
-                        state.fi.ptr.p_double[knlec] = ae_sqr(state.x.ptr.p_double[2 * i + 0]) + ae_sqr(state.x.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
-                        state.j.ptr.pp_double[knlec][2 * i + 0] = 2 * state.x.ptr.p_double[2 * i + 0];
+                        state.fi.ptr.p_double[knlec] = ae_sqr(state.x.ptr.p_double[2 * i]) + ae_sqr(state.x.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
+                        state.j.ptr.pp_double[knlec][2 * i] = 2 * state.x.ptr.p_double[2 * i];
                         state.j.ptr.pp_double[knlec][2 * i + 1] = 2 * state.x.ptr.p_double[2 * i + 1];
-                        inc(&knlec);
+                        knlec++;
                         continue;
                      }
                      if (ckind.ptr.p_int[i] == 6) {
@@ -36807,10 +36696,10 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                         for (j = 0; j < n; j++) {
                            state.j.ptr.pp_double[knlic][j] = 0.0;
                         }
-                        state.fi.ptr.p_double[knlic] = ae_sqr(state.x.ptr.p_double[2 * i + 0]) + ae_sqr(state.x.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
-                        state.j.ptr.pp_double[knlic][2 * i + 0] = 2 * state.x.ptr.p_double[2 * i + 0];
+                        state.fi.ptr.p_double[knlic] = ae_sqr(state.x.ptr.p_double[2 * i]) + ae_sqr(state.x.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
+                        state.j.ptr.pp_double[knlic][2 * i] = 2 * state.x.ptr.p_double[2 * i];
                         state.j.ptr.pp_double[knlic][2 * i + 1] = 2 * state.x.ptr.p_double[2 * i + 1];
-                        inc(&knlic);
+                        knlic++;
                         continue;
                      }
                   }
@@ -36840,41 +36729,41 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                }
                if (ckind.ptr.p_int[i] == 1) {
                // Bound equality constrained
-                  ae_set_error_flag(wereerrors, fabs(x1.ptr.p_double[2 * i + 0] - bndl.ptr.p_double[2 * i + 0]) > tolx, __FILE__, __LINE__, "testminnlcunit");
+                  ae_set_error_flag(wereerrors, fabs(x1.ptr.p_double[2 * i] - bndl.ptr.p_double[2 * i]) > tolx, __FILE__, __LINE__, "testminnlcunit");
                   ae_set_error_flag(wereerrors, fabs(x1.ptr.p_double[2 * i + 1] - bndl.ptr.p_double[2 * i + 1]) > tolx, __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 2) {
                // Bound inequality constrained
-                  ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i + 0] < bndl.ptr.p_double[2 * i + 0] - tolx, __FILE__, __LINE__, "testminnlcunit");
-                  ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i + 0] > bndu.ptr.p_double[2 * i + 0] + tolx, __FILE__, __LINE__, "testminnlcunit");
+                  ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i] < bndl.ptr.p_double[2 * i] - tolx, __FILE__, __LINE__, "testminnlcunit");
+                  ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i] > bndu.ptr.p_double[2 * i] + tolx, __FILE__, __LINE__, "testminnlcunit");
                   ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i + 1] < bndl.ptr.p_double[2 * i + 1] - tolx, __FILE__, __LINE__, "testminnlcunit");
                   ae_set_error_flag(wereerrors, x1.ptr.p_double[2 * i + 1] > bndu.ptr.p_double[2 * i + 1] + tolx, __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 3) {
                // Linear equality constrained
-                  v = x1.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
+                  v = x1.ptr.p_double[2 * i] * c.ptr.pp_double[klc][2 * i] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
                   ae_set_error_flag(wereerrors, fabs(v) > tolx, __FILE__, __LINE__, "testminnlcunit");
-                  inc(&klc);
+                  klc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 4) {
                // Linear inequality constrained
-                  v = x1.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
+                  v = x1.ptr.p_double[2 * i] * c.ptr.pp_double[klc][2 * i] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
                   ae_set_error_flag(wereerrors, v > tolx, __FILE__, __LINE__, "testminnlcunit");
-                  inc(&klc);
+                  klc++;
                   continue;
                }
                if (ckind.ptr.p_int[i] == 5) {
                // Nonlinear equality constrained
-                  v = ae_sqr(x1.ptr.p_double[2 * i + 0]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
+                  v = ae_sqr(x1.ptr.p_double[2 * i]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
                   ae_set_error_flag(wereerrors, fabs(v) > tolx, __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 6) {
                // Nonlinear inequality constrained
-                  v = ae_sqr(x1.ptr.p_double[2 * i + 0]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
+                  v = ae_sqr(x1.ptr.p_double[2 * i]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
                   ae_set_error_flag(wereerrors, v > tolx, __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
@@ -36897,55 +36786,55 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
             for (i = 0; i < n2; i++) {
                if (ckind.ptr.p_int[i] == 0) {
                // Unconstrained
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 1) {
                // Bound equality constrained, unconditionally set gradient to zero
-                  g.ptr.p_double[2 * i + 0] = 0.0;
+                  g.ptr.p_double[2 * i] = 0.0;
                   g.ptr.p_double[2 * i + 1] = 0.0;
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 2) {
                // Bound inequality constrained, conditionally set gradient to zero
                // (when constraint is active)
-                  if (x1.ptr.p_double[2 * i + 0] < bndl.ptr.p_double[2 * i + 0] + tolx || x1.ptr.p_double[2 * i + 0] > bndu.ptr.p_double[2 * i + 0] - tolx) {
-                     g.ptr.p_double[2 * i + 0] = 0.0;
+                  if (x1.ptr.p_double[2 * i] < bndl.ptr.p_double[2 * i] + tolx || x1.ptr.p_double[2 * i] > bndu.ptr.p_double[2 * i] - tolx) {
+                     g.ptr.p_double[2 * i] = 0.0;
                   }
                   if (x1.ptr.p_double[2 * i + 1] < bndl.ptr.p_double[2 * i + 1] + tolx || x1.ptr.p_double[2 * i + 1] > bndu.ptr.p_double[2 * i + 1] - tolx) {
                      g.ptr.p_double[2 * i + 1] = 0.0;
                   }
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 3) {
                // Linear equality constrained, unconditionally project gradient into
                // equality constrained subspace
-                  v = g.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
-                  vv = ae_sqr(c.ptr.pp_double[klc][2 * i + 0]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
-                  g.ptr.p_double[2 * i + 0] -= c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
+                  v = g.ptr.p_double[2 * i] * c.ptr.pp_double[klc][2 * i] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
+                  vv = ae_sqr(c.ptr.pp_double[klc][2 * i]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
+                  g.ptr.p_double[2 * i] -= c.ptr.pp_double[klc][2 * i] * (v / vv);
                   g.ptr.p_double[2 * i + 1] -= c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
-                  inc(&klc);
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  klc++;
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
                if (ckind.ptr.p_int[i] == 4) {
                // Linear inequality constrained, conditionally project gradient
                // (when constraint is active)
-                  v = x1.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
+                  v = x1.ptr.p_double[2 * i] * c.ptr.pp_double[klc][2 * i] + x1.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1] - c.ptr.pp_double[klc][n];
                   if (v > -tolx) {
-                     v = g.ptr.p_double[2 * i + 0] * c.ptr.pp_double[klc][2 * i + 0] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
-                     vv = ae_sqr(c.ptr.pp_double[klc][2 * i + 0]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
-                     g.ptr.p_double[2 * i + 0] -= c.ptr.pp_double[klc][2 * i + 0] * (v / vv);
+                     v = g.ptr.p_double[2 * i] * c.ptr.pp_double[klc][2 * i] + g.ptr.p_double[2 * i + 1] * c.ptr.pp_double[klc][2 * i + 1];
+                     vv = ae_sqr(c.ptr.pp_double[klc][2 * i]) + ae_sqr(c.ptr.pp_double[klc][2 * i + 1]);
+                     g.ptr.p_double[2 * i] -= c.ptr.pp_double[klc][2 * i] * (v / vv);
                      g.ptr.p_double[2 * i + 1] -= c.ptr.pp_double[klc][2 * i + 1] * (v / vv);
                   }
-                  inc(&klc);
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  klc++;
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
@@ -36954,13 +36843,13 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                //
                // NOTE: here we rely on the fact that corresponding components of X
                //       sum to one.
-                  v = coalesce(sqrt(ae_sqr(x1.ptr.p_double[2 * i + 0]) + ae_sqr(x1.ptr.p_double[2 * i + 1])), 1.0);
-                  vx = x1.ptr.p_double[2 * i + 0] / v;
+                  v = coalesce(sqrt(ae_sqr(x1.ptr.p_double[2 * i]) + ae_sqr(x1.ptr.p_double[2 * i + 1])), 1.0);
+                  vx = x1.ptr.p_double[2 * i] / v;
                   vy = x1.ptr.p_double[2 * i + 1] / v;
-                  v = g.ptr.p_double[2 * i + 0] * vx + g.ptr.p_double[2 * i + 1] * vy;
-                  g.ptr.p_double[2 * i + 0] -= vx * v;
+                  v = g.ptr.p_double[2 * i] * vx + g.ptr.p_double[2 * i + 1] * vy;
+                  g.ptr.p_double[2 * i] -= vx * v;
                   g.ptr.p_double[2 * i + 1] -= vy * v;
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
@@ -36970,16 +36859,16 @@ static void testminnlcunit_testnlc(bool *wereerrors) {
                //
                // NOTE: here we rely on the fact that corresponding components of X
                //       sum to one.
-                  v = ae_sqr(x1.ptr.p_double[2 * i + 0]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
+                  v = ae_sqr(x1.ptr.p_double[2 * i]) + ae_sqr(x1.ptr.p_double[2 * i + 1]) - rnlc.ptr.p_double[i];
                   if (v > -tolx) {
-                     v = coalesce(sqrt(ae_sqr(x1.ptr.p_double[2 * i + 0]) + ae_sqr(x1.ptr.p_double[2 * i + 1])), 1.0);
-                     vx = x1.ptr.p_double[2 * i + 0] / v;
+                     v = coalesce(sqrt(ae_sqr(x1.ptr.p_double[2 * i]) + ae_sqr(x1.ptr.p_double[2 * i + 1])), 1.0);
+                     vx = x1.ptr.p_double[2 * i] / v;
                      vy = x1.ptr.p_double[2 * i + 1] / v;
-                     v = g.ptr.p_double[2 * i + 0] * vx + g.ptr.p_double[2 * i + 1] * vy;
-                     g.ptr.p_double[2 * i + 0] -= vx * v;
+                     v = g.ptr.p_double[2 * i] * vx + g.ptr.p_double[2 * i + 1] * vy;
+                     g.ptr.p_double[2 * i] -= vx * v;
                      g.ptr.p_double[2 * i + 1] -= vy * v;
                   }
-                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i + 0]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
+                  gnorm2 += ae_sqr(g.ptr.p_double[2 * i]) + ae_sqr(g.ptr.p_double[2 * i + 1]);
                   ae_set_error_flag(wereerrors, gnorm2 > ae_sqr(tolg) * ae_maxreal(rawgnorm2, 1.0), __FILE__, __LINE__, "testminnlcunit");
                   continue;
                }
@@ -37434,7 +37323,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                continue;
             }
             if (state.xupdated) {
-               inc(&k);
+               k++;
                continue;
             }
             ae_assert(false, "Assertion failed");
@@ -37913,7 +37802,7 @@ static void testminnlcunit_testother(bool *wereerrors) {
                   minnlcrequesttermination(&state);
                   terminationrequested = true;
                }
-               inc(&callidx);
+               callidx++;
                continue;
             }
             if (state.xupdated) {
@@ -38839,8 +38728,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   v += ae_sqr(xu.ptr.p_double[i]);
                }
                v = sqrt(v);
-            }
-            while (v <= 0.0);
+            } while (v <= 0.0);
             for (i = 0; i < n; i++) {
                xu.ptr.p_double[i] /= v;
             }
@@ -38899,11 +38787,11 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                         state.j.ptr.pp_double[0][i] -= vpower * xu.ptr.p_double[i];
                      }
                      if (linesearchstarted) {
-                        inc(&cntbelow);
+                        cntbelow++;
                      }
                   } else {
                      if (linesearchstarted) {
-                        inc(&cntabove);
+                        cntabove++;
                      }
                   }
                   continue;
@@ -38916,8 +38804,8 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                         stplen += ae_sqr(state.x.ptr.p_double[i] - xlast.ptr.p_double[i]);
                      }
                      stplen = sqrt(stplen);
-                     wasgoodlinesearch0 = wasgoodlinesearch0 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
-                     wasgoodlinesearch1 = wasgoodlinesearch1 || ((cntbelow >= 2 && cntabove >= 2) && stplen >= shortstplen);
+                     wasgoodlinesearch0 = wasgoodlinesearch0 || cntbelow >= 2 && cntabove >= 2 && stplen >= shortstplen;
+                     wasgoodlinesearch1 = wasgoodlinesearch1 || cntbelow >= 2 && cntabove >= 2 && stplen >= shortstplen;
                   }
                // Start new line search
                   linesearchstarted = true;
@@ -38931,9 +38819,9 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                      v += state.x.ptr.p_double[i] * xu.ptr.p_double[i];
                   }
                   if (v < vbnd) {
-                     inc(&cntbelow);
+                     cntbelow++;
                   } else {
-                     inc(&cntabove);
+                     cntabove++;
                   }
                // Done
                   continue;
@@ -38956,7 +38844,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   ae_set_error_flag(wereerrors, !ogrep.nonc0suspected, __FILE__, __LINE__, "testminnlcunit");
                   ae_set_error_flag(wereerrors, ogrep.nonc0fidx != 0, __FILE__, __LINE__, "testminnlcunit");
                } else {
-                  inc(&shortsessions);
+                  shortsessions++;
                }
             }
             if (defecttype == 1) {
@@ -38965,7 +38853,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
                   ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit");
                   ae_set_error_flag(wereerrors, ogrep.nonc1fidx != 0, __FILE__, __LINE__, "testminnlcunit");
                } else {
-                  inc(&shortsessions);
+                  shortsessions++;
                }
             }
             if (*wereerrors) {
@@ -39078,7 +38966,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          failed = failed || !ogrep.nonc1suspected;
          failed = failed || ogrep.nonc1fidx != 0;
          if (failed) {
-            inc(&failurecounter);
+            failurecounter++;
          }
       // Check C1 continuity test #0
          minnlcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -39097,7 +38985,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit");
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
             testminnlcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-            inc(&c1test0fails);
+            c1test0fails++;
          }
          if (ogrep.nonc1test1positive) {
             ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit");
@@ -39113,7 +39001,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit");
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
             testminnlcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-            inc(&c1test1fails);
+            c1test1fails++;
          }
       }
       ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit");
@@ -39208,7 +39096,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          failed = failed || !ogrep.nonc1suspected;
          failed = failed || ogrep.nonc1fidx != 0;
          if (failed) {
-            inc(&failurecounter);
+            failurecounter++;
          }
       }
       ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit");
@@ -39311,7 +39199,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
          failed = failed || optguardallclear(&ogrep);
          failed = failed || !ogrep.nonc1suspected;
          if (failed) {
-            inc(&failurecounter);
+            failurecounter++;
          }
       // Check C1 continuity tests #0 and #1
          minnlcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -39330,7 +39218,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminnlcunit");
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test0reportfortask1(wereerrors, &ognonc1test0lngrep, &a, n, goodidx);
-            inc(&c1test0fails);
+            c1test0fails++;
          }
          if (ogrep.nonc1test1positive) {
             ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminnlcunit");
@@ -39346,7 +39234,7 @@ static void testminnlcunit_testoptguard(bool *wereerrors) {
             ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminnlcunit");
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1strrep, &a, n, goodidx);
             testminnlcunit_testoptguardc1test1reportfortask1(wereerrors, &ognonc1test1lngrep, &a, n, goodidx);
-            inc(&c1test1fails);
+            c1test1fails++;
          }
       }
       ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminnlcunit");
@@ -39623,7 +39511,7 @@ bool testminnlc(bool silent) {
    testminnlcunit_testother(&othererr);
    testminnlcunit_testoptguard(&optguarderr);
 // end
-   waserrors = ((((bcerr || lcerr) || nlcerr) || othererr) || bugs) || optguarderr;
+   waserrors = bcerr || lcerr || nlcerr || othererr || bugs || optguarderr;
    if (!silent || waserrors) {
       printf("TESTING MINNLC OPTIMIZATION\n");
       printf("GENERIC TESTS:\n");
@@ -39709,7 +39597,7 @@ static void testminbcunit_setrandompreconditioner(minbcstate *state, ae_int_t n,
    if (preckind == 1) {
       ae_vector_set_length(&p, n);
       for (i = 0; i < n; i++) {
-         p.ptr.p_double[i] = exp(6 * ae_randomreal() - 3);
+         p.ptr.p_double[i] = exp(3.0 * ae_randommid());
       }
       minbcsetprecdiag(state, &p);
    } else {
@@ -39861,7 +39749,7 @@ static void testminbcunit_testfeasibility(bool *feaserr, bool *converr, bool *in
                   ae_vector_set_length(&x, n);
                   ae_vector_set_length(&x0, n);
                   for (i = 0; i < n; i++) {
-                     if (ae_randomreal() > 0.5) {
+                     if (ae_randombool()) {
                         bl.ptr.p_double[i] = 0.0;
                         bu.ptr.p_double[i] = 1.0;
                      } else {
@@ -40093,7 +39981,7 @@ static void testminbcunit_testother(bool *err) {
       ae_vector_set_length(&bu, n);
       for (i = 0; i < n; i++) {
          x.ptr.p_double[i] = 10.0;
-         bl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         bl.ptr.p_double[i] = ae_randommid();
          bu.ptr.p_double[i] = +INFINITY;
       }
       minbccreate(n, &x, &state);
@@ -40200,7 +40088,7 @@ static void testminbcunit_testother(bool *err) {
       ae_vector_set_length(&bl, n);
       ae_vector_set_length(&bu, n);
       x.ptr.p_double[0] = 100.0;
-      bl.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      bl.ptr.p_double[0] = ae_randommid();
       bu.ptr.p_double[0] = +INFINITY;
       stpmax = 0.05 + 0.05 * ae_randomreal();
       minbccreate(n, &x, &state);
@@ -40273,9 +40161,9 @@ static void testminbcunit_testother(bool *err) {
                   x.ptr.p_double[i] = ae_randomreal() + 1;
                   bl.ptr.p_double[i] = -100000.0;
                   bu.ptr.p_double[i] = 100000.0;
-                  a.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
-                  s.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
-                  h.ptr.p_double[i] = exp(log(10.0) * (2 * ae_randomreal() - 1));
+                  a.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
+                  s.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
+                  h.ptr.p_double[i] = exp(log(10.0) * ae_randommid());
                }
                minbccreate(n, &x, &state);
                if (ckind == 1) {
@@ -40556,7 +40444,7 @@ static void testminbcunit_testother(bool *err) {
             continue;
          }
          if (state.xupdated) {
-            inc(&k);
+            k++;
             continue;
          }
          ae_assert(false, "Assertion failed");
@@ -40601,7 +40489,7 @@ static void testminbcunit_testother(bool *err) {
                minbcrequesttermination(&state);
                terminationrequested = true;
             }
-            inc(&callidx);
+            callidx++;
             continue;
          }
          if (state.xupdated) {
@@ -40696,7 +40584,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbcrestartfrom(&state, &x);
             while (minbciteration(&state)) {
@@ -40715,7 +40603,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbcrestartfrom(&state, &x);
             while (minbciteration(&state)) {
@@ -40736,7 +40624,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbcrestartfrom(&state, &x);
             while (minbciteration(&state)) {
@@ -40751,7 +40639,7 @@ static void testminbcunit_testpreconditioning(bool *err) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             minbcrestartfrom(&state, &x);
             while (minbciteration(&state)) {
@@ -41282,7 +41170,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    // Check C1 continuity test #0
       minbcoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -41301,7 +41189,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testminbcunit");
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testminbcunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         inc(&c1test0fails);
+         c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
          ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testminbcunit");
@@ -41317,7 +41205,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testminbcunit");
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testminbcunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         inc(&c1test1fails);
+         c1test1fails++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbcunit");
@@ -41397,7 +41285,7 @@ static void testminbcunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testminbcunit");
@@ -41466,7 +41354,7 @@ bool testminbc(bool silent) {
    testminbcunit_testpreconditioning(&precerrors);
    testminbcunit_testoptguard(&optguarderrors);
 // end
-   waserrors = ((((feasibilityerrors || othererrors) || converrors) || interrors) || precerrors) || optguarderrors;
+   waserrors = feasibilityerrors || othererrors || converrors || interrors || precerrors || optguarderrors;
    if (!silent || waserrors) {
       printf("TESTING BC OPTIMIZATION\n");
       printf("FEASIBILITY PROPERTIES:                   ");
@@ -41543,8 +41431,8 @@ static void testminnsunit_basictest0uc(bool *errors) {
    ae_vector_set_length(&d, n);
    for (pass = 1; pass <= 10; pass++) {
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         d.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = ae_randommid();
+         d.ptr.p_double[i] = pow(10.0, ae_randommid());
       }
       minnscreate(n, &x0, &s);
       minnssetalgoags(&s, 0.1, 0.0);
@@ -41656,10 +41544,10 @@ static void testminnsunit_basictest0bc(bool *errors) {
    ae_vector_set_length(&d, n);
    for (pass = 1; pass <= 10; pass++) {
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         d.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
-         v0 = 2 * ae_randomreal() - 1;
-         v1 = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
+         d.ptr.p_double[i] = pow(10.0, ae_randommid());
+         v0 = ae_randommid();
+         v1 = ae_randommid();
          bl.ptr.p_double[i] = ae_minreal(v0, v1);
          bu.ptr.p_double[i] = ae_maxreal(v0, v1);
       }
@@ -41778,22 +41666,22 @@ static void testminnsunit_basictest0lc(bool *errors) {
    for (pass = 1; pass <= 10; pass++) {
       nc = 0;
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         if (ae_randomreal() < 0.5) {
+         x0.ptr.p_double[i] = ae_randommid();
+         if (ae_randombool()) {
             for (j = 0; j <= n; j++) {
                c.ptr.pp_double[nc][j] = 0.0;
             }
             c.ptr.pp_double[nc][i] = 1.0 + ae_randomreal();
             ct.ptr.p_int[nc] = 0;
-            inc(&nc);
+            nc++;
          } else {
             for (j = 0; j <= n; j++) {
-               c.ptr.pp_double[nc + 0][j] = 0.0;
+               c.ptr.pp_double[nc][j] = 0.0;
                c.ptr.pp_double[nc + 1][j] = 0.0;
             }
-            c.ptr.pp_double[nc + 0][i] = 1.0 + ae_randomreal();
+            c.ptr.pp_double[nc][i] = 1.0 + ae_randomreal();
             c.ptr.pp_double[nc + 1][i] = 1.0 + ae_randomreal();
-            ct.ptr.p_int[nc + 0] = 1;
+            ct.ptr.p_int[nc] = 1;
             ct.ptr.p_int[nc + 1] = -1;
             nc += 2;
          }
@@ -41919,19 +41807,19 @@ static void testminnsunit_basictest0nlc(bool *errors) {
       nec = 0;
       nic = 0;
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         if (ae_randomreal() < 0.5) {
+         x0.ptr.p_double[i] = ae_randommid();
+         if (ae_randombool()) {
             for (j = 0; j <= n; j++) {
                ec.ptr.pp_double[nec][j] = 0.0;
             }
             ec.ptr.pp_double[nec][i] = 1.0 + ae_randomreal();
-            inc(&nec);
+            nec++;
          } else {
             for (j = 0; j <= n; j++) {
-               ic.ptr.pp_double[nic + 0][j] = 0.0;
+               ic.ptr.pp_double[nic][j] = 0.0;
                ic.ptr.pp_double[nic + 1][j] = 0.0;
             }
-            ic.ptr.pp_double[nic + 0][i] = 1.0 + ae_randomreal();
+            ic.ptr.pp_double[nic][i] = 1.0 + ae_randomreal();
             ic.ptr.pp_double[nic + 1][i] = -1.0 - ae_randomreal();
             nic += 2;
          }
@@ -42020,12 +41908,12 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&xrfirst, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            d.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
-            s.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
+            x0.ptr.p_double[i] = 10 * ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            d.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
+            s.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
          }
-         requirexrep = ae_randomreal() > 0.5;
+         requirexrep = ae_randombool();
          epsrad = 0.01 * pow(10.0, -2 * ae_randomreal());
          xtol = 15.0 * epsrad;
          minnscreate(n, &x0, &state);
@@ -42086,10 +41974,10 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&s, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            d.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
-            s.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
+            x0.ptr.p_double[i] = 10 * ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            d.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
+            s.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
          }
          epsrad = 0.01 * pow(10.0, -2 * ae_randomreal());
          xtol = 15.0 * epsrad;
@@ -42148,10 +42036,10 @@ static void testminnsunit_testuc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&s, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            s.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
-            d.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            s.ptr.p_double[i] = pow(10.0, ae_randommid());
+            d.ptr.p_double[i] = pow(10.0, ae_randommid());
+            x0.ptr.p_double[i] = ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
             x0s.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
          }
          minnscreate(n, &x0, &state);
@@ -42266,31 +42154,31 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&xrfirst, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            d.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
-            s.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
+            x0.ptr.p_double[i] = 10 * ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            d.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
+            s.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
             bndl.ptr.p_double[i] = -INFINITY;
             bndu.ptr.p_double[i] = +INFINITY;
             k = ae_randominteger(5);
             if (k == 1) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
             }
             if (k == 2) {
-               bndu.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndu.ptr.p_double[i] = ae_randommid();
             }
             if (k == 3) {
-               v0 = 2 * ae_randomreal() - 1;
-               v1 = 2 * ae_randomreal() - 1;
+               v0 = ae_randommid();
+               v1 = ae_randommid();
                bndl.ptr.p_double[i] = ae_minreal(v0, v1);
                bndu.ptr.p_double[i] = ae_maxreal(v0, v1);
             }
             if (k == 4) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
                bndu.ptr.p_double[i] = bndl.ptr.p_double[i];
             }
          }
-         requirexrep = ae_randomreal() > 0.5;
+         requirexrep = ae_randombool();
          epsrad = 0.01 * pow(10.0, -2 * ae_randomreal());
          xtol = 15.0 * epsrad;
          minnscreate(n, &x0, &state);
@@ -42482,27 +42370,27 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&s, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            d.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
-            s.ptr.p_double[i] = pow(10.0, 2 * (2 * ae_randomreal() - 1));
+            x0.ptr.p_double[i] = 10 * ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
+            d.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
+            s.ptr.p_double[i] = pow(10.0, 2 * ae_randommid());
             bndl.ptr.p_double[i] = -INFINITY;
             bndu.ptr.p_double[i] = +INFINITY;
             k = ae_randominteger(5);
             if (k == 1) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
             }
             if (k == 2) {
-               bndu.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndu.ptr.p_double[i] = ae_randommid();
             }
             if (k == 3) {
-               v0 = 2 * ae_randomreal() - 1;
-               v1 = 2 * ae_randomreal() - 1;
+               v0 = ae_randommid();
+               v1 = ae_randommid();
                bndl.ptr.p_double[i] = ae_minreal(v0, v1);
                bndu.ptr.p_double[i] = ae_maxreal(v0, v1);
             }
             if (k == 4) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
                bndu.ptr.p_double[i] = bndl.ptr.p_double[i];
             }
          }
@@ -42578,26 +42466,26 @@ static void testminnsunit_testbc(bool *primaryerrors, bool *othererrors) {
          for (i = 0; i < n; i++) {
             s.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
             d.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
             x0s.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
             bndl.ptr.p_double[i] = -INFINITY;
             bndu.ptr.p_double[i] = +INFINITY;
             k = ae_randominteger(5);
             if (k == 1) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
             }
             if (k == 2) {
-               bndu.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndu.ptr.p_double[i] = ae_randommid();
             }
             if (k == 3) {
-               v0 = 2 * ae_randomreal() - 1;
-               v1 = 2 * ae_randomreal() - 1;
+               v0 = ae_randommid();
+               v1 = ae_randommid();
                bndl.ptr.p_double[i] = ae_minreal(v0, v1);
                bndu.ptr.p_double[i] = ae_maxreal(v0, v1);
             }
             if (k == 4) {
-               bndl.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               bndl.ptr.p_double[i] = ae_randommid();
                bndu.ptr.p_double[i] = bndl.ptr.p_double[i];
             }
             scaledbndl.ptr.p_double[i] = bndl.ptr.p_double[i] * s.ptr.p_double[i];
@@ -42711,8 +42599,8 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          ae_vector_set_length(&d, n);
          ae_vector_set_length(&s, n);
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x0.ptr.p_double[i] = 10 * ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
             d.ptr.p_double[i] = 1 + ae_randomreal();
             s.ptr.p_double[i] = 1 + ae_randomreal();
          }
@@ -42824,12 +42712,12 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
          for (i = 0; i < n; i++) {
             x0.ptr.p_double[i] = ae_randomreal() - 0.5;
             for (j = 0; j < n; j++) {
-               c.ptr.pp_double[2 * i + 0][j] = 0.0;
+               c.ptr.pp_double[2 * i][j] = 0.0;
                c.ptr.pp_double[2 * i + 1][j] = 0.0;
             }
-            c.ptr.pp_double[2 * i + 0][i] = 1.0;
-            c.ptr.pp_double[2 * i + 0][n] = -1.0;
-            ct.ptr.p_int[2 * i + 0] = 1;
+            c.ptr.pp_double[2 * i][i] = 1.0;
+            c.ptr.pp_double[2 * i][n] = -1.0;
+            ct.ptr.p_int[2 * i] = 1;
             c.ptr.pp_double[2 * i + 1][i] = 1.0;
             c.ptr.pp_double[2 * i + 1][n] = 1.0;
             ct.ptr.p_int[2 * i + 1] = -1;
@@ -42890,36 +42778,36 @@ static void testminnsunit_testlc(bool *primaryerrors, bool *othererrors) {
             }
          }
          for (i = 0; i < n; i++) {
-            s.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
-            d.ptr.p_double[i] = pow(10.0, 2 * ae_randomreal() - 1);
-            x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            s.ptr.p_double[i] = pow(10.0, ae_randommid());
+            d.ptr.p_double[i] = pow(10.0, ae_randommid());
+            x0.ptr.p_double[i] = ae_randommid();
+            xc.ptr.p_double[i] = ae_randommid();
             x0s.ptr.p_double[i] = x0.ptr.p_double[i] * s.ptr.p_double[i];
             k = ae_randominteger(5);
             if (k == 1) {
-               c.ptr.pp_double[2 * i + 0][i] = 1.0;
-               c.ptr.pp_double[2 * i + 0][n] = 2 * ae_randomreal() - 1;
-               ct.ptr.p_int[2 * i + 0] = 1;
+               c.ptr.pp_double[2 * i][i] = 1.0;
+               c.ptr.pp_double[2 * i][n] = ae_randommid();
+               ct.ptr.p_int[2 * i] = 1;
             }
             if (k == 2) {
-               c.ptr.pp_double[2 * i + 0][i] = 1.0;
-               c.ptr.pp_double[2 * i + 0][n] = 2 * ae_randomreal() - 1;
-               ct.ptr.p_int[2 * i + 0] = -1;
+               c.ptr.pp_double[2 * i][i] = 1.0;
+               c.ptr.pp_double[2 * i][n] = ae_randommid();
+               ct.ptr.p_int[2 * i] = -1;
             }
             if (k == 3) {
-               v0 = 2 * ae_randomreal() - 1;
-               v1 = 2 * ae_randomreal() - 1;
-               c.ptr.pp_double[2 * i + 0][i] = 1.0;
-               c.ptr.pp_double[2 * i + 0][n] = ae_minreal(v0, v1);
+               v0 = ae_randommid();
+               v1 = ae_randommid();
+               c.ptr.pp_double[2 * i][i] = 1.0;
+               c.ptr.pp_double[2 * i][n] = ae_minreal(v0, v1);
                c.ptr.pp_double[2 * i + 1][i] = 1.0;
                c.ptr.pp_double[2 * i + 1][n] = ae_maxreal(v0, v1);
-               ct.ptr.p_int[2 * i + 0] = 1;
+               ct.ptr.p_int[2 * i] = 1;
                ct.ptr.p_int[2 * i + 1] = -1;
             }
             if (k == 4) {
-               c.ptr.pp_double[2 * i + 0][i] = 1.0;
-               c.ptr.pp_double[2 * i + 0][n] = 2 * ae_randomreal() - 1;
-               ct.ptr.p_int[2 * i + 0] = 0;
+               c.ptr.pp_double[2 * i][i] = 1.0;
+               c.ptr.pp_double[2 * i][n] = ae_randommid();
+               ct.ptr.p_int[2 * i] = 0;
             }
          }
          for (i = 0; i < 2 * n; i++) {
@@ -43038,8 +42926,8 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                ae_vector_set_length(&r, n);
                ae_vector_set_length(&s, n);
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x0.ptr.p_double[i] = ae_randommid();
+                  xc.ptr.p_double[i] = ae_randommid();
                   d.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   s.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   r.ptr.p_double[i] = (2 * ae_randominteger(2) - 1) * (0.1 + ae_randomreal());
@@ -43106,8 +42994,8 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                ae_vector_set_length(&r, n);
                ae_vector_set_length(&s, n);
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x0.ptr.p_double[i] = ae_randommid();
+                  xc.ptr.p_double[i] = ae_randommid();
                   d.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   s.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   r.ptr.p_double[i] = (2 * ae_randominteger(2) - 1) * (0.1 + ae_randomreal());
@@ -43188,8 +43076,8 @@ static void testminnsunit_testnlc(bool *primaryerrors, bool *othererrors) {
                ae_vector_set_length(&r, n);
                ae_vector_set_length(&s, n);
                for (i = 0; i < n; i++) {
-                  x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  xc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x0.ptr.p_double[i] = ae_randommid();
+                  xc.ptr.p_double[i] = ae_randommid();
                   d.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   s.ptr.p_double[i] = pow(10.0, ae_randomreal() - 0.5);
                   r.ptr.p_double[i] = (2 * ae_randominteger(2) - 1) * (0.1 + ae_randomreal());
@@ -43349,7 +43237,7 @@ bool testminns(bool silent) {
    testminnsunit_testlc(&lcerrors, &othererrors);
    testminnsunit_testnlc(&nlcerrors, &othererrors);
 // end
-   wereerrors = (((ucerrors || bcerrors) || lcerrors) || nlcerrors) || othererrors;
+   wereerrors = ucerrors || bcerrors || lcerrors || nlcerrors || othererrors;
    if (!silent || wereerrors) {
       printf("TESTING MINNS OPTIMIZATION\n");
       printf("TESTS:\n");
@@ -43589,9 +43477,9 @@ Local void testother(bool *err) {
             ae_vector_set_length(&h, n);
             for (i = 0; i < n; i++) {
                x.ptr.p_double[i] = ae_randomreal() + 1;
-               a.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
-               s.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
-               h.ptr.p_double[i] = exp(log(100.0) * (2 * ae_randomreal() - 1));
+               a.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
+               s.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
+               h.ptr.p_double[i] = exp(log(100.0) * ae_randommid());
             }
             mincgcreate(n, &x, &state);
             mincgsetscale(&state, &s);
@@ -43781,7 +43669,7 @@ Local void testother(bool *err) {
             continue;
          }
          if (state.xupdated) {
-            inc(&k);
+            k++;
             continue;
          }
          ae_assert(false, "Assertion failed");
@@ -43818,7 +43706,7 @@ Local void testother(bool *err) {
                mincgrequesttermination(&state);
                terminationrequested = true;
             }
-            inc(&callidx);
+            callidx++;
             continue;
          }
          if (state.xupdated) {
@@ -43998,7 +43886,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
          cntb1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             mincgrestartfrom(&state, &x);
             while (mincgiteration(&state)) {
@@ -44017,7 +43905,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
          cntg1 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             mincgrestartfrom(&state, &x);
             while (mincgiteration(&state)) {
@@ -44049,7 +43937,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
             ae_vector_set_length(&d, n);
             for (i = 0; i < n; i++) {
                x.ptr.p_double[i] = 0.0;
-               x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x0.ptr.p_double[i] = ae_randommid();
                d.ptr.p_double[i] = exp(2 * ae_randomreal());
             }
             if (vs > 0) {
@@ -44057,7 +43945,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
                ae_vector_set_length(&vd, vs);
                for (i = 0; i < vs; i++) {
                   for (j = 0; j < n; j++) {
-                     v.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     v.ptr.pp_double[i][j] = ae_randommid();
                   }
                   vd.ptr.p_double[i] = exp(2 * ae_randomreal());
                }
@@ -44069,7 +43957,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
             cntb1 = 0;
             for (pass = 0; pass < k; pass++) {
                for (i = 0; i < n; i++) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                }
                mincgrestartfrom(&state, &x);
                while (mincgiteration(&state)) {
@@ -44084,7 +43972,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
             cntg1 = 0;
             for (pass = 0; pass < k; pass++) {
                for (i = 0; i < n; i++) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                }
                mincgrestartfrom(&state, &x);
                while (mincgiteration(&state)) {
@@ -44120,7 +44008,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
          cntb2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             mincgrestartfrom(&state, &x);
             while (mincgiteration(&state)) {
@@ -44135,7 +44023,7 @@ static void testmincgunit_testpreconditioning(bool *err) {
          cntg2 = 0;
          for (pass = 0; pass < k; pass++) {
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             mincgrestartfrom(&state, &x);
             while (mincgiteration(&state)) {
@@ -44648,7 +44536,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    // Check C1 continuity test #0
       mincgoptguardnonc1test0results(&state, &ognonc1test0strrep, &ognonc1test0lngrep);
@@ -44667,7 +44555,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test0lngrep.positive, __FILE__, __LINE__, "testmincgunit");
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0strrep, &a, n);
          testmincgunit_testoptguardc1test0reportfortask0(wereerrors, &ognonc1test0lngrep, &a, n);
-         inc(&c1test0fails);
+         c1test0fails++;
       }
       if (ogrep.nonc1test1positive) {
          ae_set_error_flag(wereerrors, !ogrep.nonc1suspected, __FILE__, __LINE__, "testmincgunit");
@@ -44683,7 +44571,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
          ae_set_error_flag(wereerrors, ognonc1test1lngrep.positive, __FILE__, __LINE__, "testmincgunit");
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1strrep, &a, n);
          testmincgunit_testoptguardc1test1reportfortask0(wereerrors, &ognonc1test1lngrep, &a, n);
-         inc(&c1test1fails);
+         c1test1fails++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testmincgunit");
@@ -44763,7 +44651,7 @@ static void testmincgunit_testoptguard(bool *wereerrors) {
       failed = failed || !ogrep.nonc1suspected;
       failed = failed || ogrep.nonc1fidx != 0;
       if (failed) {
-         inc(&failurecounter);
+         failurecounter++;
       }
    }
    ae_set_error_flag(wereerrors, failurecounter > maxfails, __FILE__, __LINE__, "testmincgunit");
@@ -44857,9 +44745,9 @@ bool testmincg(bool silent) {
          ae_vector_set_length(&x, 2 + 1);
          n = 3;
          diffstep = 1.0E-6;
-         x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
-         x.ptr.p_double[1] = 100 * ae_randomreal() - 50;
-         x.ptr.p_double[2] = 100 * ae_randomreal() - 50;
+         x.ptr.p_double[0] = 50.0 * ae_randommid();
+         x.ptr.p_double[1] = 50.0 * ae_randommid();
+         x.ptr.p_double[2] = 50.0 * ae_randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
          }
@@ -44878,7 +44766,7 @@ bool testmincg(bool silent) {
             }
          }
          mincgresults(&state, &x, &rep);
-         referror = (((referror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - 2) > 0.001) || fabs(x.ptr.p_double[1]) > 0.001) || fabs(x.ptr.p_double[2] - 2) > 0.001;
+         referror = referror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - 2) > 0.001 || fabs(x.ptr.p_double[1]) > 0.001 || fabs(x.ptr.p_double[2] - 2) > 0.001;
       // F2 problem with restarts:
       // * make several iterations and restart BEFORE termination
       // * iterate and restart AFTER termination
@@ -44913,7 +44801,7 @@ bool testmincg(bool silent) {
             testmincgunit_testfunc2(&state);
          }
          mincgresults(&state, &x, &rep);
-         restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01) || fabs(x.ptr.p_double[1]) > 0.01) || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01 || fabs(x.ptr.p_double[1]) > 0.01 || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
          x.ptr.p_double[0] = 10 + 10 * ae_randomreal();
          x.ptr.p_double[1] = 10 + 10 * ae_randomreal();
          x.ptr.p_double[2] = 10 + 10 * ae_randomreal();
@@ -44922,12 +44810,12 @@ bool testmincg(bool silent) {
             testmincgunit_testfunc2(&state);
          }
          mincgresults(&state, &x, &rep);
-         restartserror = (((restartserror || rep.terminationtype <= 0) || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01) || fabs(x.ptr.p_double[1]) > 0.01) || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
+         restartserror = restartserror || rep.terminationtype <= 0 || fabs(x.ptr.p_double[0] - log(2.0)) > 0.01 || fabs(x.ptr.p_double[1]) > 0.01 || fabs(x.ptr.p_double[2] - log(2.0)) > 0.01;
       // 1D problem #1
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
          diffstep = 1.0E-6;
-         x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
+         x.ptr.p_double[0] = 50.0 * ae_randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
          }
@@ -44949,7 +44837,7 @@ bool testmincg(bool silent) {
          ae_vector_set_length(&x, 0 + 1);
          n = 1;
          diffstep = 1.0E-6;
-         x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
+         x.ptr.p_double[0] = 50.0 * ae_randommid();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
          }
@@ -44976,11 +44864,11 @@ bool testmincg(bool silent) {
             ae_vector_set_length(&xe, n);
             ae_vector_set_length(&b, n);
             for (i = 0; i < n; i++) {
-               xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               xe.ptr.p_double[i] = ae_randommid();
             }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                  a.ptr.pp_double[i][j] = ae_randommid();
                }
                a.ptr.pp_double[i][i] += 3 * ae_sign(a.ptr.pp_double[i][i]);
             }
@@ -44990,7 +44878,7 @@ bool testmincg(bool silent) {
             }
          // Solve task
             for (i = 0; i < n; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             if (difftype == 0) {
                mincgcreate(n, &x, &state);
@@ -45031,7 +44919,7 @@ bool testmincg(bool silent) {
          n = 3;
          ae_vector_set_length(&x, n);
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+            x.ptr.p_double[i] = 3.0 * ae_randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -45047,7 +44935,7 @@ bool testmincg(bool silent) {
          mincgresults(&state, &x, &rep);
          converror = converror || rep.terminationtype != 4;
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+            x.ptr.p_double[i] = 3.0 * ae_randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -45063,7 +44951,7 @@ bool testmincg(bool silent) {
          mincgresults(&state, &x, &rep);
          converror = converror || rep.terminationtype != 1;
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 6 * ae_randomreal() - 3;
+            x.ptr.p_double[i] = 3.0 * ae_randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -45079,7 +44967,7 @@ bool testmincg(bool silent) {
          mincgresults(&state, &x, &rep);
          converror = converror || rep.terminationtype != 2;
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
@@ -45093,14 +44981,14 @@ bool testmincg(bool silent) {
             testmincgunit_testfunc3(&state);
          }
          mincgresults(&state, &x, &rep);
-         converror = converror || !((rep.terminationtype == 5 && rep.iterationscount == 10) || rep.terminationtype == 7);
+         converror = converror || !(rep.terminationtype == 5 && rep.iterationscount == 10 || rep.terminationtype == 7);
       }
    }
 // Test for MinCGGradientCheck
    optguarderr = false;
    testmincgunit_testoptguard(&optguarderr);
 // end
-   waserrors = (((((((referror || eqerror) || linerror1) || linerror2) || converror) || othererrors) || restartserror) || precerror) || optguarderr;
+   waserrors = referror || eqerror || linerror1 || linerror2 || converror || othererrors || restartserror || precerror || optguarderr;
    if (!silent || waserrors) {
       printf("TESTING CG OPTIMIZATION\n");
       printf("REFERENCE PROBLEM:                        ");
@@ -45193,9 +45081,11 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
    if (state->needf) {
       nset++;
    }
+#if 0
    if (state->needfg) {
       nset++;
    }
+#endif
    if (state->needfij) {
       nset++;
    }
@@ -45222,11 +45112,11 @@ static bool testminlmunit_rkindvsstatecheck(ae_int_t rkind, minlmstate *state) {
       return result;
    }
    if (rkind == 1) {
-      result = ((state->needf || state->needfij) || state->needfg) || state->xupdated;
+      result = state->needf || state->needfij || /*state->needfg || */state->xupdated;
       return result;
    }
    if (rkind == 2) {
-      result = ((state->needf || state->needfg) || state->needfgh) || state->xupdated;
+      result = state->needf || /*state->needfg || */state->needfgh || state->xupdated;
       return result;
    }
    if (rkind == 3) {
@@ -45251,10 +45141,10 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix a, RVector b, ae_int_t
    ae_int_t j;
    ae_int_t k;
    double v;
-   if (state->needf || state->needfg || state->needfgh) {
+   if (state->needf || /*state->needfg || */state->needfgh) {
       state->f = 0.0;
    }
-   if (state->needfg || state->needfgh) {
+   if (/*state->needfg || */state->needfgh) {
       for (i = 0; i < n; i++) {
          state->g.ptr.p_double[i] = 0.0;
       }
@@ -45268,10 +45158,10 @@ static void testminlmunit_axmb(minlmstate *state, RMatrix a, RVector b, ae_int_t
    }
    for (i = 0; i < n; i++) {
       v = ae_v_dotproduct(a->ptr.pp_double[i], 1, state->x.ptr.p_double, 1, n);
-      if (state->needf || state->needfg || state->needfgh) {
+      if (state->needf || /*state->needfg || */state->needfgh) {
          state->f += ae_sqr(v - b->ptr.p_double[i]);
       }
-      if (state->needfg || state->needfgh) {
+      if (/*state->needfg || */state->needfgh) {
          for (j = 0; j < n; j++) {
             state->g.ptr.p_double[j] += 2 * (v - b->ptr.p_double[i]) * a->ptr.pp_double[i][j];
          }
@@ -45325,9 +45215,9 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
    m = 3;
    h = 0.0001;
    for (rkind = -2; rkind <= 5; rkind++) {
-      x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
-      x.ptr.p_double[1] = 100 * ae_randomreal() - 50;
-      x.ptr.p_double[2] = 100 * ae_randomreal() - 50;
+      x.ptr.p_double[0] = 50.0 * ae_randommid();
+      x.ptr.p_double[1] = 50.0 * ae_randommid();
+      x.ptr.p_double[2] = 50.0 * ae_randommid();
       if (rkind == -2) {
          minlmcreatev(n, m, &x, h, &state);
          minlmsetacctype(&state, 1);
@@ -45378,10 +45268,10 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             state.j.ptr.pp_double[2][1] = 0.0;
             state.j.ptr.pp_double[2][2] = 1.0;
          }
-         if (state.needf || state.needfg || state.needfgh) {
+         if (state.needf || /*state.needfg || */state.needfgh) {
             state.f = ae_sqr(state.x.ptr.p_double[0] - 2) + ae_sqr(state.x.ptr.p_double[1]) + ae_sqr(state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
          }
-         if (state.needfg || state.needfgh) {
+         if (/*state.needfg || */state.needfgh) {
             state.g.ptr.p_double[0] = 2 * (state.x.ptr.p_double[0] - 2) + 2 * (state.x.ptr.p_double[0] - state.x.ptr.p_double[2]);
             state.g.ptr.p_double[1] = 2 * state.x.ptr.p_double[1];
             state.g.ptr.p_double[2] = 2 * (state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
@@ -45414,7 +45304,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       n = 1;
       m = 1;
       h = 0.00001;
-      x.ptr.p_double[0] = 100 * ae_randomreal() - 50;
+      x.ptr.p_double[0] = 50.0 * ae_randommid();
       if (rkind == -2) {
          minlmcreatev(n, m, &x, h, &state);
          minlmsetacctype(&state, 1);
@@ -45452,10 +45342,10 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
             state.fi.ptr.p_double[0] = sin(state.x.ptr.p_double[0]);
             state.j.ptr.pp_double[0][0] = cos(state.x.ptr.p_double[0]);
          }
-         if (state.needf || state.needfg || state.needfgh) {
+         if (state.needf || /*state.needfg || */state.needfgh) {
             state.f = ae_sqr(sin(state.x.ptr.p_double[0]));
          }
-         if (state.needfg || state.needfgh) {
+         if (/*state.needfg || */state.needfgh) {
             state.g.ptr.p_double[0] = 2 * sin(state.x.ptr.p_double[0]) * cos(state.x.ptr.p_double[0]);
          }
          if (state.needfgh) {
@@ -45476,7 +45366,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       ae_vector_set_length(&xe, n);
       ae_vector_set_length(&b, n);
       for (i = 0; i < n; i++) {
-         xe.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         xe.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < n; i++) {
          v = ae_v_dotproduct(a.ptr.pp_double[i], 1, xe.ptr.p_double, 1, n);
@@ -45489,7 +45379,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
       for (rkind = -2; rkind <= 5; rkind++) {
       // Solve task (first attempt)
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          if (rkind == -2) {
             minlmcreatev(n, n, &x, h, &state);
@@ -45535,7 +45425,7 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
          }
       // Now we try to restart algorithm from new point
          for (i = 0; i < n; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          minlmrestartfrom(&state, &x);
          while (minlmiteration(&state)) {
@@ -45620,10 +45510,10 @@ static void testminlmunit_testu(bool *errorflag, bool *statefieldsconsistencyfla
                state.j.ptr.pp_double[2][1] = 0.0;
                state.j.ptr.pp_double[2][2] = 1.0;
             }
-            if (state.needf || state.needfg || state.needfgh) {
+            if (state.needf || /*state.needfg || */state.needfgh) {
                state.f = s * ae_sqr(exp(state.x.ptr.p_double[0]) - 2) + ae_sqr(ae_sqr(state.x.ptr.p_double[1]) + 1) + ae_sqr(state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
             }
-            if (state.needfg || state.needfgh) {
+            if (/*state.needfg || */state.needfgh) {
                state.g.ptr.p_double[0] = s * 2 * (exp(state.x.ptr.p_double[0]) - 2) * exp(state.x.ptr.p_double[0]) + 2 * (state.x.ptr.p_double[0] - state.x.ptr.p_double[2]);
                state.g.ptr.p_double[1] = 2 * (ae_sqr(state.x.ptr.p_double[1]) + 1) * 2 * state.x.ptr.p_double[1];
                state.g.ptr.p_double[2] = 2 * (state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
@@ -45755,13 +45645,13 @@ static void testminlmunit_testbc(bool *errorflag) {
                   state.fi.ptr.p_double[i] = pow(state.x.ptr.p_double[i] - xe.ptr.p_double[i], 2.0);
                }
             }
-            if (state.needf || state.needfg || state.needfgh) {
+            if (state.needf ||/* state.needfg ||*/ state.needfgh) {
                state.f = 0.0;
                for (i = 0; i < n; i++) {
                   state.f += pow(state.x.ptr.p_double[i] - xe.ptr.p_double[i], 4.0);
                }
             }
-            if (state.needfg || state.needfgh) {
+            if (/*state.needfg ||*/ state.needfgh) {
                for (i = 0; i < n; i++) {
                   state.g.ptr.p_double[i] = 4 * pow(state.x.ptr.p_double[i] - xe.ptr.p_double[i], 3.0);
                }
@@ -46092,16 +45982,15 @@ static void testminlmunit_testlc(bool *errorflag) {
             for (i = 0; i < n; i++) {
                do {
                   x1.ptr.p_double[i] = x.ptr.p_double[i] + (hqrnduniformr(&rs) * 2 - 1) * h;
-               }
-               while (!(x1.ptr.p_double[i] >= bl.ptr.p_double[i] && x1.ptr.p_double[i] <= bu.ptr.p_double[i]));
+               } while (!(x1.ptr.p_double[i] >= bl.ptr.p_double[i] && x1.ptr.p_double[i] <= bu.ptr.p_double[i]));
             }
             bflag = false;
             for (i = 0; i < rawccnt; i++) {
                ae_assert(rawct.ptr.p_int[i] != 0, "Assertion failed");
                v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, x1.ptr.p_double, 1, n);
                v -= rawc.ptr.pp_double[i][n];
-               bflag = bflag || (rawct.ptr.p_int[i] > 0 && v < 0.0);
-               bflag = bflag || (rawct.ptr.p_int[i] < 0 && v > 0.0);
+               bflag = bflag || rawct.ptr.p_int[i] > 0 && v < 0.0;
+               bflag = bflag || rawct.ptr.p_int[i] < 0 && v > 0.0;
             }
             if (bflag) {
                continue;
@@ -46249,7 +46138,7 @@ static void testminlmunit_testlc(bool *errorflag) {
       ae_vector_set_length(&x12, 2 * n);
       for (i = 0; i < n; i++) {
          x0.ptr.p_double[i] = hqrndnormal(&rs);
-         x12.ptr.p_double[2 * i + 0] = hqrndnormal(&rs);
+         x12.ptr.p_double[2 * i] = hqrndnormal(&rs);
          x12.ptr.p_double[2 * i + 1] = hqrndnormal(&rs);
       }
       ae_matrix_set_length(&c, m1 + m2, n + 1);
@@ -46416,10 +46305,10 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             state.j.ptr.pp_double[2][1] = 0.0;
             state.j.ptr.pp_double[2][2] = 1.0;
          }
-         if (state.needf || state.needfg || state.needfgh) {
+         if (state.needf ||/* state.needfg ||*/ state.needfgh) {
             state.f = s * ae_sqr(exp(state.x.ptr.p_double[0]) - 2) + ae_sqr(state.x.ptr.p_double[1]) + ae_sqr(state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
          }
-         if (state.needfg || state.needfgh) {
+         if (/*state.needfg ||*/ state.needfgh) {
             state.g.ptr.p_double[0] = s * 2 * (exp(state.x.ptr.p_double[0]) - 2) * exp(state.x.ptr.p_double[0]) + 2 * (state.x.ptr.p_double[0] - state.x.ptr.p_double[2]);
             state.g.ptr.p_double[1] = 2 * state.x.ptr.p_double[1];
             state.g.ptr.p_double[2] = 2 * (state.x.ptr.p_double[2] - state.x.ptr.p_double[0]);
@@ -46467,10 +46356,10 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
    minlmsetxrep(&state, true);
    xprev = x.ptr.p_double[0];
    while (minlmiteration(&state)) {
-      if (state.needf || state.needfg || state.needfgh) {
+      if (state.needf ||/* state.needfg ||*/ state.needfgh) {
          state.f = exp(state.x.ptr.p_double[0]) + exp(-state.x.ptr.p_double[0]);
       }
-      if (state.needfg || state.needfgh) {
+      if (/*state.needfg ||*/ state.needfgh) {
          state.g.ptr.p_double[0] = exp(state.x.ptr.p_double[0]) - exp(-state.x.ptr.p_double[0]);
       }
       if (state.needfgh) {
@@ -46521,7 +46410,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
                minlmrequesttermination(&state);
                terminationrequested = true;
             }
-            inc(&callidx);
+            callidx++;
             continue;
          }
          if (state.xupdated) {
@@ -46561,9 +46450,9 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             }
          }
          for (i = 0; i < n - 1; i++) {
-            state.fi.ptr.p_double[2 * i + 0] = s * (state.x.ptr.p_double[i + 1] - ae_sqr(state.x.ptr.p_double[i]));
-            state.j.ptr.pp_double[2 * i + 0][i] = -s * 2 * state.x.ptr.p_double[i];
-            state.j.ptr.pp_double[2 * i + 0][i + 1] = s;
+            state.fi.ptr.p_double[2 * i] = s * (state.x.ptr.p_double[i + 1] - ae_sqr(state.x.ptr.p_double[i]));
+            state.j.ptr.pp_double[2 * i][i] = -s * 2 * state.x.ptr.p_double[i];
+            state.j.ptr.pp_double[2 * i][i + 1] = s;
             state.fi.ptr.p_double[2 * i + 1] = 1 - state.x.ptr.p_double[i];
             state.j.ptr.pp_double[2 * i + 1][i] = -1.0;
          }
@@ -46580,18 +46469,18 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
             if (i == 2) {
                v = -INFINITY;
             }
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                state.fi.ptr.p_double[ae_randominteger(m)] = v;
             } else {
                state.j.ptr.pp_double[ae_randominteger(m)][ae_randominteger(n)] = v;
             }
-            inc(&spoilcnt);
+            spoilcnt++;
          }
          continue;
       }
       if (state.needfi) {
          for (i = 0; i < n - 1; i++) {
-            state.fi.ptr.p_double[2 * i + 0] = s * (state.x.ptr.p_double[i + 1] - ae_sqr(state.x.ptr.p_double[i]));
+            state.fi.ptr.p_double[2 * i] = s * (state.x.ptr.p_double[i + 1] - ae_sqr(state.x.ptr.p_double[i]));
             state.fi.ptr.p_double[2 * i + 1] = 1 - state.x.ptr.p_double[i];
          }
          mx = 0.0;
@@ -46608,7 +46497,7 @@ static void testminlmunit_testother(bool *errorflag, bool *statefieldsconsistenc
                v = -INFINITY;
             }
             state.fi.ptr.p_double[ae_randominteger(m)] = v;
-            inc(&spoilcnt);
+            spoilcnt++;
          }
          continue;
       }
@@ -46889,7 +46778,7 @@ static void testminlmunit_tryreproducefixedbugs(bool *err) {
       }
    }
    minlmresults(&s, &x, &rep);
-   ae_set_error_flag(err, ((x.ptr.p_double[0] < bl.ptr.p_double[0] || x.ptr.p_double[0] > bu.ptr.p_double[0]) || x.ptr.p_double[1] < bl.ptr.p_double[1]) || x.ptr.p_double[1] > bu.ptr.p_double[1], __FILE__, __LINE__, "testminlmunit");
+   ae_set_error_flag(err, x.ptr.p_double[0] < bl.ptr.p_double[0] || x.ptr.p_double[0] > bu.ptr.p_double[0] || x.ptr.p_double[1] < bl.ptr.p_double[1] || x.ptr.p_double[1] > bu.ptr.p_double[1], __FILE__, __LINE__, "testminlmunit");
    ae_frame_leave();
 }
 
@@ -46920,7 +46809,7 @@ bool testminlm(bool silent) {
    optguarderr = false;
    testminlmunit_testoptguard(&optguarderr);
 // end
-   waserrors = ((((uerrors || bcerrors) || lcerrors) || scerror) || othererrors) || optguarderr;
+   waserrors = uerrors || bcerrors || lcerrors || scerror || othererrors || optguarderr;
    if (!silent || waserrors) {
       printf("TESTING LEVENBERG-MARQUARDT OPTIMIZATION\n");
       printf("PROBLEM TYPES:\n");
@@ -46974,50 +46863,48 @@ bool testminlm(bool silent) {
 // === evd testing unit ===
 // Sparse fill
 //
-// Sparcity - sparcity level, in [0,1] (0=dense matrix).
+// Sparcity - sparsity level, in [0,1] (0=dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
-static void testevdunit_rmatrixfillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparcity, double diagmag) {
+static void testevdunit_rmatrixfillsparsea(RMatrix a, ae_int_t m, ae_int_t n, double sparsity, double diagmag) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (ae_randomreal() >= sparcity) {
-            a->ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-         } else {
+         if (ae_randombool(sparsity)) {
             a->ptr.pp_double[i][j] = 0.0;
+         } else {
+            a->ptr.pp_double[i][j] = ae_randommid();
          }
       }
    }
    if (diagmag > 0.0) {
       for (i = 0; i < ae_minint(m, n); i++) {
-         a->ptr.pp_double[i][i] = diagmag * (2 * ae_randomreal() - 1);
+         a->ptr.pp_double[i][i] = diagmag * ae_randommid();
       }
    }
 }
 
 // Sparse fill
 //
-// Sparcity - sparcity level, in [0,1] (0=dense matrix).
+// Sparcity - sparsity level, in [0,1] (0=dense matrix).
 // DiagMAg - magnitude of dense diagonal entries; zero value means that diagonal
 // is sparse too, non-zero value means that diagonal is dense
-static void testevdunit_cmatrixfillsparsea(CMatrix a, ae_int_t m, ae_int_t n, double sparcity, double diagmag) {
+static void testevdunit_cmatrixfillsparsea(CMatrix a, ae_int_t m, ae_int_t n, double sparsity, double diagmag) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (ae_randomreal() >= sparcity) {
-            a->ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-            a->ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
-         } else {
+         if (ae_randombool(sparsity)) {
             a->ptr.pp_complex[i][j] = ae_complex_from_i(0);
+         } else {
+            a->ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
       }
    }
    if (diagmag > 0.0) {
       for (i = 0; i < ae_minint(m, n); i++) {
-         a->ptr.pp_complex[i][i].x = diagmag * (2 * ae_randomreal() - 1);
-         a->ptr.pp_complex[i][i].y = diagmag * (2 * ae_randomreal() - 1);
+         a->ptr.pp_complex[i][i] = ae_complex_from_d(diagmag * ae_randommid(), diagmag * ae_randommid());
       }
    }
 }
@@ -47029,10 +46916,10 @@ static void testevdunit_rmatrixsymmetricsplit(RMatrix a, ae_int_t n, RMatrix al,
    ae_int_t j;
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         al->ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         al->ptr.pp_double[i][j] = ae_randommid();
          al->ptr.pp_double[j][i] = a->ptr.pp_double[i][j];
          au->ptr.pp_double[i][j] = a->ptr.pp_double[i][j];
-         au->ptr.pp_double[j][i] = 2 * ae_randomreal() - 1;
+         au->ptr.pp_double[j][i] = ae_randommid();
       }
       al->ptr.pp_double[i][i] = a->ptr.pp_double[i][i];
       au->ptr.pp_double[i][i] = a->ptr.pp_double[i][i];
@@ -47046,10 +46933,10 @@ static void testevdunit_cmatrixhermitiansplit(CMatrix a, ae_int_t n, CMatrix al,
    ae_int_t j;
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         al->ptr.pp_complex[i][j] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         al->ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid());
          al->ptr.pp_complex[j][i] = ae_c_conj(a->ptr.pp_complex[i][j]);
          au->ptr.pp_complex[i][j] = a->ptr.pp_complex[i][j];
-         au->ptr.pp_complex[j][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+         au->ptr.pp_complex[j][i] = ae_complex_from_d(ae_randommid());
       }
       al->ptr.pp_complex[i][i] = a->ptr.pp_complex[i][i];
       au->ptr.pp_complex[i][i] = a->ptr.pp_complex[i][i];
@@ -47067,7 +46954,7 @@ static void testevdunit_unset2d(RMatrix a) {
 // Unsets 2D array.
 static void testevdunit_cunset2d(CMatrix a) {
    ae_matrix_set_length(a, 0 + 1, 0 + 1);
-   a->ptr.pp_complex[0][0] = ae_complex_from_d(2 * ae_randomreal() - 1);
+   a->ptr.pp_complex[0][0] = ae_complex_from_d(ae_randommid());
 }
 
 // Unsets 1D array.
@@ -47935,7 +47822,7 @@ static void testevdunit_testtdevdproblem(RVector d, RVector e, ae_int_t n, doubl
    }
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         a1.ptr.pp_double[i][j] = ae_randommid();
          a2.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j];
       }
    }
@@ -48115,7 +48002,7 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
    ae_matrix_set_length(&a2, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         a1.ptr.pp_double[i][j] = ae_randommid();
          a2.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j];
       }
    }
@@ -48162,7 +48049,7 @@ static void testevdunit_testtdevdbiproblem(RVector d, RVector e, ae_int_t n, boo
    ae_matrix_set_length(&a2, n, n);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         a1.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+         a1.ptr.pp_double[i][j] = ae_randommid();
          a2.ptr.pp_double[i][j] = a1.ptr.pp_double[i][j];
       }
    }
@@ -48505,14 +48392,13 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
 // Random matrix
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-         ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-         ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+         ra.ptr.pp_double[i][j] = ae_randommid();
+         ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
          ra.ptr.pp_double[j][i] = ra.ptr.pp_double[i][j];
          ca.ptr.pp_complex[j][i] = ae_c_conj(ca.ptr.pp_complex[i][j]);
       }
-      ra.ptr.pp_double[i][i] = 2 * ae_randomreal() - 1;
-      ca.ptr.pp_complex[i][i] = ae_complex_from_d(2 * ae_randomreal() - 1);
+      ra.ptr.pp_double[i][i] = ae_randommid();
+      ca.ptr.pp_complex[i][i] = ae_complex_from_d(ae_randommid());
    }
    testevdunit_rmatrixsymmetricsplit(&ra, n, &ral, &rau);
    testevdunit_cmatrixhermitiansplit(&ca, n, &cal, &cau);
@@ -48521,14 +48407,13 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
 // Random diagonally dominant matrix with distinct eigenvalues
    for (i = 0; i < n; i++) {
       for (j = i + 1; j < n; j++) {
-         ra.ptr.pp_double[i][j] = 0.1 * (2 * ae_randomreal() - 1) / n;
-         ca.ptr.pp_complex[i][j].x = 0.1 * (2 * ae_randomreal() - 1) / n;
-         ca.ptr.pp_complex[i][j].y = 0.1 * (2 * ae_randomreal() - 1) / n;
+         ra.ptr.pp_double[i][j] = 0.1 * ae_randommid() / n;
+         ca.ptr.pp_complex[i][j] = ae_complex_from_d(0.1 * ae_randommid() / n, 0.1 * ae_randommid() / n);
          ra.ptr.pp_double[j][i] = ra.ptr.pp_double[i][j];
          ca.ptr.pp_complex[j][i] = ae_c_conj(ca.ptr.pp_complex[i][j]);
       }
-      ra.ptr.pp_double[i][i] = 0.1 * (2 * ae_randomreal() - 1) + i;
-      ca.ptr.pp_complex[i][i] = ae_complex_from_d(0.1 * (2 * ae_randomreal() - 1) + i);
+      ra.ptr.pp_double[i][i] = 0.1 * ae_randommid() + i;
+      ca.ptr.pp_complex[i][i] = ae_complex_from_d(0.1 * ae_randommid() + i);
    }
    testevdunit_rmatrixsymmetricsplit(&ra, n, &ral, &rau);
    testevdunit_cmatrixhermitiansplit(&ca, n, &cal, &cau);
@@ -48570,7 +48455,7 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
       if (mkind == 1) {
       // Diagonal matrix
          for (i = 0; i < n; i++) {
-            d.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            d.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n - 1; i++) {
             e.ptr.p_double[i] = 0.0;
@@ -48582,16 +48467,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
             d.ptr.p_double[i] = 0.0;
          }
          for (i = 0; i < n - 1; i++) {
-            e.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            e.ptr.p_double[i] = ae_randommid();
          }
       }
       if (mkind == 3) {
       // Dense matrix with blocks
          for (i = 0; i < n; i++) {
-            d.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            d.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n - 1; i++) {
-            e.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            e.ptr.p_double[i] = ae_randommid();
          }
          j = 1;
          i = 2;
@@ -48604,16 +48489,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
       if (mkind == 4) {
       // dense matrix
          for (i = 0; i < n; i++) {
-            d.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            d.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < n - 1; i++) {
-            e.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            e.ptr.p_double[i] = ae_randommid();
          }
       }
       if (mkind == 5) {
       // Diagonal matrix with distinct eigenvalues
          for (i = 0; i < n; i++) {
-            d.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1) + i;
+            d.ptr.p_double[i] = 0.1 * ae_randommid() + i;
          }
          for (i = 0; i < n - 1; i++) {
             e.ptr.p_double[i] = 0.0;
@@ -48625,16 +48510,16 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
             d.ptr.p_double[i] = 0.0;
          }
          for (i = 0; i < n - 1; i++) {
-            e.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1) + i + 1;
+            e.ptr.p_double[i] = 0.1 * ae_randommid() + i + 1;
          }
       }
       if (mkind == 7) {
       // dense matrix with distinct eigenvalues
          for (i = 0; i < n; i++) {
-            d.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1) + i + 1;
+            d.ptr.p_double[i] = 0.1 * ae_randommid() + i + 1;
          }
          for (i = 0; i < n - 1; i++) {
-            e.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1);
+            e.ptr.p_double[i] = 0.1 * ae_randommid();
          }
       }
       testevdunit_testtdevdproblem(&d, &e, n, threshold, tderrors);
@@ -48653,9 +48538,8 @@ static void testevdunit_testevdset(ae_int_t n, double threshold, double bithresh
    testevdunit_testnsevdproblem(&ra, n, threshold, nserrors);
    for (i = 0; i < n; i++) {
       for (j = 0; j < n; j++) {
-         ra.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
-         ca.ptr.pp_complex[i][j].x = 2 * ae_randomreal() - 1;
-         ca.ptr.pp_complex[i][j].y = 2 * ae_randomreal() - 1;
+         ra.ptr.pp_double[i][j] = ae_randommid();
+         ca.ptr.pp_complex[i][j] = ae_complex_from_d(ae_randommid(), ae_randommid());
       }
    }
    testevdunit_testnsevdproblem(&ra, n, threshold, nserrors);
@@ -49055,7 +48939,7 @@ bool testevd(bool silent) {
    }
 // report
    wfailed = (double)failc / (double)runs > failthreshold;
-   waserrors = (((((((nserrors || serrors) || herrors) || tderrors) || sbierrors) || hbierrors) || tdbierrors) || wfailed) || sisymmerrors;
+   waserrors = nserrors || serrors || herrors || tderrors || sbierrors || hbierrors || tdbierrors || wfailed || sisymmerrors;
    if (!silent || waserrors) {
       printf("TESTING EVD UNIT\n");
       printf("DENSE DIRECT SOLVERS:\n");
@@ -49172,7 +49056,7 @@ static void testbasestatunit_testranking(bool *err) {
       ae_matrix_set_length(&xy2, npoints, nfeatures);
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nfeatures; j++) {
-            xy0.ptr.pp_double[i][j] = j + 0.2 * ae_randomreal() - 0.1;
+            xy0.ptr.pp_double[i][j] = j + 0.1 * ae_randommid();
          }
          for (j = 0; j < nfeatures - 1; j++) {
             k = ae_randominteger(nfeatures - j);
@@ -49435,10 +49319,10 @@ bool testbasestat(bool silent) {
                   ae_matrix_set_length(&my, n, ky);
                   for (i = 0; i < n; i++) {
                      for (j = 0; j < kx; j++) {
-                        mx.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        mx.ptr.pp_double[i][j] = ae_randommid();
                      }
                      for (j = 0; j < ky; j++) {
-                        my.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                        my.ptr.pp_double[i][j] = ae_randommid();
                      }
                   }
                   if (ctype == 1) {
@@ -49673,11 +49557,11 @@ bool testpca(bool silent) {
          ae_matrix_set_length(&x, n, m);
          ae_vector_set_length(&means, m);
          for (j = 0; j < m; j++) {
-            means.ptr.p_double[j] = 1.5 * ae_randomreal() - 0.75;
+            means.ptr.p_double[j] = 0.75 * ae_randommid();
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
-               x.ptr.pp_double[i][j] = means.ptr.p_double[j] + (2 * ae_randomreal() - 1);
+               x.ptr.pp_double[i][j] = means.ptr.p_double[j] + ae_randommid();
             }
          }
       // Solve
@@ -50004,7 +49888,7 @@ bool testpca(bool silent) {
       }
    }
 // Final report
-   waserrors = ((((pcaconverrors || pcaorterrors) || pcavarerrors) || pcaopterrors) || pcadensesubspaceerrors) || pcasparsesubspaceerrors;
+   waserrors = pcaconverrors || pcaorterrors || pcavarerrors || pcaopterrors || pcadensesubspaceerrors || pcasparsesubspaceerrors;
    if (!silent || waserrors) {
       printf("PCA TEST\n");
       printf("COMPLETE PCA:\n");
@@ -50133,7 +50017,7 @@ bool testbdss(bool silent) {
          ae_vector_set_length(&a0, n);
          ae_vector_set_length(&at, n);
          ae_vector_set_length(&tmp, n);
-         a.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+         a.ptr.p_double[0] = ae_randommid();
          tmp.ptr.p_double[0] = ae_randomreal();
          for (i = 1; i < n; i++) {
          // A is randomly permuted
@@ -50726,7 +50610,7 @@ bool testbdss(bool silent) {
       }
    }
 // report
-   waserrors = ((tieserrors || split2errors) || optimalsplitkerrors) || splitkerrors;
+   waserrors = tieserrors || split2errors || optimalsplitkerrors || splitkerrors;
    if (!silent || waserrors) {
       printf("TESTING BASIC DATASET SUBROUTINES\n");
       printf("TIES:                               ");
@@ -51295,8 +51179,8 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    testmlpbaseunit_createnetwork(&network, nkind, 0.0, 0.0, nin, nhid1, nhid2, nout);
 // test MLPProperties()
    mlpproperties(&network, &n1, &n2, &wcount);
-   *err = ((*err || n1 != nin) || n2 != nout) || wcount <= 0;
-   *err = ((*err || mlpgetinputscount(&network) != nin) || mlpgetoutputscount(&network) != nout) || mlpgetweightscount(&network) != wcount;
+   *err = *err || n1 != nin || n2 != nout || wcount <= 0;
+   *err = *err || mlpgetinputscount(&network) != nin || mlpgetoutputscount(&network) != nout || mlpgetweightscount(&network) != wcount;
 // Test network geometry functions
 //
 // In order to do this we calculate neural network output using
@@ -51332,11 +51216,11 @@ static void testmlpbaseunit_testinformational(ae_int_t nkind, ae_int_t nin, ae_i
    }
    ae_vector_set_length(&x, nin);
    for (i = 0; i < nin; i++) {
-      x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+      x.ptr.p_double[i] = ae_randommid();
    }
    ae_vector_set_length(&y, nout);
    for (i = 0; i < nout; i++) {
-      y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+      y.ptr.p_double[i] = ae_randommid();
    }
    for (j = 0; j < nin; j++) {
       mlpgetinputscaling(&network, j, &mean, &sigma);
@@ -51406,11 +51290,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
@@ -51442,12 +51326,12 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       }
    // Same inputs leads to same outputs
       for (i = 0; i < nin; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network, &x2, &y2);
@@ -51457,14 +51341,14 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // * using MLPCopy
    // * using MLPCopyShared
       for (i = 0; i < nin; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < nout; i++) {
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y2.ptr.p_double[i] = ae_randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2);
       mlpcopy(&network, &network2);
@@ -51472,7 +51356,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpprocess(&network2, &x2, &y2);
       ae_set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit");
       for (i = 0; i < nout; i++) {
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y2.ptr.p_double[i] = ae_randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2);
       mlpcopyshared(&network, &network2);
@@ -51489,14 +51373,14 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    //      MLPImportTunableParameters - we export parameters
    //      to P1, copy PCount elements to P2, then test import.
       for (i = 0; i < nin; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
       }
       for (i = 0; i < nout; i++) {
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y2.ptr.p_double[i] = ae_randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2);
       mlpcopy(&network, &network2);
@@ -51506,7 +51390,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       mlpprocess(&network2, &x2, &y2);
       ae_set_error_flag(err, testmlpbaseunit_vectordiff(&y1, &y2, nout, 1.0) != 0.0, __FILE__, __LINE__, "testmlpbaseunit");
       for (i = 0; i < nout; i++) {
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y2.ptr.p_double[i] = ae_randommid();
       }
       testmlpbaseunit_unsetnetwork(&network2);
       mlpcopy(&network, &network2);
@@ -51547,12 +51431,12 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
          ae_frame_leave();
       }
       for (i = 0; i < nin; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nout; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       mlpprocess(&network, &x1, &y1);
       mlpprocess(&network2, &x2, &y2);
@@ -51564,11 +51448,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Different inputs leads to different outputs (non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            x2.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
             y2.ptr.p_double[i] = y1.ptr.p_double[i];
          }
          mlpprocess(&network, &x1, &y1);
@@ -51582,11 +51466,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Randomization changes outputs (when inputs are unchanged, non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            x2.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
             y2.ptr.p_double[i] = y1.ptr.p_double[i];
          }
          mlpcopy(&network, &network2);
@@ -51602,11 +51486,11 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
    // Full randomization changes outputs (when inputs are unchanged, non-zero network)
       if (!zeronet) {
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            x2.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
             y2.ptr.p_double[i] = y1.ptr.p_double[i];
          }
          mlpcopy(&network, &network2);
@@ -51623,7 +51507,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 1) {
       // Classifier network outputs are normalized
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
          }
          mlpprocess(&network, &x1, &y1);
          v = 0.0;
@@ -51636,7 +51520,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 2) {
       // B-type network outputs are bounded from above/below
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
          }
          mlpprocess(&network, &x1, &y1);
          for (i = 0; i < nout; i++) {
@@ -51650,7 +51534,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (nkind == 3) {
       // R-type network outputs are within [A1,A2] (or [A2,A1])
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
          }
          mlpprocess(&network, &x1, &y1);
          for (i = 0; i < nout; i++) {
@@ -51663,7 +51547,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       if (iscls) {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               densexy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               densexy.ptr.pp_double[i][j] = ae_randommid();
                sparseset(&sparsexy, i, j, densexy.ptr.pp_double[i][j]);
             }
             densexy.ptr.pp_double[i][nin] = (double)(ae_randominteger(nout));
@@ -51672,7 +51556,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       } else {
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin + nout; j++) {
-               densexy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               densexy.ptr.pp_double[i][j] = ae_randommid();
                sparseset(&sparsexy, i, j, densexy.ptr.pp_double[i][j]);
             }
          }
@@ -51684,7 +51568,7 @@ static void testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       subnp = ae_randominteger(npoints);
       for (i = 0; i < subnp; i++) {
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[j] = ae_randommid();
          }
          mlpprocess(&network, &x1, &y1);
          mlpprocess(&network2, &x1, &y2);
@@ -51747,11 +51631,11 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
@@ -51779,13 +51663,13 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    //       which allows us to avoid oversaturated network.
    //       In 10% of cases we use zero weights.
       mlprandomizefull(&network);
-      if (ae_randomreal() <= 0.1) {
+      if (ae_randombool(0.1)) {
          for (i = 0; i < wcount; i++) {
             network.weights.ptr.p_double[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount; i++) {
-            network.weights.ptr.p_double[i] = 0.2 * ae_randomreal() - 0.1;
+            network.weights.ptr.p_double[i] = 0.1 * ae_randommid();
          }
       }
    // Test MLPError(), MLPErrorSparse(), MLPGrad() for single-element dataset:
@@ -51797,7 +51681,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       ae_matrix_set_length(&xy, 1, nin + nout);
       sparsecreate(1, nin + nout, nin + nout, &sparsexy);
       for (i = 0; i < nin; i++) {
-         x.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+         x.ptr.p_double[i] = 2.0 * ae_randommid();
       }
       ae_v_move(xy.ptr.pp_double[0], 1, x.ptr.p_double, 1, nin);
       for (i = 0; i < nin; i++) {
@@ -51812,7 +51696,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          y.ptr.p_double[RoundZ(xy.ptr.pp_double[0][nin])] = 1.0;
       } else {
          for (i = 0; i < nout; i++) {
-            y.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+            y.ptr.p_double[i] = 2.0 * ae_randommid();
             sparseset(&sparsexy, 0, nin + i, y.ptr.p_double[i]);
          }
          ae_v_move(&xy.ptr.pp_double[0][nin], 1, y.ptr.p_double, 1, nout);
@@ -51861,7 +51745,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
    // NOTE: because we use inexact 2-point formula, we perform gradient test with NonStrictTolerance
       ae_matrix_set_length(&xy, 1, nin + nout);
       for (i = 0; i < nin; i++) {
-         x.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+         x.ptr.p_double[i] = 2.0 * ae_randommid();
       }
       ae_v_move(xy.ptr.pp_double[0], 1, x.ptr.p_double, 1, nin);
       if (mlpissoftmax(&network)) {
@@ -51872,7 +51756,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
          y.ptr.p_double[RoundZ(xy.ptr.pp_double[0][nin])] = 1.0;
       } else {
          for (i = 0; i < nout; i++) {
-            y.ptr.p_double[i] = 4 * ae_randomreal() - 2;
+            y.ptr.p_double[i] = 2.0 * ae_randommid();
          }
          ae_v_move(&xy.ptr.pp_double[0][nin], 1, y.ptr.p_double, 1, nout);
       }
@@ -51962,7 +51846,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+            x1.ptr.p_double[j] = 2.0 * ae_randommid();
             sparseset(&sparsexy, i, j, x1.ptr.p_double[j]);
          }
          ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
@@ -51975,7 +51859,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               y1.ptr.p_double[j] = 2.0 * ae_randommid();
                sparseset(&sparsexy, i, nin + j, y1.ptr.p_double[j]);
             }
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
@@ -52009,7 +51893,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       sparsecreate(ae_maxint(ssize, 1), nin + nout, ssize * (nin + nout), &sparsexy);
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+            x1.ptr.p_double[j] = 2.0 * ae_randommid();
             sparseset(&sparsexy, i, j, x1.ptr.p_double[j]);
          }
          ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
@@ -52022,7 +51906,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               y1.ptr.p_double[j] = 2.0 * ae_randommid();
                sparseset(&sparsexy, i, nin + j, y1.ptr.p_double[j]);
             }
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
@@ -52101,7 +51985,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
       referencee = 0.0;
       for (i = 0; i < ssize; i++) {
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+            x1.ptr.p_double[j] = 2.0 * ae_randommid();
          }
          ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
          if (mlpissoftmax(&network)) {
@@ -52112,7 +51996,7 @@ static void testmlpbaseunit_testgradient(ae_int_t nkind, ae_int_t nin, ae_int_t 
             y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               y1.ptr.p_double[j] = 2.0 * ae_randommid();
             }
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
          }
@@ -52164,11 +52048,11 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
@@ -52211,7 +52095,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
          for (i = 0; i < ssize; i++) {
          // X, Y
             for (j = 0; j < nin; j++) {
-               x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               x1.ptr.p_double[j] = 2.0 * ae_randommid();
             }
             ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
             if (mlpissoftmax(&network)) {
@@ -52222,7 +52106,7 @@ static void testmlpbaseunit_testhessian(ae_int_t nkind, ae_int_t nin, ae_int_t n
                y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
             } else {
                for (j = 0; j < nout; j++) {
-                  y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+                  y1.ptr.p_double[j] = 2.0 * ae_randommid();
                }
                ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
             }
@@ -52339,11 +52223,11 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
    testmlpbaseunit_createnetwork(&network, nkind, a1, a2, nin, nhid1, nhid2, nout);
@@ -52362,13 +52246,13 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
    //       which allows us to avoid oversaturated network.
    //       In 10% of cases we use zero weights.
       mlprandomizefull(&network);
-      if (ae_randomreal() <= 0.1) {
+      if (ae_randombool(0.1)) {
          for (i = 0; i < wcount; i++) {
             network.weights.ptr.p_double[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount; i++) {
-            network.weights.ptr.p_double[i] = 0.2 * ae_randomreal() - 0.1;
+            network.weights.ptr.p_double[i] = 0.1 * ae_randommid();
          }
       }
    // Generate random dataset.
@@ -52392,7 +52276,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
       for (i = 0; i < ssize; i++) {
       // Fill I-th row
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+            x1.ptr.p_double[j] = 2.0 * ae_randommid();
             sparseset(&sparsexy, i, j, x1.ptr.p_double[j]);
          }
          ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
@@ -52405,7 +52289,7 @@ static void testmlpbaseunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1
             y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               y1.ptr.p_double[j] = 2.0 * ae_randommid();
                sparseset(&sparsexy, i, nin + j, y1.ptr.p_double[j]);
             }
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
@@ -52620,11 +52504,11 @@ static bool testmlpbaseunit_testmlpgbsubset() {
       a1 = 0.0;
       a2 = 0.0;
       if (nkind == 2) {
-         a1 = 1000 * ae_randomreal() - 500;
-         a2 = 2 * ae_randomreal() - 1;
+         a1 = 500.0 * ae_randommid();
+         a2 = ae_randommid();
       }
       if (nkind == 3) {
-         a1 = 1000 * ae_randomreal() - 500;
+         a1 = 500.0 * ae_randommid();
          a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
       }
       nin = ae_randominteger(20) + 1;
@@ -52648,7 +52532,7 @@ static bool testmlpbaseunit_testmlpgbsubset() {
          }
          for (i = 0; i < ssize; i++) {
             for (j = 0; j < w; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
                sparseset(&sa, i, j, a.ptr.pp_double[i][j]);
             }
          }
@@ -52667,7 +52551,7 @@ static bool testmlpbaseunit_testmlpgbsubset() {
          }
          for (i = 0; i < ssize; i++) {
             for (j = 0; j < w; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
                sparseset(&sa, i, j, a.ptr.pp_double[i][j]);
             }
          }
@@ -52823,7 +52707,7 @@ bool testmlpbase(bool silent) {
 // Test for MLPGradBatch____Subset()
    graderrors = graderrors || testmlpbaseunit_testmlpgbsubset();
 // Final report
-   waserrors = (((inferrors || procerrors) || graderrors) || hesserrors) || errerrors;
+   waserrors = inferrors || procerrors || graderrors || hesserrors || errerrors;
    if (!silent || waserrors) {
       printf("MLP TEST\n");
       printf("INFORMATIONAL FUNCTIONS:                 ");
@@ -55364,7 +55248,6 @@ bool testgammafunc(bool silent) {
 
 // === normaldistr testing unit ===
 // Normal test
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 static void testnormaldistrunit_testnormal(bool *errorflag) {
    ae_frame _frame_block;
@@ -55388,7 +55271,6 @@ static void testnormaldistrunit_testnormal(bool *errorflag) {
 }
 
 // Bivariate normal test
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 static void testnormaldistrunit_testbvn(bool *errorflag) {
    ae_frame _frame_block;
@@ -55817,9 +55699,9 @@ bool testlinreg(bool silent) {
    // Multipass tests
       for (pass = 1; pass <= passcount; pass++) {
       // Test S variant against non-S variant
-         ea = 2 * ae_randomreal() - 1;
-         eb = 2 * ae_randomreal() - 1;
-         testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), ae_randomreal() > 0.5, 1.0, 1.0, n, &xy, &s);
+         ea = ae_randommid();
+         eb = ae_randommid();
+         testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), ae_randombool(), 1.0, 1.0, n, &xy, &s);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p);
          lrline(&xy, n, &info2, &a2, &b2);
          if (info != 1 || info2 != 1) {
@@ -55831,8 +55713,8 @@ bool testlinreg(bool silent) {
       //
       // Generate task with exact, non-perturbed y[i],
       // then make non-zero s[i]
-         ea = 2 * ae_randomreal() - 1;
-         eb = 2 * ae_randomreal() - 1;
+         ea = ae_randommid();
+         eb = ae_randommid();
          testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), n > 4, 0.0, 0.0, n, &xy, &s);
          for (i = 0; i < n; i++) {
             s.ptr.p_double[i] = 1 + ae_randomreal();
@@ -55847,8 +55729,8 @@ bool testlinreg(bool silent) {
          for (i = 0; i < qcnt; i++) {
             qvals.ptr.p_double[i] = 0.0;
          }
-         ea = 2 * ae_randomreal() - 1;
-         eb = 2 * ae_randomreal() - 1;
+         ea = ae_randommid();
+         eb = ae_randommid();
          testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), n > 4, 1.0, 2.0, n, &xy, &s);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p);
          if (info != 1) {
@@ -55929,8 +55811,8 @@ bool testlinreg(bool silent) {
    // b. no sigmas
       ae_matrix_set_length(&xy, n, 1 + 1);
       for (i = 0; i < n; i++) {
-         xy.ptr.pp_double[i][0] = 2 * ae_randomreal() - 1;
-         xy.ptr.pp_double[i][1] = 2 * ae_randomreal() - 1;
+         xy.ptr.pp_double[i][0] = ae_randommid();
+         xy.ptr.pp_double[i][1] = ae_randommid();
          s.ptr.p_double[i] = 1 + ae_randomreal();
       }
       lrbuilds(&xy, &s, n, 1, &info, &wt, &ar);
@@ -56036,7 +55918,7 @@ bool testlinreg(bool silent) {
             // Prepare task
                if (tasktype == 0) {
                   for (i = 0; i < n; i++) {
-                     xy.ptr.pp_double[i][0] = 2 * ae_randomreal() - 1;
+                     xy.ptr.pp_double[i][0] = ae_randommid();
                   }
                   for (i = 0; i < n; i++) {
                      for (j = 1; j < m; j++) {
@@ -56116,7 +55998,7 @@ bool testlinreg(bool silent) {
                ae_vector_set_length(&x, m);
                v = tmpweights.ptr.p_double[m];
                for (i = 0; i < m; i++) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                   v += tmpweights.ptr.p_double[i] * x.ptr.p_double[i];
                }
                grothererrors = grothererrors || fabs(v - lrprocess(&wt, &x)) / ae_maxreal(fabs(v), 1.0) > threshold; //(@)
@@ -56124,7 +56006,7 @@ bool testlinreg(bool silent) {
                lrpack(&tmpweights, m, &wt2);
                ae_vector_set_length(&x, m);
                for (i = 0; i < m; i++) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                }
                v = lrprocess(&wt, &x);
                grothererrors = grothererrors || fabs(v - lrprocess(&wt2, &x)) / fabs(v) > threshold; //(@)
@@ -56269,15 +56151,14 @@ bool testlinreg(bool silent) {
       n = 2;
       do {
          noiselevel = ae_randomreal() + 0.1;
-         tasklevel = 2 * ae_randomreal() - 1;
-      }
-      while (fabs(noiselevel - tasklevel) <= 0.05);
+         tasklevel = ae_randommid();
+      } while (fabs(noiselevel - tasklevel) <= 0.05);
       ae_matrix_set_length(&xy, 3 * n, 1 + 1);
       for (i = 0; i < n; i++) {
-         xy.ptr.pp_double[3 * i + 0][0] = (double)i;
+         xy.ptr.pp_double[3 * i][0] = (double)i;
          xy.ptr.pp_double[3 * i + 1][0] = (double)i;
          xy.ptr.pp_double[3 * i + 2][0] = (double)i;
-         xy.ptr.pp_double[3 * i + 0][1] = tasklevel - noiselevel;
+         xy.ptr.pp_double[3 * i][1] = tasklevel - noiselevel;
          xy.ptr.pp_double[3 * i + 1][1] = tasklevel;
          xy.ptr.pp_double[3 * i + 2][1] = tasklevel + noiselevel;
       }
@@ -56295,10 +56176,10 @@ bool testlinreg(bool silent) {
          grothererrors = true; //(@)
       }
       for (i = 0; i < n; i++) {
-         xy.ptr.pp_double[3 * i + 0][0] = (double)i;
+         xy.ptr.pp_double[3 * i][0] = (double)i;
          xy.ptr.pp_double[3 * i + 1][0] = (double)i;
          xy.ptr.pp_double[3 * i + 2][0] = (double)i;
-         xy.ptr.pp_double[3 * i + 0][1] = -noiselevel;
+         xy.ptr.pp_double[3 * i][1] = -noiselevel;
          xy.ptr.pp_double[3 * i + 1][1] = 0.0;
          xy.ptr.pp_double[3 * i + 2][1] = noiselevel;
       }
@@ -56317,7 +56198,7 @@ bool testlinreg(bool silent) {
       ae_matrix_set_length(&xy, n, m + 1);
       for (i = 0; i < n; i++) {
          for (j = 0; j <= m; j++) {
-            xy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            xy.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       lrbuild(&xy, n, m, &info, &w, &ar);
@@ -56332,7 +56213,7 @@ bool testlinreg(bool silent) {
       testlinregunit_unsetlr(&wt);
       lrcopy(&w, &wt);
       for (i = 0; i < m; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       y1 = lrprocess(&w, &x1);
@@ -56342,7 +56223,7 @@ bool testlinreg(bool silent) {
    }
 // TODO: Degenerate tests (when design matrix and right part are zero)
 // Final report
-   waserrors = (((((slerrors || slcerrors) || gropterrors) || grcoverrors) || gresterrors) || grothererrors) || grconverrors;
+   waserrors = slerrors || slcerrors || gropterrors || grcoverrors || gresterrors || grothererrors || grconverrors;
    if (!silent || waserrors) {
       printf("REGRESSION TEST\n");
       printf("STRAIGHT LINE REGRESSION:                ");
@@ -56431,15 +56312,15 @@ bool testsma(bool issilent) {
    x.ptr.p_double[1] = 8.0;
    x.ptr.p_double[2] = 9.0;
    filtersma(&x, 3, 1);
-   precomputederrors = ((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 8.0) || x.ptr.p_double[2] != 9.0;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 8.0 || x.ptr.p_double[2] != 9.0;
    filtersma(&x, 3, 2);
-   precomputederrors = ((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 7.5) || x.ptr.p_double[2] != 8.5;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 7.5 || x.ptr.p_double[2] != 8.5;
    ae_vector_set_length(&x, 3);
    x.ptr.p_double[0] = 7.0;
    x.ptr.p_double[1] = 8.0;
    x.ptr.p_double[2] = 9.0;
    filtersma(&x, 3, 4);
-   precomputederrors = ((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 7.5) || x.ptr.p_double[2] != 8.0;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 7.5 || x.ptr.p_double[2] != 8.0;
 // Test zero-handling:
 // a) when we have non-zero sequence (N1 elements) followed by zero sequence
 //    (N2 elements), then first N1+K-1 elements of the processed sequence are
@@ -56530,9 +56411,9 @@ bool testema(bool issilent) {
    x.ptr.p_double[1] = 8.0;
    x.ptr.p_double[2] = 9.0;
    filterema(&x, 3, 1.0);
-   precomputederrors = ((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 8.0) || x.ptr.p_double[2] != 9.0;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 8.0 || x.ptr.p_double[2] != 9.0;
    filterema(&x, 3, 0.5);
-   precomputederrors = ((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 7.5) || x.ptr.p_double[2] != 8.25;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 7.5 || x.ptr.p_double[2] != 8.25;
 // Final result
    result = precomputederrors;
    ae_frame_leave();
@@ -56567,9 +56448,9 @@ bool testlrma(bool issilent) {
    x.ptr.p_double[4] = 11.0;
    x.ptr.p_double[5] = 12.0;
    filterlrma(&x, 6, 1);
-   precomputederrors = (((((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 8.0) || x.ptr.p_double[2] != 9.0) || x.ptr.p_double[3] != 10.0) || x.ptr.p_double[4] != 11.0) || x.ptr.p_double[5] != 12.0;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 8.0 || x.ptr.p_double[2] != 9.0 || x.ptr.p_double[3] != 10.0 || x.ptr.p_double[4] != 11.0 || x.ptr.p_double[5] != 12.0;
    filterlrma(&x, 6, 2);
-   precomputederrors = (((((precomputederrors || x.ptr.p_double[0] != 7.0) || x.ptr.p_double[1] != 8.0) || x.ptr.p_double[2] != 9.0) || x.ptr.p_double[3] != 10.0) || x.ptr.p_double[4] != 11.0) || x.ptr.p_double[5] != 12.0;
+   precomputederrors = precomputederrors || x.ptr.p_double[0] != 7.0 || x.ptr.p_double[1] != 8.0 || x.ptr.p_double[2] != 9.0 || x.ptr.p_double[3] != 10.0 || x.ptr.p_double[4] != 11.0 || x.ptr.p_double[5] != 12.0;
 // Check several precomputed problems
    ae_vector_set_length(&x, 6);
    x.ptr.p_double[0] = 7.0;
@@ -56920,8 +56801,7 @@ static void testmcpdunit_testentryexit(bool *err) {
                   } else {
                      exitstate = ae_randominteger(n);
                   }
-               }
-               while (!((entrystate == -1 || exitstate == -1) || entrystate != exitstate));
+               } while (!(entrystate == -1 || exitstate == -1 || entrystate != exitstate));
             // Generate transition matrix P such that:
             // * columns corresponding to non-exit states sums to 1.0
             // * columns corresponding to exit states sums to 0.0
@@ -57270,12 +57150,12 @@ static void testmcpdunit_testbc(bool *err) {
             ae_assert(n >= 4, "TestBC: expectation failed");
             ic = 1 + ae_randominteger(n - 2);
             jc = 1 + ae_randominteger(n - 2);
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                vl = 0.3 * ae_randomreal();
             } else {
                vl = -INFINITY;
             }
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                vu = 0.5 + 0.3 * ae_randomreal();
             } else {
                vu = +INFINITY;
@@ -57636,7 +57516,7 @@ static void testmcpdunit_testlc(bool *err) {
          // Generate constraint and its right part
             c.ptr.pp_double[i][n * n] = 0.0;
             for (j = 0; j < n * n; j++) {
-               c.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               c.ptr.pp_double[i][j] = ae_randommid();
                c.ptr.pp_double[i][n * n] += c.ptr.pp_double[i][j] * (1.0 / (double)n);
             }
             ct.ptr.p_int[i] = ae_randominteger(3) - 1;
@@ -57705,7 +57585,7 @@ bool testmcpd(bool silent) {
    testmcpdunit_testbc(&bcerrors); //(@)
    testmcpdunit_testlc(&lcerrors); //(@)
 // Final report
-   waserrors = ((((othererrors || simpleerrors) || entryexiterrors) || ecerrors) || bcerrors) || lcerrors;
+   waserrors = othererrors || simpleerrors || entryexiterrors || ecerrors || bcerrors || lcerrors;
    if (!silent || waserrors) {
       printf("MCPD TEST\n");
       printf("TOTAL RESULTS:                           ");
@@ -57864,11 +57744,11 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
 // Initialize arrays
@@ -57944,12 +57824,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          }
       // Same inputs leads to same outputs
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             x2.ptr.p_double[i] = x1.ptr.p_double[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
+            y2.ptr.p_double[i] = ae_randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1);
          mlpeprocess(&ensemble, &x2, &y2);
@@ -57963,12 +57843,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          testmlpeunit_unsetensemble(&ensemble2);
          mlpecopy(&ensemble, &ensemble2);
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             x2.ptr.p_double[i] = x1.ptr.p_double[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
+            y2.ptr.p_double[i] = ae_randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1);
          mlpeprocess(&ensemble2, &x2, &y2);
@@ -58003,12 +57883,12 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             ae_frame_leave();
          }
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
             x2.ptr.p_double[i] = x1.ptr.p_double[i];
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
+            y2.ptr.p_double[i] = ae_randommid();
          }
          mlpeprocess(&ensemble, &x1, &y1);
          mlpeprocess(&ensemble2, &x2, &y2);
@@ -58019,11 +57899,11 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          *err = *err || !allsame;
       // Different inputs leads to different outputs (non-zero network)
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            x2.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
             y2.ptr.p_double[i] = y1.ptr.p_double[i];
          }
          mlpeprocess(&ensemble, &x1, &y1);
@@ -58035,11 +57915,11 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          *err = *err || allsame;
       // Randomization changes outputs (when inputs are unchanged, non-zero network)
          for (i = 0; i < nin; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-            x2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
+            x2.ptr.p_double[i] = ae_randommid();
          }
          for (i = 0; i < nout; i++) {
-            y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y1.ptr.p_double[i] = ae_randommid();
             y2.ptr.p_double[i] = y1.ptr.p_double[i];
          }
          mlpecopy(&ensemble, &ensemble2);
@@ -58055,7 +57935,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 1) {
          // Classifier network outputs are normalized
             for (i = 0; i < nin; i++) {
-               x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x1.ptr.p_double[i] = ae_randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1);
             v = 0.0;
@@ -58068,7 +57948,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 2) {
          // B-type network outputs are bounded from above/below
             for (i = 0; i < nin; i++) {
-               x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x1.ptr.p_double[i] = ae_randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1);
             for (i = 0; i < nout; i++) {
@@ -58082,7 +57962,7 @@ static void testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          if (nkind == 3) {
          // R-type network outputs are within [A1,A2] (or [A2,A1])
             for (i = 0; i < nin; i++) {
-               x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x1.ptr.p_double[i] = ae_randommid();
             }
             mlpeprocess(&ensemble, &x1, &y1);
             for (i = 0; i < nout; i++) {
@@ -58135,11 +58015,11 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
    a1 = 0.0;
    a2 = 0.0;
    if (nkind == 2) {
-      a1 = 1000 * ae_randomreal() - 500;
-      a2 = 2 * ae_randomreal() - 1;
+      a1 = 500.0 * ae_randommid();
+      a2 = ae_randommid();
    }
    if (nkind == 3) {
-      a1 = 1000 * ae_randomreal() - 500;
+      a1 = 500.0 * ae_randommid();
       a2 = a1 + (2 * ae_randominteger(2) - 1) * (0.1 + 0.9 * ae_randomreal());
    }
    testmlpeunit_createensemble(&ensemble, nkind, a1, a2, nin, nhid1, nhid2, nout, ec);
@@ -58158,13 +58038,13 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
    //       which allows us to avoid oversaturated Ensemble.
    //       In 10% of cases we use zero weights.
       mlperandomize(&ensemble);
-      if (ae_randomreal() <= 0.1) {
+      if (ae_randombool(0.1)) {
          for (i = 0; i < wcount * ec; i++) {
             ensemble.weights.ptr.p_double[i] = 0.0;
          }
       } else {
          for (i = 0; i < wcount * ec; i++) {
-            ensemble.weights.ptr.p_double[i] = 0.2 * ae_randomreal() - 0.1;
+            ensemble.weights.ptr.p_double[i] = 0.1 * ae_randommid();
          }
       }
    // Generate random dataset.
@@ -58188,7 +58068,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
       for (i = 0; i < ssize; i++) {
       // Fill I-th row
          for (j = 0; j < nin; j++) {
-            x1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+            x1.ptr.p_double[j] = 2.0 * ae_randommid();
             sparseset(&sparsexy, i, j, x1.ptr.p_double[j]);
          }
          ae_v_move(xy.ptr.pp_double[i], 1, x1.ptr.p_double, 1, nin);
@@ -58201,7 +58081,7 @@ static void testmlpeunit_testerr(ae_int_t nkind, ae_int_t nin, ae_int_t nhid1, a
             y1.ptr.p_double[RoundZ(xy.ptr.pp_double[i][nin])] = 1.0;
          } else {
             for (j = 0; j < nout; j++) {
-               y1.ptr.p_double[j] = 4 * ae_randomreal() - 2;
+               y1.ptr.p_double[j] = 2.0 * ae_randommid();
                sparseset(&sparsexy, i, nin + j, y1.ptr.p_double[j]);
             }
             ae_v_move(&xy.ptr.pp_double[i][nin], 1, y1.ptr.p_double, 1, nout);
@@ -58406,7 +58286,7 @@ static bool testmlptrainunit_testmlptraines() {
       ae_vector_set_length(&y, 1);
       for (i = 0; i < n; i++) {
          for (j = 0; j <= 1; j++) {
-            trnxy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            trnxy.ptr.pp_double[i][j] = ae_randommid();
             valxy.ptr.pp_double[i][j] = trnxy.ptr.pp_double[i][j];
             x.ptr.p_double[j] = trnxy.ptr.pp_double[i][j];
          }
@@ -58715,8 +58595,7 @@ static bool testmlptrainunit_testmlptrainclass() {
          for (i = 0; i < n; i++) {
             do {
                rndind = ae_randominteger(n);
-            }
-            while (rndind == i);
+            } while (rndind == i);
             tmp = xy.ptr.pp_double[i][0];
             xy.ptr.pp_double[i][0] = xy.ptr.pp_double[rndind][0];
             xy.ptr.pp_double[rndind][0] = tmp;
@@ -59093,8 +58972,8 @@ static bool testmlptrainunit_testmlprestarts() {
       for (xp = 1; xp <= numxp; xp++) {
       // Create a train set
          for (i = 0; i < n; i++) {
-            xy.ptr.pp_double[i][0] = 2 * ae_randomreal() - 1;
-            xy.ptr.pp_double[i][1] = 2 * ae_randomreal() - 1;
+            xy.ptr.pp_double[i][0] = ae_randommid();
+            xy.ptr.pp_double[i][1] = ae_randommid();
          }
       // Create and train a neural network
          mlpcreate1(1, nneurons, 1, &net0);
@@ -59262,7 +59141,7 @@ static bool testmlptrainunit_testmlpcverror() {
       // Create training set
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               trainingset.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               trainingset.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          if (isregr) {
@@ -59286,7 +59165,7 @@ static bool testmlptrainunit_testmlpcverror() {
       // Create training set
          for (i = 0; i < npoints; i++) {
             for (j = 0; j < nin; j++) {
-               sparseset(&sptrainingset, i, j, 2 * ae_randomreal() - 1);
+               sparseset(&sptrainingset, i, j, ae_randommid());
             }
          }
          if (isregr) {
@@ -59309,7 +59188,7 @@ static bool testmlptrainunit_testmlpcverror() {
    // Create test set
       for (i = 0; i < ntstpoints; i++) {
          for (j = 0; j < nin; j++) {
-            testset.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+            testset.ptr.pp_double[i][j] = ae_randommid();
          }
       }
       if (isregr) {
@@ -59444,7 +59323,7 @@ static bool testmlptrainunit_testmlptrainens() {
                ae_matrix_set_length(&xy, npoints, nin + nout);
                for (i = 0; i < npoints; i++) {
                   for (j = 0; j < nin + nout; j++) {
-                     xy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     xy.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
                mlpecreate1(nin, nhid, nout, 1 + ae_randominteger(3), &ensemble);
@@ -59453,7 +59332,7 @@ static bool testmlptrainunit_testmlptrainens() {
                nclasses = 2 + ae_randominteger(2);
                for (i = 0; i < npoints; i++) {
                   for (j = 0; j < nin; j++) {
-                     xy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     xy.ptr.pp_double[i][j] = ae_randommid();
                   }
                   xy.ptr.pp_double[i][nin] = (double)(ae_randominteger(nclasses));
                }
@@ -59864,7 +59743,7 @@ bool testmlptrain(bool silent) {
 // Training for ensembles
    mlptrainenserrors = (testmlptrainunit_testmlptrainens() || testmlptrainunit_testmlptrainensregr()) || testmlptrainunit_testmlptrainenscls();
 // Final report
-   waserrors = ((((((trnerrors || mlptrainregrerr) || mlptrainclasserr) || mlprestartserr) || mlpxorregrerr) || mlpxorclserr) || mlpcverrorerr) || mlptrainenserrors;
+   waserrors = trnerrors || mlptrainregrerr || mlptrainclasserr || mlprestartserr || mlpxorregrerr || mlpxorclserr || mlpcverrorerr || mlptrainenserrors;
    if (!silent || waserrors) {
       printf("MLP TEST\n");
       printf("CROSS-VALIDATION ERRORS:                 ");
@@ -59999,9 +59878,9 @@ static bool testclusteringunit_errorsinmerges(RMatrix d, RMatrix xy, ae_int_t np
       return result;
    }
    bflag = bflag || rep->npoints != npoints;
-   bflag = (bflag || rep->z.rows != npoints - 1) || (npoints > 1 && rep->z.cols != 2);
-   bflag = (bflag || rep->pz.rows != npoints - 1) || (npoints > 1 && rep->pz.cols != 2);
-   bflag = (bflag || rep->pm.rows != npoints - 1) || (npoints > 1 && rep->pm.cols != 6);
+   bflag = bflag || rep->z.rows != npoints - 1 || npoints > 1 && rep->z.cols != 2;
+   bflag = bflag || rep->pz.rows != npoints - 1 || npoints > 1 && rep->pz.cols != 2;
+   bflag = bflag || rep->pm.rows != npoints - 1 || npoints > 1 && rep->pm.cols != 6;
    bflag = bflag || rep->mergedist.cnt != npoints - 1;
    bflag = bflag || rep->p.cnt != npoints;
    if (bflag) {
@@ -60410,16 +60289,16 @@ static bool testclusteringunit_basicahctests() {
       return result;
    }
    berr = false;
-   berr = (berr || rep.z.ptr.pp_int[0][0] != 0) || rep.z.ptr.pp_int[0][1] != 1;
-   berr = (berr || rep.z.ptr.pp_int[1][0] != 2) || rep.z.ptr.pp_int[1][1] != 3;
-   berr = (berr || rep.z.ptr.pp_int[2][0] != 4) || rep.z.ptr.pp_int[2][1] != 5;
-   berr = (((berr || rep.p.ptr.p_int[0] != 0) || rep.p.ptr.p_int[1] != 1) || rep.p.ptr.p_int[2] != 2) || rep.p.ptr.p_int[3] != 3;
-   berr = (berr || rep.pz.ptr.pp_int[0][0] != 0) || rep.pz.ptr.pp_int[0][1] != 1;
-   berr = (berr || rep.pz.ptr.pp_int[1][0] != 2) || rep.pz.ptr.pp_int[1][1] != 3;
-   berr = (berr || rep.pz.ptr.pp_int[2][0] != 4) || rep.pz.ptr.pp_int[2][1] != 5;
-   berr = (((berr || rep.pm.ptr.pp_int[0][0] != 0) || rep.pm.ptr.pp_int[0][1] != 0) || rep.pm.ptr.pp_int[0][2] != 1) || rep.pm.ptr.pp_int[0][3] != 1;
-   berr = (((berr || rep.pm.ptr.pp_int[1][0] != 2) || rep.pm.ptr.pp_int[1][1] != 2) || rep.pm.ptr.pp_int[1][2] != 3) || rep.pm.ptr.pp_int[1][3] != 3;
-   berr = (((berr || rep.pm.ptr.pp_int[2][0] != 0) || rep.pm.ptr.pp_int[2][1] != 1) || rep.pm.ptr.pp_int[2][2] != 2) || rep.pm.ptr.pp_int[2][3] != 3;
+   berr = berr || rep.z.ptr.pp_int[0][0] != 0 || rep.z.ptr.pp_int[0][1] != 1;
+   berr = berr || rep.z.ptr.pp_int[1][0] != 2 || rep.z.ptr.pp_int[1][1] != 3;
+   berr = berr || rep.z.ptr.pp_int[2][0] != 4 || rep.z.ptr.pp_int[2][1] != 5;
+   berr = berr || rep.p.ptr.p_int[0] != 0 || rep.p.ptr.p_int[1] != 1 || rep.p.ptr.p_int[2] != 2 || rep.p.ptr.p_int[3] != 3;
+   berr = berr || rep.pz.ptr.pp_int[0][0] != 0 || rep.pz.ptr.pp_int[0][1] != 1;
+   berr = berr || rep.pz.ptr.pp_int[1][0] != 2 || rep.pz.ptr.pp_int[1][1] != 3;
+   berr = berr || rep.pz.ptr.pp_int[2][0] != 4 || rep.pz.ptr.pp_int[2][1] != 5;
+   berr = berr || rep.pm.ptr.pp_int[0][0] != 0 || rep.pm.ptr.pp_int[0][1] != 0 || rep.pm.ptr.pp_int[0][2] != 1 || rep.pm.ptr.pp_int[0][3] != 1;
+   berr = berr || rep.pm.ptr.pp_int[1][0] != 2 || rep.pm.ptr.pp_int[1][1] != 2 || rep.pm.ptr.pp_int[1][2] != 3 || rep.pm.ptr.pp_int[1][3] != 3;
+   berr = berr || rep.pm.ptr.pp_int[2][0] != 0 || rep.pm.ptr.pp_int[2][1] != 1 || rep.pm.ptr.pp_int[2][2] != 2 || rep.pm.ptr.pp_int[2][3] != 3;
    if (berr) {
       ae_frame_leave();
       return result;
@@ -60881,7 +60760,7 @@ static double testclusteringunit_distfunc(RVector x0, RVector x1, ae_int_t d, ae
    double s0;
    double s1;
    double result;
-   ae_assert((((((((disttype == 0 || disttype == 1) || disttype == 2) || disttype == 10) || disttype == 11) || disttype == 12) || disttype == 13) || disttype == 20) || disttype == 21, "Assertion failed");
+   ae_assert(disttype == 0 || disttype == 1 || disttype == 2 || disttype == 10 || disttype == 11 || disttype == 12 || disttype == 13 || disttype == 20 || disttype == 21, "Assertion failed");
    if (disttype == 0) {
       result = 0.0;
       for (i = 0; i < d; i++) {
@@ -61011,7 +60890,7 @@ static bool testclusteringunit_advancedahctests() {
          ae_vector_set_length(&idx, n * d + d * (n - 1));
          for (i = 0; i < n * d; i++) {
             for (j = 0; j < d; j++) {
-               xy.ptr.pp_double[i][j] = 0.2 * ae_randomreal() - 0.1;
+               xy.ptr.pp_double[i][j] = 0.1 * ae_randommid();
             }
             xy.ptr.pp_double[i][i % d]++;
             idx.ptr.p_int[i] = i % d;
@@ -61081,7 +60960,7 @@ static bool testclusteringunit_advancedahctests() {
          }
       // Clusterize one more time, now with distance matrix
          clusterizercreate(&s);
-         clusterizersetdistances(&s, &dm, n * d, ae_randomreal() > 0.5);
+         clusterizersetdistances(&s, &dm, n * d, ae_randombool());
          clusterizersetahcalgo(&s, ahcalgo);
          clusterizerrunahc(&s, &rep);
       // Tests:
@@ -61201,8 +61080,8 @@ static double testclusteringunit_rnormal() {
    double x1;
    double result;
    while (true) {
-      u = 2 * ae_randomreal() - 1;
-      v = 2 * ae_randomreal() - 1;
+      u = ae_randommid();
+      v = ae_randommid();
       s = ae_sqr(u) + ae_sqr(v);
       if (s > 0.0 && s < 1.0) {
          s = sqrt(-2 * log(s) / s);
@@ -61335,7 +61214,6 @@ static void testclusteringunit_kmeanssimpletest1(ae_int_t nvars, ae_int_t nc, ae
 // Outputs:
 //     XYC         -   new assignment of points to centers
 //     XYDist2     -   squared distances
-//
 // ALGLIB: Copyright 21.01.2015 by Sergey Bochkanov
 static void testclusteringunit_kmeansreferenceupdatedistances(RMatrix xy, ae_int_t npoints, ae_int_t nvars, RMatrix ct, ae_int_t k, ZVector xyc, RVector xydist2) {
    ae_frame _frame_block;
@@ -61916,8 +61794,8 @@ bool testclustering(bool silent) {
    }
 // Results
    waserrors = false;
-   waserrors = waserrors || (basicahcerrors || ahcerrors);
-   waserrors = waserrors || (((kmeansconverrors || kmeansothererrors) || kmeanssimpleerrors) || kmeansrestartserrors);
+   waserrors = waserrors || basicahcerrors || ahcerrors;
+   waserrors = waserrors || kmeansconverrors || kmeansothererrors || kmeanssimpleerrors || kmeansrestartserrors;
    if (!silent || waserrors) {
       printf("TESTING CLUSTERING\n");
       printf("AHC:                                \n");
@@ -62032,13 +61910,13 @@ static void testdforestunit_testprocessing(bool *err) {
       for (i = 0; i < npoints; i++) {
          for (j = 0; j < nvars; j++) {
             if (j % 2 == 0) {
-               xy.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               xy.ptr.pp_double[i][j] = ae_randommid();
             } else {
                xy.ptr.pp_double[i][j] = (double)(ae_randominteger(2));
             }
          }
          if (nclasses == 1) {
-            xy.ptr.pp_double[i][nvars] = 2 * ae_randomreal() - 1;
+            xy.ptr.pp_double[i][nvars] = ae_randommid();
          } else {
             xy.ptr.pp_double[i][nvars] = (double)(ae_randominteger(nclasses));
          }
@@ -62065,12 +61943,12 @@ static void testdforestunit_testprocessing(bool *err) {
       dfcreatebuffer(&df1, &buf);
    // Same inputs leads to same outputs
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       dfprocess(&df1, &x1, &y1);
       dfprocess(&df1, &x2, &y2);
@@ -62114,12 +61992,12 @@ static void testdforestunit_testprocessing(bool *err) {
       }
    // DFTsProcess() works as expected
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       dfprocess(&df1, &x1, &y1);
       dftsprocess(&df1, &buf, &x2, &y2);
@@ -62133,12 +62011,12 @@ static void testdforestunit_testprocessing(bool *err) {
       testdforestunit_unsetdf(&df2);
       dfcopy(&df1, &df2);
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       dfprocess(&df1, &x1, &y1);
       dfprocess(&df2, &x2, &y2);
@@ -62148,12 +62026,12 @@ static void testdforestunit_testprocessing(bool *err) {
       }
       *err = *err || !allsame;
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       ae_set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit");
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       ae_set_error_flag(err, dfclassify(&df1, &x1) != dfclassify(&df2, &x2), __FILE__, __LINE__, "testdforestunit");
@@ -62184,12 +62062,12 @@ static void testdforestunit_testprocessing(bool *err) {
          ae_frame_leave();
       }
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       for (i = 0; i < nclasses; i++) {
-         y1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         y2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y1.ptr.p_double[i] = ae_randommid();
+         y2.ptr.p_double[i] = ae_randommid();
       }
       dfprocess(&df1, &x1, &y1);
       dfprocess(&df2, &x2, &y2);
@@ -62199,19 +62077,19 @@ static void testdforestunit_testprocessing(bool *err) {
       }
       *err = *err || !allsame;
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       ae_set_error_flag(err, fabs(dfprocess0(&df1, &x1) - dfprocess0(&df2, &x2)) > 100 * ae_machineepsilon, __FILE__, __LINE__, "testdforestunit");
       for (i = 0; i < nvars; i++) {
-         x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x1.ptr.p_double[i] = ae_randommid();
          x2.ptr.p_double[i] = x1.ptr.p_double[i];
       }
       ae_set_error_flag(err, dfclassify(&df1, &x1) != dfclassify(&df2, &x2), __FILE__, __LINE__, "testdforestunit");
    // Normalization properties
       if (nclasses > 1) {
          for (i = 0; i < nvars; i++) {
-            x1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x1.ptr.p_double[i] = ae_randommid();
          }
          dfprocess(&df1, &x1, &y1);
          v = 0.0;
@@ -62291,7 +62169,7 @@ static void testdforestunit_basictest1(bool *err) {
                dfbuildercreate(&builder);
                dfbuildersetdataset(&builder, &xy, npoints, nvars, nclasses);
                dfbuildersetsubsampleratio(&builder, 1.0);
-               if (ae_randomreal() > 0.5) {
+               if (ae_randombool()) {
                   dfbuildersetrndvars(&builder, nvars);
                } else {
                   dfbuildersetrndvarsratio(&builder, 1.0);
@@ -63693,7 +63571,7 @@ bool testdforest(bool silent) {
    testdforestunit_testcompression(&compressionerrors);
    testdforestunit_testimportance(&importanceerrors);
 // Final report
-   waserrors = ((basicerrors || procerrors) || compressionerrors) || importanceerrors;
+   waserrors = basicerrors || procerrors || compressionerrors || importanceerrors;
    if (!silent || waserrors) {
       printf("RANDOM FOREST TEST\n");
       printf("TOTAL RESULTS:                           ");
@@ -64498,8 +64376,7 @@ static void testgqunit_buildgausslegendrequadrature(ae_int_t n, RVector x, RVect
          dp3 = n * (r * p3 - p2) / (r * r - 1);
          r1 = r;
          r -= p3 / dp3;
-      }
-      while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
+      } while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
       x->ptr.p_double[n - 1 - i] = -r;
       w->ptr.p_double[i] = 2 / ((1 - r * r) * dp3 * dp3);
@@ -64603,8 +64480,7 @@ static void testgqunit_buildgaussjacobiquadrature(ae_int_t n, double alpha, doub
          pp = (n * (alpha - beta - temp * r) * p1 + 2 * (n + alpha) * (n + beta) * p2) / (temp * (1 - r * r));
          r1 = r;
          r = r1 - p1 / pp;
-      }
-      while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
+      } while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
       w->ptr.p_double[i] = exp(lngamma(alpha + n, &tmpsgn) + lngamma(beta + n, &tmpsgn) - lngamma((double)(n + 1), &tmpsgn) - lngamma(n + alfbet + 1, &tmpsgn)) * temp * pow(2.0, alfbet) / (pp * p2);
    }
@@ -64660,8 +64536,7 @@ static void testgqunit_buildgausslaguerrequadrature(ae_int_t n, double alpha, RV
          dp3 = (n * p3 - (n + alpha) * p2) / r;
          r1 = r;
          r -= p3 / dp3;
-      }
-      while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
+      } while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
       w->ptr.p_double[i] = -exp(lngamma(alpha + n, &tsg) - lngamma((double)n, &tsg)) / (dp3 * n * p2);
    }
@@ -64726,8 +64601,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector x, RVecto
          dp3 = sqrt((double)(2 * j)) * p2;
          r1 = r;
          r -= p3 / dp3;
-      }
-      while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
+      } while (fabs(r - r1) >= ae_machineepsilon * (1 + fabs(r)) * 100);
       x->ptr.p_double[i] = r;
       w->ptr.p_double[i] = 2 / (dp3 * dp3);
       x->ptr.p_double[n - 1 - i] = -x->ptr.p_double[i];
@@ -65591,13 +65465,12 @@ static void testfftunit_reffftc1d(CVector a, ae_int_t n) {
    ae_assert(n > 0, "FFTC1D: incorrect N!");
    ae_vector_set_length(&buf, 2 * n);
    for (i = 0; i < n; i++) {
-      buf.ptr.p_double[2 * i + 0] = a->ptr.p_complex[i].x;
+      buf.ptr.p_double[2 * i] = a->ptr.p_complex[i].x;
       buf.ptr.p_double[2 * i + 1] = a->ptr.p_complex[i].y;
    }
    testfftunit_refinternalcfft(&buf, n, false);
    for (i = 0; i < n; i++) {
-      a->ptr.p_complex[i].x = buf.ptr.p_double[2 * i + 0];
-      a->ptr.p_complex[i].y = buf.ptr.p_double[2 * i + 1];
+      a->ptr.p_complex[i] = ae_complex_from_d(buf.ptr.p_double[2 * i], buf.ptr.p_double[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -65611,13 +65484,12 @@ static void testfftunit_reffftc1dinv(CVector a, ae_int_t n) {
    ae_assert(n > 0, "FFTC1DInv: incorrect N!");
    ae_vector_set_length(&buf, 2 * n);
    for (i = 0; i < n; i++) {
-      buf.ptr.p_double[2 * i + 0] = a->ptr.p_complex[i].x;
+      buf.ptr.p_double[2 * i] = a->ptr.p_complex[i].x;
       buf.ptr.p_double[2 * i + 1] = a->ptr.p_complex[i].y;
    }
    testfftunit_refinternalcfft(&buf, n, true);
    for (i = 0; i < n; i++) {
-      a->ptr.p_complex[i].x = buf.ptr.p_double[2 * i + 0];
-      a->ptr.p_complex[i].y = buf.ptr.p_double[2 * i + 1];
+      a->ptr.p_complex[i] = ae_complex_from_d(buf.ptr.p_double[2 * i], buf.ptr.p_double[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -65638,8 +65510,7 @@ static void testfftunit_refinternalrfft(RVector a, ae_int_t nn, CVector f) {
    testfftunit_refinternalcfft(&tmp, nn, false);
    ae_vector_set_length(f, nn);
    for (i = 0; i < nn; i++) {
-      f->ptr.p_complex[i].x = tmp.ptr.p_double[2 * i + 0];
-      f->ptr.p_complex[i].y = tmp.ptr.p_double[2 * i + 1];
+      f->ptr.p_complex[i] = ae_complex_from_d(tmp.ptr.p_double[2 * i], tmp.ptr.p_double[2 * i + 1]);
    }
    ae_frame_leave();
 }
@@ -65671,8 +65542,7 @@ static void testfftunit_quicktest(ae_int_t n, double *referr, double *refrerr) {
    ae_vector_set_length(&a0, n);
    ae_vector_set_length(&a1, n);
    for (i = 0; i < n; i++) {
-      a0.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-      a0.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+      a0.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
       a1.ptr.p_complex[i] = a0.ptr.p_complex[i];
    }
    fftc1d(&a0, n);
@@ -65741,8 +65611,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&a2, n);
       ae_vector_set_length(&a3, n);
       for (i = 0; i < n; i++) {
-         a1.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         a1.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         a1.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          a2.ptr.p_complex[i] = a1.ptr.p_complex[i];
          a3.ptr.p_complex[i] = a1.ptr.p_complex[i];
       }
@@ -65758,7 +65627,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&r1, n);
       ae_vector_set_length(&r2, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
       }
       fftr1d(&r2, n, &a1);
@@ -65779,8 +65648,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&a1, n);
       ae_vector_set_length(&a2, n);
       for (i = 0; i < n; i++) {
-         a1.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         a1.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         a1.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          a2.ptr.p_complex[i] = a1.ptr.p_complex[i];
       }
       fftc1d(&a1, n);
@@ -65792,8 +65660,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&a1, n);
       ae_vector_set_length(&a2, n);
       for (i = 0; i < n; i++) {
-         a1.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-         a1.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+         a1.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          a2.ptr.p_complex[i] = a1.ptr.p_complex[i];
       }
       fftc1dinv(&a1, n);
@@ -65809,7 +65676,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&r1, n);
       ae_vector_set_length(&r2, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
       }
       fftr1d(&r1, n, &a1);
@@ -65821,9 +65688,9 @@ bool testfft(bool silent) {
       for (i = 0; i <= FloorZ((double)n / 2.0); i++) {
          a3.ptr.p_complex[i] = a2.ptr.p_complex[i];
       }
-      a3.ptr.p_complex[0].y = 2 * ae_randomreal() - 1;
+      a3.ptr.p_complex[0].y = ae_randommid();
       if (n % 2 == 0) {
-         a3.ptr.p_complex[FloorZ((double)n / 2.0)].y = 2 * ae_randomreal() - 1;
+         a3.ptr.p_complex[FloorZ((double)n / 2.0)].y = ae_randommid();
       }
       for (i = 0; i < n; i++) {
          r1.ptr.p_double[i] = 0.0;
@@ -65864,7 +65731,7 @@ bool testfft(bool silent) {
       ae_vector_set_length(&r1, n);
       ae_vector_set_length(&r2, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
       }
       ftcomplexfftplan(n / 2, 1, &plan);
@@ -65874,19 +65741,18 @@ bool testfft(bool silent) {
       reinterr = ae_maxreal(reinterr, fabs(r1.ptr.p_double[0] - a2.ptr.p_complex[0].x));
       reinterr = ae_maxreal(reinterr, fabs(r1.ptr.p_double[1] - a2.ptr.p_complex[n / 2].x));
       for (i = 1; i < n / 2; i++) {
-         reinterr = ae_maxreal(reinterr, fabs(r1.ptr.p_double[2 * i + 0] - a2.ptr.p_complex[i].x));
+         reinterr = ae_maxreal(reinterr, fabs(r1.ptr.p_double[2 * i] - a2.ptr.p_complex[i].x));
          reinterr = ae_maxreal(reinterr, fabs(r1.ptr.p_double[2 * i + 1] - a2.ptr.p_complex[i].y));
       }
    // Real backward FFT
       ae_vector_set_length(&r1, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
       }
       ae_vector_set_length(&a2, FloorZ((double)n / 2.0) + 1);
       a2.ptr.p_complex[0] = ae_complex_from_d(r1.ptr.p_double[0]);
       for (i = 1; i < FloorZ((double)n / 2.0); i++) {
-         a2.ptr.p_complex[i].x = r1.ptr.p_double[2 * i + 0];
-         a2.ptr.p_complex[i].y = r1.ptr.p_double[2 * i + 1];
+         a2.ptr.p_complex[i] = ae_complex_from_d(r1.ptr.p_double[2 * i], r1.ptr.p_double[2 * i + 1]);
       }
       a2.ptr.p_complex[FloorZ((double)n / 2.0)] = ae_complex_from_d(r1.ptr.p_double[1]);
       ftcomplexfftplan(n / 2, 1, &plan);
@@ -65899,7 +65765,7 @@ bool testfft(bool silent) {
    }
    reinterrors = reinterrors || reinterr > errtol;
 // end
-   waserrors = (((bidierrors || bidirerrors) || referrors) || refrerrors) || reinterrors;
+   waserrors = bidierrors || bidirerrors || referrors || refrerrors || reinterrors;
    if (!silent || waserrors) {
       printf("TESTING FFT\n");
       printf("FINAL RESULT:                             ");
@@ -66013,7 +65879,7 @@ bool testfht(bool silent) {
       ae_vector_set_length(&r2, n);
       ae_vector_set_length(&r3, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
          r3.ptr.p_double[i] = r1.ptr.p_double[i];
       }
@@ -66034,7 +65900,7 @@ bool testfht(bool silent) {
       ae_vector_set_length(&r1, n);
       ae_vector_set_length(&r2, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
       }
       fhtr1d(&r1, n);
@@ -66046,7 +65912,7 @@ bool testfht(bool silent) {
       ae_vector_set_length(&r1, n);
       ae_vector_set_length(&r2, n);
       for (i = 0; i < n; i++) {
-         r1.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         r1.ptr.p_double[i] = ae_randommid();
          r2.ptr.p_double[i] = r1.ptr.p_double[i];
       }
       fhtr1dinv(&r1, n);
@@ -66217,13 +66083,11 @@ bool testconv(bool silent) {
             // Complex convolution
                ae_vector_set_length(&ca, m);
                for (i = 0; i < m; i++) {
-                  ca.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-                  ca.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+                  ca.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
                }
                ae_vector_set_length(&cb, n);
                for (i = 0; i < n; i++) {
-                  cb.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-                  cb.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+                  cb.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
                }
                ae_vector_set_length(&cr1, 1);
                if (rkind == -3) {
@@ -66263,11 +66127,11 @@ bool testconv(bool silent) {
             // Real convolution
                ae_vector_set_length(&ra, m);
                for (i = 0; i < m; i++) {
-                  ra.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  ra.ptr.p_double[i] = ae_randommid();
                }
                ae_vector_set_length(&rb, n);
                for (i = 0; i < n; i++) {
-                  rb.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  rb.ptr.p_double[i] = ae_randommid();
                }
                ae_vector_set_length(&rr1, 1);
                if (rkind == -3) {
@@ -66316,13 +66180,11 @@ bool testconv(bool silent) {
       // Complex circilar and non-circular
          ae_vector_set_length(&ca, m);
          for (i = 0; i < m; i++) {
-            ca.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-            ca.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+            ca.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
          ae_vector_set_length(&cb, n);
          for (i = 0; i < n; i++) {
-            cb.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-            cb.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+            cb.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
          ae_vector_set_length(&cr1, 1);
          ae_vector_set_length(&cr2, 1);
@@ -66341,11 +66203,11 @@ bool testconv(bool silent) {
       // Real circilar and non-circular
          ae_vector_set_length(&ra, m);
          for (i = 0; i < m; i++) {
-            ra.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            ra.ptr.p_double[i] = ae_randommid();
          }
          ae_vector_set_length(&rb, n);
          for (i = 0; i < n; i++) {
-            rb.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            rb.ptr.p_double[i] = ae_randommid();
          }
          ae_vector_set_length(&rr1, 1);
          ae_vector_set_length(&rr2, 1);
@@ -66366,7 +66228,7 @@ bool testconv(bool silent) {
    inverrors = inverrors || inverr > errtol;
    invrerrors = invrerrors || invrerr > errtol;
 // end
-   waserrors = ((referrors || refrerrors) || inverrors) || invrerrors;
+   waserrors = referrors || refrerrors || inverrors || invrerrors;
    if (!silent || waserrors) {
       printf("TESTING CONVOLUTION\n");
       printf("FINAL RESULT:                             ");
@@ -66549,13 +66411,11 @@ bool testcorr(bool silent) {
       // Complex correlation
          ae_vector_set_length(&ca, m);
          for (i = 0; i < m; i++) {
-            ca.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-            ca.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+            ca.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
          ae_vector_set_length(&cb, n);
          for (i = 0; i < n; i++) {
-            cb.ptr.p_complex[i].x = 2 * ae_randomreal() - 1;
-            cb.ptr.p_complex[i].y = 2 * ae_randomreal() - 1;
+            cb.ptr.p_complex[i] = ae_complex_from_d(ae_randommid(), ae_randommid());
          }
          ae_vector_set_length(&cr1, 1);
          corrc1d(&ca, m, &cb, n, &cr1);
@@ -66572,11 +66432,11 @@ bool testcorr(bool silent) {
       // Real correlation
          ae_vector_set_length(&ra, m);
          for (i = 0; i < m; i++) {
-            ra.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            ra.ptr.p_double[i] = ae_randommid();
          }
          ae_vector_set_length(&rb, n);
          for (i = 0; i < n; i++) {
-            rb.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            rb.ptr.p_double[i] = ae_randommid();
          }
          ae_vector_set_length(&rr1, 1);
          corrr1d(&ra, m, &rb, n, &rr1);
@@ -67058,7 +66918,7 @@ static void testidwunit_testcommon(bool *err) {
          // Generate two copies of the same point
             for (j = 0; j < nx + ny; j++) {
                v = hqrndnormal(&rs);
-               xy.ptr.pp_double[2 * i + 0][j] = v;
+               xy.ptr.pp_double[2 * i][j] = v;
                xy.ptr.pp_double[2 * i + 1][j] = v;
             }
          // Test distance between newly generated point and other ones.
@@ -67067,7 +66927,7 @@ static void testidwunit_testcommon(bool *err) {
             for (i0 = 0; i0 < 2 * i; i0++) {
                vv = 0.0;
                for (j = 0; j < nx; j++) {
-                  vv = ae_maxreal(vv, fabs(xy.ptr.pp_double[2 * i + 0][j] - xy.ptr.pp_double[i0][j]));
+                  vv = ae_maxreal(vv, fabs(xy.ptr.pp_double[2 * i][j] - xy.ptr.pp_double[i0][j]));
                }
                v = ae_minreal(v, vv);
             }
@@ -67076,12 +66936,12 @@ static void testidwunit_testcommon(bool *err) {
             }
          // Update meanY
             for (j = 0; j < ny; j++) {
-               meany.ptr.p_double[j] += (xy.ptr.pp_double[2 * i + 0][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j]) / n;
+               meany.ptr.p_double[j] += (xy.ptr.pp_double[2 * i][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j]) / n;
             }
          // Apply perturbation to the target value
             for (j = 0; j < ny; j++) {
                v = pow(2.0, hqrndnormal(&rs));
-               xy.ptr.pp_double[2 * i + 0][nx + j] += v;
+               xy.ptr.pp_double[2 * i][nx + j] += v;
                xy.ptr.pp_double[2 * i + 1][nx + j] -= v;
                v = fabs(v);
                refrms += 2 * v * v;
@@ -67161,11 +67021,11 @@ static void testidwunit_testcommon(bool *err) {
       // NOTE: we do not test all evaluation functions, just IDWCalc()
          for (i = 0; i < n / 2; i++) {
             for (j = 0; j < nx; j++) {
-               x.ptr.p_double[j] = xy.ptr.pp_double[2 * i + 0][j];
+               x.ptr.p_double[j] = xy.ptr.pp_double[2 * i][j];
             }
             idwcalc(&model, &x, &y);
             for (j = 0; j < ny; j++) {
-               ae_set_error_flag(err, fabs(y.ptr.p_double[j] - 0.5 * (xy.ptr.pp_double[2 * i + 0][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j])) > tol, __FILE__, __LINE__, "testidwunit");
+               ae_set_error_flag(err, fabs(y.ptr.p_double[j] - 0.5 * (xy.ptr.pp_double[2 * i][nx + j] + xy.ptr.pp_double[2 * i + 1][nx + j])) > tol, __FILE__, __LINE__, "testidwunit");
             }
          }
       // Test continuity properties:
@@ -67335,9 +67195,9 @@ static void testidwunit_testmstab(bool *err) {
    n = 100;
    ae_matrix_set_length(&xy, 3 * n, 3);
    for (i = 0; i < n; i++) {
-      xy.ptr.pp_double[3 * i + 0][0] = (double)i / (double)(n - 1);
-      xy.ptr.pp_double[3 * i + 0][1] = -0.1;
-      xy.ptr.pp_double[3 * i + 0][2] = 0.0;
+      xy.ptr.pp_double[3 * i][0] = (double)i / (double)(n - 1);
+      xy.ptr.pp_double[3 * i][1] = -0.1;
+      xy.ptr.pp_double[3 * i][2] = 0.0;
       xy.ptr.pp_double[3 * i + 1][0] = (double)i / (double)(n - 1);
       xy.ptr.pp_double[3 * i + 1][1] = 0.0;
       xy.ptr.pp_double[3 * i + 1][2] = 1.0;
@@ -67526,10 +67386,10 @@ bool testratint(bool silent) {
    // randomized tests
       for (pass = 1; pass <= passcount; pass++) {
       // generate weights from polynomial interpolation
-         v0 = 1 + 0.4 * ae_randomreal() - 0.2;
-         v1 = 2 * ae_randomreal() - 1;
-         v2 = 2 * ae_randomreal() - 1;
-         v3 = 2 * ae_randomreal() - 1;
+         v0 = 1.0 + 0.2 * ae_randommid();
+         v1 = ae_randommid();
+         v2 = ae_randommid();
+         v3 = ae_randommid();
          ae_vector_set_length(&x, n);
          ae_vector_set_length(&y, n);
          ae_vector_set_length(&w, n);
@@ -67555,19 +67415,19 @@ bool testratint(bool silent) {
          barycentricunpack(&b1, &n2, &x2, &y2, &w2);
          bcerrors = bcerrors || n2 != n;
          barycentricbuildxyw(&x2, &y2, &w2, n2, &b2);
-         t = 2 * ae_randomreal() - 1;
+         t = ae_randommid();
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - barycentriccalc(&b2, t)) > threshold;
       // copy, compare
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
-         t = 2 * ae_randomreal() - 1;
+         t = ae_randommid();
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - barycentriccalc(&b2, t)) > threshold;
       // test interpolation properties
          for (i = 0; i < n; i++) {
          // test interpolation at nodes
             bcerrors = bcerrors || fabs(barycentriccalc(&b1, x.ptr.p_double[i]) - y.ptr.p_double[i]) > threshold * fabs(y.ptr.p_double[i]);
          // compare with polynomial interpolation
-            t = 2 * ae_randomreal() - 1;
+            t = ae_randommid();
             testratintunit_poldiff2(&x, &y, n, t, &v0, &v1, &v2);
             bcerrors = bcerrors || fabs(barycentriccalc(&b1, t) - v0) > threshold * ae_maxreal(fabs(v0), 1.0);
          // test continuity between nodes
@@ -67590,11 +67450,11 @@ bool testratint(bool silent) {
                v2 = x.ptr.p_double[i] + (t - x.ptr.p_double[i]) * (j + 1) / k;
                s2 = ae_maxreal(s2, fabs(barycentriccalc(&b1, v2) - barycentriccalc(&b1, v1)) / fabs(v2 - v1));
             }
-            bcerrors = bcerrors || (s2 > lipschitztol * s1 && s1 > threshold * k);
+            bcerrors = bcerrors || s2 > lipschitztol * s1 && s1 > threshold * k;
          }
       // test differentiation properties
          for (i = 0; i < n; i++) {
-            t = 2 * ae_randomreal() - 1;
+            t = ae_randommid();
             testratintunit_poldiff2(&x, &y, n, t, &v0, &v1, &v2);
             d0 = 0.0;
             d1 = 0.0;
@@ -67611,21 +67471,21 @@ bool testratint(bool silent) {
             bcerrors = bcerrors || fabs(v2 - d2) > sqrt(threshold) * ae_maxreal(fabs(v2), 1.0);
          }
       // test linear translation
-         t = 2 * ae_randomreal() - 1;
-         a = 2 * ae_randomreal() - 1;
-         b = 2 * ae_randomreal() - 1;
+         t = ae_randommid();
+         a = ae_randommid();
+         b = ae_randommid();
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransx(&b2, a, b);
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b) - barycentriccalc(&b2, t)) > threshold;
          a = 0.0;
-         b = 2 * ae_randomreal() - 1;
+         b = ae_randommid();
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransx(&b2, a, b);
          bcerrors = bcerrors || fabs(barycentriccalc(&b1, a * t + b) - barycentriccalc(&b2, t)) > threshold;
-         a = 2 * ae_randomreal() - 1;
-         b = 2 * ae_randomreal() - 1;
+         a = ae_randommid();
+         b = ae_randommid();
          testratintunit_brcunset(&b2);
          barycentriccopy(&b1, &b2);
          barycentriclintransy(&b2, a, b);
@@ -67730,10 +67590,10 @@ bool testratint(bool silent) {
    for (pass = 1; pass < passcount; pass++) {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&y, 1);
-      x.ptr.p_double[0] = 2 * ae_randomreal() - 1;
-      y.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+      x.ptr.p_double[0] = ae_randommid();
+      y.ptr.p_double[0] = ae_randommid();
       barycentricbuildfloaterhormann(&x, &y, 1, 1, &b1);
-      maxerr = ae_maxreal(maxerr, fabs(barycentriccalc(&b1, 2 * ae_randomreal() - 1) - y.ptr.p_double[0]));
+      maxerr = ae_maxreal(maxerr, fabs(barycentriccalc(&b1, ae_randommid()) - y.ptr.p_double[0]));
    }
    for (n = 2; n <= 10; n++) {
    // compare interpolant built by subroutine
@@ -67751,7 +67611,7 @@ bool testratint(bool silent) {
             x.ptr.p_double[i] = atan((b - a) * i / (n - 1) + a);
          }
          for (i = 0; i < n; i++) {
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
          }
          w.ptr.p_double[0] = -1 / (x.ptr.p_double[1] - x.ptr.p_double[0]);
          s = 1.0;
@@ -67796,7 +67656,7 @@ bool testratint(bool silent) {
                x.ptr.p_double[i] = (b - a) * i / (n - 1) + a;
             }
             for (i = 0; i < n; i++) {
-               y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               y.ptr.p_double[i] = ae_randommid();
             }
             s = 1.0;
             if (d == 0) {
@@ -68447,7 +68307,7 @@ static bool testspline1dunit_enumerateallsplines(RVector x, RVector y, ae_int_t 
             spline1dbuildcubic(x, y, n, -1, 0.0, -1, 0.0, s);
          } else {
          // Non-periodic spline
-            spline1dbuildcubic(x, y, n, idxoffs / 3, 2 * ae_randomreal() - 1, idxoffs % 3, 2 * ae_randomreal() - 1, s);
+            spline1dbuildcubic(x, y, n, idxoffs / 3, ae_randommid(), idxoffs % 3, ae_randommid(), s);
          }
          ++*splineindex;
          result = true;
@@ -68570,14 +68430,14 @@ static bool testspline1dunit_testmonotonespline() {
    ae_vector_set_length(&y, 2);
    ae_vector_set_length(&d, 2);
    x.ptr.p_double[0] = -0.1 - ae_randomreal();
-   y.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+   y.ptr.p_double[0] = ae_randommid();
    d.ptr.p_double[0] = 0.0;
    x.ptr.p_double[1] = 0.1 + ae_randomreal();
    y.ptr.p_double[1] = y.ptr.p_double[0];
    d.ptr.p_double[1] = 0.0;
    spline1dbuildmonotone(&x, &y, 2, &c);
    spline1dbuildhermite(&x, &y, &d, 2, &s2);
-   v = 2 * ae_randomreal() - 1;
+   v = ae_randommid();
    if (fabs(spline1dcalc(&c, v) - spline1dcalc(&s2, v)) > eps) {
       result = true;
       ae_frame_leave();
@@ -68694,8 +68554,8 @@ static bool testspline1dunit_testmonotonespline() {
       }
       ae_vector_set_length(&x, alln);
       ae_vector_set_length(&y, alln);
-      x.ptr.p_double[0] = r * (2 * ae_randomreal() - 1);
-      y.ptr.p_double[0] = r * (2 * ae_randomreal() - 1);
+      x.ptr.p_double[0] = r * ae_randommid();
+      y.ptr.p_double[0] = r * ae_randommid();
    // Builds monotone function
       st = 0.1 + 0.7 * ae_randomreal();
       shift = 0;
@@ -68754,7 +68614,7 @@ static bool testspline1dunit_testmonotonespline() {
          return result;
       }
    // Builds constant function
-      y.ptr.p_double[0] = r * (2 * ae_randomreal() - 1);
+      y.ptr.p_double[0] = r * ae_randommid();
       for (i = 1; i < alln; i++) {
          y.ptr.p_double[i] = y.ptr.p_double[0];
       }
@@ -68858,7 +68718,7 @@ static void testspline1dunit_testsplinefitting(bool *fiterrors) {
          testspline1dunit_unsetspline1d(&c);
          testspline1dunit_unsetreport(&rep);
          spline1dfit(&x, &y, 2, m, pow(10.0, rho), &c, &rep);
-         v = 2 * ae_randomreal() - 1;
+         v = ae_randommid();
          v1 = (v - x.ptr.p_double[0]) / (x.ptr.p_double[1] - x.ptr.p_double[0]) * y.ptr.p_double[1] + (v - x.ptr.p_double[1]) / (x.ptr.p_double[0] - x.ptr.p_double[1]) * y.ptr.p_double[0];
          ae_set_error_flag(fiterrors, fabs(v1 - spline1dcalc(&c, v)) > threshold, __FILE__, __LINE__, "testspline1dunit");
          ae_set_error_flag(fiterrors, rep.rmserror > threshold, __FILE__, __LINE__, "testspline1dunit");
@@ -69178,8 +69038,8 @@ bool testspline1d(bool silent) {
       // * YP contains periodic function values
          a = -1 - ae_randomreal();
          b = 1 + ae_randomreal();
-         bl = 2 * ae_randomreal() - 1;
-         br = 2 * ae_randomreal() - 1;
+         bl = ae_randommid();
+         br = ae_randommid();
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * (2 * i + 1) / (2 * n));
             if (i == 0) {
@@ -69358,7 +69218,7 @@ bool testspline1d(bool silent) {
                n2 = 2 + ae_randominteger(2 * n);
                ae_vector_set_length(&tmpx, n2);
                for (i = 0; i < n2; i++) {
-                  tmpx.ptr.p_double[i] = 0.5 * (a + b) + (a - b) * (2 * ae_randomreal() - 1);
+                  tmpx.ptr.p_double[i] = 0.5 * (a + b) + (a - b) * ae_randommid();
                }
                err = 0.0;
                if (periodiccond) {
@@ -69404,8 +69264,8 @@ bool testspline1d(bool silent) {
          for (bltype = -1; bltype <= 0; bltype++) {
             periodiccond = bltype == -1;
          // select random tension value, then build
-            if (ae_randomreal() > 0.5) {
-               if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
+               if (ae_randombool()) {
                   tension = 0.0;
                } else {
                   tension = 1.0;
@@ -69513,8 +69373,8 @@ bool testspline1d(bool silent) {
          aserrors = aserrors || err > threshold;
          testspline1dunit_lconst(a, b, &c, lstep, &l10, &l11, &l12);
          testspline1dunit_lconst(a, b, &c, lstep / 3, &l20, &l21, &l22);
-         hserrors = hserrors || (l10 > 1.0E-10 && l20 / l10 > 1.2);
-         hserrors = hserrors || (l11 > 1.0E-10 && l21 / l11 > 1.2);
+         hserrors = hserrors || l10 > 1.0E-10 && l20 / l10 > 1.2;
+         hserrors = hserrors || l11 > 1.0E-10 && l21 / l11 > 1.2;
       }
    }
 // Special linear spline test:
@@ -69527,7 +69387,7 @@ bool testspline1d(bool silent) {
       b = 1.0;
       for (i = 0; i < n; i++) {
          x.ptr.p_double[i] = a + (b - a) * i / (n - 1);
-         y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         y.ptr.p_double[i] = ae_randommid();
       }
       spline1dbuildlinear(&x, &y, n, &c);
    // Test
@@ -69632,8 +69492,8 @@ bool testspline1d(bool silent) {
       a = -1 - ae_randomreal();
       b = 1 + ae_randomreal();
       for (i = 0; i < n; i++) {
-         x.ptr.p_double[i] = a + (b - a) * (i + 0.2 * ae_randomreal() - 0.1) / (n - 1);
-         y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x.ptr.p_double[i] = a + (b - a) * (i + 0.1 * ae_randommid()) / (n - 1);
+         y.ptr.p_double[i] = ae_randommid();
       }
       ae_vector_set_length(&xtest, 5 * n + 2);
       for (i = 0; i < xtest.cnt; i++) {
@@ -69642,23 +69502,23 @@ bool testspline1d(bool silent) {
       splineindex = 0;
       while (testspline1dunit_enumerateallsplines(&x, &y, n, &splineindex, &c)) {
       // LinTransX, general A
-         sa = 4 * ae_randomreal() - 2;
-         sb = 2 * ae_randomreal() - 1;
+         sa = 2.0 * ae_randommid();
+         sb = ae_randommid();
          spline1dcopy(&c, &c2);
          spline1dlintransx(&c2, sa, sb);
          for (i = 0; i < xtest.cnt; i++) {
             lterrors = lterrors || fabs(spline1dcalc(&c, xtest.ptr.p_double[i]) - spline1dcalc(&c2, (xtest.ptr.p_double[i] - sb) / sa)) > threshold;
          }
       // LinTransX, special case: A=0
-         sb = 2 * ae_randomreal() - 1;
+         sb = ae_randommid();
          spline1dcopy(&c, &c2);
          spline1dlintransx(&c2, 0.0, sb);
          for (i = 0; i < xtest.cnt; i++) {
             lterrors = lterrors || fabs(spline1dcalc(&c, sb) - spline1dcalc(&c2, xtest.ptr.p_double[i])) > threshold;
          }
       // LinTransY
-         sa = 2 * ae_randomreal() - 1;
-         sb = 2 * ae_randomreal() - 1;
+         sa = ae_randommid();
+         sb = ae_randommid();
          spline1dcopy(&c, &c2);
          spline1dlintransy(&c2, sa, sb);
          for (i = 0; i < xtest.cnt; i++) {
@@ -69706,9 +69566,9 @@ bool testspline1d(bool silent) {
       }
    }
    ierrors = ierrors || err > 0.001;
-   p0 = 2 * ae_randomreal() - 1;
-   p1 = 2 * ae_randomreal() - 1;
-   p2 = 2 * ae_randomreal() - 1;
+   p0 = ae_randommid();
+   p1 = ae_randommid();
+   p2 = ae_randommid();
    a = -ae_randomreal() - 0.5;
    b = ae_randomreal() + 0.5;
    n = 2;
@@ -69757,7 +69617,7 @@ bool testspline1d(bool silent) {
 // Test fitting errors
    testspline1dunit_testsplinefitting(&fiterr);
 // report
-   waserrors = ((((((((((lserrors || cserrors) || crserrors) || hserrors) || aserrors) || dserrors) || cperrors) || uperrors) || lterrors) || ierrors) || monotoneerr) || fiterr;
+   waserrors = lserrors || cserrors || crserrors || hserrors || aserrors || dserrors || cperrors || uperrors || lterrors || ierrors || monotoneerr || fiterr;
    if (!silent || waserrors) {
       printf("TESTING SPLINE INTERPOLATION\n");
    // Normal tests
@@ -70633,7 +70493,7 @@ static void testspline3dunit_buildrndgrid(bool isvect, bool reorder, ae_int_t *n
       for (j = 0; j < *m; j++) {
          for (k = 0; k < *l; k++) {
             for (di = 0; di < *d; di++) {
-               f->ptr.p_double[*d * (*n * (*m * k + j) + i) + di] = 2 * ae_randomreal() - 1;
+               f->ptr.p_double[*d * (*n * (*m * k + j) + i) + di] = ae_randommid();
             }
          }
       }
@@ -70699,11 +70559,11 @@ static bool testspline3dunit_basictest() {
       }
       ae_vector_set_length(&vf, l * m * n * d);
       offs = 0;
-      ax = 2 * ae_randomreal() - 1;
-      ay = 2 * ae_randomreal() - 1;
-      az = 2 * ae_randomreal() - 1;
-      axy = 2 * ae_randomreal() - 1;
-      ayz = 2 * ae_randomreal() - 1;
+      ax = ae_randommid();
+      ay = ae_randommid();
+      az = ae_randommid();
+      axy = ae_randommid();
+      ayz = ae_randommid();
       for (k = 0; k < l; k++) {
          for (j = 0; j < m; j++) {
             for (i = 0; i < n; i++) {
@@ -70840,7 +70700,7 @@ static bool testspline3dunit_testunpack() {
                // Check that all components are correct:
                // * first check, that unpacked componets are equal
                //   to packed components;
-                  bperr = (((((((((((((((((un != n || um != m) || ul != l) || tbl1.ptr.pp_double[p1][0] != x.ptr.p_double[i]) || tbl1.ptr.pp_double[p1][1] != x.ptr.p_double[i + 1]) || tbl1.ptr.pp_double[p1][2] != y.ptr.p_double[j]) || tbl1.ptr.pp_double[p1][3] != y.ptr.p_double[j + 1]) || tbl1.ptr.pp_double[p1][4] != z.ptr.p_double[k]) || tbl1.ptr.pp_double[p1][5] != z.ptr.p_double[k + 1]) || uvn != n) || uvm != m) || uvl != l) || uvd != d) || tbl0.ptr.pp_double[p0][0] != x.ptr.p_double[i]) || tbl0.ptr.pp_double[p0][1] != x.ptr.p_double[i + 1]) || tbl0.ptr.pp_double[p0][2] != y.ptr.p_double[j]) || tbl0.ptr.pp_double[p0][3] != y.ptr.p_double[j + 1]) || tbl0.ptr.pp_double[p0][4] != z.ptr.p_double[k]) || tbl0.ptr.pp_double[p0][5] != z.ptr.p_double[k + 1];
+                  bperr = un != n || um != m || ul != l || tbl1.ptr.pp_double[p1][0] != x.ptr.p_double[i] || tbl1.ptr.pp_double[p1][1] != x.ptr.p_double[i + 1] || tbl1.ptr.pp_double[p1][2] != y.ptr.p_double[j] || tbl1.ptr.pp_double[p1][3] != y.ptr.p_double[j + 1] || tbl1.ptr.pp_double[p1][4] != z.ptr.p_double[k] || tbl1.ptr.pp_double[p1][5] != z.ptr.p_double[k + 1] || uvn != n || uvm != m || uvl != l || uvd != d || tbl0.ptr.pp_double[p0][0] != x.ptr.p_double[i] || tbl0.ptr.pp_double[p0][1] != x.ptr.p_double[i + 1] || tbl0.ptr.pp_double[p0][2] != y.ptr.p_double[j] || tbl0.ptr.pp_double[p0][3] != y.ptr.p_double[j + 1] || tbl0.ptr.pp_double[p0][4] != z.ptr.p_double[k] || tbl0.ptr.pp_double[p0][5] != z.ptr.p_double[k + 1];
                // * check, that all components unpacked by Unpack
                //   function are equal to all components unpacked
                //   by UnpackV function.
@@ -70934,21 +70794,18 @@ static bool testspline3dunit_testlintrans() {
             for (zjob = 0; zjob <= 1; zjob++) {
             // Prepare
                do {
-                  a1 = 2.0 * ae_randomreal() - 1.0;
-               }
-               while (a1 == 0.0);
+                  a1 = ae_randommid();
+               } while (a1 == 0.0);
                a1 *= xjob;
                b1 = x.ptr.p_double[0] + ae_randomreal() * (x.ptr.p_double[n - 1] - x.ptr.p_double[0] + 2.0) - 1.0;
                do {
-                  a2 = 2.0 * ae_randomreal() - 1.0;
-               }
-               while (a2 == 0.0);
+                  a2 = ae_randommid();
+               } while (a2 == 0.0);
                a2 *= yjob;
                b2 = y.ptr.p_double[0] + ae_randomreal() * (y.ptr.p_double[m - 1] - y.ptr.p_double[0] + 2.0) - 1.0;
                do {
-                  a3 = 2.0 * ae_randomreal() - 1.0;
-               }
-               while (a3 == 0.0);
+                  a3 = ae_randommid();
+               } while (a3 == 0.0);
                a3 *= zjob;
                b3 = z.ptr.p_double[0] + ae_randomreal() * (z.ptr.p_double[l - 1] - z.ptr.p_double[0] + 2.0) - 1.0;
             // Test XYZ
@@ -71056,7 +70913,7 @@ static bool testspline3dunit_testtrilinearresample() {
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
             for (k = 0; k < l; k++) {
-               f.ptr.p_double[n * (m * k + j) + i] = 2 * ae_randomreal() - 1;
+               f.ptr.p_double[n * (m * k + j) + i] = ae_randommid();
             }
          }
       }
@@ -71095,7 +70952,7 @@ bool testspline3d(bool silence) {
    unpackerr = testspline3dunit_testunpack();
    lintransferr = testspline3dunit_testlintrans();
    trilinreserr = testspline3dunit_testtrilinearresample();
-   waserrors = ((basicerr || unpackerr) || lintransferr) || trilinreserr;
+   waserrors = basicerr || unpackerr || lintransferr || trilinreserr;
    if (!silence) {
       printf("TESTING 3D SPLINE\n");
       printf("BASIC TEST:                              ");
@@ -71226,10 +71083,9 @@ bool testpolint(bool silent) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * ae_randomreal() - 1;
-            b = 2 * ae_randomreal() - 1;
-         }
-         while (fabs(a - b) <= 0.2);
+            a = ae_randommid();
+            b = ae_randommid();
+         } while (fabs(a - b) <= 0.2);
          t = a + (1.2 * ae_randomreal() - 0.1) * (b - a);
          taskgenint1dequidist(a, b, n, &x, &y);
       // test "fast" equidistant interpolation (no barycentric model)
@@ -71252,10 +71108,9 @@ bool testpolint(bool silent) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * ae_randomreal() - 1;
-            b = 2 * ae_randomreal() - 1;
-         }
-         while (fabs(a - b) <= 0.2);
+            a = ae_randommid();
+            b = ae_randommid();
+         } while (fabs(a - b) <= 0.2);
          t = a + (1.2 * ae_randomreal() - 0.1) * (b - a);
          taskgenint1dcheb1(a, b, n, &x, &y);
       // test "fast" interpolation (no barycentric model)
@@ -71278,10 +71133,9 @@ bool testpolint(bool silent) {
       // * random Y
       // * T in [A,B] or near (within 10% of its width)
          do {
-            a = 2 * ae_randomreal() - 1;
-            b = 2 * ae_randomreal() - 1;
-         }
-         while (fabs(a - b) <= 0.2);
+            a = ae_randommid();
+            b = ae_randommid();
+         } while (fabs(a - b) <= 0.2);
          t = a + (1.2 * ae_randomreal() - 0.1) * (b - a);
          taskgenint1dcheb2(a, b, n, &x, &y);
       // test "fast" interpolation (no barycentric model)
@@ -71303,11 +71157,11 @@ bool testpolint(bool silent) {
          ae_vector_set_length(&x, k);
          ae_vector_set_length(&y, k);
       // Generate problem
-         a = 2 * ae_randomreal() - 1;
+         a = ae_randommid();
          b = a + (0.1 + ae_randomreal()) * (2 * ae_randominteger(2) - 1);
-         v0 = 2 * ae_randomreal() - 1;
-         v1 = 2 * ae_randomreal() - 1;
-         v2 = 2 * ae_randomreal() - 1;
+         v0 = ae_randommid();
+         v1 = ae_randommid();
+         v2 = ae_randommid();
          if (k == 1) {
             x.ptr.p_double[0] = 0.5 * (a + b);
             y.ptr.p_double[0] = v0;
@@ -71353,13 +71207,13 @@ bool testpolint(bool silent) {
          ae_vector_set_length(&x, k);
          ae_vector_set_length(&y, k);
       // Generate problem
-         poffset = 2 * ae_randomreal() - 1;
+         poffset = ae_randommid();
          pscale = (0.1 + ae_randomreal()) * (2 * ae_randominteger(2) - 1);
-         v0 = 2 * ae_randomreal() - 1;
-         v1 = 2 * ae_randomreal() - 1;
-         v2 = 2 * ae_randomreal() - 1;
-         v3 = 2 * ae_randomreal() - 1;
-         v4 = 2 * ae_randomreal() - 1;
+         v0 = ae_randommid();
+         v1 = ae_randommid();
+         v2 = ae_randommid();
+         v3 = ae_randommid();
+         v4 = ae_randommid();
          if (k == 1) {
             x.ptr.p_double[0] = poffset;
             y.ptr.p_double[0] = v0;
@@ -71422,7 +71276,7 @@ bool testpolint(bool silent) {
          }
       // Test backward conversion
          polynomialpow2bar(&c, k, poffset, pscale, &p2);
-         v = poffset + (2 * ae_randomreal() - 1) * pscale;
+         v = poffset + ae_randommid() * pscale;
          interrors = interrors || fabs(barycentriccalc(&p, v) - barycentriccalc(&p2, v)) > threshold;
       }
    }
@@ -71596,10 +71450,10 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
                      w.ptr.p_double[i] = 1 + ae_randomreal();
                   }
                   xc.ptr.p_double[0] = 0.0;
-                  yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+                  yc.ptr.p_double[0] = ae_randommid();
                   dc.ptr.p_int[0] = 0;
                   xc.ptr.p_double[1] = 0.0;
-                  yc.ptr.p_double[1] = 2 * ae_randomreal() - 1;
+                  yc.ptr.p_double[1] = ae_randommid();
                   dc.ptr.p_int[1] = 1;
                   polynomialfitwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &p1, &rep);
                   if (info <= 0) {
@@ -71663,7 +71517,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
          ae_vector_set_length(&w, n);
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = i + (ae_randomreal() - 0.5);
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
             w.ptr.p_double[i] = 1.0;
          }
          polynomialfitwc(&x, &y, &w, n, &xc, &yc, &dc, 0, m, &info, &p1, &rep);
@@ -71673,7 +71527,7 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
          } else {
          // calculate P1 (interpolant), compare with P2 error
          // compare RMS errors
-            t = 2 * ae_randomreal() - 1;
+            t = ae_randommid();
             v1 = barycentriccalc(&p1, t);
             v2 = barycentriccalc(&p2, t);
             *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12);
@@ -71708,9 +71562,9 @@ static void testlsfitunit_testpolynomialfitting(bool *fiterrors) {
          ae_vector_set_length(&y, n);
          ae_vector_set_length(&w, n);
          for (i = 0; i < maxn; i++) {
-            x.ptr.p_double[4 * i + 0] = (double)i;
-            y.ptr.p_double[4 * i + 0] = v - v2;
-            w.ptr.p_double[4 * i + 0] = 1.0;
+            x.ptr.p_double[4 * i] = (double)i;
+            y.ptr.p_double[4 * i] = v - v2;
+            w.ptr.p_double[4 * i] = 1.0;
             x.ptr.p_double[4 * i + 1] = (double)i;
             y.ptr.p_double[4 * i + 1] = v - v1;
             w.ptr.p_double[4 * i + 1] = 1.0;
@@ -71807,12 +71661,12 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
             }
             for (i = 0; i < n - k; i++) {
                x.ptr.p_double[i] = (double)i / (double)(n - 1);
-               y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               y.ptr.p_double[i] = ae_randommid();
                w.ptr.p_double[i] = 1 + ae_randomreal();
             }
             for (i = 0; i < k; i++) {
                xc.ptr.p_double[i] = (double)(n - k + i) / (double)(n - 1);
-               yc.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               yc.ptr.p_double[i] = ae_randommid();
                dc.ptr.p_int[i] = 0;
             }
             barycentricfitfloaterhormannwc(&x, &y, &w, n - k, &xc, &yc, &dc, k, n, &info, &b1, &rep);
@@ -71840,15 +71694,15 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
                ae_vector_set_length(&yc, 2);
                ae_vector_set_length(&dc, 2);
                for (i = 0; i < n; i++) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
+                  y.ptr.p_double[i] = ae_randommid();
                   w.ptr.p_double[i] = 1 + ae_randomreal();
                }
                xc.ptr.p_double[0] = -1.0;
-               yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+               yc.ptr.p_double[0] = ae_randommid();
                dc.ptr.p_int[0] = 0;
                xc.ptr.p_double[1] = 1.0;
-               yc.ptr.p_double[1] = 2 * ae_randomreal() - 1;
+               yc.ptr.p_double[1] = ae_randommid();
                dc.ptr.p_int[1] = 0;
                barycentricfitfloaterhormannwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &b1, &rep);
                if (info <= 0) {
@@ -71912,7 +71766,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
          ae_vector_set_length(&w, n);
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = i + (ae_randomreal() - 0.5);
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
             w.ptr.p_double[i] = 1.0;
          }
          barycentricfitfloaterhormannwc(&x, &y, &w, n, &xc, &yc, &dc, 0, m, &info, &b1, &rep);
@@ -71922,7 +71776,7 @@ static void testlsfitunit_testrationalfitting(bool *fiterrors) {
          } else {
          // calculate B1 (interpolant), compare with B2
          // compare RMS errors
-            t = 2 * ae_randomreal() - 1;
+            t = ae_randommid();
             v1 = barycentriccalc(&b1, t);
             v2 = barycentriccalc(&b2, t);
             *fiterrors = *fiterrors || !approxequal(v2, v1, 1.0E-12);
@@ -72053,23 +71907,23 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             ae_vector_set_length(&yc, 4);
             ae_vector_set_length(&dc, 4);
             sa = 1 + ae_randomreal();
-            sb = 2 * ae_randomreal() - 1;
+            sb = ae_randommid();
             for (i = 0; i < n; i++) {
                x.ptr.p_double[i] = sa * ae_randomreal() + sb;
-               y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               y.ptr.p_double[i] = ae_randommid();
                w.ptr.p_double[i] = 1 + ae_randomreal();
             }
             xc.ptr.p_double[0] = sb;
-            yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[0] = ae_randommid();
             dc.ptr.p_int[0] = 0;
             xc.ptr.p_double[1] = sb;
-            yc.ptr.p_double[1] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[1] = ae_randommid();
             dc.ptr.p_int[1] = 1;
             xc.ptr.p_double[2] = sa + sb;
-            yc.ptr.p_double[2] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[2] = ae_randommid();
             dc.ptr.p_int[2] = 0;
             xc.ptr.p_double[3] = sa + sb;
-            yc.ptr.p_double[3] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[3] = ae_randommid();
             dc.ptr.p_int[3] = 1;
             spline1dfitcubicwc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &c, &rep);
             if (info <= 0) {
@@ -72102,14 +71956,14 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          ae_vector_set_length(&yc, 1);
          ae_vector_set_length(&dc, 1);
          sa = 1 + ae_randomreal();
-         sb = 2 * ae_randomreal() - 1;
+         sb = ae_randommid();
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = sa * ae_randomreal() + sb;
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
             w.ptr.p_double[i] = 1 + ae_randomreal();
          }
          xc.ptr.p_double[0] = sa * ae_randomreal() + sb;
-         yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+         yc.ptr.p_double[0] = ae_randommid();
          dc.ptr.p_int[0] = ae_randominteger(2);
          spline1dfitcubicwc(&x, &y, &w, n, &xc, &yc, &dc, 1, m, &info, &c, &rep);
          if (info <= 0) {
@@ -72146,23 +72000,23 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
             ae_vector_set_length(&yc, 4);
             ae_vector_set_length(&dc, 4);
             sa = 1 + ae_randomreal();
-            sb = 2 * ae_randomreal() - 1;
+            sb = ae_randommid();
             for (i = 0; i < n; i++) {
                x.ptr.p_double[i] = sa * ae_randomreal() + sb;
-               y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               y.ptr.p_double[i] = ae_randommid();
                w.ptr.p_double[i] = 1 + ae_randomreal();
             }
             xc.ptr.p_double[0] = sb;
-            yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[0] = ae_randommid();
             dc.ptr.p_int[0] = 0;
             xc.ptr.p_double[1] = sb;
-            yc.ptr.p_double[1] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[1] = ae_randommid();
             dc.ptr.p_int[1] = 1;
             xc.ptr.p_double[2] = sa + sb;
-            yc.ptr.p_double[2] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[2] = ae_randommid();
             dc.ptr.p_int[2] = 0;
             xc.ptr.p_double[3] = sa + sb;
-            yc.ptr.p_double[3] = 2 * ae_randomreal() - 1;
+            yc.ptr.p_double[3] = ae_randommid();
             dc.ptr.p_int[3] = 1;
             spline1dfithermitewc(&x, &y, &w, n, &xc, &yc, &dc, k, m, &info, &c, &rep);
             if (info <= 0) {
@@ -72198,14 +72052,14 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          ae_vector_set_length(&yc, 1);
          ae_vector_set_length(&dc, 1);
          sa = 1 + ae_randomreal();
-         sb = 2 * ae_randomreal() - 1;
+         sb = ae_randommid();
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = sa * ae_randomreal() + sb;
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
             w.ptr.p_double[i] = 1 + ae_randomreal();
          }
          xc.ptr.p_double[0] = sa * ae_randomreal() + sb;
-         yc.ptr.p_double[0] = 2 * ae_randomreal() - 1;
+         yc.ptr.p_double[0] = ae_randommid();
          dc.ptr.p_int[0] = ae_randominteger(2);
          spline1dfithermitewc(&x, &y, &w, n, &xc, &yc, &dc, 1, m, &info, &c, &rep);
          if (info <= 0) {
@@ -72238,15 +72092,15 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          // * fit, store in C
          // * compare C and C2
             sa = 1 + ae_randomreal();
-            sb = 2 * ae_randomreal() - 1;
+            sb = ae_randommid();
             if (stype == 0) {
                ae_vector_set_length(&x, m - 2);
                ae_vector_set_length(&y, m - 2);
                for (i = 0; i < m - 2; i++) {
                   x.ptr.p_double[i] = sa * i / (m - 2 - 1) + sb;
-                  y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  y.ptr.p_double[i] = ae_randommid();
                }
-               spline1dbuildcubic(&x, &y, m - 2, 1, 2 * ae_randomreal() - 1, 1, 2 * ae_randomreal() - 1, &c2);
+               spline1dbuildcubic(&x, &y, m - 2, 1, ae_randommid(), 1, ae_randommid(), &c2);
             }
             if (stype == 1) {
                ae_vector_set_length(&x, m / 2);
@@ -72254,8 +72108,8 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
                ae_vector_set_length(&d, m / 2);
                for (i = 0; i < m / 2; i++) {
                   x.ptr.p_double[i] = sa * i / (m / 2 - 1) + sb;
-                  y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-                  d.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  y.ptr.p_double[i] = ae_randommid();
+                  d.ptr.p_double[i] = ae_randommid();
                }
                spline1dbuildhermite(&x, &y, &d, m / 2, &c2);
             }
@@ -72309,7 +72163,7 @@ static void testlsfitunit_testsplinefitting(bool *fiterrors) {
          ae_vector_set_length(&w, n);
          for (i = 0; i < n; i++) {
             x.ptr.p_double[i] = i + (ae_randomreal() - 0.5);
-            y.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            y.ptr.p_double[i] = ae_randommid();
             w.ptr.p_double[i] = 1.0;
          }
       // Fit cubic with unity weights, without weights, then compare
@@ -73055,16 +72909,15 @@ static void testlsfitunit_testlcnls(bool *errorflag) {
          for (i = 0; i < nc; i++) {
             do {
                c2.ptr.p_double[i] = c1.ptr.p_double[i] + (hqrnduniformr(&rs) * 2 - 1) * h;
-            }
-            while (!(c2.ptr.p_double[i] >= bl.ptr.p_double[i] && c2.ptr.p_double[i] <= bu.ptr.p_double[i]));
+            } while (!(c2.ptr.p_double[i] >= bl.ptr.p_double[i] && c2.ptr.p_double[i] <= bu.ptr.p_double[i]));
          }
          bflag = false;
          for (i = 0; i < rawccnt; i++) {
             ae_assert(rawct.ptr.p_int[i] != 0, "Assertion failed");
             v = ae_v_dotproduct(rawc.ptr.pp_double[i], 1, c2.ptr.p_double, 1, nc);
             v -= rawc.ptr.pp_double[i][nc];
-            bflag = bflag || (rawct.ptr.p_int[i] > 0 && v < 0.0);
-            bflag = bflag || (rawct.ptr.p_int[i] < 0 && v > 0.0);
+            bflag = bflag || rawct.ptr.p_int[i] > 0 && v < 0.0;
+            bflag = bflag || rawct.ptr.p_int[i] < 0 && v > 0.0;
          }
          if (bflag) {
             continue;
@@ -73567,7 +73420,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             xscale = 0.9 + 0.1 * ae_randomreal();
             for (i = 0; i < n; i++) {
                if (n == 1) {
-                  x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  x.ptr.p_double[i] = ae_randommid();
                } else {
                   x.ptr.p_double[i] = xscale * ((double)(2 * i) / (double)(n - 1) - 1);
                }
@@ -73593,7 +73446,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             ae_matrix_set_length(&a2, n, 2 * m);
             for (i = 0; i < n; i++) {
                for (j = 0; j < m; j++) {
-                  a2.ptr.pp_double[i][2 * j + 0] = a.ptr.pp_double[i][j];
+                  a2.ptr.pp_double[i][2 * j] = a.ptr.pp_double[i][j];
                   a2.ptr.pp_double[i][2 * j + 1] = a.ptr.pp_double[i][j];
                }
             }
@@ -73604,7 +73457,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             // test answer correctness using design matrix properties
             // and previous task solution
                for (j = 0; j < m; j++) {
-                  *llserrors = *llserrors || fabs(c2.ptr.p_double[2 * j + 0] + c2.ptr.p_double[2 * j + 1] - c.ptr.p_double[j]) > threshold;
+                  *llserrors = *llserrors || fabs(c2.ptr.p_double[2 * j] + c2.ptr.p_double[2 * j + 1] - c.ptr.p_double[j]) > threshold;
                }
             }
          // test non-weighted fitting
@@ -73631,7 +73484,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             // test function/gradient/Hessian-based weighted fitting
                lsfitlinearw(&y, &w, &a, n, m, &info, &c, &rep);
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
                lsfitcreatewf(&a, &y, &w, &c2, n, m, m, diffstep, &state);
                lsfitsetcond(&state, nlthreshold, 0);
@@ -73645,9 +73498,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
-               lsfitcreatewfg(&a, &y, &w, &c2, n, m, m, ae_randomreal() > 0.5, &state);
+               lsfitcreatewfg(&a, &y, &w, &c2, n, m, m, ae_randombool(), &state);
                lsfitsetcond(&state, nlthreshold, 0);
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
@@ -73659,7 +73512,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
                lsfitcreatewfgh(&a, &y, &w, &c2, n, m, m, &state);
                lsfitsetcond(&state, nlthreshold, 0);
@@ -73675,7 +73528,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
             // test gradient-only or Hessian-based fitting without weights
                lsfitlinear(&y, &a, n, m, &info, &c, &rep);
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
                lsfitcreatef(&a, &y, &c2, n, m, m, diffstep, &state);
                lsfitsetcond(&state, nlthreshold, 0);
@@ -73689,9 +73542,9 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
-               lsfitcreatefg(&a, &y, &c2, n, m, m, ae_randomreal() > 0.5, &state);
+               lsfitcreatefg(&a, &y, &c2, n, m, m, ae_randombool(), &state);
                lsfitsetcond(&state, nlthreshold, 0);
                testlsfitunit_fitlinearnonlinear(m, 1, &a, &state, nlserrors);
                lsfitresults(&state, &info, &c2, &rep2);
@@ -73703,7 +73556,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                   }
                }
                for (i = 0; i < m; i++) {
-                  c2.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                  c2.ptr.p_double[i] = ae_randommid();
                }
                lsfitcreatefgh(&a, &y, &c2, n, m, m, &state);
                lsfitsetcond(&state, nlthreshold, 0);
@@ -73762,7 +73615,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                xscale = 0.9 + 0.1 * ae_randomreal();
                for (i = 0; i < n; i++) {
                   if (n == 1) {
-                     x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+                     x.ptr.p_double[i] = ae_randommid();
                   } else {
                      x.ptr.p_double[i] = xscale * ((double)(2 * i) / (double)(n - 1) - 1);
                   }
@@ -73779,7 +73632,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
                ae_matrix_set_length(&cm, k, m + 1);
                for (i = 0; i < k; i++) {
                   for (j = 0; j <= m; j++) {
-                     cm.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     cm.ptr.pp_double[i][j] = ae_randommid();
                   }
                }
             // Solve constrained task
@@ -73819,7 +73672,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    ae_matrix_set_length(&a, n, 1);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
-      a.ptr.pp_double[i][0] = 4 * ae_randomreal() - 2;
+      a.ptr.pp_double[i][0] = 2.0 * ae_randommid();
       y.ptr.p_double[i] = 1 / (1 + 2 * ae_sqr(a.ptr.pp_double[i][0]));
    }
    lsfitcreatefg(&a, &y, &c, n, 1, 1, true, &state);
@@ -73975,7 +73828,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
          // * SKind=2 - linear constrained with empty set of constraints
             info = -1;
             if (skind == 0) {
-               if (ae_randomreal() > 0.5) {
+               if (ae_randombool()) {
                   lsfitcreatefg(&a, &y, &cstart, a.rows, n, n, true, &state);
                } else {
                   lsfitcreatef(&a, &y, &cstart, a.rows, n, n, 0.001 * cscale, &state);
@@ -74094,7 +73947,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       }
    // Solve problem #1 (with zero weights).
    // We randomly choose between analytic gradient and numerical differentiation.
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          lsfitcreatewfg(&a, &y, &w, &cstart, a.rows, n, n, true, &state);
       } else {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows, n, n, 0.001 * cscale, &state);
@@ -74118,7 +73971,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
       lsfitresults(&state, &info, &c2, &rep);
    // Solve problem #2 (only points with non-zero weights).
    // We randomly choose between analytic gradient and numerical differentiation.
-      if (ae_randomreal() > 0.5) {
+      if (ae_randombool()) {
          lsfitcreatewfg(&a, &y, &w, &cstart, a.rows / 2, n, n, true, &state);
       } else {
          lsfitcreatewf(&a, &y, &w, &cstart, a.rows / 2, n, n, 0.001 * cscale, &state);
@@ -74195,7 +74048,7 @@ static void testlsfitunit_testgeneralfitting(bool *llserrors, bool *nlserrors) {
    a.ptr.pp_double[2][0] = 0.0;
    y.ptr.p_double[2] = 0.0;
    lsfitlinear(&y, &a, 3, 1, &info, &c, &rep);
-   *llserrors = ((*llserrors || info <= 0) || !isfinite(rep.r2)) || rep.r2 != 1.0;
+   *llserrors = *llserrors || info <= 0 || !isfinite(rep.r2) || rep.r2 != 1.0;
    ae_frame_leave();
 }
 
@@ -74501,11 +74354,11 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       ae_vector_set_length(&x, ntotal);
       for (i = 0; i < n; i++) {
          v = scalex * exp(log(5.0) * (2 * hqrnduniformr(&rs) - 1));
-         x.ptr.p_double[2 * i + 0] = v;
+         x.ptr.p_double[2 * i] = v;
          x.ptr.p_double[2 * i + 1] = v;
       }
       for (i = 0; i < nz; i++) {
-         x.ptr.p_double[2 * n + 2 * i + 0] = 0.0;
+         x.ptr.p_double[2 * n + 2 * i] = 0.0;
          x.ptr.p_double[2 * n + 2 * i + 1] = 0.0;
       }
    // Fenerate A/B/C/D:
@@ -74522,8 +74375,8 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
       noise = 0.05 * scaley;
       ae_vector_set_length(&y, ntotal);
       for (i = 0; i < ntotal / 2; i++) {
-         if (x.ptr.p_double[2 * i + 0] != 0.0) {
-            v = de + (ae - de) / (1.0 + pow(x.ptr.p_double[2 * i + 0] / ce, be));
+         if (x.ptr.p_double[2 * i] != 0.0) {
+            v = de + (ae - de) / (1.0 + pow(x.ptr.p_double[2 * i] / ce, be));
          } else {
             if (be >= 0.0) {
                v = ae;
@@ -74531,7 +74384,7 @@ static void testlsfitunit_testlogisticfitting(bool *fiterrors) {
                v = de;
             }
          }
-         y.ptr.p_double[2 * i + 0] = v + noise;
+         y.ptr.p_double[2 * i] = v + noise;
          y.ptr.p_double[2 * i + 1] = v - noise;
       }
    // Unconstrained fit and test
@@ -74986,15 +74839,15 @@ static void testlsfitunit_testgradientcheck(bool *testg) {
    // Prepare function's parameters
       for (i = 0; i < n; i++) {
          for (j = 0; j < m; j++) {
-            x.ptr.pp_double[i][j] = spp * (2 * ae_randomreal() - 1);
+            x.ptr.pp_double[i][j] = spp * ae_randommid();
          }
-         y.ptr.p_double[i] = spp * (2 * ae_randomreal() - 1);
+         y.ptr.p_double[i] = spp * ae_randommid();
       }
       for (i = 0; i < k; i++) {
-         c.ptr.p_double[i] = spp * (2 * ae_randomreal() - 1);
+         c.ptr.p_double[i] = spp * ae_randommid();
       }
       for (i = 0; i < m; i++) {
-         x0.ptr.p_double[i] = 10 * (2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = 10 * ae_randommid();
       }
    // Prepare boundary parameters
       for (i = 0; i < k; i++) {
@@ -75080,7 +74933,7 @@ bool testlsfit(bool silent) {
    testlsfitunit_testgeneralfitting(&llserrors, &nlserrors);
    testlsfitunit_testgradientcheck(&graderrors);
 // report
-   waserrors = ((((((llserrors || nlserrors) || polfiterrors) || ratfiterrors) || splfiterrors) || graderrors) || logisticerrors) || rdperrors;
+   waserrors = llserrors || nlserrors || polfiterrors || ratfiterrors || splfiterrors || graderrors || logisticerrors || rdperrors;
    if (!silent || waserrors) {
       printf("TESTING LEAST SQUARES\n");
       printf("POLYNOMIAL LEAST SQUARES:                ");
@@ -75305,17 +75158,15 @@ static bool testspline2dunit_testlintrans(spline2dinterpolant *c, ae_int_t d, do
          for (pass = 1; pass <= passcount; pass++) {
          // Prepare
             do {
-               a1 = 2 * ae_randomreal() - 1;
-            }
-            while (a1 == 0.0);
+               a1 = ae_randommid();
+            } while (a1 == 0.0);
             a1 *= xjob;
-            b1 = 2 * ae_randomreal() - 1;
+            b1 = ae_randommid();
             do {
-               a2 = 2 * ae_randomreal() - 1;
-            }
-            while (a2 == 0.0);
+               a2 = ae_randommid();
+            } while (a2 == 0.0);
             a2 *= yjob;
-            b2 = 2 * ae_randomreal() - 1;
+            b2 = ae_randommid();
          // Test XY
             spline2dcopy(c, &c2);
             spline2dlintransxy(&c2, a1, b1, a2, b2);
@@ -75444,8 +75295,8 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
          rvectorsetlengthatleast(&f, n * m * d);
          rmatrixsetlengthatleast(&ef, m, n);
       // Build a grid for spline
-         x.ptr.p_double[0] = range * (2 * ae_randomreal() - 1);
-         y.ptr.p_double[0] = range * (2 * ae_randomreal() - 1);
+         x.ptr.p_double[0] = range * ae_randommid();
+         y.ptr.p_double[0] = range * ae_randommid();
          for (i = 1; i < n; i++) {
             x.ptr.p_double[i] = x.ptr.p_double[i - 1] + st + ae_randomreal();
          }
@@ -75455,7 +75306,7 @@ static bool testspline2dunit_testspline2dvf(bool silent) {
          for (i = 0; i < n; i++) {
             for (j = 0; j < m; j++) {
                for (k = 0; k < d; k++) {
-                  f.ptr.p_double[d * (n * j + i) + k] = range * (2 * ae_randomreal() - 1);
+                  f.ptr.p_double[d * (n * j + i) + k] = range * ae_randommid();
                }
             }
          }
@@ -77164,7 +77015,7 @@ bool testspline2d(bool silent) {
             spline2dbuildbicubicv(&x, n, &y, m, &fvd, d, &c);
             lterrors = lterrors || !testspline2dunit_testlintrans(&c, d, ax, bx, ay, by);
          // Copy test
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c);
             } else {
                spline2dbuildbilinear(&x, &y, &f, m, n, &c);
@@ -77179,7 +77030,7 @@ bool testspline2d(bool silent) {
             }
             cperrors = cperrors || err > 10000 * ae_machineepsilon;
          // Serialization test
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                spline2dbuildbicubic(&x, &y, &f, m, n, &c);
             } else {
                spline2dbuildbilinear(&x, &y, &f, m, n, &c);
@@ -77296,7 +77147,7 @@ bool testspline2d(bool silent) {
 // Test for vector-function
    vferrors = testspline2dunit_testspline2dvf(true);
 // Report
-   waserrors = (((((((((((((blerrors || bcerrors) || dserrors) || cperrors) || sererrors) || uperrors) || lterrors) || syerrors) || rlerrors) || rcerrors) || vferrors) || fiterrorsprior) || fiterrorspenalty) || fiterrorsblocksolver) || fiterrorsfastddmsolver;
+   waserrors = blerrors || bcerrors || dserrors || cperrors || sererrors || uperrors || lterrors || syerrors || rlerrors || rcerrors || vferrors || fiterrorsprior || fiterrorspenalty || fiterrorsblocksolver || fiterrorsfastddmsolver;
    if (!silent || waserrors) {
       printf("TESTING 2D SPLINE\n");
    // Normal tests
@@ -77416,7 +77267,6 @@ static const double testrbfunit_heps = 1.0E-12;
 // degenerate.
 //     * used model with linear term;
 //     * points locate in a subspace of dimension less than an original space.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 Local bool sqrdegmatrixrbftest(bool silent) {
    ae_frame _frame_block;
@@ -77480,7 +77330,7 @@ Local bool sqrdegmatrixrbftest(bool silent) {
       rbfsetalgoqnn(&s, q, z);
    // start points for grid
       for (i = 0; i < nx; i++) {
-         point.ptr.p_double[i] = sx * (2 * ae_randomreal() - 1);
+         point.ptr.p_double[i] = sx * ae_randommid();
       }
       if (nx == 2) {
          for (k0 = 2; k0 <= 4; k0++) {
@@ -77494,7 +77344,7 @@ Local bool sqrdegmatrixrbftest(bool silent) {
                gp.ptr.pp_double[i][0] = point.ptr.p_double[0] + sx * i * d0.ptr.p_double[0];
                gp.ptr.pp_double[i][1] = point.ptr.p_double[1] + sx * i * d0.ptr.p_double[1];
                for (k = 0; k < ny; k++) {
-                  gp.ptr.pp_double[i][nx + k] = sy * (2 * ae_randomreal() - 1);
+                  gp.ptr.pp_double[i][nx + k] = sy * ae_randommid();
                }
             }
             rbfsetpoints(&s, &gp, np);
@@ -77530,7 +77380,7 @@ Local bool sqrdegmatrixrbftest(bool silent) {
                         gp.ptr.pp_double[i][1] = point.ptr.p_double[1] + sx * i * d0.ptr.p_double[1];
                         gp.ptr.pp_double[i][2] = point.ptr.p_double[2] + sx * i * d0.ptr.p_double[2];
                         for (k = 0; k < ny; k++) {
-                           gp.ptr.pp_double[i][nx + k] = sy * (2 * ae_randomreal() - 1);
+                           gp.ptr.pp_double[i][nx + k] = sy * ae_randommid();
                         }
                      }
                   }
@@ -77545,7 +77395,7 @@ Local bool sqrdegmatrixrbftest(bool silent) {
                            gp.ptr.pp_double[i * k1 + j][1] = sx * i * d0.ptr.p_double[1] + sx * j * d1.ptr.p_double[1];
                            gp.ptr.pp_double[i * k1 + j][2] = sx * i * d0.ptr.p_double[2] + sx * j * d1.ptr.p_double[2];
                            for (k = 0; k < ny; k++) {
-                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * (2 * ae_randomreal() - 1);
+                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * ae_randommid();
                            }
                         }
                      }
@@ -77670,7 +77520,6 @@ static bool testrbfunit_searcherr(RMatrix y0, RMatrix y1, ae_int_t n, ae_int_t n
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 1D.
-//
 // ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 Local bool basicmultilayerrbf1dtest() {
    ae_frame _frame_block;
@@ -77732,8 +77581,8 @@ Local bool basicmultilayerrbf1dtest() {
       ae_matrix_set_length(&mody0, n, ny);
       ae_matrix_set_length(&mody1, n, ny);
       for (i = 0; i < ny; i++) {
-         a1.ptr.p_double[i] = a + 0.01 * a * (2 * ae_randomreal() - 1);
-         b1.ptr.p_double[i] = b + 0.01 * b * (2 * ae_randomreal() - 1);
+         a1.ptr.p_double[i] = a + 0.01 * a * ae_randommid();
+         b1.ptr.p_double[i] = b + 0.01 * b * ae_randommid();
          delta.ptr.p_double[i] = deltapct * b1.ptr.p_double[i]; //(@) Originally had 0.35 in place of deltapct.
       }
       ae_matrix_set_length(&gp, n, nx + ny);
@@ -77845,7 +77694,6 @@ Local bool basicmultilayerrbf1dtest() {
 //   is applied to radii, makes all radii equal (RBF-QNN).
 // * RBF-ML with NLayers=0 gives linear model
 // * Hierarchical RBF with NLayers=0 gives linear model
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 static bool testrbfunit_specialtest() {
    ae_frame _frame_block;
@@ -77893,7 +77741,7 @@ static bool testrbfunit_specialtest() {
    for (nx = 1; nx <= 4; nx++) {
       for (ny = 1; ny <= 3; ny++) {
          rbfcreate(nx, ny, &s);
-         if (ae_randomreal() > 0.5) {
+         if (ae_randombool()) {
             rbfbuildmodel(&s, &rep);
             if (rep.terminationtype <= 0) {
                ae_set_error_flag(&result, true, __FILE__, __LINE__, "testrbfunit");
@@ -77904,7 +77752,7 @@ static bool testrbfunit_specialtest() {
          ae_vector_set_length(&x, nx);
          ae_vector_set_length(&y, 1);
          for (i = 0; i < nx; i++) {
-            x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            x.ptr.p_double[i] = ae_randommid();
          }
          rbfcalc(&s, &x, &y);
          if (y.cnt != ny) {
@@ -77938,7 +77786,7 @@ static bool testrbfunit_specialtest() {
             }
             ae_matrix_set_length(&xy, 1, nx + ny);
             for (i = 0; i < nx + ny; i++) {
-               xy.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+               xy.ptr.pp_double[0][i] = ae_randommid();
             }
             rbfsetpoints(&s, &xy, 1);
             rbfbuildmodel(&s, &rep);
@@ -77967,7 +77815,7 @@ static bool testrbfunit_specialtest() {
             }
          // Second, test that model is constant
             for (i = 0; i < nx; i++) {
-               x.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               x.ptr.p_double[i] = ae_randommid();
             }
             rbfcalc(&s, &x, &y);
             if (y.cnt != ny) {
@@ -78002,7 +77850,7 @@ static bool testrbfunit_specialtest() {
             }
             ae_matrix_set_length(&xy, 2, nx + ny);
             for (i = 0; i < nx + ny; i++) {
-               xy.ptr.pp_double[0][i] = 2 * ae_randomreal() - 1;
+               xy.ptr.pp_double[0][i] = ae_randommid();
             }
             for (i = 0; i < nx + ny; i++) {
                xy.ptr.pp_double[1][i] = xy.ptr.pp_double[0][i] + 1.0;
@@ -78092,10 +77940,10 @@ static bool testrbfunit_specialtest() {
 // reproduce such function.
    n = 5;
    for (ny = 1; ny <= 3; ny++) {
-      va = 2 * ae_randomreal() - 1;
-      vb = 2 * ae_randomreal() - 1;
-      vc = 2 * ae_randomreal() - 1;
-      vd = 2 * ae_randomreal() - 1;
+      va = ae_randommid();
+      vb = ae_randommid();
+      vc = ae_randommid();
+      vd = ae_randommid();
    // Test NX=2.
    // Generate linear function using random coefficients VA/VB/VC.
    // Function is K-dimensional vector-valued, each component has slightly
@@ -78190,7 +78038,7 @@ static bool testrbfunit_specialtest() {
          ae_matrix_set_length(&vf, ny, nx + 1);
          for (i = 0; i < ny; i++) {
             for (j = 0; j <= nx; j++) {
-               vf.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               vf.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          ae_matrix_set_length(&xy, n, nx + ny);
@@ -78233,7 +78081,6 @@ static bool testrbfunit_specialtest() {
 }
 
 // Function for testing basic functionality of RBF module on regular grids.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 static bool testrbfunit_basicrbftest() {
    ae_frame _frame_block;
@@ -78315,7 +78162,7 @@ static bool testrbfunit_basicrbftest() {
             }
          // start points for grid
             for (i = 0; i < nx; i++) {
-               point.ptr.p_double[i] = sx * (2 * ae_randomreal() - 1);
+               point.ptr.p_double[i] = sx * ae_randommid();
             }
          // 2-dimensional test problem
             if (nx == 2) {
@@ -78329,7 +78176,7 @@ static bool testrbfunit_basicrbftest() {
                            gp.ptr.pp_double[i * k1 + j][0] = point.ptr.p_double[0] + sx * i;
                            gp.ptr.pp_double[i * k1 + j][1] = point.ptr.p_double[1] + sx * j;
                            for (k = 0; k < ny; k++) {
-                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * (2 * ae_randomreal() - 1);
+                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * ae_randommid();
                            }
                         }
                      }
@@ -78461,7 +78308,7 @@ static bool testrbfunit_basicrbftest() {
                                  gp.ptr.pp_double[(i * k1 + j) * k2 + k][1] = point.ptr.p_double[1] + sx * j;
                                  gp.ptr.pp_double[(i * k1 + j) * k2 + k][2] = point.ptr.p_double[2] + sx * k;
                                  for (l = 0; l < ny; l++) {
-                                    gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = sy * (2 * ae_randomreal() - 1);
+                                    gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = sy * ae_randommid();
                                  }
                               }
                            }
@@ -78570,7 +78417,6 @@ static bool testrbfunit_basicrbftest() {
 }
 
 // Function for testing RBF module on irregular grids.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 static bool testrbfunit_irregularrbftest() {
    ae_frame _frame_block;
@@ -78645,7 +78491,7 @@ static bool testrbfunit_irregularrbftest() {
             }
          // start points for grid
             for (i = 0; i < nx; i++) {
-               point.ptr.p_double[i] = sx * (2 * ae_randomreal() - 1);
+               point.ptr.p_double[i] = sx * ae_randommid();
             }
          // 2-dimensional test problems
             if (nx == 2) {
@@ -78656,10 +78502,10 @@ static bool testrbfunit_irregularrbftest() {
                   // create grid
                      for (i = 0; i < k0; i++) {
                         for (j = 0; j < k1; j++) {
-                           gp.ptr.pp_double[i * k1 + j][0] = point.ptr.p_double[0] + sx * i + noiselevel * sx * (2 * ae_randomreal() - 1);
-                           gp.ptr.pp_double[i * k1 + j][1] = point.ptr.p_double[1] + sx * j + noiselevel * sx * (2 * ae_randomreal() - 1);
+                           gp.ptr.pp_double[i * k1 + j][0] = point.ptr.p_double[0] + sx * i + noiselevel * sx * ae_randommid();
+                           gp.ptr.pp_double[i * k1 + j][1] = point.ptr.p_double[1] + sx * j + noiselevel * sx * ae_randommid();
                            for (k = 0; k < ny; k++) {
-                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * (2 * ae_randomreal() - 1);
+                              gp.ptr.pp_double[i * k1 + j][nx + k] = sy * ae_randommid();
                            }
                         }
                      }
@@ -78707,11 +78553,11 @@ static bool testrbfunit_irregularrbftest() {
                         for (i = 0; i < k0; i++) {
                            for (j = 0; j < k1; j++) {
                               for (k = 0; k < k2; k++) {
-                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][0] = point.ptr.p_double[0] + sx * i + noiselevel * sx * (2 * ae_randomreal() - 1);
-                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][1] = point.ptr.p_double[1] + sx * j + noiselevel * sx * (2 * ae_randomreal() - 1);
-                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][2] = point.ptr.p_double[2] + sx * k + noiselevel * sx * (2 * ae_randomreal() - 1);
+                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][0] = point.ptr.p_double[0] + sx * i + noiselevel * sx * ae_randommid();
+                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][1] = point.ptr.p_double[1] + sx * j + noiselevel * sx * ae_randommid();
+                                 gp.ptr.pp_double[(i * k1 + j) * k2 + k][2] = point.ptr.p_double[2] + sx * k + noiselevel * sx * ae_randommid();
                                  for (l = 0; l < ny; l++) {
-                                    gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = sy * (2 * ae_randomreal() - 1);
+                                    gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = sy * ae_randommid();
                                  }
                               }
                            }
@@ -78761,7 +78607,6 @@ static bool testrbfunit_irregularrbftest() {
 
 // The test does  check, that  algorithm  can build linear model for the data
 // sets, when Y depends on X linearly.
-//
 // ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 static bool testrbfunit_linearitymodelrbftest() {
    ae_frame _frame_block;
@@ -78819,16 +78664,16 @@ static bool testrbfunit_linearitymodelrbftest() {
          if (linterm == 1) {
             rbfsetlinterm(&s);
             for (i = 0; i < nx; i++) {
-               a.ptr.p_double[i] = sy * (2 * ae_randomreal() - 1) / sx;
+               a.ptr.p_double[i] = sy * ae_randommid() / sx;
             }
-            a.ptr.p_double[nx] = sy * (2 * ae_randomreal() - 1);
+            a.ptr.p_double[nx] = sy * ae_randommid();
          }
          if (linterm == 2) {
             rbfsetconstterm(&s);
             for (i = 0; i < nx; i++) {
                a.ptr.p_double[i] = 0.0;
             }
-            a.ptr.p_double[nx] = sy * (2 * ae_randomreal() - 1);
+            a.ptr.p_double[nx] = sy * ae_randommid();
          }
          if (linterm == 3) {
             rbfsetzeroterm(&s);
@@ -78838,7 +78683,7 @@ static bool testrbfunit_linearitymodelrbftest() {
          }
       // start points for grid
          for (i = 0; i < nx; i++) {
-            point.ptr.p_double[i] = sx * (2 * ae_randomreal() - 1);
+            point.ptr.p_double[i] = sx * ae_randommid();
          }
          if (nx == 2) {
             for (k0 = 2; k0 <= 4; k0++) {
@@ -78947,7 +78792,6 @@ static bool testrbfunit_linearitymodelrbftest() {
 }
 
 // This function tests serialization
-//
 // ALGLIB: Copyright 02.02.2012 by Sergey Bochkanov
 static bool testrbfunit_serializationtest() {
    ae_frame _frame_block;
@@ -78999,10 +78843,10 @@ static bool testrbfunit_serializationtest() {
             ae_matrix_set_length(&xy, k0 * k1, nx + ny);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
-                  xy.ptr.pp_double[i0 * k1 + i1][0] = i0 + 0.1 * (2 * ae_randomreal() - 1);
-                  xy.ptr.pp_double[i0 * k1 + i1][1] = i1 + 0.1 * (2 * ae_randomreal() - 1);
+                  xy.ptr.pp_double[i0 * k1 + i1][0] = i0 + 0.1 * ae_randommid();
+                  xy.ptr.pp_double[i0 * k1 + i1][1] = i1 + 0.1 * ae_randommid();
                   for (j = 0; j < ny; j++) {
-                     xy.ptr.pp_double[i0 * k1 + i1][nx + j] = 2 * ae_randomreal() - 1;
+                     xy.ptr.pp_double[i0 * k1 + i1][nx + j] = ae_randommid();
                   }
                }
             }
@@ -79018,11 +78862,11 @@ static bool testrbfunit_serializationtest() {
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
                   for (i2 = 0; i2 < k2; i2++) {
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * (2 * ae_randomreal() - 1);
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * (2 * ae_randomreal() - 1);
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * (2 * ae_randomreal() - 1);
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * ae_randommid();
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * ae_randommid();
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * ae_randommid();
                      for (j = 0; j < ny; j++) {
-                        xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = 2 * ae_randomreal() - 1;
+                        xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = ae_randommid();
                      }
                   }
                }
@@ -79114,10 +78958,10 @@ static bool testrbfunit_serializationtest() {
             ae_matrix_set_length(&xy, k0 * k1, nx + ny);
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
-                  xy.ptr.pp_double[i0 * k1 + i1][0] = i0 + 0.1 * (2 * ae_randomreal() - 1);
-                  xy.ptr.pp_double[i0 * k1 + i1][1] = i1 + 0.1 * (2 * ae_randomreal() - 1);
+                  xy.ptr.pp_double[i0 * k1 + i1][0] = i0 + 0.1 * ae_randommid();
+                  xy.ptr.pp_double[i0 * k1 + i1][1] = i1 + 0.1 * ae_randommid();
                   for (j = 0; j < ny; j++) {
-                     xy.ptr.pp_double[i0 * k1 + i1][nx + j] = 2 * ae_randomreal() - 1;
+                     xy.ptr.pp_double[i0 * k1 + i1][nx + j] = ae_randommid();
                   }
                }
             }
@@ -79133,11 +78977,11 @@ static bool testrbfunit_serializationtest() {
             for (i0 = 0; i0 < k0; i0++) {
                for (i1 = 0; i1 < k1; i1++) {
                   for (i2 = 0; i2 < k2; i2++) {
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * (2 * ae_randomreal() - 1);
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * (2 * ae_randomreal() - 1);
-                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * (2 * ae_randomreal() - 1);
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][0] = i0 + 0.1 * ae_randommid();
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][1] = i1 + 0.1 * ae_randommid();
+                     xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][2] = i2 + 0.1 * ae_randommid();
                      for (j = 0; j < ny; j++) {
-                        xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = 2 * ae_randomreal() - 1;
+                        xy.ptr.pp_double[i0 * k1 * k2 + i1 * k2 + i2][nx + j] = ae_randommid();
                      }
                   }
                }
@@ -79247,14 +79091,14 @@ static bool testrbfunit_serializationtest() {
          }
          ae_vector_set_length(&scalevec, nx);
          for (j = 0; j < nx; j++) {
-            scalevec.ptr.p_double[j] = pow(2.0, 2 * ae_randomreal() - 1);
+            scalevec.ptr.p_double[j] = pow(2.0, ae_randommid());
          }
       // prepare test problem
          rbfcreate(nx, ny, &s);
          rbfsetv2bf(&s, bf);
          rbfsetalgohierarchical(&s, rbase, nlayers, 0.0);
          rbfsetlinterm(&s);
-         if (ae_randomreal() > 0.5) {
+         if (ae_randombool()) {
             rbfsetpoints(&s, &xy, xy.rows);
          } else {
             rbfsetpointsandscales(&s, &xy, xy.rows, &scalevec);
@@ -79324,7 +79168,6 @@ static bool testrbfunit_serializationtest() {
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 2-3D.
-//
 // ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static bool testrbfunit_basicmultilayerrbftest() {
    ae_frame _frame_block;
@@ -79403,7 +79246,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
          rbfsetzeroterm(&s);
       }
       for (i = 0; i < nx; i++) {
-         point.ptr.p_double[i] = s1 * (2 * ae_randomreal() - 1);
+         point.ptr.p_double[i] = s1 * ae_randommid();
       }
    // 2-dimensional test problem
       if (nx == 2) {
@@ -79415,7 +79258,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                gp.ptr.pp_double[i * k1 + j][0] = point.ptr.p_double[0] + gstep * i;
                gp.ptr.pp_double[i * k1 + j][1] = point.ptr.p_double[1] + gstep * j;
                for (k = 0; k < ny; k++) {
-                  gp.ptr.pp_double[i * k1 + j][nx + k] = s2 * (2 * ae_randomreal() - 1);
+                  gp.ptr.pp_double[i * k1 + j][nx + k] = s2 * ae_randommid();
                }
             }
          }
@@ -79494,7 +79337,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
                   gp.ptr.pp_double[(i * k1 + j) * k2 + k][1] = gpgx1.ptr.p_double[j];
                   gp.ptr.pp_double[(i * k1 + j) * k2 + k][2] = gpgx2.ptr.p_double[k];
                   for (l = 0; l < ny; l++) {
-                     gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = s2 * (2 * ae_randomreal() - 1);
+                     gp.ptr.pp_double[(i * k1 + j) * k2 + k][nx + l] = s2 * ae_randommid();
                   }
                }
             }
@@ -79576,7 +79419,7 @@ static bool testrbfunit_basicmultilayerrbftest() {
       for (j = 0; j < gridsize; j++) {
          gp.ptr.pp_double[i * gridsize + j][0] = (double)i;
          gp.ptr.pp_double[i * gridsize + j][1] = (double)j;
-         gp.ptr.pp_double[i * gridsize + j][2] = 0.10 * ae_randomreal() - 0.05 + (2 * ((i + j) % 2) - 1);
+         gp.ptr.pp_double[i * gridsize + j][2] = 0.05 * ae_randommid() + (2 * ((i + j) % 2) - 1);
       }
    }
    rbfsetpoints(&s, &gp, gridsize * gridsize);
@@ -79594,7 +79437,6 @@ static bool testrbfunit_basicmultilayerrbftest() {
 
 // Function for testing basic functionality of RBF module on regular grids with
 // multi-layer algorithm in 2-3D.
-//
 // ALGLIB: Copyright 02.03.2012 by Sergey Bochkanov
 static void testrbfunit_gridcalc23test(bool *errorflag) {
    ae_frame _frame_block;
@@ -79758,7 +79600,6 @@ static void testrbfunit_gridcalc23test(bool *errorflag) {
 
 // Function for testing basic functionality of RBF module with hierarchical
 // algorithm.
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static bool testrbfunit_basichrbftest() {
    ae_frame _frame_block;
@@ -79894,7 +79735,7 @@ static bool testrbfunit_basichrbftest() {
                x.ptr.p_double[j] = xy.ptr.pp_double[i][j];
             }
             rbfcalc(&s, &xzero, &y);
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                ae_vector_set_length(&yref, ny + 1);
             }
             rbfcalc(&s, &x, &yref);
@@ -79915,7 +79756,7 @@ static bool testrbfunit_basichrbftest() {
                ae_set_error_flag(&result, rbfcalc3(&s, x.ptr.p_double[0], x.ptr.p_double[1], x.ptr.p_double[2]) != yref.ptr.p_double[0], __FILE__, __LINE__, "testrbfunit");
             }
             rbfcalc(&s, &xzero, &y);
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                ae_vector_set_length(&y, ny + 1);
                rbfcalcbuf(&s, &x, &y);
                ae_set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit");
@@ -79928,7 +79769,7 @@ static bool testrbfunit_basichrbftest() {
                ae_set_error_flag(&result, y.ptr.p_double[j] != yref.ptr.p_double[j], __FILE__, __LINE__, "testrbfunit");
             }
             rbfcalc(&s, &xzero, &y);
-            if (ae_randomreal() > 0.5) {
+            if (ae_randombool()) {
                ae_vector_set_length(&y, ny + 1);
                rbftscalcbuf(&s, &tsbuf, &x, &y);
                ae_set_error_flag(&result, y.cnt != ny + 1, __FILE__, __LINE__, "testrbfunit");
@@ -79947,7 +79788,7 @@ static bool testrbfunit_basichrbftest() {
          ae_vector_set_length(&x, nx);
          if (linterm == 2) {
             for (j = 0; j < nx; j++) {
-               if (ae_randomreal() > 0.5) {
+               if (ae_randombool()) {
                   x.ptr.p_double[j] = 1 + 1000 * rbase;
                } else {
                   x.ptr.p_double[j] = 0 - 1000 * rbase;
@@ -79955,7 +79796,7 @@ static bool testrbfunit_basichrbftest() {
             }
             rbfcalc(&s, &x, &y);
             for (j = 0; j < nx; j++) {
-               if (ae_randomreal() > 0.5) {
+               if (ae_randombool()) {
                   x.ptr.p_double[j] = 1 + 1000 * rbase;
                } else {
                   x.ptr.p_double[j] = 0 - 1000 * rbase;
@@ -79968,7 +79809,7 @@ static bool testrbfunit_basichrbftest() {
          }
          if (linterm == 3) {
             for (j = 0; j < nx; j++) {
-               if (ae_randomreal() > 0.5) {
+               if (ae_randombool()) {
                   x.ptr.p_double[j] = 1 + 1000 * rbase;
                } else {
                   x.ptr.p_double[j] = 0 - 1000 * rbase;
@@ -80009,7 +79850,7 @@ static bool testrbfunit_basichrbftest() {
          ae_vector_set_length(&scalevec, nx);
          if (hasscale) {
             for (j = 0; j < nx; j++) {
-               scalevec.ptr.p_double[j] = pow(2.0, 2 * ae_randomreal() - 1);
+               scalevec.ptr.p_double[j] = pow(2.0, ae_randommid());
             }
          }
       // Build model
@@ -80175,7 +80016,7 @@ static bool testrbfunit_basichrbftest() {
                }
                ae_matrix_set_length(&xy, n, 2);
                for (i = 0; i < n; i++) {
-                  v = shaketype * 0.25 * (ae_randomreal() - 0.5);
+                  v = shaketype * 0.125 * ae_randommid();
                   v = (i + v) / (n - 1);
                   v = 2 * v - 1;
                   xy.ptr.pp_double[i][0] = width * v;
@@ -80377,7 +80218,7 @@ static bool testrbfunit_basichrbftest() {
          }
          ae_vector_set_length(&scalevec, nx);
          for (j = 0; j < nx; j++) {
-            scalevec.ptr.p_double[j] = pow(2.0, 2 * ae_randomreal() - 1);
+            scalevec.ptr.p_double[j] = pow(2.0, ae_randommid());
          }
       // prepare test problem
          rbfcreate(nx, ny, &s);
@@ -80418,7 +80259,7 @@ static bool testrbfunit_basichrbftest() {
          for (j = 0; j < gridsize; j++) {
             xy.ptr.pp_double[i * gridsize + j][0] = (double)i;
             xy.ptr.pp_double[i * gridsize + j][1] = (double)j;
-            xy.ptr.pp_double[i * gridsize + j][2] = 0.01 * (ae_randomreal() - 0.5) + (2 * ((i + j) % 2) - 1);
+            xy.ptr.pp_double[i * gridsize + j][2] = 0.005 * ae_randommid() + (2 * ((i + j) % 2) - 1);
          }
       }
       rbfsetpoints(&s, &xy, gridsize * gridsize);
@@ -80444,7 +80285,6 @@ static bool testrbfunit_basichrbftest() {
 // hierarchical algorithm.
 //
 // Returns True on failure (error flag is set).
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static bool testrbfunit_scaledhrbftest() {
    ae_frame _frame_block;
@@ -80510,11 +80350,11 @@ static bool testrbfunit_scaledhrbftest() {
                errtol = 1.0E-3;
                ae_vector_set_length(&scalex, nx);
                for (i = 0; i < nx; i++) {
-                  scalex.ptr.p_double[i] = pow(4.0, 2 * ae_randomreal() - 1);
+                  scalex.ptr.p_double[i] = pow(4.0, ae_randommid());
                }
                ae_vector_set_length(&scaley, ny);
                for (i = 0; i < ny; i++) {
-                  scaley.ptr.p_double[i] = pow(4.0, 2 * ae_randomreal() - 1);
+                  scaley.ptr.p_double[i] = pow(4.0, ae_randommid());
                }
             }
             n = 150;
@@ -80637,7 +80477,6 @@ static bool testrbfunit_scaledhrbftest() {
 
 // Test special properties of hierarchical RBFs.
 // Returns True on errors.
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static bool testrbfunit_spechrbftest() {
    ae_frame _frame_block;
@@ -80773,7 +80612,6 @@ static bool testrbfunit_spechrbftest() {
 
 // Test gridded evaluation of hierarchical RBFs.
 // Returns True on errors.
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static bool testrbfunit_gridhrbftest() {
    ae_frame _frame_block;
@@ -80846,7 +80684,7 @@ static bool testrbfunit_gridhrbftest() {
          if (hasscale) {
             ae_vector_set_length(&scalevec, nx);
             for (j = 0; j < nx; j++) {
-               scalevec.ptr.p_double[j] = pow(2.0, 2 * ae_randomreal() - 1);
+               scalevec.ptr.p_double[j] = pow(2.0, ae_randommid());
             }
          }
       // Build model
@@ -80905,7 +80743,7 @@ static bool testrbfunit_gridhrbftest() {
          ae_vector_set_length(&needy, n0 * n1);
          v = pow(10.0, -3 * ae_randomreal());
          for (i = 0; i < n0 * n1; i++) {
-            needy.ptr.p_bool[i] = ae_randomreal() < v;
+            needy.ptr.p_bool[i] = ae_randombool(v);
          }
       // Test at grid
          ae_vector_set_length(&x, nx);
@@ -81038,7 +80876,7 @@ static bool testrbfunit_gridhrbftest() {
          if (hasscale) {
             ae_vector_set_length(&scalevec, nx);
             for (j = 0; j < nx; j++) {
-               scalevec.ptr.p_double[j] = pow(2.0, 2 * ae_randomreal() - 1);
+               scalevec.ptr.p_double[j] = pow(2.0, ae_randommid());
             }
          }
       // Build model
@@ -81107,7 +80945,7 @@ static bool testrbfunit_gridhrbftest() {
          ae_vector_set_length(&needy, n0 * n1 * n2);
          v = pow(10.0, -3 * ae_randomreal());
          for (i = 0; i < n0 * n1 * n2; i++) {
-            needy.ptr.p_bool[i] = ae_randomreal() < v;
+            needy.ptr.p_bool[i] = ae_randombool(v);
          }
       // Test at grid
          ae_vector_set_length(&x, nx);
@@ -81249,7 +81087,7 @@ bool testrbf(bool silent) {
    hrbfspecerrors = testrbfunit_spechrbftest();
    hrbfscaleerrors = testrbfunit_scaledhrbftest();
    hrbfgriderrors = testrbfunit_gridhrbftest();
-   hrbferrors = ((hrbfbasicerrors || hrbfspecerrors) || hrbfscaleerrors) || hrbfgriderrors;
+   hrbferrors = hrbfbasicerrors || hrbfspecerrors || hrbfscaleerrors || hrbfgriderrors;
 // Other tests
    specialerrors = testrbfunit_specialtest();
    basicrbferrors = testrbfunit_basicrbftest();
@@ -81262,7 +81100,7 @@ bool testrbf(bool silent) {
    gridcalc23errors = false;
    testrbfunit_gridcalc23test(&gridcalc23errors);
 // report
-   waserrors = ((((((((specialerrors || basicrbferrors) || irregularrbferrors) || linearitymodelrbferr) || sqrdegmatrixrbferr) || sererrors) || multilayerrbf1derrors) || multilayerrbferrors) || gridcalc23errors) || hrbferrors;
+   waserrors = specialerrors || basicrbferrors || irregularrbferrors || linearitymodelrbferr || sqrdegmatrixrbferr || sererrors || multilayerrbf1derrors || multilayerrbferrors || gridcalc23errors || hrbferrors;
    if (!silent || waserrors) {
       printf("TESTING RBF\n");
       printf("GENERAL TESTS:\n");
@@ -81404,10 +81242,10 @@ bool testhermite(bool silent) {
    maxn = 10;
    ae_vector_set_length(&c, maxn + 1);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * ae_randomreal() - 1;
+      x = ae_randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
+         c.ptr.p_double[n] = ae_randommid();
          v += hermitecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - hermitesum(&c, n, x)));
       }
@@ -81519,10 +81357,10 @@ bool testlaguerre(bool silent) {
    maxn = 20;
    ae_vector_set_length(&c, maxn + 1);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * ae_randomreal() - 1;
+      x = ae_randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
+         c.ptr.p_double[n] = ae_randommid();
          v += laguerrecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - laguerresum(&c, n, x)));
       }
@@ -81609,7 +81447,7 @@ bool testlegendre(bool silent) {
    for (n = 0; n <= 10; n++) {
       legendrecoefficients(n, &c);
       for (pass = 1; pass <= 10; pass++) {
-         x = 2 * ae_randomreal() - 1;
+         x = ae_randommid();
          v = legendrecalculate(n, x);
          t = 1.0;
          for (i = 0; i <= n; i++) {
@@ -81623,10 +81461,10 @@ bool testlegendre(bool silent) {
    maxn = 20;
    ae_vector_set_length(&c, maxn + 1);
    for (pass = 1; pass <= 10; pass++) {
-      x = 2 * ae_randomreal() - 1;
+      x = ae_randommid();
       v = 0.0;
       for (n = 0; n <= maxn; n++) {
-         c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
+         c.ptr.p_double[n] = ae_randommid();
          v += legendrecalculate(n, x) * c.ptr.p_double[n];
          sumerr = ae_maxreal(sumerr, fabs(v - legendresum(&c, n, x)));
       }
@@ -81763,10 +81601,10 @@ bool testchebyshev(bool silent) {
    ae_vector_set_length(&c, maxn + 1);
    for (k = 1; k <= 2; k++) {
       for (pass = 1; pass <= 10; pass++) {
-         x = 2 * ae_randomreal() - 1;
+         x = ae_randommid();
          v = 0.0;
          for (n = 0; n <= maxn; n++) {
-            c.ptr.p_double[n] = 2 * ae_randomreal() - 1;
+            c.ptr.p_double[n] = ae_randommid();
             v += chebyshevcalculate(k, n, x) * c.ptr.p_double[n];
             sumerr = ae_maxreal(sumerr, fabs(v - chebyshevsum(&c, k, n, x)));
          }
@@ -81822,7 +81660,7 @@ bool testchebyshev(bool silent) {
             p1.ptr.p_double[i] = 0.0;
          }
          for (i = 0; i <= n; i++) {
-            c.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+            c.ptr.p_double[i] = ae_randommid();
             v = c.ptr.p_double[i];
             ae_v_addd(p1.ptr.p_double, 1, a.ptr.pp_double[i], 1, i + 1, v);
          }
@@ -81833,7 +81671,7 @@ bool testchebyshev(bool silent) {
       }
    }
 // Reporting
-   waserrors = ((err > threshold || sumerr > threshold) || cerr > threshold) || ferr > threshold;
+   waserrors = err > threshold || sumerr > threshold || cerr > threshold || ferr > threshold;
    if (!silent || waserrors) {
       printf("TESTING CALCULATION OF THE CHEBYSHEV POLYNOMIALS\n");
       printf("Max error against table                   %5.2e\n", (double)err);
@@ -82548,14 +82386,14 @@ bool testschur(bool silent) {
          }
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
-               a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+               a.ptr.pp_double[i][j] = ae_randommid();
             }
          }
          testschurunit_testschurproblem(&a, n, &materr, &orterr, &errstruct, &wfailed);
       }
    }
 // report
-   waserrors = ((materr > threshold || orterr > threshold) || errstruct) || wfailed;
+   waserrors = materr > threshold || orterr > threshold || errstruct || wfailed;
    if (!silent || waserrors) {
       printf("TESTING SCHUR DECOMPOSITION\n");
       printf("Schur decomposition error:               %5.3e\n", (double)materr);
@@ -82641,7 +82479,7 @@ bool testspdgevd(bool silent) {
                ae_matrix_set_length(&l, n, n);
                for (i = 0; i < n; i++) {
                   for (j = 0; j < n; j++) {
-                     a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                     a.ptr.pp_double[i][j] = ae_randommid();
                      a.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
                      afull.ptr.pp_double[i][j] = a.ptr.pp_double[i][j];
                      afull.ptr.pp_double[j][i] = a.ptr.pp_double[i][j];
@@ -82668,20 +82506,20 @@ bool testspdgevd(bool silent) {
                   for (j = 0; j < n; j++) {
                      if (isuppera) {
                         if (j < i) {
-                           a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                           a.ptr.pp_double[i][j] = ae_randommid();
                         }
                      } else {
                         if (i < j) {
-                           a.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                           a.ptr.pp_double[i][j] = ae_randommid();
                         }
                      }
                      if (isupperb) {
                         if (j < i) {
-                           b.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                           b.ptr.pp_double[i][j] = ae_randommid();
                         }
                      } else {
                         if (i < j) {
-                           b.ptr.pp_double[i][j] = 2 * ae_randomreal() - 1;
+                           b.ptr.pp_double[i][j] = ae_randommid();
                         }
                      }
                   }
@@ -82874,8 +82712,8 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix a0, ae_
       do {
          i = 1;
          while (i <= s) {
-            u1 = 2 * ae_randomreal() - 1;
-            u2 = 2 * ae_randomreal() - 1;
+            u1 = ae_randommid();
+            u2 = ae_randommid();
             sm = u1 * u1 + u2 * u2;
             if (sm == 0.0 || sm > 1.0) {
                continue;
@@ -82888,8 +82726,7 @@ static void testinverseupdateunit_generaterandomorthogonalmatrix(RMatrix a0, ae_
             i += 2;
          }
          lambdav = ae_v_dotproduct(&v.ptr.p_double[1], 1, &v.ptr.p_double[1], 1, s);
-      }
-      while (lambdav == 0.0);
+      } while (lambdav == 0.0);
       lambdav = 2 / lambdav;
    // A * (I - 2 vv'/v'v ) =
    //   = A - (2/v'v) * A * v * v' =
@@ -83168,7 +83005,7 @@ bool testinverseupdate(bool silent) {
       // Test simple update
          updrow = ae_randominteger(n);
          updcol = ae_randominteger(n);
-         val = 0.1 * (2 * ae_randomreal() - 1);
+         val = 0.1 * ae_randommid();
          for (i = 0; i < n; i++) {
             if (i == updrow) {
                u.ptr.p_double[i] = val;
@@ -83197,7 +83034,7 @@ bool testinverseupdate(bool silent) {
             } else {
                u.ptr.p_double[i] = 0.0;
             }
-            v.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1);
+            v.ptr.p_double[i] = 0.1 * ae_randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
@@ -83215,7 +83052,7 @@ bool testinverseupdate(bool silent) {
             } else {
                v.ptr.p_double[i] = 0.0;
             }
-            u.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1);
+            u.ptr.p_double[i] = 0.1 * ae_randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
@@ -83227,8 +83064,8 @@ bool testinverseupdate(bool silent) {
          waserrors = waserrors || testinverseupdateunit_matrixdiff(&b1, &b2, n, n) > threshold;
       // Test full update
          for (i = 0; i < n; i++) {
-            v.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1);
-            u.ptr.p_double[i] = 0.1 * (2 * ae_randomreal() - 1);
+            v.ptr.p_double[i] = 0.1 * ae_randommid();
+            u.ptr.p_double[i] = 0.1 * ae_randommid();
          }
          testinverseupdateunit_makeacopy(&a, n, n, &b1);
          if (!testinverseupdateunit_updandinv(&b1, &u, &v, n)) {
@@ -83481,8 +83318,8 @@ bool testnleq(bool silent) {
    for (pass = 0; pass < passcount; pass++) {
    // Ability to find correct result
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqcreatelm(2, 2, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
@@ -83497,8 +83334,8 @@ bool testnleq(bool silent) {
       }
    // Ability to work after soft restart
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqcreatelm(2, 2, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
@@ -83507,8 +83344,8 @@ bool testnleq(bool silent) {
       }
       nleqresults(&state, &x, &rep);
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqrestartfrom(&state, &x);
       while (nleqiteration(&state)) {
          testnlequnit_testfunchbm(&state);
@@ -83540,8 +83377,8 @@ bool testnleq(bool silent) {
          testnlequnit_testfunchbm(&state);
       }
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqrestartfrom(&state, &x);
       while (nleqiteration(&state)) {
          testnlequnit_testfunchbm(&state);
@@ -83561,8 +83398,8 @@ bool testnleq(bool silent) {
    for (pass = 0; pass < passcount; pass++) {
    // Ability to find correct result
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqcreatelm(2, 1, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
@@ -83582,8 +83419,8 @@ bool testnleq(bool silent) {
    passcount = 100;
    for (pass = 0; pass < passcount; pass++) {
       ae_vector_set_length(&x, 2);
-      x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-      x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+      x.ptr.p_double[0] = 10.0 * ae_randommid();
+      x.ptr.p_double[1] = 10.0 * ae_randommid();
       nleqcreatelm(2, 3, &x, &state);
       epsf = 1.0E-9;
       nleqsetcond(&state, epsf, 0);
@@ -83603,8 +83440,8 @@ bool testnleq(bool silent) {
    n = 2;
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&xlast, n);
-   x.ptr.p_double[0] = 20 * ae_randomreal() - 10;
-   x.ptr.p_double[1] = 20 * ae_randomreal() - 10;
+   x.ptr.p_double[0] = 10.0 * ae_randommid();
+   x.ptr.p_double[1] = 10.0 * ae_randommid();
    xlast.ptr.p_double[0] = ae_maxrealnumber;
    xlast.ptr.p_double[1] = ae_maxrealnumber;
    nleqcreatelm(n, 2, &x, &state);
@@ -83978,7 +83815,6 @@ static const double testlincgunit_maxcond = 30.0;
 //
 // INPUT:
 //     Silent   -   if true then function output report
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_complextest(bool silent) {
    ae_frame _frame_block;
@@ -84021,11 +83857,11 @@ static bool testlincgunit_complextest(bool silent) {
       na = 1.0;
       ae_vector_set_length(&b, sz);
       for (i = 0; i < sz; i++) {
-         b.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         b.ptr.p_double[i] = mx * ae_randommid();
       }
       ae_vector_set_length(&x0, sz);
       for (i = 0; i < sz; i++) {
-         x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = mx * ae_randommid();
       }
       ae_matrix_set_length(&mtx, sz + 1, sz);
    // Start optimization, record its progress for further analysis
@@ -84229,7 +84065,6 @@ static bool testlincgunit_complextest(bool silent) {
 // There used two stopping criterions:
 //     1. achieved the required precision(StCrit=0);
 //     2. execution of the required number of iterations(StCrit=1).
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_complexres(bool silent) {
    ae_frame _frame_block;
@@ -84270,8 +84105,8 @@ static bool testlincgunit_complexres(bool silent) {
             ae_vector_set_length(&x0, n);
             ae_vector_set_length(&xs, n);
             for (i = 0; i < n; i++) {
-               x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
-               xs.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+               x0.ptr.p_double[i] = mx * ae_randommid();
+               xs.ptr.p_double[i] = mx * ae_randommid();
             }
             eps = 0.0;
             for (i = 0; i < n; i++) {
@@ -84357,7 +84192,6 @@ static bool testlincgunit_complexres(bool silent) {
 
 // This function check, that XUpdated return State.X=X0 at zero iteration and
 // State.X=X(algorithm result) at last.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_basictestx(bool silent) {
    ae_frame _frame_block;
@@ -84391,8 +84225,8 @@ static bool testlincgunit_basictestx(bool silent) {
       ae_vector_set_length(&x00, n);
       ae_vector_set_length(&x01, n);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
-         b.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = mx * ae_randommid();
+         b.ptr.p_double[i] = mx * ae_randommid();
       }
    // Solve, save first and last reported points to x00 and x01
       lincgcreate(n, &s);
@@ -84486,7 +84320,6 @@ static bool testlincgunit_basictestx(bool silent) {
 // This function checks that XUpdated returns correct State.R2. It creates
 // large badly conditioned problem (N=50), which should be large enough and
 // ill-conditioned enough to cause periodic recalculation of R.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_testrcorrectness(bool silent) {
    ae_frame _frame_block;
@@ -84511,7 +84344,7 @@ static bool testlincgunit_testrcorrectness(bool silent) {
    spdmatrixrndcond(n, c, &a);
    ae_vector_set_length(&b, n);
    for (i = 0; i < n; i++) {
-      b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+      b.ptr.p_double[i] = ae_randommid();
    }
    lincgcreate(n, &s);
    lincgsetb(&s, &b);
@@ -84570,7 +84403,6 @@ static bool testlincgunit_testrcorrectness(bool silent) {
 }
 
 // This function check, that number of iterations are't more than MaxIts.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_basictestiters(bool silent) {
    ae_frame _frame_block;
@@ -84600,8 +84432,8 @@ static bool testlincgunit_basictestiters(bool silent) {
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
-         b.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = mx * ae_randommid();
+         b.ptr.p_double[i] = mx * ae_randommid();
       }
    // Solve
       lincgcreate(n, &s);
@@ -84656,8 +84488,8 @@ static bool testlincgunit_basictestiters(bool silent) {
       c = (testlincgunit_maxcond - 1) * ae_randomreal() + 1;
       spdmatrixrndcond(n, c, &a);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
-         b.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         x0.ptr.p_double[i] = mx * ae_randommid();
+         b.ptr.p_double[i] = mx * ae_randommid();
       }
       lincgsetstartingpoint(&s, &x0);
       lincgrestart(&s);
@@ -84822,7 +84654,6 @@ static bool testlincgunit_frombasis(RVector x, RMatrix basis, ae_int_t n, ae_int
 }
 
 // This function check, that programmed method is Krylov subspace methed.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_krylovsubspacetest(bool silent) {
    ae_frame _frame_block;
@@ -84876,8 +84707,8 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
       ae_vector_set_length(&x0, n);
       do {
          for (i = 0; i < n; i++) {
-            x0.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
-            b.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+            x0.ptr.p_double[i] = mx * ae_randommid();
+            b.ptr.p_double[i] = mx * ae_randommid();
          }
          normr0 = 0.0;
          for (i = 0; i < n; i++) {
@@ -84888,8 +84719,7 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
             r0.ptr.p_double[i] = b.ptr.p_double[i] - tmp;
             normr0 += r0.ptr.p_double[i] * r0.ptr.p_double[i];
          }
-      }
-      while (sqrt(normr0) <= eps);
+      } while (sqrt(normr0) <= eps);
    // Fill KSR by {r0, A*r0, A^2*r0, ... }
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
@@ -84981,7 +84811,6 @@ static bool testlincgunit_krylovsubspacetest(bool silent) {
 // Function for testing  LinCgSolveSparse. This function  prepare problem with
 // a known solution 'Xs'(A*Xs-b=0). There b is A*Xs. After, function calculate
 // result by LinCGSolveSparse and compares it with 'Xs'.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_sparsetest(bool silent) {
    ae_frame _frame_block;
@@ -85016,7 +84845,7 @@ static bool testlincgunit_sparsetest(bool silent) {
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&xs, n);
       for (i = 0; i < n; i++) {
-         xs.ptr.p_double[i] = mx * (2 * ae_randomreal() - 1);
+         xs.ptr.p_double[i] = mx * ae_randommid();
       }
       eps = 0.0;
       for (i = 0; i < n; i++) {
@@ -85078,7 +84907,6 @@ static bool testlincgunit_sparsetest(bool silent) {
 }
 
 // Function for testing  the preconditioned conjugate gradient method.
-//
 // ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 static bool testlincgunit_precondtest(bool silent) {
    ae_frame _frame_block;
@@ -85153,8 +84981,8 @@ static bool testlincgunit_precondtest(bool silent) {
       ae_vector_set_length(&tx0, n);
       ae_vector_set_length(&err, n);
       for (i = 0; i < n; i++) {
-         x0.ptr.p_double[i] = 2 * ae_randomreal() - 1;
-         b.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+         x0.ptr.p_double[i] = ae_randommid();
+         b.ptr.p_double[i] = ae_randommid();
       }
       eps = 1.0E-5;
       for (i = 0; i < n; i++) {
@@ -85302,7 +85130,7 @@ static bool testlincgunit_precondtest(bool silent) {
    }
    ae_vector_set_length(&d, n);
    for (i = 0; i < n; i++) {
-      d.ptr.p_double[i] = pow(10.0, 100 * ae_randomreal() - 50);
+      d.ptr.p_double[i] = pow(10.0, 50.0 * ae_randommid());
    }
    ae_matrix_set_length(&a, n, n);
    sparsecreate(n, n, n * n, &sa);
@@ -85389,7 +85217,7 @@ bool testlincg(bool silent) {
    sparseerrors = testlincgunit_sparsetest(true);
    preconderrors = testlincgunit_precondtest(true);
 // report
-   waserrors = ((((((basictestxerrors || complexreserrors) || complexerrors) || rcorrectness) || basictestiterserr) || krylovsubspaceerr) || sparseerrors) || preconderrors;
+   waserrors = basictestxerrors || complexreserrors || complexerrors || rcorrectness || basictestiterserr || krylovsubspaceerr || sparseerrors || preconderrors;
    if (!silent || waserrors) {
       printf("TESTING LinCG\n");
       printf("BasicTestX:                                   ");
@@ -85495,17 +85323,14 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
    divrc = true;
    for (pass = 1; pass <= passcount; pass++) {
    // Test AbsC
-      ca.x = 2 * ae_randomreal() - 1;
-      ca.y = 2 * ae_randomreal() - 1;
+      ca = ae_complex_from_d(ae_randommid(), ae_randommid());
       ra = ae_c_abs(ca);
       absc = absc && fabs(ra - sqrt(ae_sqr(ca.x) + ae_sqr(ca.y))) < threshold;
    // test Add
-      ca.x = 2 * ae_randomreal() - 1;
-      ca.y = 2 * ae_randomreal() - 1;
-      cb.x = 2 * ae_randomreal() - 1;
-      cb.y = 2 * ae_randomreal() - 1;
-      ra = 2 * ae_randomreal() - 1;
-      rb = 2 * ae_randomreal() - 1;
+      ca = ae_complex_from_d(ae_randommid(), ae_randommid());
+      cb = ae_complex_from_d(ae_randommid(), ae_randommid());
+      ra = ae_randommid();
+      rb = ae_randommid();
       res = ae_c_add(ca, cb);
       addcc = (addcc && fabs(res.x - ca.x - cb.x) < threshold) && fabs(res.y - ca.y - cb.y) < threshold;
       res = ae_c_add_d(ca, rb);
@@ -85513,12 +85338,10 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
       res = ae_c_add_d(cb, ra);
       addrc = (addrc && fabs(res.x - ra - cb.x) < threshold) && fabs(res.y - cb.y) < threshold;
    // test Sub
-      ca.x = 2 * ae_randomreal() - 1;
-      ca.y = 2 * ae_randomreal() - 1;
-      cb.x = 2 * ae_randomreal() - 1;
-      cb.y = 2 * ae_randomreal() - 1;
-      ra = 2 * ae_randomreal() - 1;
-      rb = 2 * ae_randomreal() - 1;
+      ca = ae_complex_from_d(ae_randommid(), ae_randommid());
+      cb = ae_complex_from_d(ae_randommid(), ae_randommid());
+      ra = ae_randommid();
+      rb = ae_randommid();
       res = ae_c_sub(ca, cb);
       subcc = (subcc && fabs(res.x - (ca.x - cb.x)) < threshold) && fabs(res.y - (ca.y - cb.y)) < threshold;
       res = ae_c_sub_d(ca, rb);
@@ -85526,12 +85349,10 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
       res = ae_c_d_sub(ra, cb);
       subrc = (subrc && fabs(res.x - (ra - cb.x)) < threshold) && fabs(res.y + cb.y) < threshold;
    // test Mul
-      ca.x = 2 * ae_randomreal() - 1;
-      ca.y = 2 * ae_randomreal() - 1;
-      cb.x = 2 * ae_randomreal() - 1;
-      cb.y = 2 * ae_randomreal() - 1;
-      ra = 2 * ae_randomreal() - 1;
-      rb = 2 * ae_randomreal() - 1;
+      ca = ae_complex_from_d(ae_randommid(), ae_randommid());
+      cb = ae_complex_from_d(ae_randommid(), ae_randommid());
+      ra = ae_randommid();
+      rb = ae_randommid();
       res = ae_c_mul(ca, cb);
       mulcc = (mulcc && fabs(res.x - (ca.x * cb.x - ca.y * cb.y)) < threshold) && fabs(res.y - (ca.x * cb.y + ca.y * cb.x)) < threshold;
       res = ae_c_mul_d(ca, rb);
@@ -85539,18 +85360,14 @@ static bool testalglibbasicsunit_testcomplexarithmetics(bool silent) {
       res = ae_c_mul_d(cb, ra);
       mulrc = (mulrc && fabs(res.x - ra * cb.x) < threshold) && fabs(res.y - ra * cb.y) < threshold;
    // test Div
-      ca.x = 2 * ae_randomreal() - 1;
-      ca.y = 2 * ae_randomreal() - 1;
+      ca = ae_complex_from_d(ae_randommid(), ae_randommid());
       do {
-         cb.x = 2 * ae_randomreal() - 1;
-         cb.y = 2 * ae_randomreal() - 1;
-      }
-      while (ae_c_abs(cb) <= 0.5);
-      ra = 2 * ae_randomreal() - 1;
+         cb = ae_complex_from_d(ae_randommid(), ae_randommid());
+      } while (ae_c_abs(cb) <= 0.5);
+      ra = ae_randommid();
       do {
-         rb = 2 * ae_randomreal() - 1;
-      }
-      while (fabs(rb) <= 0.5);
+         rb = ae_randommid();
+      } while (fabs(rb) <= 0.5);
       res = ae_c_div(ca, cb);
       divcc = (divcc && fabs(ae_c_mul(res, cb).x - ca.x) < threshold) && fabs(ae_c_mul(res, cb).y - ca.y) < threshold;
       res = ae_c_div_d(ca, rb);
@@ -86131,9 +85948,9 @@ typedef struct {
    ae_vector i;
    ae_vector r;
 } rec4serialization;
+
 Local void rec4serialization_init(void *_p, bool make_automatic) {
    rec4serialization *p = (rec4serialization *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->b, 0, DT_BOOL, make_automatic);
    ae_vector_init(&p->i, 0, DT_INT, make_automatic);
    ae_vector_init(&p->r, 0, DT_REAL, make_automatic);
@@ -86149,7 +85966,6 @@ Local void rec4serialization_copy(void *_dst, void *_src, bool make_automatic) {
 
 Local void rec4serialization_free(void *_p, bool make_automatic) {
    rec4serialization *p = (rec4serialization *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->i, make_automatic);
    ae_vector_free(&p->r, make_automatic);
@@ -86260,7 +86076,7 @@ static bool testalglibbasicsunit_testserializationfunctions(bool silent) {
             }
             ae_vector_set_length(&r0.r, nr);
             for (i = 0; i < nr; i++) {
-               r0.r.ptr.p_double[i] = 2 * ae_randomreal() - 1;
+               r0.r.ptr.p_double[i] = ae_randommid();
             }
             {
             // This code passes data structure through serializers
@@ -86287,7 +86103,7 @@ static bool testalglibbasicsunit_testserializationfunctions(bool silent) {
             }
             if (r0.b.cnt == r1.b.cnt && r0.i.cnt == r1.i.cnt && r0.r.cnt == r1.r.cnt) {
                for (i = 0; i < nb; i++) {
-                  okb = okb && ((r0.b.ptr.p_bool[i] && r1.b.ptr.p_bool[i]) || (!r0.b.ptr.p_bool[i] && !r1.b.ptr.p_bool[i]));
+                  okb = okb && r0.b.ptr.p_bool[i] == r1.b.ptr.p_bool[i];
                }
                for (i = 0; i < ni; i++) {
                   oki = oki && r0.i.ptr.p_int[i] == r1.i.ptr.p_int[i];
@@ -86341,9 +86157,9 @@ typedef struct {
    bool bval;
    ae_vector i1val;
 } poolrec1;
+
 Local void poolrec1_init(void *_p, bool make_automatic) {
    poolrec1 *p = (poolrec1 *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_init(&p->i1val, 0, DT_INT, make_automatic);
 }
 
@@ -86359,7 +86175,6 @@ Local void poolrec1_copy(void *_dst, void *_src, bool make_automatic) {
 
 Local void poolrec1_free(void *_p, bool make_automatic) {
    poolrec1 *p = (poolrec1 *) _p;
-   ae_touch_ptr((void *)p);
    ae_vector_free(&p->i1val, make_automatic);
 }
 
@@ -86368,9 +86183,9 @@ typedef struct {
    poolrec1 recval;
    ae_shared_pool pool;
 } poolrec2;
+
 Local void poolrec2_init(void *_p, bool make_automatic) {
    poolrec2 *p = (poolrec2 *) _p;
-   ae_touch_ptr((void *)p);
    poolrec1_init(&p->recval, make_automatic);
    ae_shared_pool_init(&p->pool, make_automatic);
 }
@@ -86385,7 +86200,6 @@ Local void poolrec2_copy(void *_dst, void *_src, bool make_automatic) {
 
 Local void poolrec2_free(void *_p, bool make_automatic) {
    poolrec2 *p = (poolrec2 *) _p;
-   ae_touch_ptr((void *)p);
    poolrec1_free(&p->recval, make_automatic);
    ae_shared_pool_free(&p->pool, make_automatic);
 }
@@ -86395,12 +86209,11 @@ static void testalglibbasicsunit_createpoolandrecords(poolrec2 *seedrec2, poolre
    SetObj(poolrec2, seedrec2);
    SetObj(poolrec2, seedrec2copy);
    SetObj(ae_shared_pool, pool);
-   seedrec2->bval = ae_randomreal() > 0.5;
-   seedrec2->recval.bval = ae_randomreal() > 0.5;
+   seedrec2->bval = ae_randombool();
+   seedrec2->recval.bval = ae_randombool();
    seedrec2->recval.ival = ae_randominteger(10);
    seedrec2->recval.rval = ae_randomreal();
-   seedrec2->recval.cval.x = ae_randomreal();
-   seedrec2->recval.cval.y = ae_randomreal();
+   seedrec2->recval.cval = ae_complex_from_d(ae_randomreal(), ae_randomreal());
    ae_vector_set_length(&seedrec2->recval.i1val, 3);
    seedrec2->recval.i1val.ptr.p_int[0] = ae_randominteger(10);
    seedrec2->recval.i1val.ptr.p_int[1] = ae_randominteger(10);
@@ -86473,7 +86286,7 @@ static bool testalglibbasicsunit_sharedpoolerrors() {
       ae_frame_leave();
       return result;
    }
-   if (seedrec2copy.bval? !prec2->bval: prec2->bval) {
+   if (seedrec2copy.bval != prec2->bval) {
       ae_frame_leave();
       return result;
    }
@@ -86991,9 +86804,8 @@ static bool testalglibbasicsunit_performtestsort2() {
 typedef struct {
    ae_int_t val;
 } poolsummand;
+
 Local void poolsummand_init(void *_p, bool make_automatic) {
-   poolsummand *p = (poolsummand *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 Local void poolsummand_copy(void *_dst, void *_src, bool make_automatic) {
@@ -87003,8 +86815,6 @@ Local void poolsummand_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 Local void poolsummand_free(void *_p, bool make_automatic) {
-   poolsummand *p = (poolsummand *) _p;
-   ae_touch_ptr((void *)p);
 }
 
 // Summation routune for parallel summation test.
@@ -87119,13 +86929,12 @@ bool testalglibbasics(bool silent) {
 }
 
 // === main testing unit ===
-#if AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-#   include <windows.h>
-#endif
-
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <unistd.h>
 #   include <pthread.h>
+#endif
+#if AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+#   include <windows.h>
 #endif
 
 #define AE_SINGLECORE           1

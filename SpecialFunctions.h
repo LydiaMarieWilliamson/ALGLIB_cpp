@@ -237,7 +237,6 @@ double invnormalcdf(const double y0);
 // with -1<rho<+1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalpdf(const double x, const double y, const double rho);
 
@@ -271,7 +270,6 @@ double bivariatenormalpdf(const double x, const double y, const double rho);
 // absolute error roughly equal to 1e-14.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
-//
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalcdf(const double x, const double y, const double rho);
 } // end of namespace alglib

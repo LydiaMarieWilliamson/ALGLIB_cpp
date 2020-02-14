@@ -26,7 +26,6 @@ int main() {
    x.setlength(1);
    if (alglib_impl::_alloc_counter == 0) printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\\n");
 }
-
    if (alglib_impl::_alloc_counter != 0) {
       printf("FAILURE: alloc_counter does not decrease!\n");
       return 1;
