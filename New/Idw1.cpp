@@ -1369,8 +1369,8 @@ double RandomQ::RandomNormal1() {
 
 // Test number A for equality to B (or 0) within the range Tiny.
 // AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
-static bool NearR(double A, double B, double Tiny) { return fabs(A - B) < Tiny; }
-static bool SmallR(double A, double Tiny) { return fabs(A) < Tiny; }
+static inline bool NearR(double A, double B, double Tiny) { return fabs(A - B) < Tiny; }
+static inline bool SmallR(double A, double Tiny) { return fabs(A) < Tiny; }
 
 // Testing continuity properties: C0 (Deg == 0) or C1 (Deg == 1) continuity.
 static bool TestIdwContinuity(IdwQ &Q, Integer Xs, Integer Ys, RVector &X0, RVector &X1, Integer Steps, Integer Deg) {
@@ -1471,7 +1471,7 @@ static bool TestIdwCommon() {
       // Test error metrics.
       // NOTE:
       // *	We expect that dataset is reproduced exactly.
-         Ok = Ok && SmallR(R._RmsErr, Tiny) && SmallR(R._AveErr, Tiny) && SmallR(R._MaxErr, Tiny) && fabs(R._R2) >= 1.0 - Tiny;
+         Ok = Ok && SmallR(R._RmsErr, Tiny) && SmallR(R._AveErr, Tiny) && SmallR(R._MaxErr, Tiny) && !SmallR(R._R2, 1.0 - Tiny);
       // Test that dataset is actually exactly reproduced.
          for (Integer p = 0; p < Ps; p++) {
          // Test generic evaluation.
