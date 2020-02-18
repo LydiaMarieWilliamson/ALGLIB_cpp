@@ -107,6 +107,21 @@ double coalesce(double a, double b);
 ae_int_t coalescei(ae_int_t a, ae_int_t b);
 double inttoreal(ae_int_t a);
 double logbase2(double x);
+
+// Test number A for equality to B (or 0) within the range Tiny; inclusive for *At*().
+// Tiny > 0; and for the *At*() cases, Tiny == 0 is also allowed.
+//(@) Originally: approxequal(double A, double B, double Tiny);
+//(@) AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
+static inline bool NearAtR(double A, double B, double Tiny) { return fabs(A - B) <= Tiny; }
+static inline bool NearAtCR(ae_complex A, double B, double Tiny) { return ae_c_abs(ae_c_sub_d(A, B)) <= Tiny; }
+static inline bool NearAtC(ae_complex A, ae_complex B, double Tiny) { return ae_c_abs(ae_c_sub(A, B)) <= Tiny; }
+static inline bool NearR(double A, double B, double Tiny) { return fabs(A - B) < Tiny; }
+static inline bool NearC(ae_complex A, ae_complex B, double Tiny) { return ae_c_abs(ae_c_sub(A, B)) < Tiny; }
+static inline bool SmallAtR(double A, double Tiny) { return fabs(A) <= Tiny; }
+static inline bool SmallAtC(ae_complex A, double Tiny) { return ae_c_abs(A) <= Tiny; }
+static inline bool SmallR(double A, double Tiny) { return fabs(A) < Tiny; }
+static inline bool SmallC(ae_complex A, double Tiny) { return ae_c_abs(A) < Tiny; }
+
 void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y);
 void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y);
 void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y);

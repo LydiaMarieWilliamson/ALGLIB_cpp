@@ -887,14 +887,14 @@ ae_int_t saferdiv(double x, double y, double *r) {
 //
    if (y >= 1.0) {
       *r = x / y;
-      if (fabs(*r) <= ae_minrealnumber) {
+      if (SmallAtR(*r, ae_minrealnumber)) {
          result = -1;
          *r = 0.0;
       } else {
          result = 0;
       }
    } else {
-      if (fabs(x) >= ae_maxrealnumber * y) {
+      if (!SmallR(x, ae_maxrealnumber * y)) {
          if (x > 0.0) {
             *r = +INFINITY;
          } else {
@@ -6726,7 +6726,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
       r = p / q;
       stpc = *stx + r * (*stp - (*stx));
       stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
-      if (fabs(stpc - (*stx)) < fabs(stpq - (*stx))) {
+      if (fabs(stpc - *stx) < fabs(stpq - *stx)) {
          stpf = stpc;
       } else {
          stpf = stpc + (stpq - stpc) / 2;
@@ -6751,7 +6751,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
          r = p / q;
          stpc = *stp + r * (*stx - (*stp));
          stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-         if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+         if (fabs(stpc - *stp) > fabs(stpq - *stp)) {
             stpf = stpc;
          } else {
             stpf = stpq;
@@ -7105,7 +7105,7 @@ Spawn:
       if (state->brackt && state->stmax - state->stmin <= linmin_xtol * state->stmax) {
          *info = 2;
       }
-      if (*f < state->finit && *f <= state->ftest1 && fabs(state->dg) <= -gtol * state->dginit) {
+      if (*f < state->finit && *f <= state->ftest1 && SmallAtR(state->dg, -gtol * state->dginit)) {
          *info = 1;
       }
    // CHECK FOR TERMINATION.
@@ -7156,7 +7156,7 @@ Spawn:
    // FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
    // INTERVAL OF UNCERTAINTY.
       if (state->brackt) {
-         if (fabs(state->sty - state->stx) >= p66 * state->width1) {
+         if (!NearR(state->sty, state->stx, p66 * state->width1)) {
             *stp = state->stx + p5 * (state->sty - state->stx);
          }
          state->width1 = state->width;
@@ -9137,7 +9137,6 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abas
 
 #if 0
 // Recurrent subroutine for a InternalRealLinTranspose
-//
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
 static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
    ae_int_t i;

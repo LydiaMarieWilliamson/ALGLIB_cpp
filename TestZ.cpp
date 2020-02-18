@@ -10,6 +10,8 @@
 
 using namespace alglib;
 
+static inline bool NearR(double A, double B, double Tiny) { return fabs(A - B) <= Tiny; }
+
 const char *fmt_str = "%-29s %s\n";
 
 int main() {
@@ -165,7 +167,7 @@ int main() {
 // construction with correct malloc() succeeds
    clear_error_flag();
    spline1dbuildlinear(x, y, 2, s1);
-   passed = passed && !get_error_flag() && fabs(spline1dcalc(s1, 0.5) - 2.5) < 1.0E-12;
+   passed = passed && !get_error_flag() && NearR(spline1dcalc(s1, 0.5), 2.5, 1.0E-12);
 // assignment with broken malloc() fails
    clear_error_flag();
    spline1dinterpolant s3;
@@ -184,7 +186,7 @@ int main() {
 // assignment with working malloc() succeeds
    clear_error_flag();
    s3 = s1;
-   passed = passed && !get_error_flag() && fabs(spline1dcalc(s3, 0.5) - 2.5) < 1.0E-12;
+   passed = passed && !get_error_flag() && NearR(spline1dcalc(s3, 0.5), 2.5, 1.0E-12);
 // copy constructor with broken malloc fails
    clear_error_flag();
    alglib_impl::_force_malloc_failure = true;
@@ -194,7 +196,7 @@ int main() {
 // copy constructor with working malloc succeeds
    clear_error_flag();
    spline1dinterpolant s5(s1);
-   passed = passed && !get_error_flag() && fabs(spline1dcalc(s5, 0.5) - 2.5) < 1.0E-12;
+   passed = passed && !get_error_flag() && NearR(spline1dcalc(s5, 0.5), 2.5, 1.0E-12);
    printf(fmt_str, "* ALGLIB objects", passed ? "OK" : "FAILED");
    fflush(stdout);
    if (!passed) return 1;

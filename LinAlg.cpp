@@ -16877,7 +16877,7 @@ void hpdmatrixcholeskyinverse(CMatrix a, ae_int_t n, bool isupper, ae_int_t *inf
    ae_assert(a->rows >= n, "HPDMatrixCholeskyInverse: rows(A)<N!");
    f = true;
    for (i = 0; i < n; i++) {
-      f = (f && isfinite(a->ptr.pp_complex[i][i].x)) && isfinite(a->ptr.pp_complex[i][i].y);
+      f = f && isfinite(a->ptr.pp_complex[i][i].x) && isfinite(a->ptr.pp_complex[i][i].y);
    }
    ae_assert(f, "HPDMatrixCholeskyInverse: A contains infinite or NaN values!");
    *info = 1;
@@ -21929,7 +21929,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
          return result;
       }
    // Find diagonal block of matrix to work on
-      if (tol < 0.0 && fabs(d->ptr.p_double[m]) <= thresh) {
+      if (tol < 0.0 && SmallAtR(d->ptr.p_double[m], thresh)) {
          d->ptr.p_double[m] = 0.0;
       }
       smax = fabs(d->ptr.p_double[m]);
@@ -22007,10 +22007,10 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
    // fixed thanks to Michael Rolle < m@rolle.name >
    // Very strange that LAPACK still contains it.
       bchangedir = false;
-      if (idir == 1 && fabs(d->ptr.p_double[ll]) < 1.0E-3 * fabs(d->ptr.p_double[m])) {
+      if (idir == 1 && SmallR(d->ptr.p_double[ll], 1.0E-3 * fabs(d->ptr.p_double[m]))) {
          bchangedir = true;
       }
-      if (idir == 2 && fabs(d->ptr.p_double[m]) < 1.0E-3 * fabs(d->ptr.p_double[ll])) {
+      if (idir == 2 && SmallR(d->ptr.p_double[m], 1.0E-3 * fabs(d->ptr.p_double[ll]))) {
          bchangedir = true;
       }
       if (ll != oldll || m != oldm || bchangedir) {
@@ -22026,7 +22026,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
       if (idir == 1) {
       // Run convergence test in forward direction
       // First apply standard test to bottom of matrix
-         if (fabs(e->ptr.p_double[m - 1]) <= fabs(tol) * fabs(d->ptr.p_double[m]) || tol < 0.0 && fabs(e->ptr.p_double[m - 1]) <= thresh) {
+         if (SmallAtR(e->ptr.p_double[m - 1], fabs(tol) * fabs(d->ptr.p_double[m])) || tol < 0.0 && SmallAtR(e->ptr.p_double[m - 1], thresh)) {
             e->ptr.p_double[m - 1] = 0.0;
             continue;
          }
@@ -22037,7 +22037,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
             sminl = mu;
             iterflag = false;
             for (lll = ll; lll < m; lll++) {
-               if (fabs(e->ptr.p_double[lll]) <= tol * mu) {
+               if (SmallAtR(e->ptr.p_double[lll], tol * mu)) {
                   e->ptr.p_double[lll] = 0.0;
                   iterflag = true;
                   break;
@@ -22052,7 +22052,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
       } else {
       // Run convergence test in backward direction
       // First apply standard test to top of matrix
-         if (fabs(e->ptr.p_double[ll]) <= fabs(tol) * fabs(d->ptr.p_double[ll]) || tol < 0.0 && fabs(e->ptr.p_double[ll]) <= thresh) {
+         if (SmallAtR(e->ptr.p_double[ll], fabs(tol) * fabs(d->ptr.p_double[ll])) || tol < 0.0 && SmallAtR(e->ptr.p_double[ll], thresh)) {
             e->ptr.p_double[ll] = 0.0;
             continue;
          }
@@ -22063,7 +22063,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
             sminl = mu;
             iterflag = false;
             for (lll = m - 1; lll >= ll; lll--) {
-               if (fabs(e->ptr.p_double[lll]) <= tol * mu) {
+               if (SmallAtR(e->ptr.p_double[lll], tol * mu)) {
                   e->ptr.p_double[lll] = 0.0;
                   iterflag = true;
                   break;
@@ -22134,7 +22134,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->ptr.p_double[m - 1]) <= thresh) {
+            if (SmallAtR(e->ptr.p_double[m - 1], thresh)) {
                e->ptr.p_double[m - 1] = 0.0;
             }
          } else {
@@ -22168,7 +22168,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
                applyrotationsfromtheleft(!fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work0, &work1, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->ptr.p_double[ll]) <= thresh) {
+            if (SmallAtR(e->ptr.p_double[ll], thresh)) {
                e->ptr.p_double[ll] = 0.0;
             }
          }
@@ -22213,7 +22213,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
                applyrotationsfromtheleft(fwddir, ll + cstart - 1, m + cstart - 1, cstart, cend, &work2, &work3, c, &ctemp);
             }
          // Test convergence
-            if (fabs(e->ptr.p_double[m - 1]) <= thresh) {
+            if (SmallAtR(e->ptr.p_double[m - 1], thresh)) {
                e->ptr.p_double[m - 1] = 0.0;
             }
          } else {
@@ -22245,7 +22245,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
             }
             e->ptr.p_double[ll] = f;
          // Test convergence
-            if (fabs(e->ptr.p_double[ll]) <= thresh) {
+            if (SmallAtR(e->ptr.p_double[ll], thresh)) {
                e->ptr.p_double[ll] = 0.0;
             }
          // Update singular vectors if desired
@@ -23550,7 +23550,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
       for (its = 0; its <= itmax; its++) {
       // Look for a single small subdiagonal element.
          for (k = i; k >= l + 1; k--) {
-            if (fabs(h->ptr.pp_double[k][k - 1]) <= smlnum) {
+            if (SmallAtR(h->ptr.pp_double[k][k - 1], smlnum)) {
                break;
             }
             tst = fabs(h->ptr.pp_double[k - 1][k - 1]) + fabs(h->ptr.pp_double[k][k]);
@@ -23566,7 +23566,7 @@ static void hsschur_internalauxschur(bool wantt, bool wantz, ae_int_t n, ae_int_
          // .    deflation  criterion due to Ahues & Tisseur (LAWN 122,
          // .    1997). It has better mathematical foundation and
          // .    improves accuracy in some cases.  ====
-            if (fabs(h->ptr.pp_double[k][k - 1]) <= ulp * tst) {
+            if (SmallAtR(h->ptr.pp_double[k][k - 1], ulp * tst)) {
                ab = ae_maxreal(fabs(h->ptr.pp_double[k][k - 1]), fabs(h->ptr.pp_double[k - 1][k]));
                ba = ae_minreal(fabs(h->ptr.pp_double[k][k - 1]), fabs(h->ptr.pp_double[k - 1][k]));
                aa = ae_maxreal(fabs(h->ptr.pp_double[k][k]), fabs(h->ptr.pp_double[k - 1][k - 1] - h->ptr.pp_double[k][k]));
@@ -23997,7 +23997,7 @@ void internalschurdecomposition(RMatrix h, ae_int_t n, ae_int_t tneeded, ae_int_
             if (tst1 == 0.0) {
                tst1 = upperhessenberg1norm(h, l, i, l, i, &work);
             }
-            if (fabs(h->ptr.pp_double[k][k - 1]) <= ae_maxreal(ulp * tst1, smlnum)) {
+            if (SmallAtR(h->ptr.pp_double[k][k - 1], ae_maxreal(ulp * tst1, smlnum))) {
                break;
             }
          }
@@ -26132,7 +26132,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
       for (ji = 1; ji <= minp; ji++) {
          for (jp = 1; jp <= 2; jp++) {
             tmp1 = d->ptr.p_double[1] - ab->ptr.pp_double[ji][jp];
-            if (fabs(tmp1) < pivmin) {
+            if (SmallR(tmp1, pivmin)) {
                tmp1 = -pivmin;
             }
             nab->ptr.pp_int[ji][jp] = 0;
@@ -26141,7 +26141,7 @@ static void evd_internaldlaebz(ae_int_t ijob, ae_int_t nitmax, ae_int_t n, ae_in
             }
             for (j = 2; j <= n; j++) {
                tmp1 = d->ptr.p_double[j] - e2->ptr.p_double[j - 1] / tmp1 - ab->ptr.pp_double[ji][jp];
-               if (fabs(tmp1) < pivmin) {
+               if (SmallR(tmp1, pivmin)) {
                   tmp1 = -pivmin;
                }
                if (tmp1 <= 0.0) {
@@ -26932,7 +26932,7 @@ static void evd_tdininternaldlagtf(ae_int_t n, RVector a, double lambdav, RVecto
          iin->ptr.p_int[n] = k;
       }
    }
-   if (fabs(a->ptr.p_double[n]) <= scale1 * tl && iin->ptr.p_int[n] == 0) {
+   if (SmallAtR(a->ptr.p_double[n], scale1 * tl) && iin->ptr.p_int[n] == 0) {
       iin->ptr.p_int[n] = n;
    }
 }
@@ -27008,7 +27008,7 @@ static void evd_tdininternaldlagts(ae_int_t n, RVector a, RVector b, RVector c, 
                   ak *= bignum;
                }
             } else {
-               if (fabs(temp) > absak * bignum) {
+               if (!SmallAtR(temp, absak * bignum)) {
                   ak += pert;
                   pert *= 2;
                   continue;
@@ -27218,7 +27218,7 @@ static void evd_internaldstein(ae_int_t n, RVector d, RVector e, ae_int_t m, RVe
             // Reorthogonalize by modified Gram-Schmidt if eigenvalues are
             // close enough.
                if (jblk != 1) {
-                  if (fabs(xj - xjm) > ortol) {
+                  if (!NearAtR(xj, xjm, ortol)) {
                      gpind = j;
                   }
                   if (gpind != j) {
@@ -27544,7 +27544,7 @@ bool smatrixtdevdi(RVector d, RVector e, ae_int_t n, ae_int_t zneeded, ae_int_t 
    NewVector(e1, 0, DT_REAL);
    NewMatrix(z2, 0, 0, DT_REAL);
    NewMatrix(z3, 0, 0, DT_REAL);
-   ae_assert((0 <= i1 && i1 <= i2) && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!");
+   ae_assert(0 <= i1 && i1 <= i2 && i2 < n, "SMatrixTDEVDI: incorrect I1/I2!");
 // Copy D,E to D1, E1
    ae_vector_set_length(&d1, n + 1);
    ae_v_move(&d1.ptr.p_double[1], 1, d->ptr.p_double, 1, n);
@@ -27895,7 +27895,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          cmax = 0.0;
          icmax = 0;
          for (j = 1; j <= 4; j++) {
-            if (fabs(crv4->ptr.p_double[j]) > cmax) {
+            if (!SmallAtR(crv4->ptr.p_double[j], cmax)) {
                cmax = fabs(crv4->ptr.p_double[j]);
                icmax = j;
             }
@@ -27924,7 +27924,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          lr21 = ur11r * cr21;
          ur22 = cr22 - ur12 * lr21;
       // If smaller pivot < SMINI, use SMINI
-         if (fabs(ur22) < smini) {
+         if (SmallR(ur22, smini)) {
             ur22 = smini;
             *info = 1;
          }
@@ -27937,7 +27937,7 @@ static void evd_internalhsevdlaln2(bool ltrans, ae_int_t na, ae_int_t nw, double
          }
          br2 -= lr21 * br1;
          bbnd = ae_maxreal(fabs(br1 * (ur22 * ur11r)), fabs(br2));
-         if (bbnd > 1.0 && fabs(ur22) < 1.0) {
+         if (bbnd > 1.0 && SmallR(ur22, 1.0)) {
             if (bbnd >= bignum * fabs(ur22)) {
                *scl = 1 / bbnd;
             }

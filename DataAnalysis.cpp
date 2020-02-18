@@ -1245,7 +1245,7 @@ void dssplitk(RVector a, ZVector c, ae_int_t n, ae_int_t nc, ae_int_t kmax, ae_i
    v2 = ae_maxrealnumber;
    j = -1;
    for (i = 1; i < tiecount; i++) {
-      if (fabs(ties.ptr.p_int[i] - 0.5 * (n - 1)) < v2) {
+      if (NearR(ties.ptr.p_int[i], 0.5 * (n - 1), v2)) {
          v2 = fabs(ties.ptr.p_int[i] - 0.5 * n);
          j = i;
       }
@@ -1466,7 +1466,7 @@ void dsoptimalsplitk(RVector a, ZVector c, ae_int_t n, ae_int_t nc, ae_int_t kma
       v2 = ae_maxrealnumber;
       j = -1;
       for (i = 1; i < tiecount; i++) {
-         if (fabs(ties.ptr.p_int[i] - 0.5 * (n - 1)) < v2) {
+         if (NearR(ties.ptr.p_int[i], 0.5 * (n - 1), v2)) {
             v2 = fabs(ties.ptr.p_int[i] - 0.5 * (n - 1));
             j = i;
          }
@@ -3925,7 +3925,7 @@ void mlpactivationfunction(double net, ae_int_t k, double *f, double *df, double
    }
    if (k == 1) {
    // tanh activation function
-      if (fabs(net) < 100.0) {
+      if (SmallR(net, 100.0)) {
          *f = tanh(net);
       } else {
          *f = (double)(ae_sign(net));
@@ -4095,7 +4095,7 @@ static double mlpbase_safecrossentropy(double t, double z) {
    if (t == 0.0) {
       result = 0.0;
    } else {
-      if (fabs(z) > 1.0) {
+      if (!SmallAtR(z, 1.0)) {
       // Shouldn't be the case with softmax,
       // but we just want to be sure.
          if (t / z == 0.0) {
@@ -4105,7 +4105,7 @@ static double mlpbase_safecrossentropy(double t, double z) {
          }
       } else {
       // Normal case
-         if (z == 0.0 || fabs(t) >= ae_maxrealnumber * fabs(z)) {
+         if (z == 0.0 || !SmallR(t, ae_maxrealnumber * fabs(z))) {
             r = ae_maxrealnumber;
          } else {
             r = t / z;
@@ -13235,7 +13235,7 @@ void lrbuildzs(RMatrix xy, RVector s, ae_int_t npoints, ae_int_t nvars, ae_int_t
    for (j = 0; j < nvars; j++) {
       ae_v_move(x.ptr.p_double, 1, &xy->ptr.pp_double[0][j], xy->stride, npoints);
       samplemoments(&x, npoints, &mean, &variance, &skewness, &kurtosis);
-      if (fabs(mean) > sqrt(variance)) {
+      if (!SmallAtR(mean, sqrt(variance))) {
       // variation is relatively small, it is better to
       // bring mean value to 1
          c.ptr.p_double[j] = mean;
@@ -14372,7 +14372,7 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
       r = p / q;
       stpc = *stx + r * (*stp - (*stx));
       stpq = *stx + *dx / ((*fx - fp) / (*stp - (*stx)) + (*dx)) / 2 * (*stp - (*stx));
-      if (fabs(stpc - (*stx)) < fabs(stpq - (*stx))) {
+      if (fabs(stpc - *stx) < fabs(stpq - *stx)) {
          stpf = stpc;
       } else {
          stpf = stpc + (stpq - stpc) / 2;
@@ -14397,7 +14397,7 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
          r = p / q;
          stpc = *stp + r * (*stx - (*stp));
          stpq = *stp + dp / (dp - (*dx)) * (*stx - (*stp));
-         if (fabs(stpc - (*stp)) > fabs(stpq - (*stp))) {
+         if (fabs(stpc - *stp) > fabs(stpq - *stp)) {
             stpf = stpc;
          } else {
             stpf = stpq;
@@ -14706,7 +14706,7 @@ Spawn:
       if (state->brackt && state->stmax - state->stmin <= logit_xtol * state->stmax) {
          *info = 2;
       }
-      if (*f <= state->ftest1 && fabs(state->dg) <= -logit_gtol * state->dginit) {
+      if (*f <= state->ftest1 && SmallAtR(state->dg, -logit_gtol * state->dginit)) {
          *info = 1;
       }
    // CHECK FOR TERMINATION.
@@ -14747,7 +14747,7 @@ Spawn:
    // FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
    // INTERVAL OF UNCERTAINTY.
       if (state->brackt) {
-         if (fabs(state->sty - state->stx) >= p66 * state->width1) {
+         if (!NearR(state->sty, state->stx, p66 * state->width1)) {
             *stp = state->stx + p5 * (state->sty - state->stx);
          }
          state->width1 = state->width;
@@ -19981,7 +19981,7 @@ void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints) {
                if (j != s->nin) {
                   ae_assert(isfinite(v), "MLPSetSparseDataset: sparse matrix XY contains Infinite or NaN.");
                } else {
-                  ae_assert((isfinite(v) && RoundZ(v) >= 0) && RoundZ(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).");
+                  ae_assert(isfinite(v) && RoundZ(v) >= 0 && RoundZ(v) < s->nout, "MLPSetSparseDataset: invalid sparse matrix XY(in classifier used nonexistent class number: either XY[.,NIn]<0 or XY[.,NIn] >= NClasses).");
                }
             }
          }
@@ -23006,7 +23006,7 @@ void clusterizerseparatedbycorr(ahcreport *rep, double r, ae_int_t *k, ZVector c
    *k = 0;
    SetVector(cidx);
    SetVector(cz);
-   ae_assert((isfinite(r) && r >= -1.0) && r <= 1.0, "ClusterizerSeparatedByCorr: R is infinite or less than 0");
+   ae_assert(isfinite(r) && r >= -1.0 && r <= 1.0, "ClusterizerSeparatedByCorr: R is infinite or less than 0");
    *k = 1;
    while (*k < rep->npoints && rep->mergedist.ptr.p_double[rep->npoints - 1 - (*k)] >= 1 - r) {
       ++*k;
@@ -26165,7 +26165,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
    nvars = s->nvars;
    nclasses = s->nclasses;
    ae_assert(df->forestformat == dforest_dfuncompressedv0, "EstimateVariableImportance: integrity check failed (ff)");
-   ae_assert((idx0 >= 0 && idx0 <= idx1) && idx1 <= npoints, "EstimateVariableImportance: integrity check failed (idx)");
+   ae_assert(idx0 >= 0 && idx0 <= idx1 && idx1 <= npoints, "EstimateVariableImportance: integrity check failed (idx)");
    ae_assert(s->iobmatrix.rows >= ntrees && s->iobmatrix.cols >= npoints, "EstimateVariableImportance: integrity check failed (IOB)");
 // Perform parallelization if batch is too large
    if (idx1 - idx0 > dforest_permutationimportancebatchsize) {

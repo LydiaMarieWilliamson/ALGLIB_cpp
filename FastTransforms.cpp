@@ -803,7 +803,7 @@ void convc1dinv(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r) {
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert((n > 0 && m > 0) && n <= m, "ConvC1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvC1DInv: incorrect N or M!");
    p = ftbasefindsmooth(m);
    ftcomplexfftplan(p, 1, &plan);
    ae_vector_set_length(&buf, 2 * p);
@@ -1053,7 +1053,7 @@ void convr1dinv(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r) {
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
    NewObj(fasttransformplan, plan);
-   ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!");
+   ae_assert(n > 0 && m > 0 && n <= m, "ConvR1DInv: incorrect N or M!");
    p = ftbasefindsmootheven(m);
    ae_vector_set_length(&buf, p);
    ae_v_move(buf.ptr.p_double, 1, a->ptr.p_double, 1, m);

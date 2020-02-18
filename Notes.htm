@@ -93,7 +93,7 @@ For some of the types given in the C (<code>alglib_impl::</code>) namespace; in 
 <li>defined in a *.cpp file by <code>DefClass(Type, Vars)</code></li>
 <li>declared in the corresponding *.h file by <code>DecClass(Type, Pars)</code></li>
 </ul>
-Object classes are defined in the C++ (<code>alglib::</code>) namespace of a *.cpp file, for some of the types given in the C (<code>alglib_impl::</code>) namespace, by <code>DefClass(Type, Args)</code>.
+Object classes are defined in the C++ (<code>alglib::</code>) namespace of a *.cpp file, for some of the types given in the C (<code>alglib_impl::</code>) namespace, by <code>DefClass(Type, Vars)</code>.
 </p>
 <p>
 <u>Examples:</u>
@@ -118,8 +118,7 @@ In <code>DecClass()</code>, public members are declared as:
 <li><code>alglib::T &amp;X</code>, for members X of types T = <code>bool</code> or T = <code>double</code>;</li>
 <li><code>alglib::T_1d_array X</code>, for members of types <code>alglib_impl::ae_vector</code>;</li>
 <li><code>alglib::T_2d_array X</code>, for members of types <code>alglib_impl::ae_matrix</code>;</li>
-<li>For the vector and matrix types, T = {<code>boolean</code>,<code>integer</code>,<code>real</code>,<code>complex</code>} matching the datatypes {<code>DT_BOOL</code>,<code>DT_INT</code>,<code>DT_REAL</code>,<code>DT_COMPLEX</code>};</li>
-<li>the corresponding field in the C (<code>alglib_impl::</code>) type is always initialized to the corresponding datatype.</li>
+<li>For the vector and matrix types, T = {<code>boolean</code>,<code>integer</code>,<code>real</code>,<code>complex</code>} matching the datatypes {<code>DT_BOOL</code>,<code>DT_INT</code>,<code>DT_REAL</code>,<code>DT_COMPLEX</code>}; the corresponding field in the C (<code>alglib_impl::</code>) type is always initialized to the corresponding datatype.</li>
 </ul>
 </p>
 <p>
@@ -468,9 +467,9 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 ]</font>
 </p>
 <p>
-For those who wish to use the improvements provided by the Commercial version of ALGLIB.
+For those who wish to use the improvements provided by the Commercial version of ALGLIB,
+the following is a list of the routines in ALGLIB that have been provided with enhancements there; along with the corresponding notifications.
 There are 6 groups of routines (labeled A, B, C, D, E and F), based on which parts of which notifications apply to them.
-The following is a list of the routines in ALGLIB that have been provided with enhancements there; along with the corresponding notifications.
 <a name=supp_Commercial1 class=sheader></a><h3>A5.1. ALGLIB Commercial Notifications</h3>
 <pre class=narration>
 ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
@@ -738,7 +737,10 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 30	In-line some of the alglib:: object member functions.
 	Topological sorting of internal routines &amp; commenting out or eliminating dead-code and vestigial code from the commercial version.
 	Normalized the RCOMM interface.
-	Synthesis of new routines and generalized versions of existing routines.
+	Synthesized new routines, [ae_]randombool(), [ae_]randommid() and generalized versions of existing routines: ae_complex_from_d().
+31	Synthesized new routines for real and complex approximate comparisons: {Near,Small}[At]{R,CR,C}().
+	Normalized comparisons |A-B|/C &rArr; D to |A-B| &rArr; C&times;D; possibly removing hidden bugs as a result.
+	Normalized error flags in TestC.cpp.
 </pre>
 </p>
 <p>
@@ -826,6 +828,10 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 30	2268 3472 3498 3235 1581312636 213
 30	2278 3413 3498 3241 1581556573 216
 30	2273 3509 3510 3261 1581634496 220
+30	2299 3437 3486 3262 1581731061 217
+30	2283 3437 3414 3240 1581740396 224 // Modifications, following cross-validation against local version.
+31	2283 3472 3510 3241 1581968963 216
+31	2262 3472 3486 3235 1581983401 209
 </pre>
 </p>
 </div>

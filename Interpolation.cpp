@@ -610,7 +610,7 @@ void idwtscalcbuf(idwmodel *s, idwcalcbuffer *buf, RVector x, RVector y) {
       invrdecay = 1 / s->rdecay;
       invr = 1 / s->r0;
       lambdadecay = s->lambdadecay;
-      fastcalcpossible = (ny == 1 && s->nlayers >= 3) && lambdadecay == 1.0;
+      fastcalcpossible = ny == 1 && s->nlayers >= 3 && lambdadecay == 1.0;
       if (fastcalcpossible) {
       // Important special case, NY=1, no lambda-decay,
       // we can perform optimized fast evaluation
@@ -1995,7 +1995,7 @@ void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df
    xmax = b->x.ptr.p_double[0];
    for (i = 1; i < b->n; i++) {
       vv = b->x.ptr.p_double[i];
-      if (fabs(vv - t) < v) {
+      if (NearR(vv, t, v)) {
          v = fabs(vv - t);
          k = i;
       }
@@ -2114,7 +2114,7 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
    k = 0;
    for (i = 1; i < b->n; i++) {
       vv = b->x.ptr.p_double[i];
-      if (fabs(vv - t) < v) {
+      if (NearR(vv, t, v)) {
          v = fabs(vv - t);
          k = i;
       }
@@ -2279,7 +2279,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       b->sy = ae_maxreal(b->sy, fabs(b->y.ptr.p_double[i]));
    }
-   if (b->sy > 0.0 && fabs(b->sy - 1) > 10 * ae_machineepsilon) {
+   if (b->sy > 0.0 && !NearAtR(b->sy, 1.0, 10 * ae_machineepsilon)) {
       v = 1 / b->sy;
       ae_v_muld(b->y.ptr.p_double, 1, b->n, v);
    }
@@ -2287,7 +2287,7 @@ static void ratint_barycentricnormalize(barycentricinterpolant *b) {
    for (i = 0; i < b->n; i++) {
       v = ae_maxreal(v, fabs(b->w.ptr.p_double[i]));
    }
-   if (v > 0.0 && fabs(v - 1) > 10 * ae_machineepsilon) {
+   if (v > 0.0 && !NearAtR(v, 1.0, 10 * ae_machineepsilon)) {
       v = 1 / v;
       ae_v_muld(b->w.ptr.p_double, 1, b->n, v);
    }
@@ -7487,7 +7487,7 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
             }
          }
       }
-   } while (fabs(b0 - a0) >= eps);
+   } while (!NearR(b0, a0, eps));
    *x = m;
    result = 1;
    return result;
@@ -7585,7 +7585,7 @@ void spline1dbuildmonotone(RVector x, RVector y, ae_int_t n, spline1dinterpolant
       }
       for (j = i; j < sn - 1; j++) {
          delta = (ey.ptr.p_double[j + 1] - ey.ptr.p_double[j]) / (ex.ptr.p_double[j + 1] - ex.ptr.p_double[j]);
-         if (fabs(delta) <= epsilon) {
+         if (SmallAtR(delta, epsilon)) {
             d.ptr.p_double[j] = 0.0;
             d.ptr.p_double[j + 1] = 0.0;
          } else {
@@ -10790,7 +10790,7 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
    double vxy;
    double result;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalc: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalc: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalc: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
    if (c->d != 1) {
       result = 0.0;
       return result;
@@ -11085,8 +11085,8 @@ void spline3dresampletrilinear(RVector a, ae_int_t oldzcount, ae_int_t oldycount
    ae_int_t j;
    ae_int_t k;
    SetVector(b);
-   ae_assert((oldycount > 1 && oldzcount > 1) && oldxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
-   ae_assert((newycount > 1 && newzcount > 1) && newxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
+   ae_assert(oldycount > 1 && oldzcount > 1 && oldxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
+   ae_assert(newycount > 1 && newzcount > 1 && newxcount > 1, "Spline3DResampleTrilinear: length/width/height less than 1");
    ae_assert(a->cnt >= oldycount * oldzcount * oldxcount, "Spline3DResampleTrilinear: length/width/height less than 1");
    ae_vector_set_length(b, newxcount * newycount * newzcount);
    for (i = 0; i < newxcount; i++) {
@@ -11161,8 +11161,8 @@ void spline3dbuildtrilinearv(RVector x, ae_int_t n, RVector y, ae_int_t m, RVect
    ae_assert(n >= 2, "Spline3DBuildTrilinearV: N<2");
    ae_assert(l >= 2, "Spline3DBuildTrilinearV: L<2");
    ae_assert(d >= 1, "Spline3DBuildTrilinearV: D<1");
-   ae_assert((x->cnt >= n && y->cnt >= m) && z->cnt >= l, "Spline3DBuildTrilinearV: length of X, Y or Z is too short (Length(X/Y/Z)<N/M/L)");
-   ae_assert((isfinitevector(x, n) && isfinitevector(y, m)) && isfinitevector(z, l), "Spline3DBuildTrilinearV: X, Y or Z contains NaN or Infinite value");
+   ae_assert(x->cnt >= n && y->cnt >= m && z->cnt >= l, "Spline3DBuildTrilinearV: length of X, Y or Z is too short (Length(X/Y/Z)<N/M/L)");
+   ae_assert(isfinitevector(x, n) && isfinitevector(y, m) && isfinitevector(z, l), "Spline3DBuildTrilinearV: X, Y or Z contains NaN or Infinite value");
    tblsize = n * m * l * d;
    ae_assert(f->cnt >= tblsize, "Spline3DBuildTrilinearV: length of F is too short (Length(F)<N*M*L*D)");
    ae_assert(isfinitevector(f, tblsize), "Spline3DBuildTrilinearV: F contains NaN or Infinite value");
@@ -11292,7 +11292,7 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
    ae_int_t h;
    ae_int_t i;
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalcVBuf: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalcVBuf: X, Y or Z contains NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalcVBuf: X, Y or Z contains NaN/Infinite");
    rvectorsetlengthatleast(f, c->d);
 // Binary search in the [ x[0], ..., x[n-2] ] (x[n-1] is not included)
    l = 0;
@@ -11366,7 +11366,7 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
 void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector f) {
    SetVector(f);
    ae_assert(c->stype == -1 || c->stype == -3, "Spline3DCalcV: incorrect C (incorrect parameter C.SType)");
-   ae_assert((isfinite(x) && isfinite(y)) && isfinite(z), "Spline3DCalcV: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
+   ae_assert(isfinite(x) && isfinite(y) && isfinite(z), "Spline3DCalcV: X=NaN/Infinite, Y=NaN/Infinite or Z=NaN/Infinite");
    ae_vector_set_length(f, c->d);
    spline3dcalcvbuf(c, x, y, z, f);
 }
@@ -12468,7 +12468,7 @@ double polynomialcalceqdist(double a, double b, RVector f, ae_int_t n, double t)
       result = f->ptr.p_double[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -12600,7 +12600,7 @@ double polynomialcalccheb1(double a, double b, RVector f, ae_int_t n, double t) 
       result = f->ptr.p_double[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -12741,7 +12741,7 @@ double polynomialcalccheb2(double a, double b, RVector f, ae_int_t n, double t) 
       result = f->ptr.p_double[j];
       return result;
    }
-   if (fabs(s) > threshold) {
+   if (!SmallAtR(s, threshold)) {
    // use fast formula
       j = -1;
       s = 1.0;
@@ -24442,7 +24442,7 @@ void rbfv2partialgridcalcrec(rbfv2model *s, RVector x0, ae_int_t n0, RVector x1,
          srcoffs = blocks0->ptr.p_int[i0] + (j1 + (j2 + j3 * n2) * n1) * n0;
          emptyrow = true;
          for (nodeidx = 0; nodeidx < nodescnt; nodeidx++) {
-            emptyrow = emptyrow && (sparsey && !flagy->ptr.p_bool[srcoffs + nodeidx]);
+            emptyrow = emptyrow && sparsey && !flagy->ptr.p_bool[srcoffs + nodeidx];
          }
          if (emptyrow) {
             continue;
@@ -28014,7 +28014,7 @@ static void spline2d_reorderdatasetandbuildindexrec(RVector xy, ae_int_t d, RVec
    entrywidth = 2 + d;
    efficiency = 0.1;
    cost = d * (pt1 - pt0 + 1) * log((double)(idx1 - idx0 + 1)) / log(2.0) / efficiency;
-// Parallelism was activated if: ((rootcall && pt1 - pt0 > 10000) && idx1 - idx0 >= 2) && cost > smpactivationlevel()
+// Parallelism was activated if: rootcall && pt1 - pt0 > 10000 && idx1 - idx0 >= 2 && cost > smpactivationlevel()
 // Store left bound to XYIndex
    xyindex->ptr.p_int[idx0] = pt0;
 // Quick exit strategies
@@ -28070,7 +28070,7 @@ static void spline2d_expandindexrows(RVector xy, ae_int_t d, RVector shadow, ae_
    cost = d * (pt1 - pt0 + 1) * (log((double)kxnew) / log(2.0)) / efficiency;
    ae_assert(xyindexprev->ptr.p_int[row0 * (kxprev - 1)] == pt0, "Spline2DFit.ExpandIndexRows: integrity check failed");
    ae_assert(xyindexprev->ptr.p_int[row1 * (kxprev - 1)] == pt1, "Spline2DFit.ExpandIndexRows: integrity check failed");
-// Parallelism was activated if: ((rootcall && pt1 - pt0 > 10000) && row1 - row0 >= 2) && cost > smpactivationlevel()
+// Parallelism was activated if: rootcall && pt1 - pt0 > 10000 && row1 - row0 >= 2 && cost > smpactivationlevel()
 // Partition
    if (row1 - row0 >= 2) {
       tiledsplit(row1 - row0, 1, &i0, &i1);
@@ -28490,7 +28490,7 @@ static void spline2d_fastddmfit(RVector xy, ae_int_t npoints, ae_int_t d, ae_int
    ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), spline2dfastddmbuf_init, spline2dfastddmbuf_copy, spline2dfastddmbuf_free);
    spline2d_reorderdatasetandbuildindex(xy, npoints, d, &yraw, d, kxcur, kycur, &xyindex, &bufi);
    for (scaleidx = ntotallayers - 1; scaleidx >= 0; scaleidx--) {
-      if (nlayers > 0 && scaleidx < nlayers || nlayers <= 0 && scaleidx < imax2(ntotallayers + nlayers, 1)) {
+      if (nlayers > 0? scaleidx < nlayers: scaleidx < imax2(ntotallayers + nlayers, 1)) {
       // Fit current layer
          ae_assert(kxcur % basecasex == 1, "Spline2DFit: integrity error");
          ae_assert(kycur % basecasey == 1, "Spline2DFit: integrity error");

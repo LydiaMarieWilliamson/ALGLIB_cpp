@@ -12,6 +12,9 @@
 
 using namespace alglib;
 
+static inline bool NearR(double A, double B, double Tiny) { return fabs(A - B) <= Tiny; }
+static inline bool SmallR(double A, double Tiny) { return fabs(A) <= Tiny; }
+
 const char *fmt_str = "%-29s %s\n";
 const char *fmt_speedup = "%-25s %5.1fx\n";
 
@@ -318,23 +321,23 @@ int main() {
          boolean_1d_array arr_0, arr_1("[]"), arr_2("[true,false,true]"), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = "[true,true,false]";
-         passed = passed && (arr_0.length() == 0);
-         passed = passed && (arr_1.length() == 0);
-         passed = passed && (arr_2.length() == 3);
-         passed = passed && (arr_3.length() == 3);
-         passed = passed && (arr_2[0] == arr_2(0)) && (arr_2[1] == arr_2(1)) && (arr_2[2] == arr_2(2));
+         passed = passed && arr_0.length() == 0;
+         passed = passed && arr_1.length() == 0;
+         passed = passed && arr_2.length() == 3;
+         passed = passed && arr_3.length() == 3;
+         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
          passed = passed && arr_2[0] && !arr_2[1] && arr_2[2];
          passed = passed && arr_3[0] && !arr_3[1] && arr_3[2];
          passed = passed && arr_4[0] && !arr_4[1] && arr_4[2];
          passed = passed && arr_5[0] && arr_5[1] && !arr_5[2];
-         passed = passed && (arr_2.tostring() == "[true,false,true]");
-         passed = passed && (arr_3.tostring() == "[true,false,true]");
-         passed = passed && (arr_4.tostring() == "[true,false,true]");
-         passed = passed && (arr_5.tostring() == "[true,true,false]");
+         passed = passed && arr_2.tostring() == "[true,false,true]";
+         passed = passed && arr_3.tostring() == "[true,false,true]";
+         passed = passed && arr_4.tostring() == "[true,false,true]";
+         passed = passed && arr_5.tostring() == "[true,true,false]";
          arr_2[0] = false;
          passed = passed && !arr_2[0] && arr_3[0] && arr_4[0];
          arr_5.setlength(99);
-         passed = passed && (arr_5.length() == 99);
+         passed = passed && arr_5.length() == 99;
       // setcontent/getcontent
          bool a0[] = { true, false, true, false, false };
          bool a0_mod = false;
@@ -342,20 +345,20 @@ int main() {
          bool *p6;
          boolean_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
+         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && (p6 != a0);
-         passed = passed && (p6[0] == a0[0]) && (p6[1] == a0[1]) && (p6[2] == a0[2]) && (p6[3] == a0[3]) && (p6[4] == a0[4]);
+         passed = passed && p6 != a0;
+         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && (arr_6[0] != a0[0]);
+         passed = passed && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const boolean_1d_array & ac = arr_6;
-            passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
-            passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
+            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const bool *p = ac.getcontent();
-            passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
+            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -450,23 +453,23 @@ int main() {
          integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && (arr_0.length() == 0);
-         passed = passed && (arr_1.length() == 0);
-         passed = passed && (arr_2.length() == 3);
-         passed = passed && (arr_3.length() == 3);
-         passed = passed && (arr_2[0] == arr_2(0)) && (arr_2[1] == arr_2(1)) && (arr_2[2] == arr_2(2));
-         passed = passed && (arr_2[0] == v10) && (arr_2[1] == v11) && (arr_2[2] == v12);
-         passed = passed && (arr_3[0] == v10) && (arr_3[1] == v11) && (arr_3[2] == v12);
-         passed = passed && (arr_4[0] == v10) && (arr_4[1] == v11) && (arr_4[2] == v12);
-         passed = passed && (arr_5[0] == v20) && (arr_5[1] == v21) && (arr_5[2] == v22);
-         passed = passed && (arr_2.tostring() == s1);
-         passed = passed && (arr_3.tostring() == s1);
-         passed = passed && (arr_4.tostring() == s1);
-         passed = passed && (arr_5.tostring() == s2);
+         passed = passed && arr_0.length() == 0;
+         passed = passed && arr_1.length() == 0;
+         passed = passed && arr_2.length() == 3;
+         passed = passed && arr_3.length() == 3;
+         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         passed = passed && arr_2.tostring() == s1;
+         passed = passed && arr_3.tostring() == s1;
+         passed = passed && arr_4.tostring() == s1;
+         passed = passed && arr_5.tostring() == s2;
          arr_2[0] = v10_mod;
-         passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
+         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && (arr_5.length() == 99);
+         passed = passed && arr_5.length() == 99;
       // setcontent/getcontent
          ae_int_t a0[] = {
          2, 3, 1, 9, 2};
@@ -475,20 +478,20 @@ int main() {
          ae_int_t *p6;
          integer_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
+         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && (p6 != a0);
-         passed = passed && (p6[0] == a0[0]) && (p6[1] == a0[1]) && (p6[2] == a0[2]) && (p6[3] == a0[3]) && (p6[4] == a0[4]);
+         passed = passed && p6 != a0;
+         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && (arr_6[0] != a0[0]);
+         passed = passed && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const integer_1d_array & ac = arr_6;
-            passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
-            passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
+            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const ae_int_t *p = ac.getcontent();
-            passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
+            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -503,20 +506,20 @@ int main() {
          targt = s3;
          integer_1d_array proxy(targt.c_ptr());
          acopy = proxy;
-         passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
-         passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
-         passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
+         passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+         passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+         passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
          targt[0] = v30_mod;
-         passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
+         passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
          proxy[0] = v30;
-         passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
+         passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
          acopy = s4;
          proxy = acopy;
-         passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
-         passed = passed && (proxy[0] == v40) && (proxy[1] == v41) && (proxy[2] == v42) && (proxy[3] == v43);
+         passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+         passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
          proxy = s5;
-         passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
-         passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
+         passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+         passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
          try {
             acopy = s6;
             proxy = acopy;
@@ -586,23 +589,23 @@ int main() {
          real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && (arr_0.length() == 0);
-         passed = passed && (arr_1.length() == 0);
-         passed = passed && (arr_2.length() == 3);
-         passed = passed && (arr_3.length() == 3);
-         passed = passed && (arr_2[0] == arr_2(0)) && (arr_2[1] == arr_2(1)) && (arr_2[2] == arr_2(2));
-         passed = passed && (arr_2[0] == v10) && (arr_2[1] == v11) && (arr_2[2] == v12);
-         passed = passed && (arr_3[0] == v10) && (arr_3[1] == v11) && (arr_3[2] == v12);
-         passed = passed && (arr_4[0] == v10) && (arr_4[1] == v11) && (arr_4[2] == v12);
-         passed = passed && (arr_5[0] == v20) && (arr_5[1] == v21) && (arr_5[2] == v22);
-         passed = passed && (arr_2.tostring(dps) == s1_fmt);
-         passed = passed && (arr_3.tostring(dps) == s1_fmt);
-         passed = passed && (arr_4.tostring(dps) == s1_fmt);
-         passed = passed && (arr_5.tostring(dps) == s2_fmt);
+         passed = passed && arr_0.length() == 0;
+         passed = passed && arr_1.length() == 0;
+         passed = passed && arr_2.length() == 3;
+         passed = passed && arr_3.length() == 3;
+         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         passed = passed && arr_2.tostring(dps) == s1_fmt;
+         passed = passed && arr_3.tostring(dps) == s1_fmt;
+         passed = passed && arr_4.tostring(dps) == s1_fmt;
+         passed = passed && arr_5.tostring(dps) == s2_fmt;
          arr_2[0] = v10_mod;
-         passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
+         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && (arr_5.length() == 99);
+         passed = passed && arr_5.length() == 99;
       // setcontent/getcontent
          double a0[] = { 2, 3.5, 1, 9.125, 2 };
          double a0_mod = 7.0;
@@ -610,20 +613,20 @@ int main() {
          double *p6;
          real_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
+         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && (p6 != a0);
-         passed = passed && (p6[0] == a0[0]) && (p6[1] == a0[1]) && (p6[2] == a0[2]) && (p6[3] == a0[3]) && (p6[4] == a0[4]);
+         passed = passed && p6 != a0;
+         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && (arr_6[0] != a0[0]);
+         passed = passed && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const real_1d_array & ac = arr_6;
-            passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
-            passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
+            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const double *p = ac.getcontent();
-            passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
+            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays attached via attach_to(ae_vector*):
@@ -639,20 +642,20 @@ int main() {
             targt = s3;
             real_1d_array proxy(targt.c_ptr());
             acopy = proxy;
-            passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
-            passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
-            passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
+            passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+            passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+            passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
             targt[0] = v30_mod;
-            passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
+            passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
             proxy[0] = v30;
-            passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
+            passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
             acopy = s4;
             proxy = acopy;
-            passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
-            passed = passed && (proxy[0] == v40) && (proxy[1] == v41) && (proxy[2] == v42) && (proxy[3] == v43);
+            passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+            passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
             proxy = s5;
-            passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
-            passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
+            passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+            passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
             try {
                acopy = s6;
                proxy = acopy;
@@ -707,20 +710,20 @@ int main() {
             double targt[] = { v30, v31, v32, v33 };
             proxy.attach_to_ptr(4, targt);
             acopy = proxy;
-            passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
-            passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
-            passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
+            passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+            passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+            passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
             targt[0] = v30_mod;
-            passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
+            passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
             proxy[0] = v30;
-            passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
+            passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
             acopy = s4;
             proxy = acopy;
-            passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
-            passed = passed && (proxy[0] == v40) && (proxy[1] == v41) && (proxy[2] == v42) && (proxy[3] == v43);
+            passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+            passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
             proxy = s5;
-            passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
-            passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
+            passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+            passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
             try {
                acopy = s6;
                proxy = acopy;
@@ -791,23 +794,23 @@ int main() {
          complex_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && (arr_0.length() == 0);
-         passed = passed && (arr_1.length() == 0);
-         passed = passed && (arr_2.length() == 3);
-         passed = passed && (arr_3.length() == 3);
-         passed = passed && (arr_2[0] == arr_2(0)) && (arr_2[1] == arr_2(1)) && (arr_2[2] == arr_2(2));
-         passed = passed && (arr_2[0] == v10) && (arr_2[1] == v11) && (arr_2[2] == v12);
-         passed = passed && (arr_3[0] == v10) && (arr_3[1] == v11) && (arr_3[2] == v12);
-         passed = passed && (arr_4[0] == v10) && (arr_4[1] == v11) && (arr_4[2] == v12);
-         passed = passed && (arr_5[0] == v20) && (arr_5[1] == v21) && (arr_5[2] == v22);
-         passed = passed && (arr_2.tostring(dps) == s1_fmt);
-         passed = passed && (arr_3.tostring(dps) == s1_fmt);
-         passed = passed && (arr_4.tostring(dps) == s1_fmt);
-         passed = passed && (arr_5.tostring(dps) == s2_fmt);
+         passed = passed && arr_0.length() == 0;
+         passed = passed && arr_1.length() == 0;
+         passed = passed && arr_2.length() == 3;
+         passed = passed && arr_3.length() == 3;
+         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         passed = passed && arr_2.tostring(dps) == s1_fmt;
+         passed = passed && arr_3.tostring(dps) == s1_fmt;
+         passed = passed && arr_4.tostring(dps) == s1_fmt;
+         passed = passed && arr_5.tostring(dps) == s2_fmt;
          arr_2[0] = v10_mod;
-         passed = passed && (arr_2[0] == v10_mod) && (arr_3[0] == v10) && (arr_4[0] == v10);
+         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && (arr_5.length() == 99);
+         passed = passed && arr_5.length() == 99;
       // setcontent/getcontent
          complex a0[] = {
          2, 3.5, 1, 9.125, 2};
@@ -816,20 +819,20 @@ int main() {
          complex *p6;
          complex_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && (arr_6[0] == a0[0]) && (arr_6[1] == a0[1]) && (arr_6[2] == a0[2]) && (arr_6[3] == a0[3]) && (arr_6[4] == a0[4]);
+         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && (p6 != a0);
-         passed = passed && (p6[0] == a0[0]) && (p6[1] == a0[1]) && (p6[2] == a0[2]) && (p6[3] == a0[3]) && (p6[4] == a0[4]);
+         passed = passed && p6 != a0;
+         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && (arr_6[0] != a0[0]);
+         passed = passed && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const complex_1d_array & ac = arr_6;
-            passed = passed && (ac[0] == a0[0]) && (ac[1] == a0[1]) && (ac[2] == a0[2]) && (ac[3] == a0[3]) && (ac[4] == a0[4]);
-            passed = passed && (ac(0) == a0[0]) && (ac(1) == a0[1]) && (ac(2) == a0[2]) && (ac(3) == a0[3]) && (ac(4) == a0[4]);
+            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const complex *p = ac.getcontent();
-            passed = passed && (p[0] == a0[0]) && (p[1] == a0[1]) && (p[2] == a0[2]) && (p[3] == a0[3]) && (p[4] == a0[4]);
+            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -844,20 +847,20 @@ int main() {
          targt = s3;
          complex_1d_array proxy(targt.c_ptr());
          acopy = proxy;
-         passed = passed && (targt[0] == v30) && (targt[1] == v31) && (targt[2] == v32) && (targt[3] == v33);
-         passed = passed && (proxy[0] == v30) && (proxy[1] == v31) && (proxy[2] == v32) && (proxy[3] == v33);
-         passed = passed && (acopy[0] == v30) && (acopy[1] == v31) && (acopy[2] == v32) && (acopy[3] == v33);
+         passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+         passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+         passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
          targt[0] = v30_mod;
-         passed = passed && (targt[0] == v30_mod) && (proxy[0] == v30_mod) && (acopy[0] == v30);
+         passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
          proxy[0] = v30;
-         passed = passed && (targt[0] == v30) && (proxy[0] == v30) && (acopy[0] == v30);
+         passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
          acopy = s4;
          proxy = acopy;
-         passed = passed && (targt[0] == v40) && (targt[1] == v41) && (targt[2] == v42) && (targt[3] == v43);
-         passed = passed && (proxy[0] == v40) && (proxy[1] == v41) && (proxy[2] == v42) && (proxy[3] == v43);
+         passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+         passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
          proxy = s5;
-         passed = passed && (targt[0] == v50) && (targt[1] == v51) && (targt[2] == v52) && (targt[3] == v53);
-         passed = passed && (proxy[0] == v50) && (proxy[1] == v51) && (proxy[2] == v52) && (proxy[3] == v53);
+         passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+         passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
          try {
             acopy = s6;
             proxy = acopy;
@@ -944,29 +947,29 @@ int main() {
          real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && (arr_0.rows() == 0) && (arr_0.cols() == 0) && (arr_0.getstride() == 0);
-         passed = passed && (arr_1.rows() == 0) && (arr_1.cols() == 0) && (arr_1.getstride() == 0);
-         passed = passed && (arr_2.rows() == 2) && (arr_2.cols() == 3) && (arr_2.getstride() >= arr_2.cols());
-         passed = passed && (arr_3.rows() == 2) && (arr_3.cols() == 3) && (arr_3.getstride() >= arr_3.cols());
-         passed = passed && (arr_4.rows() == 2) && (arr_4.cols() == 3) && (arr_4.getstride() >= arr_4.cols());
-         passed = passed && (arr_5.rows() == 3) && (arr_5.cols() == 1) && (arr_5.getstride() >= arr_5.cols());
-         passed = passed && (arr_2[0][0] == arr_2(0, 0)) && (arr_2[0][1] == arr_2(0, 1)) && (arr_2[0][2] == arr_2(0, 2));
-         passed = passed && (arr_2[1][0] == arr_2(1, 0)) && (arr_2[1][1] == arr_2(1, 1)) && (arr_2[1][2] == arr_2(1, 2));
-         passed = passed && (arr_2[0][0] == v10) && (arr_2[0][1] == v11) && (arr_2[0][2] == v12);
-         passed = passed && (arr_2[1][0] == v13) && (arr_2[1][1] == v14) && (arr_2[1][2] == v15);
-         passed = passed && (arr_3[0][0] == v10) && (arr_3[0][1] == v11) && (arr_3[0][2] == v12);
-         passed = passed && (arr_3[1][0] == v13) && (arr_3[1][1] == v14) && (arr_3[1][2] == v15);
-         passed = passed && (arr_4[0][0] == v10) && (arr_4[0][1] == v11) && (arr_4[0][2] == v12);
-         passed = passed && (arr_4[1][0] == v13) && (arr_4[1][1] == v14) && (arr_4[1][2] == v15);
-         passed = passed && (arr_5[0][0] == v20) && (arr_5[1][0] == v21) && (arr_5[2][0] == v22);
-         passed = passed && (arr_2.tostring(dps) == s1_fmt);
-         passed = passed && (arr_3.tostring(dps) == s1_fmt);
-         passed = passed && (arr_4.tostring(dps) == s1_fmt);
-         passed = passed && (arr_5.tostring(dps) == s2_fmt);
+         passed = passed && arr_0.rows() == 0 && arr_0.cols() == 0 && arr_0.getstride() == 0;
+         passed = passed && arr_1.rows() == 0 && arr_1.cols() == 0 && arr_1.getstride() == 0;
+         passed = passed && arr_2.rows() == 2 && arr_2.cols() == 3 && arr_2.getstride() >= arr_2.cols();
+         passed = passed && arr_3.rows() == 2 && arr_3.cols() == 3 && arr_3.getstride() >= arr_3.cols();
+         passed = passed && arr_4.rows() == 2 && arr_4.cols() == 3 && arr_4.getstride() >= arr_4.cols();
+         passed = passed && arr_5.rows() == 3 && arr_5.cols() == 1 && arr_5.getstride() >= arr_5.cols();
+         passed = passed && arr_2[0][0] == arr_2(0, 0) && arr_2[0][1] == arr_2(0, 1) && arr_2[0][2] == arr_2(0, 2);
+         passed = passed && arr_2[1][0] == arr_2(1, 0) && arr_2[1][1] == arr_2(1, 1) && arr_2[1][2] == arr_2(1, 2);
+         passed = passed && arr_2[0][0] == v10 && arr_2[0][1] == v11 && arr_2[0][2] == v12;
+         passed = passed && arr_2[1][0] == v13 && arr_2[1][1] == v14 && arr_2[1][2] == v15;
+         passed = passed && arr_3[0][0] == v10 && arr_3[0][1] == v11 && arr_3[0][2] == v12;
+         passed = passed && arr_3[1][0] == v13 && arr_3[1][1] == v14 && arr_3[1][2] == v15;
+         passed = passed && arr_4[0][0] == v10 && arr_4[0][1] == v11 && arr_4[0][2] == v12;
+         passed = passed && arr_4[1][0] == v13 && arr_4[1][1] == v14 && arr_4[1][2] == v15;
+         passed = passed && arr_5[0][0] == v20 && arr_5[1][0] == v21 && arr_5[2][0] == v22;
+         passed = passed && arr_2.tostring(dps) == s1_fmt;
+         passed = passed && arr_3.tostring(dps) == s1_fmt;
+         passed = passed && arr_4.tostring(dps) == s1_fmt;
+         passed = passed && arr_5.tostring(dps) == s2_fmt;
          arr_2[0][0] = v10_mod;
-         passed = passed && (arr_2[0][0] == v10_mod) && (arr_3[0][0] == v10) && (arr_4[0][0] == v10);
+         passed = passed && arr_2[0][0] == v10_mod && arr_3[0][0] == v10 && arr_4[0][0] == v10;
          arr_5.setlength(99, 97);
-         passed = passed && (arr_5.rows() == 99) && (arr_5.cols() == 97);
+         passed = passed && arr_5.rows() == 99 && arr_5.cols() == 97;
       //
       // setcontent/elementwise access/constant arrays
       //
@@ -981,21 +984,21 @@ int main() {
                arr_6.setcontent(m, n, a0);
                for (i = 0; i < m; i++)
                   for (j = 0; j < n; j++) {
-                     passed = passed && (arr_6[i][j] == a0[i * n + j]);
-                     passed = passed && (arr_6(i, j) == a0[i * n + j]);
+                     passed = passed && arr_6[i][j] == a0[i * n + j];
+                     passed = passed && arr_6(i, j) == a0[i * n + j];
                   }
             // test that setcontent() actually copies data instead of creating just reference
                r = a0[0];
                a0[0]++;
-               passed = passed && (arr_6[0][0] != a0[0]);
+               passed = passed && arr_6[0][0] != a0[0];
                a0[0] = r;
             // operations on constant arrays
                {
                   const real_2d_array & ac = arr_6;
                   for (i = 0; i < m; i++)
                      for (j = 0; j < n; j++) {
-                        passed = passed && (ac[i][j] == a0[i * n + j]);
-                        passed = passed && (ac(i, j) == a0[i * n + j]);
+                        passed = passed && ac[i][j] == a0[i * n + j];
+                        passed = passed && ac(i, j) == a0[i * n + j];
                      }
                }
             }
@@ -1016,34 +1019,34 @@ int main() {
             acopy = proxy;
             for (i = 0; i < targt.rows(); i++)
                for (j = 0; j < targt.cols(); j++) {
-                  passed = passed && (proxy[i][j] == targt[i][j]);
-                  passed = passed && (acopy[i][j] == targt[i][j]);
+                  passed = passed && proxy[i][j] == targt[i][j];
+                  passed = passed && acopy[i][j] == targt[i][j];
                }
             r = targt[0][0];
             targt[0][0] = r + 1;
-            passed = passed && (targt[0][0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            passed = passed && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && (targt[0][0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 1
             acopy = s4;
             proxy = acopy;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && (proxy[i][j] == acopy[i][j]);
-                  passed = passed && (targt[i][j] == acopy[i][j]);
+                  passed = passed && proxy[i][j] == acopy[i][j];
+                  passed = passed && targt[i][j] == acopy[i][j];
                }
             r = targt[0][0];
             targt[0][0] = r + 1;
-            passed = passed && (targt[0][0] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            passed = passed && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && (targt[0][0] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 2
             acopy2 = s5;
             proxy = s5;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && (proxy[i][j] == acopy2[i][j]);
-                  passed = passed && (targt[i][j] == acopy2[i][j]);
+                  passed = passed && proxy[i][j] == acopy2[i][j];
+                  passed = passed && targt[i][j] == acopy2[i][j];
                }
          // error handling test 0
             try {
@@ -1117,34 +1120,34 @@ int main() {
             acopy = proxy;
             for (i = 0; i < proxy.rows(); i++)
                for (j = 0; j < proxy.cols(); j++) {
-                  passed = passed && (proxy[i][j] == targt[i * NCOLS + j]);
-                  passed = passed && (acopy[i][j] == targt[i * NCOLS + j]);
+                  passed = passed && proxy[i][j] == targt[i * NCOLS + j];
+                  passed = passed && acopy[i][j] == targt[i * NCOLS + j];
                }
             r = targt[0 * NCOLS];
             targt[0 * NCOLS] = r + 1;
-            passed = passed && (targt[0 * NCOLS] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            passed = passed && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && (targt[0 * NCOLS] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 1
             acopy = s4;
             proxy = acopy;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && (proxy[i][j] == acopy[i][j]);
-                  passed = passed && (targt[i * NCOLS + j] == acopy[i][j]);
+                  passed = passed && proxy[i][j] == acopy[i][j];
+                  passed = passed && targt[i * NCOLS + j] == acopy[i][j];
                }
             r = targt[0 * NCOLS];
             targt[0 * NCOLS] = r + 1;
-            passed = passed && (targt[0 * NCOLS] != r) && (proxy[0][0] != r) && (acopy[0][0] == r);
+            passed = passed && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && (targt[0 * NCOLS] == r) && (proxy[0][0] == r) && (acopy[0][0] == r);
+            passed = passed && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 2
             acopy2 = s5;
             proxy = s5;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && (proxy[i][j] == acopy2[i][j]);
-                  passed = passed && (targt[i * NCOLS + j] == acopy2[i][j]);
+                  passed = passed && proxy[i][j] == acopy2[i][j];
+                  passed = passed && targt[i * NCOLS + j] == acopy2[i][j];
                }
          // error handling test 0
             try {
@@ -1386,7 +1389,7 @@ int main() {
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && (rxy0[0][j] == rxy1[0][j]);
+               passed = passed && rxy0[0][j] == rxy1[0][j];
          }
       }
       catch(...) {
@@ -1407,13 +1410,13 @@ int main() {
          s.put('n');
          s.put('d');
          s.seekg(0);
-         passed = passed && (s.get() == 'b');
-         passed = passed && (s.get() == 'e');
-         passed = passed && (s.get() == 'g');
+         passed = passed && s.get() == 'b';
+         passed = passed && s.get() == 'e';
+         passed = passed && s.get() == 'g';
          kdtreeunserialize(s, tree1);
-         passed = passed && (s.get() == 'e');
-         passed = passed && (s.get() == 'n');
-         passed = passed && (s.get() == 'd');
+         passed = passed && s.get() == 'e';
+         passed = passed && s.get() == 'n';
+         passed = passed && s.get() == 'd';
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
                qx[j] = hqrndnormal(rs);
@@ -1426,7 +1429,7 @@ int main() {
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && (rxy0[0][j] == rxy1[0][j]);
+               passed = passed && rxy0[0][j] == rxy1[0][j];
          }
       }
       catch(...) {
@@ -1451,7 +1454,7 @@ int main() {
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && (rxy0[0][j] == rxy1[0][j]);
+               passed = passed && rxy0[0][j] == rxy1[0][j];
          }
       }
       catch(...) {
@@ -1476,7 +1479,7 @@ int main() {
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && (rxy0[0][j] == rxy1[0][j]);
+               passed = passed && rxy0[0][j] == rxy1[0][j];
          }
       }
       catch(...) {
@@ -1567,7 +1570,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(std::string(pc_str), model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       }
       catch(...) {
          passed = false;
@@ -1579,7 +1582,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(std::string(pc_str) + ".", model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       }
       catch(...) {
          passed = false;
@@ -1605,7 +1608,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
+            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       }
       catch(...) {
          passed = false;
@@ -1618,11 +1621,11 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && (fabs(rbfcalc2(model, i, 0) - ref_val[i]) < eps);
-         passed = passed && (stream.get() == '<');
-         passed = passed && (stream.get() == 'a');
-         passed = passed && (stream.get() == 'z');
-         passed = passed && (stream.get() == '>');
+            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
+         passed = passed && stream.get() == '<';
+         passed = passed && stream.get() == 'a';
+         passed = passed && stream.get() == 'z';
+         passed = passed && stream.get() == '>';
       }
       catch(...) {
          passed = false;
@@ -1654,7 +1657,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       rbfsetalgohierarchical(rbf, rbase, 1, 0.0);
       rbfsetpoints(rbf, xy);
       rbfsetv2its(rbf, 100000);
-      passed = passed && (rbfpeekprogress(rbf) == 0);
+      passed = passed && rbfpeekprogress(rbf) == 0;
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
@@ -1679,8 +1682,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 //(#) Drop down to alglib_impl here, because the state and frame accesses are no longer thread-safe.
       for (double last_progress = 0.0; last_progress < 0.001; ) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         passed = passed && (new_progress >= last_progress);
-         passed = passed && (new_progress <= 0.1);      // we expect to terminate well before reaching 10%
+         passed = passed && new_progress >= last_progress;
+         passed = passed && new_progress <= 0.1;      // we expect to terminate well before reaching 10%
          last_progress = new_progress;
       }
       alglib_impl::rbfrequesttermination(rbf.c_ptr());
@@ -1688,9 +1691,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
          passed = passed && (new_progress <= 0.1 || new_progress == 1.0);   // we expect to terminate well before reaching 10%
       }
-      passed = passed && (rbfpeekprogress(rbf) == 1);
-      passed = passed && (rep.terminationtype == 8);
-      passed = passed && (rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0);
+      passed = passed && rbfpeekprogress(rbf) == 1;
+      passed = passed && rep.terminationtype == 8;
+      passed = passed && rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0;
       printf(fmt_str, "* Progress/termination (RBF)", passed ? "OK" : "FAILED");
       fflush(stdout);
       if (!passed)
@@ -1920,14 +1923,14 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          printf(fmt_speedup, "* serial (nworkers=1)", time_glob_ser / time_glob_smp_nw1);
          printf(fmt_speedup, "* parallel (global)", time_glob_ser / time_glob_smp);
          printf(fmt_speedup, "* parallel (local) v1", time_glob_ser / time_glob_ser_loc_smp);
-         passed = passed && (time_glob_ser / time_default > 0.85) && (time_glob_ser / time_default < 1.15);
-         passed = passed && (time_glob_ser / time_glob_ser > 0.85) && (time_glob_ser / time_glob_ser < 1.15);
-         passed = passed && (time_glob_ser / time_glob_ser_loc_ser > 0.85) && (time_glob_ser / time_glob_ser_loc_ser < 1.15);
-         passed = passed && (time_glob_ser / time_glob_smp_loc_ser > 0.85) && (time_glob_ser / time_glob_smp_loc_ser < 1.15);
-         passed = passed && (time_glob_ser / time_glob_smp_nw1 > 0.85) && (time_glob_ser / time_glob_smp_nw1 < 1.15);
-         passed = passed && (time_glob_ser / time_glob_smp > 1.30);
-         passed = passed && (time_glob_ser / time_glob_ser_loc_smp > 1.30);
-         passed = passed && (time_glob_ser / time_glob_smp_loc_smp > 1.30);
+         passed = passed && time_glob_ser / time_default > 0.85 && time_glob_ser / time_default < 1.15;
+         passed = passed && time_glob_ser / time_glob_ser > 0.85 && time_glob_ser / time_glob_ser < 1.15;
+         passed = passed && time_glob_ser / time_glob_ser_loc_ser > 0.85 && time_glob_ser / time_glob_ser_loc_ser < 1.15;
+         passed = passed && time_glob_ser / time_glob_smp_loc_ser > 0.85 && time_glob_ser / time_glob_smp_loc_ser < 1.15;
+         passed = passed && time_glob_ser / time_glob_smp_nw1 > 0.85 && time_glob_ser / time_glob_smp_nw1 < 1.15;
+         passed = passed && time_glob_ser / time_glob_smp > 1.30;
+         passed = passed && time_glob_ser / time_glob_ser_loc_smp > 1.30;
+         passed = passed && time_glob_ser / time_glob_smp_loc_smp > 1.30;
          printf(fmt_str, "* test result", passed ? "OK" : "FAILED (soft failure)");
          fflush(stdout);
       //
@@ -1963,7 +1966,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
          mincgoptimize(state, func505_grad, NULL, &x0);
          mincgresults(state, x, rep);
-         issue505_passed = issue505_passed && (fabs(4 * pow(x[0] - x0, 3)) < 1.0E-3);
+         issue505_passed = issue505_passed && SmallR(4.0 * pow(x[0] - x0, 3), 1.0E-3);
       }
       catch(...) {
          issue505_passed = false;
@@ -1980,7 +1983,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmsetcond(state, epsx, 0);
          minlmoptimize(state, func505_vec, func505_jac, NULL, &x0);
          minlmresults(state, x, rep);
-         issue505_passed = issue505_passed && (fabs(x[0] - x0) < 1.0E-3);
+         issue505_passed = issue505_passed && NearR(x[0], x0, 1.0E-3);
       }
       catch(...) {
          issue505_passed = false;
@@ -2030,12 +2033,12 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                      n0++;
                   else
                      n1++;
-                  issue478_passed = issue478_passed && (v >= 0) && (v < nmax[nidx]);
+                  issue478_passed = issue478_passed && v >= 0 && v < nmax[nidx];
                }
-               issue478_passed = issue478_passed && (n0 / (n0 + n1) > 0.45);
-               issue478_passed = issue478_passed && (n0 / (n0 + n1) < 0.55);
-               issue478_passed = issue478_passed && (n1 / (n0 + n1) > 0.45);
-               issue478_passed = issue478_passed && (n1 / (n0 + n1) < 0.55);
+               issue478_passed = issue478_passed && n0 / (n0 + n1) > 0.45;
+               issue478_passed = issue478_passed && n0 / (n0 + n1) < 0.55;
+               issue478_passed = issue478_passed && n1 / (n0 + n1) > 0.45;
+               issue478_passed = issue478_passed && n1 / (n0 + n1) < 0.55;
             }
          }
          catch(...) {
@@ -2071,7 +2074,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          NewObj(seedrec, seed);
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
+         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
       // case #1: seeding and retrieving, not recycling
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2083,7 +2086,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
+         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
       // case #2: seeding and retrieving twice to different pointers, recycling both
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -2100,7 +2103,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_recycle(&pool, &_p0);
          alglib_impl::ae_shared_pool_recycle(&pool, &_p1);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);
+         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
       }
       catch(...) {
          issue528_passed = false;
@@ -2130,13 +2133,13 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       //
          net1 = net0;
          mlpprocess(net1, x, y1);
-         issue591_passed = issue591_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
+         issue591_passed = issue591_passed && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
       //
       // Test copy constructor
       //
          multilayerperceptron net2(net0);
          mlpprocess(net2, x, y2);
-         issue591_passed = issue591_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
+         issue591_passed = issue591_passed && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
       }
       catch(...) {
          issue591_passed = false;
@@ -2170,8 +2173,8 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mlprandomize(net0);
          mlpprocess(net1, x, y1);
          mlpprocess(net2, x, y2);
-         issue594_passed = issue594_passed && (fabs(y0[0] - y1[0]) < 1.0E-9) && (fabs(y0[1] - y1[1]) < 1.0E-9);
-         issue594_passed = issue594_passed && (fabs(y0[0] - y2[0]) < 1.0E-9) && (fabs(y0[1] - y2[1]) < 1.0E-9);
+         issue594_passed = issue594_passed && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
+         issue594_passed = issue594_passed && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
       }
       catch(...) {
          issue594_passed = false;
@@ -2198,7 +2201,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_state_clear();
-         issue764_passed = issue764_passed && (alloc_cnt == alglib_impl::_alloc_counter);
+         issue764_passed = issue764_passed && alloc_cnt == alglib_impl::_alloc_counter;
       }
       catch(...) {
          issue764_passed = false;
