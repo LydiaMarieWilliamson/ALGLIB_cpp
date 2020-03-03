@@ -440,8 +440,8 @@ void sparseswap(const sparsematrix &s0, const sparsematrix &s1);
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to add, must be finite number
 //
 // Outputs:
@@ -480,8 +480,8 @@ void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const 
 //
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table, SKS or CRS format.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to set, must be finite number, can be zero
 //
 // Outputs:
@@ -499,8 +499,8 @@ void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const 
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
@@ -518,7 +518,7 @@ double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   index of the element to modify, 0 <= I<min(M,N)
+//     I           -   index of the element to modify, 0 <= I < min(M,N)
 //
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
@@ -607,7 +607,7 @@ void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 //     all. Initial values of Y are ignored (we do not  multiply  Y by  zero,
 //     we just rewrite it by zeros)
 //   * if Beta != 0, then Y is replaced by Beta*Y
-// * if M>0, N>0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
+// * if M > 0, N > 0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
 //   initial state of Y  is ignored (rewritten without initial multiplication
 //   by zeros).
 //
@@ -916,8 +916,8 @@ void sparseresizematrix(const sparsematrix &s);
 // Outputs:
 //     T0          -   new value of the internal counter
 //     T1          -   new value of the internal counter
-//     I           -   row index of non-zero element, 0 <= I<M.
-//     J           -   column index of non-zero element, 0 <= J<N
+//     I           -   row index of non-zero element, 0 <= I < M.
+//     J           -   column index of non-zero element, 0 <= J < N
 //     V           -   value of the T-th element
 //
 // Result:
@@ -945,8 +945,8 @@ bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t
 // Inputs:
 //     S           -   sparse M*N matrix in any kind of representation
 //                     (Hash, SKS, CRS).
-//     I           -   row index of non-zero element to modify, 0 <= I<M
-//     J           -   column index of non-zero element to modify, 0 <= J<N
+//     I           -   row index of non-zero element to modify, 0 <= I < M
+//     J           -   column index of non-zero element to modify, 0 <= J < N
 //     V           -   value to rewrite, must be finite number
 //
 // Outputs:
@@ -963,7 +963,7 @@ bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     IRow        -   output buffer, can be  preallocated.  In  case  buffer
 //                     size  is  too  small  to  store  I-th   row,   it   is
 //                     automatically reallocated.
@@ -991,7 +991,7 @@ void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow);
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     ColIdx      -   output buffer for column indexes, can be preallocated.
 //                     In case buffer size is too small to store I-th row, it
 //                     is automatically reallocated.
@@ -1578,7 +1578,6 @@ void cmatrixrank1(const ae_int_t m, const ae_int_t n, complex_2d_array &a, const
 //     IV  -   subvector offset
 void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae_int_t ia, const ae_int_t ja, real_1d_array &u, const ae_int_t iu, real_1d_array &v, const ae_int_t iv);
 
-//
 void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 
 // Matrix-vector product: y := op(A)*x
@@ -1639,10 +1638,8 @@ void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, co
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const real_1d_array &y, const ae_int_t iy);
 
-//
 void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 
-//
 double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp);
 
 // This subroutine solves linear system op(A)*x=b where:
@@ -1858,9 +1855,9 @@ void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const r
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -1904,9 +1901,9 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -2375,7 +2372,7 @@ bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -2425,7 +2422,7 @@ void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -2461,7 +2458,7 @@ void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const 
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -2487,7 +2484,7 @@ void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, co
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -3560,7 +3557,7 @@ void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_
 // G(0)*G(1)*...*G(n-2), where G(i) = 1 - tau*u*u'. Tau is stored in TauP[i],
 // u(0:i)=0, u(i+1)=1, u(i+2:n-1) is stored in elements A(i,i+2:n-1).
 //
-// If M<N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
+// If M < N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
 // corresponding   elements  of  matrix  A.  Q = H(0)*H(1)*...*H(m-2),  where
 // H(i) = 1 - tau*v*v', tau is stored in TauQ, v(0:i)=0, v(i+1)=1, v(i+2:m-1)
 // is    stored    in   elements   A(i+2:m-1,i).    P = G(0)*G(1)*...*G(m-1),
@@ -4022,9 +4019,9 @@ namespace alglib {
 //
 // Outputs:
 //     D       -   singular values of matrix B in descending order.
-//     U       -   if NRU>0, contains matrix U*Q.
-//     VT      -   if NCVT>0, contains matrix (P^T)*VT.
-//     C       -   if NCC>0, contains matrix Q'*C.
+//     U       -   if NRU > 0, contains matrix U*Q.
+//     VT      -   if NCVT > 0, contains matrix (P^T)*VT.
+//     C       -   if NCC > 0, contains matrix Q'*C.
 //
 // Result:
 //     True, if the algorithm has converged.
@@ -4037,7 +4034,7 @@ namespace alglib {
 // Additional information:
 //     The type of convergence is controlled by the internal  parameter  TOL.
 //     If the parameter is greater than 0, the singular values will have
-//     relative accuracy TOL. If TOL<0, the singular values will have
+//     relative accuracy TOL. If TOL < 0, the singular values will have
 //     absolute accuracy ABS(TOL)*norm(B).
 //     By default, |TOL| falls within the range of 10*Epsilon and 100*Epsilon,
 //     where Epsilon is the machine precision. It is not  recommended  to  use
@@ -4162,8 +4159,8 @@ DecClass(normestimatorstate, EndD);
 // 3. User calls NormEstimatorResults() to get solution.
 //
 // Inputs:
-//     M       -   number of rows in the matrix being estimated, M>0
-//     N       -   number of columns in the matrix being estimated, N>0
+//     M       -   number of rows in the matrix being estimated, M > 0
+//     N       -   number of columns in the matrix being estimated, N > 0
 //     NStart  -   number of random starting vectors
 //                 recommended value - at least 5.
 //     NIts    -   number of iterations to do with best starting vector
@@ -4351,8 +4348,8 @@ DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 //    > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
 // Inputs:
-//     N       -   problem dimensionality, N>0
-//     K       -   number of top eigenvector to calculate, 0<K <= N.
+//     N       -   problem dimensionality, N > 0
+//     K       -   number of top eigenvector to calculate, 0 < K <= N.
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -4874,7 +4871,7 @@ bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zne
 //                    and the eigenvectors matrix (from the right);
 //                  * 2, Z contains the eigenvectors.
 //                  * 3, Z contains the first row of the eigenvectors matrix.
-//                 If ZNeeded<3, Z is the array whose indexes range within [0..N-1, 0..N-1].
+//                 If ZNeeded < 3, Z is the array whose indexes range within [0..N-1, 0..N-1].
 //                 In that case, the eigenvectors are stored in the matrix columns.
 //                 If ZNeeded=3, Z is the array whose indexes range within [0..0, 0..N-1].
 //
@@ -5018,11 +5015,11 @@ bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, c
 //     VL, VR  -   arrays of left and right eigenvectors (if they are needed).
 //                 If WI[i]=0, the respective eigenvalue is a real number,
 //                 and it corresponds to the column number I of matrices VL/VR.
-//                 If WI[i]>0, we have a pair of complex conjugate numbers with
+//                 If WI[i] > 0, we have a pair of complex conjugate numbers with
 //                 positive and negative imaginary parts:
 //                     the first eigenvalue WR[i] + sqrt(-1)*WI[i];
 //                     the second eigenvalue WR[i+1] + sqrt(-1)*WI[i+1];
-//                     WI[i]>0
+//                     WI[i] > 0
 //                     WI[i+1] = -WI[i] < 0
 //                 In that case, the eigenvector  corresponding to the first
 //                 eigenvalue is located in i and i+1 columns of matrices
@@ -5037,11 +5034,11 @@ bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, c
 //     False, if the algorithm has not converged.
 //
 // Note 1:
-//     Some users may ask the following question: what if WI[N-1]>0?
+//     Some users may ask the following question: what if WI[N-1] > 0?
 //     WI[N] must contain an eigenvalue which is complex conjugate to the
 //     N-th eigenvalue, but the array has only size N?
 //     The answer is as follows: such a situation cannot occur because the
-//     algorithm finds a pairs of eigenvalues, therefore, if WI[i]>0, I is
+//     algorithm finds a pairs of eigenvalues, therefore, if WI[i] > 0, I is
 //     strictly less than N-1.
 //
 // Note 2:

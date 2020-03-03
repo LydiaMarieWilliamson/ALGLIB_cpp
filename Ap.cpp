@@ -2189,13 +2189,13 @@ void ae_bool2str(bool v, char *buf) {
 // This function unserializes boolean value from buffer
 //
 // buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             ignored, trailing spaces/tabs/newlines are treated as  end  of
 //             the boolean value.
 //
 // This function raises an error in case unexpected symbol is found
 bool ae_str2bool(const char *buf, const char **pasttheend) {
    bool was0, was1;
-   const char *emsg = "ALGLIB: unable to read boolean value from stream";
+   const char *emsg = "ae_str2bool: unable to read boolean value from stream";
    was0 = false;
    was1 = false;
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
@@ -2214,11 +2214,9 @@ bool ae_str2bool(const char *buf, const char **pasttheend) {
       ae_break(ERR_ASSERTION_FAILED, emsg);
    }
    *pasttheend = buf;
-   if (!was0 && !was1)
+   if (was0 == was1)
       ae_break(ERR_ASSERTION_FAILED, emsg);
-   if (was0 && was1)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   return was1 ? true : false;
+   return was1;
 }
 
 // This function serializes integer value into buffer
@@ -2315,12 +2313,12 @@ static void ae_int642str(ae_int64_t v, char *buf) {
 // This function unserializes integer value from string
 //
 // buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             ignored, trailing spaces/tabs/newlines are treated as  end  of
 //             the boolean value.
 //
 // This function raises an error in case unexpected symbol is found
 ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   const char *emsg = "ae_str2int: unable to read integer value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
    union _u {
@@ -2366,13 +2364,13 @@ ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
 // This function unserializes 64-bit integer value from string
 //
 // buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             ignored, trailing spaces/tabs/newlines are treated as  end  of
 //             the boolean value.
 // state       ALGLIB environment state
 //
 // This function raises an error in case unexpected symbol is found
 static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read integer value from stream";
+   const char *emsg = "ae_str2int64: unable to read integer value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
    unsigned char bytes[9];
@@ -2470,12 +2468,12 @@ void ae_double2str(double v, char *buf) {
 // This function unserializes double value from string
 //
 // buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             ignored, trailing spaces/tabs/newlines are treated as  end  of
 //             the boolean value.
 //
 // This function raises an error in case unexpected symbol is found
 double ae_str2double(const char *buf, const char **pasttheend) {
-   const char *emsg = "ALGLIB: unable to read double value from stream";
+   const char *emsg = "ae_str2double: unable to read double value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
    union _u { double dval; unsigned char bytes[9]; } u;
@@ -3207,7 +3205,7 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
 
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
    char buf[AE_SER_ENTRY_LENGTH + 3];
-   const char *emsg = "ALGLIB: serialization integrity error";
+   const char *emsg = "ae_serializer_serialize_bool: serialization integrity error";
    ae_int_t bytes_appended;
 // prepare serialization, check consistency
    ae_bool2str(v, buf);
@@ -3232,7 +3230,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
       return;
    }
    if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream");
+      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "ae_serializer_serialize_bool: error writing to stream");
       return;
    }
    ae_break(ERR_ASSERTION_FAILED, emsg);
@@ -3240,7 +3238,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
 
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
    char buf[AE_SER_ENTRY_LENGTH + 3];
-   const char *emsg = "ALGLIB: serialization integrity error";
+   const char *emsg = "ae_serializer_serialize_int: serialization integrity error";
    ae_int_t bytes_appended;
 // prepare serialization, check consistency
    ae_int2str(v, buf);
@@ -3265,7 +3263,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
       return;
    }
    if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream");
+      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "ae_serializer_serialize_int: error writing to stream");
       return;
    }
    ae_break(ERR_ASSERTION_FAILED, emsg);
@@ -3273,7 +3271,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
 
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
    char buf[AE_SER_ENTRY_LENGTH + 3];
-   const char *emsg = "ALGLIB: serialization integrity error";
+   const char *emsg = "ae_serializer_serialize_int64: serialization integrity error";
    ae_int_t bytes_appended;
 // prepare serialization, check consistency
    ae_int642str(v, buf);
@@ -3298,7 +3296,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
       return;
    }
    if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream");
+      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "ae_serializer_serialize_int64: error writing to stream");
       return;
    }
    ae_break(ERR_ASSERTION_FAILED, emsg);
@@ -3306,7 +3304,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
 
 void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
    char buf[AE_SER_ENTRY_LENGTH + 3];
-   const char *emsg = "ALGLIB: serialization integrity error";
+   const char *emsg = "ae_serializer_serialize_double: serialization integrity error";
    ae_int_t bytes_appended;
 // prepare serialization, check consistency
    ae_double2str(v, buf);
@@ -3331,7 +3329,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
       return;
    }
    if (serializer->mode == AE_SM_TO_STREAM) {
-      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "serializer: error writing to stream");
+      ae_assert(serializer->stream_writer(buf, serializer->stream_aux) == 0, "ae_serializer_serialize_double: error writing to stream");
       return;
    }
    ae_break(ERR_ASSERTION_FAILED, emsg);
@@ -3363,7 +3361,7 @@ void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v) {
    if (serializer->mode == AE_SM_FROM_STREAM) {
       char buf[AE_SER_ENTRY_LENGTH + 3];
       const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream");
+      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "ae_serializer_unserialize_bool: error reading from stream");
       *v = ae_str2bool(buf, &p);
       return;
    }
@@ -3378,7 +3376,7 @@ void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v) {
    if (serializer->mode == AE_SM_FROM_STREAM) {
       char buf[AE_SER_ENTRY_LENGTH + 3];
       const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream");
+      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "ae_serializer_unserialize_int: error reading from stream");
       *v = ae_str2int(buf, &p);
       return;
    }
@@ -3393,7 +3391,7 @@ void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v) {
    if (serializer->mode == AE_SM_FROM_STREAM) {
       char buf[AE_SER_ENTRY_LENGTH + 3];
       const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream");
+      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "ae_serializer_unserialize_int64: error reading from stream");
       *v = ae_str2int64(buf, &p);
       return;
    }
@@ -3408,7 +3406,7 @@ void ae_serializer_unserialize_double(ae_serializer *serializer, double *v) {
    if (serializer->mode == AE_SM_FROM_STREAM) {
       char buf[AE_SER_ENTRY_LENGTH + 3];
       const char *p = buf;
-      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "serializer: error reading from stream");
+      ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf) == 0, "ae_serializer_unserialize_double: error reading from stream");
       *v = ae_str2double(buf, &p);
       return;
    }
@@ -7210,7 +7208,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
          if (datatype == alglib_impl::DT_COMPLEX) This->ptr.p_complex[i] = ae_complex_from_c(parse_complex_delim(svec[i], ",]"));
       }
       alglib_impl::ae_free(p);
-   } catch( ...) {
+   } catch(...) {
       alglib_impl::ae_free(p);
       throw;
    }
@@ -7453,7 +7451,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
          if (datatype == alglib_impl::DT_COMPLEX) This->ptr.pp_complex[i][j] = ae_complex_from_c(parse_complex_delim(smat[i][j], ",]"));
       }
       alglib_impl::ae_free(p);
-   } catch( ...) {
+   } catch(...) {
       alglib_impl::ae_free(p);
       throw;
    }

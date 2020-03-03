@@ -108,8 +108,8 @@ ae_int_t coalescei(ae_int_t a, ae_int_t b);
 double inttoreal(ae_int_t a);
 double logbase2(double x);
 
-// Test number A for equality to B (or 0) within the range Tiny; inclusive for *At*().
-// Tiny > 0; and for the *At*() cases, Tiny == 0 is also allowed.
+// Test number A for equality to B (or to 0.0) within the range Tiny; inclusive for *At*().
+// Tiny > 0; and for the *At*() cases, Tiny == 0.0 is also allowed.
 //(@) Originally: approxequal(double A, double B, double Tiny);
 //(@) AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
 static inline bool NearAtR(double A, double B, double Tiny) { return fabs(A - B) <= Tiny; }

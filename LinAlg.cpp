@@ -553,8 +553,8 @@ static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to add, must be finite number
 //
 // Outputs:
@@ -641,8 +641,8 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table, SKS or CRS format.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to set, must be finite number, can be zero
 //
 // Outputs:
@@ -732,8 +732,8 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
@@ -825,7 +825,7 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   index of the element to modify, 0 <= I<min(M,N)
+//     I           -   index of the element to modify, 0 <= I < min(M,N)
 //
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
@@ -1080,7 +1080,7 @@ void sparsemtv(sparsematrix *s, RVector x, RVector y) {
 //     all. Initial values of Y are ignored (we do not  multiply  Y by  zero,
 //     we just rewrite it by zeros)
 //   * if Beta != 0, then Y is replaced by Beta*Y
-// * if M>0, N>0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
+// * if M > 0, N > 0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
 //   initial state of Y  is ignored (rewritten without initial multiplication
 //   by zeros).
 //
@@ -2725,8 +2725,8 @@ double sparsegetaveragelengthofchain(sparsematrix *s) {
 // Outputs:
 //     T0          -   new value of the internal counter
 //     T1          -   new value of the internal counter
-//     I           -   row index of non-zero element, 0 <= I<M.
-//     J           -   column index of non-zero element, 0 <= J<N
+//     I           -   row index of non-zero element, 0 <= I < M.
+//     J           -   column index of non-zero element, 0 <= J < N
 //     V           -   value of the T-th element
 //
 // Result:
@@ -2837,8 +2837,8 @@ bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, a
 // Inputs:
 //     S           -   sparse M*N matrix in any kind of representation
 //                     (Hash, SKS, CRS).
-//     I           -   row index of non-zero element to modify, 0 <= I<M
-//     J           -   column index of non-zero element to modify, 0 <= J<N
+//     I           -   row index of non-zero element to modify, 0 <= I < M
+//     J           -   column index of non-zero element to modify, 0 <= J < N
 //     V           -   value to rewrite, must be finite number
 //
 // Outputs:
@@ -2927,7 +2927,7 @@ bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     IRow        -   output buffer, can be  preallocated.  In  case  buffer
 //                     size  is  too  small  to  store  I-th   row,   it   is
 //                     automatically reallocated.
@@ -2994,7 +2994,7 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector irow) {
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     ColIdx      -   output buffer for column indexes, can be preallocated.
 //                     In case buffer size is too small to store I-th row, it
 //                     is automatically reallocated.
@@ -4603,62 +4603,6 @@ void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsema
    alglib_impl::sparsecreate(m, n, k, ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
 }
-
-// This function creates sparse matrix in a Hash-Table format.
-//
-// This function creates Hast-Table matrix, which can be  converted  to  CRS
-// format after its initialization is over. Typical  usage  scenario  for  a
-// sparse matrix is:
-// 1. creation in a Hash-Table format
-// 2. insertion of the matrix elements
-// 3. conversion to the CRS representation
-// 4. matrix is passed to some linear algebra algorithm
-//
-// Some  information  about  different matrix formats can be found below, in
-// the "NOTES" section.
-//
-// Inputs:
-//     M           -   number of rows in a matrix, M >= 1
-//     N           -   number of columns in a matrix, N >= 1
-//     K           -   K >= 0, expected number of non-zero elements in a matrix.
-//                     K can be inexact approximation, can be less than actual
-//                     number  of  elements  (table will grow when needed) or
-//                     even zero).
-//                     It is important to understand that although hash-table
-//                     may grow automatically, it is better to  provide  good
-//                     estimate of data size.
-//
-// Outputs:
-//     S           -   sparse M*N matrix in Hash-Table representation.
-//                     All elements of the matrix are zero.
-//
-// NOTE 1
-//
-// Hash-tables use memory inefficiently, and they have to keep  some  amount
-// of the "spare memory" in order to have good performance. Hash  table  for
-// matrix with K non-zero elements will  need  C*K*(8+2*sizeof(int))  bytes,
-// where C is a small constant, about 1.5-2 in magnitude.
-//
-// CRS storage, from the other side, is  more  memory-efficient,  and  needs
-// just K*(8+sizeof(int))+M*sizeof(int) bytes, where M is a number  of  rows
-// in a matrix.
-//
-// When you convert from the Hash-Table to CRS  representation, all unneeded
-// memory will be freed.
-//
-// NOTE 2
-//
-// Comments of SparseMatrix structure outline  information  about  different
-// sparse storage formats. We recommend you to read them before starting  to
-// use ALGLIB sparse matrices.
-//
-// NOTE 3
-//
-// This function completely  overwrites S with new sparse matrix. Previously
-// allocated storage is NOT reused. If you  want  to reuse already allocated
-// memory, call SparseCreateBuf function.
-//
-// ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s) {
    ae_int_t k = 0;
@@ -4699,31 +4643,6 @@ void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const
    alglib_impl::sparsecreatebuf(m, n, k, ConstT(sparsematrix, s));
    alglib_impl::ae_state_clear();
 }
-
-// This version of SparseCreate function creates sparse matrix in Hash-Table
-// format, reusing previously allocated storage as much  as  possible.  Read
-// comments for SparseCreate() for more information.
-//
-// Inputs:
-//     M           -   number of rows in a matrix, M >= 1
-//     N           -   number of columns in a matrix, N >= 1
-//     K           -   K >= 0, expected number of non-zero elements in a matrix.
-//                     K can be inexact approximation, can be less than actual
-//                     number  of  elements  (table will grow when needed) or
-//                     even zero).
-//                     It is important to understand that although hash-table
-//                     may grow automatically, it is better to  provide  good
-//                     estimate of data size.
-//     S           -   SparseMatrix structure which MAY contain some  already
-//                     allocated storage.
-//
-// Outputs:
-//     S           -   sparse M*N matrix in Hash-Table representation.
-//                     All elements of the matrix are zero.
-//                     Previously allocated storage is reused, if  its  size
-//                     is compatible with expected number of non-zeros K.
-//
-// ALGLIB Project: Copyright 14.01.2014 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s) {
    ae_int_t k = 0;
@@ -4982,8 +4901,8 @@ void sparseswap(const sparsematrix &s0, const sparsematrix &s1) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to add, must be finite number
 //
 // Outputs:
@@ -5027,8 +4946,8 @@ void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const 
 //
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table, SKS or CRS format.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //     V           -   value to set, must be finite number, can be zero
 //
 // Outputs:
@@ -5051,8 +4970,8 @@ void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const 
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   row index of the element to modify, 0 <= I<M
-//     J           -   column index of the element to modify, 0 <= J<N
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
@@ -5076,7 +4995,7 @@ double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j) {
 // Inputs:
 //     S           -   sparse M*N matrix in Hash-Table representation.
 //                     Exception will be thrown for CRS matrix.
-//     I           -   index of the element to modify, 0 <= I<min(M,N)
+//     I           -   index of the element to modify, 0 <= I < min(M,N)
 //
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
@@ -5181,7 +5100,7 @@ void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y) 
 //     all. Initial values of Y are ignored (we do not  multiply  Y by  zero,
 //     we just rewrite it by zeros)
 //   * if Beta != 0, then Y is replaced by Beta*Y
-// * if M>0, N>0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
+// * if M > 0, N > 0, Alpha != 0, but  Beta=0, then  Y is replaced by alpha*op(S)*x
 //   initial state of Y  is ignored (rewritten without initial multiplication
 //   by zeros).
 //
@@ -5546,8 +5465,8 @@ void sparseresizematrix(const sparsematrix &s) {
 // Outputs:
 //     T0          -   new value of the internal counter
 //     T1          -   new value of the internal counter
-//     I           -   row index of non-zero element, 0 <= I<M.
-//     J           -   column index of non-zero element, 0 <= J<N
+//     I           -   row index of non-zero element, 0 <= I < M.
+//     J           -   column index of non-zero element, 0 <= J < N
 //     V           -   value of the T-th element
 //
 // Result:
@@ -5581,8 +5500,8 @@ bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t
 // Inputs:
 //     S           -   sparse M*N matrix in any kind of representation
 //                     (Hash, SKS, CRS).
-//     I           -   row index of non-zero element to modify, 0 <= I<M
-//     J           -   column index of non-zero element to modify, 0 <= J<N
+//     I           -   row index of non-zero element to modify, 0 <= I < M
+//     J           -   column index of non-zero element to modify, 0 <= J < N
 //     V           -   value to rewrite, must be finite number
 //
 // Outputs:
@@ -5605,7 +5524,7 @@ bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     IRow        -   output buffer, can be  preallocated.  In  case  buffer
 //                     size  is  too  small  to  store  I-th   row,   it   is
 //                     automatically reallocated.
@@ -5638,7 +5557,7 @@ void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow) 
 //
 // Inputs:
 //     S           -   sparse M*N matrix in CRS format
-//     I           -   row index, 0 <= I<M
+//     I           -   row index, 0 <= I < M
 //     ColIdx      -   output buffer for column indexes, can be preallocated.
 //                     In case buffer size is too small to store I-th row, it
 //                     is automatically reallocated.
@@ -6216,7 +6135,7 @@ static void ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb, ae_int_t *n1
 //     A   -   real matrix, is passed to ensure that we didn't split
 //             complex matrix using real splitting subroutine.
 //             matrix itself is not changed.
-//     N   -   length, N>0
+//     N   -   length, N > 0
 //
 // Outputs:
 //     N1  -   length
@@ -6802,7 +6721,7 @@ void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix a, ae_int_t ia, a
    double v;
 // Quick exit for M=0, N=0 or Alpha=0.
 //
-// After this block we have M>0, N>0, Alpha != 0.
+// After this block we have M > 0, N > 0, Alpha != 0.
    if (m <= 0) {
       return;
    }
@@ -7015,7 +6934,7 @@ void rmatrixsymv(ae_int_t n, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, 
    double vx;
 // Quick exit for M=0, N=0 or Alpha=0.
 //
-// After this block we have M>0, N>0, Alpha != 0.
+// After this block we have M > 0, N > 0, Alpha != 0.
    if (n <= 0) {
       return;
    }
@@ -8432,9 +8351,9 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex 
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -8525,9 +8444,9 @@ static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -8766,7 +8685,6 @@ void rmatrixrank1(const ae_int_t m, const ae_int_t n, real_2d_array &a, const ae
    alglib_impl::ae_state_clear();
 }
 
-//
 void rmatrixgemv(const ae_int_t m, const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -8842,7 +8760,6 @@ void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const
    alglib_impl::ae_state_clear();
 }
 
-//
 void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -8850,7 +8767,6 @@ void rmatrixsymv(const ae_int_t n, const double alpha, const real_2d_array &a, c
    alglib_impl::ae_state_clear();
 }
 
-//
 double rmatrixsyvmv(const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const bool isupper, const real_1d_array &x, const ae_int_t ix, const real_1d_array &tmp) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -9107,9 +9023,9 @@ void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const r
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -9158,9 +9074,9 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -11219,7 +11135,7 @@ void rmatrixrndorthogonalfromtheright(RMatrix a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_REAL);
    NewVector(v, 0, DT_REAL);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M < 1!");
    if (n == 1) {
    // Special case
       tau = (double)(2 * ae_randominteger(2) - 1);
@@ -11284,7 +11200,7 @@ void rmatrixrndorthogonalfromtheleft(RMatrix a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_REAL);
    NewVector(v, 0, DT_REAL);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "RMatrixRndOrthogonalFromTheRight: N<1 or M < 1!");
    if (m == 1) {
    // special case
       tau = (double)(2 * ae_randominteger(2) - 1);
@@ -11347,7 +11263,7 @@ void cmatrixrndorthogonalfromtheright(CMatrix a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_COMPLEX);
    NewVector(v, 0, DT_COMPLEX);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M < 1!");
    if (n == 1) {
    // Special case
       hqrndrandomize(&state);
@@ -11407,7 +11323,7 @@ void cmatrixrndorthogonalfromtheleft(CMatrix a, ae_int_t m, ae_int_t n) {
    NewVector(w, 0, DT_COMPLEX);
    NewVector(v, 0, DT_COMPLEX);
    NewObj(hqrndstate, state);
-   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M<1!");
+   ae_assert(n >= 1 && m >= 1, "CMatrixRndOrthogonalFromTheRight: N<1 or M < 1!");
    if (m == 1) {
    // special case
       hqrndrandomize(&state);
@@ -12135,7 +12051,7 @@ bool spdmatrixcholesky(RMatrix a, ae_int_t n, bool isupper) {
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -12195,7 +12111,7 @@ void spdmatrixcholeskyupdateadd1(RMatrix a, ae_int_t n, bool isupper, RVector u)
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -12241,7 +12157,7 @@ void spdmatrixcholeskyupdatefix(RMatrix a, ae_int_t n, bool isupper, BVector fix
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -12338,7 +12254,7 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix a, ae_int_t n, bool isupper, RVector
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -13469,7 +13385,7 @@ bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper) {
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -13524,7 +13440,7 @@ void spdmatrixcholeskyupdateadd1(const real_2d_array &a, const ae_int_t n, const
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -13565,7 +13481,7 @@ void spdmatrixcholeskyupdatefix(const real_2d_array &a, const ae_int_t n, const 
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     U       -   array[N], rank-1 update to A: A_mod = A + u*u'
@@ -13596,7 +13512,7 @@ void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, co
 //     A       -   upper or lower Cholesky factor.
 //                 array with elements [0..N-1, 0..N-1].
 //                 Exception is thrown if array size is too small.
-//     N       -   size of matrix A, N>0
+//     N       -   size of matrix A, N > 0
 //     IsUpper -   if IsUpper=True, then A contains  upper  Cholesky  factor;
 //                 otherwise A contains a lower one.
 //     Fix     -   array[N], I-th element is True if I-th  variable  must  be
@@ -17270,37 +17186,6 @@ void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae
    alglib_impl::rmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a matrix given by its LU decomposition.
-//
-// Inputs:
-//     A       -   LU decomposition of the matrix
-//                 (output of RMatrixLU subroutine).
-//     Pivots  -   table of permutations
-//                 (the output of RMatrixLU subroutine).
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//
-// Outputs:
-//     Info    -   return code:
-//                 * -3    A is singular, or VERY close to singular.
-//                         it is filled by zeros in such cases.
-//                 *  1    task is solved (but matrix A may be ill-conditioned,
-//                         check R1/RInf parameters for condition numbers).
-//     Rep     -   solver report, see below for more info
-//     A       -   inverse of matrix A.
-//                 Array whose indexes range within [0..N-1, 0..N-1].
-//
-// SOLVER REPORT
-//
-// Subroutine sets following fields of the Rep structure:
-// * R1        reciprocal of condition number: 1/cond(A), 1-norm.
-// * RInf      reciprocal of condition number: 1/cond(A), inf-norm.
-//
-// ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'rmatrixluinverse': looks like one of arguments has wrong size");
@@ -17337,26 +17222,6 @@ void rmatrixinverse(real_2d_array &a, const ae_int_t n, ae_int_t &info, matinvre
    alglib_impl::rmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a general matrix.
-//
-// Inputs:
-//     A       -   matrix.
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// Result:
-//     True, if the matrix is not singular.
-//     False, if the matrix is singular.
-// ALGLIB: Copyright 2005-2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixinverse': looks like one of arguments has wrong size");
@@ -17393,26 +17258,6 @@ void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const
    alglib_impl::cmatrixluinverse(ConstT(ae_matrix, a), ConstT(ae_vector, pivots), n, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a matrix given by its LU decomposition.
-//
-// Inputs:
-//     A       -   LU decomposition of the matrix
-//                 (output of CMatrixLU subroutine).
-//     Pivots  -   table of permutations
-//                 (the output of CMatrixLU subroutine).
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows() || a.cols() != pivots.length()) ThrowError("Error while calling 'cmatrixluinverse': looks like one of arguments has wrong size");
@@ -17445,22 +17290,6 @@ void cmatrixinverse(complex_2d_array &a, const ae_int_t n, ae_int_t &info, matin
    alglib_impl::cmatrixinverse(ConstT(ae_matrix, a), n, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a general matrix.
-//
-// Inputs:
-//     A       -   matrix
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-// ALGLIB: Copyright 2005 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixinverse': looks like one of arguments has wrong size");
@@ -17505,34 +17334,6 @@ void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isu
    alglib_impl::spdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a symmetric positive definite matrix which is given
-// by Cholesky decomposition.
-//
-// Inputs:
-//     A       -   Cholesky decomposition of the matrix to be inverted:
-//                 A=U'*U or A = L*L'.
-//                 Output of  SPDMatrixCholesky subroutine.
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   storage type (optional):
-//                 * if True, symmetric  matrix  A  is  given  by  its  upper
-//                   triangle, and the lower triangle isn't  used/changed  by
-//                   function
-//                 * if False,  symmetric matrix  A  is  given  by  its lower
-//                   triangle, and the  upper triangle isn't used/changed  by
-//                   function
-//                 * if not given, lower half is used.
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixcholeskyinverse': looks like one of arguments has wrong size");
@@ -17581,37 +17382,6 @@ void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae
    alglib_impl::spdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a symmetric positive definite matrix.
-//
-// Given an upper or lower triangle of a symmetric positive definite matrix,
-// the algorithm generates matrix A^-1 and saves the upper or lower triangle
-// depending on the input.
-//
-// Inputs:
-//     A       -   matrix to be inverted (upper or lower triangle).
-//                 Array with elements [0..N-1,0..N-1].
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   storage type (optional):
-//                 * if True, symmetric  matrix  A  is  given  by  its  upper
-//                   triangle, and the lower triangle isn't  used/changed  by
-//                   function
-//                 * if False,  symmetric matrix  A  is  given  by  its lower
-//                   triangle, and the  upper triangle isn't used/changed  by
-//                   function
-//                 * if not given,  both lower and upper  triangles  must  be
-//                   filled.
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'spdmatrixinverse': looks like one of arguments has wrong size");
@@ -17659,34 +17429,6 @@ void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool 
    alglib_impl::hpdmatrixcholeskyinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a Hermitian positive definite matrix which is given
-// by Cholesky decomposition.
-//
-// Inputs:
-//     A       -   Cholesky decomposition of the matrix to be inverted:
-//                 A=U'*U or A = L*L'.
-//                 Output of  HPDMatrixCholesky subroutine.
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   storage type (optional):
-//                 * if True, symmetric  matrix  A  is  given  by  its  upper
-//                   triangle, and the lower triangle isn't  used/changed  by
-//                   function
-//                 * if False,  symmetric matrix  A  is  given  by  its lower
-//                   triangle, and the  upper triangle isn't used/changed  by
-//                   function
-//                 * if not given, lower half is used.
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixcholeskyinverse': looks like one of arguments has wrong size");
@@ -17735,37 +17477,6 @@ void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper,
    alglib_impl::hpdmatrixinverse(ConstT(ae_matrix, a), n, isupper, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Inversion of a Hermitian positive definite matrix.
-//
-// Given an upper or lower triangle of a Hermitian positive definite matrix,
-// the algorithm generates matrix A^-1 and saves the upper or lower triangle
-// depending on the input.
-//
-// Inputs:
-//     A       -   matrix to be inverted (upper or lower triangle).
-//                 Array with elements [0..N-1,0..N-1].
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   storage type (optional):
-//                 * if True, symmetric  matrix  A  is  given  by  its  upper
-//                   triangle, and the lower triangle isn't  used/changed  by
-//                   function
-//                 * if False,  symmetric matrix  A  is  given  by  its lower
-//                   triangle, and the  upper triangle isn't used/changed  by
-//                   function
-//                 * if not given,  both lower and upper  triangles  must  be
-//                   filled.
-//
-// Outputs:
-//     Info    -   return code, same as in RMatrixLUInverse
-//     Rep     -   solver report, same as in RMatrixLUInverse
-//     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
-// ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'hpdmatrixinverse': looks like one of arguments has wrong size");
@@ -17820,41 +17531,6 @@ void rmatrixtrinverse(real_2d_array &a, const ae_int_t n, const bool isupper, co
    alglib_impl::rmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Triangular matrix inverse (real)
-//
-// The subroutine inverts the following types of matrices:
-//     * upper triangular
-//     * upper triangular with unit diagonal
-//     * lower triangular
-//     * lower triangular with unit diagonal
-//
-// In case of an upper (lower) triangular matrix,  the  inverse  matrix  will
-// also be upper (lower) triangular, and after the end of the algorithm,  the
-// inverse matrix replaces the source matrix. The elements  below (above) the
-// main diagonal are not changed by the algorithm.
-//
-// If  the matrix  has a unit diagonal, the inverse matrix also  has  a  unit
-// diagonal, and the diagonal elements are not passed to the algorithm.
-//
-// Inputs:
-//     A       -   matrix, array[0..N-1, 0..N-1].
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   True, if the matrix is upper triangular.
-//     IsUnit  -   diagonal type (optional):
-//                 * if True, matrix has unit diagonal (a[i,i] are NOT used)
-//                 * if False, matrix diagonal is arbitrary
-//                 * if not given, False is assumed
-//
-// Outputs:
-//     Info    -   same as for RMatrixLUInverse
-//     Rep     -   same as for RMatrixLUInverse
-//     A       -   same as for RMatrixLUInverse.
-// ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rmatrixtrinverse(real_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'rmatrixtrinverse': looks like one of arguments has wrong size");
@@ -17907,41 +17583,6 @@ void cmatrixtrinverse(complex_2d_array &a, const ae_int_t n, const bool isupper,
    alglib_impl::cmatrixtrinverse(ConstT(ae_matrix, a), n, isupper, isunit, &info, ConstT(matinvreport, rep));
    alglib_impl::ae_state_clear();
 }
-
-// Triangular matrix inverse (complex)
-//
-// The subroutine inverts the following types of matrices:
-//     * upper triangular
-//     * upper triangular with unit diagonal
-//     * lower triangular
-//     * lower triangular with unit diagonal
-//
-// In case of an upper (lower) triangular matrix,  the  inverse  matrix  will
-// also be upper (lower) triangular, and after the end of the algorithm,  the
-// inverse matrix replaces the source matrix. The elements  below (above) the
-// main diagonal are not changed by the algorithm.
-//
-// If  the matrix  has a unit diagonal, the inverse matrix also  has  a  unit
-// diagonal, and the diagonal elements are not passed to the algorithm.
-//
-// Inputs:
-//     A       -   matrix, array[0..N-1, 0..N-1].
-//     N       -   size of matrix A (optional) :
-//                 * if given, only principal NxN submatrix is processed  and
-//                   overwritten. other elements are unchanged.
-//                 * if not given,  size  is  automatically  determined  from
-//                   matrix size (A must be square matrix)
-//     IsUpper -   True, if the matrix is upper triangular.
-//     IsUnit  -   diagonal type (optional):
-//                 * if True, matrix has unit diagonal (a[i,i] are NOT used)
-//                 * if False, matrix diagonal is arbitrary
-//                 * if not given, False is assumed
-//
-// Outputs:
-//     Info    -   same as for RMatrixLUInverse
-//     Rep     -   same as for RMatrixLUInverse
-//     A       -   same as for RMatrixLUInverse.
-// ALGLIB: Copyright 05.02.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void cmatrixtrinverse(complex_2d_array &a, const bool isupper, ae_int_t &info, matinvreport &rep) {
    if (a.cols() != a.rows()) ThrowError("Error while calling 'cmatrixtrinverse': looks like one of arguments has wrong size");
@@ -19172,7 +18813,7 @@ void rmatrixlqbasecase(RMatrix a, ae_int_t m, ae_int_t n, RVector work, RVector 
 // G(0)*G(1)*...*G(n-2), where G(i) = 1 - tau*u*u'. Tau is stored in TauP[i],
 // u(0:i)=0, u(i+1)=1, u(i+2:n-1) is stored in elements A(i,i+2:n-1).
 //
-// If M<N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
+// If M < N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
 // corresponding   elements  of  matrix  A.  Q = H(0)*H(1)*...*H(m-2),  where
 // H(i) = 1 - tau*v*v', tau is stored in TauQ, v(0:i)=0, v(i+1)=1, v(i+2:m-1)
 // is    stored    in   elements   A(i+2:m-1,i).    P = G(0)*G(1)*...*G(m-1),
@@ -20609,7 +20250,7 @@ void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_
 // G(0)*G(1)*...*G(n-2), where G(i) = 1 - tau*u*u'. Tau is stored in TauP[i],
 // u(0:i)=0, u(i+1)=1, u(i+2:n-1) is stored in elements A(i,i+2:n-1).
 //
-// If M<N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
+// If M < N, B is the  lower  bidiagonal  MxN  matrix  and  is  stored  in  the
 // corresponding   elements  of  matrix  A.  Q = H(0)*H(1)*...*H(m-2),  where
 // H(i) = 1 - tau*v*v', tau is stored in TauQ, v(0:i)=0, v(i+1)=1, v(i+2:m-1)
 // is    stored    in   elements   A(i+2:m-1,i).    P = G(0)*G(1)*...*G(m-1),
@@ -21439,7 +21080,7 @@ void fblssolvels(RMatrix a, RVector b, ae_int_t m, ae_int_t n, RVector tmp0, RVe
    ae_int_t k;
    double v;
    ae_assert(n > 0, "FBLSSolveLS: N <= 0");
-   ae_assert(m >= n, "FBLSSolveLS: M<N");
+   ae_assert(m >= n, "FBLSSolveLS: M < N");
    ae_assert(a->rows >= m, "FBLSSolveLS: Rows(A)<M");
    ae_assert(a->cols >= n, "FBLSSolveLS: Cols(A)<N");
    ae_assert(b->cnt >= m, "FBLSSolveLS: Length(B)<M");
@@ -22369,9 +22010,9 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
 //
 // Outputs:
 //     D       -   singular values of matrix B in descending order.
-//     U       -   if NRU>0, contains matrix U*Q.
-//     VT      -   if NCVT>0, contains matrix (P^T)*VT.
-//     C       -   if NCC>0, contains matrix Q'*C.
+//     U       -   if NRU > 0, contains matrix U*Q.
+//     VT      -   if NCVT > 0, contains matrix (P^T)*VT.
+//     C       -   if NCC > 0, contains matrix Q'*C.
 //
 // Result:
 //     True, if the algorithm has converged.
@@ -22384,7 +22025,7 @@ static bool bdsvd_bidiagonalsvddecompositioninternal(RVector d, RVector e, ae_in
 // Additional information:
 //     The type of convergence is controlled by the internal  parameter  TOL.
 //     If the parameter is greater than 0, the singular values will have
-//     relative accuracy TOL. If TOL<0, the singular values will have
+//     relative accuracy TOL. If TOL < 0, the singular values will have
 //     absolute accuracy ABS(TOL)*norm(B).
 //     By default, |TOL| falls within the range of 10*Epsilon and 100*Epsilon,
 //     where Epsilon is the machine precision. It is not  recommended  to  use
@@ -22496,9 +22137,9 @@ namespace alglib {
 //
 // Outputs:
 //     D       -   singular values of matrix B in descending order.
-//     U       -   if NRU>0, contains matrix U*Q.
-//     VT      -   if NCVT>0, contains matrix (P^T)*VT.
-//     C       -   if NCC>0, contains matrix Q'*C.
+//     U       -   if NRU > 0, contains matrix U*Q.
+//     VT      -   if NCVT > 0, contains matrix (P^T)*VT.
+//     C       -   if NCC > 0, contains matrix Q'*C.
 //
 // Result:
 //     True, if the algorithm has converged.
@@ -22511,7 +22152,7 @@ namespace alglib {
 // Additional information:
 //     The type of convergence is controlled by the internal  parameter  TOL.
 //     If the parameter is greater than 0, the singular values will have
-//     relative accuracy TOL. If TOL<0, the singular values will have
+//     relative accuracy TOL. If TOL < 0, the singular values will have
 //     absolute accuracy ABS(TOL)*norm(B).
 //     By default, |TOL| falls within the range of 10*Epsilon and 100*Epsilon,
 //     where Epsilon is the machine precision. It is not  recommended  to  use
@@ -22843,8 +22484,8 @@ namespace alglib_impl {
 // 3. User calls NormEstimatorResults() to get solution.
 //
 // Inputs:
-//     M       -   number of rows in the matrix being estimated, M>0
-//     N       -   number of columns in the matrix being estimated, N>0
+//     M       -   number of rows in the matrix being estimated, M > 0
+//     N       -   number of columns in the matrix being estimated, N > 0
 //     NStart  -   number of random starting vectors
 //                 recommended value - at least 5.
 //     NIts    -   number of iterations to do with best starting vector
@@ -23087,8 +22728,8 @@ DefClass(normestimatorstate, EndD)
 // 3. User calls NormEstimatorResults() to get solution.
 //
 // Inputs:
-//     M       -   number of rows in the matrix being estimated, M>0
-//     N       -   number of columns in the matrix being estimated, N>0
+//     M       -   number of rows in the matrix being estimated, M > 0
+//     N       -   number of columns in the matrix being estimated, N > 0
 //     NStart  -   number of random starting vectors
 //                 recommended value - at least 5.
 //     NIts    -   number of iterations to do with best starting vector
@@ -24181,8 +23822,8 @@ static const ae_int_t evd_stepswithintol = 2;
 //    > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
 // Inputs:
-//     N       -   problem dimensionality, N>0
-//     K       -   number of top eigenvector to calculate, 0<K <= N.
+//     N       -   problem dimensionality, N > 0
+//     K       -   number of top eigenvector to calculate, 0 < K <= N.
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -24195,7 +23836,7 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
    SetObj(eigsubspacestate, state);
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0");
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0");
-   ae_assert(k <= n, "EigSubspaceCreate: K>N");
+   ae_assert(k <= n, "EigSubspaceCreate: K > N");
    eigsubspacecreatebuf(n, k, state);
 }
 
@@ -24205,7 +23846,7 @@ void eigsubspacecreate(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
 void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
    ae_assert(n > 0, "EigSubspaceCreate: N <= 0");
    ae_assert(k > 0, "EigSubspaceCreate: K <= 0");
-   ae_assert(k <= n, "EigSubspaceCreate: K>N");
+   ae_assert(k <= n, "EigSubspaceCreate: K > N");
 // Initialize algorithm parameters
    state->running = false;
    state->n = n;
@@ -24259,7 +23900,7 @@ void eigsubspacecreatebuf(ae_int_t n, ae_int_t k, eigsubspacestate *state) {
 // ALGLIB: Copyright 16.01.2017 by Sergey Bochkanov
 void eigsubspacesetcond(eigsubspacestate *state, double eps, ae_int_t maxits) {
    ae_assert(!state->running, "EigSubspaceSetCond: solver is already running");
-   ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps<0 or NAN/INF");
+   ae_assert(isfinite(eps) && eps >= 0.0, "EigSubspaceSetCond: Eps < 0 or NAN/INF");
    ae_assert(maxits >= 0, "EigSubspaceSetCond: MaxIts<0");
    if (eps == 0.0 && maxits == 0) {
       eps = 1.0E-6;
@@ -26003,7 +25644,7 @@ static bool evd_tridiagonalevd(RVector d, RVector e, ae_int_t n, ae_int_t zneede
 //                    and the eigenvectors matrix (from the right);
 //                  * 2, Z contains the eigenvectors.
 //                  * 3, Z contains the first row of the eigenvectors matrix.
-//                 If ZNeeded<3, Z is the array whose indexes range within [0..N-1, 0..N-1].
+//                 If ZNeeded < 3, Z is the array whose indexes range within [0..N-1, 0..N-1].
 //                 In that case, the eigenvectors are stored in the matrix columns.
 //                 If ZNeeded=3, Z is the array whose indexes range within [0..0, 0..N-1].
 //
@@ -28985,11 +28626,11 @@ static void evd_rmatrixinternaltrevc(RMatrix t, ae_int_t n, ae_int_t side, ae_in
 //     VL, VR  -   arrays of left and right eigenvectors (if they are needed).
 //                 If WI[i]=0, the respective eigenvalue is a real number,
 //                 and it corresponds to the column number I of matrices VL/VR.
-//                 If WI[i]>0, we have a pair of complex conjugate numbers with
+//                 If WI[i] > 0, we have a pair of complex conjugate numbers with
 //                 positive and negative imaginary parts:
 //                     the first eigenvalue WR[i] + sqrt(-1)*WI[i];
 //                     the second eigenvalue WR[i+1] + sqrt(-1)*WI[i+1];
-//                     WI[i]>0
+//                     WI[i] > 0
 //                     WI[i+1] = -WI[i] < 0
 //                 In that case, the eigenvector  corresponding to the first
 //                 eigenvalue is located in i and i+1 columns of matrices
@@ -29004,11 +28645,11 @@ static void evd_rmatrixinternaltrevc(RMatrix t, ae_int_t n, ae_int_t side, ae_in
 //     False, if the algorithm has not converged.
 //
 // Note 1:
-//     Some users may ask the following question: what if WI[N-1]>0?
+//     Some users may ask the following question: what if WI[N-1] > 0?
 //     WI[N] must contain an eigenvalue which is complex conjugate to the
 //     N-th eigenvalue, but the array has only size N?
 //     The answer is as follows: such a situation cannot occur because the
-//     algorithm finds a pairs of eigenvalues, therefore, if WI[i]>0, I is
+//     algorithm finds a pairs of eigenvalues, therefore, if WI[i] > 0, I is
 //     strictly less than N-1.
 //
 // Note 2:
@@ -29222,8 +28863,8 @@ DefClass(eigsubspacereport, AndD DecVal(iterationscount))
 //    > alglib.eigsubspaceoocstop(state, out W, out Z, out Report)
 //
 // Inputs:
-//     N       -   problem dimensionality, N>0
-//     K       -   number of top eigenvector to calculate, 0<K <= N.
+//     N       -   problem dimensionality, N > 0
+//     K       -   number of top eigenvector to calculate, 0 < K <= N.
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -29842,7 +29483,7 @@ bool hmatrixevdi(const complex_2d_array &a, const ae_int_t n, const ae_int_t zne
 //                    and the eigenvectors matrix (from the right);
 //                  * 2, Z contains the eigenvectors.
 //                  * 3, Z contains the first row of the eigenvectors matrix.
-//                 If ZNeeded<3, Z is the array whose indexes range within [0..N-1, 0..N-1].
+//                 If ZNeeded < 3, Z is the array whose indexes range within [0..N-1, 0..N-1].
 //                 In that case, the eigenvectors are stored in the matrix columns.
 //                 If ZNeeded=3, Z is the array whose indexes range within [0..0, 0..N-1].
 //
@@ -30004,11 +29645,11 @@ bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, c
 //     VL, VR  -   arrays of left and right eigenvectors (if they are needed).
 //                 If WI[i]=0, the respective eigenvalue is a real number,
 //                 and it corresponds to the column number I of matrices VL/VR.
-//                 If WI[i]>0, we have a pair of complex conjugate numbers with
+//                 If WI[i] > 0, we have a pair of complex conjugate numbers with
 //                 positive and negative imaginary parts:
 //                     the first eigenvalue WR[i] + sqrt(-1)*WI[i];
 //                     the second eigenvalue WR[i+1] + sqrt(-1)*WI[i+1];
-//                     WI[i]>0
+//                     WI[i] > 0
 //                     WI[i+1] = -WI[i] < 0
 //                 In that case, the eigenvector  corresponding to the first
 //                 eigenvalue is located in i and i+1 columns of matrices
@@ -30023,11 +29664,11 @@ bool smatrixtdevdi(real_1d_array &d, const real_1d_array &e, const ae_int_t n, c
 //     False, if the algorithm has not converged.
 //
 // Note 1:
-//     Some users may ask the following question: what if WI[N-1]>0?
+//     Some users may ask the following question: what if WI[N-1] > 0?
 //     WI[N] must contain an eigenvalue which is complex conjugate to the
 //     N-th eigenvalue, but the array has only size N?
 //     The answer is as follows: such a situation cannot occur because the
-//     algorithm finds a pairs of eigenvalues, therefore, if WI[i]>0, I is
+//     algorithm finds a pairs of eigenvalues, therefore, if WI[i] > 0, I is
 //     strictly less than N-1.
 //
 // Note 2:
@@ -31120,23 +30761,6 @@ double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots, cons
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Determinant calculation of the matrix given by its LU decomposition.
-//
-// Inputs:
-//     A       -   LU decomposition of the matrix (output of
-//                 RMatrixLU subroutine).
-//     Pivots  -   table of permutations which were made during
-//                 the LU decomposition.
-//                 Output of RMatrixLU subroutine.
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//
-// Result: matrix determinant.
-// ALGLIB: Copyright 2005 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double rmatrixludet(const real_2d_array &a, const integer_1d_array &pivots) {
    if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'rmatrixludet': looks like one of arguments has wrong size");
@@ -31168,19 +30792,6 @@ double rmatrixdet(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Calculation of the determinant of a general matrix
-//
-// Inputs:
-//     A       -   matrix, array[0..N-1, 0..N-1]
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//
-// Result: determinant of matrix A.
-// ALGLIB: Copyright 2005 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double rmatrixdet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'rmatrixdet': looks like one of arguments has wrong size");
@@ -31216,23 +30827,6 @@ complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots, 
    alglib_impl::ae_state_clear();
    return ComplexOf(C);
 }
-
-// Determinant calculation of the matrix given by its LU decomposition.
-//
-// Inputs:
-//     A       -   LU decomposition of the matrix (output of
-//                 RMatrixLU subroutine).
-//     Pivots  -   table of permutations which were made during
-//                 the LU decomposition.
-//                 Output of RMatrixLU subroutine.
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//
-// Result: matrix determinant.
-// ALGLIB: Copyright 2005 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 complex cmatrixludet(const complex_2d_array &a, const integer_1d_array &pivots) {
    if (a.rows() != a.cols() || a.rows() != pivots.length()) ThrowError("Error while calling 'cmatrixludet': looks like one of arguments has wrong size");
@@ -31264,19 +30858,6 @@ complex cmatrixdet(const complex_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return ComplexOf(C);
 }
-
-// Calculation of the determinant of a general matrix
-//
-// Inputs:
-//     A       -   matrix, array[0..N-1, 0..N-1]
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//
-// Result: determinant of matrix A.
-// ALGLIB: Copyright 2005 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 complex cmatrixdet(const complex_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'cmatrixdet': looks like one of arguments has wrong size");
@@ -31314,25 +30895,6 @@ double spdmatrixcholeskydet(const real_2d_array &a, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Determinant calculation of the matrix given by the Cholesky decomposition.
-//
-// Inputs:
-//     A       -   Cholesky decomposition,
-//                 output of SMatrixCholesky subroutine.
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//
-// As the determinant is equal to the product of squares of diagonal elements,
-// it's not necessary to specify which triangle - lower or upper - the matrix
-// is stored in.
-//
-// Result:
-//     matrix determinant.
-// ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double spdmatrixcholeskydet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixcholeskydet': looks like one of arguments has wrong size");
@@ -31375,30 +30937,6 @@ double spdmatrixdet(const real_2d_array &a, const ae_int_t n, const bool isupper
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Determinant calculation of the symmetric positive definite matrix.
-//
-// Inputs:
-//     A       -   matrix. Array with elements [0..N-1, 0..N-1].
-//     N       -   (optional) size of matrix A:
-//                 * if given, only principal NxN submatrix is processed and
-//                   overwritten. other elements are unchanged.
-//                 * if not given, automatically determined from matrix size
-//                   (A must be square matrix)
-//     IsUpper -   (optional) storage type:
-//                 * if True, symmetric matrix  A  is  given  by  its  upper
-//                   triangle, and the lower triangle isn't used/changed  by
-//                   function
-//                 * if False, symmetric matrix  A  is  given  by  its lower
-//                   triangle, and the upper triangle isn't used/changed  by
-//                   function
-//                 * if not given, both lower and upper  triangles  must  be
-//                   filled.
-//
-// Result:
-//     determinant of matrix A.
-//     If matrix A is not positive definite, exception is thrown.
-// ALGLIB: Copyright 2005-2008 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double spdmatrixdet(const real_2d_array &a) {
    if (a.rows() != a.cols()) ThrowError("Error while calling 'spdmatrixdet': looks like one of arguments has wrong size");

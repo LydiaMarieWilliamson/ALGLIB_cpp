@@ -937,7 +937,7 @@ double safeminposrv(double x, double y, double v) {
 
 // This function makes periodic mapping of X to [A,B].
 //
-// It accepts X, A, B (A>B). It returns T which lies in  [A,B] and integer K,
+// It accepts X, A, B (A > B). It returns T which lies in  [A,B] and integer K,
 // such that X = T + K*(B-A).
 //
 // NOTES:
@@ -1155,7 +1155,7 @@ double rmul3(double v0, double v1, double v2) {
    return result;
 }
 
-// This function returns (A div B) rounded up; it expects that A>0, B>0, but
+// This function returns (A div B) rounded up; it expects that A>0, B > 0, but
 // does not check it.
 ae_int_t idivup(ae_int_t a, ae_int_t b) {
    ae_int_t result;
@@ -1985,16 +1985,16 @@ void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
       p2->ptr.p_int[0] = 0;
       return;
    }
-// General case, N>1: prepare permutations table P1
+// General case, N > 1: prepare permutations table P1
    ivectorsetlengthatleast(p1, n);
    for (i = 0; i < n; i++) {
       p1->ptr.p_int[i] = i;
    }
-// General case, N>1: sort, update P1
+// General case, N > 1: sort, update P1
    rvectorsetlengthatleast(&buf->ra0, n);
    ivectorsetlengthatleast(&buf->ia0, n);
    tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n);
-// General case, N>1: fill permutations table P2
+// General case, N > 1: fill permutations table P2
 //
 // To fill P2 we maintain two arrays:
 // * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
@@ -2581,7 +2581,7 @@ void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
    if (n <= 1) {
       return;
    }
-// General case, N>1: sort, update B
+// General case, N > 1: sort, update B
    for (i = 2; i <= n; i++) {
       t = i;
       while (t != 1) {
@@ -2658,7 +2658,7 @@ void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
    if (n <= 1) {
       return;
    }
-// General case, N>1: sort, update B
+// General case, N > 1: sort, update B
    for (i = 2; i <= n; i++) {
       t = i;
       while (t != 1) {
@@ -3576,9 +3576,9 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -3851,9 +3851,9 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 // space to store result, exception will be generated.
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -3929,9 +3929,9 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, a
 // * this function requires that Alpha != 0 (assertion is thrown otherwise)
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -4132,9 +4132,9 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // * this function requires that Alpha != 0 (assertion is thrown otherwise)
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -4334,9 +4334,9 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // * this function requires that Alpha != 0 (assertion is thrown otherwise)
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -4537,9 +4537,9 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 // * this function requires that Alpha != 0 (assertion is thrown otherwise)
 //
 // Inputs:
-//     M       -   matrix size, M>0
-//     N       -   matrix size, N>0
-//     K       -   matrix size, K>0
+//     M       -   matrix size, M > 0
+//     N       -   matrix size, N > 0
+//     K       -   matrix size, K > 0
 //     Alpha   -   coefficient
 //     A       -   matrix
 //     IA      -   submatrix offset
@@ -7960,7 +7960,7 @@ static ae_int_t ntheory_modmul(ae_int_t a, ae_int_t b, ae_int_t n) {
    double rb;
    ae_int_t result;
    ae_assert(a >= 0 && a < n, "ModMul: A<0 or A >= N");
-   ae_assert(b >= 0 && b < n, "ModMul: B<0 or B >= N");
+   ae_assert(b >= 0 && b < n, "ModMul: B < 0 or B >= N");
 // Base cases
    ra = (double)a;
    rb = (double)b;
@@ -8022,7 +8022,7 @@ static ae_int_t ntheory_modexp(ae_int_t a, ae_int_t b, ae_int_t n) {
    ae_int_t t;
    ae_int_t result;
    ae_assert(a >= 0 && a < n, "ModExp: A<0 or A >= N");
-   ae_assert(b >= 0, "ModExp: B<0");
+   ae_assert(b >= 0, "ModExp: B < 0");
 // Base cases
    if (b == 0) {
       result = 1;
@@ -8368,7 +8368,7 @@ static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_in
 // Factorizes task size N into product of two smaller sizes N1 and N2
 //
 // Inputs:
-//     N       -   task size, N>0
+//     N       -   task size, N > 0
 //     IsRoot  -   whether taks is root task (first one in a sequence)
 //
 // Outputs:
@@ -8434,7 +8434,7 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
 // Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
 //
 // Inputs:
-//     N       -   task size, N>0
+//     N       -   task size, N > 0
 //
 // RESULU:
 //     cost in UNITs, rounded down to nearest integer

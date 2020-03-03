@@ -401,32 +401,6 @@ void fftc1d(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::fftc1d(ConstT(ae_vector, a), n);
    alglib_impl::ae_state_clear();
 }
-
-// 1-dimensional complex FFT.
-//
-// Array size N may be arbitrary number (composite or prime).  Composite  N's
-// are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
-// Small prime-factors are transformed using hard coded  codelets (similar to
-// FFTW codelets, but without low-level  optimization),  large  prime-factors
-// are handled with Bluestein's algorithm.
-//
-// Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
-// most fast for powers of 2. When N have prime factors  larger  than  these,
-// but orders of magnitude smaller than N, computations will be about 4 times
-// slower than for nearby highly composite N's. When N itself is prime, speed
-// will be 6 times lower.
-//
-// Algorithm has O(N*logN) complexity for any N (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..N-1] - complex function to be transformed
-//     N   -   problem size
-//
-// Outputs:
-//     A   -   DFT of a input array, array[0..N-1]
-//             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-//
-// ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void fftc1d(complex_1d_array &a) {
    ae_int_t n = a.length();
@@ -459,23 +433,6 @@ void fftc1dinv(complex_1d_array &a, const ae_int_t n) {
    alglib_impl::fftc1dinv(ConstT(ae_vector, a), n);
    alglib_impl::ae_state_clear();
 }
-
-// 1-dimensional complex inverse FFT.
-//
-// Array size N may be arbitrary number (composite or prime).  Algorithm  has
-// O(N*logN) complexity for any N (composite or prime).
-//
-// See FFTC1D() description for more information about algorithm performance.
-//
-// Inputs:
-//     A   -   array[0..N-1] - complex array to be transformed
-//     N   -   problem size
-//
-// Outputs:
-//     A   -   inverse DFT of a input array, array[0..N-1]
-//             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-//
-// ALGLIB: Copyright 29.05.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void fftc1dinv(complex_1d_array &a) {
    ae_int_t n = a.length();
@@ -511,26 +468,6 @@ void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f) {
    alglib_impl::fftr1d(ConstT(ae_vector, a), n, ConstT(ae_vector, f));
    alglib_impl::ae_state_clear();
 }
-
-// 1-dimensional real FFT.
-//
-// Algorithm has O(N*logN) complexity for any N (composite or prime).
-//
-// Inputs:
-//     A   -   array[0..N-1] - real function to be transformed
-//     N   -   problem size
-//
-// Outputs:
-//     F   -   DFT of a input array, array[0..N-1]
-//             F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-//
-// NOTE:
-//     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-// of  array  is  usually needed. But for convinience subroutine returns full
-// complex array (with frequencies above N/2), so its result may be  used  by
-// other FFT-related subroutines.
-//
-// ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void fftr1d(const real_1d_array &a, complex_1d_array &f) {
    ae_int_t n = a.length();
@@ -578,38 +515,6 @@ void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a) {
    alglib_impl::fftr1dinv(ConstT(ae_vector, f), n, ConstT(ae_vector, a));
    alglib_impl::ae_state_clear();
 }
-
-// 1-dimensional real inverse FFT.
-//
-// Algorithm has O(N*logN) complexity for any N (composite or prime).
-//
-// Inputs:
-//     F   -   array[0..floor(N/2)] - frequencies from forward real FFT
-//     N   -   problem size
-//
-// Outputs:
-//     A   -   inverse DFT of a input array, array[0..N-1]
-//
-// NOTE:
-//     F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
-// half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
-// is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
-// F[floor(N/2)] has no special properties.
-//
-// Relying on properties noted above, FFTR1DInv subroutine uses only elements
-// from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
-// N is even it ignores imaginary part of F[floor(N/2)] too.
-//
-// When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
-// - you can pass either either frequencies array with N elements or  reduced
-// array with roughly N/2 elements - subroutine will  successfully  transform
-// both.
-//
-// If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
-// - you must pass FULL array with N elements (although higher  N/2 are still
-// not used) because array size is used to automatically determine FFT length
-//
-// ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void fftr1dinv(const complex_1d_array &f, real_1d_array &a) {
    ae_int_t n = f.length();
@@ -752,7 +657,7 @@ namespace alglib_impl {
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -786,7 +691,7 @@ void convc1d(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -862,7 +767,7 @@ void convc1dinv(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r) {
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -915,7 +820,7 @@ void convc1dcircular(CVector s, ae_int_t m, CVector r, ae_int_t n, CVector c) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1002,7 +907,7 @@ void convc1dcircularinv(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r)
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1036,7 +941,7 @@ void convr1d(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1098,7 +1003,7 @@ void convr1dinv(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r) {
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1152,7 +1057,7 @@ void convr1dcircular(RVector s, ae_int_t m, RVector r, ae_int_t n, RVector c) {
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1284,7 +1189,7 @@ void convc1dx(CVector a, ae_int_t m, CVector b, ae_int_t n, bool circular, ae_in
    NewVector(buf, 0, DT_REAL);
    NewVector(buf2, 0, DT_REAL);
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N<M assumption is false!");
+   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
 // Auto-select
    if (alg == -1 || alg == -2) {
    // Initial candidate: straightforward implementation.
@@ -1617,7 +1522,7 @@ void convr1dx(RVector a, ae_int_t m, RVector b, ae_int_t n, bool circular, ae_in
    NewVector(buf2, 0, DT_REAL);
    NewVector(buf3, 0, DT_REAL);
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!");
-   ae_assert(n <= m, "ConvC1DX: N<M assumption is false!");
+   ae_assert(n <= m, "ConvC1DX: N < M assumption is false!");
 // handle special cases
    if (ae_minint(m, n) <= 2) {
       alg = 0;
@@ -1901,7 +1806,7 @@ namespace alglib {
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1930,7 +1835,7 @@ void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1961,7 +1866,7 @@ void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_ar
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -1990,7 +1895,7 @@ void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -2015,7 +1920,7 @@ void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const compl
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -2044,7 +1949,7 @@ void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, c
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -2069,7 +1974,7 @@ void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -2098,7 +2003,7 @@ void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_arr
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov

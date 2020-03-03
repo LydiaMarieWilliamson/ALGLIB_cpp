@@ -111,7 +111,7 @@
 #define _ALGLIB_FLG_THREADING_PARALLEL      0x2
 
 // Now we are ready to include the remaining headers.
-#include <ctype.h>
+// #include <ctype.h>
 #include <string.h>
 #include <setjmp.h>
 #if defined AE_HAVE_STDINT

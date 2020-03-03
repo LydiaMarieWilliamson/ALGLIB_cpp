@@ -740,7 +740,13 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Synthesized new routines, [ae_]randombool(), [ae_]randommid() and generalized versions of existing routines: ae_complex_from_d().
 31	Synthesized new routines for real and complex approximate comparisons: {Near,Small}[At]{R,CR,C}().
 	Normalized comparisons |A-B|/C &rArr; D to |A-B| &rArr; C&times;D; possibly removing hidden bugs as a result.
-	Normalized error flags in TestC.cpp.
+	Normalized most error flags in TestC.cpp to *Ok and *Erred.
+32	Corrected the Manual entry for "autogkintegrate" (it originally listed the entry for "odesolversolve").
+	Corrections in the comments &amp; printouts
+	(e.g. "traling" → "trailing", "trainig" → "training", "inself" → "itself", "it's" → "its", "discripancy" → "discrepancy").
+	Normalized all test routines and flags in TestC.cpp to true on success, false on failure.
+	Normalize comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
+	First round of normalization of comments &amp; documentation.
 </pre>
 </p>
 <p>
@@ -832,6 +838,12 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 30	2283 3437 3414 3240 1581740396 224 // Modifications, following cross-validation against local version.
 31	2283 3472 3510 3241 1581968963 216
 31	2262 3472 3486 3235 1581983401 209
+32	2268 3485 3498 3208 1582670816 218 // 1 TestC test failed.
+32	2257 3572 3498 3246 1582673449 214 // Corrected.
+32	2252 3413 3473 3200 1582847620 213
+32	2273 3379 3486 3184 1582951824 225 // 1 TestC test "failed" due to a hidden bug in TestC.cpp inherited from ALGLIB. Corrected.
+32	2222 3356 3438 3266 1583163421 226
+32	2242 3356 3473 3238 1583193341 216
 </pre>
 </p>
 </div>

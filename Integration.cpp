@@ -36,7 +36,7 @@ namespace alglib_impl {
 //     Alpha   -   array[0..N-1], alpha coefficients
 //     Beta    -   array[0..N-1], beta coefficients
 //                 Zero-indexed element is not used and may be arbitrary.
-//                 Beta[I]>0.
+//                 Beta[I] > 0.
 //     Mu0     -   zeroth moment of the weight function.
 //     N       -   number of nodes of the quadrature formula, N >= 1
 //
@@ -113,7 +113,7 @@ void gqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t
 //     Alpha   -   array[0..N-2], alpha coefficients
 //     Beta    -   array[0..N-2], beta coefficients.
 //                 Zero-indexed element is not used, may be arbitrary.
-//                 Beta[I]>0
+//                 Beta[I] > 0
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
 //     B       -   right boundary of the integration interval.
@@ -251,7 +251,7 @@ void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a
 //     Alpha   -   array[0..N-2], alpha coefficients.
 //     Beta    -   array[0..N-1], beta coefficients
 //                 Zero-indexed element is not used.
-//                 Beta[I]>0
+//                 Beta[I] > 0
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
 //     N       -   number of nodes of the quadrature formula, N >= 2
@@ -391,8 +391,8 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector w) {
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
-//     Alpha       -   power-law coefficient, Alpha>-1
-//     Beta        -   power-law coefficient, Beta>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
+//     Beta        -   power-law coefficient, Beta > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -469,7 +469,7 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
-//     Alpha       -   power-law coefficient, Alpha>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -609,7 +609,7 @@ namespace alglib {
 //     Alpha   -   array[0..N-1], alpha coefficients
 //     Beta    -   array[0..N-1], beta coefficients
 //                 Zero-indexed element is not used and may be arbitrary.
-//                 Beta[I]>0.
+//                 Beta[I] > 0.
 //     Mu0     -   zeroth moment of the weight function.
 //     N       -   number of nodes of the quadrature formula, N >= 1
 //
@@ -648,7 +648,7 @@ void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const 
 //     Alpha   -   array[0..N-2], alpha coefficients
 //     Beta    -   array[0..N-2], beta coefficients.
 //                 Zero-indexed element is not used, may be arbitrary.
-//                 Beta[I]>0
+//                 Beta[I] > 0
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
 //     B       -   right boundary of the integration interval.
@@ -690,7 +690,7 @@ void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &
 //     Alpha   -   array[0..N-2], alpha coefficients.
 //     Beta    -   array[0..N-1], beta coefficients
 //                 Zero-indexed element is not used.
-//                 Beta[I]>0
+//                 Beta[I] > 0
 //     Mu0     -   zeroth moment of the weighting function.
 //     A       -   left boundary of the integration interval.
 //     N       -   number of nodes of the quadrature formula, N >= 2
@@ -746,8 +746,8 @@ void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x,
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
-//     Alpha       -   power-law coefficient, Alpha>-1
-//     Beta        -   power-law coefficient, Beta>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
+//     Beta        -   power-law coefficient, Beta > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -776,7 +776,7 @@ void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double be
 //
 // Inputs:
 //     N           -   number of nodes, >= 1
-//     Alpha       -   power-law coefficient, Alpha>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -849,7 +849,7 @@ namespace alglib_impl {
 //     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
 //     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
 //                     Beta[0] is not used and may be arbitrary.
-//                     Beta[I]>0.
+//                     Beta[I] > 0.
 //     Mu0         -   zeroth moment of the weight function.
 //     N           -   number of nodes of the Gauss-Kronrod quadrature formula,
 //                     N >= 3,
@@ -1053,8 +1053,8 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector wkr
 //
 // Inputs:
 //     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//     Alpha       -   power-law coefficient, Alpha>-1
-//     Beta        -   power-law coefficient, Beta>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
+//     Beta        -   power-law coefficient, Beta > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -1070,7 +1070,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector wkr
 //                     * -1    incorrect N was passed
 //                     * +1    OK
 //                     * +2    OK, but quadrature rule have exterior  nodes,
-//                             x[0]<-1 or x[n-1]>+1
+//                             x[0] < -1 or x[n-1] > +1
 //     X           -   array[0..N-1] - array of quadrature nodes, ordered in
 //                     ascending order.
 //     WKronrod    -   array[0..N-1] - Kronrod weights
@@ -1605,7 +1605,7 @@ namespace alglib {
 //     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
 //     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
 //                     Beta[0] is not used and may be arbitrary.
-//                     Beta[I]>0.
+//                     Beta[I] > 0.
 //     Mu0         -   zeroth moment of the weight function.
 //     N           -   number of nodes of the Gauss-Kronrod quadrature formula,
 //                     N >= 3,
@@ -1674,8 +1674,8 @@ void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x
 //
 // Inputs:
 //     N           -   number of Kronrod nodes, must be odd number, >= 3.
-//     Alpha       -   power-law coefficient, Alpha>-1
-//     Beta        -   power-law coefficient, Beta>-1
+//     Alpha       -   power-law coefficient, Alpha > -1
+//     Beta        -   power-law coefficient, Beta > -1
 //
 // Outputs:
 //     Info        -   error code:
@@ -1691,7 +1691,7 @@ void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x
 //                     * -1    incorrect N was passed
 //                     * +1    OK
 //                     * +2    OK, but quadrature rule have exterior  nodes,
-//                             x[0]<-1 or x[n-1]>+1
+//                             x[0] < -1 or x[n-1] > +1
 //     X           -   array[0..N-1] - array of quadrature nodes, ordered in
 //                     ascending order.
 //     WKronrod    -   array[0..N-1] - Kronrod weights
@@ -1779,7 +1779,7 @@ static const ae_int_t autogk_maxsubintervals = 10000;
 // cases.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -1805,7 +1805,7 @@ void autogksmooth(double a, double b, autogkstate *state) {
 // subroutine can overlook them.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -1830,7 +1830,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
 // Integrand have integrable singularities at A/B.
 //
 // F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
-// alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
+// alpha/beta (alpha > -1, beta > -1).  If alpha/beta  are  not known,  estimates
 // from below can be used (but these estimates should be greater than -1 too).
 //
 // One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
@@ -1841,11 +1841,11 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state) {
 // is calculated with accuracy close to the machine precision.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //     Alpha   -   power-law coefficient of the F(x) at A,
-//                 Alpha>-1
+//                 Alpha > -1
 //     Beta    -   power-law coefficient of the F(x) at B,
-//                 Beta>-1
+//                 Beta > -1
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -2280,7 +2280,7 @@ Spawn:
       autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + alpha), eps, state->xwidth, &state->internalstate);
       while (autogk_autogkinternaliteration(&state->internalstate)) {
       // Fill State.X, State.XMinusA, State.BMinusX.
-      // Latter two are filled correctly even if B<A.
+      // Latter two are filled correctly even if B < A.
          x = state->internalstate.x;
          t = pow(x, 1 / (1 + alpha));
          state->x = a + t;
@@ -2307,7 +2307,7 @@ Spawn:
       autogk_autogkinternalprepare(0.0, pow(0.5 * (b - a), 1 + beta), eps, state->xwidth, &state->internalstate);
       while (autogk_autogkinternaliteration(&state->internalstate)) {
       // Fill State.X, State.XMinusA, State.BMinusX.
-      // Latter two are filled correctly (X-A, B-X) even if B<A.
+      // Latter two are filled correctly (X-A, B-X) even if B < A.
          x = state->internalstate.x;
          t = pow(x, 1 / (1 + beta));
          state->x = b - t;
@@ -2483,7 +2483,7 @@ DefClass(autogkstate, AndD DecVal(x) AndD DecVal(xminusa) AndD DecVal(bminusx) A
 // cases.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -2509,7 +2509,7 @@ void autogksmooth(const double a, const double b, autogkstate &state) {
 // subroutine can overlook them.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -2529,7 +2529,7 @@ void autogksmoothw(const double a, const double b, const double xwidth, autogkst
 // Integrand have integrable singularities at A/B.
 //
 // F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
-// alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
+// alpha/beta (alpha > -1, beta > -1).  If alpha/beta  are  not known,  estimates
 // from below can be used (but these estimates should be greater than -1 too).
 //
 // One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
@@ -2540,11 +2540,11 @@ void autogksmoothw(const double a, const double b, const double xwidth, autogkst
 // is calculated with accuracy close to the machine precision.
 //
 // Inputs:
-//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     A, B    -   interval boundaries (A < B, A = B or A > B)
 //     Alpha   -   power-law coefficient of the F(x) at A,
-//                 Alpha>-1
+//                 Alpha > -1
 //     Beta    -   power-law coefficient of the F(x) at B,
-//                 Beta>-1
+//                 Beta > -1
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -2561,7 +2561,7 @@ void autogksingular(const double a, const double b, const double alpha, const do
 }
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool autogkiteration(const autogkstate &state) {
    alglib_impl::ae_state_init();
@@ -2571,6 +2571,13 @@ bool autogkiteration(const autogkstate &state) {
    return Ok;
 }
 
+// This function is used to launch iterations of the 1-dimensional integrator
+//
+// It accepts following parameters:
+//     func    -   callback which calculates f(x) for given x
+//     ptr     -   optional pointer which is passed to func; can be NULL
+//
+// ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
 void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr) {
    alglib_impl::ae_state_init();
    TryCatch()

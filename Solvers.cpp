@@ -59,7 +59,7 @@ namespace alglib_impl {
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixsolve(RMatrix a, ae_int_t n, RVector b, ae_int_t *info, densesolverreport *rep, RVector x) {
@@ -135,7 +135,7 @@ static void directdensesolvers_rbasiclusolve(RMatrix lua, ZVector p, ae_int_t n,
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void rmatrixsolvefast(RMatrix a, ae_int_t n, RVector b, ae_int_t *info) {
@@ -342,7 +342,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix lua, ZVector p, ae
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -410,7 +410,7 @@ void rmatrixsolvem(RMatrix a, ae_int_t n, RMatrix b, ae_int_t m, bool rfs, ae_in
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -505,7 +505,7 @@ void rmatrixsolvemfast(RMatrix a, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *i
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -555,7 +555,7 @@ void rmatrixlusolve(RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *inf
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvefast(RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *info) {
@@ -628,7 +628,7 @@ void rmatrixlusolvefast(RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -676,7 +676,7 @@ void rmatrixlusolvem(RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, 
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvemfast(RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info) {
@@ -745,7 +745,7 @@ void rmatrixlusolvemfast(RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolve(RMatrix a, RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *info, densesolverreport *rep, RVector x) {
@@ -798,7 +798,7 @@ void rmatrixmixedsolve(RMatrix a, RMatrix lua, ZVector p, ae_int_t n, RVector b,
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolvem(RMatrix a, RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x) {
@@ -1013,7 +1013,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix lua, ZVector p, ae
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvem(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix x) {
@@ -1068,7 +1068,7 @@ void cmatrixsolvem(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, bool rfs, ae_in
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void cmatrixsolvemfast(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info) {
@@ -1156,7 +1156,7 @@ void cmatrixsolvemfast(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *i
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolve(CMatrix a, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x) {
@@ -1199,7 +1199,7 @@ void cmatrixsolve(CMatrix a, ae_int_t n, CVector b, ae_int_t *info, densesolverr
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvefast(CMatrix a, ae_int_t n, CVector b, ae_int_t *info) {
@@ -1275,7 +1275,7 @@ void cmatrixsolvefast(CMatrix a, ae_int_t n, CVector b, ae_int_t *info) {
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolvem(CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x) {
@@ -1318,7 +1318,7 @@ void cmatrixlusolvem(CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, 
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -1404,7 +1404,7 @@ void cmatrixlusolvemfast(CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolve(CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x) {
@@ -1450,7 +1450,7 @@ void cmatrixlusolve(CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *inf
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // NOTE: unlike  CMatrixLUSolve(),  this   function   does   NOT   check  for
@@ -1506,7 +1506,7 @@ void cmatrixlusolvefast(CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolvem(CMatrix a, CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x) {
@@ -1547,7 +1547,7 @@ void cmatrixmixedsolvem(CMatrix a, CMatrix lua, ZVector p, ae_int_t n, CMatrix b
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolve(CMatrix a, CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x) {
@@ -1661,7 +1661,7 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix cha, ae_in
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolvem(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x) {
@@ -1733,7 +1733,7 @@ void spdmatrixsolvem(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_t m,
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvemfast(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info) {
@@ -1815,7 +1815,7 @@ void spdmatrixsolvemfast(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolve(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t *info, densesolverreport *rep, RVector x) {
@@ -1907,7 +1907,7 @@ static void directdensesolvers_spdbasiccholeskysolve(RMatrix cha, ae_int_t n, bo
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvefast(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t *info) {
@@ -1961,7 +1961,7 @@ void spdmatrixsolvefast(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveMFast() function.
@@ -1984,7 +1984,7 @@ void spdmatrixsolvefast(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0 contains solution
+//                 * for info > 0contains solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvem(RMatrix cha, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x) {
@@ -2030,7 +2030,7 @@ void spdmatrixcholeskysolvem(RMatrix cha, ae_int_t n, bool isupper, RMatrix b, a
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
-//                 * for info>0 overwritten by solution
+//                 * for info > 0overwritten by solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void spdmatrixcholeskysolvemfast(RMatrix cha, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info) {
@@ -2088,7 +2088,7 @@ void spdmatrixcholeskysolvemfast(RMatrix cha, ae_int_t n, bool isupper, RMatrix 
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveFast() function.
@@ -2110,7 +2110,7 @@ void spdmatrixcholeskysolvemfast(RMatrix cha, ae_int_t n, bool isupper, RMatrix 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0  - solution
+//                 * for info > 0 - solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolve(RMatrix cha, ae_int_t n, bool isupper, RVector b, ae_int_t *info, densesolverreport *rep, RVector x) {
@@ -2157,7 +2157,7 @@ void spdmatrixcholeskysolve(RMatrix cha, ae_int_t n, bool isupper, RVector b, ae
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * for info>0  - overwritten by solution
+//                 * for info > 0 - overwritten by solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvefast(RMatrix cha, ae_int_t n, bool isupper, RVector b, ae_int_t *info) {
@@ -2266,7 +2266,7 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix cha, ae_in
 //            ! This performance penalty is especially apparent when you  use
 //            ! ALGLIB parallel capabilities (condition number estimation  is
 //            ! inherently  sequential).  It   also   becomes significant for
-//            ! small-scale problems (N<100).
+//            ! small-scale problems (N < 100).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixSolveMFast() function.
@@ -2576,7 +2576,7 @@ void hpdmatrixsolvefast(CMatrix a, ae_int_t n, bool isupper, CVector b, ae_int_t
 //            ! cost of large Cholesky decomposition.  However,  if  you call
 //            ! this  function  many  times  for  the same  left  side,  this
 //            ! overhead BECOMES significant. It  also   becomes  significant
-//            ! for small-scale problems (N<50).
+//            ! for small-scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveMFast() function.
@@ -2600,7 +2600,7 @@ void hpdmatrixsolvefast(CMatrix a, ae_int_t n, bool isupper, CVector b, ae_int_t
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0 contains solution
+//                 * for info > 0contains solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolvem(CMatrix cha, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x) {
@@ -2647,7 +2647,7 @@ void hpdmatrixcholeskysolvem(CMatrix cha, ae_int_t n, bool isupper, CMatrix b, a
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
-//                 * for info>0 overwritten by solution
+//                 * for info > 0overwritten by solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvemfast(CMatrix cha, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info) {
@@ -2705,7 +2705,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix cha, ae_int_t n, bool isupper, CMatrix 
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveFast() function.
@@ -2727,7 +2727,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix cha, ae_int_t n, bool isupper, CMatrix 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0  - solution
+//                 * for info > 0 - solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolve(CMatrix cha, ae_int_t n, bool isupper, CVector b, ae_int_t *info, densesolverreport *rep, CVector x) {
@@ -2774,7 +2774,7 @@ void hpdmatrixcholeskysolve(CMatrix cha, ae_int_t n, bool isupper, CVector b, ae
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * for info>0  - overwritten by solution
+//                 * for info > 0 - overwritten by solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvefast(CMatrix cha, ae_int_t n, bool isupper, CVector b, ae_int_t *info) {
@@ -2835,7 +2835,7 @@ static ae_int_t directdensesolvers_densesolverrfsmaxv2(ae_int_t n, double r2) {
 // Outputs:
 //     Info    -   return code:
 //                 * -4    SVD subroutine failed
-//                 * -1    if NRows <= 0 or NCols <= 0 or Threshold<0 was passed
+//                 * -1    if NRows <= 0 or NCols <= 0 or Threshold < 0 was passed
 //                 *  1    if task is solved
 //     Rep     -   solver report, see below for more info
 //     X       -   array[0..N-1,0..M-1], it contains:
@@ -3091,7 +3091,7 @@ DefClass(densesolverlsreport, AndD DecVal(r2) AndD DecVar(cx) AndD DecVal(n) And
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
@@ -3127,7 +3127,7 @@ void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array 
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
@@ -3188,7 +3188,7 @@ void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_ar
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -3232,7 +3232,7 @@ void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -3289,7 +3289,7 @@ void rmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const real_2d_a
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -3325,7 +3325,7 @@ void rmatrixlusolve(const real_2d_array &lua, const integer_1d_array &p, const a
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info) {
@@ -3384,7 +3384,7 @@ void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, con
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -3421,7 +3421,7 @@ void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const 
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info) {
@@ -3460,7 +3460,7 @@ void rmatrixlusolvemfast(const real_2d_array &lua, const integer_1d_array &p, co
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
@@ -3499,7 +3499,7 @@ void rmatrixmixedsolve(const real_2d_array &a, const real_2d_array &lua, const i
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x) {
@@ -3558,7 +3558,7 @@ void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x) {
@@ -3590,7 +3590,7 @@ void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info) {
@@ -3640,7 +3640,7 @@ void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const comple
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x) {
@@ -3669,7 +3669,7 @@ void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info) {
@@ -3723,7 +3723,7 @@ void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x) {
@@ -3755,7 +3755,7 @@ void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, con
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N,M]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
@@ -3811,7 +3811,7 @@ void cmatrixlusolvemfast(const complex_2d_array &lua, const integer_1d_array &p,
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x) {
@@ -3843,7 +3843,7 @@ void cmatrixlusolve(const complex_2d_array &lua, const integer_1d_array &p, cons
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * info>0    =>  overwritten by solution
+//                 * info > 0   =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
 //
 // NOTE: unlike  CMatrixLUSolve(),  this   function   does   NOT   check  for
@@ -3885,7 +3885,7 @@ void cmatrixlusolvefast(const complex_2d_array &lua, const integer_1d_array &p, 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x) {
@@ -3920,7 +3920,7 @@ void cmatrixmixedsolvem(const complex_2d_array &a, const complex_2d_array &lua, 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x) {
@@ -3976,7 +3976,7 @@ void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, c
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x) {
@@ -4007,7 +4007,7 @@ void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isuppe
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N,M], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info) {
@@ -4063,7 +4063,7 @@ void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool is
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
@@ -4094,7 +4094,7 @@ void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N], it contains:
-//                 * info>0    =>  solution
+//                 * info > 0   =>  solution
 //                 * info=-3   =>  filled by zeros
 // ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info) {
@@ -4131,7 +4131,7 @@ void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isu
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveMFast() function.
@@ -4154,7 +4154,7 @@ void spdmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const bool isu
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0 contains solution
+//                 * for info > 0contains solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x) {
@@ -4189,7 +4189,7 @@ void spdmatrixcholeskysolvem(const real_2d_array &cha, const ae_int_t n, const b
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
-//                 * for info>0 overwritten by solution
+//                 * for info > 0overwritten by solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info) {
@@ -4224,7 +4224,7 @@ void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, con
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! SPDMatrixCholeskySolveFast() function.
@@ -4246,7 +4246,7 @@ void spdmatrixcholeskysolvemfast(const real_2d_array &cha, const ae_int_t n, con
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0  - solution
+//                 * for info > 0 - solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x) {
@@ -4279,7 +4279,7 @@ void spdmatrixcholeskysolve(const real_2d_array &cha, const ae_int_t n, const bo
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * for info>0  - overwritten by solution
+//                 * for info > 0 - overwritten by solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info) {
@@ -4313,7 +4313,7 @@ void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, cons
 //            ! This performance penalty is especially apparent when you  use
 //            ! ALGLIB parallel capabilities (condition number estimation  is
 //            ! inherently  sequential).  It   also   becomes significant for
-//            ! small-scale problems (N<100).
+//            ! small-scale problems (N < 100).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixSolveMFast() function.
@@ -4479,7 +4479,7 @@ void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool 
 //            ! cost of large Cholesky decomposition.  However,  if  you call
 //            ! this  function  many  times  for  the same  left  side,  this
 //            ! overhead BECOMES significant. It  also   becomes  significant
-//            ! for small-scale problems (N<50).
+//            ! for small-scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveMFast() function.
@@ -4503,7 +4503,7 @@ void hpdmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const bool 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0 contains solution
+//                 * for info > 0contains solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x) {
@@ -4537,7 +4537,7 @@ void hpdmatrixcholeskysolvem(const complex_2d_array &cha, const ae_int_t n, cons
 //                 * -1    N <= 0 was passed
 //                 *  1    task was solved
 //     B       -   array[N]:
-//                 * for info>0 overwritten by solution
+//                 * for info > 0overwritten by solution
 //                 * for info=-3 filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info) {
@@ -4572,7 +4572,7 @@ void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, 
 //            ! cost of large LU decomposition.  However,  if you  call  this
 //            ! function many times for the same  left  side,  this  overhead
 //            ! BECOMES significant. It  also  becomes significant for small-
-//            ! scale problems (N<50).
+//            ! scale problems (N < 50).
 //            !
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveFast() function.
@@ -4594,7 +4594,7 @@ void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, 
 //                 * rep.r1    condition number in 1-norm
 //                 * rep.rinf  condition number in inf-norm
 //     X       -   array[N]:
-//                 * for info>0  - solution
+//                 * for info > 0 - solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x) {
@@ -4627,7 +4627,7 @@ void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const
 //                 * -1    N <= 0 was passed
 //                 *  1    task is solved
 //     B       -   array[N]:
-//                 * for info>0  - overwritten by solution
+//                 * for info > 0 - overwritten by solution
 //                 * for info=-3 - filled by zeros
 // ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info) {
@@ -4662,7 +4662,7 @@ void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, c
 // Outputs:
 //     Info    -   return code:
 //                 * -4    SVD subroutine failed
-//                 * -1    if NRows <= 0 or NCols <= 0 or Threshold<0 was passed
+//                 * -1    if NRows <= 0 or NCols <= 0 or Threshold < 0 was passed
 //                 *  1    if task is solved
 //     Rep     -   solver report, see below for more info
 //     X       -   array[0..N-1,0..M-1], it contains:
@@ -4708,7 +4708,7 @@ static const double linlsqr_btol = 1.0E-6;
 //
 // Inputs:
 //     M       -   number of rows in A
-//     N       -   number of variables, N>0
+//     N       -   number of variables, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -4729,7 +4729,7 @@ void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state) {
 //
 // Inputs:
 //     M       -   number of rows in A
-//     N       -   number of variables, N>0
+//     N       -   number of variables, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -5433,7 +5433,7 @@ DefClass(linlsqrreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVa
 //
 // Inputs:
 //     M       -   number of rows in A
-//     N       -   number of variables, N>0
+//     N       -   number of variables, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -5454,7 +5454,7 @@ void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
 //
 // Inputs:
 //     M       -   number of rows in A
-//     N       -   number of variables, N>0
+//     N       -   number of variables, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -5843,7 +5843,7 @@ namespace alglib_impl {
 //       * vector function F(x) and its Jacobian J(x) are continuously
 //         differentiable on N
 //       * ||F(x)|| provides local error bound on N, i.e. there  exists  such
-//         c1, that ||F(x)||>c1*distance(x,XS)
+//         c1, that ||F(x)|| > c1*distance(x,XS)
 // Note that these conditions are much more weaker than usual non-singularity
 // conditions. For example, algorithm will converge for any  affine  function
 // F (whether its Jacobian singular or not).
@@ -5870,7 +5870,7 @@ namespace alglib_impl {
 //
 //
 // Inputs:
-//     N       -   space dimension, N>1:
+//     N       -   space dimension, N > 1:
 //                 * if provided, only leading N elements of X are used
 //                 * if not provided, determined automatically from size of X
 //     M       -   system size
@@ -5897,7 +5897,7 @@ namespace alglib_impl {
 void nleqcreatelm(ae_int_t n, ae_int_t m, RVector x, nleqstate *state) {
    SetObj(nleqstate, state);
    ae_assert(n >= 1, "NLEQCreateLM: N<1!");
-   ae_assert(m >= 1, "NLEQCreateLM: M<1!");
+   ae_assert(m >= 1, "NLEQCreateLM: M < 1!");
    ae_assert(x->cnt >= n, "NLEQCreateLM: Length(X)<N!");
    ae_assert(isfinitevector(x, n), "NLEQCreateLM: X contains infinite or NaN values!");
 // Initialize
@@ -6319,7 +6319,7 @@ DefClass(nleqreport, AndD DecVal(iterationscount) AndD DecVal(nfunc) AndD DecVal
 //       * vector function F(x) and its Jacobian J(x) are continuously
 //         differentiable on N
 //       * ||F(x)|| provides local error bound on N, i.e. there  exists  such
-//         c1, that ||F(x)||>c1*distance(x,XS)
+//         c1, that ||F(x)|| > c1*distance(x,XS)
 // Note that these conditions are much more weaker than usual non-singularity
 // conditions. For example, algorithm will converge for any  affine  function
 // F (whether its Jacobian singular or not).
@@ -6346,7 +6346,7 @@ DefClass(nleqreport, AndD DecVal(iterationscount) AndD DecVal(nfunc) AndD DecVal
 //
 //
 // Inputs:
-//     N       -   space dimension, N>1:
+//     N       -   space dimension, N > 1:
 //                 * if provided, only leading N elements of X are used
 //                 * if not provided, determined automatically from size of X
 //     M       -   system size
@@ -6376,73 +6376,6 @@ void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nl
    alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
    alglib_impl::ae_state_clear();
 }
-
-//                 LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
-//
-// DESCRIPTION:
-// This algorithm solves system of nonlinear equations
-//     F[0](x[0], ..., x[n-1])   = 0
-//     F[1](x[0], ..., x[n-1])   = 0
-//     ...
-//     F[M-1](x[0], ..., x[n-1]) = 0
-// with M/N do not necessarily coincide.  Algorithm  converges  quadratically
-// under following conditions:
-//     * the solution set XS is nonempty
-//     * for some xs in XS there exist such neighbourhood N(xs) that:
-//       * vector function F(x) and its Jacobian J(x) are continuously
-//         differentiable on N
-//       * ||F(x)|| provides local error bound on N, i.e. there  exists  such
-//         c1, that ||F(x)||>c1*distance(x,XS)
-// Note that these conditions are much more weaker than usual non-singularity
-// conditions. For example, algorithm will converge for any  affine  function
-// F (whether its Jacobian singular or not).
-//
-//
-// REQUIREMENTS:
-// Algorithm will request following information during its operation:
-// * function vector F[] and Jacobian matrix at given point X
-// * value of merit function f(x)=F[0]^2(x)+...+F[M-1]^2(x) at given point X
-//
-//
-// USAGE:
-// 1. User initializes algorithm state with NLEQCreateLM() call
-// 2. User tunes solver parameters with  NLEQSetCond(),  NLEQSetStpMax()  and
-//    other functions
-// 3. User  calls  NLEQSolve()  function  which  takes  algorithm  state  and
-//    pointers (delegates, etc.) to callback functions which calculate  merit
-//    function value and Jacobian.
-// 4. User calls NLEQResults() to get solution
-// 5. Optionally, user may call NLEQRestartFrom() to  solve  another  problem
-//    with same parameters (N/M) but another starting  point  and/or  another
-//    function vector. NLEQRestartFrom() allows to reuse already  initialized
-//    structure.
-//
-//
-// Inputs:
-//     N       -   space dimension, N>1:
-//                 * if provided, only leading N elements of X are used
-//                 * if not provided, determined automatically from size of X
-//     M       -   system size
-//     X       -   starting point
-//
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-//
-// NOTES:
-// 1. you may tune stopping conditions with NLEQSetCond() function
-// 2. if target function contains exp() or other fast growing functions,  and
-//    optimization algorithm makes too large steps which leads  to  overflow,
-//    use NLEQSetStpMax() function to bound algorithm's steps.
-// 3. this  algorithm  is  a  slightly  modified implementation of the method
-//    described  in  'Levenberg-Marquardt  method  for constrained  nonlinear
-//    equations with strong local convergence properties' by Christian Kanzow
-//    Nobuo Yamashita and Masao Fukushima and further  developed  in  'On the
-//    convergence of a New Levenberg-Marquardt Method'  by  Jin-yan  Fan  and
-//    Ya-Xiang Yuan.
-//
-// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state) {
    ae_int_t n = x.length();
@@ -6512,7 +6445,7 @@ void nleqsetstpmax(const nleqstate &state, const double stpmax) {
 }
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool nleqiteration(const nleqstate &state) {
    alglib_impl::ae_state_init();
@@ -6522,6 +6455,20 @@ bool nleqiteration(const nleqstate &state) {
    return Ok;
 }
 
+// This family of functions is used to launch iterations of nonlinear solver
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     jac     -   callback which calculates function vector fi[]
+//                 and Jacobian jac at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+//
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -6620,16 +6567,16 @@ static void directsparsesolvers_initreport(sparsesolverreport *rep) {
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate or non-SPD system).
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b, sparsesolverreport *rep, RVector x) {
@@ -6678,16 +6625,16 @@ void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b, sparse
 //
 // Inputs:
 //     A       -   sparse NxN matrix stored in SKS format, must be NxN exactly
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[N], right part
 //
 // Outputs:
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate or non-SPD system).
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b, sparsesolverreport *rep, RVector x) {
@@ -6732,15 +6679,15 @@ void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly, any storage format
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolve(sparsematrix *a, ae_int_t n, RVector b, RVector x, sparsesolverreport *rep) {
@@ -6802,15 +6749,15 @@ void sparsesolve(sparsematrix *a, ae_int_t n, RVector b, RVector x, sparsesolver
 //     A       -   LU factorization of the sparse matrix, must be NxN exactly
 //                 in CRS storage format
 //     P, Q    -   pivot indexes from LU factorization
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparselusolve(sparsematrix *a, ZVector p, ZVector q, ae_int_t n, RVector b, RVector x, sparsesolverreport *rep) {
@@ -6891,16 +6838,16 @@ DefClass(sparsesolverreport, AndD DecVal(terminationtype))
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate or non-SPD system).
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x) {
@@ -6919,16 +6866,16 @@ void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper,
 //
 // Inputs:
 //     A       -   sparse NxN matrix stored in SKS format, must be NxN exactly
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[N], right part
 //
 // Outputs:
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate or non-SPD system).
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x) {
@@ -6946,15 +6893,15 @@ void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool 
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly, any storage format
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
@@ -6975,15 +6922,15 @@ void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b
 //     A       -   LU factorization of the sparse matrix, must be NxN exactly
 //                 in CRS storage format
 //     P, Q    -   pivot indexes from LU factorization
-//     N       -   size of A, N>0
+//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
 //     X       -   array[N], it contains:
-//                 * rep.terminationtype>0    =>  solution
+//                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
 //     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; >0 for success,
+//                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
@@ -7023,7 +6970,7 @@ static void lincg_updateitersdata(lincgstate *state) {
 //    LinCGState structure.
 //
 // Inputs:
-//     N       -   problem dimension, N>0
+//     N       -   problem dimension, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -7647,7 +7594,7 @@ DefClass(lincgreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(
 //    LinCGState structure.
 //
 // Inputs:
-//     N       -   problem dimension, N>0
+//     N       -   problem dimension, N > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state

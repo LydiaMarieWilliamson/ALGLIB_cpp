@@ -207,7 +207,7 @@ namespace alglib {
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -231,7 +231,7 @@ void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -257,7 +257,7 @@ void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_ar
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -281,7 +281,7 @@ void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -301,7 +301,7 @@ void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const compl
 //     R   -   convolution: A*B. array[0..N+M-2].
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -325,7 +325,7 @@ void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, c
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+//     It is assumed that A is zero at T < 0, B is zero too.  If  one  or  both
 // functions have non-zero values at negative T's, you  can  still  use  this
 // subroutine - just shift its result correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -345,7 +345,7 @@ void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b
 //     R   -   convolution: A*B. array[0..M-1].
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov
@@ -369,7 +369,7 @@ void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_arr
 // (if your response function is degenerate, i.e. has zero Fourier coefficient).
 //
 // NOTE:
-//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+//     It is assumed that B is zero at T < 0. If  it  has  non-zero  values  at
 // negative T's, you can still use this subroutine - just  shift  its  result
 // correspondingly.
 // ALGLIB: Copyright 21.07.2009 by Sergey Bochkanov

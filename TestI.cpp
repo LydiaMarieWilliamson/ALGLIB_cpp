@@ -605,8 +605,7 @@ int main() {
             kdtreequeryresultsx(kdt, r);
             _TestResult = _TestResult && doc_test_real_matrix(r, "[[0,0]]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -647,8 +646,7 @@ int main() {
             kdtreequeryresultsx(kdt, rx);
             _TestResult = _TestResult && doc_test_real_matrix(rx, "[[0,0],[1,1]]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -696,8 +694,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real_matrix(r0, "[[0,0]]", 0.05);
             _TestResult = _TestResult && doc_test_real_matrix(r1, "[[0,0]]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -754,8 +751,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real_vector(xtbl, "[0, 1, 2, 3]", 0.005);
             _TestResult = _TestResult && doc_test_real_matrix(ytbl, "[[1], [0.367], [0.135], [0.050]]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -826,8 +822,7 @@ int main() {
             sparsemv(s, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,-5.000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -911,8 +906,7 @@ int main() {
             sparsemv(s, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,-2.000,2.000,-9]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -982,8 +976,7 @@ int main() {
          optypeb = 1;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
          _TestResult = _TestResult && doc_test_real_matrix(c, "[[5,1],[5,3]]", 0.0001);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -1038,8 +1031,7 @@ int main() {
       // output result.
       // IMPORTANT: lower triangle of C was NOT updated!
          _TestResult = _TestResult && doc_test_real_matrix(c, "[[1,2],[0,4]]", 0.0001);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -1061,8 +1053,7 @@ int main() {
          c = "[[0,0],[0,0]]";
          cmatrixgemm(2, 2, 2, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
          _TestResult = _TestResult && doc_test_complex_matrix(c, "[[4i,3i],[2,4]]", 0.0001);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -1099,8 +1090,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real(rep.r1, 0.5, 0.00005);
             _TestResult = _TestResult && doc_test_real(rep.rinf, 0.5, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1138,8 +1128,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real(rep.r1, 0.5, 0.00005);
             _TestResult = _TestResult && doc_test_real(rep.rinf, 0.5, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1175,8 +1164,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && doc_test_real_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1212,8 +1200,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && doc_test_complex_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1234,8 +1221,7 @@ int main() {
          _TestResult = _TestResult && doc_test_int(info, -3);
          _TestResult = _TestResult && doc_test_real(rep.r1, 0.0, 0.00005);
          _TestResult = _TestResult && doc_test_real(rep.rinf, 0.0, 0.00005);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -1255,8 +1241,7 @@ int main() {
          _TestResult = _TestResult && doc_test_int(info, -3);
          _TestResult = _TestResult && doc_test_real(rep.r1, 0.0, 0.00005);
          _TestResult = _TestResult && doc_test_real(rep.rinf, 0.0, 0.00005);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -1274,8 +1259,7 @@ int main() {
          matinvreport rep;
          spdmatrixinverse(a, info, rep);
          _TestResult = false;
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
       }
       if (!_TestResult) {
          printf("%-32s FAILED\n", "matinv_e_spd1");
@@ -1292,8 +1276,7 @@ int main() {
          matinvreport rep;
          hpdmatrixinverse(a, info, rep);
          _TestResult = false;
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
       }
       if (!_TestResult) {
          printf("%-32s FAILED\n", "matinv_e_hpd1");
@@ -1401,8 +1384,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1511,8 +1493,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1576,8 +1557,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1663,8 +1643,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
             _TestResult = _TestResult && doc_test_real_vector(x, "[1.000,2.000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1795,8 +1774,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -1932,8 +1910,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2062,8 +2039,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2195,8 +2171,7 @@ int main() {
             minqpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2339,8 +2314,7 @@ int main() {
             minqpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[2.5,2]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2464,8 +2438,7 @@ int main() {
             minqpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, -5);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2562,8 +2535,7 @@ int main() {
             minqpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2712,8 +2684,7 @@ int main() {
             minqpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, -4);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -2828,8 +2799,7 @@ int main() {
             minlpresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[0,1]", 0.0005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3000,8 +2970,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3169,8 +3138,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3345,8 +3313,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3476,8 +3443,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3607,8 +3573,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3740,8 +3705,7 @@ int main() {
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -3852,8 +3816,7 @@ int main() {
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4007,8 +3970,7 @@ int main() {
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4166,8 +4128,7 @@ int main() {
             minnsresults(state, x1, rep);
             _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4277,8 +4238,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4387,8 +4347,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4494,8 +4453,7 @@ int main() {
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
             _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4571,8 +4529,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4669,8 +4626,7 @@ int main() {
             minlmoptguardresults(state, ogrep);
             _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4720,8 +4676,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4814,8 +4769,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-1,+1]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4883,8 +4837,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[0,1]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4922,8 +4875,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -4961,8 +4913,7 @@ int main() {
             minlmresults(state, x, rep);
             _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5020,8 +4971,7 @@ int main() {
             samplepercentile(x, p, v);
             _TestResult = _TestResult && doc_test_real(v, 20.5, 0.01);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5075,8 +5025,7 @@ int main() {
             v = spearmancorr2(x, y);
             _TestResult = _TestResult && doc_test_real(v, 1.000, 0.001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5120,8 +5069,7 @@ int main() {
             spearmancorrm(x, c);
             _TestResult = _TestResult && doc_test_real_matrix(c, "[[1.000,0.556,-0.306],[0.556,1.000,-0.750],[-0.306,-0.750,1.000]]", 0.01);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5172,8 +5120,7 @@ int main() {
             spearmancorrm2(x, y, c);
             _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.541,-0.649],[0.216,-0.433],[0.433,-0.135]]", 0.01);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5288,8 +5235,7 @@ int main() {
                p = -INFINITY;
             samplepercentile(x8, 10, p, v);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5625,8 +5571,7 @@ int main() {
                spoil_matrix_by_deleting_col(y15);
             spearmancorrm2(x15, y15, 5, 3, 2, c);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5683,8 +5628,7 @@ int main() {
             ssaanalyzesequence(s, x, trend, noise);
             _TestResult = _TestResult && doc_test_real_vector(trend, "[0.3815,0.5582,0.7810,1.0794,1.5041,2.0105]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5746,8 +5690,7 @@ int main() {
          //
             _TestResult = _TestResult && doc_test_real_vector(trend, "[9.0005,9.9322,10.8051]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5862,8 +5805,7 @@ int main() {
          // it is exactly the same as one calculated with incremental approach!
             _TestResult = _TestResult && doc_test_real_matrix(a2, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5893,8 +5835,7 @@ int main() {
          _TestResult = _TestResult && doc_test_int(info, 1);
          lrunpack(model, c, nvars);
          _TestResult = _TestResult && doc_test_real_vector(c, "[1.98650,0.00000]", 0.00005);
-      }
-      catch(ap_error) {
+      } catch(ap_error) {
          _TestResult = false;
       }
       if (!_TestResult) {
@@ -5925,8 +5866,7 @@ int main() {
             filtersma(x, 2);
             _TestResult = _TestResult && doc_test_real_vector(x, "[5,5.5,6.5,7.5]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5958,8 +5898,7 @@ int main() {
             filterema(x, 0.5);
             _TestResult = _TestResult && doc_test_real_vector(x, "[5,5.5,6.25,7.125]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -5991,8 +5930,7 @@ int main() {
             filterlrma(x, 3);
             _TestResult = _TestResult && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6071,8 +6009,7 @@ int main() {
          //
             _TestResult = _TestResult && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6162,8 +6099,7 @@ int main() {
          //
             _TestResult = _TestResult && doc_test_real_matrix(p, "[[0.95,0.50,0.00],[0.05,0.25,0.00],[0.00,0.25,1.00]]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6227,8 +6163,7 @@ int main() {
             mlpprocess(network, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[4.000]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6294,8 +6229,7 @@ int main() {
             mlpprocess(network, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[3.000,2.000]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6410,8 +6344,7 @@ int main() {
             mlpprocess(network, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[0.500,0.500]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6510,8 +6443,7 @@ int main() {
             mlpprocess(network, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,0.000,1.000]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6623,8 +6555,7 @@ int main() {
             mlptrainnetwork(trn, net2, 5, rep);
             mlptrainnetwork(trn, net3, 5, rep);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6694,8 +6625,7 @@ int main() {
          // estimates.
          //
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6745,8 +6675,7 @@ int main() {
             mlpecreate1(1, 4, 1, 50, ensemble);
             mlptrainensemblees(trn, ensemble, 5, rep);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6840,8 +6769,7 @@ int main() {
          //
             mlptrainensemblees(trn, ensemble, 5, rep);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -6962,8 +6890,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int_vector(rep.p, "[3,4,0,2,1]");
             _TestResult = _TestResult && doc_test_int_matrix(rep.pm, "[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]");
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7035,8 +6962,7 @@ int main() {
             clusterizerrunkmeans(s, 2, rep);
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, -5);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7092,8 +7018,7 @@ int main() {
             clusterizergetkclusters(rep, 2, cidx, cz);
             _TestResult = _TestResult && doc_test_int_vector(cidx, "[0,0,1,1,1]");
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7160,8 +7085,7 @@ int main() {
             clusterizerrunahc(s, rep);
             _TestResult = _TestResult && doc_test_int_matrix(rep.z, "[[0,2],[1,3]]");
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7216,8 +7140,7 @@ int main() {
             clusterizergetkclusters(rep, 3, cidx, cz);
             _TestResult = _TestResult && doc_test_int_vector(cidx, "[2,2,1,0,1]");
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7234,7 +7157,7 @@ int main() {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
-         // as ones with x >= 0 and ones with x<0 (y is ignored, but our classifier
+         // as ones with x >= 0 and ones with x < 0 (y is ignored, but our classifier
          // has to find out it).
          //
          // First, we have to create decision forest builder object, load dataset and
@@ -7300,8 +7223,7 @@ int main() {
             i = dfclassify(forest, x);
             _TestResult = _TestResult && doc_test_int(i, 0);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7376,8 +7298,7 @@ int main() {
             i = dfclassify(model, x);
             _TestResult = _TestResult && doc_test_int(i, -1);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7394,7 +7315,7 @@ int main() {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
-         // as ones with x >= 0 and ones with x<0 (y is ignored, but our classifier
+         // as ones with x >= 0 and ones with x < 0 (y is ignored, but our classifier
          // has to find out it).
          //
          // First, we have to create KNN builder object, load dataset and specify
@@ -7457,8 +7378,7 @@ int main() {
             i = knnclassify(model, x);
             _TestResult = _TestResult && doc_test_int(i, 0);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7535,8 +7455,7 @@ int main() {
             i = knnclassify(model, x);
             _TestResult = _TestResult && doc_test_int(i, -1);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7579,8 +7498,7 @@ int main() {
             autogkresults(s, v, rep);
             _TestResult = _TestResult && doc_test_real(v, 1.7182, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7615,8 +7533,7 @@ int main() {
             fftc1dinv(z);
             _TestResult = _TestResult && doc_test_complex_vector(z, "[1i,1i,1i,1i]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7650,8 +7567,7 @@ int main() {
             fftc1dinv(z);
             _TestResult = _TestResult && doc_test_complex_vector(z, "[0,1,0,1i]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7688,8 +7604,7 @@ int main() {
             fftr1dinv(f, x2);
             _TestResult = _TestResult && doc_test_real_vector(x2, "[1,1,1,1]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7743,8 +7658,7 @@ int main() {
             fftr1dinv(f, 4, x2);
             _TestResult = _TestResult && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7769,8 +7683,7 @@ int main() {
             fftc1dinv(z);
             _TestResult = _TestResult && doc_test_complex_vector(z, "[0,1i,0,-1i]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7847,8 +7760,7 @@ int main() {
             v = idwcalc2(model, 1.0, 0.0);
             _TestResult = _TestResult && doc_test_real(v, 3.000, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7910,8 +7822,7 @@ int main() {
             v = idwcalc2(model2, 1.0, 0.0);
             _TestResult = _TestResult && doc_test_real(v, 3.000, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -7965,8 +7876,7 @@ int main() {
             v = spline1dcalc(s, t);
             _TestResult = _TestResult && doc_test_real(v, 0.125, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8035,8 +7945,7 @@ int main() {
             v = spline1dcalc(s, t);
             _TestResult = _TestResult && doc_test_real(v, 0.0580, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8105,8 +8014,7 @@ int main() {
             v = spline1dcalc(s, 2.0);
             _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8175,8 +8083,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
             _TestResult = _TestResult && doc_test_real_vector(d2, "[ 2.0,  2.0, 2.0,  2.0,  2.0]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8260,8 +8167,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
             _TestResult = _TestResult && doc_test_real_vector(d2_new, "[2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]", 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8341,8 +8247,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(nsections, 2);
             _TestResult = _TestResult && doc_test_int_vector(idxy, "[0,2,3]");
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8431,8 +8336,7 @@ int main() {
             v = spline3dcalc(s, vx, vy, vz);
             _TestResult = _TestResult && doc_test_real(v, 1.2500, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8529,8 +8433,7 @@ int main() {
             spline3dcalcv(s, vx, vy, vz, v);
             _TestResult = _TestResult && doc_test_real_vector(v, "[1.2500,1.5000]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8598,8 +8501,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real(dv, -3.0, 0.00005);
             _TestResult = _TestResult && doc_test_real(d2v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8648,8 +8550,7 @@ int main() {
             polynomialbar2pow(p, a2);
             _TestResult = _TestResult && doc_test_real_vector(a2, "[0,-1,+1]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8736,8 +8637,7 @@ int main() {
             v = polynomialcalccheb2(-1, +1, y_cheb2, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8781,8 +8681,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8817,8 +8716,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8853,8 +8751,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8903,8 +8800,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8937,8 +8833,7 @@ int main() {
             v = polynomialcalceqdist(0.0, 2.0, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -8985,8 +8880,7 @@ int main() {
             v = polynomialcalccheb1(a, b, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9033,8 +8927,7 @@ int main() {
             v = polynomialcalccheb2(a, b, y, 3, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9067,8 +8960,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9115,8 +9007,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9163,8 +9054,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9195,8 +9085,7 @@ int main() {
             v = polynomialcalceqdist(0.0, 2.0, y, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9241,8 +9130,7 @@ int main() {
             v = polynomialcalccheb1(a, b, y, t);
             _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9287,8 +9175,7 @@ int main() {
             v = polynomialcalccheb2(a, b, y, t);
             _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9390,8 +9277,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9482,8 +9368,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9574,8 +9459,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9668,8 +9552,7 @@ int main() {
             lsfitresults(state, info, c, rep);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.0]", 0.05);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9785,8 +9668,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 2);
             _TestResult = _TestResult && doc_test_real_vector(c, "[4.142560e+12, 0.434240, 0.565376]", -0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9855,8 +9737,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && doc_test_real_vector(c, "[1.983354]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -9952,8 +9833,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && doc_test_real_vector(c, "[0,0.938322]", 0.0005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10058,8 +9938,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.023, 0.002);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10168,8 +10047,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.000, 0.001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10267,8 +10145,7 @@ int main() {
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
             _TestResult = _TestResult && doc_test_int(info, 1);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10315,8 +10192,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.011, 0.002);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10375,8 +10251,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.023, 0.002);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10453,8 +10328,7 @@ int main() {
             v = barycentriccalc(p, t);
             _TestResult = _TestResult && doc_test_real(v, 2.000, 0.001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10508,8 +10382,7 @@ int main() {
             v = logisticcalc4(0.5, a, b, c, d);
             _TestResult = _TestResult && doc_test_real(v, -0.33874308, 0.001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10565,8 +10438,7 @@ int main() {
             v = logisticcalc5(0.5, a, b, c, d, g);
             _TestResult = _TestResult && doc_test_real(v, -0.2354656824, 0.001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10630,8 +10502,7 @@ int main() {
             v = spline2dcalc(s, vx, vy);
             _TestResult = _TestResult && doc_test_real(v, 1.1250, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10703,8 +10574,7 @@ int main() {
             _TestResult = _TestResult && doc_test_real(dx, 0.5000, 0.00005);
             _TestResult = _TestResult && doc_test_real(dy, 2.0000, 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10779,8 +10649,7 @@ int main() {
          // check maximum error - it must be nearly zero
             _TestResult = _TestResult && doc_test_real(rep.maxerror, 0.000, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10837,8 +10706,7 @@ int main() {
             spline2dunpackv(s, m, n, d, c);
             _TestResult = _TestResult && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10924,8 +10792,7 @@ int main() {
             spline2dcalcv(snew, 0.5, 1.0, vr);
             _TestResult = _TestResult && doc_test_real_vector(vr, "[8.000,7.000]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -10978,8 +10845,7 @@ int main() {
             spline2dcalcv(s, 0.1, 0.3, vr);
             _TestResult = _TestResult && doc_test_real_vector(vr, "[0.700,0.500]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11069,8 +10935,7 @@ int main() {
             v = rbfcalc2(model, 0.0, 0.0);
             _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11164,8 +11029,7 @@ int main() {
             rbfcalc(model, x, y);
             _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,-1.000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11269,8 +11133,7 @@ int main() {
             v = rbfcalc2(model, 1000.0, 0.0);
             _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11361,8 +11224,7 @@ int main() {
             v = rbfcalc2(model1, 0.0, 0.0);
             _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11396,8 +11258,7 @@ int main() {
             a = rmatrixdet(b);
             _TestResult = _TestResult && doc_test_real(a, -3, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11427,8 +11288,7 @@ int main() {
             a = rmatrixdet(b, 2);
             _TestResult = _TestResult && doc_test_real(a, 9, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11462,8 +11322,7 @@ int main() {
             a = cmatrixdet(b);
             _TestResult = _TestResult && doc_test_complex(a, -2, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11493,8 +11352,7 @@ int main() {
             a = cmatrixdet(b, 2);
             _TestResult = _TestResult && doc_test_complex(a, complex(0, 9), 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11528,8 +11386,7 @@ int main() {
             a = cmatrixdet(b);
             _TestResult = _TestResult && doc_test_complex(a, 7, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11559,8 +11416,7 @@ int main() {
             a = rmatrixdet(b, 2);
             _TestResult = _TestResult && doc_test_real(a, 25, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11599,8 +11455,7 @@ int main() {
             a = rmatrixludet(b, p);
             _TestResult = _TestResult && doc_test_real(a, -5, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11633,8 +11488,7 @@ int main() {
             a = rmatrixludet(b, p, 2);
             _TestResult = _TestResult && doc_test_real(a, 25, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11664,8 +11518,7 @@ int main() {
             a = cmatrixdet(b, 2);
             _TestResult = _TestResult && doc_test_complex(a, -9, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11704,8 +11557,7 @@ int main() {
             a = cmatrixludet(b, p);
             _TestResult = _TestResult && doc_test_complex(a, complex(0, -5), 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11738,8 +11590,7 @@ int main() {
             a = cmatrixludet(b, p, 2);
             _TestResult = _TestResult && doc_test_complex(a, 25, 0.0001);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11810,8 +11661,7 @@ int main() {
             sparsesolvesks(s, n, isuppertriangle, b, rep, x);
             _TestResult = _TestResult && doc_test_real_vector(x, "[1.0000, 2.0000, 3.0000, 4.0000]", 0.00005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11912,8 +11762,7 @@ int main() {
             _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
             _TestResult = _TestResult && doc_test_real_vector(x, "[1.000,2.000,1.000,2.000,1.000]", 0.005);
             _TestResult = _TestResult && _spoil_scenario == -1;
-         }
-         catch(ap_error) {
+         } catch(ap_error) {
             _TestResult = _TestResult && _spoil_scenario != -1;
          }
       }
@@ -11922,8 +11771,7 @@ int main() {
          fflush(stdout);
       }
       _TotalResult = _TotalResult && _TestResult;
-   }
-   catch(...) {
+   } catch(...) {
       printf("Unhandled exception was raised!\n");
       return 1;
    }

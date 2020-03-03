@@ -680,7 +680,7 @@ double invnormalcdf(double y0) {
 //                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
 //
 //
-// with -1<rho<+1 and arbitrary x, y.
+// with -1 < rho < +1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
@@ -756,7 +756,7 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 //                       (        2*(1-rho^2)        )
 //
 //
-// with -1<rho<+1 and arbitrary x, y.
+// with -1 < rho < +1 and arbitrary x, y.
 //
 // This subroutine uses high-precision approximation scheme proposed  by
 // Alan Genz in "Numerical  Computation  of  Rectangular  Bivariate  and
@@ -1046,7 +1046,7 @@ double invnormalcdf(const double y0) {
 //                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
 //
 //
-// with -1<rho<+1 and arbitrary x, y.
+// with -1 < rho < +1 and arbitrary x, y.
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
@@ -1080,7 +1080,7 @@ double bivariatenormalpdf(const double x, const double y, const double rho) {
 //                       (        2*(1-rho^2)        )
 //
 //
-// with -1<rho<+1 and arbitrary x, y.
+// with -1 < rho < +1 and arbitrary x, y.
 //
 // This subroutine uses high-precision approximation scheme proposed  by
 // Alan Genz in "Numerical  Computation  of  Rectangular  Bivariate  and

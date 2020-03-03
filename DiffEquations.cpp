@@ -36,7 +36,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
       h = -h;
    }
 // quick exit if necessary.
-// after this block we assume that M>1
+// after this block we assume that M > 1
    if (m == 1) {
       state->repnfev = 0;
       state->repterminationtype = 1;
@@ -102,17 +102,17 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
 //                 values at X[i] are returned too.
 //                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
 //     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                 * M > 2 means that you need both Y(X[M-1]) and M-2 values at
 //                   intermediate points
 //                 * M=2 means that you want just to integrate from  X[0]  to
 //                   X[1] and don't interested in intermediate values.
 //                 * M=1 means that you don't want to integrate :)
 //                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
+//                 * M < 1 means error
 //     Eps     -   tolerance (absolute/relative error on each  step  will  be
 //                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                 * Eps > 0, it means desired ABSOLUTE error
+//                 * Eps < 0, it means desired RELATIVE error.  Relative errors
 //                   are calculated with respect to maximum values of  Y seen
 //                   so far. Be careful to use this criterion  when  starting
 //                   from Y[] that are close to zero.
@@ -134,7 +134,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
 void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
    SetObj(odesolverstate, state);
    ae_assert(n >= 1, "ODESolverRKCK: N<1!");
-   ae_assert(m >= 1, "ODESolverRKCK: M<1!");
+   ae_assert(m >= 1, "ODESolverRKCK: M < 1!");
    ae_assert(y->cnt >= n, "ODESolverRKCK: Length(Y)<N!");
    ae_assert(x->cnt >= m, "ODESolverRKCK: Length(X)<M!");
    ae_assert(isfinitevector(y, n), "ODESolverRKCK: Y contains infinite or NaN values!");
@@ -189,7 +189,7 @@ Spawn:
    maxgrowpow = pow(odesolver_odesolvermaxgrow, 5.0);
    state->repnfev = 0;
 // some preliminary checks for internal errors
-// after this we assume that H>0 and M>1
+// after this we assume that H>0 and M > 1
    ae_assert(state->h > 0.0, "ODESolver: internal error");
    ae_assert(m > 1, "ODESolverIteration: internal error");
 // choose solver
@@ -482,17 +482,17 @@ DefClass(odesolverreport, AndD DecVal(nfev) AndD DecVal(terminationtype))
 //                 values at X[i] are returned too.
 //                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
 //     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                 * M > 2 means that you need both Y(X[M-1]) and M-2 values at
 //                   intermediate points
 //                 * M=2 means that you want just to integrate from  X[0]  to
 //                   X[1] and don't interested in intermediate values.
 //                 * M=1 means that you don't want to integrate :)
 //                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
+//                 * M < 1 means error
 //     Eps     -   tolerance (absolute/relative error on each  step  will  be
 //                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                 * Eps > 0, it means desired ABSOLUTE error
+//                 * Eps < 0, it means desired RELATIVE error.  Relative errors
 //                   are calculated with respect to maximum values of  Y seen
 //                   so far. Be careful to use this criterion  when  starting
 //                   from Y[] that are close to zero.
@@ -517,50 +517,6 @@ void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array
    alglib_impl::odesolverrkck(ConstT(ae_vector, y), n, ConstT(ae_vector, x), m, eps, h, ConstT(odesolverstate, state));
    alglib_impl::ae_state_clear();
 }
-
-// Cash-Karp adaptive ODE solver.
-//
-// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-// (here Y may be single variable or vector of N variables).
-//
-// Inputs:
-//     Y       -   initial conditions, array[0..N-1].
-//                 contains values of Y[] at X[0]
-//     N       -   system size
-//     X       -   points at which Y should be tabulated, array[0..M-1]
-//                 integrations starts at X[0], ends at X[M-1],  intermediate
-//                 values at X[i] are returned too.
-//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-//     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
-//                   intermediate points
-//                 * M=2 means that you want just to integrate from  X[0]  to
-//                   X[1] and don't interested in intermediate values.
-//                 * M=1 means that you don't want to integrate :)
-//                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
-//     Eps     -   tolerance (absolute/relative error on each  step  will  be
-//                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
-//                   are calculated with respect to maximum values of  Y seen
-//                   so far. Be careful to use this criterion  when  starting
-//                   from Y[] that are close to zero.
-//     H       -   initial  step  lenth,  it  will  be adjusted automatically
-//                 after the first  step.  If  H=0,  step  will  be  selected
-//                 automatically  (usualy  it  will  be  equal  to  0.001  of
-//                 min(x[i]-x[j])).
-//
-// Outputs:
-//     State   -   structure which stores algorithm state between  subsequent
-//                 calls of OdeSolverIteration. Used for reverse communication.
-//                 This structure should be passed  to the OdeSolverIteration
-//                 subroutine.
-//
-// SEE ALSO
-//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-//
-// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state) {
    ae_int_t n = y.length();
@@ -573,7 +529,7 @@ void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double 
 #endif
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool odesolveriteration(const odesolverstate &state) {
    alglib_impl::ae_state_init();
@@ -583,6 +539,13 @@ bool odesolveriteration(const odesolverstate &state) {
    return Ok;
 }
 
+// This function is used to launch iterations of ODE solver
+//
+// It accepts following parameters:
+//     diff    -   callback which calculates dy/dx for given y and x
+//     ptr     -   optional pointer which is passed to diff; can be NULL
+//
+// ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
 void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr) {
    alglib_impl::ae_state_init();
    TryCatch()

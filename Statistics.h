@@ -231,7 +231,7 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -250,7 +250,7 @@ void covm(const real_2d_array &x, real_2d_array &c);
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -269,7 +269,7 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c);
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -291,10 +291,10 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c);
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -316,10 +316,10 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -341,10 +341,10 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -777,7 +777,7 @@ namespace alglib {
 // 10..15     N..100     1.0e-02    2.2e-05
 // 15..100    N..100     6.1e-03    2.7e-06
 //
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// For N, M > 100 accuracy checks weren't put into  practice,  but  taking  into
 // account characteristics of asymptotic approximation used, precision should
 // not be sharply different from the values for interval [5, 100].
 //
@@ -817,7 +817,7 @@ namespace alglib {
 // [0.01, 0.001]       < 6%
 // [0.001, 0]          wasn't measured
 //
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);

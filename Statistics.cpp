@@ -594,7 +594,7 @@ double spearmancorr2(RVector x, RVector y, ae_int_t n) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -613,7 +613,7 @@ void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    NewVector(x0, 0, DT_REAL);
    NewVector(same, 0, DT_BOOL);
    ae_assert(n >= 0, "CovM: N<0");
-   ae_assert(m >= 1, "CovM: M<1");
+   ae_assert(m >= 1, "CovM: M < 1");
    ae_assert(x->rows >= n, "CovM: Rows(X)<N!");
    ae_assert(x->cols >= m || n == 0, "CovM: Cols(X)<M!");
    ae_assert(apservisfinitematrix(x, n, m), "CovM: X contains infinite/NAN elements");
@@ -673,7 +673,7 @@ void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -689,7 +689,7 @@ void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    SetMatrix(c);
    NewVector(t, 0, DT_REAL);
    ae_assert(n >= 0, "PearsonCorrM: N<0");
-   ae_assert(m >= 1, "PearsonCorrM: M<1");
+   ae_assert(m >= 1, "PearsonCorrM: M < 1");
    ae_assert(x->rows >= n, "PearsonCorrM: Rows(X)<N!");
    ae_assert(x->cols >= m || n == 0, "PearsonCorrM: Cols(X)<M!");
    ae_assert(apservisfinitematrix(x, n, m), "PearsonCorrM: X contains infinite/NAN elements");
@@ -720,7 +720,7 @@ void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -741,7 +741,7 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
    NewMatrix(xc, 0, 0, DT_REAL);
    NewVector(t, 0, DT_REAL);
    ae_assert(n >= 0, "SpearmanCorrM: N<0");
-   ae_assert(m >= 1, "SpearmanCorrM: M<1");
+   ae_assert(m >= 1, "SpearmanCorrM: M < 1");
    ae_assert(x->rows >= n, "SpearmanCorrM: Rows(X)<N!");
    ae_assert(x->cols >= m || n == 0, "SpearmanCorrM: Cols(X)<M!");
    ae_assert(apservisfinitematrix(x, n, m), "SpearmanCorrM: X contains infinite/NAN elements");
@@ -826,10 +826,10 @@ void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -940,10 +940,10 @@ void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -1090,10 +1090,10 @@ void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, R
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -1341,7 +1341,7 @@ void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints<0");
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
    ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
    ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
@@ -1391,7 +1391,7 @@ void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures) {
    NewObj(apbuffers, buf0);
    NewObj(apbuffers, buf1);
    NewObj(ae_shared_pool, pool);
-   ae_assert(npoints >= 0, "RankData: NPoints<0");
+   ae_assert(npoints >= 0, "RankData: NPoints < 0");
    ae_assert(nfeatures >= 1, "RankData: NFeatures<1");
    ae_assert(xy->rows >= npoints, "RankData: Rows(XY)<NPoints");
    ae_assert(xy->cols >= nfeatures || npoints == 0, "RankData: Cols(XY)<NFeatures");
@@ -1456,23 +1456,6 @@ void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, doubl
    alglib_impl::samplemoments(ConstT(ae_vector, x), n, &mean, &variance, &skewness, &kurtosis);
    alglib_impl::ae_state_clear();
 }
-
-// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// Outputs:
-//     Mean    -   mean.
-//     Variance-   variance.
-//     Skewness-   skewness (if variance != 0; zero otherwise).
-//     Kurtosis-   kurtosis (if variance != 0; zero otherwise).
-//
-// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis) {
    ae_int_t n = x.length();
@@ -1504,21 +1487,6 @@ double samplemean(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Calculation of the mean.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Mean' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double samplemean(const real_1d_array &x) {
    ae_int_t n = x.length();
@@ -1551,21 +1519,6 @@ double samplevariance(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Calculation of the variance.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Variance' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double samplevariance(const real_1d_array &x) {
    ae_int_t n = x.length();
@@ -1598,21 +1551,6 @@ double sampleskewness(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Calculation of the skewness.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Skewness' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double sampleskewness(const real_1d_array &x) {
    ae_int_t n = x.length();
@@ -1645,21 +1583,6 @@ double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Calculation of the kurtosis.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Kurtosis' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double samplekurtosis(const real_1d_array &x) {
    ae_int_t n = x.length();
@@ -1688,18 +1611,6 @@ void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
    alglib_impl::sampleadev(ConstT(ae_vector, x), n, &adev);
    alglib_impl::ae_state_clear();
 }
-
-// ADev
-//
-// Inputs:
-//     X   -   sample
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Outputs:
-//     ADev-   ADev
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void sampleadev(const real_1d_array &x, double &adev) {
    ae_int_t n = x.length();
@@ -1727,18 +1638,6 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
    alglib_impl::samplemedian(ConstT(ae_vector, x), n, &median);
    alglib_impl::ae_state_clear();
 }
-
-// Median calculation.
-//
-// Inputs:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Outputs:
-//     Median
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplemedian(const real_1d_array &x, double &median) {
    ae_int_t n = x.length();
@@ -1767,19 +1666,6 @@ void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, 
    alglib_impl::samplepercentile(ConstT(ae_vector, x), n, p, &v);
    alglib_impl::ae_state_clear();
 }
-
-// Percentile calculation.
-//
-// Inputs:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//     P   -   percentile (0 <= P <= 1)
-//
-// Outputs:
-//     V   -   percentile
-// ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void samplepercentile(const real_1d_array &x, const double p, double &v) {
    ae_int_t n = x.length();
@@ -1809,19 +1695,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// 2-sample covariance
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     covariance (zero for N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double cov2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'cov2': looks like one of arguments has wrong size");
@@ -1854,20 +1727,6 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Pearson product-moment correlation coefficient
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Pearson product-moment correlation coefficient
-//     (zero for N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
@@ -1900,20 +1759,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_in
    alglib_impl::ae_state_clear();
    return D;
 }
-
-// Spearman's rank correlation coefficient
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Spearman's rank correlation coefficient
-//     (zero for N=0 or N=1)
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
    if (x.length() != y.length()) ThrowError("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
@@ -1935,7 +1780,7 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -1948,23 +1793,6 @@ void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_ar
    alglib_impl::covm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Covariance matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void covm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
@@ -1985,7 +1813,7 @@ void covm(const real_2d_array &x, real_2d_array &c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -1998,23 +1826,6 @@ void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, re
    alglib_impl::pearsoncorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Pearson product-moment correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
@@ -2035,7 +1846,7 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X are used
 //             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
+//     M   -   M > 0, number of variables:
 //             * if given, only leading M columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -2048,23 +1859,6 @@ void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, r
    alglib_impl::spearmancorrm(ConstT(ae_matrix, x), n, m, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Spearman's rank correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M>0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
    ae_int_t n = x.rows();
@@ -2088,10 +1882,10 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -2104,29 +1898,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, con
    alglib_impl::covm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Cross-covariance matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
    if (x.rows() != y.rows()) ThrowError("Error while calling 'covm2': looks like one of arguments has wrong size");
@@ -2152,10 +1923,10 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -2168,29 +1939,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
    alglib_impl::pearsoncorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Pearson product-moment cross-correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
    if (x.rows() != y.rows()) ThrowError("Error while calling 'pearsoncorrm2': looks like one of arguments has wrong size");
@@ -2216,10 +1964,10 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 //     N   -   N >= 0, number of observations:
 //             * if given, only leading N rows of X/Y are used
 //             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
+//     M1  -   M1 > 0, number of variables in X:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
+//     M2  -   M2 > 0, number of variables in Y:
 //             * if given, only leading M1 columns of X are used
 //             * if not given, automatically determined from input size
 //
@@ -2232,29 +1980,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int
    alglib_impl::spearmancorrm2(ConstT(ae_matrix, x), ConstT(ae_matrix, y), n, m1, m2, ConstT(ae_matrix, c));
    alglib_impl::ae_state_clear();
 }
-
-// Spearman's rank cross-correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1>0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2>0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
    if (x.rows() != y.rows()) ThrowError("Error while calling 'spearmancorrm2': looks like one of arguments has wrong size");
@@ -2290,23 +2015,6 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
    alglib_impl::rankdata(ConstT(ae_matrix, xy), npoints, nfeatures);
    alglib_impl::ae_state_clear();
 }
-
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rankdata(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
@@ -2342,25 +2050,6 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
    alglib_impl::rankdatacentered(ConstT(ae_matrix, xy), npoints, nfeatures);
    alglib_impl::ae_state_clear();
 }
-
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
-//   mean value, but does NOT change higher moments
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 #if !defined AE_NO_EXCEPTIONS
 void rankdatacentered(real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
@@ -7702,7 +7391,7 @@ static double correlationtests_spearmantail9(double s) {
    return result;
 }
 
-// Tail(T,N), accepts T<0
+// Tail(T,N), accepts T < 0
 static double correlationtests_spearmantail(double t, ae_int_t n) {
    double result;
    if (n == 5) {
@@ -11875,7 +11564,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
 // 10..15     N..100     1.0e-02    2.2e-05
 // 15..100    N..100     6.1e-03    2.7e-06
 //
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// For N, M > 100 accuracy checks weren't put into  practice,  but  taking  into
 // account characteristics of asymptotic approximation used, precision should
 // not be sharply different from the values for interval [5, 100].
 //
@@ -12087,7 +11776,7 @@ namespace alglib {
 // 10..15     N..100     1.0e-02    2.2e-05
 // 15..100    N..100     6.1e-03    2.7e-06
 //
-// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// For N, M > 100 accuracy checks weren't put into  practice,  but  taking  into
 // account characteristics of asymptotic approximation used, precision should
 // not be sharply different from the values for interval [5, 100].
 //
@@ -13973,7 +13662,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
 // [0.01, 0.001]       < 6%
 // [0.001, 0]          wasn't measured
 //
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(RVector x, ae_int_t n, double *p) {
@@ -14014,7 +13703,7 @@ namespace alglib {
 // [0.01, 0.001]       < 6%
 // [0.001, 0]          wasn't measured
 //
-// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {

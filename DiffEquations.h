@@ -81,17 +81,17 @@ DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 //                 values at X[i] are returned too.
 //                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
 //     M       -   number of intermediate points + first point + last point:
-//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                 * M > 2 means that you need both Y(X[M-1]) and M-2 values at
 //                   intermediate points
 //                 * M=2 means that you want just to integrate from  X[0]  to
 //                   X[1] and don't interested in intermediate values.
 //                 * M=1 means that you don't want to integrate :)
 //                   it is degenerate case, but it will be handled correctly.
-//                 * M<1 means error
+//                 * M < 1 means error
 //     Eps     -   tolerance (absolute/relative error on each  step  will  be
 //                 less than Eps). When passing:
-//                 * Eps>0, it means desired ABSOLUTE error
-//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                 * Eps > 0, it means desired ABSOLUTE error
+//                 * Eps < 0, it means desired RELATIVE error.  Relative errors
 //                   are calculated with respect to maximum values of  Y seen
 //                   so far. Be careful to use this criterion  when  starting
 //                   from Y[] that are close to zero.
@@ -114,18 +114,17 @@ void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool odesolveriteration(const odesolverstate &state);
 
-// This function is used to launcn iterations of ODE solver
+// This function is used to launch iterations of ODE solver
 //
 // It accepts following parameters:
 //     diff    -   callback which calculates dy/dx for given y and x
 //     ptr     -   optional pointer which is passed to diff; can be NULL
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-//
 void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL);
 
 // ODE solver results

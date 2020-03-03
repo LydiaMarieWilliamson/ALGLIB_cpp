@@ -1181,7 +1181,7 @@ DecClass(minlbfgsreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &te
 //
 //
 // Inputs:
-//     N       -   problem dimension. N>0
+//     N       -   problem dimension. N > 0
 //     M       -   number of corrections in the BFGS scheme of Hessian
 //                 approximation update. Recommended value:  3 <= M <= 7. The smaller
 //                 value causes worse convergence, the bigger will  not  cause  a
@@ -1213,7 +1213,7 @@ void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &sta
 // more information about creation of LBFGS optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of corrections in the BFGS scheme of Hessian
@@ -1222,7 +1222,7 @@ void minlbfgscreate(const ae_int_t m, const real_1d_array &x, minlbfgsstate &sta
 //                 considerably better convergence, but will cause a fall in  the
 //                 performance. M <= N.
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -1257,7 +1257,7 @@ void minlbfgscreatef(const ae_int_t m, const real_1d_array &x, const double diff
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -1407,11 +1407,11 @@ void minlbfgssetprecdiag(const minlbfgsstate &state, const real_1d_array &d);
 void minlbfgssetprecscale(const minlbfgsstate &state);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minlbfgsiteration(const minlbfgsstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -1455,8 +1455,8 @@ bool minlbfgsiteration(const minlbfgsstate &state);
 //    to pass gradient information to MinCGOptimize()) will lead to exception
 //    being thrown. Either  you  did  not pass gradient when it WAS needed or
 //    you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -1489,7 +1489,7 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x,
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -2105,7 +2105,7 @@ DecClass(minbleicreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &va
 //       constraints) it can be several times faster than MinBLEIC.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -2128,11 +2128,11 @@ void minbleiccreate(const real_1d_array &x, minbleicstate &state);
 // more information about creation of BLEIC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -2209,9 +2209,9 @@ void minbleicsetbc(const minbleicstate &state, const real_1d_array &bndl, const 
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -2236,7 +2236,7 @@ void minbleicsetlc(const minbleicstate &state, const real_2d_array &c, const int
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -2369,11 +2369,11 @@ void minbleicsetxrep(const minbleicstate &state, const bool needxrep);
 void minbleicsetstpmax(const minbleicstate &state, const double stpmax);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minbleiciteration(const minbleicstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -2417,8 +2417,8 @@ bool minbleiciteration(const minbleicstate &state);
 //    and  to  pass  gradient information to MinBLEICOptimize()) will lead to
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -2451,7 +2451,7 @@ void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x,
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -2957,14 +2957,14 @@ DecClass(minqpstate, EndD);
 //
 // Two arrays of multipliers are returned:
 // * LagBC is array[N] which is loaded with multipliers from box constraints;
-//   LagBC[i]>0 means that I-th constraint is at the  upper bound, LagBC[I]<0
+//   LagBC[i] > 0 means that I-th constraint is at the upper bound, LagBC[I] < 0
 //   means that I-th constraint is at the lower bound, LagBC[I]=0 means  that
 //   I-th box constraint is inactive.
 // * LagLC is array[MSparse+MDense] which is  loaded  with  multipliers  from
 //   general  linear  constraints  (former  MSparse  elements  corresponds to
 //   sparse part of the constraint matrix, latter MDense are  for  the  dense
 //   constraints, as was specified by user).
-//   LagLC[i]>0 means that I-th constraint at  the  upper  bound,  LagLC[i]<0
+//   LagLC[i] > 0 means that I-th constraint at the upper bound, LagLC[i] < 0
 //   means that I-th constraint is at the lower bound, LagLC[i]=0 means  that
 //   I-th linear constraint is inactive.
 //
@@ -3230,7 +3230,7 @@ void minqpsetscaleautodiag(const minqpstate &state);
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -3315,7 +3315,7 @@ void minqpsetalgobleic(const minqpstate &state, const double epsg, const double 
 //                 variable scaling being applied) is less than EpsX.
 //                 See  minqpsetscale()  for  more  information  on  variable
 //                 scaling.
-//     Rho     -   penalty coefficient, Rho>0:
+//     Rho     -   penalty coefficient, Rho > 0:
 //                 * large enough  that  algorithm  converges  with   desired
 //                   precision.
 //                 * not TOO large to prevent ill-conditioning
@@ -3328,7 +3328,7 @@ void minqpsetalgobleic(const minqpstate &state, const double epsg, const double 
 //                   automatically chosen (10 iterations in current version).
 //                 * ItsCnt=1 means that AUL algorithm performs just as usual
 //                   penalty method.
-//                 * ItsCnt>1 means that  AUL  algorithm  performs  specified
+//                 * ItsCnt > 1 means that  AUL  algorithm  performs  specified
 //                   number of outer iterations
 //
 // IT IS VERY IMPORTANT TO CALL minqpsetscale() WHEN YOU USE THIS  ALGORITHM
@@ -3514,7 +3514,7 @@ void minqpsetalgosparseipm(const minqpstate &state, const double eps);
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled constrained gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -3594,7 +3594,7 @@ void minqpsetalgoquickqp(const minqpstate &state, const double epsg, const doubl
 // NOTE: if constraints for all variables are same you may use minqpsetbcall()
 //       which allows to specify constraints without using arrays.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -3628,7 +3628,7 @@ void minqpsetbc(const minqpstate &state, const real_1d_array &bndl, const real_1
 //       is not recommended because large numbers may introduce large numerical
 //       errors in the algorithm.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu);
 
@@ -3657,7 +3657,7 @@ void minqpsetbcall(const minqpstate &state, const double bndl, const double bndu
 //       is not recommended because large numbers may introduce large numerical
 //       errors in the algorithm.
 //
-// NOTE: BndL>BndU will result in QP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in QP problem being recognized as infeasible.
 // ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, const double bndu);
 
@@ -3680,9 +3680,9 @@ void minqpsetbci(const minqpstate &state, const ae_int_t i, const double bndl, c
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -3716,9 +3716,9 @@ void minqpsetlc(const minqpstate &state, const real_2d_array &c, const integer_1
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0
 //
 // NOTE 1: linear (non-bound) constraints are satisfied only approximately  -
@@ -3749,9 +3749,9 @@ void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const inte
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     SparseCT-   type of sparse constraints, array[K]:
-//                 * if SparseCT[i]>0, then I-th constraint is SparseC[i,*]*x >= SparseC[i,n+1]
+//                 * if SparseCT[i] > 0, then I-th constraint is SparseC[i,*]*x >= SparseC[i,n+1]
 //                 * if SparseCT[i]=0, then I-th constraint is SparseC[i,*]*x  = SparseC[i,n+1]
-//                 * if SparseCT[i]<0, then I-th constraint is SparseC[i,*]*x <= SparseC[i,n+1]
+//                 * if SparseCT[i] < 0, then I-th constraint is SparseC[i,*]*x <= SparseC[i,n+1]
 //     SparseK -   number of sparse equality/inequality constraints, K >= 0
 //     DenseC  -   dense linear constraints, array[K,N+1].
 //                 Each row of DenseC represents one constraint, either equality
@@ -3760,9 +3760,9 @@ void minqpsetlcsparse(const minqpstate &state, const sparsematrix &c, const inte
 //                 * last element corresponds to the right part.
 //                 All elements of DenseC (including right part) must be finite.
 //     DenseCT -   type of constraints, array[K]:
-//                 * if DenseCT[i]>0, then I-th constraint is DenseC[i,*]*x >= DenseC[i,n+1]
+//                 * if DenseCT[i] > 0, then I-th constraint is DenseC[i,*]*x >= DenseC[i,n+1]
 //                 * if DenseCT[i]=0, then I-th constraint is DenseC[i,*]*x  = DenseC[i,n+1]
-//                 * if DenseCT[i]<0, then I-th constraint is DenseC[i,*]*x <= DenseC[i,n+1]
+//                 * if DenseCT[i] < 0, then I-th constraint is DenseC[i,*]*x <= DenseC[i,n+1]
 //     DenseK  -   number of equality/inequality constraints, DenseK >= 0
 //
 // NOTE 1: linear (non-box) constraints  are  satisfied only approximately  -
@@ -3811,7 +3811,7 @@ void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec,
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] < AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
 //                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
 //                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
@@ -3834,7 +3834,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] < AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
 //                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
 //                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
@@ -3869,7 +3869,7 @@ void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_a
 //                 SparseK elements corresponding to sparse constraints,  and
 //                 latter DenseK elements corresponding to dense constraints;
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] < AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
 //                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
 //                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
@@ -3887,7 +3887,7 @@ void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, cons
 //                 included.
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
 //                 * AL=-INF  => one-sided constraint Ai*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
@@ -3911,7 +3911,7 @@ void minqpaddlc2dense(const minqpstate &state, const real_1d_array &a, const dou
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
 //                 * AL=-INF  => one-sided constraint A*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
@@ -4174,12 +4174,12 @@ DecClass(minlpstate, EndD);
 // * y                         dual variables
 // * stats                     array[N+M], statuses of box (N) and linear (M)
 //                             constraints:
-//                             * stats[i]>0  =>  constraint at upper bound
-//                                               (also used for free non-basic
-//                                               variables set to zero)
-//                             * stats[i]<0  =>  constraint at lower bound
-//                             * stats[i]=0  =>  constraint is inactive, basic
-//                                               variable
+//                             * stats[i] > 0  =>  constraint at upper bound
+//                                                 (also used for free non-basic
+//                                                 variables set to zero)
+//                             * stats[i] < 0  =>  constraint at lower bound
+//                             * stats[i] = 0  =>  constraint is inactive, basic
+//                                                 variable
 // * primalerror               primal feasibility error
 // * dualerror                 dual feasibility error
 // * iterationscount           iteration count
@@ -4289,7 +4289,7 @@ void minlpsetscale(const minlpstate &state, const real_1d_array &s);
 // NOTE: if constraints for all variables are same you may use minlpsetbcall()
 //       which allows to specify constraints without using arrays.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1d_array &bndu);
 
@@ -4326,7 +4326,7 @@ void minlpsetbc(const minlpstate &state, const real_1d_array &bndl, const real_1
 // NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
 //       different variables.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu);
 
@@ -4362,7 +4362,7 @@ void minlpsetbcall(const minlpstate &state, const double bndl, const double bndu
 // NOTE: minlpsetbc() can  be  used  to  specify  different  constraints  for
 //       different variables.
 //
-// NOTE: BndL>BndU will result in LP problem being recognized as infeasible.
+// NOTE: BndL > BndU will result in LP problem being recognized as infeasible.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
 void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, const double bndu);
 
@@ -4384,9 +4384,9 @@ void minlpsetbci(const minlpstate &state, const ae_int_t i, const double bndl, c
 //                 one constraint, with first N elements being linear coefficients,
 //                 and last element being right side.
 //     CT      -   constraint types, array[K]:
-//                 * if CT[i]>0, then I-th constraint is A[i,*]*x >= A[i,n]
+//                 * if CT[i] > 0, then I-th constraint is A[i,*]*x >= A[i,n]
 //                 * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
-//                 * if CT[i]<0, then I-th constraint is A[i,*]*x <= A[i,n]
+//                 * if CT[i] < 0, then I-th constraint is A[i,*]*x <= A[i,n]
 //     K       -   number of equality/inequality constraints,  K >= 0;  if  not
 //                 given, inferred from sizes of A and CT.
 // ALGLIB: Copyright 19.07.2018 by Sergey Bochkanov
@@ -4418,7 +4418,7 @@ void minlpsetlc(const minlpstate &state, const real_2d_array &a, const integer_1
 //                 supported (see below)
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] < AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
 //                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
 //                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
@@ -4441,7 +4441,7 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
 //                 A can be stored in any sparse storage format.
 //     AL, AU  -   lower and upper bounds, array[K];
 //                 * AL[i]=AU[i] => equality constraint Ai*x
-//                 * AL[i]<AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
+//                 * AL[i] < AU[i] => two-sided constraint AL[i] <= Ai*x <= AU[i]
 //                 * AL[i]=-INF  => one-sided constraint Ai*x <= AU[i]
 //                 * AU[i]=+INF  => one-sided constraint AL[i] <= Ai*x
 //                 * AL[i]=-INF, AU[i]=+INF => constraint is ignored
@@ -4465,7 +4465,7 @@ void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_a
 //                 included.
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint Ai*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
 //                 * AL=-INF  => one-sided constraint Ai*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= Ai*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
@@ -4489,7 +4489,7 @@ void minlpaddlc2dense(const minlpstate &state, const real_1d_array &a, const dou
 //     NNZ     -   number of non-zero coefficients in A
 //     AL, AU  -   lower and upper bounds;
 //                 * AL=AU    => equality constraint A*x
-//                 * AL<AU    => two-sided constraint AL <= A*x <= AU
+//                 * AL < AU    => two-sided constraint AL <= A*x <= AU
 //                 * AL=-INF  => one-sided constraint A*x <= AU
 //                 * AU=+INF  => one-sided constraint AL <= A*x
 //                 * AL=-INF, AU=+INF => constraint is ignored
@@ -4990,7 +4990,7 @@ DecClass(minnlcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &term
 //
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -5013,7 +5013,7 @@ void minnlccreate(const real_1d_array &x, minnlcstate &state);
 // information about creation of NLC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -5021,7 +5021,7 @@ void minnlccreate(const real_1d_array &x, minnlcstate &state);
 //                 * but X can be infeasible, in which case algorithm will try
 //                   to find feasible point first, using X as initial
 //                   approximation.
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure stores algorithm state
@@ -5097,9 +5097,9 @@ void minnlcsetbc(const minnlcstate &state, const real_1d_array &bndl, const real
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -5247,9 +5247,9 @@ void minnlcsetprecinexact(const minnlcstate &state);
 // Exact low-rank preconditioner  uses  Woodbury  matrix  identity  to  build
 // quadratic model of the penalized function. It has following features:
 // * no special assumptions about orthogonality of constraints
-// * preconditioner evaluation is optimized for K<<N. Its cost  is  O(N*K^2),
+// * preconditioner evaluation is optimized for K << N. Its cost  is  O(N*K^2),
 //   so it may become prohibitively slow for K >= N.
-// * finally, stability of the process is guaranteed only for K<<N.  Woodbury
+// * finally, stability of the process is guaranteed only for K << N.  Woodbury
 //   update often fail for K >= N due to degeneracy of  intermediate  matrices.
 //   That's why we recommend to use "exact robust"  preconditioner  for  such
 //   cases.
@@ -5299,7 +5299,7 @@ void minnlcsetprecexactlowrank(const minnlcstate &state, const ae_int_t updatefr
 //   version which fails for K >= N, this one works well for any value of K.
 // * the only drawback is that is takes O(N^3+K*N^2) time  to  build  it.  No
 //   economical  Woodbury update is applied even when it  makes  sense,  thus
-//   there  are  exist situations (K<<N) when "exact low rank" preconditioner
+//   there  are  exist situations (K << N) when "exact low rank" preconditioner
 //   outperforms this one.
 //
 // RECOMMENDATIONS
@@ -5404,7 +5404,7 @@ void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 //
 // Inputs:
 //     State   -   structure which stores algorithm state
-//     Rho     -   penalty coefficient, Rho>0:
+//     Rho     -   penalty coefficient, Rho > 0:
 //                 * large enough  that  algorithm  converges  with   desired
 //                   precision. Minimum value is 10*max(S'*diag(H)*S),  where
 //                   S is a scale matrix (set by MinNLCSetScale) and H  is  a
@@ -5422,7 +5422,7 @@ void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 //                   automatically chosen (10 iterations in current version).
 //                 * ItsCnt=1 means that AUL algorithm performs just as usual
 //                   barrier method.
-//                 * ItsCnt>1 means that  AUL  algorithm  performs  specified
+//                 * ItsCnt > 1 means that  AUL  algorithm  performs  specified
 //                   number of outer iterations
 //
 // HOW TO CHOOSE PARAMETERS
@@ -5534,8 +5534,8 @@ void minnlcsetstpmax(const minnlcstate &state, const double stpmax);
 // minimize  f=x^2  subject to constraint x >= 0.  Unconstrained   extremum  is
 // located  exactly  at  the  boundary  of  constrained  area.  In  this case
 // algorithm will tend to oscillate between negative  and  positive  x.  Each
-// time it stops at x<0 it "reinforces" constraint x >= 0, and each time it  is
-// bounced to x>0 it "relaxes" constraint (and is  attracted  to  x<0).
+// time it stops at x < 0 it "reinforces" constraint x >= 0, and each time it  is
+// bounced to x > 0 it "relaxes" constraint (and is  attracted  to  x < 0).
 //
 // Such situation  sometimes  happens  in  problems  with  hidden  symetries.
 // Algorithm  is  got  caught  in  a  loop with  Lagrange  multipliers  being
@@ -5661,11 +5661,11 @@ void minnlcsetalgosqp(const minnlcstate &state);
 void minnlcsetxrep(const minnlcstate &state, const bool needxrep);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minnlciteration(const minnlcstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -5706,8 +5706,8 @@ bool minnlciteration(const minnlcstate &state);
 //    function  and  MinNLCOptimize()  version.   Attemps   to    use    such
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -5741,7 +5741,7 @@ void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -6265,7 +6265,7 @@ DecClass(minbcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varid
 //
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size ofX
 //     X       -   starting point, array[N]:
@@ -6288,11 +6288,11 @@ void minbccreate(const real_1d_array &x, minbcstate &state);
 // more information about creation of BC optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -6352,7 +6352,7 @@ void minbcsetbc(const minbcstate &state, const real_1d_array &bndl, const real_1
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -6477,11 +6477,11 @@ void minbcsetxrep(const minbcstate &state, const bool needxrep);
 void minbcsetstpmax(const minbcstate &state, const double stpmax);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minbciteration(const minbcstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -6525,8 +6525,8 @@ bool minbciteration(const minbcstate &state);
 //    and  to  pass  gradient  information  to  MinCGOptimize()) will lead to
 //    exception being thrown. Either  you  did  not pass gradient when it WAS
 //    needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -6559,7 +6559,7 @@ void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, doubl
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -7133,7 +7133,7 @@ DecClass(minnsreport, ae_int_t &iterationscount; ae_int_t &nfev; double &cerr; d
 //
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[N]:
@@ -7160,7 +7160,7 @@ void minnscreate(const real_1d_array &x, minnsstate &state);
 // formula is unstable when used on non-smooth functions.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[N]:
@@ -7168,7 +7168,7 @@ void minnscreate(const real_1d_array &x, minnsstate &state);
 //                 * but X can be infeasible, in which case algorithm will try
 //                   to find feasible point first, using X as initial
 //                   approximation.
-//     DiffStep-   differentiation  step,  DiffStep>0.   Algorithm   performs
+//     DiffStep-   differentiation  step,  DiffStep > 0.   Algorithm   performs
 //                 numerical differentiation  with  step  for  I-th  variable
 //                 being equal to DiffStep*S[I] (here S[] is a  scale vector,
 //                 set by minnssetscale() function).
@@ -7220,9 +7220,9 @@ void minnssetbc(const minnsstate &state, const real_1d_array &bndl, const real_1
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -7462,11 +7462,11 @@ void minnssetxrep(const minnsstate &state, const bool needxrep);
 void minnsrequesttermination(const minnsstate &state);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minnsiteration(const minnsstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -7507,8 +7507,8 @@ bool minnsiteration(const minnsstate &state);
 //    function  and  minnsoptimize()  version.   Attemps   to    use     such
 //    combination will lead to exception. Either  you  did  not pass gradient
 //    when it WAS needed or you passed gradient when it was NOT needed.
-// ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -7537,7 +7537,6 @@ void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1
 // ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 void minnsresults(const minnsstate &state, real_1d_array &x, minnsreport &rep);
 
-//
 // Buffered implementation of minnsresults() which uses pre-allocated  buffer
 // to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
 // intended to be used in the inner cycles of performance critical algorithms
@@ -7685,11 +7684,11 @@ void minasasetalgorithm(const minasastate &state, const ae_int_t algotype);
 void minasasetstpmax(const minasastate &state, const double stpmax);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minasaiteration(const minasastate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -7700,8 +7699,8 @@ bool minasaiteration(const minasastate &state);
 //     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
 //                 can be NULL
 //
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
 // Obsolete optimization algorithm.
@@ -7893,7 +7892,7 @@ DecClass(mincgreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &termi
 //
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
@@ -7912,11 +7911,11 @@ void mincgcreate(const real_1d_array &x, mincgstate &state);
 // information about creation of CG optimizer.
 //
 // Inputs:
-//     N       -   problem dimension, N>0:
+//     N       -   problem dimension, N > 0:
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   starting point, array[0..N-1].
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -7951,7 +7950,7 @@ void mincgcreatef(const real_1d_array &x, const double diffstep, mincgstate &sta
 //     State   -   structure which stores algorithm state
 //     EpsG    - >= 0
 //                 The  subroutine  finishes  its  work   if   the  condition
-//                 |v|<EpsG is satisfied, where:
+//                 |v| < EpsG is satisfied, where:
 //                 * |.| means Euclidian norm
 //                 * v - scaled gradient vector, v[i]=g[i]*s[i]
 //                 * g - gradient
@@ -8121,11 +8120,11 @@ void mincgsetprecdiag(const mincgstate &state, const real_1d_array &d);
 void mincgsetprecscale(const mincgstate &state);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool mincgiteration(const mincgstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -8169,8 +8168,8 @@ bool mincgiteration(const mincgstate &state);
 //    gradient information to MinCGOptimize()) will lead to  exception  being
 //    thrown. Either  you  did  not  pass  gradient when it WAS needed or you
 //    passed gradient when it was NOT needed.
-// ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
 void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 
@@ -8203,7 +8202,7 @@ void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, doubl
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
@@ -8748,7 +8747,7 @@ DecClass(minlmreport, ae_int_t &iterationscount; ae_int_t &terminationtype; ae_i
 //
 //
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of functions f[i]
@@ -8805,12 +8804,12 @@ void minlmcreatevj(const ae_int_t m, const real_1d_array &x, minlmstate &state);
 //
 //
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     M       -   number of functions f[i]
 //     X       -   initial solution, array[0..N-1]
-//     DiffStep-   differentiation step, >0
+//     DiffStep-   differentiation step, > 0
 //
 // Outputs:
 //     State   -   structure which stores algorithm state
@@ -8870,7 +8869,7 @@ void minlmcreatev(const ae_int_t m, const real_1d_array &x, const double diffste
 //
 //
 // Inputs:
-//     N       -   dimension, N>1
+//     N       -   dimension, N > 1
 //                 * if given, only leading N elements of X are used
 //                 * if not given, automatically determined from size of X
 //     X       -   initial solution, array[0..N-1]
@@ -9010,9 +9009,9 @@ void minlmsetbc(const minlmstate &state, const real_1d_array &bndl, const real_1
 //                 * last element corresponds to the right part.
 //                 All elements of C (including right part) must be finite.
 //     CT      -   type of constraints, array[K]:
-//                 * if CT[i]>0, then I-th constraint is C[i,*]*x >= C[i,n+1]
+//                 * if CT[i] > 0, then I-th constraint is C[i,*]*x >= C[i,n+1]
 //                 * if CT[i]=0, then I-th constraint is C[i,*]*x  = C[i,n+1]
-//                 * if CT[i]<0, then I-th constraint is C[i,*]*x <= C[i,n+1]
+//                 * if CT[i] < 0, then I-th constraint is C[i,*]*x <= C[i,n+1]
 //     K       -   number of equality/inequality constraints, K >= 0:
 //                 * if given, only leading K elements of C/CT are used
 //                 * if not given, automatically determined from sizes of C/CT
@@ -9083,11 +9082,11 @@ void minlmsetlc(const minlmstate &state, const real_2d_array &c, const integer_1
 void minlmsetacctype(const minlmstate &state, const ae_int_t acctype);
 
 // This function provides reverse communication interface
-// Reverse communication interface is not documented or recommended to use.
+// Reverse communication interface is not documented or recommended for use.
 // See below for functions which provide better documented API
 bool minlmiteration(const minlmstate &state);
 
-// This family of functions is used to launcn iterations of nonlinear optimizer
+// This family of functions is used to launch iterations of nonlinear optimizer
 //
 // These functions accept following parameters:
 //     state   -   algorithm state
@@ -9120,8 +9119,8 @@ bool minlmiteration(const minlmstate &state);
 //
 //    Be careful to avoid such errors because there is no way to find them at
 //    compile time - you can see them at runtime only.
-// ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 //
+// ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
 void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_1d_array &fi, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
 void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*grad)(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr), void (*hess)(const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
@@ -9157,7 +9156,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
 //     State       -   structure used to store algorithm state
 //     TestStep    -   verification step used for numerical differentiation:
 //                     * TestStep=0 turns verification off
-//                     * TestStep>0 activates verification
+//                     * TestStep > 0 activates verification
 //                     You should carefully choose TestStep. Value  which  is
 //                     too large (so large that  function  behavior  is  non-
 //                     cubic at this scale) will lead  to  false  alarms. Too
