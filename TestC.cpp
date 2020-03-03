@@ -1603,6 +1603,7 @@ bool testhqrnd() {
    bool discreteOk;
    bool continuousOk;
    ae_frame_make(&_frame_block);
+   if (!silent) printf("Random Number Generator Test Breakdown\n");
    NewVector(x, 0, DT_REAL);
    NewVector(bins, 0, DT_INT);
    NewObj(hqrndstate, state);
@@ -4861,6 +4862,7 @@ bool testsparse() {
    bool rewriteexistingOk;
    bool sksOk;
    bool crsOk;
+   if (!silent) printf("Sparse Matrix Test Breakdown\n");
    getrowOk = true;
    crsOk = true;
    sksOk = skstest();
@@ -21196,6 +21198,7 @@ bool testlinlsqr() {
    bool prectestOk;
    bool termreqOk;
    bool Ok;
+   if (!silent) printf("LinLSQR Test Breakdown\n");
    termreqOk = true;
    svdtestOk = testlinlsqrunit_svdtest();
    mwcranksvdOk = testlinlsqrunit_mwcranksvdtest();
@@ -54832,7 +54835,7 @@ bool testlinreg() {
 // === filters testing unit ===
 // This function tests SMA(k) filter.
 // Additional IsSilent parameter controls detailed error reporting.
-bool testsma() {
+Local bool testsma() {
    ae_frame _frame_block;
    bool precomputedOk;
    bool zerohandlingOk;
@@ -54931,7 +54934,7 @@ bool testsma() {
 
 // This function tests EMA(alpha) filter.
 // Additional IsSilent parameter controls detailed error reporting.
-bool testema() {
+Local bool testema() {
    ae_frame _frame_block;
    bool precomputedOk;
    bool Ok;
@@ -54968,7 +54971,7 @@ bool testema() {
 
 // This function tests LRMA(k) filter.
 // Additional IsSilent parameter controls detailed error reporting.
-bool testlrma() {
+Local bool testlrma() {
    ae_frame _frame_block;
    bool precomputedOk;
    double threshold;
@@ -55036,6 +55039,7 @@ bool testfilters() {
    bool smaOk;
    bool emaOk;
    bool lrmaOk;
+   if (!silent) printf("Filter Test Breakdown\n");
    smaOk = testsma();
    emaOk = testema();
    lrmaOk = testlrma();
@@ -74769,6 +74773,7 @@ bool testspline2d() {
    double v2xy;
    double mf;
    ae_frame_make(&_frame_block);
+   if (!silent) printf("2D Spline Test Breakdown\n");
    NewVector(x, 0, DT_REAL);
    NewVector(y, 0, DT_REAL);
    NewObj(spline2dinterpolant, c);
@@ -82925,6 +82930,7 @@ bool testlincg() {
    bool sparseOk;
    bool precondOk;
    bool Ok;
+   if (!silent) printf("LinCG Test Breakdown\n");
    basictestxOk = testlincgunit_basictestx();
    basictestitersOk = testlincgunit_basictestiters();
    complexresOk = testlincgunit_complexres();
@@ -84429,6 +84435,7 @@ static bool testalglibbasicsunit_testsmp() {
 }
 
 bool testalglibbasics() {
+   if (!silent) printf("AlgLib Basics Test Breakdown\n");
    bool complexOk = testalglibbasicsunit_testcomplexarithmetics();
    bool specialOk = testalglibbasicsunit_testieeespecial();
    bool swapOk = testalglibbasicsunit_testswapfunctions();
@@ -84651,6 +84658,7 @@ void tester_function(void *T) {
          global_failure_flag = 1;
       acquire_lock(&print_lock);
       printf("%-32s %s\n", unittests[idx].name, Ok? "Ok": "Failed");
+      if (!silent) putchar('\n');
       fflush(stdout);
       release_lock(&print_lock);
    }
