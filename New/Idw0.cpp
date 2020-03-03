@@ -118,7 +118,7 @@ template<typename T> struct Matrix {
 // NOTE:
 // *	No memory allocation is performed for initialization with Ys = Xs = 0.
    void InitMatrix(Integer Ys = 0, Integer Xs = 0) {
-      Assert(Xs >= 0 && Ys >= 0, "InitMatrix(): negative length");
+      Assert(Xs >= 0 && Ys >= 0, "Matrix::InitMatrix: negative size");
    // If either Xs or Ys is 0, then they both must be made so.
       if (Xs == 0) Ys = 0; else if (Ys == 0) Xs = 0;
    // Initialize.
@@ -140,7 +140,7 @@ template<typename T> struct Matrix {
 // Resize matrix to size Xs x Ys, where either Xs, Ys or both may be 0.
 // Upon allocation failure return an indication of success or failure.
    void ReSizeMatrix(Integer Ys, Integer Xs) {
-      Assert(Xs >= 0 && Ys >= 0, "ReSizeMatrix(): negative length");
+      Assert(Xs >= 0 && Ys >= 0, "Matrix::ReSizeMatrix: negative size");
       if (_Xs == Xs && _Ys == Ys) return;
    // Re-initialize.
       _Xs = Xs, _Ys = Ys;
@@ -379,7 +379,7 @@ const Integer SplitNodeSizeKd = 6, FirstVersionKd = 0;
 // Segregate nodes [Lo, Hi) in dimension D by threshold S into [Lo, Mid) + [Mid, Hi).
 // This subroutine doesn't create tree structures, but only rearranges nodes.
 Integer KdTree::SplitKd(Integer Lo, Integer Hi, const Integer D, const double S) const {
-   Assert(_N > 0, "SplitKd: internal error");
+   Assert(_N > 0, "KdTree::SplitKd: internal error");
 // Split XY/Tags in two parts: [Lo, Hi) is the non-processed part of XY/Tags.
 // After the cycle is done, we have [Lo, Hi) = [Mid, Mid].
 // We deal with this element separately.
@@ -406,8 +406,8 @@ Integer KdTree::SplitKd(Integer Lo, Integer Hi, const Integer D, const double S)
 // NodesOffs[] and SplitsOffs[] must be large enough.
 // AlgLib: Copyright 28.02.2010 by Sergey Bochkanov
 void KdTree::GenerateKd(Integer &NodeN, Integer &SplitN, const Integer Lo, const Integer Hi, const Integer HiLeafN) {
-   Assert(_N > 0, "GenerateKd: internal error");
-   Assert(Hi > Lo, "GenerateKd: internal error");
+   Assert(_N > 0, "KdTree::GenerateKd: internal error (empty tree)");
+   Assert(Hi > Lo, "KdTree::GenerateKd: internal error (Hi <= Lo)");
 // Generate leaf if needed.
    if (Hi - Lo <= HiLeafN) { _Node._X[NodeN++] = Hi - Lo, _Node._X[NodeN++] = Lo; return; }
 // Select which dimension D to split.
@@ -470,7 +470,7 @@ void KdTree::GenerateKd(Integer &NodeN, Integer &SplitN, const Integer Lo, const
    _Node._X[ExOff + 4] = NodeN, V = _Kb._CurLo._X[D], _Kb._CurLo._X[D] = S;
    GenerateKd(NodeN, SplitN, Mid, Hi, HiLeafN), _Kb._CurLo._X[D] = V;
 // Zero-fill unused portions of the node (avoid false warnings by Valgrind about attempt to serialize uninitialized values)
-   Assert(SplitNodeSizeKd == 6, "GenerateKd: node size has unexpectedly changed");
+   Assert(SplitNodeSizeKd == 6, "KdTree::GenerateKd: node size has unexpectedly changed");
    _Node._X[ExOff + 5] = 0;
 }
 
@@ -592,7 +592,7 @@ static void InitBoxKd(const KdTree &Kd, const RVector &X, KdTreeReq &Kb) {
 // Do not set Kd._Xs or Kd._Ys; just allocate the arrays.
 // AlgLib: Copyright 14.03.2011 by Sergey Bochkanov
 void KdTree::NewIndependentsKd(const Integer Xs, const Integer Ys) {
-   Assert(_N > 0, "NewIndependentsKd: internal error");
+   Assert(_N > 0, "KdTree::NewIndependentsKd: internal error");
    _Lo.InitVector(Xs), _Hi.InitVector(Xs);
 }
 
@@ -600,7 +600,7 @@ void KdTree::NewIndependentsKd(const Integer Xs, const Integer Ys) {
 // Do not set Kd._N, Kd._Xs or Kd._Ys; just allocate the arrays.
 // AlgLib: Copyright 14.03.2011 by Sergey Bochkanov
 void KdTree::NewDependentsKd(const Integer N, const Integer Xs, const Integer Ys) {
-   Assert(N > 0, "NewDependentsKd: internal error");
+   Assert(N > 0, "KdTree::NewDependentsKd: internal error");
    _XY.InitMatrix(N, 2*Xs + Ys), _Tags.InitVector(N);
    _Node.InitVector(2*N*SplitNodeSizeKd), _Split.InitVector(2*N);
 }
@@ -608,12 +608,12 @@ void KdTree::NewDependentsKd(const Integer N, const Integer Xs, const Integer Ys
 // This function checks consistency of request buffer structure with dimensions of kd-tree object.
 // AlgLib: Copyright 02.04.2016 by Sergey Bochkanov
 static void CheckBufKd(const KdTree &Kd, const KdTreeReq &Kb) {
-   Assert(Kb._X._N >= Kd._Xs, "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
-   Assert(Kb._Ix._N >= Kd._N, "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
-   Assert(Kb._R._N >= Kd._N, "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
-   Assert(Kb._Buf._N >= Max(Kd._N, Kd._Xs), "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
-   Assert(Kb._CurLo._N >= Kd._Xs, "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
-   Assert(Kb._CurHi._N >= Kd._Xs, "CheckBufKd: dimensions of KdTreeReq are inconsistent with KdTree structure");
+   Assert(Kb._X._N >= Kd._Xs, "CheckBufKd: dimensions of Kb are inconsistent with Kd");
+   Assert(Kb._Ix._N >= Kd._N, "CheckBufKd: dimensions of Kb are inconsistent with Kd");
+   Assert(Kb._R._N >= Kd._N, "CheckBufKd: dimensions of Kb are inconsistent with Kd");
+   Assert(Kb._Buf._N >= Max(Kd._N, Kd._Xs), "CheckBufKd: dimensions of Kb are inconsistent with Kd");
+   Assert(Kb._CurLo._N >= Kd._Xs, "CheckBufKd: dimensions of Kb are inconsistent with Kd");
+   Assert(Kb._CurHi._N >= Kd._Xs, "CheckBufKd: dimensions of Kb are inconsistent with Kd");
 }
 
 // R-NN query: All points within an R-sphere centered at X, using an external thread-local buffer, in ascending order of distance from X.
@@ -672,13 +672,13 @@ void KdTreeReq::MakeKdBuf(const KdTree &Kd) {
 
 // Create a KD-tree from set of X-values, integer tags and optional Y-values
 void KdTree::TagKd(const RMatrix XY, const ZVector &Tags, const Integer N, const Integer Xs, const Integer Ys, const Integer Metric) {
-   Assert(N >= 0, "TagKd: N < 0");
-   Assert(Xs >= 1, "TagKd: Xs < 1");
-   Assert(Ys >= 0, "TagKd: Ys < 0");
-   Assert(Metric >= 0 && Metric <= 2, "TagKd: incorrect Metric");
-   Assert(XY._Ys >= N, "TagKd: Ys(X) < N");
-   Assert(XY._Xs >= Xs + Ys || N == 0, "TagKd: Xs(X) < Xs + Ys");
-   Assert(IsFiniteRMatrix(XY, N, Xs + Ys), "TagKd: XY contains infinite or NaN values");
+   Assert(N >= 0, "KdTree::TagKd: N < 0");
+   Assert(Xs >= 1, "KdTree::TagKd: Xs < 1");
+   Assert(Ys >= 0, "KdTree::TagKd: Ys < 0");
+   Assert(Metric >= 0 && Metric <= 2, "KdTree::TagKd: incorrect Metric");
+   Assert(XY._Ys >= N, "KdTree::TagKd: Ys(X) < N");
+   Assert(XY._Xs >= Xs + Ys || N == 0, "KdTree::TagKd: Xs(X) < Xs + Ys");
+   Assert(IsFiniteRMatrix(XY, N, Xs + Ys), "KdTree::TagKd: XY contains infinite or NaN values");
 // Initialize.
    _N = N, _Xs = Xs, _Ys = Ys, _Metric = Metric, _Kb._CurK = 0;
    if (N == 0) { InitKdTree(); return; } // Nothing to do: quick exit.
@@ -699,13 +699,13 @@ void KdTree::TagKd(const RMatrix XY, const ZVector &Tags, const Integer N, const
 
 // Create a KD-Tree from a set of X-values and optional Y-values.
 void KdTree::MakeKd(const RMatrix XY, const Integer N, const Integer Xs, const Integer Ys, const Integer Metric) {
-   Assert(N >= 0, "MakeKd: N < 0");
-   Assert(Xs >= 1, "MakeKd: Xs < 1");
-   Assert(Ys >= 0, "MakeKd: Ys < 0");
-   Assert(Metric >= 0 && Metric <= 2, "MakeKd: incorrect Metric");
-   Assert(XY._Ys >= N, "MakeKd: Ys(X) < N");
-   Assert(XY._Xs >= Xs + Ys || N == 0, "MakeKd: Xs(X) < Xs + Ys");
-   Assert(IsFiniteRMatrix(XY, N, Xs + Ys), "MakeKd: XY contains infinite or NaN values");
+   Assert(N >= 0, "KdTree::MakeKd: N < 0");
+   Assert(Xs >= 1, "KdTree::MakeKd: Xs < 1");
+   Assert(Ys >= 0, "KdTree::MakeKd: Ys < 0");
+   Assert(Metric >= 0 && Metric <= 2, "KdTree::MakeKd: incorrect Metric");
+   Assert(XY._Ys >= N, "KdTree::MakeKd: Ys(X) < N");
+   Assert(XY._Xs >= Xs + Ys || N == 0, "KdTree::MakeKd: Xs(X) < Xs + Ys");
+   Assert(IsFiniteRMatrix(XY, N, Xs + Ys), "KdTree::MakeKd: XY contains infinite or NaN values");
    ZVector Tags(N); for (Integer n = 0; n < N; n++) Tags._X[n] = 0;
    TagKd(XY, Tags, N, Xs, Ys, Metric);
 }
@@ -922,10 +922,10 @@ static double IdwW0 = 1.0, IdwLam0 = 0.3333;
 
 // A new buffer which can be used for parallel IDW model evaluations from multiple threads, with each thread accessing the IDW model from its own buffer.
 void IdwBuf::IdwMakeBuf(const IdwQ &Q) {
-   Assert(Q._Xs >= 1, "IdwMakeBuf: integrity check failed");
-   Assert(Q._Ys >= 1, "IdwMakeBuf: integrity check failed");
-   Assert(Q._Ls >= 0, "IdwMakeBuf: integrity check failed");
-   Assert(Q._Op >= 0, "IdwMakeBuf: integrity check failed");
+   Assert(Q._Xs >= 1, "IdwBuf::IdwMakeBuf: integrity check failed");
+   Assert(Q._Ys >= 1, "IdwBuf::IdwMakeBuf: integrity check failed");
+   Assert(Q._Ls >= 0, "IdwBuf::IdwMakeBuf: integrity check failed");
+   Assert(Q._Op >= 0, "IdwBuf::IdwMakeBuf: integrity check failed");
    _X.InitVector(Q._Xs), _Y.InitVector(Q._Ys);
    _YWb.InitVector(Q._Ys*Max(Q._Ls, 1)), _Wb.InitVector(Max(Q._Ls, 1)), _XYb.InitMatrix();
    _Rb.InitVector();
@@ -936,8 +936,8 @@ void IdwBuf::IdwMakeBuf(const IdwQ &Q) {
 IdwB::IdwB(const Integer Xs, const Integer Ys) {
    const Integer IdwLs = 16;
    InitIdwB();
-   Assert(Xs >= 1, "IdbMake: Xs <= 0");
-   Assert(Ys >= 1, "IdbMake: Ys <= 0");
+   Assert(Xs >= 1, "IdwB::IdwB: Xs <= 0");
+   Assert(Ys >= 1, "IdwB::IdwB: Ys <= 0");
 // We choose reasonable defaults for the algorithm:
 // *	MSTAB algorithm
 // *	12 layers
@@ -955,17 +955,17 @@ IdwB::IdwB(const Integer Xs, const Integer Ys) {
 
 // Change the number of layers used by the IDW-MSTAB algorithm.
 void IdwB::IdbSetLayers(const Integer Ls) {
-   Assert(Ls >= 1, "IdbSetLayers: Ls < 1");
+   Assert(Ls >= 1, "IdwB::IdbSetLayers: Ls < 1");
    _Ls = Ls;
 }
 
 // Add a data set to the Idw builder, ovewriting any data set already there.
 void IdwB::IdbSetPoints(const RMatrix &XY, const Integer Ps) {
-   Assert(Ps >= 0, "IdbSetPoints: Ps < 0");
-   Assert(XY._Ys >= Ps, "IdbSetPoints: Ys(XY) < Ps");
+   Assert(Ps >= 0, "IdwB::IdbSetPoints: Ps < 0");
+   Assert(XY._Ys >= Ps, "IdwB::IdbSetPoints: Ys(XY) < Ps");
    Integer XYs = _Xs + _Ys;
-   Assert(Ps == 0 || XY._Xs >= XYs, "IdbSetPoints: Xs(XY) < Xs + Ys");
-   Assert(IsFiniteRMatrix(XY, Ps, XYs), "IdbSetPoints: XY contains infinite or NaN values!");
+   Assert(Ps == 0 || XY._Xs >= XYs, "IdwB::IdbSetPoints: Xs(XY) < Xs + Ys");
+   Assert(IsFiniteRMatrix(XY, Ps, XYs), "IdwB::IdbSetPoints: XY contains infinite or NaN values!");
    _Ps = Ps;
    _XY.GrowVector(Ps*XYs);
    for (Integer xyp = 0, p = 0; p < Ps; p++) for (Integer xy = 0; xy < XYs; xyp++, xy++) _XY._X[xyp] = XY._XY[p][xy];
@@ -973,8 +973,8 @@ void IdwB::IdbSetPoints(const RMatrix &XY, const Integer Ps) {
 
 // Configure the IDW model to use, as its construction algorithm, the Multilayer Stabilized IDW method (IDW-MSTAB).
 void IdwB::IdbSetMStab(const double RadS) {
-   Assert(isfinite(RadS), "IdbSetMStab: RadS is not finite");
-   Assert(RadS > 0.0, "IdbSetMStab: RadS <= 0");
+   Assert(isfinite(RadS), "IdwB::IdbSetMStab: RadS is not finite");
+   Assert(RadS > 0.0, "IdwB::IdbSetMStab: RadS <= 0");
 // Set the algorithm.
    _Op = 2;
 // Set the options.
@@ -984,23 +984,23 @@ void IdwB::IdbSetMStab(const double RadS) {
 
 // Configure the IDW model to use, as its construction algorithm, the textbook Shepard's algorithm with custom (user-specified) power parameter.
 void IdwB::IdbSetShepard(const double P) {
-   Assert(isfinite(P), "IdbSetShepard: P is not finite");
-   Assert(P > 0.0, "IdbSetShepard: P <= 0");
+   Assert(isfinite(P), "IdwB::IdbSetShepard: P is not finite");
+   Assert(P > 0.0, "IdwB::IdbSetShepard: P <= 0");
 // Set the algorithm and options.
    _Op = 0, _ShepP = P;
 }
 
 // Configure the IDW model to use, as its construction algorithm, the 'textbook' modified Shepard's algorithm with user-specified search radius.
 void IdwB::IdbSetModShepard(const double RadS) {
-   Assert(isfinite(RadS), "IdbSetModShephard: RadS is not finite");
-   Assert(RadS > 0.0, "IdbSetModShephard: RadS <= 0");
+   Assert(isfinite(RadS), "IdwB::IdbSetModShephard: RadS is not finite");
+   Assert(RadS > 0.0, "IdwB::IdbSetModShephard: RadS <= 0");
 // Set the algorithm and options.
    _Op = 1, _R0 = RadS;
 }
 
 // Set the prior term (the model value at infinity) as user-specified value.
 void IdwB::IdbSetUserTerm(const double V) {
-   Assert(isfinite(V), "IdbSetUserTerm: infinite/NAN value passed");
+   Assert(isfinite(V), "IdwB::IdbSetUserTerm: infinite/NAN value passed");
    _PriorType = 0;
    for (Integer Y = 0; Y < _Ys; Y++) _PriorVal._X[Y] = V;
 }
@@ -1013,8 +1013,8 @@ void IdwB::IdbSetZeroTerm() { _PriorType = 3; }
 
 // The values of the IDW model at the given point, using an external buffer object (the internal temporaries of IDW model are not modified).
 void IdwQ::IdwCalcTs(IdwBuf &Buf, const RVector &X, RVector &Y) const {
-   Assert(X._N >= _Xs, "IdwCalcTs: N(X) < _Xs");
-   Assert(IsFiniteRVector(X, _Xs), "IdwCalcTs: X contains infinite or NaN values");
+   Assert(X._N >= _Xs, "IdwQ::IdwCalcTs: N(X) < _Xs");
+   Assert(IsFiniteRVector(X, _Xs), "IdwQ::IdwCalcTs: X contains infinite or NaN values");
 // Allocate the output.
    Y.GrowVector(_Ys);
 // Quick exit for _Ls == 0 (no data set).
@@ -1023,7 +1023,7 @@ void IdwQ::IdwCalcTs(IdwBuf &Buf, const RVector &X, RVector &Y) const {
       return;
    }
    if (_Op == 0) { // Textbook Shepard's method.
-      Assert(_Ps > 0, "IdwCalcTs: integrity check failed");
+      Assert(_Ps > 0, "IdwQ::IdwCalcTs: integrity check failed");
       double Eps = 1.0E-50;
       Integer XYs = _Xs + _Ys;
       double ShepP = _ShepP;
@@ -1051,7 +1051,7 @@ void IdwQ::IdwCalcTs(IdwBuf &Buf, const RVector &X, RVector &Y) const {
       }
       for (Integer y = 0; y < _Ys; y++) Y._X[y] = Y._X[y]/Buf._YWb._X[y] + _GlobP._X[y];
    } else if (_Op == 2) { // MSTAB.
-      Assert(IdwW0 == 1.0, "IdwCalcTs: unexpected W0, integrity check failed");
+      Assert(IdwW0 == 1.0, "IdwQ::IdwCalcTs: unexpected W0, integrity check failed");
       double UDecay = 1.0/_dR, U = 1.0/_R0, LamDecay = _dLam;
       bool SpeedUp = _Ys == 1 && _Ls >= 3 && LamDecay == 1.0;
       double Wf0 = 0.0, Ws0 = SpeedUp? IdwW0: 0.0;
@@ -1096,35 +1096,35 @@ void IdwQ::IdwCalcTs(IdwBuf &Buf, const RVector &X, RVector &Y) const {
          Buf._YWb._X[1] = Wf1, Buf._Wb._X[1] = Ws1;
       for (Integer y = 0; y < _Ys; y++) Y._X[y] = _GlobP._X[y];
       for (Integer L = 0; L < _Ls; L++) for (Integer y = 0; y < _Ys; y++) Y._X[y] += Buf._YWb._X[L*_Ys + y]/Buf._Wb._X[L];
-   } else Assert(false, "IdwCalcTs: unexpected Op");
+   } else Assert(false, "IdwQ::IdwCalcTs: unexpected Op");
 }
 
 // IDW interpolation: scalar target, 1-dimensional argument.
 double IdwQ::IdwCalc1(const double X) {
-   Assert(_Xs == 1, "IdwCalc1: _Xs != 1");
-   Assert(_Ys == 1, "IdwCalc1: _Ys != 1");
-   Assert(isfinite(X), "IdwCalc1: X is INFINITY or NAN");
+   Assert(_Xs == 1, "IdwQ::IdwCalc1: _Xs != 1");
+   Assert(_Ys == 1, "IdwQ::IdwCalc1: _Ys != 1");
+   Assert(isfinite(X), "IdwQ::IdwCalc1: X is INFINITY or NAN");
    _Buf._X._X[0] = X, IdwCalcTs(_Buf, _Buf._X, _Buf._Y);
    return _Buf._Y._X[0];
 }
 
 // IDW interpolation: scalar target, 2-dimensional argument.
 double IdwQ::IdwCalc2(const double X, const double Y) {
-   Assert(_Xs == 2, "IdwCalc2: _Xs != 2");
-   Assert(_Ys == 1, "IdwCalc2: _Ys != 1");
-   Assert(isfinite(X), "IdwCalc2: X is INFINITY or NAN");
-   Assert(isfinite(Y), "IdwCalc2: Y is INFINITY or NAN");
+   Assert(_Xs == 2, "IdwQ::IdwCalc2: _Xs != 2");
+   Assert(_Ys == 1, "IdwQ::IdwCalc2: _Ys != 1");
+   Assert(isfinite(X), "IdwQ::IdwCalc2: X is INFINITY or NAN");
+   Assert(isfinite(Y), "IdwQ::IdwCalc2: Y is INFINITY or NAN");
    _Buf._X._X[0] = X, _Buf._X._X[1] = Y, IdwCalcTs(_Buf, _Buf._X, _Buf._Y);
    return _Buf._Y._X[0];
 }
 
 // IDW interpolation: scalar target, 3-dimensional argument.
 double IdwQ::IdwCalc3(const double X, const double Y, const double Z) {
-   Assert(_Xs == 3, "IdwCalc3: _Xs != 3");
-   Assert(_Ys == 1, "IdwCalc3: _Ys != 1");
-   Assert(isfinite(X), "IdwCalc3: X is INFINITY or NAN");
-   Assert(isfinite(Y), "IdwCalc3: Y is INFINITY or NAN");
-   Assert(isfinite(Z), "IdwCalc3: Z is INFINITY or NAN");
+   Assert(_Xs == 3, "IdwQ::IdwCalc3: _Xs != 3");
+   Assert(_Ys == 1, "IdwQ::IdwCalc3: _Ys != 1");
+   Assert(isfinite(X), "IdwQ::IdwCalc3: X is INFINITY or NAN");
+   Assert(isfinite(Y), "IdwQ::IdwCalc3: Y is INFINITY or NAN");
+   Assert(isfinite(Z), "IdwQ::IdwCalc3: Z is INFINITY or NAN");
    _Buf._X._X[0] = X, _Buf._X._X[1] = Y, _Buf._X._X[2] = Z, IdwCalcTs(_Buf, _Buf._X, _Buf._Y);
    return _Buf._Y._X[0];
 }
@@ -1181,7 +1181,7 @@ IdwR::IdwR(IdwB &Qb) {
    }
 // Compute temporaries which will be required later:
 // *	global mean
-   Assert(Qb._Ps > 0, "IdwFit: integrity check failed");
+   Assert(Qb._Ps > 0, "IdwR::IdwR: integrity check failed");
    Qb._TmpMu.GrowVector(Ys);
    for (Integer y = 0; y < Ys; y++) Qb._TmpMu._X[y] = 0.0;
    for (Integer p = 0; p < Ps; p++) for (Integer y = 0; y < Ys; y++) Qb._TmpMu._X[y] += Qb._XY._X[p*(Xs + Ys) + Xs + y];
@@ -1233,7 +1233,7 @@ IdwR::IdwR(IdwB &Qb) {
       _Q._Buf.IdwMakeBuf(_Q),
       IdwErrorMetricsViaCalc(Qb);
    } else if (Qb._Op == 2) { // MSTAB algorithm.
-      Assert(Qb._Ls >= 1, "IdwFit: integrity check failed");
+      Assert(Qb._Ls >= 1, "IdwR::IdwR: integrity check failed");
    // Initialize the model.
       _Q._Op = 2;
       _Q._Xs = Xs, _Q._Ys = Ys, _Q._Ls = Qb._Ls;
@@ -1282,7 +1282,7 @@ IdwR::IdwR(IdwB &Qb) {
       _RmsErr = sqrt(_RmsErr/(Ps*Ys)), _AveErr /= Ps*Ys, _R2 = 1.0 - Rss/(Tss == 0.0? 1.0: Tss);
    // Prepare the internal buffer.
       _Q._Buf.IdwMakeBuf(_Q);
-   } else Assert(false, "IdwFit: integrity check failed, unexpected algorithm"); // Unknown algorithm.
+   } else Assert(false, "IdwR::IdwR: integrity check failed, unexpected algorithm"); // Unknown algorithm.
 }
 
 // === Random Package ===
@@ -1308,7 +1308,7 @@ const Integer RandMax = 0x7fffffa9, RandM0 = 0x7fffffab, RandM1 = 0x7fffff07, Ra
 // A random integer in [0, RandMax].
 // L'Ecuyer, Efficient and portable combined random number generators
 Integer RandomQ::RandBase() {
-   Assert(_MagicV == RandMagic, "RandBase: this is not correctly initialized!");
+   Assert(_MagicV == RandMagic, "RandomQ::RandBase: this is not correctly initialized!");
    Integer K0 = _S0/53668; _S0 = 40014*(_S0 - K0*53668) - K0*12211; if (_S0 < 0) _S0 += RandM0;
    Integer K1 = _S1/52774; _S1 = 40692*(_S1 - K1*52774) - K1*3791; if (_S1 < 0) _S1 += RandM1;
    Integer Base = _S0 - _S1; return Base < 1? Base += RandMax: --Base;
@@ -1339,10 +1339,10 @@ double RandomQ::RandMidUniformR() { return (double)(2*RandBase() - RandMax)/(dou
 // An exception will be generated if N is too large.
 // AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
 Integer RandomQ::RandomUniformZ(Integer N) {
-   Assert(N > 0, "RandomUniformZ: N <= 0!");
+   Assert(N > 0, "RandomQ::RandomUniformZ: N <= 0!");
    Integer HiN = RandMax + 1;
    if (N > HiN) { // Reduce the problem on the interval spanning [0, N) to several subproblems on intervals spanning [0, HiN).
-      Integer Nq = N/HiN; if (N%HiN > 0) Nq++; Assert(Nq <= HiN, "RandomUniformZ: N is too large");
+      Integer Nq = N/HiN; if (N%HiN > 0) Nq++; Assert(Nq <= HiN, "RandomQ::RandomUniformZ: N is too large");
    // Produce a random B in Nq, a random offset A within bin B
    // and filter out any results at or beyond N to avoid bias in the result.
       Integer A, B, C;
@@ -1376,7 +1376,7 @@ static inline bool SmallR(double A, double Tiny) { return fabs(A) < Tiny; }
 // Testing continuity properties: C0 (Deg == 0) or C1 (Deg == 1) continuity.
 static bool TestIdwContinuity(IdwQ &Q, Integer Xs, Integer Ys, RVector &X0, RVector &X1, Integer Steps, Integer Deg) {
    bool Ok = true;
-   Assert(Steps >= 10, "TestIdwContinuity: NSteps is too small");
+   Assert(Steps >= 10, "TestIdwContinuity: Steps is too small");
    Assert(Deg == 0 || Deg == 1, "TestIdwContinuity: incorrect Deg");
 // Compute sequence of function values.
    RVector Xc(Xs); RMatrix Yv(Steps, Ys); RVector Yc;
@@ -1414,7 +1414,7 @@ static bool TestIdwCommon() {
             case 0: Qb.IdbSetShepard(1 + (Xs + 1)*RQ.RandomUniformR()); break;
             case 1: Qb.IdbSetModShepard(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
             case 2: Qb.IdbSetMStab(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
-            default: Assert(false, "TestCommon: unexpected Op"); break;
+            default: Assert(false, "TestIdwCommon: unexpected Op"); break;
          }
       // Fit and store result directly into the variable
          IdwR R(Qb); IdwBuf Buf(R._Q);
@@ -1464,7 +1464,7 @@ static bool TestIdwCommon() {
             case 0: Qb.IdbSetShepard(1 + (Xs + 1)*RQ.RandomUniformR()); break;
             case 1: Qb.IdbSetModShepard(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
             case 2: Qb.IdbSetMStab(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
-            default: Assert(false, "TestCommon: unexpected AlgoType");
+            default: Assert(false, "TestIdwCommon: unexpected Op");
          }
          Qb.IdbSetPoints(XY, Ps);
       // Fit and store result directly into the variable.
@@ -1567,7 +1567,7 @@ static bool TestIdwCommon() {
             case 0: Qb.IdbSetShepard(Xs*(1 + RQ.RandomUniformR())); break;
             case 1: Qb.IdbSetModShepard(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
             case 2: Qb.IdbSetMStab(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
-            default: Assert(false, "TestCommon: unexpected Op"); break;
+            default: Assert(false, "TestIdwCommon: unexpected Op"); break;
          }
          Qb.IdbSetPoints(XY, Ps);
       // Fit and store the result directly into the variable.
@@ -1623,7 +1623,7 @@ static bool TestIdwCommon() {
             case 0: Qb.IdbSetShepard(1 + (Xs + 1)*RQ.RandomUniformR()); break;
             case 1: Qb.IdbSetModShepard(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
             case 2: Qb.IdbSetMStab(pow(2.0, 2.0*RQ.RandMidUniformR())); break;
-            default: Assert(false, "TestCommon: unexpected AlgoType (prior test)"); break;
+            default: Assert(false, "TestIdwCommon: unexpected Op (prior test)"); break;
          }
          Qb.IdbSetPoints(XY, Ps);
       // Zero prior (not tested with the textbook Shepard method).
