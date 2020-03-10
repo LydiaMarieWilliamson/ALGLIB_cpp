@@ -677,6 +677,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 <a name=supp_History2 class=sheader></a><h3>A6.2. Test Stages</h3>
 <pre class=narration>
 00	Comment-layout was redone to make comments conspicuous to "grep" and other search utilities.
+	Elimination of parameter comments for ae_{vector,matrix} and replacement by pointer typedefs {B,C,R,Z}{Vector,Matrix}.
 00	Indent was used to normalize the layout.
 01	The original version: ALGLIB 3.15.0.
 02	The allocation counters were fully turned on.
@@ -742,11 +743,60 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Normalized comparisons |A-B|/C &rArr; D to |A-B| &rArr; C&times;D; possibly removing hidden bugs as a result.
 	Normalized most error flags in TestC.cpp to *Ok and *Erred.
 32	Corrected the Manual entry for "autogkintegrate" (it originally listed the entry for "odesolversolve").
-	Corrections in the comments &amp; printouts
-	(e.g. "traling" → "trailing", "trainig" → "training", "inself" → "itself", "it's" → "its", "discripancy" → "discrepancy").
+	Corrections in the comments &amp; printouts; e.g.
+		"launcn" → "launch" "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
+		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
+		"⋯intial⋯" → "⋯initial⋯".
 	Normalized all test routines and flags in TestC.cpp to true on success, false on failure.
 	Normalize comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
 	First round of normalization of comments &amp; documentation.
+33	Further cleanup of unused/stub/legacy code from ALGLIB:
+	Normalized test routines and flags in Test{X,Z}.cpp to *Ok; and true on success, false on error.
+	Merge {b,i,r}{vector,matrix}setlengthatleast() into {vector,matrix}setlengthatleast().
+	Removed aresameboolean(); already subsumed by "==";
+	Normalized boolean comparisons, e.g. A&amp;&amp;B || !A&amp;&amp;!B &rArr; A == B
+	Removed ae_never_call_it(): it's a legacy stub from the Commercial version of ALGLIB.
+	Removed countdown(): it is unused.
+	Removed maxreal3(); it's a duplicate of rmax3().
+	Removed boundval(): it's a duplicate of rboundval().
+	Normalization of structs and unions to C++ (embedded unions made anonymous; redundant typedefs removed).
+	(Redefined the {B,C,R,Z}{Vector,Matrix} typedefs as structures, instead of as pointers.)
+	Combined (the empty) ae_serializer_clear() into ae_serializer_stop() ― the two are always called together.
+	Removed unsetintegerarray(), unsetrealarray(): they are duplicates of SetVector().
+	Removed unsetrealmatrix(): it's a duplicate of SetMatrix().
+	Made ae_vector_wrapper::c_ptr(), ae_matrix_wrapper::c_ptr() in-line in Ap.h and removed them from Ap.cpp.
+	The declarations of ae_vector_wrapper::ae_vector_wrapper() and ae_vector_wrapper::operator=() in Ap.h were removed - unused.
+	The declarations of ae_matrix_wrapper::ae_matrix_wrapper() and ae_matrix_wrapper::operator=() in Ap.h were removed - unused.
+	The output parameters in ae_serializer_unserialize_{bool,int,int64,double} were remade into return values.
+	The parameter type in ae_shared_pool_is_initialized() was raised from (void *) to (ae_shared_pool *).
+	Changed the return type of ae_stream_{reader,writer} to bool; normalized them to true on success, false on failure.
+	Changed cpp_{reader,writer} in Ap.cpp similarly.
+	Redefined the ae_datatype typedef as the (previously unnamed) enum for DT_{BOOL,BYTE,INT,REAL,COMPLEX}.
+	Converted multi-branch statements involving DT_* into switch statements.
+	Moved the AE_SM_* constants from Ap.cpp to Ap.h, remaking them into an enum type ae_sermode_t.
+	Redeclared serializer::mode as type ae_sermode_t.
+	Converted multi-branch statements involving AE_SM_* into switch statements.
+	Made the following (local) routines in Ap.cpp "static" and topologically sorted them:
+		_ialglib_{rmv,cmv,mcopyblock,pack_n2,mm22,mm22x2}_sse2()
+		ae_str2{bool,int,int64,double}(), ae_{bool,int,int64,double}2str()
+		my_stricmp() filter_spaces() str_{vector,matrix}_create()
+		parse_{bool,int,real,complex}_delim() _parse_real_delim() arraytostring()
+	Inverted my_stricmp() into a bool-returning function and renamed it strimatch().
+	Remade CPU_SSE2 = 1 in Ap.h into an enum typedef ae_cpuid_t.
+	Lifted the return type of ae_cpuid() in Ap.cpp and the type of CurCPU to ae_cpuid_t.
+	Moved i{min,max}2(), imin3(), {i,r}max3(), rmaxabs3(), {i,r}boundval() from AlgLibInternal.{cpp,h} to Ap.{cpp,h}.
+	Removed ae_{min,max}int(): they are duplicates respectively if i{min,max}2().
+	Renamed ae_minreal() as rmin2() and ae_maxreal() as rmax2().
+	Removed the unused or redundant types s{boolean,integer,real,complex}[array] from AlgLibInternal.{cpp,h};
+	Converted sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector;
+	Redefined and replaced srealarray_{init,copy,free} by RVector_{init,copy,free}.
+	Removed inttoreal() from AlgLibInternal.{cpp,h} ― it's unused and duplicates the typecast function double().
+	Removed countnz{1,2}() from AlgLibInternal.{cpp,h} ― they are unused.
+	Removed idivup() from AlgLibInternal.{cpp,h}; replacing idivup(a,b) by the operation (a + b - 1) / b.
+	Removed rmul{2,3}() from AlgLibInternal.{cpp,h}; replacing rmul2(a,b) by (double)a * b, rmul3(a,b,c) by (double)a * b * c.
+34	Preliminary work for the inclusion of multi-threading (mostly still forthcoming).
+	Consolidation of all system-dependent routines for locks and threads.
+	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
 </pre>
 </p>
 <p>
@@ -845,6 +895,11 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 32	2222 3356 3438 3266 1583163421 226
 32	2242 3356 3473 3238 1583193341 216
 32	2232 3379 3473 3229 1583267567 210
+33	2262 3367 3473 3218 1583609500 220
+33	2288 3460 3510 3217 1583795111 218
+33	2278 3497 3510 3279 1583852957 227
+34	2288 3521 3500 3274 1583869463 // (Ended early to make a last-minute change to the display format of TestC.cpp.)
+34	2262 3413 3510 3248 1583869582 218
 </pre>
 </p>
 </div>

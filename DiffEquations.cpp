@@ -21,7 +21,7 @@ static const double odesolver_odesolvermaxgrow = 3.0;
 static const double odesolver_odesolvermaxshrink = 10.0;
 
 // Internal initialization subroutine
-static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
+static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state) {
    ae_int_t i;
    double v;
    SetObj(odesolverstate, state);
@@ -41,27 +41,27 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
       state->repnfev = 0;
       state->repterminationtype = 1;
       ae_matrix_set_length(&state->ytbl, 1, n);
-      ae_v_move(state->ytbl.ptr.pp_double[0], 1, y->ptr.p_double, 1, n);
+      ae_v_move(state->ytbl.xyR[0], 1, y->xR, 1, n);
       ae_vector_set_length(&state->xg, m);
-      ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
+      ae_v_move(state->xg.xR, 1, x->xR, 1, m);
       return;
    }
 // check again: correct order of X[]
-   if (x->ptr.p_double[1] == x->ptr.p_double[0]) {
+   if (x->xR[1] == x->xR[0]) {
       state->repterminationtype = -2;
       return;
    }
    for (i = 1; i < m; i++) {
-      if (x->ptr.p_double[1] > x->ptr.p_double[0] && x->ptr.p_double[i] <= x->ptr.p_double[i - 1] || x->ptr.p_double[1] < x->ptr.p_double[0] && x->ptr.p_double[i] >= x->ptr.p_double[i - 1]) {
+      if (x->xR[1] > x->xR[0] && x->xR[i] <= x->xR[i - 1] || x->xR[1] < x->xR[0] && x->xR[i] >= x->xR[i - 1]) {
          state->repterminationtype = -2;
          return;
       }
    }
 // auto-select H if necessary
    if (h == 0.0) {
-      v = fabs(x->ptr.p_double[1] - x->ptr.p_double[0]);
+      v = fabs(x->xR[1] - x->xR[0]);
       for (i = 2; i < m; i++) {
-         v = ae_minreal(v, fabs(x->ptr.p_double[i] - x->ptr.p_double[i - 1]));
+         v = rmin2(v, fabs(x->xR[i] - x->xR[i - 1]));
       }
       h = 0.001 * v;
    }
@@ -72,15 +72,15 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
    state->eps = fabs(eps);
    state->fraceps = eps < 0.0;
    ae_vector_set_length(&state->xg, m);
-   ae_v_move(state->xg.ptr.p_double, 1, x->ptr.p_double, 1, m);
-   if (x->ptr.p_double[1] > x->ptr.p_double[0]) {
+   ae_v_move(state->xg.xR, 1, x->xR, 1, m);
+   if (x->xR[1] > x->xR[0]) {
       state->xscale = 1.0;
    } else {
       state->xscale = -1.0;
-      ae_v_muld(state->xg.ptr.p_double, 1, m, -1);
+      ae_v_muld(state->xg.xR, 1, m, -1);
    }
    ae_vector_set_length(&state->yc, n);
-   ae_v_move(state->yc.ptr.p_double, 1, y->ptr.p_double, 1, n);
+   ae_v_move(state->yc.xR, 1, y->xR, 1, n);
    state->solvertype = solvertype;
    state->repterminationtype = 0;
 // Allocate arrays
@@ -131,7 +131,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype, RVector y, ae_int_t n, 
 //     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state) {
+void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state) {
    SetObj(odesolverstate, state);
    ae_assert(n >= 1, "ODESolverRKCK: N<1!");
    ae_assert(m >= 1, "ODESolverRKCK: M < 1!");
@@ -198,42 +198,42 @@ Spawn:
    // Prepare coefficients table.
    // Check it for errors
       ae_vector_set_length(&state->rka, 6);
-      state->rka.ptr.p_double[0] = 0.0;
-      state->rka.ptr.p_double[1] = 1.0 / 5.0;
-      state->rka.ptr.p_double[2] = 3.0 / 10.0;
-      state->rka.ptr.p_double[3] = 3.0 / 5.0;
-      state->rka.ptr.p_double[4] = 1.0;
-      state->rka.ptr.p_double[5] = 7.0 / 8.0;
+      state->rka.xR[0] = 0.0;
+      state->rka.xR[1] = 1.0 / 5.0;
+      state->rka.xR[2] = 3.0 / 10.0;
+      state->rka.xR[3] = 3.0 / 5.0;
+      state->rka.xR[4] = 1.0;
+      state->rka.xR[5] = 7.0 / 8.0;
       ae_matrix_set_length(&state->rkb, 6, 5);
-      state->rkb.ptr.pp_double[1][0] = 1.0 / 5.0;
-      state->rkb.ptr.pp_double[2][0] = 3.0 / 40.0;
-      state->rkb.ptr.pp_double[2][1] = 9.0 / 40.0;
-      state->rkb.ptr.pp_double[3][0] = 3.0 / 10.0;
-      state->rkb.ptr.pp_double[3][1] = -9.0 / 10.0;
-      state->rkb.ptr.pp_double[3][2] = 6.0 / 5.0;
-      state->rkb.ptr.pp_double[4][0] = -11.0 / 54.0;
-      state->rkb.ptr.pp_double[4][1] = 5.0 / 2.0;
-      state->rkb.ptr.pp_double[4][2] = -70.0 / 27.0;
-      state->rkb.ptr.pp_double[4][3] = 35.0 / 27.0;
-      state->rkb.ptr.pp_double[5][0] = 1631.0 / 55296.0;
-      state->rkb.ptr.pp_double[5][1] = 175.0 / 512.0;
-      state->rkb.ptr.pp_double[5][2] = 575.0 / 13824.0;
-      state->rkb.ptr.pp_double[5][3] = 44275.0 / 110592.0;
-      state->rkb.ptr.pp_double[5][4] = 253.0 / 4096.0;
+      state->rkb.xyR[1][0] = 1.0 / 5.0;
+      state->rkb.xyR[2][0] = 3.0 / 40.0;
+      state->rkb.xyR[2][1] = 9.0 / 40.0;
+      state->rkb.xyR[3][0] = 3.0 / 10.0;
+      state->rkb.xyR[3][1] = -9.0 / 10.0;
+      state->rkb.xyR[3][2] = 6.0 / 5.0;
+      state->rkb.xyR[4][0] = -11.0 / 54.0;
+      state->rkb.xyR[4][1] = 5.0 / 2.0;
+      state->rkb.xyR[4][2] = -70.0 / 27.0;
+      state->rkb.xyR[4][3] = 35.0 / 27.0;
+      state->rkb.xyR[5][0] = 1631.0 / 55296.0;
+      state->rkb.xyR[5][1] = 175.0 / 512.0;
+      state->rkb.xyR[5][2] = 575.0 / 13824.0;
+      state->rkb.xyR[5][3] = 44275.0 / 110592.0;
+      state->rkb.xyR[5][4] = 253.0 / 4096.0;
       ae_vector_set_length(&state->rkc, 6);
-      state->rkc.ptr.p_double[0] = 37.0 / 378.0;
-      state->rkc.ptr.p_double[1] = 0.0;
-      state->rkc.ptr.p_double[2] = 250.0 / 621.0;
-      state->rkc.ptr.p_double[3] = 125.0 / 594.0;
-      state->rkc.ptr.p_double[4] = 0.0;
-      state->rkc.ptr.p_double[5] = 512.0 / 1771.0;
+      state->rkc.xR[0] = 37.0 / 378.0;
+      state->rkc.xR[1] = 0.0;
+      state->rkc.xR[2] = 250.0 / 621.0;
+      state->rkc.xR[3] = 125.0 / 594.0;
+      state->rkc.xR[4] = 0.0;
+      state->rkc.xR[5] = 512.0 / 1771.0;
       ae_vector_set_length(&state->rkcs, 6);
-      state->rkcs.ptr.p_double[0] = 2825.0 / 27648.0;
-      state->rkcs.ptr.p_double[1] = 0.0;
-      state->rkcs.ptr.p_double[2] = 18575.0 / 48384.0;
-      state->rkcs.ptr.p_double[3] = 13525.0 / 55296.0;
-      state->rkcs.ptr.p_double[4] = 277.0 / 14336.0;
-      state->rkcs.ptr.p_double[5] = 1.0 / 4.0;
+      state->rkcs.xR[0] = 2825.0 / 27648.0;
+      state->rkcs.xR[1] = 0.0;
+      state->rkcs.xR[2] = 18575.0 / 48384.0;
+      state->rkcs.xR[3] = 13525.0 / 55296.0;
+      state->rkcs.xR[4] = 277.0 / 14336.0;
+      state->rkcs.xR[5] = 1.0 / 4.0;
       ae_matrix_set_length(&state->rkk, 6, n);
    // Main cycle consists of two iterations:
    // * outer where we travel from X[i-1] to X[i]
@@ -242,18 +242,18 @@ Spawn:
       ae_vector_set_length(&state->escale, n);
       ae_vector_set_length(&state->yn, n);
       ae_vector_set_length(&state->yns, n);
-      xc = state->xg.ptr.p_double[0];
-      ae_v_move(state->ytbl.ptr.pp_double[0], 1, state->yc.ptr.p_double, 1, n);
+      xc = state->xg.xR[0];
+      ae_v_move(state->ytbl.xyR[0], 1, state->yc.xR, 1, n);
       for (j = 0; j < n; j++) {
-         state->escale.ptr.p_double[j] = 0.0;
+         state->escale.xR[j] = 0.0;
       }
       for (i = 1; i < m; i++) {
       // begin inner iteration
          while (true) {
          // truncate step if needed (beyond right boundary).
          // determine should we store X or not
-            if (xc + h >= state->xg.ptr.p_double[i]) {
-               h = state->xg.ptr.p_double[i] - xc;
+            if (xc + h >= state->xg.xR[i]) {
+               h = state->xg.xR[i] - xc;
                gridpoint = true;
             } else {
                gridpoint = false;
@@ -263,7 +263,7 @@ Spawn:
          // These maximums are initialized by zeros,
          // then updated every iterations.
             for (j = 0; j < n; j++) {
-               state->escale.ptr.p_double[j] = ae_maxreal(state->escale.ptr.p_double[j], fabs(state->yc.ptr.p_double[j]));
+               state->escale.xR[j] = rmax2(state->escale.xR[j], fabs(state->yc.xR[j]));
             }
          // make one step:
          // 1. calculate all info needed to do step
@@ -274,39 +274,39 @@ Spawn:
          // to the form where x[0] < x[1] < ... < x[n-1]. So X is
          // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
          // by dy/dt=xscale*f(y,xscale*t).
-            ae_v_move(state->yn.ptr.p_double, 1, state->yc.ptr.p_double, 1, n);
-            ae_v_move(state->yns.ptr.p_double, 1, state->yc.ptr.p_double, 1, n);
+            ae_v_move(state->yn.xR, 1, state->yc.xR, 1, n);
+            ae_v_move(state->yns.xR, 1, state->yc.xR, 1, n);
             for (k = 0; k < 6; k++) {
             // prepare data for the next update of YN/YNS
-               state->x = state->xscale * (xc + state->rka.ptr.p_double[k] * h);
-               ae_v_move(state->y.ptr.p_double, 1, state->yc.ptr.p_double, 1, n);
+               state->x = state->xscale * (xc + state->rka.xR[k] * h);
+               ae_v_move(state->y.xR, 1, state->yc.xR, 1, n);
                for (j = 0; j < k; j++) {
-                  v = state->rkb.ptr.pp_double[k][j];
-                  ae_v_addd(state->y.ptr.p_double, 1, state->rkk.ptr.pp_double[j], 1, n, v);
+                  v = state->rkb.xyR[k][j];
+                  ae_v_addd(state->y.xR, 1, state->rkk.xyR[j], 1, n, v);
                }
                state->PQ = 0; goto Pause; Resume0:
                state->repnfev++;
                v = h * state->xscale;
-               ae_v_moved(state->rkk.ptr.pp_double[k], 1, state->dy.ptr.p_double, 1, n, v);
+               ae_v_moved(state->rkk.xyR[k], 1, state->dy.xR, 1, n, v);
             // update YN/YNS
-               v = state->rkc.ptr.p_double[k];
-               ae_v_addd(state->yn.ptr.p_double, 1, state->rkk.ptr.pp_double[k], 1, n, v);
-               v = state->rkcs.ptr.p_double[k];
-               ae_v_addd(state->yns.ptr.p_double, 1, state->rkk.ptr.pp_double[k], 1, n, v);
+               v = state->rkc.xR[k];
+               ae_v_addd(state->yn.xR, 1, state->rkk.xyR[k], 1, n, v);
+               v = state->rkcs.xR[k];
+               ae_v_addd(state->yns.xR, 1, state->rkk.xyR[k], 1, n, v);
             }
          // estimate error
             err = 0.0;
             for (j = 0; j < n; j++) {
                if (!state->fraceps) {
                // absolute error is estimated
-                  err = ae_maxreal(err, fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j]));
+                  err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]));
                } else {
                // Relative error is estimated
-                  v = state->escale.ptr.p_double[j];
+                  v = state->escale.xR[j];
                   if (v == 0.0) {
                      v = 1.0;
                   }
-                  err = ae_maxreal(err, fabs(state->yn.ptr.p_double[j] - state->yns.ptr.p_double[j]) / v);
+                  err = rmax2(err, fabs(state->yn.xR[j] - state->yns.xR[j]) / v);
                }
             }
          // calculate new step, restart if necessary
@@ -324,7 +324,7 @@ Spawn:
             }
          // advance position
             xc += h;
-            ae_v_move(state->yc.ptr.p_double, 1, state->yn.ptr.p_double, 1, n);
+            ae_v_move(state->yc.xR, 1, state->yn.xR, 1, n);
          // update H
             h = h2;
          // break on grid point
@@ -333,7 +333,7 @@ Spawn:
             }
          }
       // save result
-         ae_v_move(state->ytbl.ptr.pp_double[i], 1, state->yc.ptr.p_double, 1, n);
+         ae_v_move(state->ytbl.xyR[i], 1, state->yc.xR, 1, n);
       }
       state->repterminationtype = 1;
       goto Exit;
@@ -364,7 +364,7 @@ Pause:
 //                     *  1    task has been solved
 //                 * Rep.NFEV contains number of function calculations
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix ytbl, odesolverreport *rep) {
+void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep) {
    double v;
    ae_int_t i;
    *m = 0;
@@ -377,10 +377,10 @@ void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix 
       rep->nfev = state->repnfev;
       ae_vector_set_length(xtbl, state->m);
       v = state->xscale;
-      ae_v_moved(xtbl->ptr.p_double, 1, state->xg.ptr.p_double, 1, state->m, v);
+      ae_v_moved(xtbl->xR, 1, state->xg.xR, 1, state->m, v);
       ae_matrix_set_length(ytbl, state->m, state->n);
       for (i = 0; i < state->m; i++) {
-         ae_v_move(ytbl->ptr.pp_double[i], 1, state->ytbl.ptr.pp_double[i], 1, state->n);
+         ae_v_move(ytbl->xyR[i], 1, state->ytbl.xyR[i], 1, state->n);
       }
    } else {
       rep->nfev = 0;
@@ -546,10 +546,10 @@ bool odesolveriteration(const odesolverstate &state) {
 //     ptr     -   optional pointer which is passed to diff; can be NULL
 //
 // ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
-void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr) {
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr/* = NULL*/) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_assert(diff != NULL, "ALGLIB: error in 'odesolversolve()' (diff is NULL)");
+   alglib_impl::ae_assert(diff != NULL, "odesolversolve: diff is NULL");
    while (alglib_impl::odesolveriteration(state.c_ptr()))
    BegPoll
       diff(state.y, state.x, state.dy, ptr);

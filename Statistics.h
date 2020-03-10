@@ -21,27 +21,27 @@
 // Depends on: (AlgLibInternal) BASICSTATOPS
 // Depends on: (LinAlg) ABLAS
 namespace alglib_impl {
-void samplemoments(RVector x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis);
-double samplemean(RVector x, ae_int_t n);
-double samplevariance(RVector x, ae_int_t n);
-double sampleskewness(RVector x, ae_int_t n);
-double samplekurtosis(RVector x, ae_int_t n);
-void sampleadev(RVector x, ae_int_t n, double *adev);
-void samplemedian(RVector x, ae_int_t n, double *median);
-void samplepercentile(RVector x, ae_int_t n, double p, double *v);
-double cov2(RVector x, RVector y, ae_int_t n);
-double pearsoncorr2(RVector x, RVector y, ae_int_t n);
-double spearmancorr2(RVector x, RVector y, ae_int_t n);
-void covm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c);
-void pearsoncorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c);
-void spearmancorrm(RMatrix x, ae_int_t n, ae_int_t m, RMatrix c);
-void covm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c);
-void pearsoncorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c);
-void spearmancorrm2(RMatrix x, RMatrix y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix c);
-void rankdata(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures);
-void rankdatacentered(RMatrix xy, ae_int_t npoints, ae_int_t nfeatures);
-double pearsoncorrelation(RVector x, RVector y, ae_int_t n);
-double spearmanrankcorrelation(RVector x, RVector y, ae_int_t n);
+void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis);
+double samplemean(RVector *x, ae_int_t n);
+double samplevariance(RVector *x, ae_int_t n);
+double sampleskewness(RVector *x, ae_int_t n);
+double samplekurtosis(RVector *x, ae_int_t n);
+void sampleadev(RVector *x, ae_int_t n, double *adev);
+void samplemedian(RVector *x, ae_int_t n, double *median);
+void samplepercentile(RVector *x, ae_int_t n, double p, double *v);
+double cov2(RVector *x, RVector *y, ae_int_t n);
+double pearsoncorr2(RVector *x, RVector *y, ae_int_t n);
+double spearmancorr2(RVector *x, RVector *y, ae_int_t n);
+void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
+void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
+void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c);
+void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
+void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
+void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c);
+void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
+void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n);
+double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -379,7 +379,7 @@ void rankdata(real_2d_array &xy);
 // * tied data are correctly handled (tied ranks are calculated)
 // * centered ranks are just usual ranks, but centered in such way  that  sum
 //   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e it changes
+// * centering is performed by subtracting mean from each row, i.e. it changes
 //   mean value, but does NOT change higher moments
 //
 // Inputs:
@@ -406,7 +406,7 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 // === WSR Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-void wilcoxonsignedranktest(RVector x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail);
+void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -461,7 +461,7 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
 // === STEST Package ===
 // Depends on: (SpecialFunctions) BINOMIALDISTR
 namespace alglib_impl {
-void onesamplesigntest(RVector x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail);
+void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -587,9 +587,9 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 // === STUDENTTTESTS Package ===
 // Depends on: (SpecialFunctions) STUDENTTDISTR
 namespace alglib_impl {
-void studentttest1(RVector x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail);
-void studentttest2(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
-void unequalvariancettest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail);
+void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -717,7 +717,7 @@ void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1
 // === MANNWHITNEYU Package ===
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
-void mannwhitneyutest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -790,7 +790,7 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 
 // === JARQUEBERA Package ===
 namespace alglib_impl {
-void jarqueberatest(RVector x, ae_int_t n, double *p);
+void jarqueberatest(RVector *x, ae_int_t n, double *p);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -827,8 +827,8 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
 // Depends on: (SpecialFunctions) FDISTR
 // Depends on: (SpecialFunctions) CHISQUAREDISTR
 namespace alglib_impl {
-void ftest(RVector x, ae_int_t n, RVector y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
-void onesamplevariancetest(RVector x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail);
+void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail);
 } // end of namespace alglib_impl
 
 namespace alglib {

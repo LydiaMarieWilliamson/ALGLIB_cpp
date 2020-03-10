@@ -36,8 +36,6 @@
 #   include <vector>
 #endif
 
-#define AutoS static // "auto static": static thread-local variables in block or file scope.
-
 #define AE_USE_CPP
 
 // Definitions
@@ -51,7 +49,7 @@
 #define AE_POSIX	2
 #define AE_LINUX	304
 #if !defined AE_OS
-#   define AE_OS AE_UNKNOWN
+#   define AE_OS AE_OTHER_OS
 #elif AE_OS == AE_LINUX
 #   undef AE_OS
 #   define AE_OS AE_POSIX
@@ -89,9 +87,9 @@
 #elif defined _MSC_VER
 #   define AE_COMPILER AE_MSVC
 #   define ALIGNED __declspec(align(8))
+#   if defined InAlgLib && !defined AE_ALL_WARNINGS
 // Disable some irrelevant warnings.
 //(#) Originally preceded the headers other than Ap.h in TestC.cpp and followed them in the program module *.cpp files.
-#   if defined InAlgLib && !defined AE_ALL_WARNINGS
 #      pragma warning(disable:4100)
 #      pragma warning(disable:4127)
 #      pragma warning(disable:4611)
@@ -102,6 +100,16 @@
 #   define AE_COMPILER AE_OTHERC
 #   define ALIGNED
 #endif
+
+// Solaris Studio C/C++, IBM XL C/C++, GNU C, CLang, IntelC++ Compiler (Linux): _thread static
+// Visual C++, Intel C/C++ (Windows), C++ Builder, Digital Mars C++: __declspec(thread) static
+// C++ Builder: __thread static or _declspec(thread) static
+// On Windows before Vista and Server 2008 _declspec(thread) won't work in DLL's except those bound to executables.
+// In C++11 (and in C++ if <threads.h> is supported): thread_local static; requires #include <threads.h>
+// In C11 (in general): Thread_local static
+// The keywords "auto" and "Thread_local"/"thread_local" in C/C++ have mutually exclusive uses
+// and can therefore be considered as different cases of the same concept!
+#define AutoS static // "auto static": static thread-local variables in block or file scope.
 
 // state flags
 #define _ALGLIB_FLG_THREADING_MASK          0x7
@@ -126,8 +134,8 @@
 // -	an x86 architecture definition AE_CPU == AE_INTEL
 // -	a compiler which supports intrinsics
 // The presence of AE_HAS_SSE2_INTRINSICS does NOT mean that our CPU actually supports SSE2 -
-// such things should be determined by CurCPU, which is intialized on start-up.
-// It means that we are working under Intel and out compiler can issue SSE2-capable code.
+// such things should be determined by CurCPU, which is initialized on start-up.
+// It means that we are working under Intel and our compiler can issue SSE2-capable code.
 #if defined AE_CPU && AE_CPU == AE_INTEL
 #   if AE_COMPILER == AE_MSVC
 #      include <emmintrin.h>
@@ -192,15 +200,14 @@ typedef ptrdiff_t ae_int_t;
 typedef enum { false = 0, true = 1 } bool;
 #endif
 
-typedef struct { double x, y; } ae_complex;
+struct ae_complex { double x, y; } ;
 typedef enum { ERR_OK = 0, ERR_OUT_OF_MEMORY = 1, ERR_XARRAY_TOO_LARGE = 2, ERR_ASSERTION_FAILED = 3 } ae_error_type;
-typedef ae_int_t ae_datatype;
+typedef enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 } ae_datatype;
+typedef enum { CPU_SSE2 = 1 } ae_cpuid_t;
 
 // other definitions
 enum { OWN_CALLER = 1, OWN_AE = 2 };
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
-enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 };
-enum { CPU_SSE2 = 1 };
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
@@ -240,13 +247,13 @@ bool ae_check_zeros(const void *ptr, ae_int_t n);
 //                 This field locates the actual base pointer
 //                 and is meant only for use as a hint for Valgrind - NOT for anything else.
 typedef void (*ae_deallocator)(void *);
-typedef struct ae_dyn_block {
+struct ae_dyn_block {
    struct ae_dyn_block *volatile p_next;
 // void *deallocator;
    ae_deallocator deallocator;
    void *volatile ptr;
 // void *valgrind_hint; // Redundant: it is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
-} ae_dyn_block;
+};
 
 void ae_db_attach(ae_dyn_block *block);
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
@@ -267,19 +274,19 @@ typedef struct ae_dyn_block ae_frame;
 void ae_frame_make(ae_frame *tmp);
 void ae_frame_leave();
 
-typedef struct ae_vector {
+struct ae_vector {
 // Number of elements in array, cnt >= 0
    ae_int_t cnt;
 
 // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
    ae_datatype datatype;
 
-// If ptr points to memory owned and managed by ae_vector itself,
+// If xX points to memory owned and managed by ae_vector itself,
 // this field is false. If vector was attached to x_vector structure
 // with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
 
-// ae_dyn_block structure which manages data in ptr. This structure
+// ae_dyn_block structure which manages data in xX. This structure
 // is responsible for automatic deletion of object when its frame
 // is destroyed.
    ae_dyn_block data;
@@ -287,14 +294,14 @@ typedef struct ae_vector {
 // Pointer to data.
 // User usually works with this field.
    union {
-      void *p_ptr;
-      bool *p_bool;
-      unsigned char *p_ubyte;
-      ae_int_t *p_int;
-      double *p_double;
-      ae_complex *p_complex;
-   } ptr;
-} ae_vector;
+      void *xX;
+      bool *xB;
+      unsigned char *xU;
+      ae_int_t *xZ;
+      double *xR;
+      ae_complex *xC;
+   };
+};
 
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic);
 void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic);
@@ -306,27 +313,27 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
 #define DupVector(V)			ae_vector _##V; memset(&_##V, 0, sizeof _##V), ae_vector_copy(&_##V, V, true), V = &_##V
 #define SetVector(P)			ae_vector_free(P, true)
 
-typedef struct ae_matrix {
+struct ae_matrix {
    ae_int_t rows;
    ae_int_t cols;
    ae_int_t stride;
    ae_datatype datatype;
 
-// If ptr points to memory owned and managed by ae_vector itself,
+// If xX points to memory owned and managed by ae_vector itself,
 // this field is false. If vector was attached to x_vector structure
 // with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
 
    ae_dyn_block data;
    union {
-      void *p_ptr;
-      void **pp_void;
-      bool **pp_bool;
-      ae_int_t **pp_int;
-      double **pp_double;
-      ae_complex **pp_complex;
-   } ptr;
-} ae_matrix;
+      void *xX;
+      void **xyX;
+      bool **xyB;
+      ae_int_t **xyZ;
+      double **xyR;
+      ae_complex **xyC;
+   };
+};
 
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic);
 void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic);
@@ -338,8 +345,8 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 #define SetMatrix(P)			ae_matrix_free(P, true)
 
 // Used for better documenting function parameters.
-typedef ae_vector *BVector, *ZVector, *RVector, *CVector;
-typedef ae_matrix *BMatrix, *ZMatrix, *RMatrix, *CMatrix;
+typedef ae_vector BVector, ZVector, RVector, CVector;
+typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
 // Serializer:
 //
@@ -354,7 +361,7 @@ typedef ae_matrix *BMatrix, *ZMatrix, *RMatrix, *CMatrix;
 //   writer. String parameter may include spaces and  linefeed  symbols,  it
 //   should be written to stream as is.
 //
-//   Return value must be zero for success or non-zero for failure.
+//   The return value is true on success, false on failure.
 //
 // * ae_stream_reader type is a function pointer for stream  reader  method;
 //   this pointer is used by X-core for out-of-core unserialization (say, to
@@ -374,14 +381,18 @@ typedef ae_matrix *BMatrix, *ZMatrix, *RMatrix, *CMatrix;
 //   * read exactly cnt symbols  from  stream  to  buffer;  check  that  all
 //     symbols being read are non-space non-linefeed ones
 //   * append trailing zero symbol to buffer
-//   * return value must be zero on success, non-zero if  even  one  of  the
-//     conditions above fails. When reader returns non-zero value,  contents
-//     of buf is not used.
-typedef char (*ae_stream_writer)(const char *p_string, ae_int_t aux);
-typedef char (*ae_stream_reader)(ae_int_t aux, ae_int_t cnt, char *p_buf);
+//   * return value true on sucess, false if even one of the conditions above fails.
+//     When the reader returns false, contents of buf is not used.
+typedef bool (*ae_stream_writer)(const char *p_string, ae_int_t aux);
+typedef bool (*ae_stream_reader)(ae_int_t aux, ae_int_t cnt, char *p_buf);
+typedef enum {
+   AE_SM_DEFAULT = 0, AE_SM_ALLOC = 1, AE_SM_READY2S = 2,
+   AE_SM_TO_STRING = 10, AE_SM_TO_CPPSTRING = 11, AE_SM_TO_STREAM = 12,
+   AE_SM_FROM_STRING = 20, AE_SM_FROM_STREAM = 22
+} ae_sermode_t;
 
-typedef struct {
-   ae_int_t mode;
+struct ae_serializer {
+   ae_sermode_t mode;
    ae_int_t entries_needed;
    ae_int_t entries_saved;
    ae_int_t bytes_asked;
@@ -395,10 +406,9 @@ typedef struct {
    ae_int_t stream_aux;
    ae_stream_writer stream_writer;
    ae_stream_reader stream_reader;
-} ae_serializer;
+};
 
 void ae_serializer_init(ae_serializer *serializer);
-void ae_serializer_clear(ae_serializer *serializer);
 
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
@@ -421,10 +431,10 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v);
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v);
 void ae_serializer_serialize_double(ae_serializer *serializer, double v);
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
-void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v);
-void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v);
-void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v);
-void ae_serializer_unserialize_double(ae_serializer *serializer, double *v);
+bool ae_serializer_unserialize_bool(ae_serializer *serializer);
+ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer);
+ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer);
+double ae_serializer_unserialize_double(ae_serializer *serializer);
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 void ae_serializer_stop(ae_serializer *serializer);
@@ -443,11 +453,11 @@ void ae_serializer_stop(ae_serializer *serializer);
 //     ptr         pointer to the actual data
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_string {
    ALIGNED ae_int64_t owner;
    ALIGNED ae_int64_t last_action;
    ALIGNED char *ptr;
-} x_string;
+};
 
 // x-vector:
 //     cnt         number of elements
@@ -456,8 +466,8 @@ typedef struct {
 //
 //     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
 //                 If vector is owned by caller, X-interface  will  just set
-//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
-//                 will call ae_free/x_free/aligned_free family functions.
+//                 x_ptr to NULL before realloc(). If it is owned by X,
+//                 it will call ae_free/x_free/aligned_free family functions.
 //
 //     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
 //                 contents is either: unchanged, stored at the same location,
@@ -467,19 +477,19 @@ typedef struct {
 //                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
 //                 reallocation or copying is required).
 //
-//     ptr         pointer to the actual data
+//     x_ptr       pointer to the actual data
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_vector {
    ae_int64_t cnt;
    ae_int64_t datatype;
    ae_int64_t owner;
    ae_int64_t last_action;
    union {
-      void *p_ptr;
+      void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
-   } x_ptr;
-} x_vector;
+   };
+};
 void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic);
 void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic);
 void ae_x_set_vector(x_vector *dst, ae_vector *src);
@@ -497,8 +507,8 @@ void x_vector_free(x_vector *dst, bool make_automatic);
 //
 //     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
 //                 If vector is owned by caller, X-interface  will  just set
-//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
-//                 will call ae_free/x_free/aligned_free family functions.
+//                 x_ptr to NULL before realloc(). If it is owned by X,
+//                 it will call ae_free/x_free/aligned_free family functions.
 //
 //     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
 //                 contents is either: unchanged, stored at the same location,
@@ -508,10 +518,10 @@ void x_vector_free(x_vector *dst, bool make_automatic);
 //                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
 //                 reallocation or copying is required).
 //
-//     ptr         pointer to the actual data, stored rowwise
+//     x_ptr       pointer to the actual data, stored rowwise
 //
 // Members of this structure are ae_int64_t to avoid alignment problems.
-typedef struct {
+struct x_matrix {
    ae_int64_t rows;
    ae_int64_t cols;
    ae_int64_t stride;
@@ -519,10 +529,10 @@ typedef struct {
    ae_int64_t owner;
    ae_int64_t last_action;
    union {
-      void *p_ptr;
+      void *x_ptr;
       ae_int64_t portable_alignment_enforcer;
-   } x_ptr;
-} x_matrix;
+   };
+};
 
 void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
 void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
@@ -537,7 +547,7 @@ bool ae_is_hermitian(ae_matrix *a);
 bool ae_force_symmetric(ae_matrix *a);
 bool ae_force_hermitian(ae_matrix *a);
 
-typedef struct ae_smart_ptr {
+struct ae_smart_ptr {
 // pointer to subscriber; all changes in ptr are translated to subscriber
    void **subscriber;
 // pointer to object
@@ -551,7 +561,7 @@ typedef struct ae_smart_ptr {
    void (*free)(void *, bool make_automatic);
 // frame entry; used to ensure automatic deallocation of smart pointer in case of exception/exit
    ae_dyn_block frame_entry;
-} ae_smart_ptr;
+};
 
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
 void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr*.
@@ -572,7 +582,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 //   c) when thread acquires free lock, it immediately returns
 //   d) when thread acquires busy lock, program is terminated
 //      (because lock is already acquired and no one else can free it)
-typedef struct {
+struct ae_lock {
 // Pointer to _lock structure. This pointer has type void* in order to
 // make header file OS-independent (lock declaration depends on OS).
    void *lock_ptr;
@@ -585,7 +595,7 @@ typedef struct {
 // transient lock. Eternal locks are allocated without using ae_dyn_block
 // structure and do not allow deallocation.
    bool eternal;
-} ae_lock;
+};
 
 void ae_yield();
 void ae_init_lock(ae_lock *lock, bool make_automatic);
@@ -596,12 +606,12 @@ void ae_free_lock(ae_lock *lock);
 
 // Shared pool: data structure used to provide thread-safe access to pool  of
 // temporary variables.
-typedef struct ae_shared_pool_entry {
+struct ae_shared_pool_entry {
    void *volatile obj;
    void *volatile next_entry;
-} ae_shared_pool_entry;
+};
 
-typedef struct ae_shared_pool {
+struct ae_shared_pool {
 // lock object which protects pool
    ae_lock pool_lock;
 // seed object (used to create new instances of temporaries)
@@ -629,12 +639,12 @@ typedef struct ae_shared_pool {
    void (*free)(void *ptr, bool make_automatic);
 // frame entry; contains pointer to the pool object itself
    ae_dyn_block frame_entry;
-} ae_shared_pool;
+};
 
 void ae_shared_pool_init(void *_dst, bool make_automatic);
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
 void ae_shared_pool_free(void *dst, bool make_automatic);
-bool ae_shared_pool_is_initialized(void *_dst);
+bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr);
@@ -643,7 +653,6 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_reset(ae_shared_pool *pool);
 
-void ae_never_call_it();
 void ae_set_dbg_flag(ae_int64_t flag_id, ae_int64_t flag_val);
 ae_int64_t ae_get_dbg_value(ae_int64_t id);
 void ae_set_global_threading(ae_uint64_t flg_value);
@@ -651,23 +660,33 @@ ae_uint64_t ae_get_global_threading();
 
 // Service functions
 void ae_assert(bool cond, const char *msg);
-extern const ae_int_t CurCPU;
+extern const ae_cpuid_t CurCPU;
 
 // Real math functions:
 // * standard functions
-bool isposinf(double x);
 bool isneginf(double x);
+bool isposinf(double x);
+
+ae_int_t imin2(ae_int_t x, ae_int_t y);
+ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z);
+ae_int_t imax2(ae_int_t x, ae_int_t y);
+ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z);
 ae_int_t ae_iabs(ae_int_t x);
-double ae_sqr(double x);
 ae_int_t ae_sign(double x);
 ae_int_t RoundZ(double x);
 ae_int_t TruncZ(double x);
 ae_int_t FloorZ(double x);
 ae_int_t CeilZ(double x);
-ae_int_t ae_maxint(ae_int_t m1, ae_int_t m2);
-ae_int_t ae_minint(ae_int_t m1, ae_int_t m2);
-double ae_maxreal(double m1, double m2);
-double ae_minreal(double m1, double m2);
+
+double rmin2(double x, double y);
+double rmax2(double x, double y);
+double rmax3(double x, double y, double z);
+double rmaxabs3(double x, double y, double z);
+double ae_sqr(double x);
+
+ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2);
+double rboundval(double x, double b1, double b2);
+
 double ae_randomreal();
 double ae_randommid();
 ae_int_t ae_randominteger(ae_int_t maxv);
@@ -1045,12 +1064,10 @@ struct ae_vector_wrapper {
    ae_int_t length() const;
 // Access to internal C-structure used by C-core.
 // Not intended for external use.
-   const alglib_impl::ae_vector *c_ptr() const;
-   alglib_impl::ae_vector *c_ptr();
+   const alglib_impl::ae_vector *c_ptr() const { return This; }
+   alglib_impl::ae_vector *c_ptr() { return This; }
 private:
-   ae_vector_wrapper();
    ae_vector_wrapper(const ae_vector_wrapper &rhs);
-   const ae_vector_wrapper &operator=(const ae_vector_wrapper &rhs);
 protected:
 #if !defined AE_NO_EXCEPTIONS
 // Copies array given by string into current object. Additional
@@ -1219,12 +1236,10 @@ struct ae_matrix_wrapper {
    ae_int_t cols() const;
    bool isempty() const;
    ae_int_t getstride() const;
-   const alglib_impl::ae_matrix *c_ptr() const;
-   alglib_impl::ae_matrix *c_ptr();
+   const alglib_impl::ae_matrix *c_ptr() const { return This; }
+   alglib_impl::ae_matrix *c_ptr() { return This; }
 private:
-   ae_matrix_wrapper();
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
-   const ae_matrix_wrapper &operator=(const ae_matrix_wrapper &rhs);
 protected:
 #if !defined AE_NO_EXCEPTIONS
 // Copies array given by string into current object. Additional
@@ -1417,23 +1432,25 @@ extern const double machineepsilon, maxrealnumber, minrealnumber;
 static const int CSV_DEFAULT = 0x0;
 static const int CSV_SKIP_HEADERS = 0x1;
 
+bool isneginf(double x);
+bool isposinf(double x);
+
+int minint(int x, int y);
+int maxint(int x, int y);
 int sign(double x);
-double randomreal();
-double randommid();
-ae_int_t randominteger(ae_int_t maxv);
-bool randombool(double p = 0.5);
 int RoundZ(double x);
 int TruncZ(double x);
 int FloorZ(double x);
 int CeilZ(double x);
-double pi();
+
+double minreal(double x, double y);
+double maxreal(double x, double y);
 double sqr(double x);
-int maxint(int m1, int m2);
-int minint(int m1, int m2);
-double maxreal(double m1, double m2);
-double minreal(double m1, double m2);
-bool isposinf(double x);
-bool isneginf(double x);
+
+double randomreal();
+double randommid();
+ae_int_t randominteger(ae_int_t maxv);
+bool randombool(double p = 0.5);
 } // end of namespace alglib
 
 #endif // OnceOnly

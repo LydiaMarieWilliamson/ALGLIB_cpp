@@ -51,7 +51,7 @@ static const ae_int_t nearestneighbor_kdtreefirstversion = 0;
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreebuild(RMatrix xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt) {
+void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_frame_make(&_frame_block);
@@ -67,7 +67,7 @@ void kdtreebuild(RMatrix xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t norm
    if (n > 0) {
       ae_vector_set_length(&tags, n);
       for (i = 0; i < n; i++) {
-         tags.ptr.p_int[i] = 0;
+         tags.xZ[i] = 0;
       }
    }
    kdtreebuildtagged(xy, &tags, n, nx, ny, normtype, kdt);
@@ -97,7 +97,7 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
    ileft = i1;
    iright = i2 - 1;
    while (ileft < iright) {
-      if (kdt->xy.ptr.pp_double[ileft][d] <= s) {
+      if (kdt->xy.xyR[ileft][d] <= s) {
       // XY[ILeft] is on its place.
       // Advance ILeft.
          ileft++;
@@ -105,17 +105,17 @@ static void nearestneighbor_kdtreesplit(kdtree *kdt, ae_int_t i1, ae_int_t i2, a
       // XY[ILeft,..] must be at IRight.
       // Swap and advance IRight.
          for (i = 0; i < 2 * kdt->nx + kdt->ny; i++) {
-            v = kdt->xy.ptr.pp_double[ileft][i];
-            kdt->xy.ptr.pp_double[ileft][i] = kdt->xy.ptr.pp_double[iright][i];
-            kdt->xy.ptr.pp_double[iright][i] = v;
+            v = kdt->xy.xyR[ileft][i];
+            kdt->xy.xyR[ileft][i] = kdt->xy.xyR[iright][i];
+            kdt->xy.xyR[iright][i] = v;
          }
-         j = kdt->tags.ptr.p_int[ileft];
-         kdt->tags.ptr.p_int[ileft] = kdt->tags.ptr.p_int[iright];
-         kdt->tags.ptr.p_int[iright] = j;
+         j = kdt->tags.xZ[ileft];
+         kdt->tags.xZ[ileft] = kdt->tags.xZ[iright];
+         kdt->tags.xZ[iright] = j;
          iright--;
       }
    }
-   if (kdt->xy.ptr.pp_double[ileft][d] <= s) {
+   if (kdt->xy.xyR[ileft][d] <= s) {
       ileft++;
    } else {
       iright--;
@@ -157,8 +157,8 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    ae_assert(i2 > i1, "KDTreeGenerateTreeRec: internal error");
 // Generate leaf if needed
    if (i2 - i1 <= maxleafsize) {
-      kdt->nodes.ptr.p_int[*nodesoffs] = i2 - i1;
-      kdt->nodes.ptr.p_int[*nodesoffs + 1] = i1;
+      kdt->nodes.xZ[*nodesoffs] = i2 - i1;
+      kdt->nodes.xZ[*nodesoffs + 1] = i1;
       *nodesoffs += 2;
       return;
    }
@@ -169,17 +169,17 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // * D is a dimension number
 // In case bounding box has zero size, we enforce creation of the leaf node.
    d = 0;
-   ds = kdt->innerbuf.curboxmax.ptr.p_double[0] - kdt->innerbuf.curboxmin.ptr.p_double[0];
+   ds = kdt->innerbuf.curboxmax.xR[0] - kdt->innerbuf.curboxmin.xR[0];
    for (i = 1; i < nx; i++) {
-      v = kdt->innerbuf.curboxmax.ptr.p_double[i] - kdt->innerbuf.curboxmin.ptr.p_double[i];
+      v = kdt->innerbuf.curboxmax.xR[i] - kdt->innerbuf.curboxmin.xR[i];
       if (v > ds) {
          ds = v;
          d = i;
       }
    }
    if (ds == 0.0) {
-      kdt->nodes.ptr.p_int[*nodesoffs] = i2 - i1;
-      kdt->nodes.ptr.p_int[*nodesoffs + 1] = i1;
+      kdt->nodes.xZ[*nodesoffs] = i2 - i1;
+      kdt->nodes.xZ[*nodesoffs + 1] = i1;
       *nodesoffs += 2;
       return;
    }
@@ -189,17 +189,17 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // In case all points has same value of D-th component
 // (MinV=MaxV) we enforce D-th dimension of bounding
 // box to become exactly zero and repeat tree construction.
-   s = kdt->innerbuf.curboxmin.ptr.p_double[d] + 0.5 * ds;
-   ae_v_move(kdt->innerbuf.buf.ptr.p_double, 1, &kdt->xy.ptr.pp_double[i1][d], kdt->xy.stride, i2 - i1);
+   s = kdt->innerbuf.curboxmin.xR[d] + 0.5 * ds;
+   ae_v_move(kdt->innerbuf.buf.xR, 1, &kdt->xy.xyR[i1][d], kdt->xy.stride, i2 - i1);
    n = i2 - i1;
    cntless = 0;
    cntgreater = 0;
-   minv = kdt->innerbuf.buf.ptr.p_double[0];
-   maxv = kdt->innerbuf.buf.ptr.p_double[0];
+   minv = kdt->innerbuf.buf.xR[0];
+   maxv = kdt->innerbuf.buf.xR[0];
    minidx = i1;
    maxidx = i1;
    for (i = 0; i < n; i++) {
-      v = kdt->innerbuf.buf.ptr.p_double[i];
+      v = kdt->innerbuf.buf.xR[i];
       if (v < minv) {
          minv = v;
          minidx = i1 + i;
@@ -219,13 +219,13 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
    // In case all points has same value of D-th component
    // (MinV=MaxV) we enforce D-th dimension of bounding
    // box to become exactly zero and repeat tree construction.
-      v0 = kdt->innerbuf.curboxmin.ptr.p_double[d];
-      v1 = kdt->innerbuf.curboxmax.ptr.p_double[d];
-      kdt->innerbuf.curboxmin.ptr.p_double[d] = minv;
-      kdt->innerbuf.curboxmax.ptr.p_double[d] = maxv;
+      v0 = kdt->innerbuf.curboxmin.xR[d];
+      v1 = kdt->innerbuf.curboxmax.xR[d];
+      kdt->innerbuf.curboxmin.xR[d] = minv;
+      kdt->innerbuf.curboxmax.xR[d] = maxv;
       nearestneighbor_kdtreegeneratetreerec(kdt, nodesoffs, splitsoffs, i1, i2, maxleafsize);
-      kdt->innerbuf.curboxmin.ptr.p_double[d] = v0;
-      kdt->innerbuf.curboxmax.ptr.p_double[d] = v1;
+      kdt->innerbuf.curboxmin.xR[d] = v0;
+      kdt->innerbuf.curboxmax.xR[d] = v1;
       return;
    }
    if (cntless > 0 && cntgreater > 0) {
@@ -240,13 +240,13 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          s = minv;
          if (minidx != i1) {
             for (i = 0; i < 2 * nx + ny; i++) {
-               v = kdt->xy.ptr.pp_double[minidx][i];
-               kdt->xy.ptr.pp_double[minidx][i] = kdt->xy.ptr.pp_double[i1][i];
-               kdt->xy.ptr.pp_double[i1][i] = v;
+               v = kdt->xy.xyR[minidx][i];
+               kdt->xy.xyR[minidx][i] = kdt->xy.xyR[i1][i];
+               kdt->xy.xyR[i1][i] = v;
             }
-            j = kdt->tags.ptr.p_int[minidx];
-            kdt->tags.ptr.p_int[minidx] = kdt->tags.ptr.p_int[i1];
-            kdt->tags.ptr.p_int[i1] = j;
+            j = kdt->tags.xZ[minidx];
+            kdt->tags.xZ[minidx] = kdt->tags.xZ[i1];
+            kdt->tags.xZ[i1] = j;
          }
          i3 = i1 + 1;
       } else {
@@ -256,22 +256,22 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
          s = maxv;
          if (maxidx != i2 - 1) {
             for (i = 0; i < 2 * nx + ny; i++) {
-               v = kdt->xy.ptr.pp_double[maxidx][i];
-               kdt->xy.ptr.pp_double[maxidx][i] = kdt->xy.ptr.pp_double[i2 - 1][i];
-               kdt->xy.ptr.pp_double[i2 - 1][i] = v;
+               v = kdt->xy.xyR[maxidx][i];
+               kdt->xy.xyR[maxidx][i] = kdt->xy.xyR[i2 - 1][i];
+               kdt->xy.xyR[i2 - 1][i] = v;
             }
-            j = kdt->tags.ptr.p_int[maxidx];
-            kdt->tags.ptr.p_int[maxidx] = kdt->tags.ptr.p_int[i2 - 1];
-            kdt->tags.ptr.p_int[i2 - 1] = j;
+            j = kdt->tags.xZ[maxidx];
+            kdt->tags.xZ[maxidx] = kdt->tags.xZ[i2 - 1];
+            kdt->tags.xZ[i2 - 1] = j;
          }
          i3 = i2 - 1;
       }
    }
 // Generate 'split' node
-   kdt->nodes.ptr.p_int[*nodesoffs] = 0;
-   kdt->nodes.ptr.p_int[*nodesoffs + 1] = d;
-   kdt->nodes.ptr.p_int[*nodesoffs + 2] = *splitsoffs;
-   kdt->splits.ptr.p_double[*splitsoffs] = s;
+   kdt->nodes.xZ[*nodesoffs] = 0;
+   kdt->nodes.xZ[*nodesoffs + 1] = d;
+   kdt->nodes.xZ[*nodesoffs + 2] = *splitsoffs;
+   kdt->splits.xR[*splitsoffs] = s;
    oldoffs = *nodesoffs;
    *nodesoffs += nearestneighbor_splitnodesize;
    ++*splitsoffs;
@@ -279,20 +279,20 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree *kdt, ae_int_t *nodesof
 // * update CurBox
 // * call subroutine
 // * restore CurBox
-   kdt->nodes.ptr.p_int[oldoffs + 3] = *nodesoffs;
-   v = kdt->innerbuf.curboxmax.ptr.p_double[d];
-   kdt->innerbuf.curboxmax.ptr.p_double[d] = s;
+   kdt->nodes.xZ[oldoffs + 3] = *nodesoffs;
+   v = kdt->innerbuf.curboxmax.xR[d];
+   kdt->innerbuf.curboxmax.xR[d] = s;
    nearestneighbor_kdtreegeneratetreerec(kdt, nodesoffs, splitsoffs, i1, i3, maxleafsize);
-   kdt->innerbuf.curboxmax.ptr.p_double[d] = v;
-   kdt->nodes.ptr.p_int[oldoffs + 4] = *nodesoffs;
-   v = kdt->innerbuf.curboxmin.ptr.p_double[d];
-   kdt->innerbuf.curboxmin.ptr.p_double[d] = s;
+   kdt->innerbuf.curboxmax.xR[d] = v;
+   kdt->nodes.xZ[oldoffs + 4] = *nodesoffs;
+   v = kdt->innerbuf.curboxmin.xR[d];
+   kdt->innerbuf.curboxmin.xR[d] = s;
    nearestneighbor_kdtreegeneratetreerec(kdt, nodesoffs, splitsoffs, i3, i2, maxleafsize);
-   kdt->innerbuf.curboxmin.ptr.p_double[d] = v;
+   kdt->innerbuf.curboxmin.xR[d] = v;
 // Zero-fill unused portions of the node (avoid false warnings by Valgrind
 // about attempt to serialize uninitialized values)
    ae_assert(nearestneighbor_splitnodesize == 6, "KDTreeGenerateTreeRec: node size has unexpectedly changed");
-   kdt->nodes.ptr.p_int[oldoffs + 5] = 0;
+   kdt->nodes.xZ[oldoffs + 5] = 0;
 }
 
 // This function allocates all dataset-independend array  fields  of  KDTree,
@@ -354,7 +354,7 @@ static void nearestneighbor_kdtreeallocdatasetdependent(kdtree *kdt, ae_int_t n,
 //    inefficient case, because  simple  binary  search  (without  additional
 //    structures) is much more efficient in such tasks than KD-trees.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreebuildtagged(RMatrix xy, ZVector tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt) {
+void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t nodesoffs;
@@ -383,24 +383,24 @@ void kdtreebuildtagged(RMatrix xy, ZVector tags, ae_int_t n, ae_int_t nx, ae_int
    kdtreecreaterequestbuffer(kdt, &kdt->innerbuf);
 // Initial fill
    for (i = 0; i < n; i++) {
-      ae_v_move(kdt->xy.ptr.pp_double[i], 1, xy->ptr.pp_double[i], 1, nx);
-      ae_v_move(&kdt->xy.ptr.pp_double[i][nx], 1, xy->ptr.pp_double[i], 1, nx + ny);
-      kdt->tags.ptr.p_int[i] = tags->ptr.p_int[i];
+      ae_v_move(kdt->xy.xyR[i], 1, xy->xyR[i], 1, nx);
+      ae_v_move(&kdt->xy.xyR[i][nx], 1, xy->xyR[i], 1, nx + ny);
+      kdt->tags.xZ[i] = tags->xZ[i];
    }
 // Determine bounding box
-   ae_v_move(kdt->boxmin.ptr.p_double, 1, kdt->xy.ptr.pp_double[0], 1, nx);
-   ae_v_move(kdt->boxmax.ptr.p_double, 1, kdt->xy.ptr.pp_double[0], 1, nx);
+   ae_v_move(kdt->boxmin.xR, 1, kdt->xy.xyR[0], 1, nx);
+   ae_v_move(kdt->boxmax.xR, 1, kdt->xy.xyR[0], 1, nx);
    for (i = 1; i < n; i++) {
       for (j = 0; j < nx; j++) {
-         kdt->boxmin.ptr.p_double[j] = ae_minreal(kdt->boxmin.ptr.p_double[j], kdt->xy.ptr.pp_double[i][j]);
-         kdt->boxmax.ptr.p_double[j] = ae_maxreal(kdt->boxmax.ptr.p_double[j], kdt->xy.ptr.pp_double[i][j]);
+         kdt->boxmin.xR[j] = rmin2(kdt->boxmin.xR[j], kdt->xy.xyR[i][j]);
+         kdt->boxmax.xR[j] = rmax2(kdt->boxmax.xR[j], kdt->xy.xyR[i][j]);
       }
    }
 // Generate tree
    nodesoffs = 0;
    splitsoffs = 0;
-   ae_v_move(kdt->innerbuf.curboxmin.ptr.p_double, 1, kdt->boxmin.ptr.p_double, 1, nx);
-   ae_v_move(kdt->innerbuf.curboxmax.ptr.p_double, 1, kdt->boxmax.ptr.p_double, 1, nx);
+   ae_v_move(kdt->innerbuf.curboxmin.xR, 1, kdt->boxmin.xR, 1, nx);
+   ae_v_move(kdt->innerbuf.curboxmax.xR, 1, kdt->boxmax.xR, 1, nx);
    nearestneighbor_kdtreegeneratetreerec(kdt, &nodesoffs, &splitsoffs, 0, n, 8);
    ivectorresize(&kdt->nodes, nodesoffs);
    rvectorresize(&kdt->splits, splitsoffs);
@@ -436,7 +436,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf) {
    ae_vector_set_length(&buf->boxmax, kdt->nx);
    ae_vector_set_length(&buf->idx, kdt->n);
    ae_vector_set_length(&buf->r, kdt->n);
-   ae_vector_set_length(&buf->buf, ae_maxint(kdt->n, kdt->nx));
+   ae_vector_set_length(&buf->buf, imax2(kdt->n, kdt->nx));
    ae_vector_set_length(&buf->curboxmin, kdt->nx);
    ae_vector_set_length(&buf->curboxmax, kdt->nx);
    buf->kcur = 0;
@@ -472,7 +472,7 @@ void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf) {
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-ae_int_t kdtreequeryknn(kdtree *kdt, RVector x, ae_int_t k, bool selfmatch) {
+ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch) {
    ae_int_t result;
    ae_assert(k >= 1, "KDTreeQueryKNN: K<1!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeQueryKNN: Length(X)<NX!");
@@ -518,7 +518,7 @@ ae_int_t kdtreequeryknn(kdtree *kdt, RVector x, ae_int_t k, bool selfmatch) {
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, ae_int_t k, bool selfmatch) {
+ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch) {
    ae_int_t result;
    ae_assert(k >= 1, "KDTreeTsQueryKNN: K<1!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryKNN: Length(X)<NX!");
@@ -562,7 +562,7 @@ ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, ae_i
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-ae_int_t kdtreequeryrnn(kdtree *kdt, RVector x, double r, bool selfmatch) {
+ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNN: incorrect R!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNN: Length(X)<NX!");
@@ -605,7 +605,7 @@ ae_int_t kdtreequeryrnn(kdtree *kdt, RVector x, double r, bool selfmatch) {
 //
 // As indicated by "U" suffix, this function returns unordered results.
 // ALGLIB: Copyright 01.11.2018 by Sergey Bochkanov
-ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector x, double r, bool selfmatch) {
+ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(r > 0.0, "KDTreeQueryRNNU: incorrect R!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeQueryRNNU: Length(X)<NX!");
@@ -637,26 +637,26 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
    ae_assert(kdt->n > 0, "KDTreeQueryNNRec: internal error");
 // Leaf node.
 // Process points.
-   if (kdt->nodes.ptr.p_int[offs] > 0) {
-      i1 = kdt->nodes.ptr.p_int[offs + 1];
-      i2 = i1 + kdt->nodes.ptr.p_int[offs];
+   if (kdt->nodes.xZ[offs] > 0) {
+      i1 = kdt->nodes.xZ[offs + 1];
+      i2 = i1 + kdt->nodes.xZ[offs];
       for (i = i1; i < i2; i++) {
       // Calculate distance
          ptdist = 0.0;
          nx = kdt->nx;
          if (kdt->normtype == 0) {
             for (j = 0; j < nx; j++) {
-               ptdist = ae_maxreal(ptdist, fabs(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]));
+               ptdist = rmax2(ptdist, fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]));
             }
          }
          if (kdt->normtype == 1) {
             for (j = 0; j < nx; j++) {
-               ptdist += fabs(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
+               ptdist += fabs(kdt->xy.xyR[i][j] - buf->x.xR[j]);
             }
          }
          if (kdt->normtype == 2) {
             for (j = 0; j < nx; j++) {
-               ptdist += ae_sqr(kdt->xy.ptr.pp_double[i][j] - buf->x.ptr.p_double[j]);
+               ptdist += ae_sqr(kdt->xy.xyR[i][j] - buf->x.xR[j]);
             }
          }
       // Skip points with zero distance if self-matches are turned off
@@ -676,10 +676,10 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             } else {
             // New points are added or not, depending on their distance.
             // If added, they replace element at the top of the heap
-               if (ptdist < buf->r.ptr.p_double[0]) {
+               if (ptdist < buf->r.xR[0]) {
                   if (buf->kneeded == 1) {
-                     buf->idx.ptr.p_int[0] = i;
-                     buf->r.ptr.p_double[0] = ptdist;
+                     buf->idx.xZ[0] = i;
+                     buf->r.xR[0] = ptdist;
                   } else {
                      tagheapreplacetopi(&buf->r, &buf->idx, buf->kneeded, ptdist, i);
                   }
@@ -690,22 +690,22 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
       return;
    }
 // Simple split
-   if (kdt->nodes.ptr.p_int[offs] == 0) {
+   if (kdt->nodes.xZ[offs] == 0) {
    // Load:
    // * D  dimension to split
    // * S  split position
-      d = kdt->nodes.ptr.p_int[offs + 1];
-      s = kdt->splits.ptr.p_double[kdt->nodes.ptr.p_int[offs + 2]];
+      d = kdt->nodes.xZ[offs + 1];
+      s = kdt->splits.xR[kdt->nodes.xZ[offs + 2]];
    // Calculate:
    // * ChildBestOffs      child box with best chances
    // * ChildWorstOffs     child box with worst chances
-      if (buf->x.ptr.p_double[d] <= s) {
-         childbestoffs = kdt->nodes.ptr.p_int[offs + 3];
-         childworstoffs = kdt->nodes.ptr.p_int[offs + 4];
+      if (buf->x.xR[d] <= s) {
+         childbestoffs = kdt->nodes.xZ[offs + 3];
+         childworstoffs = kdt->nodes.xZ[offs + 4];
          bestisleft = true;
       } else {
-         childbestoffs = kdt->nodes.ptr.p_int[offs + 4];
-         childworstoffs = kdt->nodes.ptr.p_int[offs + 3];
+         childbestoffs = kdt->nodes.xZ[offs + 4];
+         childworstoffs = kdt->nodes.xZ[offs + 3];
          bestisleft = false;
       }
    // Navigate through childs
@@ -724,36 +724,36 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
       // Update bounding box and current distance
          if (updatemin) {
             prevdist = buf->curdist;
-            t1 = buf->x.ptr.p_double[d];
-            v = buf->curboxmin.ptr.p_double[d];
+            t1 = buf->x.xR[d];
+            v = buf->curboxmin.xR[d];
             if (t1 <= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = ae_maxreal(buf->curdist, s - t1);
+                  buf->curdist = rmax2(buf->curdist, s - t1);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= ae_maxreal(v - t1, 0.0) - s + t1;
+                  buf->curdist -= rmax2(v - t1, 0.0) - s + t1;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= ae_sqr(ae_maxreal(v - t1, 0.0)) - ae_sqr(s - t1);
+                  buf->curdist -= ae_sqr(rmax2(v - t1, 0.0)) - ae_sqr(s - t1);
                }
             }
-            buf->curboxmin.ptr.p_double[d] = s;
+            buf->curboxmin.xR[d] = s;
          } else {
             prevdist = buf->curdist;
-            t1 = buf->x.ptr.p_double[d];
-            v = buf->curboxmax.ptr.p_double[d];
+            t1 = buf->x.xR[d];
+            v = buf->curboxmax.xR[d];
             if (t1 >= s) {
                if (kdt->normtype == 0) {
-                  buf->curdist = ae_maxreal(buf->curdist, t1 - s);
+                  buf->curdist = rmax2(buf->curdist, t1 - s);
                }
                if (kdt->normtype == 1) {
-                  buf->curdist -= ae_maxreal(t1 - v, 0.0) - t1 + s;
+                  buf->curdist -= rmax2(t1 - v, 0.0) - t1 + s;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= ae_sqr(ae_maxreal(t1 - v, 0.0)) - ae_sqr(t1 - s);
+                  buf->curdist -= ae_sqr(rmax2(t1 - v, 0.0)) - ae_sqr(t1 - s);
                }
             }
-            buf->curboxmax.ptr.p_double[d] = s;
+            buf->curboxmax.xR[d] = s;
          }
       // Decide: to dive into cell or not to dive
          if (buf->rneeded != 0 && buf->curdist > buf->rneeded) {
@@ -765,7 +765,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
             } else {
             // KCur=KNeeded, decide to dive or not to dive
             // using point position relative to bounding box.
-               todive = buf->curdist <= buf->r.ptr.p_double[0] * buf->approxf;
+               todive = buf->curdist <= buf->r.xR[0] * buf->approxf;
             }
          }
          if (todive) {
@@ -773,9 +773,9 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          }
       // Restore bounding box and distance
          if (updatemin) {
-            buf->curboxmin.ptr.p_double[d] = v;
+            buf->curboxmin.xR[d] = v;
          } else {
-            buf->curboxmax.ptr.p_double[d] = v;
+            buf->curboxmax.xR[d] = v;
          }
          buf->curdist = prevdist;
       }
@@ -787,7 +787,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
 // Loads distance from X[] to bounding box.
 // Initializes Buf.CurBox[].
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector x, kdtreerequestbuffer *buf) {
+static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequestbuffer *buf) {
    ae_int_t i;
    double vx;
    double vmin;
@@ -797,29 +797,29 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector x, kdtreerequestb
    buf->curdist = 0.0;
    if (kdt->normtype == 0) {
       for (i = 0; i < kdt->nx; i++) {
-         vx = x->ptr.p_double[i];
-         vmin = kdt->boxmin.ptr.p_double[i];
-         vmax = kdt->boxmax.ptr.p_double[i];
-         buf->x.ptr.p_double[i] = vx;
-         buf->curboxmin.ptr.p_double[i] = vmin;
-         buf->curboxmax.ptr.p_double[i] = vmax;
+         vx = x->xR[i];
+         vmin = kdt->boxmin.xR[i];
+         vmax = kdt->boxmax.xR[i];
+         buf->x.xR[i] = vx;
+         buf->curboxmin.xR[i] = vmin;
+         buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
-            buf->curdist = ae_maxreal(buf->curdist, vmin - vx);
+            buf->curdist = rmax2(buf->curdist, vmin - vx);
          } else {
             if (vx > vmax) {
-               buf->curdist = ae_maxreal(buf->curdist, vx - vmax);
+               buf->curdist = rmax2(buf->curdist, vx - vmax);
             }
          }
       }
    }
    if (kdt->normtype == 1) {
       for (i = 0; i < kdt->nx; i++) {
-         vx = x->ptr.p_double[i];
-         vmin = kdt->boxmin.ptr.p_double[i];
-         vmax = kdt->boxmax.ptr.p_double[i];
-         buf->x.ptr.p_double[i] = vx;
-         buf->curboxmin.ptr.p_double[i] = vmin;
-         buf->curboxmax.ptr.p_double[i] = vmax;
+         vx = x->xR[i];
+         vmin = kdt->boxmin.xR[i];
+         vmax = kdt->boxmax.xR[i];
+         buf->x.xR[i] = vx;
+         buf->curboxmin.xR[i] = vmin;
+         buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
             buf->curdist += vmin - vx;
          } else {
@@ -831,12 +831,12 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector x, kdtreerequestb
    }
    if (kdt->normtype == 2) {
       for (i = 0; i < kdt->nx; i++) {
-         vx = x->ptr.p_double[i];
-         vmin = kdt->boxmin.ptr.p_double[i];
-         vmax = kdt->boxmax.ptr.p_double[i];
-         buf->x.ptr.p_double[i] = vx;
-         buf->curboxmin.ptr.p_double[i] = vmin;
-         buf->curboxmax.ptr.p_double[i] = vmax;
+         vx = x->xR[i];
+         vmin = kdt->boxmin.xR[i];
+         vmax = kdt->boxmax.xR[i];
+         buf->x.xR[i] = vx;
+         buf->curboxmin.xR[i] = vmin;
+         buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
             buf->curdist += ae_sqr(vmin - vx);
          } else {
@@ -855,7 +855,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
    ae_assert(buf->x.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
    ae_assert(buf->idx.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
    ae_assert(buf->r.cnt >= kdt->n, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
-   ae_assert(buf->buf.cnt >= ae_maxint(kdt->n, kdt->nx), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
+   ae_assert(buf->buf.cnt >= imax2(kdt->n, kdt->nx), "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
    ae_assert(buf->curboxmin.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
    ae_assert(buf->curboxmax.cnt >= kdt->nx, "KDTree: dimensions of kdtreerequestbuffer are inconsistent with kdtree structure");
 }
@@ -902,7 +902,7 @@ static void nearestneighbor_checkrequestbufferconsistency(kdtree *kdt, kdtreereq
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, double r, bool selfmatch, bool orderedbydist) {
+static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch, bool orderedbydist) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t result;
@@ -985,7 +985,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, double r, bool selfmatch) {
+ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNN: incorrect R!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNN: Length(X)<NX!");
@@ -1035,7 +1035,7 @@ ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, doub
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, double r, bool selfmatch) {
+ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch) {
    ae_int_t result;
    ae_assert(isfinite(r) && r > 0.0, "KDTreeTsQueryRNNU: incorrect R!");
    ae_assert(x->cnt >= kdt->nx, "KDTreeTsQueryRNNU: Length(X)<NX!");
@@ -1081,7 +1081,7 @@ ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, dou
 // * KDTreeQueryResultsTags() to get tag values
 // * KDTreeQueryResultsDistances() to get distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-ae_int_t kdtreequeryaknn(kdtree *kdt, RVector x, ae_int_t k, bool selfmatch, double eps) {
+ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, double eps) {
    ae_int_t result;
    result = kdtreetsqueryaknn(kdt, &kdt->innerbuf, x, k, selfmatch, eps);
    return result;
@@ -1131,7 +1131,7 @@ ae_int_t kdtreequeryaknn(kdtree *kdt, RVector x, ae_int_t k, bool selfmatch, dou
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 18.03.2016 by Sergey Bochkanov
-ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, ae_int_t k, bool selfmatch, double eps) {
+ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch, double eps) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t result;
@@ -1148,7 +1148,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, ae_
 // Check consistency of request buffer
    nearestneighbor_checkrequestbufferconsistency(kdt, buf);
 // Prepare parameters
-   k = ae_minint(k, kdt->n);
+   k = imin2(k, kdt->n);
    buf->kneeded = k;
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
@@ -1205,7 +1205,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector x, ae_
 //       associated with points - it is either INSIDE  or OUTSIDE (so request
 //       for distances will return zeros).
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
-ae_int_t kdtreequerybox(kdtree *kdt, RVector boxmin, RVector boxmax) {
+ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax) {
    ae_int_t result;
    result = kdtreetsquerybox(kdt, &kdt->innerbuf, boxmin, boxmax);
    return result;
@@ -1229,56 +1229,56 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
 // This check is performed once for Offs=0 (tree root).
    if (offs == 0) {
       for (j = 0; j < nx; j++) {
-         if (buf->boxmin.ptr.p_double[j] > buf->curboxmax.ptr.p_double[j]) {
+         if (buf->boxmin.xR[j] > buf->curboxmax.xR[j]) {
             return;
          }
-         if (buf->boxmax.ptr.p_double[j] < buf->curboxmin.ptr.p_double[j]) {
+         if (buf->boxmax.xR[j] < buf->curboxmin.xR[j]) {
             return;
          }
       }
    }
 // Leaf node.
 // Process points.
-   if (kdt->nodes.ptr.p_int[offs] > 0) {
-      i1 = kdt->nodes.ptr.p_int[offs + 1];
-      i2 = i1 + kdt->nodes.ptr.p_int[offs];
+   if (kdt->nodes.xZ[offs] > 0) {
+      i1 = kdt->nodes.xZ[offs + 1];
+      i2 = i1 + kdt->nodes.xZ[offs];
       for (i = i1; i < i2; i++) {
       // Check whether point is in box or not
          inbox = true;
          for (j = 0; j < nx; j++) {
-            inbox = inbox && kdt->xy.ptr.pp_double[i][j] >= buf->boxmin.ptr.p_double[j];
-            inbox = inbox && kdt->xy.ptr.pp_double[i][j] <= buf->boxmax.ptr.p_double[j];
+            inbox = inbox && kdt->xy.xyR[i][j] >= buf->boxmin.xR[j];
+            inbox = inbox && kdt->xy.xyR[i][j] <= buf->boxmax.xR[j];
          }
          if (!inbox) {
             continue;
          }
       // Add point to unordered list
-         buf->r.ptr.p_double[buf->kcur] = 0.0;
-         buf->idx.ptr.p_int[buf->kcur] = i;
+         buf->r.xR[buf->kcur] = 0.0;
+         buf->idx.xZ[buf->kcur] = i;
          buf->kcur++;
       }
       return;
    }
 // Simple split
-   if (kdt->nodes.ptr.p_int[offs] == 0) {
+   if (kdt->nodes.xZ[offs] == 0) {
    // Load:
    // * D  dimension to split
    // * S  split position
-      d = kdt->nodes.ptr.p_int[offs + 1];
-      s = kdt->splits.ptr.p_double[kdt->nodes.ptr.p_int[offs + 2]];
+      d = kdt->nodes.xZ[offs + 1];
+      s = kdt->splits.xR[kdt->nodes.xZ[offs + 2]];
    // Check lower split (S is upper bound of new bounding box)
-      if (s >= buf->boxmin.ptr.p_double[d]) {
-         v = buf->curboxmax.ptr.p_double[d];
-         buf->curboxmax.ptr.p_double[d] = s;
-         nearestneighbor_kdtreequeryboxrec(kdt, buf, kdt->nodes.ptr.p_int[offs + 3]);
-         buf->curboxmax.ptr.p_double[d] = v;
+      if (s >= buf->boxmin.xR[d]) {
+         v = buf->curboxmax.xR[d];
+         buf->curboxmax.xR[d] = s;
+         nearestneighbor_kdtreequeryboxrec(kdt, buf, kdt->nodes.xZ[offs + 3]);
+         buf->curboxmax.xR[d] = v;
       }
    // Check upper split (S is lower bound of new bounding box)
-      if (s <= buf->boxmax.ptr.p_double[d]) {
-         v = buf->curboxmin.ptr.p_double[d];
-         buf->curboxmin.ptr.p_double[d] = s;
-         nearestneighbor_kdtreequeryboxrec(kdt, buf, kdt->nodes.ptr.p_int[offs + 4]);
-         buf->curboxmin.ptr.p_double[d] = v;
+      if (s <= buf->boxmax.xR[d]) {
+         v = buf->curboxmin.xR[d];
+         buf->curboxmin.xR[d] = s;
+         nearestneighbor_kdtreequeryboxrec(kdt, buf, kdt->nodes.xZ[offs + 4]);
+         buf->curboxmin.xR[d] = v;
       }
       return;
    }
@@ -1320,7 +1320,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree *kdt, kdtreerequestbuffer *
 //            failure (exception) because sizes of internal arrays do not fit
 //            to dimensions of KD-tree structure.
 // ALGLIB: Copyright 14.05.2016 by Sergey Bochkanov
-ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector boxmin, RVector boxmax) {
+ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin, RVector *boxmax) {
    ae_int_t j;
    ae_int_t result;
    ae_assert(boxmin->cnt >= kdt->nx, "KDTreeTsQueryBox: Length(BoxMin)<NX!");
@@ -1331,7 +1331,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector boxmin,
    nearestneighbor_checkrequestbufferconsistency(kdt, buf);
 // Quick exit for degenerate boxes
    for (j = 0; j < kdt->nx; j++) {
-      if (boxmin->ptr.p_double[j] > boxmax->ptr.p_double[j]) {
+      if (boxmin->xR[j] > boxmax->xR[j]) {
          buf->kcur = 0;
          result = 0;
          return result;
@@ -1339,10 +1339,10 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector boxmin,
    }
 // Prepare parameters
    for (j = 0; j < kdt->nx; j++) {
-      buf->boxmin.ptr.p_double[j] = boxmin->ptr.p_double[j];
-      buf->boxmax.ptr.p_double[j] = boxmax->ptr.p_double[j];
-      buf->curboxmin.ptr.p_double[j] = boxmin->ptr.p_double[j];
-      buf->curboxmax.ptr.p_double[j] = boxmax->ptr.p_double[j];
+      buf->boxmin.xR[j] = boxmin->xR[j];
+      buf->boxmax.xR[j] = boxmax->xR[j];
+      buf->curboxmin.xR[j] = boxmin->xR[j];
+      buf->curboxmax.xR[j] = boxmax->xR[j];
    }
    buf->kcur = 0;
 // call recursive search
@@ -1381,7 +1381,7 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector boxmin,
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsx(kdtree *kdt, RMatrix x) {
+void kdtreequeryresultsx(kdtree *kdt, RMatrix *x) {
    kdtreetsqueryresultsx(kdt, &kdt->innerbuf, x);
 }
 
@@ -1416,7 +1416,7 @@ void kdtreequeryresultsx(kdtree *kdt, RMatrix x) {
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsxy(kdtree *kdt, RMatrix xy) {
+void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy) {
    kdtreetsqueryresultsxy(kdt, &kdt->innerbuf, xy);
 }
 
@@ -1451,7 +1451,7 @@ void kdtreequeryresultsxy(kdtree *kdt, RMatrix xy) {
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultstags(kdtree *kdt, ZVector tags) {
+void kdtreequeryresultstags(kdtree *kdt, ZVector *tags) {
    kdtreetsqueryresultstags(kdt, &kdt->innerbuf, tags);
 }
 
@@ -1485,7 +1485,7 @@ void kdtreequeryresultstags(kdtree *kdt, ZVector tags) {
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsdistances(kdtree *kdt, RVector r) {
+void kdtreequeryresultsdistances(kdtree *kdt, RVector *r) {
    kdtreetsqueryresultsdistances(kdt, &kdt->innerbuf, r);
 }
 
@@ -1516,7 +1516,7 @@ void kdtreequeryresultsdistances(kdtree *kdt, RVector r) {
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix x) {
+void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x) {
    ae_int_t i;
    ae_int_t k;
    if (buf->kcur == 0) {
@@ -1527,7 +1527,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix x) {
    }
    k = buf->kcur;
    for (i = 0; i < k; i++) {
-      ae_v_move(x->ptr.pp_double[i], 1, &kdt->xy.ptr.pp_double[buf->idx.ptr.p_int[i]][kdt->nx], 1, kdt->nx);
+      ae_v_move(x->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx);
    }
 }
 
@@ -1559,7 +1559,7 @@ void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix x) {
 // * KDTreeQueryResultsTags()          tag values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix xy) {
+void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy) {
    ae_int_t i;
    ae_int_t k;
    if (buf->kcur == 0) {
@@ -1570,7 +1570,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix xy) {
    }
    k = buf->kcur;
    for (i = 0; i < k; i++) {
-      ae_v_move(xy->ptr.pp_double[i], 1, &kdt->xy.ptr.pp_double[buf->idx.ptr.p_int[i]][kdt->nx], 1, kdt->nx + kdt->ny);
+      ae_v_move(xy->xyR[i], 1, &kdt->xy.xyR[buf->idx.xZ[i]][kdt->nx], 1, kdt->nx + kdt->ny);
    }
 }
 
@@ -1607,7 +1607,7 @@ void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix xy) {
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsDistances()     distances
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector tags) {
+void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *tags) {
    ae_int_t i;
    ae_int_t k;
    if (buf->kcur == 0) {
@@ -1618,7 +1618,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector tag
    }
    k = buf->kcur;
    for (i = 0; i < k; i++) {
-      tags->ptr.p_int[i] = kdt->tags.ptr.p_int[buf->idx.ptr.p_int[i]];
+      tags->xZ[i] = kdt->tags.xZ[buf->idx.xZ[i]];
    }
 }
 
@@ -1654,7 +1654,7 @@ void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector tag
 // * KDTreeQueryResultsXY()            X- and Y-values
 // * KDTreeQueryResultsTags()          tag values
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVector r) {
+void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVector *r) {
    ae_int_t i;
    ae_int_t k;
    if (buf->kcur == 0) {
@@ -1670,17 +1670,17 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // (generated during KFN requests)
    if (kdt->normtype == 0) {
       for (i = 0; i < k; i++) {
-         r->ptr.p_double[i] = fabs(buf->r.ptr.p_double[i]);
+         r->xR[i] = fabs(buf->r.xR[i]);
       }
    }
    if (kdt->normtype == 1) {
       for (i = 0; i < k; i++) {
-         r->ptr.p_double[i] = fabs(buf->r.ptr.p_double[i]);
+         r->xR[i] = fabs(buf->r.xR[i]);
       }
    }
    if (kdt->normtype == 2) {
       for (i = 0; i < k; i++) {
-         r->ptr.p_double[i] = sqrt(fabs(buf->r.ptr.p_double[i]));
+         r->xR[i] = sqrt(fabs(buf->r.xR[i]));
       }
    }
 }
@@ -1693,7 +1693,7 @@ void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVecto
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsxi(kdtree *kdt, RMatrix x) {
+void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x) {
    SetMatrix(x);
    kdtreequeryresultsx(kdt, x);
 }
@@ -1706,7 +1706,7 @@ void kdtreequeryresultsxi(kdtree *kdt, RMatrix x) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsxyi(kdtree *kdt, RMatrix xy) {
+void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy) {
    SetMatrix(xy);
    kdtreequeryresultsxy(kdt, xy);
 }
@@ -1719,7 +1719,7 @@ void kdtreequeryresultsxyi(kdtree *kdt, RMatrix xy) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultstagsi(kdtree *kdt, ZVector tags) {
+void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags) {
    SetVector(tags);
    kdtreequeryresultstags(kdt, tags);
 }
@@ -1732,7 +1732,7 @@ void kdtreequeryresultstagsi(kdtree *kdt, ZVector tags) {
 // slower than its 'non-interactive' counterpart, but it is  more  convenient
 // when you call it from command line.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void kdtreequeryresultsdistancesi(kdtree *kdt, RVector r) {
+void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r) {
    SetVector(r);
    kdtreequeryresultsdistances(kdt, r);
 }
@@ -1743,13 +1743,13 @@ void kdtreequeryresultsdistancesi(kdtree *kdt, RVector r) {
 //
 // This function assumes that output buffers are preallocated by caller.
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
-void kdtreeexplorebox(kdtree *kdt, RVector boxmin, RVector boxmax) {
+void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax) {
    ae_int_t i;
-   rvectorsetlengthatleast(boxmin, kdt->nx);
-   rvectorsetlengthatleast(boxmax, kdt->nx);
+   vectorsetlengthatleast(boxmin, kdt->nx);
+   vectorsetlengthatleast(boxmax, kdt->nx);
    for (i = 0; i < kdt->nx; i++) {
-      boxmin->ptr.p_double[i] = kdt->boxmin.ptr.p_double[i];
-      boxmax->ptr.p_double[i] = kdt->boxmax.ptr.p_double[i];
+      boxmin->xR[i] = kdt->boxmin.xR[i];
+      boxmax->xR[i] = kdt->boxmax.xR[i];
    }
 }
 
@@ -1772,12 +1772,12 @@ void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype) {
    *nodetype = 0;
    ae_assert(node >= 0, "KDTreeExploreNodeType: incorrect node");
    ae_assert(node < kdt->nodes.cnt, "KDTreeExploreNodeType: incorrect node");
-   if (kdt->nodes.ptr.p_int[node] > 0) {
+   if (kdt->nodes.xZ[node] > 0) {
    // Leaf node
       *nodetype = 0;
       return;
    }
-   if (kdt->nodes.ptr.p_int[node] == 0) {
+   if (kdt->nodes.xZ[node] == 0) {
    // Split node
       *nodetype = 1;
       return;
@@ -1798,22 +1798,22 @@ void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype) {
 //                 XY values
 //     K       -   number of rows in XY
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
-void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix xy, ae_int_t *k) {
+void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k) {
    ae_int_t offs;
    ae_int_t i;
    ae_int_t j;
    *k = 0;
    ae_assert(node >= 0, "KDTreeExploreLeaf: incorrect node index");
    ae_assert(node + 1 < kdt->nodes.cnt, "KDTreeExploreLeaf: incorrect node index");
-   ae_assert(kdt->nodes.ptr.p_int[node] > 0, "KDTreeExploreLeaf: incorrect node index");
-   *k = kdt->nodes.ptr.p_int[node];
-   offs = kdt->nodes.ptr.p_int[node + 1];
+   ae_assert(kdt->nodes.xZ[node] > 0, "KDTreeExploreLeaf: incorrect node index");
+   *k = kdt->nodes.xZ[node];
+   offs = kdt->nodes.xZ[node + 1];
    ae_assert(offs >= 0, "KDTreeExploreLeaf: integrity error");
    ae_assert(offs + (*k) - 1 < kdt->xy.rows, "KDTreeExploreLeaf: integrity error");
-   rmatrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny);
+   matrixsetlengthatleast(xy, *k, kdt->nx + kdt->ny);
    for (i = 0; i < *k; i++) {
       for (j = 0; j < kdt->nx + kdt->ny; j++) {
-         xy->ptr.pp_double[i][j] = kdt->xy.ptr.pp_double[offs + i][kdt->nx + j];
+         xy->xyR[i][j] = kdt->xy.xyR[offs + i][kdt->nx + j];
       }
    }
 }
@@ -1843,11 +1843,11 @@ void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_i
    *nodege = 0;
    ae_assert(node >= 0, "KDTreeExploreSplit: incorrect node index");
    ae_assert(node + 4 < kdt->nodes.cnt, "KDTreeExploreSplit: incorrect node index");
-   ae_assert(kdt->nodes.ptr.p_int[node] == 0, "KDTreeExploreSplit: incorrect node index");
-   *d = kdt->nodes.ptr.p_int[node + 1];
-   *s = kdt->splits.ptr.p_double[kdt->nodes.ptr.p_int[node + 2]];
-   *nodele = kdt->nodes.ptr.p_int[node + 3];
-   *nodege = kdt->nodes.ptr.p_int[node + 4];
+   ae_assert(kdt->nodes.xZ[node] == 0, "KDTreeExploreSplit: incorrect node index");
+   *d = kdt->nodes.xZ[node + 1];
+   *s = kdt->splits.xR[kdt->nodes.xZ[node + 2]];
+   *nodele = kdt->nodes.xZ[node + 3];
+   *nodege = kdt->nodes.xZ[node + 4];
    ae_assert(*d >= 0, "KDTreeExploreSplit: integrity failure");
    ae_assert(*d < kdt->nx, "KDTreeExploreSplit: integrity failure");
    ae_assert(isfinite(*s), "KDTreeExploreSplit: integrity failure");
@@ -1902,15 +1902,15 @@ void kdtreeunserialize(ae_serializer *s, kdtree *tree) {
    ae_int_t i1;
    SetObj(kdtree, tree);
 // check correctness of header
-   ae_serializer_unserialize_int(s, &i0);
-   ae_assert(i0 == getkdtreeserializationcode(), "KDTreeUnserialize: stream header corrupted");
-   ae_serializer_unserialize_int(s, &i1);
-   ae_assert(i1 == nearestneighbor_kdtreefirstversion, "KDTreeUnserialize: stream header corrupted");
+   i0 = ae_serializer_unserialize_int(s);
+   ae_assert(i0 == getkdtreeserializationcode(), "kdtreeunserialize: stream header corrupted");
+   i1 = ae_serializer_unserialize_int(s);
+   ae_assert(i1 == nearestneighbor_kdtreefirstversion, "kdtreeunserialize: stream header corrupted");
 // Unserialize data
-   ae_serializer_unserialize_int(s, &tree->n);
-   ae_serializer_unserialize_int(s, &tree->nx);
-   ae_serializer_unserialize_int(s, &tree->ny);
-   ae_serializer_unserialize_int(s, &tree->normtype);
+   tree->n = ae_serializer_unserialize_int(s);
+   tree->nx = ae_serializer_unserialize_int(s);
+   tree->ny = ae_serializer_unserialize_int(s);
+   tree->normtype = ae_serializer_unserialize_int(s);
    unserializerealmatrix(s, &tree->xy);
    unserializeintegerarray(s, &tree->tags);
    unserializerealarray(s, &tree->boxmin);
@@ -2037,8 +2037,7 @@ void kdtreeserialize(kdtree &obj, std::string &s_out) {
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
    alglib_impl::kdtreeserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
-   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "ALGLIB: serialization integrity error");
-   alglib_impl::ae_serializer_clear(&serializer);
+   alglib_impl::ae_assert(s_out.length() <= (size_t)ssize, "kdtreeserialize: serialization integrity error");
    alglib_impl::ae_state_clear();
 }
 void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
@@ -2052,7 +2051,6 @@ void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
    alglib_impl::ae_serializer_sstart_stream(&serializer, &s_out);
    alglib_impl::kdtreeserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear();
 }
 
@@ -2071,7 +2069,6 @@ void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear();
 }
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
@@ -2082,7 +2079,6 @@ void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
-   alglib_impl::ae_serializer_clear(&serializer);
    alglib_impl::ae_state_clear();
 }
 
@@ -3291,8 +3287,8 @@ void hqrndunit2(hqrndstate *state, double *x, double *y) {
    do {
       hqrndnormal2(state, x, y);
    } while (!(*x != 0.0 || *y != 0.0));
-   mx = ae_maxreal(fabs(*x), fabs(*y));
-   mn = ae_minreal(fabs(*x), fabs(*y));
+   mx = rmax2(fabs(*x), fabs(*y));
+   mn = rmin2(fabs(*x), fabs(*y));
    v = mx * sqrt(1 + ae_sqr(mn / mx));
    *x /= v;
    *y /= v;
@@ -3349,11 +3345,11 @@ double hqrndexponential(hqrndstate *state, double lambdav) {
 // Result:
 //     this function returns one of the X[i] for random i=0..N-1
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-double hqrnddiscrete(hqrndstate *state, RVector x, ae_int_t n) {
+double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n) {
    double result;
    ae_assert(n > 0, "HQRNDDiscrete: N <= 0");
    ae_assert(n <= x->cnt, "HQRNDDiscrete: Length(X)<N");
-   result = x->ptr.p_double[hqrnduniformi(state, n)];
+   result = x->xR[hqrnduniformi(state, n)];
    return result;
 }
 
@@ -3372,7 +3368,7 @@ double hqrnddiscrete(hqrndstate *state, RVector x, ae_int_t n) {
 //     this function returns random number from continuous distribution which
 //     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
 // ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-double hqrndcontinuous(hqrndstate *state, RVector x, ae_int_t n) {
+double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n) {
    double mx;
    double mn;
    ae_int_t i;
@@ -3380,12 +3376,12 @@ double hqrndcontinuous(hqrndstate *state, RVector x, ae_int_t n) {
    ae_assert(n > 0, "HQRNDContinuous: N <= 0");
    ae_assert(n <= x->cnt, "HQRNDContinuous: Length(X)<N");
    if (n == 1) {
-      result = x->ptr.p_double[0];
+      result = x->xR[0];
       return result;
    }
    i = hqrnduniformi(state, n - 1);
-   mn = x->ptr.p_double[i];
-   mx = x->ptr.p_double[i + 1];
+   mn = x->xR[i];
+   mx = x->xR[i + 1];
    ae_assert(mx >= mn, "HQRNDDiscrete: X is not sorted by ascending");
    if (mx != mn) {
       result = (mx - mn) * hqrnduniformr(state) + mn;
@@ -3567,9 +3563,8 @@ double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae
 
 // === XDEBUG Package ===
 namespace alglib_impl {
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
+// Debug functions to test the ALGLIB interface generator: not meant for use in production code.
+
 // Creates and returns XDebugRecord1 structure:
 // * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
 // * array field of Rec1 is set to [2,3]
@@ -3579,303 +3574,252 @@ void xdebuginitrecord1(xdebugrecord1 *rec1) {
    rec1->i = 1;
    rec1->c = ae_complex_from_d(1.0, 1.0);
    ae_vector_set_length(&rec1->a, 2);
-   rec1->a.ptr.p_double[0] = 2.0;
-   rec1->a.ptr.p_double[1] = 3.0;
+   rec1->a.xR[0] = 2.0;
+   rec1->a.xR[1] = 3.0;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Counts number of True values in the boolean 1D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_int_t xdebugb1count(BVector a) {
+ae_int_t xdebugb1count(BVector *a) {
    ae_int_t i;
    ae_int_t result;
    result = 0;
    for (i = 0; i < a->cnt; i++) {
-      if (a->ptr.p_bool[i]) {
+      if (a->xB[i]) {
          result++;
       }
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb1not(BVector a) {
+void xdebugb1not(BVector *a) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_bool[i] = !a->ptr.p_bool[i];
+      a->xB[i] = !a->xB[i];
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb1appendcopy(BVector a) {
+void xdebugb1appendcopy(BVector *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_frame_make(&_frame_block);
    NewVector(b, 0, DT_BOOL);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
-      b.ptr.p_bool[i] = a->ptr.p_bool[i];
+      b.xB[i] = a->xB[i];
    }
    ae_vector_set_length(a, 2 * b.cnt);
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_bool[i] = b.ptr.p_bool[i % b.cnt];
+      a->xB[i] = b.xB[i % b.cnt];
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered elements set to True.
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb1outeven(ae_int_t n, BVector a) {
+void xdebugb1outeven(ae_int_t n, BVector *a) {
    ae_int_t i;
    SetVector(a);
    ae_vector_set_length(a, n);
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_bool[i] = i % 2 == 0;
+      a->xB[i] = i % 2 == 0;
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_int_t xdebugi1sum(ZVector a) {
+ae_int_t xdebugi1sum(ZVector *a) {
    ae_int_t i;
    ae_int_t result;
    result = 0;
    for (i = 0; i < a->cnt; i++) {
-      result += a->ptr.p_int[i];
+      result += a->xZ[i];
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi1neg(ZVector a) {
+void xdebugi1neg(ZVector *a) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_int[i] = -a->ptr.p_int[i];
+      a->xZ[i] = -a->xZ[i];
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi1appendcopy(ZVector a) {
+void xdebugi1appendcopy(ZVector *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_frame_make(&_frame_block);
    NewVector(b, 0, DT_INT);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
-      b.ptr.p_int[i] = a->ptr.p_int[i];
+      b.xZ[i] = a->xZ[i];
    }
    ae_vector_set_length(a, 2 * b.cnt);
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_int[i] = b.ptr.p_int[i % b.cnt];
+      a->xZ[i] = b.xZ[i % b.cnt];
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[I] set to I, and odd-numbered
 // ones set to 0.
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi1outeven(ae_int_t n, ZVector a) {
+void xdebugi1outeven(ae_int_t n, ZVector *a) {
    ae_int_t i;
    SetVector(a);
    ae_vector_set_length(a, n);
    for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
-         a->ptr.p_int[i] = i;
+         a->xZ[i] = i;
       } else {
-         a->ptr.p_int[i] = 0;
+         a->xZ[i] = 0;
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-double xdebugr1sum(RVector a) {
+double xdebugr1sum(RVector *a) {
    ae_int_t i;
    double result;
    result = 0.0;
    for (i = 0; i < a->cnt; i++) {
-      result += a->ptr.p_double[i];
+      result += a->xR[i];
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr1neg(RVector a) {
+void xdebugr1neg(RVector *a) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_double[i] = -a->ptr.p_double[i];
+      a->xR[i] = -a->xR[i];
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr1appendcopy(RVector a) {
+void xdebugr1appendcopy(RVector *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_frame_make(&_frame_block);
    NewVector(b, 0, DT_REAL);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
-      b.ptr.p_double[i] = a->ptr.p_double[i];
+      b.xR[i] = a->xR[i];
    }
    ae_vector_set_length(a, 2 * b.cnt);
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_double[i] = b.ptr.p_double[i % b.cnt];
+      a->xR[i] = b.xR[i % b.cnt];
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[I] set to I*0.25,
 // and odd-numbered ones are set to 0.
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr1outeven(ae_int_t n, RVector a) {
+void xdebugr1outeven(ae_int_t n, RVector *a) {
    ae_int_t i;
    SetVector(a);
    ae_vector_set_length(a, n);
    for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
-         a->ptr.p_double[i] = i * 0.25;
+         a->xR[i] = i * 0.25;
       } else {
-         a->ptr.p_double[i] = 0.0;
+         a->xR[i] = 0.0;
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_complex xdebugc1sum(CVector a) {
+ae_complex xdebugc1sum(CVector *a) {
    ae_int_t i;
    ae_complex result;
    result = ae_complex_from_i(0);
    for (i = 0; i < a->cnt; i++) {
-      result = ae_c_add(result, a->ptr.p_complex[i]);
+      result = ae_c_add(result, a->xC[i]);
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc1neg(CVector a) {
+void xdebugc1neg(CVector *a) {
    ae_int_t i;
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_complex[i] = ae_c_neg(a->ptr.p_complex[i]);
+      a->xC[i] = ae_c_neg(a->xC[i]);
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc1appendcopy(CVector a) {
+void xdebugc1appendcopy(CVector *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_frame_make(&_frame_block);
    NewVector(b, 0, DT_COMPLEX);
    ae_vector_set_length(&b, a->cnt);
    for (i = 0; i < b.cnt; i++) {
-      b.ptr.p_complex[i] = a->ptr.p_complex[i];
+      b.xC[i] = a->xC[i];
    }
    ae_vector_set_length(a, 2 * b.cnt);
    for (i = 0; i < a->cnt; i++) {
-      a->ptr.p_complex[i] = b.ptr.p_complex[i % b.cnt];
+      a->xC[i] = b.xC[i % b.cnt];
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[K] set to (x,y) = (K*0.25, K*0.125)
 // and odd-numbered ones are set to 0.
 //
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc1outeven(ae_int_t n, CVector a) {
+void xdebugc1outeven(ae_int_t n, CVector *a) {
    ae_int_t i;
    SetVector(a);
    ae_vector_set_length(a, n);
    for (i = 0; i < a->cnt; i++) {
       if (i % 2 == 0) {
-         a->ptr.p_complex[i] = ae_complex_from_d(i * 0.250, i * 0.125);
+         a->xC[i] = ae_complex_from_d(i * 0.250, i * 0.125);
       } else {
-         a->ptr.p_complex[i] = ae_complex_from_i(0);
+         a->xC[i] = ae_complex_from_i(0);
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Counts number of True values in the boolean 2D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_int_t xdebugb2count(BMatrix a) {
+ae_int_t xdebugb2count(BMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t result;
    result = 0;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         if (a->ptr.pp_bool[i][j]) {
+         if (a->xyB[i][j]) {
             result++;
          }
       }
@@ -3883,29 +3827,23 @@ ae_int_t xdebugb2count(BMatrix a) {
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb2not(BMatrix a) {
+void xdebugb2not(BMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_bool[i][j] = !a->ptr.pp_bool[i][j];
+         a->xyB[i][j] = !a->xyB[i][j];
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb2transpose(BMatrix a) {
+void xdebugb2transpose(BMatrix *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -3914,77 +3852,65 @@ void xdebugb2transpose(BMatrix a) {
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         b.ptr.pp_bool[i][j] = a->ptr.pp_bool[i][j];
+         b.xyB[i][j] = a->xyB[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         a->ptr.pp_bool[j][i] = b.ptr.pp_bool[i][j];
+         a->xyB[j][i] = b.xyB[i][j];
       }
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J) > 0"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix a) {
+void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_bool[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
+         a->xyB[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_int_t xdebugi2sum(ZMatrix a) {
+ae_int_t xdebugi2sum(ZMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t result;
    result = 0;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         result += a->ptr.pp_int[i][j];
+         result += a->xyZ[i][j];
       }
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi2neg(ZMatrix a) {
+void xdebugi2neg(ZMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_int[i][j] = -a->ptr.pp_int[i][j];
+         a->xyZ[i][j] = -a->xyZ[i][j];
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi2transpose(ZMatrix a) {
+void xdebugi2transpose(ZMatrix *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -3993,77 +3919,65 @@ void xdebugi2transpose(ZMatrix a) {
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         b.ptr.pp_int[i][j] = a->ptr.pp_int[i][j];
+         b.xyZ[i][j] = a->xyZ[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         a->ptr.pp_int[j][i] = b.ptr.pp_int[i][j];
+         a->xyZ[j][i] = b.xyZ[i][j];
       }
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix a) {
+void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_int[i][j] = ae_sign(sin((double)(3 * i + 5 * j)));
+         a->xyZ[i][j] = ae_sign(sin((double)(3 * i + 5 * j)));
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-double xdebugr2sum(RMatrix a) {
+double xdebugr2sum(RMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    double result;
    result = 0.0;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         result += a->ptr.pp_double[i][j];
+         result += a->xyR[i][j];
       }
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr2neg(RMatrix a) {
+void xdebugr2neg(RMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_double[i][j] = -a->ptr.pp_double[i][j];
+         a->xyR[i][j] = -a->xyR[i][j];
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr2transpose(RMatrix a) {
+void xdebugr2transpose(RMatrix *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -4072,77 +3986,65 @@ void xdebugr2transpose(RMatrix a) {
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         b.ptr.pp_double[i][j] = a->ptr.pp_double[i][j];
+         b.xyR[i][j] = a->xyR[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         a->ptr.pp_double[j][i] = b.ptr.pp_double[i][j];
+         a->xyR[j][i] = b.xyR[i][j];
       }
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix a) {
+void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_double[i][j] = sin((double)(3 * i + 5 * j));
+         a->xyR[i][j] = sin((double)(3 * i + 5 * j));
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-ae_complex xdebugc2sum(CMatrix a) {
+ae_complex xdebugc2sum(CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    ae_complex result;
    result = ae_complex_from_i(0);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         result = ae_c_add(result, a->ptr.pp_complex[i][j]);
+         result = ae_c_add(result, a->xyC[i][j]);
       }
    }
    return result;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc2neg(CMatrix a) {
+void xdebugc2neg(CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_complex[i][j] = ae_c_neg(a->ptr.pp_complex[i][j]);
+         a->xyC[i][j] = ae_c_neg(a->xyC[i][j]);
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc2transpose(CMatrix a) {
+void xdebugc2transpose(CMatrix *a) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -4151,42 +4053,36 @@ void xdebugc2transpose(CMatrix a) {
    ae_matrix_set_length(&b, a->rows, a->cols);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         b.ptr.pp_complex[i][j] = a->ptr.pp_complex[i][j];
+         b.xyC[i][j] = a->xyC[i][j];
       }
    }
    ae_matrix_set_length(a, b.cols, b.rows);
    for (i = 0; i < b.rows; i++) {
       for (j = 0; j < b.cols; j++) {
-         a->ptr.pp_complex[j][i] = b.ptr.pp_complex[i][j];
+         a->xyC[j][i] = b.xyC[i][j];
       }
    }
    ae_frame_leave();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix a) {
+void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(a);
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->ptr.pp_complex[i][j] = ae_complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
+         a->xyC[i][j] = ae_complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
       }
    }
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix a, RMatrix b, BMatrix c) {
+double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c) {
    ae_int_t i;
    ae_int_t j;
    double result;
@@ -4199,8 +4095,8 @@ double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix a, RMatrix b
    result = 0.0;
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (c->ptr.pp_bool[i][j]) {
-            result += a->ptr.pp_double[i][j] * (1 + b->ptr.pp_double[i][j]);
+         if (c->xyB[i][j]) {
+            result += a->xyR[i][j] * (1 + b->xyR[i][j]);
          }
       }
    }
@@ -4229,9 +4125,8 @@ void xdebugrecord1_free(void *_p, bool make_automatic) {
 namespace alglib {
 DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
+// Debug functions to test the ALGLIB interface generator: not meant for use in production code.
+
 // Creates and returns XDebugRecord1 structure:
 // * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
 // * array field of Rec1 is set to [2,3]
@@ -4243,9 +4138,6 @@ void xdebuginitrecord1(xdebugrecord1 &rec1) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Counts number of True values in the boolean 1D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugb1count(const boolean_1d_array &a) {
@@ -4256,9 +4148,6 @@ ae_int_t xdebugb1count(const boolean_1d_array &a) {
    return Z;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4269,9 +4158,6 @@ void xdebugb1not(const boolean_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4282,9 +4168,6 @@ void xdebugb1appendcopy(boolean_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered elements set to True.
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4295,9 +4178,6 @@ void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugi1sum(const integer_1d_array &a) {
@@ -4308,9 +4188,6 @@ ae_int_t xdebugi1sum(const integer_1d_array &a) {
    return Z;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4321,9 +4198,6 @@ void xdebugi1neg(const integer_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4334,9 +4208,6 @@ void xdebugi1appendcopy(integer_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[I] set to I, and odd-numbered
 // ones set to 0.
 //
@@ -4349,9 +4220,6 @@ void xdebugi1outeven(const ae_int_t n, integer_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugr1sum(const real_1d_array &a) {
@@ -4362,9 +4230,6 @@ double xdebugr1sum(const real_1d_array &a) {
    return D;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4375,9 +4240,6 @@ void xdebugr1neg(const real_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4388,9 +4250,6 @@ void xdebugr1appendcopy(real_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[I] set to I*0.25,
 // and odd-numbered ones are set to 0.
 //
@@ -4403,9 +4262,6 @@ void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 complex xdebugc1sum(const complex_1d_array &a) {
@@ -4416,9 +4272,6 @@ complex xdebugc1sum(const complex_1d_array &a) {
    return ComplexOf(C);
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -A[I]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4429,9 +4282,6 @@ void xdebugc1neg(const complex_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Appends copy of array to itself.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4442,9 +4292,6 @@ void xdebugc1appendcopy(complex_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate N-element array with even-numbered A[K] set to (x,y) = (K*0.25, K*0.125)
 // and odd-numbered ones are set to 0.
 //
@@ -4457,9 +4304,6 @@ void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Counts number of True values in the boolean 2D array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugb2count(const boolean_2d_array &a) {
@@ -4470,9 +4314,6 @@ ae_int_t xdebugb2count(const boolean_2d_array &a) {
    return Z;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by NOT(a[i]).
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4483,9 +4324,6 @@ void xdebugb2not(const boolean_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4496,9 +4334,6 @@ void xdebugb2transpose(boolean_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J) > 0"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4509,9 +4344,6 @@ void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 ae_int_t xdebugi2sum(const integer_2d_array &a) {
@@ -4522,9 +4354,6 @@ ae_int_t xdebugi2sum(const integer_2d_array &a) {
    return Z;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4535,9 +4364,6 @@ void xdebugi2neg(const integer_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4548,9 +4374,6 @@ void xdebugi2transpose(integer_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4561,9 +4384,6 @@ void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugr2sum(const real_2d_array &a) {
@@ -4574,9 +4394,6 @@ double xdebugr2sum(const real_2d_array &a) {
    return D;
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4587,9 +4404,6 @@ void xdebugr2neg(const real_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4600,9 +4414,6 @@ void xdebugr2transpose(real_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4613,9 +4424,6 @@ void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 complex xdebugc2sum(const complex_2d_array &a) {
@@ -4626,9 +4434,6 @@ complex xdebugc2sum(const complex_2d_array &a) {
    return ComplexOf(C);
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Replace all values in array by -a[i,j]
 // Array is passed using "shared" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4639,9 +4444,6 @@ void xdebugc2neg(const complex_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Transposes array.
 // Array is passed using "var" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4652,9 +4454,6 @@ void xdebugc2transpose(complex_2d_array &a) {
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
 // Array is passed using "out" convention.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
@@ -4665,9 +4464,6 @@ void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a) 
    alglib_impl::ae_state_clear();
 }
 
-// This is debug function intended for testing ALGLIB interface generator.
-// Never use it in any real life project.
-//
 // Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c) {

@@ -19,23 +19,23 @@ const char *fmt_str = "%-29s %s\n";
 const char *fmt_speedup = "%-25s %5.1fx\n";
 
 // Flag variables
-bool issue505_passed = true;
-bool issue478_passed = true;
-bool issue528_passed = true;
-bool issue591_passed = true;
-bool issue594_passed = true;
-bool issue764_passed = true;
-bool issue813_passed = true;
-bool issue824_passed = true;
+bool issue505Ok = true;
+bool issue478Ok = true;
+bool issue528Ok = true;
+bool issue591Ok = true;
+bool issue594Ok = true;
+bool issue764Ok = true;
+bool issue813Ok = true;
+bool issue824Ok = true;
 
 // Service datatypes
-typedef struct {
+struct innerrec {
    alglib_impl::ae_complex cval;
    double rval;
    ae_int_t ival;
    bool bval;
    alglib_impl::ae_vector i1val;
-} innerrec;
+};
 
 void innerrec_init(void *_p, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
@@ -57,11 +57,11 @@ void innerrec_free(void *_p, bool make_automatic) {
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
-typedef struct {
+struct seedrec {
    bool bval;
    innerrec recval;
    alglib_impl::ae_shared_pool pool;
-} seedrec;
+};
 
 void seedrec_init(void *_p, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
@@ -103,22 +103,22 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
    z = "[0,1]";
    try {
       grad = "[0,1]";
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       grad = z;
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       grad.setlength(10);
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       grad.setlength(1);
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
 //
@@ -157,28 +157,28 @@ void func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, 
 //
    try {
       jac = "[[0]]";
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       jac = "[[0,0],[1,1]]";
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       z = "[[0,1]]";
       jac = z;
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       jac.setlength(10, 6);
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
    try {
       jac.setlength(2, 1);
-      issue505_passed = false;
+      issue505Ok = false;
    } catch(...) {
    }
 //
@@ -294,7 +294,7 @@ int main() {
    printf("Basic functions:\n");
    {
    // Testing 1D array functionality
-      bool passed = true;
+      bool Ok = true;
       try {
       //
       // 1D boolean
@@ -312,23 +312,23 @@ int main() {
          boolean_1d_array arr_0, arr_1("[]"), arr_2("[true,false,true]"), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = "[true,true,false]";
-         passed = passed && arr_0.length() == 0;
-         passed = passed && arr_1.length() == 0;
-         passed = passed && arr_2.length() == 3;
-         passed = passed && arr_3.length() == 3;
-         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
-         passed = passed && arr_2[0] && !arr_2[1] && arr_2[2];
-         passed = passed && arr_3[0] && !arr_3[1] && arr_3[2];
-         passed = passed && arr_4[0] && !arr_4[1] && arr_4[2];
-         passed = passed && arr_5[0] && arr_5[1] && !arr_5[2];
-         passed = passed && arr_2.tostring() == "[true,false,true]";
-         passed = passed && arr_3.tostring() == "[true,false,true]";
-         passed = passed && arr_4.tostring() == "[true,false,true]";
-         passed = passed && arr_5.tostring() == "[true,true,false]";
+         Ok = Ok && arr_0.length() == 0;
+         Ok = Ok && arr_1.length() == 0;
+         Ok = Ok && arr_2.length() == 3;
+         Ok = Ok && arr_3.length() == 3;
+         Ok = Ok && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         Ok = Ok && arr_2[0] && !arr_2[1] && arr_2[2];
+         Ok = Ok && arr_3[0] && !arr_3[1] && arr_3[2];
+         Ok = Ok && arr_4[0] && !arr_4[1] && arr_4[2];
+         Ok = Ok && arr_5[0] && arr_5[1] && !arr_5[2];
+         Ok = Ok && arr_2.tostring() == "[true,false,true]";
+         Ok = Ok && arr_3.tostring() == "[true,false,true]";
+         Ok = Ok && arr_4.tostring() == "[true,false,true]";
+         Ok = Ok && arr_5.tostring() == "[true,true,false]";
          arr_2[0] = false;
-         passed = passed && !arr_2[0] && arr_3[0] && arr_4[0];
+         Ok = Ok && !arr_2[0] && arr_3[0] && arr_4[0];
          arr_5.setlength(99);
-         passed = passed && arr_5.length() == 99;
+         Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
          bool a0[] = { true, false, true, false, false };
          bool a0_mod = false;
@@ -336,20 +336,20 @@ int main() {
          bool *p6;
          boolean_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
+         Ok = Ok && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && p6 != a0;
-         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
+         Ok = Ok && p6 != a0;
+         Ok = Ok && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && arr_6[0] != a0[0];
+         Ok = Ok && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const boolean_1d_array & ac = arr_6;
-            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
-            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
+            Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const bool *p = ac.getcontent();
-            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
+            Ok = Ok && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -364,51 +364,51 @@ int main() {
          targt = "[true,false,false,true]";
          boolean_1d_array proxy(targt.c_ptr());
          acopy = proxy;
-         passed = passed && targt[0] && !targt[1] && !targt[2] && targt[3];
-         passed = passed && proxy[0] && !proxy[1] && !proxy[2] && proxy[3];
-         passed = passed && acopy[0] && !acopy[1] && !acopy[2] && acopy[3];
+         Ok = Ok && targt[0] && !targt[1] && !targt[2] && targt[3];
+         Ok = Ok && proxy[0] && !proxy[1] && !proxy[2] && proxy[3];
+         Ok = Ok && acopy[0] && !acopy[1] && !acopy[2] && acopy[3];
          targt[0] = false;
-         passed = passed && !targt[0] && !proxy[0] && acopy[0];
+         Ok = Ok && !targt[0] && !proxy[0] && acopy[0];
          proxy[0] = true;
-         passed = passed && targt[0] && proxy[0] && acopy[0];
+         Ok = Ok && targt[0] && proxy[0] && acopy[0];
          acopy = "[false,true,true,true]";
          proxy = acopy;
-         passed = passed && !targt[0] && targt[1] && targt[2] && targt[3];
-         passed = passed && !proxy[0] && proxy[1] && proxy[2] && proxy[3];
+         Ok = Ok && !targt[0] && targt[1] && targt[2] && targt[3];
+         Ok = Ok && !proxy[0] && proxy[1] && proxy[2] && proxy[3];
          proxy = "[true,false,true,true]";
-         passed = passed && targt[0] && !targt[1] && targt[2] && targt[3];
-         passed = passed && proxy[0] && !proxy[1] && proxy[2] && proxy[3];
+         Ok = Ok && targt[0] && !targt[1] && targt[2] && targt[3];
+         Ok = Ok && proxy[0] && !proxy[1] && proxy[2] && proxy[3];
          try {
             acopy = "[false,true,true]";
             proxy = acopy;
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy = "[true,true,true]";
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(100);
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(proxy.length());
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       //
@@ -435,23 +435,23 @@ int main() {
          integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && arr_0.length() == 0;
-         passed = passed && arr_1.length() == 0;
-         passed = passed && arr_2.length() == 3;
-         passed = passed && arr_3.length() == 3;
-         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
-         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
-         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
-         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
-         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
-         passed = passed && arr_2.tostring() == s1;
-         passed = passed && arr_3.tostring() == s1;
-         passed = passed && arr_4.tostring() == s1;
-         passed = passed && arr_5.tostring() == s2;
+         Ok = Ok && arr_0.length() == 0;
+         Ok = Ok && arr_1.length() == 0;
+         Ok = Ok && arr_2.length() == 3;
+         Ok = Ok && arr_3.length() == 3;
+         Ok = Ok && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         Ok = Ok && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         Ok = Ok && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         Ok = Ok && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         Ok = Ok && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         Ok = Ok && arr_2.tostring() == s1;
+         Ok = Ok && arr_3.tostring() == s1;
+         Ok = Ok && arr_4.tostring() == s1;
+         Ok = Ok && arr_5.tostring() == s2;
          arr_2[0] = v10_mod;
-         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
+         Ok = Ok && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && arr_5.length() == 99;
+         Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
          ae_int_t a0[] = {
          2, 3, 1, 9, 2};
@@ -460,20 +460,20 @@ int main() {
          ae_int_t *p6;
          integer_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
+         Ok = Ok && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && p6 != a0;
-         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
+         Ok = Ok && p6 != a0;
+         Ok = Ok && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && arr_6[0] != a0[0];
+         Ok = Ok && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const integer_1d_array & ac = arr_6;
-            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
-            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
+            Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const ae_int_t *p = ac.getcontent();
-            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
+            Ok = Ok && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -488,51 +488,51 @@ int main() {
          targt = s3;
          integer_1d_array proxy(targt.c_ptr());
          acopy = proxy;
-         passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
-         passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
-         passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
+         Ok = Ok && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+         Ok = Ok && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+         Ok = Ok && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
          targt[0] = v30_mod;
-         passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
+         Ok = Ok && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
          proxy[0] = v30;
-         passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
+         Ok = Ok && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
          acopy = s4;
          proxy = acopy;
-         passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
-         passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
+         Ok = Ok && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+         Ok = Ok && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
          proxy = s5;
-         passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
-         passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
+         Ok = Ok && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+         Ok = Ok && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
          try {
             acopy = s6;
             proxy = acopy;
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy = s6;
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(100);
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(proxy.length());
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       //
@@ -562,23 +562,23 @@ int main() {
          real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && arr_0.length() == 0;
-         passed = passed && arr_1.length() == 0;
-         passed = passed && arr_2.length() == 3;
-         passed = passed && arr_3.length() == 3;
-         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
-         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
-         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
-         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
-         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
-         passed = passed && arr_2.tostring(dps) == s1_fmt;
-         passed = passed && arr_3.tostring(dps) == s1_fmt;
-         passed = passed && arr_4.tostring(dps) == s1_fmt;
-         passed = passed && arr_5.tostring(dps) == s2_fmt;
+         Ok = Ok && arr_0.length() == 0;
+         Ok = Ok && arr_1.length() == 0;
+         Ok = Ok && arr_2.length() == 3;
+         Ok = Ok && arr_3.length() == 3;
+         Ok = Ok && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         Ok = Ok && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         Ok = Ok && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         Ok = Ok && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         Ok = Ok && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         Ok = Ok && arr_2.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_3.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_4.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_5.tostring(dps) == s2_fmt;
          arr_2[0] = v10_mod;
-         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
+         Ok = Ok && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && arr_5.length() == 99;
+         Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
          double a0[] = { 2, 3.5, 1, 9.125, 2 };
          double a0_mod = 7.0;
@@ -586,20 +586,20 @@ int main() {
          double *p6;
          real_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
+         Ok = Ok && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && p6 != a0;
-         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
+         Ok = Ok && p6 != a0;
+         Ok = Ok && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && arr_6[0] != a0[0];
+         Ok = Ok && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const real_1d_array & ac = arr_6;
-            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
-            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
+            Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const double *p = ac.getcontent();
-            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
+            Ok = Ok && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays attached via attach_to(ae_vector*):
@@ -615,48 +615,48 @@ int main() {
             targt = s3;
             real_1d_array proxy(targt.c_ptr());
             acopy = proxy;
-            passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
-            passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
-            passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
+            Ok = Ok && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+            Ok = Ok && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+            Ok = Ok && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
             targt[0] = v30_mod;
-            passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
+            Ok = Ok && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
             proxy[0] = v30;
-            passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
+            Ok = Ok && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
             acopy = s4;
             proxy = acopy;
-            passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
-            passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
+            Ok = Ok && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+            Ok = Ok && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
             proxy = s5;
-            passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
-            passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
+            Ok = Ok && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+            Ok = Ok && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
             try {
                acopy = s6;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy = s6;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy.setlength(100);
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy.setlength(proxy.length());
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          }
       //
@@ -675,52 +675,52 @@ int main() {
             double targt[] = { v30, v31, v32, v33 };
             proxy.attach_to_ptr(4, targt);
             acopy = proxy;
-            passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
-            passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
-            passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
+            Ok = Ok && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+            Ok = Ok && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+            Ok = Ok && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
             targt[0] = v30_mod;
-            passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
+            Ok = Ok && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
             proxy[0] = v30;
-            passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
+            Ok = Ok && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
             acopy = s4;
             proxy = acopy;
-            passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
-            passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
+            Ok = Ok && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+            Ok = Ok && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
             proxy = s5;
-            passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
-            passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
+            Ok = Ok && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+            Ok = Ok && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
             try {
                acopy = s6;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy = s6;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy.setlength(100);
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
             try {
                proxy.setlength(proxy.length());
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       //
@@ -750,23 +750,23 @@ int main() {
          complex_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && arr_0.length() == 0;
-         passed = passed && arr_1.length() == 0;
-         passed = passed && arr_2.length() == 3;
-         passed = passed && arr_3.length() == 3;
-         passed = passed && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
-         passed = passed && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
-         passed = passed && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
-         passed = passed && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
-         passed = passed && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
-         passed = passed && arr_2.tostring(dps) == s1_fmt;
-         passed = passed && arr_3.tostring(dps) == s1_fmt;
-         passed = passed && arr_4.tostring(dps) == s1_fmt;
-         passed = passed && arr_5.tostring(dps) == s2_fmt;
+         Ok = Ok && arr_0.length() == 0;
+         Ok = Ok && arr_1.length() == 0;
+         Ok = Ok && arr_2.length() == 3;
+         Ok = Ok && arr_3.length() == 3;
+         Ok = Ok && arr_2[0] == arr_2(0) && arr_2[1] == arr_2(1) && arr_2[2] == arr_2(2);
+         Ok = Ok && arr_2[0] == v10 && arr_2[1] == v11 && arr_2[2] == v12;
+         Ok = Ok && arr_3[0] == v10 && arr_3[1] == v11 && arr_3[2] == v12;
+         Ok = Ok && arr_4[0] == v10 && arr_4[1] == v11 && arr_4[2] == v12;
+         Ok = Ok && arr_5[0] == v20 && arr_5[1] == v21 && arr_5[2] == v22;
+         Ok = Ok && arr_2.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_3.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_4.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_5.tostring(dps) == s2_fmt;
          arr_2[0] = v10_mod;
-         passed = passed && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
+         Ok = Ok && arr_2[0] == v10_mod && arr_3[0] == v10 && arr_4[0] == v10;
          arr_5.setlength(99);
-         passed = passed && arr_5.length() == 99;
+         Ok = Ok && arr_5.length() == 99;
       // setcontent/getcontent
          complex a0[] = {
          2, 3.5, 1, 9.125, 2};
@@ -775,20 +775,20 @@ int main() {
          complex *p6;
          complex_1d_array arr_6;
          arr_6.setcontent(5, a0);
-         passed = passed && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
+         Ok = Ok && arr_6[0] == a0[0] && arr_6[1] == a0[1] && arr_6[2] == a0[2] && arr_6[3] == a0[3] && arr_6[4] == a0[4];
          p6 = arr_6.getcontent();
-         passed = passed && p6 != a0;
-         passed = passed && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
+         Ok = Ok && p6 != a0;
+         Ok = Ok && p6[0] == a0[0] && p6[1] == a0[1] && p6[2] == a0[2] && p6[3] == a0[3] && p6[4] == a0[4];
          a0[0] = a0_mod;
-         passed = passed && arr_6[0] != a0[0];
+         Ok = Ok && arr_6[0] != a0[0];
          a0[0] = a0_orig;
       // operations on constant arrays
          {
             const complex_1d_array & ac = arr_6;
-            passed = passed && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
-            passed = passed && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
+            Ok = Ok && ac[0] == a0[0] && ac[1] == a0[1] && ac[2] == a0[2] && ac[3] == a0[3] && ac[4] == a0[4];
+            Ok = Ok && ac(0) == a0[0] && ac(1) == a0[1] && ac(2) == a0[2] && ac(3) == a0[3] && ac(4) == a0[4];
             const complex *p = ac.getcontent();
-            passed = passed && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
+            Ok = Ok && p[0] == a0[0] && p[1] == a0[1] && p[2] == a0[2] && p[3] == a0[3] && p[4] == a0[4];
          }
       //
       // Operations with proxy arrays:
@@ -803,65 +803,65 @@ int main() {
          targt = s3;
          complex_1d_array proxy(targt.c_ptr());
          acopy = proxy;
-         passed = passed && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
-         passed = passed && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
-         passed = passed && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
+         Ok = Ok && targt[0] == v30 && targt[1] == v31 && targt[2] == v32 && targt[3] == v33;
+         Ok = Ok && proxy[0] == v30 && proxy[1] == v31 && proxy[2] == v32 && proxy[3] == v33;
+         Ok = Ok && acopy[0] == v30 && acopy[1] == v31 && acopy[2] == v32 && acopy[3] == v33;
          targt[0] = v30_mod;
-         passed = passed && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
+         Ok = Ok && targt[0] == v30_mod && proxy[0] == v30_mod && acopy[0] == v30;
          proxy[0] = v30;
-         passed = passed && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
+         Ok = Ok && targt[0] == v30 && proxy[0] == v30 && acopy[0] == v30;
          acopy = s4;
          proxy = acopy;
-         passed = passed && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
-         passed = passed && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
+         Ok = Ok && targt[0] == v40 && targt[1] == v41 && targt[2] == v42 && targt[3] == v43;
+         Ok = Ok && proxy[0] == v40 && proxy[1] == v41 && proxy[2] == v42 && proxy[3] == v43;
          proxy = s5;
-         passed = passed && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
-         passed = passed && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
+         Ok = Ok && targt[0] == v50 && targt[1] == v51 && targt[2] == v52 && targt[3] == v53;
+         Ok = Ok && proxy[0] == v50 && proxy[1] == v51 && proxy[2] == v52 && proxy[3] == v53;
          try {
             acopy = s6;
             proxy = acopy;
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy = s6;
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(100);
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             proxy.setlength(proxy.length());
-            passed = false;
+            Ok = false;
          } catch(ap_error e) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
    //
    // Report
    //
-      printf(fmt_str, "* 1D arrays", passed ? "OK" : "FAILED");
+      printf(fmt_str, "* 1D arrays", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
    }
    {
    //
    // Testing 2D array functionality
    //
-      bool passed = true;
+      bool Ok = true;
       try {
       //
       // 2D real
@@ -894,29 +894,29 @@ int main() {
          real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
          arr_4 = arr_2;
          arr_5 = s2;
-         passed = passed && arr_0.rows() == 0 && arr_0.cols() == 0 && arr_0.getstride() == 0;
-         passed = passed && arr_1.rows() == 0 && arr_1.cols() == 0 && arr_1.getstride() == 0;
-         passed = passed && arr_2.rows() == 2 && arr_2.cols() == 3 && arr_2.getstride() >= arr_2.cols();
-         passed = passed && arr_3.rows() == 2 && arr_3.cols() == 3 && arr_3.getstride() >= arr_3.cols();
-         passed = passed && arr_4.rows() == 2 && arr_4.cols() == 3 && arr_4.getstride() >= arr_4.cols();
-         passed = passed && arr_5.rows() == 3 && arr_5.cols() == 1 && arr_5.getstride() >= arr_5.cols();
-         passed = passed && arr_2[0][0] == arr_2(0, 0) && arr_2[0][1] == arr_2(0, 1) && arr_2[0][2] == arr_2(0, 2);
-         passed = passed && arr_2[1][0] == arr_2(1, 0) && arr_2[1][1] == arr_2(1, 1) && arr_2[1][2] == arr_2(1, 2);
-         passed = passed && arr_2[0][0] == v10 && arr_2[0][1] == v11 && arr_2[0][2] == v12;
-         passed = passed && arr_2[1][0] == v13 && arr_2[1][1] == v14 && arr_2[1][2] == v15;
-         passed = passed && arr_3[0][0] == v10 && arr_3[0][1] == v11 && arr_3[0][2] == v12;
-         passed = passed && arr_3[1][0] == v13 && arr_3[1][1] == v14 && arr_3[1][2] == v15;
-         passed = passed && arr_4[0][0] == v10 && arr_4[0][1] == v11 && arr_4[0][2] == v12;
-         passed = passed && arr_4[1][0] == v13 && arr_4[1][1] == v14 && arr_4[1][2] == v15;
-         passed = passed && arr_5[0][0] == v20 && arr_5[1][0] == v21 && arr_5[2][0] == v22;
-         passed = passed && arr_2.tostring(dps) == s1_fmt;
-         passed = passed && arr_3.tostring(dps) == s1_fmt;
-         passed = passed && arr_4.tostring(dps) == s1_fmt;
-         passed = passed && arr_5.tostring(dps) == s2_fmt;
+         Ok = Ok && arr_0.rows() == 0 && arr_0.cols() == 0 && arr_0.getstride() == 0;
+         Ok = Ok && arr_1.rows() == 0 && arr_1.cols() == 0 && arr_1.getstride() == 0;
+         Ok = Ok && arr_2.rows() == 2 && arr_2.cols() == 3 && arr_2.getstride() >= arr_2.cols();
+         Ok = Ok && arr_3.rows() == 2 && arr_3.cols() == 3 && arr_3.getstride() >= arr_3.cols();
+         Ok = Ok && arr_4.rows() == 2 && arr_4.cols() == 3 && arr_4.getstride() >= arr_4.cols();
+         Ok = Ok && arr_5.rows() == 3 && arr_5.cols() == 1 && arr_5.getstride() >= arr_5.cols();
+         Ok = Ok && arr_2[0][0] == arr_2(0, 0) && arr_2[0][1] == arr_2(0, 1) && arr_2[0][2] == arr_2(0, 2);
+         Ok = Ok && arr_2[1][0] == arr_2(1, 0) && arr_2[1][1] == arr_2(1, 1) && arr_2[1][2] == arr_2(1, 2);
+         Ok = Ok && arr_2[0][0] == v10 && arr_2[0][1] == v11 && arr_2[0][2] == v12;
+         Ok = Ok && arr_2[1][0] == v13 && arr_2[1][1] == v14 && arr_2[1][2] == v15;
+         Ok = Ok && arr_3[0][0] == v10 && arr_3[0][1] == v11 && arr_3[0][2] == v12;
+         Ok = Ok && arr_3[1][0] == v13 && arr_3[1][1] == v14 && arr_3[1][2] == v15;
+         Ok = Ok && arr_4[0][0] == v10 && arr_4[0][1] == v11 && arr_4[0][2] == v12;
+         Ok = Ok && arr_4[1][0] == v13 && arr_4[1][1] == v14 && arr_4[1][2] == v15;
+         Ok = Ok && arr_5[0][0] == v20 && arr_5[1][0] == v21 && arr_5[2][0] == v22;
+         Ok = Ok && arr_2.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_3.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_4.tostring(dps) == s1_fmt;
+         Ok = Ok && arr_5.tostring(dps) == s2_fmt;
          arr_2[0][0] = v10_mod;
-         passed = passed && arr_2[0][0] == v10_mod && arr_3[0][0] == v10 && arr_4[0][0] == v10;
+         Ok = Ok && arr_2[0][0] == v10_mod && arr_3[0][0] == v10 && arr_4[0][0] == v10;
          arr_5.setlength(99, 97);
-         passed = passed && arr_5.rows() == 99 && arr_5.cols() == 97;
+         Ok = Ok && arr_5.rows() == 99 && arr_5.cols() == 97;
       //
       // setcontent/elementwise access/constant arrays
       //
@@ -931,21 +931,21 @@ int main() {
                arr_6.setcontent(m, n, a0);
                for (i = 0; i < m; i++)
                   for (j = 0; j < n; j++) {
-                     passed = passed && arr_6[i][j] == a0[i * n + j];
-                     passed = passed && arr_6(i, j) == a0[i * n + j];
+                     Ok = Ok && arr_6[i][j] == a0[i * n + j];
+                     Ok = Ok && arr_6(i, j) == a0[i * n + j];
                   }
             // test that setcontent() actually copies data instead of creating just reference
                r = a0[0];
                a0[0]++;
-               passed = passed && arr_6[0][0] != a0[0];
+               Ok = Ok && arr_6[0][0] != a0[0];
                a0[0] = r;
             // operations on constant arrays
                {
                   const real_2d_array & ac = arr_6;
                   for (i = 0; i < m; i++)
                      for (j = 0; j < n; j++) {
-                        passed = passed && ac[i][j] == a0[i * n + j];
-                        passed = passed && ac(i, j) == a0[i * n + j];
+                        Ok = Ok && ac[i][j] == a0[i * n + j];
+                        Ok = Ok && ac(i, j) == a0[i * n + j];
                      }
                }
             }
@@ -966,84 +966,84 @@ int main() {
             acopy = proxy;
             for (i = 0; i < targt.rows(); i++)
                for (j = 0; j < targt.cols(); j++) {
-                  passed = passed && proxy[i][j] == targt[i][j];
-                  passed = passed && acopy[i][j] == targt[i][j];
+                  Ok = Ok && proxy[i][j] == targt[i][j];
+                  Ok = Ok && acopy[i][j] == targt[i][j];
                }
             r = targt[0][0];
             targt[0][0] = r + 1;
-            passed = passed && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
+            Ok = Ok && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
+            Ok = Ok && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 1
             acopy = s4;
             proxy = acopy;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && proxy[i][j] == acopy[i][j];
-                  passed = passed && targt[i][j] == acopy[i][j];
+                  Ok = Ok && proxy[i][j] == acopy[i][j];
+                  Ok = Ok && targt[i][j] == acopy[i][j];
                }
             r = targt[0][0];
             targt[0][0] = r + 1;
-            passed = passed && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
+            Ok = Ok && targt[0][0] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
+            Ok = Ok && targt[0][0] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 2
             acopy2 = s5;
             proxy = s5;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && proxy[i][j] == acopy2[i][j];
-                  passed = passed && targt[i][j] == acopy2[i][j];
+                  Ok = Ok && proxy[i][j] == acopy2[i][j];
+                  Ok = Ok && targt[i][j] == acopy2[i][j];
                }
          // error handling test 0
             try {
                acopy = s60;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 1
             try {
                acopy = s61;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 2
             try {
                proxy = s60;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 3
             try {
                proxy = s61;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 4
             try {
                proxy.setlength(100, 99);
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 5
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          }
          {      // test attach_to(double*)
@@ -1055,95 +1055,95 @@ int main() {
             acopy = proxy;
             for (i = 0; i < proxy.rows(); i++)
                for (j = 0; j < proxy.cols(); j++) {
-                  passed = passed && proxy[i][j] == targt[i * NCOLS + j];
-                  passed = passed && acopy[i][j] == targt[i * NCOLS + j];
+                  Ok = Ok && proxy[i][j] == targt[i * NCOLS + j];
+                  Ok = Ok && acopy[i][j] == targt[i * NCOLS + j];
                }
             r = targt[0 * NCOLS];
             targt[0 * NCOLS] = r + 1;
-            passed = passed && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
+            Ok = Ok && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
+            Ok = Ok && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 1
             acopy = s4;
             proxy = acopy;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && proxy[i][j] == acopy[i][j];
-                  passed = passed && targt[i * NCOLS + j] == acopy[i][j];
+                  Ok = Ok && proxy[i][j] == acopy[i][j];
+                  Ok = Ok && targt[i * NCOLS + j] == acopy[i][j];
                }
             r = targt[0 * NCOLS];
             targt[0 * NCOLS] = r + 1;
-            passed = passed && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
+            Ok = Ok && targt[0 * NCOLS] != r && proxy[0][0] != r && acopy[0][0] == r;
             proxy[0][0] = r;
-            passed = passed && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
+            Ok = Ok && targt[0 * NCOLS] == r && proxy[0][0] == r && acopy[0][0] == r;
          // subtest 2
             acopy2 = s5;
             proxy = s5;
             for (i = 0; i < acopy.rows(); i++)
                for (j = 0; j < acopy.cols(); j++) {
-                  passed = passed && proxy[i][j] == acopy2[i][j];
-                  passed = passed && targt[i * NCOLS + j] == acopy2[i][j];
+                  Ok = Ok && proxy[i][j] == acopy2[i][j];
+                  Ok = Ok && targt[i * NCOLS + j] == acopy2[i][j];
                }
          // error handling test 0
             try {
                acopy = s60;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 1
             try {
                acopy = s61;
                proxy = acopy;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 2
             try {
                proxy = s60;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 3
             try {
                proxy = s61;
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 4
             try {
                proxy.setlength(100, 99);
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          // error handling test 5
             try {
                proxy.setlength(proxy.rows(), proxy.cols());
-               passed = false;
+               Ok = false;
             } catch(ap_error e) {
             } catch(...) {
-               passed = false;
+               Ok = false;
             }
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
    //
    // Report
    //
-      printf(fmt_str, "* 2D arrays", passed ? "OK" : "FAILED");
+      printf(fmt_str, "* 2D arrays", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
    }
    {
@@ -1151,18 +1151,18 @@ int main() {
    // Testing CSV functionality
    //
       const char *csv_name = "alglib-tst-35252-ndg4sf.csv";
-      bool passed = true;
+      bool Ok = true;
       try {
       // CSV_DEFAULT must be zero
-         passed = passed && CSV_DEFAULT == 0;
+         Ok = Ok && CSV_DEFAULT == 0;
       // absent file - must fail
          try {
             real_2d_array arr;
             read_csv("nonexistent123foralgtestinglib", '\t', CSV_DEFAULT, arr);
-            passed = false;
+            Ok = false;
          } catch(ap_error) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // non-rectangular file - must fail
          try {
@@ -1170,30 +1170,30 @@ int main() {
             file_put_contents(csv_name, "a,b,c\r\n1,2");
             read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
-            passed = false;
+            Ok = false;
          } catch(ap_error) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             real_2d_array arr;
             file_put_contents(csv_name, "a,b,c\r\n1,2,3,4");
             read_csv(csv_name, ',', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
-            passed = false;
+            Ok = false;
          } catch(ap_error) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
          try {
             real_2d_array arr;
             file_put_contents(csv_name, "1,2,3,4\n1,2,3\n1,2,3");
             read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
-            passed = false;
+            Ok = false;
          } catch(ap_error) {
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // empty file
          try {
@@ -1201,9 +1201,9 @@ int main() {
             file_put_contents(csv_name, "");
             read_csv(csv_name, '\t', CSV_DEFAULT, arr);
             remove(csv_name);
-            passed = passed && arr.rows() == 0 && arr.cols() == 0;
+            Ok = Ok && arr.rows() == 0 && arr.cols() == 0;
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // one row with header, tab separator
          try {
@@ -1211,9 +1211,9 @@ int main() {
             file_put_contents(csv_name, "a\tb\tc\n");
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
-            passed = passed && arr.rows() == 0 && arr.cols() == 0;
+            Ok = Ok && arr.rows() == 0 && arr.cols() == 0;
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // no header, comma-separated, full stop as decimal point
          try {
@@ -1221,9 +1221,9 @@ int main() {
             file_put_contents(csv_name, "1.5,2,3.25\n4,5,6");
             read_csv(csv_name, ',', CSV_DEFAULT, arr);
             remove(csv_name);
-            passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.00,6.00]]";
+            Ok = Ok && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.00,6.00]]";
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // header, tab-separated, mixed use of comma and full stop as decimal points
          try {
@@ -1231,9 +1231,9 @@ int main() {
             file_put_contents(csv_name, "a\tb\tc\n1.5\t2\t3,25\n4\t5.25\t6,1\n");
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
-            passed = passed && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.25,6.10]]";
+            Ok = Ok && arr.tostring(2) == "[[1.50,2.00,3.25],[4.00,5.25,6.10]]";
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       // header, tab-separated, fixed/exponential, spaces, mixed use of comma and full stop as decimal points
          try {
@@ -1241,19 +1241,19 @@ int main() {
             file_put_contents(csv_name, " a\t b \tc\n1,1\t 2.9\t -3.5  \n  1.1E1  \t 2.0E-1 \t-3E+1 \n+1  \t -2\t 3.    \n.1\t-.2\t+.3\n");
             read_csv(csv_name, '\t', CSV_SKIP_HEADERS, arr);
             remove(csv_name);
-            passed = passed && arr.tostring(2) == "[[1.10,2.90,-3.50],[11.00,0.20,-30.00],[1.00,-2.00,3.00],[0.10,-0.20,0.30]]";
+            Ok = Ok && arr.tostring(2) == "[[1.10,2.90,-3.50],[11.00,0.20,-30.00],[1.00,-2.00,3.00],[0.10,-0.20,0.30]]";
          } catch(...) {
-            passed = false;
+            Ok = false;
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
    //
    // Report
    //
-      printf(fmt_str, "* CSV support", passed ? "OK" : "FAILED");
+      printf(fmt_str, "* CSV support", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
    }
 //
@@ -1263,7 +1263,7 @@ int main() {
    //
    // Test kd-tree serialization
    //
-      bool passed = true;
+      bool Ok = true;
       hqrndstate rs;
       kdtree tree0;
       real_2d_array xy, rxy0, rxy1;
@@ -1291,16 +1291,16 @@ int main() {
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if (cnt0 != 1 || cnt1 != 1) {
-               passed = false;
+               Ok = false;
                break;
             }
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && rxy0[0][j] == rxy1[0][j];
+               Ok = Ok && rxy0[0][j] == rxy1[0][j];
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test stream serialization/unserialization
@@ -1317,29 +1317,29 @@ int main() {
          s.put('n');
          s.put('d');
          s.seekg(0);
-         passed = passed && s.get() == 'b';
-         passed = passed && s.get() == 'e';
-         passed = passed && s.get() == 'g';
+         Ok = Ok && s.get() == 'b';
+         Ok = Ok && s.get() == 'e';
+         Ok = Ok && s.get() == 'g';
          kdtreeunserialize(s, tree1);
-         passed = passed && s.get() == 'e';
-         passed = passed && s.get() == 'n';
-         passed = passed && s.get() == 'd';
+         Ok = Ok && s.get() == 'e';
+         Ok = Ok && s.get() == 'n';
+         Ok = Ok && s.get() == 'd';
          for (int i = 0; i < 100; i++) {
             for (int j = 0; j < nx; j++)
                qx[j] = hqrndnormal(rs);
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if (cnt0 != 1 || cnt1 != 1) {
-               passed = false;
+               Ok = false;
                break;
             }
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && rxy0[0][j] == rxy1[0][j];
+               Ok = Ok && rxy0[0][j] == rxy1[0][j];
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test string-to-stream serialization/unserialization
@@ -1354,16 +1354,16 @@ int main() {
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if (cnt0 != 1 || cnt1 != 1) {
-               passed = false;
+               Ok = false;
                break;
             }
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && rxy0[0][j] == rxy1[0][j];
+               Ok = Ok && rxy0[0][j] == rxy1[0][j];
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test stream-to-string serialization/unserialization
@@ -1378,95 +1378,73 @@ int main() {
             cnt0 = kdtreequeryknn(tree0, qx, 1, true);
             cnt1 = kdtreequeryknn(tree1, qx, 1, true);
             if (cnt0 != 1 || cnt1 != 1) {
-               passed = false;
+               Ok = false;
                break;
             }
             kdtreequeryresultsxy(tree0, rxy0);
             kdtreequeryresultsxy(tree1, rxy1);
             for (int j = 0; j < nx + ny; j++)
-               passed = passed && rxy0[0][j] == rxy1[0][j];
+               Ok = Ok && rxy0[0][j] == rxy1[0][j];
          }
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
    //
    // Report
    //
-      printf(fmt_str, "* Serialization (kd-tree)", passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Serialization (kd-tree)", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
    }
    {
    //
    // Test legacy RBF interface
    //
-      const char *pc_str = "50000000000 00000000000 20000000000 10000000000 A0000000000 \
-30000000000 20000000000 00000000000 A0000000000 30000000000\r\
-00000000000 20000000000 A0000000000 60000000000 00000000000\n\
-00000000000 00000000000 00000000000 00000000000 00000000000\r\n\
-00000000m_3 00000000000 00000000000 00000000m_3 00000000000\n\r\
-00000000000 00000000004 00000000000 00000000000\t00000000004 \
-00000000000 00000000000 00000000804 00000000000 00000000000 \
-00000000804 00000000000 00000000000 00000000G04 00000000000 \
-00000000000 00000000G04 00000000000 00000000000 00000000O04 \
-00000000000 00000000000 00000000O04 00000000000 00000000000 \
-00000000S04 00000000000 00000000000 00000000S04 00000000000 \
-00000000000 00000000W04 00000000000 00000000000 00000000W04 \
-00000000000 00000000000 00000000Y04 00000000000 00000000000 \
-00000000Y04 00000000000 00000000000 00000000K04 00000000000 \
-00000000000 00000000K04 00000000000 00000000000 A0000000000 \
-00000000000 10000000000 20000000000 30000000000 40000000000 \
-60000000000 70000000000 80000000000 90000000000 50000000000 \
-30000000000 00000000000 00000000000 00000000000 30000000000 \
-00000000Y04 00000000000 00000000000 u1000000000 00000000000 \
-00000000000 00000000000 60000000000 80000000000 00000000000 \
-50000000000 00000000000 50000000000 50000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 K0000000000 \
-00000000I04 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-00000000000 00000000000 00000000000 00000000000 00000000000 \
-A0000000000 30000000000 00000000000 00000000000 00000000000 \
-00000000m_3 00000000000 00000000000 00000000004 00000000000 \
-00000000000 00000000804 00000000000 00000000000 00000000G04 \
-00000000000 00000000000 00000000K04 00000000000 00000000000 \
-00000000O04 00000000000 00000000000 00000000S04 00000000000 \
-00000000000 00000000W04 00000000000 00000000000 00000000Y04 \
-00000000000 00000000000 A0000000000 40000000000 00000000q04 \
--pAGQnQBI14 UqUWierJ91C esm8ag6G61C 00000000q04 4wcFMyCtu04 \
-oPDvwHqst04 CExQXp8Ct04 00000000q04 litzPFhRb0C oKJvjcct314 \
-5-fT-X8w614 00000000q04 3HSOsPVH11C vZWf4dgfv04 GbZg4MTJn04 \
-00000000q04 iv7rMhuR71C hRtixp15r_3 EvCEDtLu-0C 00000000q04 \
-41CXzA_q71C umRYLK2yp0C 1zzY3Zqd91C 00000000q04 JvxJzDeI21C \
-TVbyd7Ygz0C JLywRdR1n0C 00000000q04 KmFarhc4g0C 1ehrn2tUt0C \
-AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
-00000000q04 n1b9361vI14 mhJhviUE114 54a_qyBrH1C 00000000q04 \
-10000000000 40000000000 StLCgor39-3 00000000000 00000000000 \
-6qTG7Ae-1_3\n";
+      const char *pc_str =
+         "50000000000 00000000000 20000000000 10000000000 A0000000000 30000000000 20000000000 00000000000 A0000000000 30000000000\r"
+         "00000000000 20000000000 A0000000000 60000000000 00000000000\n"
+         "00000000000 00000000000 00000000000 00000000000 00000000000\r\n"
+         "00000000m_3 00000000000 00000000000 00000000m_3 00000000000\n\r"
+         "00000000000 00000000004 00000000000 00000000000\t00000000004 00000000000 00000000000 00000000804 "
+         "00000000000 00000000000 00000000804 00000000000 00000000000 00000000G04 00000000000 00000000000 "
+         "00000000G04 00000000000 00000000000 00000000O04 00000000000 00000000000 00000000O04 00000000000 "
+         "00000000000 00000000S04 00000000000 00000000000 00000000S04 00000000000 00000000000 00000000W04 "
+         "00000000000 00000000000 00000000W04 00000000000 00000000000 00000000Y04 00000000000 00000000000 "
+         "00000000Y04 00000000000 00000000000 00000000K04 00000000000 00000000000 00000000K04 00000000000 "
+         "00000000000 A0000000000 00000000000 10000000000 20000000000 30000000000 40000000000 60000000000 "
+         "70000000000 80000000000 90000000000 50000000000 30000000000 00000000000 00000000000 00000000000 "
+         "30000000000 00000000Y04 00000000000 00000000000 u1000000000 00000000000 00000000000 00000000000 "
+         "60000000000 80000000000 00000000000 50000000000 00000000000 50000000000 50000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 K0000000000 00000000I04 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 00000000000 "
+         "00000000000 00000000000 A0000000000 30000000000 00000000000 00000000000 00000000000 00000000m_3 "
+         "00000000000 00000000000 00000000004 00000000000 00000000000 00000000804 00000000000 00000000000 "
+         "00000000G04 00000000000 00000000000 00000000K04 00000000000 00000000000 00000000O04 00000000000 "
+         "00000000000 00000000S04 00000000000 00000000000 00000000W04 00000000000 00000000000 00000000Y04 "
+         "00000000000 00000000000 A0000000000 40000000000 00000000q04 -pAGQnQBI14 UqUWierJ91C esm8ag6G61C "
+         "00000000q04 4wcFMyCtu04 oPDvwHqst04 CExQXp8Ct04 00000000q04 litzPFhRb0C oKJvjcct314 5-fT-X8w614 "
+         "00000000q04 3HSOsPVH11C vZWf4dgfv04 GbZg4MTJn04 00000000q04 iv7rMhuR71C hRtixp15r_3 EvCEDtLu-0C "
+         "00000000q04 41CXzA_q71C umRYLK2yp0C 1zzY3Zqd91C 00000000q04 JvxJzDeI21C TVbyd7Ygz0C JLywRdR1n0C "
+         "00000000q04 KmFarhc4g0C 1ehrn2tUt0C AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 "
+         "00000000q04 n1b9361vI14 mhJhviUE114 54a_qyBrH1C 00000000q04 10000000000 40000000000 StLCgor39-3 "
+         "00000000000 00000000000 6qTG7Ae-1_3\n";
       real_1d_array ref_val("[-0.042560546916643, 0.942523544654062, 0.875197036560778, 0.0656948997826632, -0.743065973803404, -0.8903682039297, -0.26994815318748, 0.602248517290195, 0.980011992233124, 0.436594293214176]");
-      bool passed = true;
+      bool Ok = true;
       try {
       // test unserialization from string without trailing end-of-stream symbol (dot)
       // this test is necessary for backward compatibility
@@ -1474,9 +1452,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(std::string(pc_str), model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
+            Ok = Ok && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test unserialization from string with trailing end-of-stream symbol (dot)
@@ -1485,9 +1463,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(std::string(pc_str) + ".", model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
+            Ok = Ok && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test unserialization from stream WITHOUT trailing end-of-stream symbol (dot)
@@ -1497,7 +1475,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          std::istringstream stream(_s);
          rbfmodel model;
          rbfunserialize(stream, model);
-         passed = false;
+         Ok = false;
       } catch(...) {
       } // Do nothing, it is expected to fail.
       try {
@@ -1509,9 +1487,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
+            Ok = Ok && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
       try {
       // test that we can read from the stream after unserialization
@@ -1521,24 +1499,24 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          rbfmodel model;
          rbfunserialize(stream, model);
          for (int i = 0; i < ref_val.length(); i++)
-            passed = passed && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
-         passed = passed && stream.get() == '<';
-         passed = passed && stream.get() == 'a';
-         passed = passed && stream.get() == 'z';
-         passed = passed && stream.get() == '>';
+            Ok = Ok && NearR(rbfcalc2(model, i, 0), ref_val[i], eps);
+         Ok = Ok && stream.get() == '<';
+         Ok = Ok && stream.get() == 'a';
+         Ok = Ok && stream.get() == 'z';
+         Ok = Ok && stream.get() == '>';
       } catch(...) {
-         passed = false;
+         Ok = false;
       }
    //
    // Report
    //
-      printf(fmt_str, "* Serialization (RBF)", passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Serialization (RBF)", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
    }
    {
-      bool passed = true;
+      bool Ok = true;
 #if AE_OS == AE_WINDOWS || AE_OS == AE_POSIX
       hqrndstate rs;
       rbfmodel rbf;
@@ -1556,21 +1534,21 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       rbfsetalgohierarchical(rbf, rbase, 1, 0.0);
       rbfsetpoints(rbf, xy);
       rbfsetv2its(rbf, 100000);
-      passed = passed && rbfpeekprogress(rbf) == 0;
+      Ok = Ok && rbfpeekprogress(rbf) == 0;
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
 #   if AE_OS == AE_POSIX
       pthread_t thread;
       if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
-         printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
+         printf(fmt_str, "* Progress/termination (RBF)", "Failed");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
          return 1;
       }
 #   elif AE_OS == AE_WINDOWS
       if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
-         printf(fmt_str, "* Progress/termination (RBF)", "FAILED");
+         printf(fmt_str, "* Progress/termination (RBF)", "Failed");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
          return 1;
@@ -1578,29 +1556,29 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 #   else
 #      error Unable to determine OS, unexpected here
 #   endif
-//(#) Drop down to alglib_impl here, because the state and frame accesses are no longer thread-safe.
+//(@) Drop down to alglib_impl here, because the state and frame accesses are no longer thread-safe.
       for (double last_progress = 0.0; last_progress < 0.001; ) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         passed = passed && new_progress >= last_progress;
-         passed = passed && new_progress <= 0.1;      // we expect to terminate well before reaching 10%
+         Ok = Ok && new_progress >= last_progress;
+         Ok = Ok && new_progress <= 0.1;      // we expect to terminate well before reaching 10%
          last_progress = new_progress;
       }
       alglib_impl::rbfrequesttermination(rbf.c_ptr());
       while (!async_rec.thread_finished) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         passed = passed && (new_progress <= 0.1 || new_progress == 1.0);   // we expect to terminate well before reaching 10%
+         Ok = Ok && (new_progress <= 0.1 || new_progress == 1.0);   // we expect to terminate well before reaching 10%
       }
-      passed = passed && rbfpeekprogress(rbf) == 1;
-      passed = passed && rep.terminationtype == 8;
-      passed = passed && rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0;
-      printf(fmt_str, "* Progress/termination (RBF)", passed ? "OK" : "FAILED");
+      Ok = Ok && rbfpeekprogress(rbf) == 1;
+      Ok = Ok && rep.terminationtype == 8;
+      Ok = Ok && rbfcalc2(rbf, hqrndnormal(rs), hqrndnormal(rs)) == 0.0;
+      printf(fmt_str, "* Progress/termination (RBF)", Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
 #else
       printf(fmt_str, "* Progress/termination (RBF)", "??");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
 #endif
    }
@@ -1609,7 +1587,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    // Test malloc() exceptions in constructors
    //
 #ifdef AE_USE_ALLOC_COUNTER
-      bool passed = true;
+      bool Ok = true;
       bool were_exceptions = false;
       for (int eidx = 0;; eidx++)       // loop is terminated when we survive through all the tests
       {
@@ -1717,9 +1695,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          }
       }
       alglib_impl::_malloc_failure_after = 0;   // turn off artificial malloc failures
-      printf(fmt_str, "* Exceptions in constructors", were_exceptions ? (passed ? "OK" : "FAILED") : "..");
+      printf(fmt_str, "* Exceptions in constructors", were_exceptions ? (Ok ? "Ok" : "Failed") : "..");
       fflush(stdout);
-      if (!passed)
+      if (!Ok)
          return 1;
 #else
       printf(fmt_str, "* Exceptions in constructors", "??");
@@ -1735,7 +1713,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    //
       printf("SMP settings vs GEMM speedup:\n");
       if (_ae_cores_count() > 1) {
-         bool passed = true;
+         bool Ok = true;
          alglib_impl::ae_uint64_t default_global_threading = _ae_get_global_threading();
          ae_int_t default_nworkers = getnworkers();
          double time_default = 0.0, time_glob_ser = 0.0, time_glob_smp = 0.0, time_glob_ser_loc_ser = 0.0, time_glob_ser_loc_smp = 0.0, time_glob_smp_loc_ser = 0.0, time_glob_smp_loc_smp = 0.0, time_glob_smp_nw1 = 0.0;
@@ -1812,7 +1790,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                setnworkers(default_nworkers);
             }
          } catch(ap_error) {
-            passed = false;
+            Ok = false;
          }
          printf(fmt_speedup, "* default speedup", time_glob_ser / time_glob_ser);
          printf(fmt_speedup, "* serial (global)", time_glob_ser / time_default);
@@ -1820,19 +1798,19 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          printf(fmt_speedup, "* serial (nworkers=1)", time_glob_ser / time_glob_smp_nw1);
          printf(fmt_speedup, "* parallel (global)", time_glob_ser / time_glob_smp);
          printf(fmt_speedup, "* parallel (local) v1", time_glob_ser / time_glob_ser_loc_smp);
-         passed = passed && time_glob_ser / time_default > 0.85 && time_glob_ser / time_default < 1.15;
-         passed = passed && time_glob_ser / time_glob_ser > 0.85 && time_glob_ser / time_glob_ser < 1.15;
-         passed = passed && time_glob_ser / time_glob_ser_loc_ser > 0.85 && time_glob_ser / time_glob_ser_loc_ser < 1.15;
-         passed = passed && time_glob_ser / time_glob_smp_loc_ser > 0.85 && time_glob_ser / time_glob_smp_loc_ser < 1.15;
-         passed = passed && time_glob_ser / time_glob_smp_nw1 > 0.85 && time_glob_ser / time_glob_smp_nw1 < 1.15;
-         passed = passed && time_glob_ser / time_glob_smp > 1.30;
-         passed = passed && time_glob_ser / time_glob_ser_loc_smp > 1.30;
-         passed = passed && time_glob_ser / time_glob_smp_loc_smp > 1.30;
-         printf(fmt_str, "* test result", passed ? "OK" : "FAILED (soft failure)");
+         Ok = Ok && time_glob_ser / time_default > 0.85 && time_glob_ser / time_default < 1.15;
+         Ok = Ok && time_glob_ser / time_glob_ser > 0.85 && time_glob_ser / time_glob_ser < 1.15;
+         Ok = Ok && time_glob_ser / time_glob_ser_loc_ser > 0.85 && time_glob_ser / time_glob_ser_loc_ser < 1.15;
+         Ok = Ok && time_glob_ser / time_glob_smp_loc_ser > 0.85 && time_glob_ser / time_glob_smp_loc_ser < 1.15;
+         Ok = Ok && time_glob_ser / time_glob_smp_nw1 > 0.85 && time_glob_ser / time_glob_smp_nw1 < 1.15;
+         Ok = Ok && time_glob_ser / time_glob_smp > 1.30;
+         Ok = Ok && time_glob_ser / time_glob_ser_loc_smp > 1.30;
+         Ok = Ok && time_glob_ser / time_glob_smp_loc_smp > 1.30;
+         printf(fmt_str, "* test result", Ok ? "Ok" : "Failed (soft failure)");
          fflush(stdout);
       //
       // soft failure:
-      // // if (!passed)
+      // // if (!Ok)
       // //   return 1;
       //
       } else {
@@ -1863,9 +1841,9 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mincgsetcond(state, 0.0, 0.0, epsx, 0);
          mincgoptimize(state, func505_grad, NULL, &x0);
          mincgresults(state, x, rep);
-         issue505_passed = issue505_passed && SmallR(4.0 * pow(x[0] - x0, 3), 1.0E-3);
+         issue505Ok = issue505Ok && SmallR(4.0 * pow(x[0] - x0, 3), 1.0E-3);
       } catch(...) {
-         issue505_passed = false;
+         issue505Ok = false;
       }
       try {
       // Test LM
@@ -1879,13 +1857,13 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          minlmsetcond(state, epsx, 0);
          minlmoptimize(state, func505_vec, func505_jac, NULL, &x0);
          minlmresults(state, x, rep);
-         issue505_passed = issue505_passed && NearR(x[0], x0, 1.0E-3);
+         issue505Ok = issue505Ok && NearR(x[0], x0, 1.0E-3);
       } catch(...) {
-         issue505_passed = false;
+         issue505Ok = false;
       }
-      printf(fmt_str, "* issue 505", issue505_passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Issue 505", issue505Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!issue505_passed)
+      if (!issue505Ok)
          return 1;
    // Testing issue #478 (http://bugs.alglib.net/view.php?id=478)
    // in high-quality RNG. It have to correctly handle random numbers
@@ -1928,25 +1906,25 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                      n0++;
                   else
                      n1++;
-                  issue478_passed = issue478_passed && v >= 0 && v < nmax[nidx];
+                  issue478Ok = issue478Ok && v >= 0 && v < nmax[nidx];
                }
-               issue478_passed = issue478_passed && n0 / (n0 + n1) > 0.45;
-               issue478_passed = issue478_passed && n0 / (n0 + n1) < 0.55;
-               issue478_passed = issue478_passed && n1 / (n0 + n1) > 0.45;
-               issue478_passed = issue478_passed && n1 / (n0 + n1) < 0.55;
+               issue478Ok = issue478Ok && n0 / (n0 + n1) > 0.45;
+               issue478Ok = issue478Ok && n0 / (n0 + n1) < 0.55;
+               issue478Ok = issue478Ok && n1 / (n0 + n1) > 0.45;
+               issue478Ok = issue478Ok && n1 / (n0 + n1) < 0.55;
             }
          } catch(...) {
-            issue478_passed = false;
+            issue478Ok = false;
          }
-         printf(fmt_str, "* issue 478", issue478_passed ? "OK" : "FAILED");
+         printf(fmt_str, "* Issue 478", issue478Ok ? "Ok" : "Failed");
          fflush(stdout);
-         if (!issue478_passed)
+         if (!issue478Ok)
             return 1;
       } else {
       //
       // 32-bit mode, skip test
       //
-         printf(fmt_str, "* issue 478", "OK (skipped in 32-bit mode)");
+         printf(fmt_str, "* Issue 478", "Ok (skipped in 32-bit mode)");
          fflush(stdout);
       }
    // Testing issue #528 (http://bugs.alglib.net/view.php?id=528)
@@ -1968,7 +1946,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          NewObj(seedrec, seed);
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
+         issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       // case #1: seeding and retrieving, not recycling
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -1980,7 +1958,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof seed, seedrec_init, seedrec_copy, seedrec_free);
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
+         issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       // case #2: seeding and retrieving twice to different pointers, recycling both
          alloc_cnt = alglib_impl::_alloc_counter;
          alglib_impl::ae_state_init();
@@ -1997,16 +1975,16 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_recycle(&pool, &_p0);
          alglib_impl::ae_shared_pool_recycle(&pool, &_p1);
          alglib_impl::ae_state_clear();
-         issue528_passed = issue528_passed && alloc_cnt == alglib_impl::_alloc_counter;
+         issue528Ok = issue528Ok && alloc_cnt == alglib_impl::_alloc_counter;
       } catch(...) {
-         issue528_passed = false;
+         issue528Ok = false;
       }
-      printf(fmt_str, "* issue 528", issue528_passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Issue 528", issue528Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!issue528_passed)
+      if (!issue528Ok)
          return 1;
 #else
-      printf(fmt_str, "* issue 528", "??");
+      printf(fmt_str, "* Issue 528", "??");
       fflush(stdout);
 #endif
    // Testing issue #591 (http://bugs.alglib.net/view.php?id=591)
@@ -2026,19 +2004,19 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
       //
          net1 = net0;
          mlpprocess(net1, x, y1);
-         issue591_passed = issue591_passed && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
+         issue591Ok = issue591Ok && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
       //
       // Test copy constructor
       //
          multilayerperceptron net2(net0);
          mlpprocess(net2, x, y2);
-         issue591_passed = issue591_passed && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
+         issue591Ok = issue591Ok && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
       } catch(...) {
-         issue591_passed = false;
+         issue591Ok = false;
       }
-      printf(fmt_str, "* issue 591", issue591_passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Issue 591", issue591Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!issue591_passed)
+      if (!issue591Ok)
          return 1;
    //
    // Task #594 (http://bugs.alglib.net/view.php?id=594) - additional
@@ -2065,17 +2043,17 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          mlprandomize(net0);
          mlpprocess(net1, x, y1);
          mlpprocess(net2, x, y2);
-         issue594_passed = issue594_passed && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
-         issue594_passed = issue594_passed && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
+         issue594Ok = issue594Ok && NearR(y0[0], y1[0], 1.0E-9) && NearR(y0[1], y1[1], 1.0E-9);
+         issue594Ok = issue594Ok && NearR(y0[0], y2[0], 1.0E-9) && NearR(y0[1], y2[1], 1.0E-9);
       } catch(...) {
-         issue594_passed = false;
+         issue594Ok = false;
       }
-      printf(fmt_str, "* issue 594", issue594_passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Issue 594", issue594Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!issue594_passed)
+      if (!issue594Ok)
          return 1;
    //
-   // Issue 764#, potential memory leak in the smart pointer
+   // Issue #764, potential memory leak in the smart pointer
    //
 #ifdef AE_USE_ALLOC_COUNTER
       try {
@@ -2092,16 +2070,16 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_shared_pool_retrieve(&pool, &_p0);
          alglib_impl::ae_state_clear();
-         issue764_passed = issue764_passed && alloc_cnt == alglib_impl::_alloc_counter;
+         issue764Ok = issue764Ok && alloc_cnt == alglib_impl::_alloc_counter;
       } catch(...) {
-         issue764_passed = false;
+         issue764Ok = false;
       }
-      printf(fmt_str, "* issue 764", issue764_passed ? "OK" : "FAILED");
+      printf(fmt_str, "* Issue 764", issue764Ok ? "Ok" : "Failed");
       fflush(stdout);
-      if (!issue764_passed)
+      if (!issue764Ok)
          return 1;
 #else
-      printf(fmt_str, "* issue 764", "??");
+      printf(fmt_str, "* Issue 764", "??");
       fflush(stdout);
 #endif
    //
@@ -2114,15 +2092,15 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          x.setlength(1);
          x[0] = 0;
          minlmcreatev(1, x, 1e-5, state);
-         issue813_passed = false;
+         issue813Ok = false;
          try {
             minlmoptimize(state, &issue813_callback);
          } catch(...) {
-            issue813_passed = true;
+            issue813Ok = true;
          }
-         printf(fmt_str, "* issue 813", issue813_passed ? "OK" : "FAILED");
+         printf(fmt_str, "* Issue 813", issue813Ok ? "Ok" : "Failed");
          fflush(stdout);
-         if (!issue813_passed)
+         if (!issue813Ok)
             return 1;
       }
    //
@@ -2134,29 +2112,29 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          x.setlength(1);
          x[0] = 0;
          mincgcreatef(1, x, 1e-5, state);
-         issue824_passed = true;
+         issue824Ok = true;
       // throw int*
          try {
             mincgoptimize(state, &issue824_callback_i);
          } catch(int *) {
          } catch(double *) {
-            issue824_passed = false;
+            issue824Ok = false;
          } catch(...) {
-            issue824_passed = false;
+            issue824Ok = false;
          }
       // throw double*
          try {
             mincgoptimize(state, &issue824_callback_d);
          } catch(int *) {
-            issue824_passed = false;
+            issue824Ok = false;
          } catch(double *) {
          } catch(...) {
-            issue824_passed = false;
+            issue824Ok = false;
          }
       // done
-         printf(fmt_str, "* issue 824", issue824_passed ? "OK" : "FAILED");
+         printf(fmt_str, "* Issue 824", issue824Ok ? "Ok" : "Failed");
          fflush(stdout);
-         if (!issue824_passed)
+         if (!issue824Ok)
             return 1;
       }
    }
@@ -2219,10 +2197,10 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
    alglib_impl::ae_complete_finalization_before_exit();
 #   endif
    if (alglib_impl::_alloc_counter != 0) {
-      printf("FAILURE: alloc_counter is non-zero on end!\n");
+      printf("Failed: alloc_counter is non-zero on end!\n");
       return 1;
    } else
-      printf("OK\n");
+      printf("Ok\n");
 #endif
 // Return
    return 0;

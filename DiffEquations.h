@@ -19,7 +19,7 @@
 // === ODESOLVER Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
-typedef struct {
+struct odesolverstate {
    ae_int_t n;
    ae_int_t m;
    double xscale;
@@ -45,22 +45,22 @@ typedef struct {
    ae_matrix rkb;
    ae_matrix rkk;
    ae_int_t PQ;
-} odesolverstate;
+};
 void odesolverstate_init(void *_p, bool make_automatic);
 void odesolverstate_copy(void *_dst, void *_src, bool make_automatic);
 void odesolverstate_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct odesolverreport {
    ae_int_t nfev;
    ae_int_t terminationtype;
-} odesolverreport;
+};
 void odesolverreport_init(void *_p, bool make_automatic);
 void odesolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void odesolverreport_free(void *_p, bool make_automatic);
 
-void odesolverrkck(RVector y, ae_int_t n, RVector x, ae_int_t m, double eps, double h, odesolverstate *state);
+void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state);
 bool odesolveriteration(odesolverstate *state);
-void odesolverresults(odesolverstate *state, ae_int_t *m, RVector xtbl, RMatrix ytbl, odesolverreport *rep);
+void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {

@@ -93,21 +93,14 @@ ae_int_t coalescei(ae_int_t a, ae_int_t b) {
    return result;
 }
 
-// The function convert integer value to real value.
-// ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
-double inttoreal(ae_int_t a) {
-   double result;
-   result = (double)a;
-   return result;
-}
-
 // The function calculates binary logarithm.
 //
 // NOTE: it costs twice as much as Ln(x)
 // ALGLIB: Copyright 17.09.2012 by Sergey Bochkanov
 double logbase2(double x) {
+   static double log2e = 1.0 / log(2.0);
    double result;
-   result = log(x) / log(2.0);
+   result = log(x) * log2e;
    return result;
 }
 
@@ -116,7 +109,7 @@ double logbase2(double x) {
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
+void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
    double h;
    SetVector(x);
@@ -125,20 +118,20 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_vector_set_length(x, n);
    ae_vector_set_length(y, n);
    if (n > 1) {
-      x->ptr.p_double[0] = a;
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = a;
+      y->xR[0] = ae_randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
          if (i != n - 1) {
-            x->ptr.p_double[i] = a + (i + 0.2 * ae_randommid()) * h;
+            x->xR[i] = a + (i + 0.2 * ae_randommid()) * h;
          } else {
-            x->ptr.p_double[i] = b;
+            x->xR[i] = b;
          }
-         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+         y->xR[i] = y->xR[i - 1] + ae_randommid() * (x->xR[i] - x->xR[i - 1]);
       }
    } else {
-      x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = 0.5 * (a + b);
+      y->xR[0] = ae_randommid();
    }
 }
 
@@ -147,7 +140,7 @@ void taskgenint1d(double a, double b, ae_int_t n, RVector x, RVector y) {
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) {
+void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
    double h;
    SetVector(x);
@@ -156,16 +149,16 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) 
    ae_vector_set_length(x, n);
    ae_vector_set_length(y, n);
    if (n > 1) {
-      x->ptr.p_double[0] = a;
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = a;
+      y->xR[0] = ae_randommid();
       h = (b - a) / (n - 1);
       for (i = 1; i < n; i++) {
-         x->ptr.p_double[i] = a + i * h;
-         y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * h;
+         x->xR[i] = a + i * h;
+         y->xR[i] = y->xR[i - 1] + ae_randommid() * h;
       }
    } else {
-      x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = 0.5 * (a + b);
+      y->xR[0] = ae_randommid();
    }
 }
 
@@ -174,7 +167,7 @@ void taskgenint1dequidist(double a, double b, ae_int_t n, RVector x, RVector y) 
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
+void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
    SetVector(x);
    SetVector(y);
@@ -183,16 +176,16 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_vector_set_length(y, n);
    if (n > 1) {
       for (i = 0; i < n; i++) {
-         x->ptr.p_double[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * (2 * i + 1) / (2 * n));
+         x->xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * (2 * i + 1) / (2 * n));
          if (i == 0) {
-            y->ptr.p_double[i] = ae_randommid();
+            y->xR[i] = ae_randommid();
          } else {
-            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+            y->xR[i] = y->xR[i - 1] + ae_randommid() * (x->xR[i] - x->xR[i - 1]);
          }
       }
    } else {
-      x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = 0.5 * (a + b);
+      y->xR[0] = ae_randommid();
    }
 }
 
@@ -201,7 +194,7 @@ void taskgenint1dcheb1(double a, double b, ae_int_t n, RVector x, RVector y) {
 //
 // If N=1 then suborutine generates only one point at the middle of [A,B]
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
+void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y) {
    ae_int_t i;
    SetVector(x);
    SetVector(y);
@@ -210,16 +203,16 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
    ae_vector_set_length(y, n);
    if (n > 1) {
       for (i = 0; i < n; i++) {
-         x->ptr.p_double[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * i / (n - 1));
+         x->xR[i] = 0.5 * (b + a) + 0.5 * (b - a) * cos(ae_pi * i / (n - 1));
          if (i == 0) {
-            y->ptr.p_double[i] = ae_randommid();
+            y->xR[i] = ae_randommid();
          } else {
-            y->ptr.p_double[i] = y->ptr.p_double[i - 1] + ae_randommid() * (x->ptr.p_double[i] - x->ptr.p_double[i - 1]);
+            y->xR[i] = y->xR[i - 1] + ae_randommid() * (x->xR[i] - x->xR[i - 1]);
          }
       }
    } else {
-      x->ptr.p_double[0] = 0.5 * (a + b);
-      y->ptr.p_double[0] = ae_randommid();
+      x->xR[0] = 0.5 * (a + b);
+      y->xR[0] = ae_randommid();
    }
 }
 
@@ -235,7 +228,7 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector x, RVector y) {
 // NOTE:
 //     X[] must be sorted by ascending (subroutine ASSERT's it)
 // ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-bool aredistinct(RVector x, ae_int_t n) {
+bool aredistinct(RVector *x, ae_int_t n) {
    double a;
    double b;
    ae_int_t i;
@@ -248,17 +241,17 @@ bool aredistinct(RVector x, ae_int_t n) {
       result = true;
       return result;
    }
-   a = x->ptr.p_double[0];
-   b = x->ptr.p_double[0];
+   a = x->xR[0];
+   b = x->xR[0];
    nonsorted = false;
    for (i = 1; i < n; i++) {
-      a = ae_minreal(a, x->ptr.p_double[i]);
-      b = ae_maxreal(b, x->ptr.p_double[i]);
-      nonsorted = nonsorted || x->ptr.p_double[i - 1] >= x->ptr.p_double[i];
+      a = rmin2(a, x->xR[i]);
+      b = rmax2(b, x->xR[i]);
+      nonsorted = nonsorted || x->xR[i - 1] >= x->xR[i];
    }
    ae_assert(!nonsorted, "APSERVAreDistinct: internal error (not sorted)");
    for (i = 1; i < n; i++) {
-      if ((x->ptr.p_double[i] - a) / (b - a) + 1 == (x->ptr.p_double[i - 1] - a) / (b - a) + 1) {
+      if ((x->xR[i] - a) / (b - a) + 1 == (x->xR[i - 1] - a) / (b - a) + 1) {
          result = false;
          return result;
       }
@@ -267,45 +260,20 @@ bool aredistinct(RVector x, ae_int_t n) {
    return result;
 }
 
-// This function checks that two boolean values are the same (both  are  True
-// or both are False).
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-bool aresameboolean(bool v1, bool v2) {
-   bool result;
-   result = v1 == v2;
-   return result;
-}
-
 // Resizes X and fills by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void setlengthzero(RVector x, ae_int_t n) {
+void setlengthzero(RVector *x, ae_int_t n) {
    ae_int_t i;
    ae_assert(n >= 0, "SetLengthZero: N<0");
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[i] = 0.0;
+      x->xR[i] = 0.0;
    }
 }
 
 // If Length(X)<N, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void bvectorsetlengthatleast(BVector x, ae_int_t n) {
-   if (x->cnt < n) {
-      ae_vector_set_length(x, n);
-   }
-}
-
-// If Length(X)<N, resizes X
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void ivectorsetlengthatleast(ZVector x, ae_int_t n) {
-   if (x->cnt < n) {
-      ae_vector_set_length(x, n);
-   }
-}
-
-// If Length(X)<N, resizes X
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rvectorsetlengthatleast(RVector x, ae_int_t n) {
+void vectorsetlengthatleast(ae_vector *x, ae_int_t n) {
    if (x->cnt < n) {
       ae_vector_set_length(x, n);
    }
@@ -313,17 +281,7 @@ void rvectorsetlengthatleast(RVector x, ae_int_t n) {
 
 // If Cols(X)<N or Rows(X)<M, resizes X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixsetlengthatleast(RMatrix x, ae_int_t m, ae_int_t n) {
-   if (m > 0 && n > 0) {
-      if (x->rows < m || x->cols < n) {
-         ae_matrix_set_length(x, m, n);
-      }
-   }
-}
-
-// If Cols(X)<N or Rows(X)<M, resizes X
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void bmatrixsetlengthatleast(BMatrix x, ae_int_t m, ae_int_t n) {
+void matrixsetlengthatleast(ae_matrix *x, ae_int_t m, ae_int_t n) {
    if (m > 0 && n > 0) {
       if (x->rows < m || x->cols < n) {
          ae_matrix_set_length(x, m, n);
@@ -337,7 +295,7 @@ void bmatrixsetlengthatleast(BMatrix x, ae_int_t m, ae_int_t n) {
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void bvectorgrowto(BVector x, ae_int_t n) {
+void bvectorgrowto(BVector *x, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
@@ -349,16 +307,16 @@ void bvectorgrowto(BVector x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = ae_maxint(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
       if (i < n2) {
-         x->ptr.p_bool[i] = oldx.ptr.p_bool[i];
+         x->xB[i] = oldx.xB[i];
       } else {
-         x->ptr.p_bool[i] = false;
+         x->xB[i] = false;
       }
    }
    ae_frame_leave();
@@ -370,7 +328,7 @@ void bvectorgrowto(BVector x, ae_int_t n) {
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void ivectorgrowto(ZVector x, ae_int_t n) {
+void ivectorgrowto(ZVector *x, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
@@ -382,16 +340,16 @@ void ivectorgrowto(ZVector x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = ae_maxint(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
       if (i < n2) {
-         x->ptr.p_int[i] = oldx.ptr.p_int[i];
+         x->xZ[i] = oldx.xZ[i];
       } else {
-         x->ptr.p_int[i] = 0;
+         x->xZ[i] = 0;
       }
    }
    ae_frame_leave();
@@ -406,7 +364,7 @@ void ivectorgrowto(ZVector x, ae_int_t n) {
 //    of columns is present, new columns are added with undefined contents);
 //    MinCols can be 0 or negative value = ignored
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixgrowrowsto(RMatrix a, ae_int_t n, ae_int_t mincols) {
+void rmatrixgrowrowsto(RMatrix *a, ae_int_t n, ae_int_t mincols) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -421,16 +379,16 @@ void rmatrixgrowrowsto(RMatrix a, ae_int_t n, ae_int_t mincols) {
    }
 // Sizes and metrics
    if (a->rows < n) {
-      n = ae_maxint(n, RoundZ(1.8 * a->rows + 1));
+      n = imax2(n, RoundZ(1.8 * a->rows + 1));
    }
-   n2 = ae_minint(a->rows, n);
+   n2 = imin2(a->rows, n);
    m = a->cols;
 // Grow
    ae_swap_matrices(a, &olda);
-   ae_matrix_set_length(a, n, ae_maxint(m, mincols));
+   ae_matrix_set_length(a, n, imax2(m, mincols));
    for (i = 0; i < n2; i++) {
       for (j = 0; j < m; j++) {
-         a->ptr.pp_double[i][j] = olda.ptr.pp_double[i][j];
+         a->xyR[i][j] = olda.xyR[i][j];
       }
    }
    ae_frame_leave();
@@ -445,7 +403,7 @@ void rmatrixgrowrowsto(RMatrix a, ae_int_t n, ae_int_t mincols) {
 //    of rows is present, new rows are added with undefined contents);
 //    MinRows can be 0 or negative value = ignored
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixgrowcolsto(RMatrix a, ae_int_t n, ae_int_t minrows) {
+void rmatrixgrowcolsto(RMatrix *a, ae_int_t n, ae_int_t minrows) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -460,16 +418,16 @@ void rmatrixgrowcolsto(RMatrix a, ae_int_t n, ae_int_t minrows) {
    }
 // Sizes and metrics
    if (a->cols < n) {
-      n = ae_maxint(n, RoundZ(1.8 * a->cols + 1));
+      n = imax2(n, RoundZ(1.8 * a->cols + 1));
    }
-   n2 = ae_minint(a->cols, n);
+   n2 = imin2(a->cols, n);
    m = a->rows;
 // Grow
    ae_swap_matrices(a, &olda);
-   ae_matrix_set_length(a, ae_maxint(m, minrows), n);
+   ae_matrix_set_length(a, imax2(m, minrows), n);
    for (i = 0; i < m; i++) {
       for (j = 0; j < n2; j++) {
-         a->ptr.pp_double[i][j] = olda.ptr.pp_double[i][j];
+         a->xyR[i][j] = olda.xyR[i][j];
       }
    }
    ae_frame_leave();
@@ -481,7 +439,7 @@ void rmatrixgrowcolsto(RMatrix a, ae_int_t n, ae_int_t minrows) {
 // c) new size can be larger than N, so subsequent grow() calls can return
 //    without reallocation
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rvectorgrowto(RVector x, ae_int_t n) {
+void rvectorgrowto(RVector *x, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
@@ -493,16 +451,16 @@ void rvectorgrowto(RVector x, ae_int_t n) {
       return;
    }
 // Choose new size
-   n = ae_maxint(n, RoundZ(1.8 * x->cnt + 1));
+   n = imax2(n, RoundZ(1.8 * x->cnt + 1));
 // Grow
    n2 = x->cnt;
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
       if (i < n2) {
-         x->ptr.p_double[i] = oldx.ptr.p_double[i];
+         x->xR[i] = oldx.xR[i];
       } else {
-         x->ptr.p_double[i] = 0.0;
+         x->xR[i] = 0.0;
       }
    }
    ae_frame_leave();
@@ -512,7 +470,7 @@ void rvectorgrowto(RVector x, ae_int_t n) {
 // * preserves old contents of X
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void ivectorresize(ZVector x, ae_int_t n) {
+void ivectorresize(ZVector *x, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
@@ -523,9 +481,9 @@ void ivectorresize(ZVector x, ae_int_t n) {
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
       if (i < n2) {
-         x->ptr.p_int[i] = oldx.ptr.p_int[i];
+         x->xZ[i] = oldx.xZ[i];
       } else {
-         x->ptr.p_int[i] = 0;
+         x->xZ[i] = 0;
       }
    }
    ae_frame_leave();
@@ -535,7 +493,7 @@ void ivectorresize(ZVector x, ae_int_t n) {
 // * preserves old contents of X
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rvectorresize(RVector x, ae_int_t n) {
+void rvectorresize(RVector *x, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n2;
@@ -546,9 +504,9 @@ void rvectorresize(RVector x, ae_int_t n) {
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
       if (i < n2) {
-         x->ptr.p_double[i] = oldx.ptr.p_double[i];
+         x->xR[i] = oldx.xR[i];
       } else {
-         x->ptr.p_double[i] = 0.0;
+         x->xR[i] = 0.0;
       }
    }
    ae_frame_leave();
@@ -558,7 +516,7 @@ void rvectorresize(RVector x, ae_int_t n) {
 // * preserves old contents of X
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void rmatrixresize(RMatrix x, ae_int_t m, ae_int_t n) {
+void rmatrixresize(RMatrix *x, ae_int_t m, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -573,9 +531,9 @@ void rmatrixresize(RMatrix x, ae_int_t m, ae_int_t n) {
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (i < m2 && j < n2) {
-            x->ptr.pp_double[i][j] = oldx.ptr.pp_double[i][j];
+            x->xyR[i][j] = oldx.xyR[i][j];
          } else {
-            x->ptr.pp_double[i][j] = 0.0;
+            x->xyR[i][j] = 0.0;
          }
       }
    }
@@ -586,7 +544,7 @@ void rmatrixresize(RMatrix x, ae_int_t m, ae_int_t n) {
 // * preserves old contents of X
 // * fills new elements by zeros
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void imatrixresize(ZMatrix x, ae_int_t m, ae_int_t n) {
+void imatrixresize(ZMatrix *x, ae_int_t m, ae_int_t n) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -601,9 +559,9 @@ void imatrixresize(ZMatrix x, ae_int_t m, ae_int_t n) {
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
          if (i < m2 && j < n2) {
-            x->ptr.pp_int[i][j] = oldx.ptr.pp_int[i][j];
+            x->xyZ[i][j] = oldx.xyZ[i][j];
          } else {
-            x->ptr.pp_int[i][j] = 0;
+            x->xyZ[i][j] = 0;
          }
       }
    }
@@ -612,7 +570,7 @@ void imatrixresize(ZMatrix x, ae_int_t m, ae_int_t n) {
 
 // appends element to X
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void ivectorappend(ZVector x, ae_int_t v) {
+void ivectorappend(ZVector *x, ae_int_t v) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t n;
@@ -622,16 +580,16 @@ void ivectorappend(ZVector x, ae_int_t v) {
    ae_swap_vectors(x, &oldx);
    ae_vector_set_length(x, n + 1);
    for (i = 0; i < n; i++) {
-      x->ptr.p_int[i] = oldx.ptr.p_int[i];
+      x->xZ[i] = oldx.xZ[i];
    }
-   x->ptr.p_int[n] = v;
+   x->xZ[n] = v;
    ae_frame_leave();
 }
 
 // This function checks that length(X) is at least N and first N values  from
 // X[] are finite
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool isfinitevector(RVector x, ae_int_t n) {
+bool isfinitevector(RVector *x, ae_int_t n) {
    ae_int_t i;
    double v;
    bool result;
@@ -646,7 +604,7 @@ bool isfinitevector(RVector x, ae_int_t n) {
    }
    v = 0.0;
    for (i = 0; i < n; i++) {
-      v = 0.01 * v + x->ptr.p_double[i];
+      v = 0.01 * v + x->xR[i];
    }
    result = isfinite(v);
    return result;
@@ -654,12 +612,12 @@ bool isfinitevector(RVector x, ae_int_t n) {
 
 // This function checks that first N values from X[] are finite
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool isfinitecvector(CVector z, ae_int_t n) {
+bool isfinitecvector(CVector *z, ae_int_t n) {
    ae_int_t i;
    bool result;
    ae_assert(n >= 0, "APSERVIsFiniteCVector: internal error (N<0)");
    for (i = 0; i < n; i++) {
-      if (!isfinite(z->ptr.p_complex[i].x) || !isfinite(z->ptr.p_complex[i].y)) {
+      if (!isfinite(z->xC[i].x) || !isfinite(z->xC[i].y)) {
          result = false;
          return result;
       }
@@ -671,7 +629,7 @@ bool isfinitecvector(CVector z, ae_int_t n) {
 // This function checks that size of X is at least MxN and values from
 // X[0..M-1,0..N-1] are finite.
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool apservisfinitematrix(RMatrix x, ae_int_t m, ae_int_t n) {
+bool apservisfinitematrix(RMatrix *x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool result;
@@ -687,7 +645,7 @@ bool apservisfinitematrix(RMatrix x, ae_int_t m, ae_int_t n) {
    }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (!isfinite(x->ptr.pp_double[i][j])) {
+         if (!isfinite(x->xyR[i][j])) {
             result = false;
             return result;
          }
@@ -699,7 +657,7 @@ bool apservisfinitematrix(RMatrix x, ae_int_t m, ae_int_t n) {
 
 // This function checks that all values from X[0..M-1,0..N-1] are finite
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool apservisfinitecmatrix(CMatrix x, ae_int_t m, ae_int_t n) {
+bool apservisfinitecmatrix(CMatrix *x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool result;
@@ -707,7 +665,7 @@ bool apservisfinitecmatrix(CMatrix x, ae_int_t m, ae_int_t n) {
    ae_assert(m >= 0, "APSERVIsFiniteCMatrix: internal error (M<0)");
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (!isfinite(x->ptr.pp_complex[i][j].x) || !isfinite(x->ptr.pp_complex[i][j].y)) {
+         if (!isfinite(x->xyC[i][j].x) || !isfinite(x->xyC[i][j].y)) {
             result = false;
             return result;
          }
@@ -720,7 +678,7 @@ bool apservisfinitecmatrix(CMatrix x, ae_int_t m, ae_int_t n) {
 // This function checks that size of X is at least NxN and all values from
 // upper/lower triangle of X[0..N-1,0..N-1] are finite
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool isfinitertrmatrix(RMatrix x, ae_int_t n, bool isupper) {
+bool isfinitertrmatrix(RMatrix *x, ae_int_t n, bool isupper) {
    ae_int_t i;
    ae_int_t j1;
    ae_int_t j2;
@@ -744,7 +702,7 @@ bool isfinitertrmatrix(RMatrix x, ae_int_t n, bool isupper) {
          j2 = i;
       }
       for (j = j1; j <= j2; j++) {
-         if (!isfinite(x->ptr.pp_double[i][j])) {
+         if (!isfinite(x->xyR[i][j])) {
             result = false;
             return result;
          }
@@ -757,7 +715,7 @@ bool isfinitertrmatrix(RMatrix x, ae_int_t n, bool isupper) {
 // This function checks that all values from upper/lower triangle of
 // X[0..N-1,0..N-1] are finite
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool apservisfinitectrmatrix(CMatrix x, ae_int_t n, bool isupper) {
+bool apservisfinitectrmatrix(CMatrix *x, ae_int_t n, bool isupper) {
    ae_int_t i;
    ae_int_t j1;
    ae_int_t j2;
@@ -773,7 +731,7 @@ bool apservisfinitectrmatrix(CMatrix x, ae_int_t n, bool isupper) {
          j2 = i;
       }
       for (j = j1; j <= j2; j++) {
-         if (!isfinite(x->ptr.pp_complex[i][j].x) || !isfinite(x->ptr.pp_complex[i][j].y)) {
+         if (!isfinite(x->xyC[i][j].x) || !isfinite(x->xyC[i][j].y)) {
             result = false;
             return result;
          }
@@ -786,7 +744,7 @@ bool apservisfinitectrmatrix(CMatrix x, ae_int_t n, bool isupper) {
 // This function checks that all values from X[0..M-1,0..N-1] are  finite  or
 // NaN's.
 // ALGLIB: Copyright 18.06.2010 by Sergey Bochkanov
-bool apservisfiniteornanmatrix(RMatrix x, ae_int_t m, ae_int_t n) {
+bool apservisfiniteornanmatrix(RMatrix *x, ae_int_t m, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool result;
@@ -794,7 +752,7 @@ bool apservisfiniteornanmatrix(RMatrix x, ae_int_t m, ae_int_t n) {
    ae_assert(m >= 0, "APSERVIsFiniteOrNaNMatrix: internal error (M<0)");
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         if (!(isfinite(x->ptr.pp_double[i][j]) || isnan(x->ptr.pp_double[i][j]))) {
+         if (!(isfinite(x->xyR[i][j]) || isnan(x->xyR[i][j]))) {
             result = false;
             return result;
          }
@@ -814,8 +772,8 @@ double safepythag2(double x, double y) {
    double result;
    xabs = fabs(x);
    yabs = fabs(y);
-   w = ae_maxreal(xabs, yabs);
-   z = ae_minreal(xabs, yabs);
+   w = rmax2(xabs, yabs);
+   z = rmin2(xabs, yabs);
    if (z == 0.0) {
       result = w;
    } else {
@@ -829,7 +787,7 @@ double safepythag2(double x, double y) {
 double safepythag3(double x, double y, double z) {
    double w;
    double result;
-   w = ae_maxreal(fabs(x), ae_maxreal(fabs(y), fabs(z)));
+   w = rmax2(fabs(x), rmax2(fabs(y), fabs(z)));
    if (w == 0.0) {
       result = 0.0;
       return result;
@@ -958,8 +916,8 @@ void apperiodicmap(double *x, double a, double b, double *k) {
       *x -= b - a;
       ++*k;
    }
-   *x = ae_maxreal(*x, a);
-   *x = ae_minreal(*x, b);
+   *x = rmax2(*x, a);
+   *x = rmin2(*x, b);
 }
 
 // Returns random normal number using low-quality system-provided generator
@@ -987,7 +945,7 @@ double randomnormal() {
 // Generates random unit vector using low-quality system-provided generator.
 // Reallocates array if its size is too short.
 // ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void randomunit(ae_int_t n, RVector x) {
+void randomunit(ae_int_t n, RVector *x) {
    ae_int_t i;
    double v;
    double vv;
@@ -999,13 +957,13 @@ void randomunit(ae_int_t n, RVector x) {
       v = 0.0;
       for (i = 0; i < n; i++) {
          vv = randomnormal();
-         x->ptr.p_double[i] = vv;
+         x->xR[i] = vv;
          v += vv * vv;
       }
    } while (v <= 0.0);
    v = 1 / sqrt(v);
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[i] *= v;
+      x->xR[i] *= v;
    }
 }
 
@@ -1027,7 +985,7 @@ void swapr(double *v0, double *v1) {
 
 // This function is used to swap two rows of the matrix; if NCols<0, automatically
 // determined from the matrix size.
-void swaprows(RMatrix a, ae_int_t i0, ae_int_t i1, ae_int_t ncols) {
+void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols) {
    ae_int_t j;
    double v;
    if (i0 == i1) {
@@ -1037,15 +995,15 @@ void swaprows(RMatrix a, ae_int_t i0, ae_int_t i1, ae_int_t ncols) {
       ncols = a->cols;
    }
    for (j = 0; j < ncols; j++) {
-      v = a->ptr.pp_double[i0][j];
-      a->ptr.pp_double[i0][j] = a->ptr.pp_double[i1][j];
-      a->ptr.pp_double[i1][j] = v;
+      v = a->xyR[i0][j];
+      a->xyR[i0][j] = a->xyR[i1][j];
+      a->xyR[i1][j] = v;
    }
 }
 
 // This function is used to swap two cols of the matrix; if NRows<0, automatically
 // determined from the matrix size.
-void swapcols(RMatrix a, ae_int_t j0, ae_int_t j1, ae_int_t nrows) {
+void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows) {
    ae_int_t i;
    double v;
    if (j0 == j1) {
@@ -1055,15 +1013,15 @@ void swapcols(RMatrix a, ae_int_t j0, ae_int_t j1, ae_int_t nrows) {
       nrows = a->rows;
    }
    for (i = 0; i < nrows; i++) {
-      v = a->ptr.pp_double[i][j0];
-      a->ptr.pp_double[i][j0] = a->ptr.pp_double[i][j1];
-      a->ptr.pp_double[i][j1] = v;
+      v = a->xyR[i][j0];
+      a->xyR[i][j0] = a->xyR[i][j1];
+      a->xyR[i][j1] = v;
    }
 }
 
 // This function is used to swap two "entries" in 1-dimensional array composed
 // from D-element entries
-void swapentries(RVector a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth) {
+void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth) {
    ae_int_t offs0;
    ae_int_t offs1;
    ae_int_t j;
@@ -1074,57 +1032,32 @@ void swapentries(RVector a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth) {
    offs0 = i0 * entrywidth;
    offs1 = i1 * entrywidth;
    for (j = 0; j < entrywidth; j++) {
-      v = a->ptr.p_double[offs0 + j];
-      a->ptr.p_double[offs0 + j] = a->ptr.p_double[offs1 + j];
-      a->ptr.p_double[offs1 + j] = v;
+      v = a->xR[offs0 + j];
+      a->xR[offs0 + j] = a->xR[offs1 + j];
+      a->xR[offs1 + j] = v;
    }
 }
 
 // This function is used to swap two elements of the vector
-void swapelements(RVector a, ae_int_t i0, ae_int_t i1) {
+void swapelements(RVector *a, ae_int_t i0, ae_int_t i1) {
    double v;
    if (i0 == i1) {
       return;
    }
-   v = a->ptr.p_double[i0];
-   a->ptr.p_double[i0] = a->ptr.p_double[i1];
-   a->ptr.p_double[i1] = v;
+   v = a->xR[i0];
+   a->xR[i0] = a->xR[i1];
+   a->xR[i1] = v;
 }
 
 // This function is used to swap two elements of the vector
-void swapelementsi(ZVector a, ae_int_t i0, ae_int_t i1) {
+void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1) {
    ae_int_t v;
    if (i0 == i1) {
       return;
    }
-   v = a->ptr.p_int[i0];
-   a->ptr.p_int[i0] = a->ptr.p_int[i1];
-   a->ptr.p_int[i1] = v;
-}
-
-// This function is used to return maximum of three real values
-double maxreal3(double v0, double v1, double v2) {
-   double result;
-   result = v0;
-   if (result < v1) {
-      result = v1;
-   }
-   if (result < v2) {
-      result = v2;
-   }
-   return result;
-}
-
-// This function performs two operations:
-// 1. decrements value of integer variable, if it is positive
-// 2. explicitly sets variable to zero if it is non-positive
-// It is used by some algorithms to decrease value of internal counters.
-void countdown(ae_int_t *v) {
-   if (*v > 0) {
-      --*v;
-   } else {
-      *v = 0;
-   }
+   v = a->xZ[i0];
+   a->xZ[i0] = a->xZ[i1];
+   a->xZ[i1] = v;
 }
 
 // This function returns +1 or -1 depending on sign of X.
@@ -1135,185 +1068,6 @@ double possign(double x) {
       result = 1.0;
    } else {
       result = -1.0;
-   }
-   return result;
-}
-
-// This function returns product of two real numbers. It is convenient when
-// you have to perform typecast-and-product of two INTEGERS.
-double rmul2(double v0, double v1) {
-   double result;
-   result = v0 * v1;
-   return result;
-}
-
-// This function returns product of three real numbers. It is convenient when
-// you have to perform typecast-and-product of two INTEGERS.
-double rmul3(double v0, double v1, double v2) {
-   double result;
-   result = v0 * v1 * v2;
-   return result;
-}
-
-// This function returns (A div B) rounded up; it expects that A>0, B > 0, but
-// does not check it.
-ae_int_t idivup(ae_int_t a, ae_int_t b) {
-   ae_int_t result;
-   result = a / b;
-   if (a % b > 0) {
-      result++;
-   }
-   return result;
-}
-
-// This function returns min(i0,i1)
-ae_int_t imin2(ae_int_t i0, ae_int_t i1) {
-   ae_int_t result;
-   result = i0;
-   if (i1 < result) {
-      result = i1;
-   }
-   return result;
-}
-
-// This function returns min(i0,i1,i2)
-ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2) {
-   ae_int_t result;
-   result = i0;
-   if (i1 < result) {
-      result = i1;
-   }
-   if (i2 < result) {
-      result = i2;
-   }
-   return result;
-}
-
-// This function returns max(i0,i1)
-ae_int_t imax2(ae_int_t i0, ae_int_t i1) {
-   ae_int_t result;
-   result = i0;
-   if (i1 > result) {
-      result = i1;
-   }
-   return result;
-}
-
-// This function returns max(i0,i1,i2)
-ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2) {
-   ae_int_t result;
-   result = i0;
-   if (i1 > result) {
-      result = i1;
-   }
-   if (i2 > result) {
-      result = i2;
-   }
-   return result;
-}
-
-// This function returns max(r0,r1,r2)
-double rmax3(double r0, double r1, double r2) {
-   double result;
-   result = r0;
-   if (r1 > result) {
-      result = r1;
-   }
-   if (r2 > result) {
-      result = r2;
-   }
-   return result;
-}
-
-// This function returns max(|r0|,|r1|,|r2|)
-double rmaxabs3(double r0, double r1, double r2) {
-   double result;
-   r0 = fabs(r0);
-   r1 = fabs(r1);
-   r2 = fabs(r2);
-   result = r0;
-   if (r1 > result) {
-      result = r1;
-   }
-   if (r2 > result) {
-      result = r2;
-   }
-   return result;
-}
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-double boundval(double x, double b1, double b2) {
-   double result;
-   if (x <= b1) {
-      result = b1;
-      return result;
-   }
-   if (x >= b2) {
-      result = b2;
-      return result;
-   }
-   result = x;
-   return result;
-}
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
-   ae_int_t result;
-   if (x <= b1) {
-      result = b1;
-      return result;
-   }
-   if (x >= b2) {
-      result = b2;
-      return result;
-   }
-   result = x;
-   return result;
-}
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-double rboundval(double x, double b1, double b2) {
-   double result;
-   if (x <= b1) {
-      result = b1;
-      return result;
-   }
-   if (x >= b2) {
-      result = b2;
-      return result;
-   }
-   result = x;
-   return result;
-}
-
-// Returns number of non-zeros
-ae_int_t countnz1(RVector v, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < n; i++) {
-      if (!(v->ptr.p_double[i] == 0)) {
-         result++;
-      }
-   }
-   return result;
-}
-
-// Returns number of non-zeros
-ae_int_t countnz2(RMatrix v, ae_int_t m, ae_int_t n) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-         if (!(v->ptr.pp_double[i][j] == 0)) {
-            result++;
-         }
-      }
    }
    return result;
 }
@@ -1333,13 +1087,13 @@ void serializecomplex(ae_serializer *s, ae_complex v) {
 // Unserialization: complex value
 ae_complex unserializecomplex(ae_serializer *s) {
    ae_complex result;
-   ae_serializer_unserialize_double(s, &result.x);
-   ae_serializer_unserialize_double(s, &result.y);
+   result.x = ae_serializer_unserialize_double(s);
+   result.y = ae_serializer_unserialize_double(s);
    return result;
 }
 
 // Allocation of serializer: real array
-void allocrealarray(ae_serializer *s, RVector v, ae_int_t n) {
+void allocrealarray(ae_serializer *s, RVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
       n = v->cnt;
@@ -1351,36 +1105,34 @@ void allocrealarray(ae_serializer *s, RVector v, ae_int_t n) {
 }
 
 // Serialization: complex value
-void serializerealarray(ae_serializer *s, RVector v, ae_int_t n) {
+void serializerealarray(ae_serializer *s, RVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
       n = v->cnt;
    }
    ae_serializer_serialize_int(s, n);
    for (i = 0; i < n; i++) {
-      ae_serializer_serialize_double(s, v->ptr.p_double[i]);
+      ae_serializer_serialize_double(s, v->xR[i]);
    }
 }
 
 // Unserialization: complex value
-void unserializerealarray(ae_serializer *s, RVector v) {
+void unserializerealarray(ae_serializer *s, RVector *v) {
    ae_int_t n;
    ae_int_t i;
-   double t;
    SetVector(v);
-   ae_serializer_unserialize_int(s, &n);
+   n = ae_serializer_unserialize_int(s);
    if (n == 0) {
       return;
    }
    ae_vector_set_length(v, n);
    for (i = 0; i < n; i++) {
-      ae_serializer_unserialize_double(s, &t);
-      v->ptr.p_double[i] = t;
+      v->xR[i] = ae_serializer_unserialize_double(s);
    }
 }
 
 // Allocation of serializer: ae_int_t array
-void allocintegerarray(ae_serializer *s, ZVector v, ae_int_t n) {
+void allocintegerarray(ae_serializer *s, ZVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
       n = v->cnt;
@@ -1392,36 +1144,34 @@ void allocintegerarray(ae_serializer *s, ZVector v, ae_int_t n) {
 }
 
 // Serialization: ae_int_t array
-void serializeintegerarray(ae_serializer *s, ZVector v, ae_int_t n) {
+void serializeintegerarray(ae_serializer *s, ZVector *v, ae_int_t n) {
    ae_int_t i;
    if (n < 0) {
       n = v->cnt;
    }
    ae_serializer_serialize_int(s, n);
    for (i = 0; i < n; i++) {
-      ae_serializer_serialize_int(s, v->ptr.p_int[i]);
+      ae_serializer_serialize_int(s, v->xZ[i]);
    }
 }
 
 // Unserialization: complex value
-void unserializeintegerarray(ae_serializer *s, ZVector v) {
+void unserializeintegerarray(ae_serializer *s, ZVector *v) {
    ae_int_t n;
    ae_int_t i;
-   ae_int_t t;
    SetVector(v);
-   ae_serializer_unserialize_int(s, &n);
+   n = ae_serializer_unserialize_int(s);
    if (n == 0) {
       return;
    }
    ae_vector_set_length(v, n);
    for (i = 0; i < n; i++) {
-      ae_serializer_unserialize_int(s, &t);
-      v->ptr.p_int[i] = t;
+      v->xZ[i] = ae_serializer_unserialize_int(s);
    }
 }
 
 // Allocation of serializer: real matrix
-void allocrealmatrix(ae_serializer *s, RMatrix v, ae_int_t n0, ae_int_t n1) {
+void allocrealmatrix(ae_serializer *s, RMatrix *v, ae_int_t n0, ae_int_t n1) {
    ae_int_t i;
    ae_int_t j;
    if (n0 < 0) {
@@ -1440,7 +1190,7 @@ void allocrealmatrix(ae_serializer *s, RMatrix v, ae_int_t n0, ae_int_t n1) {
 }
 
 // Serialization: complex value
-void serializerealmatrix(ae_serializer *s, RMatrix v, ae_int_t n0, ae_int_t n1) {
+void serializerealmatrix(ae_serializer *s, RMatrix *v, ae_int_t n0, ae_int_t n1) {
    ae_int_t i;
    ae_int_t j;
    if (n0 < 0) {
@@ -1453,71 +1203,69 @@ void serializerealmatrix(ae_serializer *s, RMatrix v, ae_int_t n0, ae_int_t n1) 
    ae_serializer_serialize_int(s, n1);
    for (i = 0; i < n0; i++) {
       for (j = 0; j < n1; j++) {
-         ae_serializer_serialize_double(s, v->ptr.pp_double[i][j]);
+         ae_serializer_serialize_double(s, v->xyR[i][j]);
       }
    }
 }
 
 // Unserialization: complex value
-void unserializerealmatrix(ae_serializer *s, RMatrix v) {
+void unserializerealmatrix(ae_serializer *s, RMatrix *v) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t n0;
    ae_int_t n1;
-   double t;
    SetMatrix(v);
-   ae_serializer_unserialize_int(s, &n0);
-   ae_serializer_unserialize_int(s, &n1);
+   n0 = ae_serializer_unserialize_int(s);
+   n1 = ae_serializer_unserialize_int(s);
    if (n0 == 0 || n1 == 0) {
       return;
    }
    ae_matrix_set_length(v, n0, n1);
    for (i = 0; i < n0; i++) {
       for (j = 0; j < n1; j++) {
-         ae_serializer_unserialize_double(s, &t);
-         v->ptr.pp_double[i][j] = t;
+         v->xyR[i][j] = ae_serializer_unserialize_double(s);
       }
    }
 }
 
 // Copy boolean array
-void copybooleanarray(BVector src, BVector dst) {
+void copybooleanarray(BVector *src, BVector *dst) {
    ae_int_t i;
    SetVector(dst);
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt);
       for (i = 0; i < src->cnt; i++) {
-         dst->ptr.p_bool[i] = src->ptr.p_bool[i];
+         dst->xB[i] = src->xB[i];
       }
    }
 }
 
 // Copy integer array
-void copyintegerarray(ZVector src, ZVector dst) {
+void copyintegerarray(ZVector *src, ZVector *dst) {
    ae_int_t i;
    SetVector(dst);
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt);
       for (i = 0; i < src->cnt; i++) {
-         dst->ptr.p_int[i] = src->ptr.p_int[i];
+         dst->xZ[i] = src->xZ[i];
       }
    }
 }
 
 // Copy real array
-void copyrealarray(RVector src, RVector dst) {
+void copyrealarray(RVector *src, RVector *dst) {
    ae_int_t i;
    SetVector(dst);
    if (src->cnt > 0) {
       ae_vector_set_length(dst, src->cnt);
       for (i = 0; i < src->cnt; i++) {
-         dst->ptr.p_double[i] = src->ptr.p_double[i];
+         dst->xR[i] = src->xR[i];
       }
    }
 }
 
 // Copy real matrix
-void copyrealmatrix(RMatrix src, RMatrix dst) {
+void copyrealmatrix(RMatrix *src, RMatrix *dst) {
    ae_int_t i;
    ae_int_t j;
    SetMatrix(dst);
@@ -1525,25 +1273,10 @@ void copyrealmatrix(RMatrix src, RMatrix dst) {
       ae_matrix_set_length(dst, src->rows, src->cols);
       for (i = 0; i < src->rows; i++) {
          for (j = 0; j < src->cols; j++) {
-            dst->ptr.pp_double[i][j] = src->ptr.pp_double[i][j];
+            dst->xyR[i][j] = src->xyR[i][j];
          }
       }
    }
-}
-
-// Clears integer array
-void unsetintegerarray(ZVector a) {
-   SetVector(a);
-}
-
-// Clears real array
-void unsetrealarray(RVector a) {
-   SetVector(a);
-}
-
-// Clears real matrix
-void unsetrealmatrix(RMatrix a) {
-   SetMatrix(a);
 }
 
 // This function is used in parallel functions for recurrent division of large
@@ -1564,7 +1297,7 @@ void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t 
    ae_assert(tasksize > tilesize, "TiledSplit: TaskSize <= TileSize");
    cc = chunkscount(tasksize, tilesize);
    ae_assert(cc >= 2, "TiledSplit: integrity check failed");
-   *task0 = idivup(cc, 2) * tilesize;
+   *task0 = (cc + 1) / 2 * tilesize;
    *task1 = tasksize - (*task0);
    ae_assert(*task0 >= 1, "TiledSplit: internal error");
    ae_assert(*task1 >= 1, "TiledSplit: internal error");
@@ -1582,7 +1315,7 @@ void tiledsplit(ae_int_t tasksize, ae_int_t tilesize, ae_int_t *task0, ae_int_t 
 // This function searches A (records with indices [I0,I1)) for a record with
 // header B. It returns index of this record (not offset!), or -1 on failure.
 // ALGLIB: Copyright 28.03.2011 by Sergey Bochkanov
-ae_int_t recsearch(ZVector a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector b) {
+ae_int_t recsearch(ZVector *a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_int_t i1, ZVector *b) {
    ae_int_t mididx;
    ae_int_t cflag;
    ae_int_t k;
@@ -1597,11 +1330,11 @@ ae_int_t recsearch(ZVector a, ae_int_t nrec, ae_int_t nheader, ae_int_t i0, ae_i
       offs = nrec * mididx;
       cflag = 0;
       for (k = 0; k < nheader; k++) {
-         if (a->ptr.p_int[offs + k] < b->ptr.p_int[k]) {
+         if (a->xZ[offs + k] < b->xZ[k]) {
             cflag = -1;
             break;
          }
-         if (a->ptr.p_int[offs + k] > b->ptr.p_int[k]) {
+         if (a->xZ[offs + k] > b->xZ[k]) {
             cflag = 1;
             break;
          }
@@ -1720,7 +1453,7 @@ double smpactivationlevel() {
    double nn;
    double result;
    nn = (double)(2 * matrixtilesizeb());
-   result = ae_maxreal(0.95 * 2 * nn * nn * nn, 1.0E7);
+   result = rmax2(0.95 * 2 * nn * nn * nn, 1.0E7);
    return result;
 }
 
@@ -1809,116 +1542,20 @@ void apbuffers_free(void *_p, bool make_automatic) {
    ae_matrix_free(&p->rm1, make_automatic);
 }
 
-void sboolean_init(void *_p, bool make_automatic) {
+void RVector_init(void *_p, bool make_automatic) {
+   RVector *p = (RVector *) _p;
+   ae_vector_init(p, 0, DT_REAL, make_automatic);
 }
 
-void sboolean_copy(void *_dst, void *_src, bool make_automatic) {
-   sboolean *dst = (sboolean *) _dst;
-   sboolean *src = (sboolean *) _src;
-   dst->val = src->val;
+void RVector_copy(void *_dst, void *_src, bool make_automatic) {
+   RVector *dst = (RVector *) _dst;
+   RVector *src = (RVector *) _src;
+   ae_vector_copy(dst, src, make_automatic);
 }
 
-void sboolean_free(void *_p, bool make_automatic) {
-}
-
-void sbooleanarray_init(void *_p, bool make_automatic) {
-   sbooleanarray *p = (sbooleanarray *) _p;
-   ae_vector_init(&p->val, 0, DT_BOOL, make_automatic);
-}
-
-void sbooleanarray_copy(void *_dst, void *_src, bool make_automatic) {
-   sbooleanarray *dst = (sbooleanarray *) _dst;
-   sbooleanarray *src = (sbooleanarray *) _src;
-   ae_vector_copy(&dst->val, &src->val, make_automatic);
-}
-
-void sbooleanarray_free(void *_p, bool make_automatic) {
-   sbooleanarray *p = (sbooleanarray *) _p;
-   ae_vector_free(&p->val, make_automatic);
-}
-
-void sinteger_init(void *_p, bool make_automatic) {
-}
-
-void sinteger_copy(void *_dst, void *_src, bool make_automatic) {
-   sinteger *dst = (sinteger *) _dst;
-   sinteger *src = (sinteger *) _src;
-   dst->val = src->val;
-}
-
-void sinteger_free(void *_p, bool make_automatic) {
-}
-
-void sintegerarray_init(void *_p, bool make_automatic) {
-   sintegerarray *p = (sintegerarray *) _p;
-   ae_vector_init(&p->val, 0, DT_INT, make_automatic);
-}
-
-void sintegerarray_copy(void *_dst, void *_src, bool make_automatic) {
-   sintegerarray *dst = (sintegerarray *) _dst;
-   sintegerarray *src = (sintegerarray *) _src;
-   ae_vector_copy(&dst->val, &src->val, make_automatic);
-}
-
-void sintegerarray_free(void *_p, bool make_automatic) {
-   sintegerarray *p = (sintegerarray *) _p;
-   ae_vector_free(&p->val, make_automatic);
-}
-
-void sreal_init(void *_p, bool make_automatic) {
-}
-
-void sreal_copy(void *_dst, void *_src, bool make_automatic) {
-   sreal *dst = (sreal *) _dst;
-   sreal *src = (sreal *) _src;
-   dst->val = src->val;
-}
-
-void sreal_free(void *_p, bool make_automatic) {
-}
-
-void srealarray_init(void *_p, bool make_automatic) {
-   srealarray *p = (srealarray *) _p;
-   ae_vector_init(&p->val, 0, DT_REAL, make_automatic);
-}
-
-void srealarray_copy(void *_dst, void *_src, bool make_automatic) {
-   srealarray *dst = (srealarray *) _dst;
-   srealarray *src = (srealarray *) _src;
-   ae_vector_copy(&dst->val, &src->val, make_automatic);
-}
-
-void srealarray_free(void *_p, bool make_automatic) {
-   srealarray *p = (srealarray *) _p;
-   ae_vector_free(&p->val, make_automatic);
-}
-
-void scomplex_init(void *_p, bool make_automatic) {
-}
-
-void scomplex_copy(void *_dst, void *_src, bool make_automatic) {
-   scomplex *dst = (scomplex *) _dst;
-   scomplex *src = (scomplex *) _src;
-   dst->val = src->val;
-}
-
-void scomplex_free(void *_p, bool make_automatic) {
-}
-
-void scomplexarray_init(void *_p, bool make_automatic) {
-   scomplexarray *p = (scomplexarray *) _p;
-   ae_vector_init(&p->val, 0, DT_COMPLEX, make_automatic);
-}
-
-void scomplexarray_copy(void *_dst, void *_src, bool make_automatic) {
-   scomplexarray *dst = (scomplexarray *) _dst;
-   scomplexarray *src = (scomplexarray *) _src;
-   ae_vector_copy(&dst->val, &src->val, make_automatic);
-}
-
-void scomplexarray_free(void *_p, bool make_automatic) {
-   scomplexarray *p = (scomplexarray *) _p;
-   ae_vector_free(&p->val, make_automatic);
+void RVector_free(void *_p, bool make_automatic) {
+   RVector *p = (RVector *) _p;
+   ae_vector_free(p, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -1950,7 +1587,7 @@ namespace alglib_impl {
 //     condition. All other conditions (size of input arrays, etc.) are not
 //     checked too.
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsort(RVector a, ae_int_t n, ZVector p1, ZVector p2) {
+void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2) {
    ae_frame _frame_block;
    ae_frame_make(&_frame_block);
    SetVector(p1);
@@ -1968,7 +1605,7 @@ void tagsort(RVector a, ae_int_t n, ZVector p1, ZVector p2) {
 // It is intended to be used in the performance-critical parts of code, where
 // additional allocations can lead to severe performance degradation
 // ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
+void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf) {
    ae_int_t i;
    ae_int_t lv;
    ae_int_t lp;
@@ -1979,20 +1616,20 @@ void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
       return;
    }
    if (n == 1) {
-      ivectorsetlengthatleast(p1, 1);
-      ivectorsetlengthatleast(p2, 1);
-      p1->ptr.p_int[0] = 0;
-      p2->ptr.p_int[0] = 0;
+      vectorsetlengthatleast(p1, 1);
+      vectorsetlengthatleast(p2, 1);
+      p1->xZ[0] = 0;
+      p2->xZ[0] = 0;
       return;
    }
 // General case, N > 1: prepare permutations table P1
-   ivectorsetlengthatleast(p1, n);
+   vectorsetlengthatleast(p1, n);
    for (i = 0; i < n; i++) {
-      p1->ptr.p_int[i] = i;
+      p1->xZ[i] = i;
    }
 // General case, N > 1: sort, update P1
-   rvectorsetlengthatleast(&buf->ra0, n);
-   ivectorsetlengthatleast(&buf->ia0, n);
+   vectorsetlengthatleast(&buf->ra0, n);
+   vectorsetlengthatleast(&buf->ia0, n);
    tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n);
 // General case, N > 1: fill permutations table P2
 //
@@ -2004,33 +1641,33 @@ void tagsortbuf(RVector a, ae_int_t n, ZVector p1, ZVector p2, apbuffers *buf) {
 //   Left, which is given by position/value pair LP/LV
 //   and Right, which is given by RP/RV
 // and updating PV[] and VP[] correspondingly.
-   ivectorsetlengthatleast(&buf->ia0, n);
-   ivectorsetlengthatleast(&buf->ia1, n);
-   ivectorsetlengthatleast(p2, n);
+   vectorsetlengthatleast(&buf->ia0, n);
+   vectorsetlengthatleast(&buf->ia1, n);
+   vectorsetlengthatleast(p2, n);
    for (i = 0; i < n; i++) {
-      buf->ia0.ptr.p_int[i] = i;
-      buf->ia1.ptr.p_int[i] = i;
+      buf->ia0.xZ[i] = i;
+      buf->ia1.xZ[i] = i;
    }
    for (i = 0; i < n; i++) {
    // calculate LP, LV, RP, RV
       lp = i;
-      lv = buf->ia1.ptr.p_int[lp];
-      rv = p1->ptr.p_int[i];
-      rp = buf->ia0.ptr.p_int[rv];
+      lv = buf->ia1.xZ[lp];
+      rv = p1->xZ[i];
+      rp = buf->ia0.xZ[rv];
    // Fill P2
-      p2->ptr.p_int[i] = rp;
+      p2->xZ[i] = rp;
    // update PV and VP
-      buf->ia1.ptr.p_int[lp] = rv;
-      buf->ia1.ptr.p_int[rp] = lv;
-      buf->ia0.ptr.p_int[lv] = rp;
-      buf->ia0.ptr.p_int[rv] = lp;
+      buf->ia1.xZ[lp] = rv;
+      buf->ia1.xZ[rp] = lv;
+      buf->ia0.xZ[lv] = rp;
+      buf->ia0.xZ[rv] = lp;
    }
 }
 
 // Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t i1, ae_int_t i2) {
+static void tsort_tagsortfastirec(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t i1, ae_int_t i2) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -2054,10 +1691,10 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
       //
       // This code stops immediately if we can leave A[J] at J-th position
       // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->ptr.p_double[j];
+         tmpr = a->xR[j];
          tmpi = j;
          for (k = j - 1; k >= i1; k--) {
-            if (a->ptr.p_double[k] <= tmpr) {
+            if (a->xR[k] <= tmpr) {
                break;
             }
             tmpi = k;
@@ -2065,23 +1702,23 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
          k = tmpi;
       // Insert Jth element into Kth position
          if (k != j) {
-            tmpr = a->ptr.p_double[j];
-            tmpi = b->ptr.p_int[j];
+            tmpr = a->xR[j];
+            tmpi = b->xZ[j];
             for (i = j - 1; i >= k; i--) {
-               a->ptr.p_double[i + 1] = a->ptr.p_double[i];
-               b->ptr.p_int[i + 1] = b->ptr.p_int[i];
+               a->xR[i + 1] = a->xR[i];
+               b->xZ[i + 1] = b->xZ[i];
             }
-            a->ptr.p_double[k] = tmpr;
-            b->ptr.p_int[k] = tmpi;
+            a->xR[k] = tmpr;
+            b->xZ[k] = tmpi;
          }
       }
       return;
    }
 // Quicksort: choose pivot
 // Here we assume that I2-I1 >= 2
-   v0 = a->ptr.p_double[i1];
-   v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
-   v2 = a->ptr.p_double[i2];
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
    if (v0 > v1) {
       tmpr = v1;
       v1 = v0;
@@ -2108,13 +1745,13 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
    cnteq = 0;
    cntgreater = 0;
    for (i = i1; i <= i2; i++) {
-      v0 = a->ptr.p_double[i];
+      v0 = a->xR[i];
       if (v0 < vp) {
       // LESS
          k = i1 + cntless;
          if (i != k) {
-            a->ptr.p_double[k] = v0;
-            b->ptr.p_int[k] = b->ptr.p_int[i];
+            a->xR[k] = v0;
+            b->xZ[k] = b->xZ[i];
          }
          cntless++;
          continue;
@@ -2122,28 +1759,28 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
       if (v0 == vp) {
       // EQUAL
          k = i2 - cnteq;
-         bufa->ptr.p_double[k] = v0;
-         bufb->ptr.p_int[k] = b->ptr.p_int[i];
+         bufa->xR[k] = v0;
+         bufb->xZ[k] = b->xZ[i];
          cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
-      bufa->ptr.p_double[k] = v0;
-      bufb->ptr.p_int[k] = b->ptr.p_int[i];
+      bufa->xR[k] = v0;
+      bufb->xZ[k] = b->xZ[i];
       cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
       k = i2 + i - (cnteq - 1);
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
-      b->ptr.p_int[j] = bufb->ptr.p_int[k];
+      a->xR[j] = bufa->xR[k];
+      b->xZ[j] = bufb->xZ[k];
    }
    for (i = 0; i < cntgreater; i++) {
       j = i1 + cntless + cnteq + i;
       k = i1 + i;
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
-      b->ptr.p_int[j] = bufb->ptr.p_int[k];
+      a->xR[j] = bufa->xR[k];
+      b->xZ[j] = bufb->xZ[k];
    }
 // Sort left and right parts of the array (ignoring middle part)
    tsort_tagsortfastirec(a, b, bufa, bufb, i1, i1 + cntless - 1);
@@ -2162,7 +1799,7 @@ static void tsort_tagsortfastirec(RVector a, ZVector b, RVector bufa, ZVector bu
 //     They may be preallocated (which will save some time) or not, in which
 //     case function will automatically allocate memory.
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) {
+void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool isascending;
@@ -2177,8 +1814,8 @@ void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) 
    isascending = true;
    isdescending = true;
    for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
    }
    if (isascending) {
       return;
@@ -2189,12 +1826,12 @@ void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) 
          if (j <= i) {
             break;
          }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
-         tmpi = b->ptr.p_int[i];
-         b->ptr.p_int[i] = b->ptr.p_int[j];
-         b->ptr.p_int[j] = tmpi;
+         tmpr = a->xR[i];
+         a->xR[i] = a->xR[j];
+         a->xR[j] = tmpr;
+         tmpi = b->xZ[i];
+         b->xZ[i] = b->xZ[j];
+         b->xZ[j] = tmpi;
       }
       return;
    }
@@ -2211,7 +1848,7 @@ void tagsortfasti(RVector a, ZVector b, RVector bufa, ZVector bufb, ae_int_t n) 
 // Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t i1, ae_int_t i2) {
+static void tsort_tagsortfastrrec(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t i1, ae_int_t i2) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -2236,10 +1873,10 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
       //
       // This code stops immediatly if we can leave A[J] at J-th position
       // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->ptr.p_double[j];
+         tmpr = a->xR[j];
          tmpi = j;
          for (k = j - 1; k >= i1; k--) {
-            if (a->ptr.p_double[k] <= tmpr) {
+            if (a->xR[k] <= tmpr) {
                break;
             }
             tmpi = k;
@@ -2247,23 +1884,23 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
          k = tmpi;
       // Insert Jth element into Kth position
          if (k != j) {
-            tmpr = a->ptr.p_double[j];
-            tmpr2 = b->ptr.p_double[j];
+            tmpr = a->xR[j];
+            tmpr2 = b->xR[j];
             for (i = j - 1; i >= k; i--) {
-               a->ptr.p_double[i + 1] = a->ptr.p_double[i];
-               b->ptr.p_double[i + 1] = b->ptr.p_double[i];
+               a->xR[i + 1] = a->xR[i];
+               b->xR[i + 1] = b->xR[i];
             }
-            a->ptr.p_double[k] = tmpr;
-            b->ptr.p_double[k] = tmpr2;
+            a->xR[k] = tmpr;
+            b->xR[k] = tmpr2;
          }
       }
       return;
    }
 // Quicksort: choose pivot
 // Here we assume that I2-I1 >= 16
-   v0 = a->ptr.p_double[i1];
-   v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
-   v2 = a->ptr.p_double[i2];
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
    if (v0 > v1) {
       tmpr = v1;
       v1 = v0;
@@ -2290,13 +1927,13 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
    cnteq = 0;
    cntgreater = 0;
    for (i = i1; i <= i2; i++) {
-      v0 = a->ptr.p_double[i];
+      v0 = a->xR[i];
       if (v0 < vp) {
       // LESS
          k = i1 + cntless;
          if (i != k) {
-            a->ptr.p_double[k] = v0;
-            b->ptr.p_double[k] = b->ptr.p_double[i];
+            a->xR[k] = v0;
+            b->xR[k] = b->xR[i];
          }
          cntless++;
          continue;
@@ -2304,28 +1941,28 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
       if (v0 == vp) {
       // EQUAL
          k = i2 - cnteq;
-         bufa->ptr.p_double[k] = v0;
-         bufb->ptr.p_double[k] = b->ptr.p_double[i];
+         bufa->xR[k] = v0;
+         bufb->xR[k] = b->xR[i];
          cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
-      bufa->ptr.p_double[k] = v0;
-      bufb->ptr.p_double[k] = b->ptr.p_double[i];
+      bufa->xR[k] = v0;
+      bufb->xR[k] = b->xR[i];
       cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
       k = i2 + i - (cnteq - 1);
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
-      b->ptr.p_double[j] = bufb->ptr.p_double[k];
+      a->xR[j] = bufa->xR[k];
+      b->xR[j] = bufb->xR[k];
    }
    for (i = 0; i < cntgreater; i++) {
       j = i1 + cntless + cnteq + i;
       k = i1 + i;
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
-      b->ptr.p_double[j] = bufb->ptr.p_double[k];
+      a->xR[j] = bufa->xR[k];
+      b->xR[j] = bufb->xR[k];
    }
 // Sort left and right parts of the array (ignoring middle part)
    tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i1 + cntless - 1);
@@ -2344,7 +1981,7 @@ static void tsort_tagsortfastrrec(RVector a, RVector b, RVector bufa, RVector bu
 //     They may be preallocated (which will save some time) or not, in which
 //     case function will automatically allocate memory.
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) {
+void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool isascending;
@@ -2358,8 +1995,8 @@ void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) 
    isascending = true;
    isdescending = true;
    for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
    }
    if (isascending) {
       return;
@@ -2370,12 +2007,12 @@ void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) 
          if (j <= i) {
             break;
          }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
-         tmpr = b->ptr.p_double[i];
-         b->ptr.p_double[i] = b->ptr.p_double[j];
-         b->ptr.p_double[j] = tmpr;
+         tmpr = a->xR[i];
+         a->xR[i] = a->xR[j];
+         a->xR[j] = tmpr;
+         tmpr = b->xR[i];
+         b->xR[i] = b->xR[j];
+         b->xR[j] = tmpr;
       }
       return;
    }
@@ -2392,7 +2029,7 @@ void tagsortfastr(RVector a, RVector b, RVector bufa, RVector bufb, ae_int_t n) 
 // Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
 // applies same permutations to B.
 // ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t i2) {
+static void tsort_tagsortfastrec(RVector *a, RVector *bufa, ae_int_t i1, ae_int_t i2) {
    ae_int_t cntless;
    ae_int_t cnteq;
    ae_int_t cntgreater;
@@ -2416,10 +2053,10 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
       //
       // This code stops immediatly if we can leave A[J] at J-th position
       // (all elements have same value of A[J] larger than any of them)
-         tmpr = a->ptr.p_double[j];
+         tmpr = a->xR[j];
          tmpi = j;
          for (k = j - 1; k >= i1; k--) {
-            if (a->ptr.p_double[k] <= tmpr) {
+            if (a->xR[k] <= tmpr) {
                break;
             }
             tmpi = k;
@@ -2427,20 +2064,20 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
          k = tmpi;
       // Insert Jth element into Kth position
          if (k != j) {
-            tmpr = a->ptr.p_double[j];
+            tmpr = a->xR[j];
             for (i = j - 1; i >= k; i--) {
-               a->ptr.p_double[i + 1] = a->ptr.p_double[i];
+               a->xR[i + 1] = a->xR[i];
             }
-            a->ptr.p_double[k] = tmpr;
+            a->xR[k] = tmpr;
          }
       }
       return;
    }
 // Quicksort: choose pivot
 // Here we assume that I2-I1 >= 16
-   v0 = a->ptr.p_double[i1];
-   v1 = a->ptr.p_double[i1 + (i2 - i1) / 2];
-   v2 = a->ptr.p_double[i2];
+   v0 = a->xR[i1];
+   v1 = a->xR[i1 + (i2 - i1) / 2];
+   v2 = a->xR[i2];
    if (v0 > v1) {
       tmpr = v1;
       v1 = v0;
@@ -2467,12 +2104,12 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
    cnteq = 0;
    cntgreater = 0;
    for (i = i1; i <= i2; i++) {
-      v0 = a->ptr.p_double[i];
+      v0 = a->xR[i];
       if (v0 < vp) {
       // LESS
          k = i1 + cntless;
          if (i != k) {
-            a->ptr.p_double[k] = v0;
+            a->xR[k] = v0;
          }
          cntless++;
          continue;
@@ -2480,24 +2117,24 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
       if (v0 == vp) {
       // EQUAL
          k = i2 - cnteq;
-         bufa->ptr.p_double[k] = v0;
+         bufa->xR[k] = v0;
          cnteq++;
          continue;
       }
    // GREATER
       k = i1 + cntgreater;
-      bufa->ptr.p_double[k] = v0;
+      bufa->xR[k] = v0;
       cntgreater++;
    }
    for (i = 0; i < cnteq; i++) {
       j = i1 + cntless + cnteq - 1 - i;
       k = i2 + i - (cnteq - 1);
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
+      a->xR[j] = bufa->xR[k];
    }
    for (i = 0; i < cntgreater; i++) {
       j = i1 + cntless + cnteq + i;
       k = i1 + i;
-      a->ptr.p_double[j] = bufa->ptr.p_double[k];
+      a->xR[j] = bufa->xR[k];
    }
 // Sort left and right parts of the array (ignoring middle part)
    tsort_tagsortfastrec(a, bufa, i1, i1 + cntless - 1);
@@ -2516,7 +2153,7 @@ static void tsort_tagsortfastrec(RVector a, RVector bufa, ae_int_t i1, ae_int_t 
 //     preallocated (which will save some time) or not, in which case
 //     function will automatically allocate memory.
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
+void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    bool isascending;
@@ -2530,8 +2167,8 @@ void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
    isascending = true;
    isdescending = true;
    for (i = 1; i < n; i++) {
-      isascending = isascending && a->ptr.p_double[i] >= a->ptr.p_double[i - 1];
-      isdescending = isdescending && a->ptr.p_double[i] <= a->ptr.p_double[i - 1];
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
    }
    if (isascending) {
       return;
@@ -2542,9 +2179,9 @@ void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
          if (j <= i) {
             break;
          }
-         tmpr = a->ptr.p_double[i];
-         a->ptr.p_double[i] = a->ptr.p_double[j];
-         a->ptr.p_double[j] = tmpr;
+         tmpr = a->xR[i];
+         a->xR[i] = a->xR[j];
+         a->xR[j] = tmpr;
       }
       return;
    }
@@ -2565,7 +2202,7 @@ void tagsortfast(RVector a, RVector bufa, ae_int_t n) {
 //     condition. All other conditions (size of input arrays, etc.) are not
 //     checked too.
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
+void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t offset, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t t;
@@ -2588,29 +2225,29 @@ void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
          k = t / 2;
          p0 = offset + k - 1;
          p1 = offset + t - 1;
-         ak = a->ptr.p_int[p0];
-         at = a->ptr.p_int[p1];
+         ak = a->xZ[p0];
+         at = a->xZ[p1];
          if (ak >= at) {
             break;
          }
-         a->ptr.p_int[p0] = at;
-         a->ptr.p_int[p1] = ak;
-         tmpr = b->ptr.p_double[p0];
-         b->ptr.p_double[p0] = b->ptr.p_double[p1];
-         b->ptr.p_double[p1] = tmpr;
+         a->xZ[p0] = at;
+         a->xZ[p1] = ak;
+         tmpr = b->xR[p0];
+         b->xR[p0] = b->xR[p1];
+         b->xR[p1] = tmpr;
          t = k;
       }
    }
    for (i = n - 1; i >= 1; i--) {
       p0 = offset + 0;
       p1 = offset + i;
-      tmp = a->ptr.p_int[p1];
-      a->ptr.p_int[p1] = a->ptr.p_int[p0];
-      a->ptr.p_int[p0] = tmp;
+      tmp = a->xZ[p1];
+      a->xZ[p1] = a->xZ[p0];
+      a->xZ[p0] = tmp;
       at = tmp;
-      tmpr = b->ptr.p_double[p1];
-      b->ptr.p_double[p1] = b->ptr.p_double[p0];
-      b->ptr.p_double[p0] = tmpr;
+      tmpr = b->xR[p1];
+      b->xR[p1] = b->xR[p0];
+      b->xR[p0] = tmpr;
       bt = tmpr;
       t = 0;
       while (true) {
@@ -2620,9 +2257,9 @@ void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
          }
          p0 = offset + t;
          p1 = offset + k;
-         ak = a->ptr.p_int[p1];
+         ak = a->xZ[p1];
          if (k + 1 < i) {
-            ak1 = a->ptr.p_int[p1 + 1];
+            ak1 = a->xZ[p1 + 1];
             if (ak1 > ak) {
                ak = ak1;
                p1++;
@@ -2632,10 +2269,10 @@ void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
          if (at >= ak) {
             break;
          }
-         a->ptr.p_int[p1] = at;
-         a->ptr.p_int[p0] = ak;
-         b->ptr.p_double[p0] = b->ptr.p_double[p1];
-         b->ptr.p_double[p1] = bt;
+         a->xZ[p1] = at;
+         a->xZ[p0] = ak;
+         b->xR[p0] = b->xR[p1];
+         b->xR[p1] = bt;
          t = k;
       }
    }
@@ -2644,7 +2281,7 @@ void tagsortmiddleir(ZVector a, RVector b, ae_int_t offset, ae_int_t n) {
 // Sorting function optimized for integer values (only keys, no labels),  can
 // be used to sort middle of the array
 // ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
+void sortmiddlei(ZVector *a, ae_int_t offset, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t t;
@@ -2665,22 +2302,22 @@ void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
          k = t / 2;
          p0 = offset + k - 1;
          p1 = offset + t - 1;
-         ak = a->ptr.p_int[p0];
-         at = a->ptr.p_int[p1];
+         ak = a->xZ[p0];
+         at = a->xZ[p1];
          if (ak >= at) {
             break;
          }
-         a->ptr.p_int[p0] = at;
-         a->ptr.p_int[p1] = ak;
+         a->xZ[p0] = at;
+         a->xZ[p1] = ak;
          t = k;
       }
    }
    for (i = n - 1; i >= 1; i--) {
       p0 = offset + 0;
       p1 = offset + i;
-      tmp = a->ptr.p_int[p1];
-      a->ptr.p_int[p1] = a->ptr.p_int[p0];
-      a->ptr.p_int[p0] = tmp;
+      tmp = a->xZ[p1];
+      a->xZ[p1] = a->xZ[p0];
+      a->xZ[p0] = tmp;
       at = tmp;
       t = 0;
       while (true) {
@@ -2690,9 +2327,9 @@ void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
          }
          p0 = offset + t;
          p1 = offset + k;
-         ak = a->ptr.p_int[p1];
+         ak = a->xZ[p1];
          if (k + 1 < i) {
-            ak1 = a->ptr.p_int[p1 + 1];
+            ak1 = a->xZ[p1 + 1];
             if (ak1 > ak) {
                ak = ak1;
                p1++;
@@ -2702,8 +2339,8 @@ void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
          if (at >= ak) {
             break;
          }
-         a->ptr.p_int[p1] = at;
-         a->ptr.p_int[p0] = ak;
+         a->xZ[p1] = at;
+         a->xZ[p0] = ak;
          t = k;
       }
    }
@@ -2720,7 +2357,7 @@ void sortmiddlei(ZVector a, ae_int_t offset, ae_int_t n) {
 //     VA      -   value of the element being added
 //     VB      -   value of the tag
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
+void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb) {
    ae_int_t j;
    ae_int_t k;
    double v;
@@ -2729,8 +2366,8 @@ void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
    }
 // N=0 is a special case
    if (*n == 0) {
-      a->ptr.p_double[0] = va;
-      b->ptr.p_int[0] = vb;
+      a->xR[0] = va;
+      b->xZ[0] = vb;
       ++*n;
       return;
    }
@@ -2744,19 +2381,19 @@ void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
    ++*n;
    while (j > 0) {
       k = (j - 1) / 2;
-      v = a->ptr.p_double[k];
+      v = a->xR[k];
       if (v < va) {
       // swap with higher element
-         a->ptr.p_double[j] = v;
-         b->ptr.p_int[j] = b->ptr.p_int[k];
+         a->xR[j] = v;
+         b->xZ[j] = b->xZ[k];
          j = k;
       } else {
       // element in its place. terminate.
          break;
       }
    }
-   a->ptr.p_double[j] = va;
-   b->ptr.p_int[j] = vb;
+   a->xR[j] = va;
+   b->xZ[j] = vb;
 }
 
 // Heap operations: replaces top element with new element
@@ -2770,7 +2407,7 @@ void tagheappushi(RVector a, ZVector b, ae_int_t *n, double va, ae_int_t vb) {
 //     VA      -   value of the element which replaces top element
 //     VB      -   value of the tag
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb) {
+void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb) {
    ae_int_t j;
    ae_int_t k1;
    ae_int_t k2;
@@ -2782,8 +2419,8 @@ void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb
    }
 // N=1 is a special case
    if (n == 1) {
-      a->ptr.p_double[0] = va;
-      b->ptr.p_int[0] = vb;
+      a->xR[0] = va;
+      b->xZ[0] = vb;
       return;
    }
 // move down through heap:
@@ -2803,29 +2440,29 @@ void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb
       //
       // swap and terminate (because this child
       // have no siblings due to heap structure)
-         v = a->ptr.p_double[k1];
+         v = a->xR[k1];
          if (v > va) {
-            a->ptr.p_double[j] = v;
-            b->ptr.p_int[j] = b->ptr.p_int[k1];
+            a->xR[j] = v;
+            b->xZ[j] = b->xZ[k1];
             j = k1;
          }
          break;
       } else {
       // two childs
-         v1 = a->ptr.p_double[k1];
-         v2 = a->ptr.p_double[k2];
+         v1 = a->xR[k1];
+         v2 = a->xR[k2];
          if (v1 > v2) {
             if (va < v1) {
-               a->ptr.p_double[j] = v1;
-               b->ptr.p_int[j] = b->ptr.p_int[k1];
+               a->xR[j] = v1;
+               b->xZ[j] = b->xZ[k1];
                j = k1;
             } else {
                break;
             }
          } else {
             if (va < v2) {
-               a->ptr.p_double[j] = v2;
-               b->ptr.p_int[j] = b->ptr.p_int[k2];
+               a->xR[j] = v2;
+               b->xZ[j] = b->xZ[k2];
                j = k2;
             } else {
                break;
@@ -2835,8 +2472,8 @@ void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb
          k2 = 2 * j + 2;
       }
    }
-   a->ptr.p_double[j] = va;
-   b->ptr.p_int[j] = vb;
+   a->xR[j] = va;
+   b->xZ[j] = vb;
 }
 
 // Heap operations: pops top element from the heap
@@ -2850,7 +2487,7 @@ void tagheapreplacetopi(RVector a, ZVector b, ae_int_t n, double va, ae_int_t vb
 // On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
 // decreased by 1.
 // ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappopi(RVector a, ZVector b, ae_int_t *n) {
+void tagheappopi(RVector *a, ZVector *b, ae_int_t *n) {
    double va;
    ae_int_t vb;
    if (*n < 1) {
@@ -2863,10 +2500,10 @@ void tagheappopi(RVector a, ZVector b, ae_int_t *n) {
    }
 // swap top element and last element,
 // then reorder heap
-   va = a->ptr.p_double[*n - 1];
-   vb = b->ptr.p_int[*n - 1];
-   a->ptr.p_double[*n - 1] = a->ptr.p_double[0];
-   b->ptr.p_int[*n - 1] = b->ptr.p_int[0];
+   va = a->xR[*n - 1];
+   vb = b->xZ[*n - 1];
+   a->xR[*n - 1] = a->xR[0];
+   b->xZ[*n - 1] = b->xZ[0];
    --*n;
    tagheapreplacetopi(a, b, *n, va, vb);
 }
@@ -2881,7 +2518,7 @@ void tagheappopi(RVector a, ZVector b, ae_int_t *n) {
 // Result:
 //     The very first element's index, which isn't less than T.
 // In the case when there aren't such elements, returns N.
-ae_int_t lowerbound(RVector a, ae_int_t n, double t) {
+ae_int_t lowerbound(RVector *a, ae_int_t n, double t) {
    ae_int_t l;
    ae_int_t half;
    ae_int_t first;
@@ -2892,7 +2529,7 @@ ae_int_t lowerbound(RVector a, ae_int_t n, double t) {
    while (l > 0) {
       half = l / 2;
       middle = first + half;
-      if (a->ptr.p_double[middle] < t) {
+      if (a->xR[middle] < t) {
          first = middle + 1;
          l -= half + 1;
       } else {
@@ -2913,7 +2550,7 @@ ae_int_t lowerbound(RVector a, ae_int_t n, double t) {
 // Result:
 //     The very first element's index, which more than T.
 // In the case when there aren't such elements, returns N.
-ae_int_t upperbound(RVector a, ae_int_t n, double t) {
+ae_int_t upperbound(RVector *a, ae_int_t n, double t) {
    ae_int_t l;
    ae_int_t half;
    ae_int_t first;
@@ -2924,7 +2561,7 @@ ae_int_t upperbound(RVector a, ae_int_t n, double t) {
    while (l > 0) {
       half = l / 2;
       middle = first + half;
-      if (t < a->ptr.p_double[middle]) {
+      if (t < a->xR[middle]) {
          l = half;
       } else {
          first = middle + 1;
@@ -2941,7 +2578,7 @@ namespace alglib_impl {
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, double alpha, RVector u, ae_int_t iu, RVector v, ae_int_t iv) {
+bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -2954,7 +2591,7 @@ bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, 
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja, CVector u, ae_int_t iu, CVector v, ae_int_t iv) {
+bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -2967,7 +2604,7 @@ bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, RVector u, ae_int_t iu, RVector v, ae_int_t iv) {
+bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -2980,7 +2617,7 @@ bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector x, ae_int_t ix, CVector y, ae_int_t iy) {
+bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -2993,7 +2630,7 @@ bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja, a
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector x, ae_int_t ix, RVector y, ae_int_t iy) {
+bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3006,7 +2643,7 @@ bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, a
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector x, ae_int_t ix, double beta, RVector y, ae_int_t iy) {
+bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3019,7 +2656,7 @@ bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix a, ae_int_t ia
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixtrsvmkl(ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector x, ae_int_t ix) {
+bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3032,7 +2669,7 @@ bool rmatrixtrsvmkl(ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, bool isuppe
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3045,7 +2682,7 @@ bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3058,7 +2695,7 @@ bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix a, ae_int_t ia
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3071,7 +2708,7 @@ bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a,
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 01.10.2017 by Sergey Bochkanov
-bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, bool isupper, RVector x, ae_int_t ix, double beta, RVector y, ae_int_t iy) {
+bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3084,7 +2721,7 @@ bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix a, ae_int_t ia, ae_int_t j
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix c, ae_int_t ic, ae_int_t jc) {
+bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3097,7 +2734,7 @@ bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatri
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3110,7 +2747,7 @@ bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3123,7 +2760,7 @@ bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3136,7 +2773,7 @@ bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t
 // MKL-based kernel
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3155,7 +2792,7 @@ bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_
 // (True on succeess).
 //
 // ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool spdmatrixcholeskymkl(RMatrix a, ae_int_t offs, ae_int_t n, bool isupper, bool *cholresult) {
+bool spdmatrixcholeskymkl(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool *cholresult) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3168,7 +2805,7 @@ bool spdmatrixcholeskymkl(RMatrix a, ae_int_t offs, ae_int_t n, bool isupper, bo
 // MKL-based kernel.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixplumkl(RMatrix a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector pivots) {
+bool rmatrixplumkl(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3184,7 +2821,7 @@ bool rmatrixplumkl(RMatrix a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector piv
 //       D and E must be at least max(M,N)-wide.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdmkl(RMatrix a, ae_int_t m, ae_int_t n, RVector d, RVector e, RVector tauq, RVector taup) {
+bool rmatrixbdmkl(RMatrix *a, ae_int_t m, ae_int_t n, RVector *d, RVector *e, RVector *tauq, RVector *taup) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3200,7 +2837,7 @@ bool rmatrixbdmkl(RMatrix a, ae_int_t m, ae_int_t n, RVector d, RVector e, RVect
 // If ByQ is False, TauQ is not used (can be empty array).
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdmultiplybymkl(RMatrix qp, ae_int_t m, ae_int_t n, RVector tauq, RVector taup, RMatrix z, ae_int_t zrows, ae_int_t zcolumns, bool byq, bool fromtheright, bool dotranspose) {
+bool rmatrixbdmultiplybymkl(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool byq, bool fromtheright, bool dotranspose) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3215,7 +2852,7 @@ bool rmatrixbdmultiplybymkl(RMatrix qp, ae_int_t m, ae_int_t n, RVector tauq, RV
 // NOTE: Tau must be preallocated array with at least N-1 elements.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixhessenbergmkl(RMatrix a, ae_int_t n, RVector tau) {
+bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3230,7 +2867,7 @@ bool rmatrixhessenbergmkl(RMatrix a, ae_int_t n, RVector tau) {
 // NOTE: Q must be preallocated N*N array
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixhessenbergunpackqmkl(RMatrix a, ae_int_t n, RVector tau, RMatrix q) {
+bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3247,7 +2884,7 @@ bool rmatrixhessenbergunpackqmkl(RMatrix a, ae_int_t n, RVector tau, RMatrix q) 
 //       length(D)=N (or larger)
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdmkl(RMatrix a, ae_int_t n, bool isupper, RVector tau, RVector d, RVector e) {
+bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3262,7 +2899,7 @@ bool smatrixtdmkl(RMatrix a, ae_int_t n, bool isupper, RVector tau, RVector d, R
 // NOTE: Q must be preallocated N*N array
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdunpackqmkl(RMatrix a, ae_int_t n, bool isupper, RVector tau, RMatrix q) {
+bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3279,7 +2916,7 @@ bool smatrixtdunpackqmkl(RMatrix a, ae_int_t n, bool isupper, RVector tau, RMatr
 //       length(D)=N (or larger)
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool hmatrixtdmkl(CMatrix a, ae_int_t n, bool isupper, CVector tau, RVector d, RVector e) {
+bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3294,7 +2931,7 @@ bool hmatrixtdmkl(CMatrix a, ae_int_t n, bool isupper, CVector tau, RVector d, R
 // NOTE: Q must be preallocated N*N array
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool hmatrixtdunpackqmkl(CMatrix a, ae_int_t n, bool isupper, CVector tau, CMatrix q) {
+bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3315,7 +2952,7 @@ bool hmatrixtdunpackqmkl(CMatrix a, ae_int_t n, bool isupper, CVector tau, CMatr
 // SVDResult is modified if and only if MKL is present.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdsvdmkl(RVector d, RVector e, ae_int_t n, bool isupper, RMatrix u, ae_int_t nru, RMatrix c, ae_int_t ncc, RMatrix vt, ae_int_t ncvt, bool *svdresult) {
+bool rmatrixbdsvdmkl(RVector *d, RVector *e, ae_int_t n, bool isupper, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, bool *svdresult) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3333,7 +2970,7 @@ bool rmatrixbdsvdmkl(RVector d, RVector e, ae_int_t n, bool isupper, RMatrix u, 
 // Z is pre-allocated array[N,N].
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixinternalschurdecompositionmkl(RMatrix h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector wr, RVector wi, RMatrix z, ae_int_t *info) {
+bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3353,7 +2990,7 @@ bool rmatrixinternalschurdecompositionmkl(RMatrix h, ae_int_t n, ae_int_t tneede
 // variables is not required, it can be dummy (empty) array.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixinternaltrevcmkl(RMatrix t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix vl, RMatrix vr, ae_int_t *m, ae_int_t *info) {
+bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3376,7 +3013,7 @@ bool rmatrixinternaltrevcmkl(RMatrix t, ae_int_t n, ae_int_t side, ae_int_t howm
 // EVDResult is modified if and only if MKL is present.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdevdmkl(RVector d, RVector e, ae_int_t n, ae_int_t zneeded, RMatrix z, bool *evdresult) {
+bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, bool *evdresult) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3399,7 +3036,7 @@ bool smatrixtdevdmkl(RVector d, RVector e, ae_int_t n, ae_int_t zneeded, RMatrix
 // EVDResult is modified if and only if MKL is present.
 //
 // ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector vals, ZVector cidx, ZVector ridx, RVector x, ae_int_t ix, double beta, RVector y, ae_int_t iy) {
+bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector *vals, ZVector *cidx, ZVector *ridx, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
 #ifndef ALGLIB_INTERCEPTS_MKL
    bool result;
    result = false;
@@ -3415,7 +3052,7 @@ namespace alglib_impl {
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, double ralpha, RVector u, ae_int_t iu, RVector v, ae_int_t iv) {
+bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double ralpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3428,7 +3065,7 @@ bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, do
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja, CVector u, ae_int_t iu, CVector v, ae_int_t iv) {
+bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3441,7 +3078,7 @@ bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t ia, ae_int_t ja, 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, RVector u, ae_int_t iu, RVector v, ae_int_t iv) {
+bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3454,7 +3091,7 @@ bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t ia, ae_int_t ja, 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3467,7 +3104,7 @@ bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix x, ae_int_t i2, ae_int_t j2) {
+bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3480,7 +3117,7 @@ bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix a, ae_int_t i1, ae_int_t j
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3493,7 +3130,7 @@ bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix x, ae_int_t i2, ae_int_t j2) {
+bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3506,7 +3143,7 @@ bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix a, ae_int_t i1, ae_int_t j
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3519,7 +3156,7 @@ bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix a, ae_int_t ia, 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix c, ae_int_t ic, ae_int_t jc, bool isupper) {
+bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3532,7 +3169,7 @@ bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, 
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3545,7 +3182,7 @@ bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, a
 // Fast kernel
 //
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
-bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix c, ae_int_t ic, ae_int_t jc) {
+bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
    bool result;
    result = false;
@@ -3600,7 +3237,7 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix c, ae_int_t ic, ae_int_t jc) {
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
    ae_complex v;
@@ -3651,13 +3288,13 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
          if (ae_c_neq_d(beta, 0.0)) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c->ptr.pp_complex[ic + i][jc + j] = ae_c_mul(beta, c->ptr.pp_complex[ic + i][jc + j]);
+                  c->xyC[ic + i][jc + j] = ae_c_mul(beta, c->xyC[ic + i][jc + j]);
                }
             }
          } else {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c->ptr.pp_complex[ic + i][jc + j] = ae_complex_from_i(0);
+                  c->xyC[ic + i][jc + j] = ae_complex_from_i(0);
                }
             }
          }
@@ -3714,40 +3351,40 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
             }
             for (t = 0; t < k; t++) {
                if (optypea == 0) {
-                  a0x = a->ptr.pp_complex[idxa0][offsa].x;
-                  a0y = a->ptr.pp_complex[idxa0][offsa].y;
-                  a1x = a->ptr.pp_complex[idxa1][offsa].x;
-                  a1y = a->ptr.pp_complex[idxa1][offsa].y;
+                  a0x = a->xyC[idxa0][offsa].x;
+                  a0y = a->xyC[idxa0][offsa].y;
+                  a1x = a->xyC[idxa1][offsa].x;
+                  a1y = a->xyC[idxa1][offsa].y;
                }
                if (optypea == 1) {
-                  a0x = a->ptr.pp_complex[offsa][idxa0].x;
-                  a0y = a->ptr.pp_complex[offsa][idxa0].y;
-                  a1x = a->ptr.pp_complex[offsa][idxa1].x;
-                  a1y = a->ptr.pp_complex[offsa][idxa1].y;
+                  a0x = a->xyC[offsa][idxa0].x;
+                  a0y = a->xyC[offsa][idxa0].y;
+                  a1x = a->xyC[offsa][idxa1].x;
+                  a1y = a->xyC[offsa][idxa1].y;
                }
                if (optypea == 2) {
-                  a0x = a->ptr.pp_complex[offsa][idxa0].x;
-                  a0y = -a->ptr.pp_complex[offsa][idxa0].y;
-                  a1x = a->ptr.pp_complex[offsa][idxa1].x;
-                  a1y = -a->ptr.pp_complex[offsa][idxa1].y;
+                  a0x = a->xyC[offsa][idxa0].x;
+                  a0y = -a->xyC[offsa][idxa0].y;
+                  a1x = a->xyC[offsa][idxa1].x;
+                  a1y = -a->xyC[offsa][idxa1].y;
                }
                if (optypeb == 0) {
-                  b0x = b->ptr.pp_complex[offsb][idxb0].x;
-                  b0y = b->ptr.pp_complex[offsb][idxb0].y;
-                  b1x = b->ptr.pp_complex[offsb][idxb1].x;
-                  b1y = b->ptr.pp_complex[offsb][idxb1].y;
+                  b0x = b->xyC[offsb][idxb0].x;
+                  b0y = b->xyC[offsb][idxb0].y;
+                  b1x = b->xyC[offsb][idxb1].x;
+                  b1y = b->xyC[offsb][idxb1].y;
                }
                if (optypeb == 1) {
-                  b0x = b->ptr.pp_complex[idxb0][offsb].x;
-                  b0y = b->ptr.pp_complex[idxb0][offsb].y;
-                  b1x = b->ptr.pp_complex[idxb1][offsb].x;
-                  b1y = b->ptr.pp_complex[idxb1][offsb].y;
+                  b0x = b->xyC[idxb0][offsb].x;
+                  b0y = b->xyC[idxb0][offsb].y;
+                  b1x = b->xyC[idxb1][offsb].x;
+                  b1y = b->xyC[idxb1][offsb].y;
                }
                if (optypeb == 2) {
-                  b0x = b->ptr.pp_complex[idxb0][offsb].x;
-                  b0y = -b->ptr.pp_complex[idxb0][offsb].y;
-                  b1x = b->ptr.pp_complex[idxb1][offsb].x;
-                  b1y = -b->ptr.pp_complex[idxb1][offsb].y;
+                  b0x = b->xyC[idxb0][offsb].x;
+                  b0y = -b->xyC[idxb0][offsb].y;
+                  b1x = b->xyC[idxb1][offsb].x;
+                  b1y = -b->xyC[idxb1][offsb].y;
                }
                v00x += a0x * b0x - a0y * b0y;
                v00y += a0x * b0y + a0y * b0x;
@@ -3765,22 +3402,22 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
             v01 = ae_complex_from_d(v01x, v01y);
             v11 = ae_complex_from_d(v11x, v11y);
             if (ae_c_eq_d(beta, 0.0)) {
-               c->ptr.pp_complex[ic + i][jc + j] = ae_c_mul(alpha, v00);
-               c->ptr.pp_complex[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
-               c->ptr.pp_complex[ic + i + 1][jc + j] = ae_c_mul(alpha, v10);
-               c->ptr.pp_complex[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
+               c->xyC[ic + i][jc + j] = ae_c_mul(alpha, v00);
+               c->xyC[ic + i][jc + j + 1] = ae_c_mul(alpha, v01);
+               c->xyC[ic + i + 1][jc + j] = ae_c_mul(alpha, v10);
+               c->xyC[ic + i + 1][jc + j + 1] = ae_c_mul(alpha, v11);
             } else {
-               c->ptr.pp_complex[ic + i][jc + j] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i][jc + j]), ae_c_mul(alpha, v00));
-               c->ptr.pp_complex[ic + i][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i][jc + j + 1]), ae_c_mul(alpha, v01));
-               c->ptr.pp_complex[ic + i + 1][jc + j] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 1][jc + j]), ae_c_mul(alpha, v10));
-               c->ptr.pp_complex[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
+               c->xyC[ic + i][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j]), ae_c_mul(alpha, v00));
+               c->xyC[ic + i][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i][jc + j + 1]), ae_c_mul(alpha, v01));
+               c->xyC[ic + i + 1][jc + j] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j]), ae_c_mul(alpha, v10));
+               c->xyC[ic + i + 1][jc + j + 1] = ae_c_add(ae_c_mul(beta, c->xyC[ic + i + 1][jc + j + 1]), ae_c_mul(alpha, v11));
             }
          } else {
          // Determine submatrix [I0..I1]x[J0..J1] to process
             i0 = i;
-            i1 = ae_minint(i + 1, m - 1);
+            i1 = imin2(i + 1, m - 1);
             j0 = j;
-            j1 = ae_minint(j + 1, n - 1);
+            j1 = imin2(j + 1, n - 1);
          // Process submatrix
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
@@ -3789,37 +3426,37 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
                   } else {
                      v = ae_complex_from_d(0.0);
                      if (optypea == 0 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia + ik][ja], 1, "N", &b->ptr.pp_complex[ib][jb + jk], b->stride, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
                      }
                      if (optypea == 0 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia + ik][ja], 1, "N", &b->ptr.pp_complex[ib + jk][jb], 1, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "N", k);
                      }
                      if (optypea == 0 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia + ik][ja], 1, "N", &b->ptr.pp_complex[ib + jk][jb], 1, "Conj", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia + ik][ja], 1, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
                      }
                      if (optypea == 1 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "N", &b->ptr.pp_complex[ib][jb + jk], b->stride, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib][jb + jk], b->stride, "N", k);
                      }
                      if (optypea == 1 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "N", &b->ptr.pp_complex[ib + jk][jb], 1, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "N", k);
                      }
                      if (optypea == 1 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "N", &b->ptr.pp_complex[ib + jk][jb], 1, "Conj", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "N", &b->xyC[ib + jk][jb], 1, "Conj", k);
                      }
                      if (optypea == 2 && optypeb == 0) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "Conj", &b->ptr.pp_complex[ib][jb + jk], b->stride, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib][jb + jk], b->stride, "N", k);
                      }
                      if (optypea == 2 && optypeb == 1) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "Conj", &b->ptr.pp_complex[ib + jk][jb], 1, "N", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "N", k);
                      }
                      if (optypea == 2 && optypeb == 2) {
-                        v = ae_v_cdotproduct(&a->ptr.pp_complex[ia][ja + ik], a->stride, "Conj", &b->ptr.pp_complex[ib + jk][jb], 1, "Conj", k);
+                        v = ae_v_cdotproduct(&a->xyC[ia][ja + ik], a->stride, "Conj", &b->xyC[ib + jk][jb], 1, "Conj", k);
                      }
                   }
                   if (ae_c_eq_d(beta, 0.0)) {
-                     c->ptr.pp_complex[ic + ik][jc + jk] = ae_c_mul(alpha, v);
+                     c->xyC[ic + ik][jc + jk] = ae_c_mul(alpha, v);
                   } else {
-                     c->ptr.pp_complex[ic + ik][jc + jk] = ae_c_add(ae_c_mul(beta, c->ptr.pp_complex[ic + ik][jc + jk]), ae_c_mul(alpha, v));
+                     c->xyC[ic + ik][jc + jk] = ae_c_add(ae_c_mul(beta, c->xyC[ic + ik][jc + jk]), ae_c_mul(alpha, v));
                   }
                }
             }
@@ -3873,7 +3510,7 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
 // if matrix size is zero
@@ -3890,13 +3527,13 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, a
          if (beta != 0.0) {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c->ptr.pp_double[ic + i][jc + j] *= beta;
+                  c->xyR[ic + i][jc + j] *= beta;
                }
             }
          } else {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
-                  c->ptr.pp_double[ic + i][jc + j] = 0.0;
+                  c->xyR[ic + i][jc + j] = 0.0;
                }
             }
          }
@@ -3945,7 +3582,7 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, a
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, RMatrix b, ae_int_t ib, ae_int_t jb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -4035,22 +3672,22 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
             v33 = 0.0;
          // Different variants of internal loop
             for (t = 0; t < k; t++) {
-               a0 = a->ptr.pp_double[idxa0][offsa];
-               a1 = a->ptr.pp_double[idxa1][offsa];
-               b0 = b->ptr.pp_double[offsb][idxb0];
-               b1 = b->ptr.pp_double[offsb][idxb1];
+               a0 = a->xyR[idxa0][offsa];
+               a1 = a->xyR[idxa1][offsa];
+               b0 = b->xyR[offsb][idxb0];
+               b1 = b->xyR[offsb][idxb1];
                v00 += a0 * b0;
                v01 += a0 * b1;
                v10 += a1 * b0;
                v11 += a1 * b1;
-               a2 = a->ptr.pp_double[idxa2][offsa];
-               a3 = a->ptr.pp_double[idxa3][offsa];
+               a2 = a->xyR[idxa2][offsa];
+               a3 = a->xyR[idxa3][offsa];
                v20 += a2 * b0;
                v21 += a2 * b1;
                v30 += a3 * b0;
                v31 += a3 * b1;
-               b2 = b->ptr.pp_double[offsb][idxb2];
-               b3 = b->ptr.pp_double[offsb][idxb3];
+               b2 = b->xyR[offsb][idxb2];
+               b3 = b->xyR[offsb][idxb3];
                v22 += a2 * b2;
                v23 += a2 * b3;
                v32 += a3 * b2;
@@ -4063,58 +3700,58 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
             }
          } else {
          // Determine submatrix [I0..I1]x[J0..J1] to process
             i0 = i;
-            i1 = ae_minint(i + 3, m - 1);
+            i1 = imin2(i + 3, m - 1);
             j0 = j;
-            j1 = ae_minint(j + 3, n - 1);
+            j1 = imin2(j + 3, n - 1);
          // Process submatrix
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
                   if (k == 0 || alpha == 0.0) {
                      v = 0.0;
                   } else {
-                     v = ae_v_dotproduct(&a->ptr.pp_double[ia + ik][ja], 1, &b->ptr.pp_double[ib][jb + jk], b->stride, k);
+                     v = ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib][jb + jk], b->stride, k);
                   }
                   if (beta == 0.0) {
-                     c->ptr.pp_double[ic + ik][jc + jk] = alpha * v;
+                     c->xyR[ic + ik][jc + jk] = alpha * v;
                   } else {
-                     c->ptr.pp_double[ic + ik][jc + jk] = beta * c->ptr.pp_double[ic + ik][jc + jk] + alpha * v;
+                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
                   }
                }
             }
@@ -4148,7 +3785,7 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, RMatrix b, ae_int_t ib, ae_int_t jb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -4237,22 +3874,22 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
             v32 = 0.0;
             v33 = 0.0;
             for (t = 0; t < k; t++) {
-               a0 = a->ptr.pp_double[idxa0][offsa];
-               a1 = a->ptr.pp_double[idxa1][offsa];
-               b0 = b->ptr.pp_double[idxb0][offsb];
-               b1 = b->ptr.pp_double[idxb1][offsb];
+               a0 = a->xyR[idxa0][offsa];
+               a1 = a->xyR[idxa1][offsa];
+               b0 = b->xyR[idxb0][offsb];
+               b1 = b->xyR[idxb1][offsb];
                v00 += a0 * b0;
                v01 += a0 * b1;
                v10 += a1 * b0;
                v11 += a1 * b1;
-               a2 = a->ptr.pp_double[idxa2][offsa];
-               a3 = a->ptr.pp_double[idxa3][offsa];
+               a2 = a->xyR[idxa2][offsa];
+               a3 = a->xyR[idxa3][offsa];
                v20 += a2 * b0;
                v21 += a2 * b1;
                v30 += a3 * b0;
                v31 += a3 * b1;
-               b2 = b->ptr.pp_double[idxb2][offsb];
-               b3 = b->ptr.pp_double[idxb3][offsb];
+               b2 = b->xyR[idxb2][offsb];
+               b3 = b->xyR[idxb3][offsb];
                v22 += a2 * b2;
                v23 += a2 * b3;
                v32 += a3 * b2;
@@ -4265,58 +3902,58 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
             }
          } else {
          // Determine submatrix [I0..I1]x[J0..J1] to process
             i0 = i;
-            i1 = ae_minint(i + 3, m - 1);
+            i1 = imin2(i + 3, m - 1);
             j0 = j;
-            j1 = ae_minint(j + 3, n - 1);
+            j1 = imin2(j + 3, n - 1);
          // Process submatrix
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
                   if (k == 0 || alpha == 0.0) {
                      v = 0.0;
                   } else {
-                     v = ae_v_dotproduct(&a->ptr.pp_double[ia + ik][ja], 1, &b->ptr.pp_double[ib + jk][jb], 1, k);
+                     v = ae_v_dotproduct(&a->xyR[ia + ik][ja], 1, &b->xyR[ib + jk][jb], 1, k);
                   }
                   if (beta == 0.0) {
-                     c->ptr.pp_double[ic + ik][jc + jk] = alpha * v;
+                     c->xyR[ic + ik][jc + jk] = alpha * v;
                   } else {
-                     c->ptr.pp_double[ic + ik][jc + jk] = beta * c->ptr.pp_double[ic + ik][jc + jk] + alpha * v;
+                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
                   }
                }
             }
@@ -4350,7 +3987,7 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, RMatrix b, ae_int_t ib, ae_int_t jb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -4439,22 +4076,22 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
             v32 = 0.0;
             v33 = 0.0;
             for (t = 0; t < k; t++) {
-               a0 = a->ptr.pp_double[offsa][idxa0];
-               a1 = a->ptr.pp_double[offsa][idxa1];
-               b0 = b->ptr.pp_double[offsb][idxb0];
-               b1 = b->ptr.pp_double[offsb][idxb1];
+               a0 = a->xyR[offsa][idxa0];
+               a1 = a->xyR[offsa][idxa1];
+               b0 = b->xyR[offsb][idxb0];
+               b1 = b->xyR[offsb][idxb1];
                v00 += a0 * b0;
                v01 += a0 * b1;
                v10 += a1 * b0;
                v11 += a1 * b1;
-               a2 = a->ptr.pp_double[offsa][idxa2];
-               a3 = a->ptr.pp_double[offsa][idxa3];
+               a2 = a->xyR[offsa][idxa2];
+               a3 = a->xyR[offsa][idxa3];
                v20 += a2 * b0;
                v21 += a2 * b1;
                v30 += a3 * b0;
                v31 += a3 * b1;
-               b2 = b->ptr.pp_double[offsb][idxb2];
-               b3 = b->ptr.pp_double[offsb][idxb3];
+               b2 = b->xyR[offsb][idxb2];
+               b3 = b->xyR[offsb][idxb3];
                v22 += a2 * b2;
                v23 += a2 * b3;
                v32 += a3 * b2;
@@ -4467,46 +4104,46 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
             }
          } else {
          // Determine submatrix [I0..I1]x[J0..J1] to process
             i0 = i;
-            i1 = ae_minint(i + 3, m - 1);
+            i1 = imin2(i + 3, m - 1);
             j0 = j;
-            j1 = ae_minint(j + 3, n - 1);
+            j1 = imin2(j + 3, n - 1);
          // Process submatrix
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
@@ -4514,12 +4151,12 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                      v = 0.0;
                   } else {
                      v = 0.0;
-                     v = ae_v_dotproduct(&a->ptr.pp_double[ia][ja + ik], a->stride, &b->ptr.pp_double[ib][jb + jk], b->stride, k);
+                     v = ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib][jb + jk], b->stride, k);
                   }
                   if (beta == 0.0) {
-                     c->ptr.pp_double[ic + ik][jc + jk] = alpha * v;
+                     c->xyR[ic + ik][jc + jk] = alpha * v;
                   } else {
-                     c->ptr.pp_double[ic + ik][jc + jk] = beta * c->ptr.pp_double[ic + ik][jc + jk] + alpha * v;
+                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
                   }
                }
             }
@@ -4553,7 +4190,7 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     JC      -   submatrix offset
 //
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
-void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix a, ae_int_t ia, ae_int_t ja, RMatrix b, ae_int_t ib, ae_int_t jb, double beta, RMatrix c, ae_int_t ic, ae_int_t jc) {
+void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -4642,22 +4279,22 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
             v32 = 0.0;
             v33 = 0.0;
             for (t = 0; t < k; t++) {
-               a0 = a->ptr.pp_double[offsa][idxa0];
-               a1 = a->ptr.pp_double[offsa][idxa1];
-               b0 = b->ptr.pp_double[idxb0][offsb];
-               b1 = b->ptr.pp_double[idxb1][offsb];
+               a0 = a->xyR[offsa][idxa0];
+               a1 = a->xyR[offsa][idxa1];
+               b0 = b->xyR[idxb0][offsb];
+               b1 = b->xyR[idxb1][offsb];
                v00 += a0 * b0;
                v01 += a0 * b1;
                v10 += a1 * b0;
                v11 += a1 * b1;
-               a2 = a->ptr.pp_double[offsa][idxa2];
-               a3 = a->ptr.pp_double[offsa][idxa3];
+               a2 = a->xyR[offsa][idxa2];
+               a3 = a->xyR[offsa][idxa3];
                v20 += a2 * b0;
                v21 += a2 * b1;
                v30 += a3 * b0;
                v31 += a3 * b1;
-               b2 = b->ptr.pp_double[idxb2][offsb];
-               b3 = b->ptr.pp_double[idxb3][offsb];
+               b2 = b->xyR[idxb2][offsb];
+               b3 = b->xyR[idxb3][offsb];
                v22 += a2 * b2;
                v23 += a2 * b3;
                v32 += a3 * b2;
@@ -4670,46 +4307,46 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                offsb++;
             }
             if (beta == 0.0) {
-               c->ptr.pp_double[ic + i][jc + j] = alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = alpha * v33;
+               c->xyR[ic + i][jc + j] = alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = alpha * v33;
             } else {
-               c->ptr.pp_double[ic + i][jc + j] = beta * c->ptr.pp_double[ic + i][jc + j] + alpha * v00;
-               c->ptr.pp_double[ic + i][jc + j + 1] = beta * c->ptr.pp_double[ic + i][jc + j + 1] + alpha * v01;
-               c->ptr.pp_double[ic + i][jc + j + 2] = beta * c->ptr.pp_double[ic + i][jc + j + 2] + alpha * v02;
-               c->ptr.pp_double[ic + i][jc + j + 3] = beta * c->ptr.pp_double[ic + i][jc + j + 3] + alpha * v03;
-               c->ptr.pp_double[ic + i + 1][jc + j] = beta * c->ptr.pp_double[ic + i + 1][jc + j] + alpha * v10;
-               c->ptr.pp_double[ic + i + 1][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 1] + alpha * v11;
-               c->ptr.pp_double[ic + i + 1][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 2] + alpha * v12;
-               c->ptr.pp_double[ic + i + 1][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 1][jc + j + 3] + alpha * v13;
-               c->ptr.pp_double[ic + i + 2][jc + j] = beta * c->ptr.pp_double[ic + i + 2][jc + j] + alpha * v20;
-               c->ptr.pp_double[ic + i + 2][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 1] + alpha * v21;
-               c->ptr.pp_double[ic + i + 2][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 2] + alpha * v22;
-               c->ptr.pp_double[ic + i + 2][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 2][jc + j + 3] + alpha * v23;
-               c->ptr.pp_double[ic + i + 3][jc + j] = beta * c->ptr.pp_double[ic + i + 3][jc + j] + alpha * v30;
-               c->ptr.pp_double[ic + i + 3][jc + j + 1] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 1] + alpha * v31;
-               c->ptr.pp_double[ic + i + 3][jc + j + 2] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 2] + alpha * v32;
-               c->ptr.pp_double[ic + i + 3][jc + j + 3] = beta * c->ptr.pp_double[ic + i + 3][jc + j + 3] + alpha * v33;
+               c->xyR[ic + i][jc + j] = beta * c->xyR[ic + i][jc + j] + alpha * v00;
+               c->xyR[ic + i][jc + j + 1] = beta * c->xyR[ic + i][jc + j + 1] + alpha * v01;
+               c->xyR[ic + i][jc + j + 2] = beta * c->xyR[ic + i][jc + j + 2] + alpha * v02;
+               c->xyR[ic + i][jc + j + 3] = beta * c->xyR[ic + i][jc + j + 3] + alpha * v03;
+               c->xyR[ic + i + 1][jc + j] = beta * c->xyR[ic + i + 1][jc + j] + alpha * v10;
+               c->xyR[ic + i + 1][jc + j + 1] = beta * c->xyR[ic + i + 1][jc + j + 1] + alpha * v11;
+               c->xyR[ic + i + 1][jc + j + 2] = beta * c->xyR[ic + i + 1][jc + j + 2] + alpha * v12;
+               c->xyR[ic + i + 1][jc + j + 3] = beta * c->xyR[ic + i + 1][jc + j + 3] + alpha * v13;
+               c->xyR[ic + i + 2][jc + j] = beta * c->xyR[ic + i + 2][jc + j] + alpha * v20;
+               c->xyR[ic + i + 2][jc + j + 1] = beta * c->xyR[ic + i + 2][jc + j + 1] + alpha * v21;
+               c->xyR[ic + i + 2][jc + j + 2] = beta * c->xyR[ic + i + 2][jc + j + 2] + alpha * v22;
+               c->xyR[ic + i + 2][jc + j + 3] = beta * c->xyR[ic + i + 2][jc + j + 3] + alpha * v23;
+               c->xyR[ic + i + 3][jc + j] = beta * c->xyR[ic + i + 3][jc + j] + alpha * v30;
+               c->xyR[ic + i + 3][jc + j + 1] = beta * c->xyR[ic + i + 3][jc + j + 1] + alpha * v31;
+               c->xyR[ic + i + 3][jc + j + 2] = beta * c->xyR[ic + i + 3][jc + j + 2] + alpha * v32;
+               c->xyR[ic + i + 3][jc + j + 3] = beta * c->xyR[ic + i + 3][jc + j + 3] + alpha * v33;
             }
          } else {
          // Determine submatrix [I0..I1]x[J0..J1] to process
             i0 = i;
-            i1 = ae_minint(i + 3, m - 1);
+            i1 = imin2(i + 3, m - 1);
             j0 = j;
-            j1 = ae_minint(j + 3, n - 1);
+            j1 = imin2(j + 3, n - 1);
          // Process submatrix
             for (ik = i0; ik <= i1; ik++) {
                for (jk = j0; jk <= j1; jk++) {
@@ -4717,12 +4354,12 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
                      v = 0.0;
                   } else {
                      v = 0.0;
-                     v = ae_v_dotproduct(&a->ptr.pp_double[ia][ja + ik], a->stride, &b->ptr.pp_double[ib + jk][jb], 1, k);
+                     v = ae_v_dotproduct(&a->xyR[ia][ja + ik], a->stride, &b->xyR[ib + jk][jb], 1, k);
                   }
                   if (beta == 0.0) {
-                     c->ptr.pp_double[ic + ik][jc + jk] = alpha * v;
+                     c->xyR[ic + ik][jc + jk] = alpha * v;
                   } else {
-                     c->ptr.pp_double[ic + ik][jc + jk] = beta * c->ptr.pp_double[ic + ik][jc + jk] + alpha * v;
+                     c->xyR[ic + ik][jc + jk] = beta * c->xyR[ic + ik][jc + jk] + alpha * v;
                   }
                }
             }
@@ -4770,7 +4407,7 @@ namespace alglib_impl {
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-void complexgeneratereflection(CVector x, ae_int_t n, ae_complex *tau) {
+void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau) {
    ae_int_t j;
    ae_complex alpha;
    double alphi;
@@ -4791,30 +4428,30 @@ void complexgeneratereflection(CVector x, ae_int_t n, ae_complex *tau) {
 // calculations).
    mx = 0.0;
    for (j = 1; j <= n; j++) {
-      mx = ae_maxreal(ae_c_abs(x->ptr.p_complex[j]), mx);
+      mx = rmax2(ae_c_abs(x->xC[j]), mx);
    }
    s = 1.0;
    if (mx != 0.0) {
       if (mx < 1.0) {
          s = sqrt(ae_minrealnumber);
          v = ae_complex_from_d(1 / s);
-         ae_v_cmulc(&x->ptr.p_complex[1], 1, n, v);
+         ae_v_cmulc(&x->xC[1], 1, n, v);
       } else {
          s = sqrt(ae_maxrealnumber);
          v = ae_complex_from_d(1 / s);
-         ae_v_cmulc(&x->ptr.p_complex[1], 1, n, v);
+         ae_v_cmulc(&x->xC[1], 1, n, v);
       }
    }
 // calculate
-   alpha = x->ptr.p_complex[1];
+   alpha = x->xC[1];
    mx = 0.0;
    for (j = 2; j <= n; j++) {
-      mx = ae_maxreal(ae_c_abs(x->ptr.p_complex[j]), mx);
+      mx = rmax2(ae_c_abs(x->xC[j]), mx);
    }
    xnorm = 0.0;
    if (mx != 0.0) {
       for (j = 2; j <= n; j++) {
-         t = ae_c_div_d(x->ptr.p_complex[j], mx);
+         t = ae_c_div_d(x->xC[j], mx);
          xnorm += ae_c_mul(t, ae_c_conj(t)).x;
       }
       xnorm = sqrt(xnorm) * mx;
@@ -4823,11 +4460,11 @@ void complexgeneratereflection(CVector x, ae_int_t n, ae_complex *tau) {
    alphi = alpha.y;
    if (xnorm == 0.0 && alphi == 0.0) {
       *tau = ae_complex_from_i(0);
-      x->ptr.p_complex[1] = ae_c_mul_d(x->ptr.p_complex[1], s);
+      x->xC[1] = ae_c_mul_d(x->xC[1], s);
       return;
    }
-   mx = ae_maxreal(fabs(alphr), fabs(alphi));
-   mx = ae_maxreal(mx, fabs(xnorm));
+   mx = rmax2(fabs(alphr), fabs(alphi));
+   mx = rmax2(mx, fabs(xnorm));
    beta = -mx * sqrt(ae_sqr(alphr / mx) + ae_sqr(alphi / mx) + ae_sqr(xnorm / mx));
    if (alphr < 0.0) {
       beta = -beta;
@@ -4836,12 +4473,12 @@ void complexgeneratereflection(CVector x, ae_int_t n, ae_complex *tau) {
    tau->y = -alphi / beta;
    alpha = ae_c_d_div(1, ae_c_sub_d(alpha, beta));
    if (n > 1) {
-      ae_v_cmulc(&x->ptr.p_complex[2], 1, n - 1, alpha);
+      ae_v_cmulc(&x->xC[2], 1, n - 1, alpha);
    }
    alpha = ae_complex_from_d(beta);
-   x->ptr.p_complex[1] = alpha;
+   x->xC[1] = alpha;
 // Scale back
-   x->ptr.p_complex[1] = ae_c_mul_d(x->ptr.p_complex[1], s);
+   x->xC[1] = ae_c_mul_d(x->xC[1], s);
 }
 
 // Application of an elementary reflection to a rectangular matrix of size MxN
@@ -4873,7 +4510,7 @@ void complexgeneratereflection(CVector x, ae_int_t n, ae_complex *tau) {
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-void complexapplyreflectionfromtheleft(CMatrix c, ae_complex tau, CVector v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector work) {
+void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
    ae_complex t;
    ae_int_t i;
    if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
@@ -4881,16 +4518,16 @@ void complexapplyreflectionfromtheleft(CMatrix c, ae_complex tau, CVector v, ae_
    }
 // w := C^T * conj(v)
    for (i = n1; i <= n2; i++) {
-      work->ptr.p_complex[i] = ae_complex_from_i(0);
+      work->xC[i] = ae_complex_from_i(0);
    }
    for (i = m1; i <= m2; i++) {
-      t = ae_c_conj(v->ptr.p_complex[i + 1 - m1]);
-      ae_v_caddc(&work->ptr.p_complex[n1], 1, &c->ptr.pp_complex[i][n1], 1, "N", n2 - n1 + 1, t);
+      t = ae_c_conj(v->xC[i + 1 - m1]);
+      ae_v_caddc(&work->xC[n1], 1, &c->xyC[i][n1], 1, "N", n2 - n1 + 1, t);
    }
 // C := C - tau * v * w^T
    for (i = m1; i <= m2; i++) {
-      t = ae_c_mul(v->ptr.p_complex[i - m1 + 1], tau);
-      ae_v_csubc(&c->ptr.pp_complex[i][n1], 1, &work->ptr.p_complex[n1], 1, "N", n2 - n1 + 1, t);
+      t = ae_c_mul(v->xC[i - m1 + 1], tau);
+      ae_v_csubc(&c->xyC[i][n1], 1, &work->xC[n1], 1, "N", n2 - n1 + 1, t);
    }
 }
 
@@ -4920,7 +4557,7 @@ void complexapplyreflectionfromtheleft(CMatrix c, ae_complex tau, CVector v, ae_
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      September 30, 1994
-void complexapplyreflectionfromtheright(CMatrix c, ae_complex tau, CVector v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector work) {
+void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
    ae_complex t;
    ae_int_t i;
    ae_int_t vm;
@@ -4930,16 +4567,16 @@ void complexapplyreflectionfromtheright(CMatrix c, ae_complex tau, CVector v, ae
 // w := C * v
    vm = n2 - n1 + 1;
    for (i = m1; i <= m2; i++) {
-      t = ae_v_cdotproduct(&c->ptr.pp_complex[i][n1], 1, "N", &v->ptr.p_complex[1], 1, "N", n2 - n1 + 1);
-      work->ptr.p_complex[i] = t;
+      t = ae_v_cdotproduct(&c->xyC[i][n1], 1, "N", &v->xC[1], 1, "N", n2 - n1 + 1);
+      work->xC[i] = t;
    }
 // C := C - w * conj(v^T)
-   ae_v_cmove(&v->ptr.p_complex[1], 1, &v->ptr.p_complex[1], 1, "Conj", vm);
+   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
    for (i = m1; i <= m2; i++) {
-      t = ae_c_mul(work->ptr.p_complex[i], tau);
-      ae_v_csubc(&c->ptr.pp_complex[i][n1], 1, &v->ptr.p_complex[1], 1, "N", n2 - n1 + 1, t);
+      t = ae_c_mul(work->xC[i], tau);
+      ae_v_csubc(&c->xyC[i][n1], 1, &v->xC[1], 1, "N", n2 - n1 + 1, t);
    }
-   ae_v_cmove(&v->ptr.p_complex[1], 1, &v->ptr.p_complex[1], 1, "Conj", vm);
+   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
 }
 } // end of namespace alglib_impl
 
@@ -4968,7 +4605,7 @@ namespace alglib_impl {
 //     A           -   transformed matrix.
 //
 // Utility subroutine.
-void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector c, RVector s, RMatrix a, RVector work) {
+void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work) {
    ae_int_t j;
    ae_int_t jp1;
    double ctemp;
@@ -4982,26 +4619,26 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
       if (n1 != n2) {
       // Common case: N1 != N2
          for (j = m1; j < m2; j++) {
-            ctemp = c->ptr.p_double[j - m1 + 1];
-            stemp = s->ptr.p_double[j - m1 + 1];
+            ctemp = c->xR[j - m1 + 1];
+            stemp = s->xR[j - m1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
                jp1 = j + 1;
-               ae_v_moved(&work->ptr.p_double[n1], 1, &a->ptr.pp_double[jp1][n1], 1, n2 - n1 + 1, ctemp);
-               ae_v_subd(&work->ptr.p_double[n1], 1, &a->ptr.pp_double[j][n1], 1, n2 - n1 + 1, stemp);
-               ae_v_muld(&a->ptr.pp_double[j][n1], 1, n2 - n1 + 1, ctemp);
-               ae_v_addd(&a->ptr.pp_double[j][n1], 1, &a->ptr.pp_double[jp1][n1], 1, n2 - n1 + 1, stemp);
-               ae_v_move(&a->ptr.pp_double[jp1][n1], 1, &work->ptr.p_double[n1], 1, n2 - n1 + 1);
+               ae_v_moved(&work->xR[n1], 1, &a->xyR[jp1][n1], 1, n2 - n1 + 1, ctemp);
+               ae_v_subd(&work->xR[n1], 1, &a->xyR[j][n1], 1, n2 - n1 + 1, stemp);
+               ae_v_muld(&a->xyR[j][n1], 1, n2 - n1 + 1, ctemp);
+               ae_v_addd(&a->xyR[j][n1], 1, &a->xyR[jp1][n1], 1, n2 - n1 + 1, stemp);
+               ae_v_move(&a->xyR[jp1][n1], 1, &work->xR[n1], 1, n2 - n1 + 1);
             }
          }
       } else {
       // Special case: N1=N2
          for (j = m1; j < m2; j++) {
-            ctemp = c->ptr.p_double[j - m1 + 1];
-            stemp = s->ptr.p_double[j - m1 + 1];
+            ctemp = c->xR[j - m1 + 1];
+            stemp = s->xR[j - m1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
-               temp = a->ptr.pp_double[j + 1][n1];
-               a->ptr.pp_double[j + 1][n1] = ctemp * temp - stemp * a->ptr.pp_double[j][n1];
-               a->ptr.pp_double[j][n1] = stemp * temp + ctemp * a->ptr.pp_double[j][n1];
+               temp = a->xyR[j + 1][n1];
+               a->xyR[j + 1][n1] = ctemp * temp - stemp * a->xyR[j][n1];
+               a->xyR[j][n1] = stemp * temp + ctemp * a->xyR[j][n1];
             }
          }
       }
@@ -5009,26 +4646,26 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
       if (n1 != n2) {
       // Common case: N1 != N2
          for (j = m2 - 1; j >= m1; j--) {
-            ctemp = c->ptr.p_double[j - m1 + 1];
-            stemp = s->ptr.p_double[j - m1 + 1];
+            ctemp = c->xR[j - m1 + 1];
+            stemp = s->xR[j - m1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
                jp1 = j + 1;
-               ae_v_moved(&work->ptr.p_double[n1], 1, &a->ptr.pp_double[jp1][n1], 1, n2 - n1 + 1, ctemp);
-               ae_v_subd(&work->ptr.p_double[n1], 1, &a->ptr.pp_double[j][n1], 1, n2 - n1 + 1, stemp);
-               ae_v_muld(&a->ptr.pp_double[j][n1], 1, n2 - n1 + 1, ctemp);
-               ae_v_addd(&a->ptr.pp_double[j][n1], 1, &a->ptr.pp_double[jp1][n1], 1, n2 - n1 + 1, stemp);
-               ae_v_move(&a->ptr.pp_double[jp1][n1], 1, &work->ptr.p_double[n1], 1, n2 - n1 + 1);
+               ae_v_moved(&work->xR[n1], 1, &a->xyR[jp1][n1], 1, n2 - n1 + 1, ctemp);
+               ae_v_subd(&work->xR[n1], 1, &a->xyR[j][n1], 1, n2 - n1 + 1, stemp);
+               ae_v_muld(&a->xyR[j][n1], 1, n2 - n1 + 1, ctemp);
+               ae_v_addd(&a->xyR[j][n1], 1, &a->xyR[jp1][n1], 1, n2 - n1 + 1, stemp);
+               ae_v_move(&a->xyR[jp1][n1], 1, &work->xR[n1], 1, n2 - n1 + 1);
             }
          }
       } else {
       // Special case: N1=N2
          for (j = m2 - 1; j >= m1; j--) {
-            ctemp = c->ptr.p_double[j - m1 + 1];
-            stemp = s->ptr.p_double[j - m1 + 1];
+            ctemp = c->xR[j - m1 + 1];
+            stemp = s->xR[j - m1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
-               temp = a->ptr.pp_double[j + 1][n1];
-               a->ptr.pp_double[j + 1][n1] = ctemp * temp - stemp * a->ptr.pp_double[j][n1];
-               a->ptr.pp_double[j][n1] = stemp * temp + ctemp * a->ptr.pp_double[j][n1];
+               temp = a->xyR[j + 1][n1];
+               a->xyR[j + 1][n1] = ctemp * temp - stemp * a->xyR[j][n1];
+               a->xyR[j][n1] = stemp * temp + ctemp * a->xyR[j][n1];
             }
          }
       }
@@ -5058,7 +4695,7 @@ void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_
 //     A           -   transformed matrix.
 //
 // Utility subroutine.
-void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector c, RVector s, RMatrix a, RVector work) {
+void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work) {
    ae_int_t j;
    ae_int_t jp1;
    double ctemp;
@@ -5069,26 +4706,26 @@ void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int
       if (m1 != m2) {
       // Common case: M1 != M2
          for (j = n1; j < n2; j++) {
-            ctemp = c->ptr.p_double[j - n1 + 1];
-            stemp = s->ptr.p_double[j - n1 + 1];
+            ctemp = c->xR[j - n1 + 1];
+            stemp = s->xR[j - n1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
                jp1 = j + 1;
-               ae_v_moved(&work->ptr.p_double[m1], 1, &a->ptr.pp_double[m1][jp1], a->stride, m2 - m1 + 1, ctemp);
-               ae_v_subd(&work->ptr.p_double[m1], 1, &a->ptr.pp_double[m1][j], a->stride, m2 - m1 + 1, stemp);
-               ae_v_muld(&a->ptr.pp_double[m1][j], a->stride, m2 - m1 + 1, ctemp);
-               ae_v_addd(&a->ptr.pp_double[m1][j], a->stride, &a->ptr.pp_double[m1][jp1], a->stride, m2 - m1 + 1, stemp);
-               ae_v_move(&a->ptr.pp_double[m1][jp1], a->stride, &work->ptr.p_double[m1], 1, m2 - m1 + 1);
+               ae_v_moved(&work->xR[m1], 1, &a->xyR[m1][jp1], a->stride, m2 - m1 + 1, ctemp);
+               ae_v_subd(&work->xR[m1], 1, &a->xyR[m1][j], a->stride, m2 - m1 + 1, stemp);
+               ae_v_muld(&a->xyR[m1][j], a->stride, m2 - m1 + 1, ctemp);
+               ae_v_addd(&a->xyR[m1][j], a->stride, &a->xyR[m1][jp1], a->stride, m2 - m1 + 1, stemp);
+               ae_v_move(&a->xyR[m1][jp1], a->stride, &work->xR[m1], 1, m2 - m1 + 1);
             }
          }
       } else {
       // Special case: M1=M2
          for (j = n1; j < n2; j++) {
-            ctemp = c->ptr.p_double[j - n1 + 1];
-            stemp = s->ptr.p_double[j - n1 + 1];
+            ctemp = c->xR[j - n1 + 1];
+            stemp = s->xR[j - n1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
-               temp = a->ptr.pp_double[m1][j + 1];
-               a->ptr.pp_double[m1][j + 1] = ctemp * temp - stemp * a->ptr.pp_double[m1][j];
-               a->ptr.pp_double[m1][j] = stemp * temp + ctemp * a->ptr.pp_double[m1][j];
+               temp = a->xyR[m1][j + 1];
+               a->xyR[m1][j + 1] = ctemp * temp - stemp * a->xyR[m1][j];
+               a->xyR[m1][j] = stemp * temp + ctemp * a->xyR[m1][j];
             }
          }
       }
@@ -5096,26 +4733,26 @@ void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int
       if (m1 != m2) {
       // Common case: M1 != M2
          for (j = n2 - 1; j >= n1; j--) {
-            ctemp = c->ptr.p_double[j - n1 + 1];
-            stemp = s->ptr.p_double[j - n1 + 1];
+            ctemp = c->xR[j - n1 + 1];
+            stemp = s->xR[j - n1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
                jp1 = j + 1;
-               ae_v_moved(&work->ptr.p_double[m1], 1, &a->ptr.pp_double[m1][jp1], a->stride, m2 - m1 + 1, ctemp);
-               ae_v_subd(&work->ptr.p_double[m1], 1, &a->ptr.pp_double[m1][j], a->stride, m2 - m1 + 1, stemp);
-               ae_v_muld(&a->ptr.pp_double[m1][j], a->stride, m2 - m1 + 1, ctemp);
-               ae_v_addd(&a->ptr.pp_double[m1][j], a->stride, &a->ptr.pp_double[m1][jp1], a->stride, m2 - m1 + 1, stemp);
-               ae_v_move(&a->ptr.pp_double[m1][jp1], a->stride, &work->ptr.p_double[m1], 1, m2 - m1 + 1);
+               ae_v_moved(&work->xR[m1], 1, &a->xyR[m1][jp1], a->stride, m2 - m1 + 1, ctemp);
+               ae_v_subd(&work->xR[m1], 1, &a->xyR[m1][j], a->stride, m2 - m1 + 1, stemp);
+               ae_v_muld(&a->xyR[m1][j], a->stride, m2 - m1 + 1, ctemp);
+               ae_v_addd(&a->xyR[m1][j], a->stride, &a->xyR[m1][jp1], a->stride, m2 - m1 + 1, stemp);
+               ae_v_move(&a->xyR[m1][jp1], a->stride, &work->xR[m1], 1, m2 - m1 + 1);
             }
          }
       } else {
       // Special case: M1=M2
          for (j = n2 - 1; j >= n1; j--) {
-            ctemp = c->ptr.p_double[j - n1 + 1];
-            stemp = s->ptr.p_double[j - n1 + 1];
+            ctemp = c->xR[j - n1 + 1];
+            stemp = s->xR[j - n1 + 1];
             if (ctemp != 1.0 || stemp != 0.0) {
-               temp = a->ptr.pp_double[m1][j + 1];
-               a->ptr.pp_double[m1][j + 1] = ctemp * temp - stemp * a->ptr.pp_double[m1][j];
-               a->ptr.pp_double[m1][j] = stemp * temp + ctemp * a->ptr.pp_double[m1][j];
+               temp = a->xyR[m1][j + 1];
+               a->xyR[m1][j + 1] = ctemp * temp - stemp * a->xyR[m1][j];
+               a->xyR[m1][j] = stemp * temp + ctemp * a->xyR[m1][j];
             }
          }
       }
@@ -5204,7 +4841,7 @@ namespace alglib_impl {
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
 //      Courant Institute, Argonne National Lab, and Rice University
 //      June 30, 1992
-void rmatrixtrsafesolve(RMatrix a, ae_int_t n, RVector x, double *s, bool isupper, bool istrans, bool isunit) {
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit) {
    ae_frame _frame_block;
    bool normin;
    ae_int_t i;
@@ -5218,19 +4855,19 @@ void rmatrixtrsafesolve(RMatrix a, ae_int_t n, RVector x, double *s, bool isuppe
    ae_matrix_set_length(&a1, n + 1, n + 1);
    ae_vector_set_length(&x1, n + 1);
    for (i = 1; i <= n; i++) {
-      ae_v_move(&a1.ptr.pp_double[i][1], 1, a->ptr.pp_double[i - 1], 1, n);
+      ae_v_move(&a1.xyR[i][1], 1, a->xyR[i - 1], 1, n);
    }
-   ae_v_move(&x1.ptr.p_double[1], 1, x->ptr.p_double, 1, n);
+   ae_v_move(&x1.xR[1], 1, x->xR, 1, n);
 // Solve 1-based
    safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm);
 // From 1-based to 0-based
-   ae_v_move(x->ptr.p_double, 1, &x1.ptr.p_double[1], 1, n);
+   ae_v_move(x->xR, 1, &x1.xR[1], 1, n);
    ae_frame_leave();
 }
 
 // Obsolete 1-based subroutine.
 // See RMatrixTRSafeSolve for 0-based replacement.
-void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector cnorm) {
+void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm) {
    ae_int_t i;
    ae_int_t imax;
    ae_int_t j;
@@ -5284,46 +4921,46 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          for (j = 1; j <= n; j++) {
             v = 0.0;
             for (k = 1; k < j; k++) {
-               v += fabs(a->ptr.pp_double[k][j]);
+               v += fabs(a->xyR[k][j]);
             }
-            cnorm->ptr.p_double[j] = v;
+            cnorm->xR[j] = v;
          }
       } else {
       // A is lower triangular.
          for (j = 1; j < n; j++) {
             v = 0.0;
             for (k = j + 1; k <= n; k++) {
-               v += fabs(a->ptr.pp_double[k][j]);
+               v += fabs(a->xyR[k][j]);
             }
-            cnorm->ptr.p_double[j] = v;
+            cnorm->xR[j] = v;
          }
-         cnorm->ptr.p_double[n] = 0.0;
+         cnorm->xR[n] = 0.0;
       }
    }
 // Scale the column norms by TSCAL if the maximum element in CNORM is
 // greater than BIGNUM.
    imax = 1;
    for (k = 2; k <= n; k++) {
-      if (cnorm->ptr.p_double[k] > cnorm->ptr.p_double[imax]) {
+      if (cnorm->xR[k] > cnorm->xR[imax]) {
          imax = k;
       }
    }
-   tmax = cnorm->ptr.p_double[imax];
+   tmax = cnorm->xR[imax];
    if (tmax <= bignum) {
       tscal = 1.0;
    } else {
       tscal = 1 / (smlnum * tmax);
-      ae_v_muld(&cnorm->ptr.p_double[1], 1, n, tscal);
+      ae_v_muld(&cnorm->xR[1], 1, n, tscal);
    }
 // Compute a bound on the computed solution vector to see if the
 // Level 2 BLAS routine DTRSV can be used.
    j = 1;
    for (k = 2; k <= n; k++) {
-      if (fabs(x->ptr.p_double[k]) > fabs(x->ptr.p_double[j])) {
+      if (fabs(x->xR[k]) > fabs(x->xR[j])) {
          j = k;
       }
    }
-   xmax = fabs(x->ptr.p_double[j]);
+   xmax = fabs(x->xR[j]);
    xbnd = xmax;
    if (notran) {
    // Compute the growth in A * x = b.
@@ -5344,7 +4981,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
          // Initially, G(0) = max{x(i), i=1,...,n}.
-            grow = 1 / ae_maxreal(xbnd, smlnum);
+            grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5353,11 +4990,11 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                   break;
                }
             // M(j) = G(j-1) / abs(A(j,j))
-               tjj = fabs(a->ptr.pp_double[j][j]);
-               xbnd = ae_minreal(xbnd, ae_minreal(1.0, tjj) * grow);
-               if (tjj + cnorm->ptr.p_double[j] >= smlnum) {
+               tjj = fabs(a->xyR[j][j]);
+               xbnd = rmin2(xbnd, rmin2(1.0, tjj) * grow);
+               if (tjj + cnorm->xR[j] >= smlnum) {
                // G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) )
-                  grow *= tjj / (tjj + cnorm->ptr.p_double[j]);
+                  grow *= tjj / (tjj + cnorm->xR[j]);
                } else {
                // G(j) could overflow, set GROW to 0.
                   grow = 0.0;
@@ -5371,7 +5008,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          // A is unit triangular.
          //
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
-            grow = ae_minreal(1.0, 1 / ae_maxreal(xbnd, smlnum));
+            grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
@@ -5379,7 +5016,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                   break;
                }
             // G(j) = G(j-1)*( 1 + CNORM(j) )
-               grow /= 1 + cnorm->ptr.p_double[j];
+               grow /= 1 + cnorm->xR[j];
                j += jinc;
             }
          }
@@ -5403,7 +5040,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          //
          // Compute GROW = 1/G(j) and XBND = 1/M(j).
          // Initially, M(0) = max{x(i), i=1,...,n}.
-            grow = 1 / ae_maxreal(xbnd, smlnum);
+            grow = 1 / rmax2(xbnd, smlnum);
             xbnd = grow;
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
@@ -5412,15 +5049,15 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                   break;
                }
             // G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) )
-               xj = 1 + cnorm->ptr.p_double[j];
-               grow = ae_minreal(grow, xbnd / xj);
+               xj = 1 + cnorm->xR[j];
+               grow = rmin2(grow, xbnd / xj);
             // M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j))
-               tjj = fabs(a->ptr.pp_double[j][j]);
+               tjj = fabs(a->xyR[j][j]);
                if (xj > tjj) {
                   xbnd *= tjj / xj;
                }
                if (j == jlast) {
-                  grow = ae_minreal(grow, xbnd);
+                  grow = rmin2(grow, xbnd);
                }
                j += jinc;
             }
@@ -5428,7 +5065,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          // A is unit triangular.
          //
          // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
-            grow = ae_minreal(1.0, 1 / ae_maxreal(xbnd, smlnum));
+            grow = rmin2(1.0, 1 / rmax2(xbnd, smlnum));
             j = jfirst;
             while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
             // Exit the loop if the growth factor is too small.
@@ -5436,7 +5073,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                   break;
                }
             // G(j) = ( 1 + CNORM(j) )*G(j-1)
-               xj = 1 + cnorm->ptr.p_double[j];
+               xj = 1 + cnorm->xR[j];
                grow /= xj;
                j += jinc;
             }
@@ -5448,45 +5085,45 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
    // elements of X is not too small.
       if (upper == notran) {
          if (nounit) {
-            vd = a->ptr.pp_double[n][n];
+            vd = a->xyR[n][n];
          } else {
             vd = 1.0;
          }
-         x->ptr.p_double[n] /= vd;
+         x->xR[n] /= vd;
          for (i = n - 1; i >= 1; i--) {
             ip1 = i + 1;
             if (upper) {
-               v = ae_v_dotproduct(&a->ptr.pp_double[i][ip1], 1, &x->ptr.p_double[ip1], 1, n - ip1 + 1);
+               v = ae_v_dotproduct(&a->xyR[i][ip1], 1, &x->xR[ip1], 1, n - ip1 + 1);
             } else {
-               v = ae_v_dotproduct(&a->ptr.pp_double[ip1][i], a->stride, &x->ptr.p_double[ip1], 1, n - ip1 + 1);
+               v = ae_v_dotproduct(&a->xyR[ip1][i], a->stride, &x->xR[ip1], 1, n - ip1 + 1);
             }
             if (nounit) {
-               vd = a->ptr.pp_double[i][i];
+               vd = a->xyR[i][i];
             } else {
                vd = 1.0;
             }
-            x->ptr.p_double[i] = (x->ptr.p_double[i] - v) / vd;
+            x->xR[i] = (x->xR[i] - v) / vd;
          }
       } else {
          if (nounit) {
-            vd = a->ptr.pp_double[1][1];
+            vd = a->xyR[1][1];
          } else {
             vd = 1.0;
          }
-         x->ptr.p_double[1] /= vd;
+         x->xR[1] /= vd;
          for (i = 2; i <= n; i++) {
             im1 = i - 1;
             if (upper) {
-               v = ae_v_dotproduct(&a->ptr.pp_double[1][i], a->stride, &x->ptr.p_double[1], 1, im1);
+               v = ae_v_dotproduct(&a->xyR[1][i], a->stride, &x->xR[1], 1, im1);
             } else {
-               v = ae_v_dotproduct(&a->ptr.pp_double[i][1], 1, &x->ptr.p_double[1], 1, im1);
+               v = ae_v_dotproduct(&a->xyR[i][1], 1, &x->xR[1], 1, im1);
             }
             if (nounit) {
-               vd = a->ptr.pp_double[i][i];
+               vd = a->xyR[i][i];
             } else {
                vd = 1.0;
             }
-            x->ptr.p_double[i] = (x->ptr.p_double[i] - v) / vd;
+            x->xR[i] = (x->xR[i] - v) / vd;
          }
       }
    } else {
@@ -5495,7 +5132,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
       // Scale X so that its components are less than or equal to
       // BIGNUM in absolute value.
          *s = bignum / xmax;
-         ae_v_muld(&x->ptr.p_double[1], 1, n, *s);
+         ae_v_muld(&x->xR[1], 1, n, *s);
          xmax = bignum;
       }
       if (notran) {
@@ -5503,10 +5140,10 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          j = jfirst;
          while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) / A(j,j), scaling x if necessary.
-            xj = fabs(x->ptr.p_double[j]);
+            xj = fabs(x->xR[j]);
             flg = 0;
             if (nounit) {
-               tjjs = a->ptr.pp_double[j][j] * tscal;
+               tjjs = a->xyR[j][j] * tscal;
             } else {
                tjjs = tscal;
                if (tscal == 1.0) {
@@ -5521,13 +5158,13 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                      if (xj > tjj * bignum) {
                      // Scale x by 1/b(j).
                         rec = 1 / xj;
-                        ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                        ae_v_muld(&x->xR[1], 1, n, rec);
                         *s *= rec;
                         xmax *= rec;
                      }
                   }
-                  x->ptr.p_double[j] /= tjjs;
-                  xj = fabs(x->ptr.p_double[j]);
+                  x->xR[j] /= tjjs;
+                  xj = fabs(x->xR[j]);
                } else {
                   if (tjj > 0.0) {
                   // 0 < abs(A(j,j)) <= SMLNUM:
@@ -5535,24 +5172,24 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                      // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM
                      // to avoid overflow when dividing by A(j,j).
                         rec = tjj * bignum / xj;
-                        if (cnorm->ptr.p_double[j] > 1.0) {
+                        if (cnorm->xR[j] > 1.0) {
                         // Scale by 1/CNORM(j) to avoid overflow when
                         // multiplying x(j) times column j.
-                           rec /= cnorm->ptr.p_double[j];
+                           rec /= cnorm->xR[j];
                         }
-                        ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                        ae_v_muld(&x->xR[1], 1, n, rec);
                         *s *= rec;
                         xmax *= rec;
                      }
-                     x->ptr.p_double[j] /= tjjs;
-                     xj = fabs(x->ptr.p_double[j]);
+                     x->xR[j] /= tjjs;
+                     xj = fabs(x->xR[j]);
                   } else {
                   // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
                   // scale = 0, and compute a solution to A*x = 0.
                      for (i = 1; i <= n; i++) {
-                        x->ptr.p_double[i] = 0.0;
+                        x->xR[i] = 0.0;
                      }
-                     x->ptr.p_double[j] = 1.0;
+                     x->xR[j] = 1.0;
                      xj = 1.0;
                      *s = 0.0;
                      xmax = 0.0;
@@ -5563,16 +5200,16 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          // multiple of column j of A.
             if (xj > 1.0) {
                rec = 1 / xj;
-               if (cnorm->ptr.p_double[j] > (bignum - xmax) * rec) {
+               if (cnorm->xR[j] > (bignum - xmax) * rec) {
                // Scale x by 1/(2*abs(x(j))).
                   rec *= 0.5;
-                  ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                  ae_v_muld(&x->xR[1], 1, n, rec);
                   *s *= rec;
                }
             } else {
-               if (xj * cnorm->ptr.p_double[j] > bignum - xmax) {
+               if (xj * cnorm->xR[j] > bignum - xmax) {
                // Scale x by 1/2.
-                  ae_v_muld(&x->ptr.p_double[1], 1, n, 0.5);
+                  ae_v_muld(&x->xR[1], 1, n, 0.5);
                   *s *= 0.5;
                }
             }
@@ -5580,31 +5217,31 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                if (j > 1) {
                // Compute the update
                // x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j)
-                  v = x->ptr.p_double[j] * tscal;
+                  v = x->xR[j] * tscal;
                   jm1 = j - 1;
-                  ae_v_subd(&x->ptr.p_double[1], 1, &a->ptr.pp_double[1][j], a->stride, jm1, v);
+                  ae_v_subd(&x->xR[1], 1, &a->xyR[1][j], a->stride, jm1, v);
                   i = 1;
                   for (k = 2; k < j; k++) {
-                     if (fabs(x->ptr.p_double[k]) > fabs(x->ptr.p_double[i])) {
+                     if (fabs(x->xR[k]) > fabs(x->xR[i])) {
                         i = k;
                      }
                   }
-                  xmax = fabs(x->ptr.p_double[i]);
+                  xmax = fabs(x->xR[i]);
                }
             } else {
                if (j < n) {
                // Compute the update
                // x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j)
                   jp1 = j + 1;
-                  v = x->ptr.p_double[j] * tscal;
-                  ae_v_subd(&x->ptr.p_double[jp1], 1, &a->ptr.pp_double[jp1][j], a->stride, n - jp1 + 1, v);
+                  v = x->xR[j] * tscal;
+                  ae_v_subd(&x->xR[jp1], 1, &a->xyR[jp1][j], a->stride, n - jp1 + 1, v);
                   i = j + 1;
                   for (k = j + 2; k <= n; k++) {
-                     if (fabs(x->ptr.p_double[k]) > fabs(x->ptr.p_double[i])) {
+                     if (fabs(x->xR[k]) > fabs(x->xR[i])) {
                         i = k;
                      }
                   }
-                  xmax = fabs(x->ptr.p_double[i]);
+                  xmax = fabs(x->xR[i]);
                }
             }
             j += jinc;
@@ -5615,25 +5252,25 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
          while (jinc > 0 && j <= jlast || jinc < 0 && j >= jlast) {
          // Compute x(j) = b(j) - sum A(k,j)*x(k).
          //   k != j
-            xj = fabs(x->ptr.p_double[j]);
+            xj = fabs(x->xR[j]);
             uscal = tscal;
-            rec = 1 / ae_maxreal(xmax, 1.0);
-            if (cnorm->ptr.p_double[j] > (bignum - xj) * rec) {
+            rec = 1 / rmax2(xmax, 1.0);
+            if (cnorm->xR[j] > (bignum - xj) * rec) {
             // If x(j) could overflow, scale x by 1/(2*XMAX).
                rec *= 0.5;
                if (nounit) {
-                  tjjs = a->ptr.pp_double[j][j] * tscal;
+                  tjjs = a->xyR[j][j] * tscal;
                } else {
                   tjjs = tscal;
                }
                tjj = fabs(tjjs);
                if (tjj > 1.0) {
                // Divide by A(j,j) when scaling x if A(j,j) > 1.
-                  rec = ae_minreal(1.0, rec * tjj);
+                  rec = rmin2(1.0, rec * tjj);
                   uscal /= tjjs;
                }
                if (rec < 1.0) {
-                  ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                  ae_v_muld(&x->xR[1], 1, n, rec);
                   *s *= rec;
                   xmax *= rec;
                }
@@ -5645,28 +5282,28 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                if (upper) {
                   if (j > 1) {
                      jm1 = j - 1;
-                     sumj = ae_v_dotproduct(&a->ptr.pp_double[1][j], a->stride, &x->ptr.p_double[1], 1, jm1);
+                     sumj = ae_v_dotproduct(&a->xyR[1][j], a->stride, &x->xR[1], 1, jm1);
                   } else {
                      sumj = 0.0;
                   }
                } else {
                   if (j < n) {
                      jp1 = j + 1;
-                     sumj = ae_v_dotproduct(&a->ptr.pp_double[jp1][j], a->stride, &x->ptr.p_double[jp1], 1, n - jp1 + 1);
+                     sumj = ae_v_dotproduct(&a->xyR[jp1][j], a->stride, &x->xR[jp1], 1, n - jp1 + 1);
                   }
                }
             } else {
             // Otherwise, use in-line code for the dot product.
                if (upper) {
                   for (i = 1; i < j; i++) {
-                     v = a->ptr.pp_double[i][j] * uscal;
-                     sumj += v * x->ptr.p_double[i];
+                     v = a->xyR[i][j] * uscal;
+                     sumj += v * x->xR[i];
                   }
                } else {
                   if (j < n) {
                      for (i = j + 1; i <= n; i++) {
-                        v = a->ptr.pp_double[i][j] * uscal;
-                        sumj += v * x->ptr.p_double[i];
+                        v = a->xyR[i][j] * uscal;
+                        sumj += v * x->xR[i];
                      }
                   }
                }
@@ -5674,11 +5311,11 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
             if (uscal == tscal) {
             // Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
             // was not used to scale the dotproduct.
-               x->ptr.p_double[j] -= sumj;
-               xj = fabs(x->ptr.p_double[j]);
+               x->xR[j] -= sumj;
+               xj = fabs(x->xR[j]);
                flg = 0;
                if (nounit) {
-                  tjjs = a->ptr.pp_double[j][j] * tscal;
+                  tjjs = a->xyR[j][j] * tscal;
                } else {
                   tjjs = tscal;
                   if (tscal == 1.0) {
@@ -5694,30 +5331,30 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
                         if (xj > tjj * bignum) {
                         // Scale X by 1/abs(x(j)).
                            rec = 1 / xj;
-                           ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                           ae_v_muld(&x->xR[1], 1, n, rec);
                            *s *= rec;
                            xmax *= rec;
                         }
                      }
-                     x->ptr.p_double[j] /= tjjs;
+                     x->xR[j] /= tjjs;
                   } else {
                      if (tjj > 0.0) {
                      // 0 < abs(A(j,j)) <= SMLNUM:
                         if (xj > tjj * bignum) {
                         // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM.
                            rec = tjj * bignum / xj;
-                           ae_v_muld(&x->ptr.p_double[1], 1, n, rec);
+                           ae_v_muld(&x->xR[1], 1, n, rec);
                            *s *= rec;
                            xmax *= rec;
                         }
-                        x->ptr.p_double[j] /= tjjs;
+                        x->xR[j] /= tjjs;
                      } else {
                      // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
                      // scale = 0, and compute a solution to A'*x = 0.
                         for (i = 1; i <= n; i++) {
-                           x->ptr.p_double[i] = 0.0;
+                           x->xR[i] = 0.0;
                         }
-                        x->ptr.p_double[j] = 1.0;
+                        x->xR[j] = 1.0;
                         *s = 0.0;
                         xmax = 0.0;
                      }
@@ -5726,9 +5363,9 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
             } else {
             // Compute x(j) := x(j) / A(j,j)  - sumj if the dot
             // product has already been divided by 1/A(j,j).
-               x->ptr.p_double[j] = x->ptr.p_double[j] / tjjs - sumj;
+               x->xR[j] = x->xR[j] / tjjs - sumj;
             }
-            xmax = ae_maxreal(xmax, fabs(x->ptr.p_double[j]));
+            xmax = rmax2(xmax, fabs(x->xR[j]));
             j += jinc;
          }
       }
@@ -5737,7 +5374,7 @@ void safesolvetriangular(RMatrix a, ae_int_t n, RVector x, double *s, bool isupp
 // Scale the column norms by 1/TSCAL for return.
    if (tscal != 1.0) {
       v = 1 / tscal;
-      ae_v_muld(&cnorm->ptr.p_double[1], 1, n, v);
+      ae_v_muld(&cnorm->xR[1], 1, n, v);
    }
 }
 } // end of namespace alglib_impl
@@ -5783,7 +5420,7 @@ static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, do
       *x = ae_complex_from_i(0);
    }
 // update NrmX, test growth limit
-   *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x));
+   *xnorm = rmax2(*xnorm, ae_c_abs(*x));
    if (*xnorm > maxgrowth * bnorm) {
       return result;
    }
@@ -5794,7 +5431,7 @@ static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, do
 // Real implementation of CMatrixScaledTRSafeSolve
 //
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
-bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
+bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
    ae_frame _frame_block;
    double lnmax;
    double nrmb;
@@ -5819,7 +5456,7 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
 // Load norms: right part and X
    nrmb = 0.0;
    for (i = 0; i < n; i++) {
-      nrmb = ae_maxreal(nrmb, fabs(x->ptr.p_double[i]));
+      nrmb = rmax2(nrmb, fabs(x->xR[i]));
    }
    nrmx = 0.0;
 // Solve
@@ -5832,14 +5469,14 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->ptr.pp_double[i][i] * sa);
+            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
          }
          if (i < n - 1) {
-            ae_v_moved(&tmp.ptr.p_double[i + 1], 1, &a->ptr.pp_double[i][i + 1], 1, n - i - 1, sa);
-            vr = ae_v_dotproduct(&tmp.ptr.p_double[i + 1], 1, &x->ptr.p_double[i + 1], 1, n - i - 1);
-            beta = ae_complex_from_d(x->ptr.p_double[i] - vr);
+            ae_v_moved(&tmp.xR[i + 1], 1, &a->xyR[i][i + 1], 1, n - i - 1, sa);
+            vr = ae_v_dotproduct(&tmp.xR[i + 1], 1, &x->xR[i + 1], 1, n - i - 1);
+            beta = ae_complex_from_d(x->xR[i] - vr);
          } else {
-            beta = ae_complex_from_d(x->ptr.p_double[i]);
+            beta = ae_complex_from_d(x->xR[i]);
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
@@ -5847,7 +5484,7 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_double[i] = cx.x;
+         x->xR[i] = cx.x;
       }
       ae_frame_leave();
       return result;
@@ -5859,14 +5496,14 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->ptr.pp_double[i][i] * sa);
+            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
          }
          if (i > 0) {
-            ae_v_moved(tmp.ptr.p_double, 1, a->ptr.pp_double[i], 1, i, sa);
-            vr = ae_v_dotproduct(tmp.ptr.p_double, 1, x->ptr.p_double, 1, i);
-            beta = ae_complex_from_d(x->ptr.p_double[i] - vr);
+            ae_v_moved(tmp.xR, 1, a->xyR[i], 1, i, sa);
+            vr = ae_v_dotproduct(tmp.xR, 1, x->xR, 1, i);
+            beta = ae_complex_from_d(x->xR[i] - vr);
          } else {
-            beta = ae_complex_from_d(x->ptr.p_double[i]);
+            beta = ae_complex_from_d(x->xR[i]);
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
@@ -5874,7 +5511,7 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_double[i] = cx.x;
+         x->xR[i] = cx.x;
       }
       ae_frame_leave();
       return result;
@@ -5886,21 +5523,21 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->ptr.pp_double[i][i] * sa);
+            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
          }
-         beta = ae_complex_from_d(x->ptr.p_double[i]);
+         beta = ae_complex_from_d(x->xR[i]);
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_double[i] = cx.x;
+         x->xR[i] = cx.x;
       // update the rest of right part
          if (i < n - 1) {
             vr = cx.x;
-            ae_v_moved(&tmp.ptr.p_double[i + 1], 1, &a->ptr.pp_double[i][i + 1], 1, n - i - 1, sa);
-            ae_v_subd(&x->ptr.p_double[i + 1], 1, &tmp.ptr.p_double[i + 1], 1, n - i - 1, vr);
+            ae_v_moved(&tmp.xR[i + 1], 1, &a->xyR[i][i + 1], 1, n - i - 1, sa);
+            ae_v_subd(&x->xR[i + 1], 1, &tmp.xR[i + 1], 1, n - i - 1, vr);
          }
       }
       ae_frame_leave();
@@ -5913,21 +5550,21 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_complex_from_d(a->ptr.pp_double[i][i] * sa);
+            alpha = ae_complex_from_d(a->xyR[i][i] * sa);
          }
-         beta = ae_complex_from_d(x->ptr.p_double[i]);
+         beta = ae_complex_from_d(x->xR[i]);
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_double[i] = cx.x;
+         x->xR[i] = cx.x;
       // update the rest of right part
          if (i > 0) {
             vr = cx.x;
-            ae_v_moved(tmp.ptr.p_double, 1, a->ptr.pp_double[i], 1, i, sa);
-            ae_v_subd(x->ptr.p_double, 1, tmp.ptr.p_double, 1, i, vr);
+            ae_v_moved(tmp.xR, 1, a->xyR[i], 1, i, sa);
+            ae_v_subd(x->xR, 1, tmp.xR, 1, i, vr);
          }
       }
       ae_frame_leave();
@@ -5952,7 +5589,7 @@ bool rmatrixscaledtrsafesolve(RMatrix a, double sa, ae_int_t n, RVector x, bool 
 // as MaxGrowth is significantly less than MaxRealNumber/norm(b).
 //
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
-bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
+bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
    ae_frame _frame_block;
    double lnmax;
    double nrmb;
@@ -5976,7 +5613,7 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
 // Load norms: right part and X
    nrmb = 0.0;
    for (i = 0; i < n; i++) {
-      nrmb = ae_maxreal(nrmb, ae_c_abs(x->ptr.p_complex[i]));
+      nrmb = rmax2(nrmb, ae_c_abs(x->xC[i]));
    }
    nrmx = 0.0;
 // Solve
@@ -5989,14 +5626,14 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(a->ptr.pp_complex[i][i], sa);
+            alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
          if (i < n - 1) {
-            ae_v_cmoved(&tmp.ptr.p_complex[i + 1], 1, &a->ptr.pp_complex[i][i + 1], 1, "N", n - i - 1, sa);
-            vc = ae_v_cdotproduct(&tmp.ptr.p_complex[i + 1], 1, "N", &x->ptr.p_complex[i + 1], 1, "N", n - i - 1);
-            beta = ae_c_sub(x->ptr.p_complex[i], vc);
+            ae_v_cmoved(&tmp.xC[i + 1], 1, &a->xyC[i][i + 1], 1, "N", n - i - 1, sa);
+            vc = ae_v_cdotproduct(&tmp.xC[i + 1], 1, "N", &x->xC[i + 1], 1, "N", n - i - 1);
+            beta = ae_c_sub(x->xC[i], vc);
          } else {
-            beta = x->ptr.p_complex[i];
+            beta = x->xC[i];
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
@@ -6004,7 +5641,7 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       }
       ae_frame_leave();
       return result;
@@ -6016,14 +5653,14 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(a->ptr.pp_complex[i][i], sa);
+            alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
          if (i > 0) {
-            ae_v_cmoved(tmp.ptr.p_complex, 1, a->ptr.pp_complex[i], 1, "N", i, sa);
-            vc = ae_v_cdotproduct(tmp.ptr.p_complex, 1, "N", x->ptr.p_complex, 1, "N", i);
-            beta = ae_c_sub(x->ptr.p_complex[i], vc);
+            ae_v_cmoved(tmp.xC, 1, a->xyC[i], 1, "N", i, sa);
+            vc = ae_v_cdotproduct(tmp.xC, 1, "N", x->xC, 1, "N", i);
+            beta = ae_c_sub(x->xC[i], vc);
          } else {
-            beta = x->ptr.p_complex[i];
+            beta = x->xC[i];
          }
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
@@ -6031,7 +5668,7 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       }
       ae_frame_leave();
       return result;
@@ -6043,20 +5680,20 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(a->ptr.pp_complex[i][i], sa);
+            alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
-         beta = x->ptr.p_complex[i];
+         beta = x->xC[i];
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       // update the rest of right part
          if (i < n - 1) {
-            ae_v_cmoved(&tmp.ptr.p_complex[i + 1], 1, &a->ptr.pp_complex[i][i + 1], 1, "N", n - i - 1, sa);
-            ae_v_csubc(&x->ptr.p_complex[i + 1], 1, &tmp.ptr.p_complex[i + 1], 1, "N", n - i - 1, vc);
+            ae_v_cmoved(&tmp.xC[i + 1], 1, &a->xyC[i][i + 1], 1, "N", n - i - 1, sa);
+            ae_v_csubc(&x->xC[i + 1], 1, &tmp.xC[i + 1], 1, "N", n - i - 1, vc);
          }
       }
       ae_frame_leave();
@@ -6069,20 +5706,20 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(a->ptr.pp_complex[i][i], sa);
+            alpha = ae_c_mul_d(a->xyC[i][i], sa);
          }
-         beta = x->ptr.p_complex[i];
+         beta = x->xC[i];
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       // update the rest of right part
          if (i > 0) {
-            ae_v_cmoved(tmp.ptr.p_complex, 1, a->ptr.pp_complex[i], 1, "N", i, sa);
-            ae_v_csubc(x->ptr.p_complex, 1, tmp.ptr.p_complex, 1, "N", i, vc);
+            ae_v_cmoved(tmp.xC, 1, a->xyC[i], 1, "N", i, sa);
+            ae_v_csubc(x->xC, 1, tmp.xC, 1, "N", i, vc);
          }
       }
       ae_frame_leave();
@@ -6095,20 +5732,20 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(ae_c_conj(a->ptr.pp_complex[i][i]), sa);
+            alpha = ae_c_mul_d(ae_c_conj(a->xyC[i][i]), sa);
          }
-         beta = x->ptr.p_complex[i];
+         beta = x->xC[i];
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       // update the rest of right part
          if (i < n - 1) {
-            ae_v_cmoved(&tmp.ptr.p_complex[i + 1], 1, &a->ptr.pp_complex[i][i + 1], 1, "Conj", n - i - 1, sa);
-            ae_v_csubc(&x->ptr.p_complex[i + 1], 1, &tmp.ptr.p_complex[i + 1], 1, "N", n - i - 1, vc);
+            ae_v_cmoved(&tmp.xC[i + 1], 1, &a->xyC[i][i + 1], 1, "Conj", n - i - 1, sa);
+            ae_v_csubc(&x->xC[i + 1], 1, &tmp.xC[i + 1], 1, "N", n - i - 1, vc);
          }
       }
       ae_frame_leave();
@@ -6121,20 +5758,20 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
          if (isunit) {
             alpha = ae_complex_from_d(sa);
          } else {
-            alpha = ae_c_mul_d(ae_c_conj(a->ptr.pp_complex[i][i]), sa);
+            alpha = ae_c_mul_d(ae_c_conj(a->xyC[i][i]), sa);
          }
-         beta = x->ptr.p_complex[i];
+         beta = x->xC[i];
       // solve alpha*x[i] = beta
          result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc);
          if (!result) {
             ae_frame_leave();
             return result;
          }
-         x->ptr.p_complex[i] = vc;
+         x->xC[i] = vc;
       // update the rest of right part
          if (i > 0) {
-            ae_v_cmoved(tmp.ptr.p_complex, 1, a->ptr.pp_complex[i], 1, "Conj", i, sa);
-            ae_v_csubc(x->ptr.p_complex, 1, tmp.ptr.p_complex, 1, "N", i, vc);
+            ae_v_cmoved(tmp.xC, 1, a->xyC[i], 1, "Conj", i, sa);
+            ae_v_csubc(x->xC, 1, tmp.xC, 1, "N", i, vc);
          }
       }
       ae_frame_leave();
@@ -6148,7 +5785,7 @@ bool cmatrixscaledtrsafesolve(CMatrix a, double sa, ae_int_t n, CVector x, bool 
 
 // === HBLAS Package ===
 namespace alglib_impl {
-void hermitianmatrixvectormultiply(CMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, CVector x, ae_complex alpha, CVector y) {
+void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y) {
    ae_int_t i;
    ae_int_t ba1;
    ae_int_t by1;
@@ -6170,23 +5807,23 @@ void hermitianmatrixvectormultiply(CMatrix a, bool isupper, ae_int_t i1, ae_int_
 //
 // Calculate D*x first
    for (i = i1; i <= i2; i++) {
-      y->ptr.p_complex[i - i1 + 1] = ae_c_mul(a->ptr.pp_complex[i][i], x->ptr.p_complex[i - i1 + 1]);
+      y->xC[i - i1 + 1] = ae_c_mul(a->xyC[i][i], x->xC[i - i1 + 1]);
    }
 // Add L*x + U*x
    if (isupper) {
       for (i = i1; i < i2; i++) {
       // Add L*x to the result
-         v = x->ptr.p_complex[i - i1 + 1];
+         v = x->xC[i - i1 + 1];
          by1 = i - i1 + 2;
          by2 = n;
          ba1 = i + 1;
-         ae_v_caddc(&y->ptr.p_complex[by1], 1, &a->ptr.pp_complex[i][ba1], 1, "Conj", by2 - by1 + 1, v);
+         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
       // Add U*x to the result
          bx1 = i - i1 + 2;
          bx2 = n;
          ba1 = i + 1;
-         v = ae_v_cdotproduct(&x->ptr.p_complex[bx1], 1, "N", &a->ptr.pp_complex[i][ba1], 1, "N", bx2 - bx1 + 1);
-         y->ptr.p_complex[i - i1 + 1] = ae_c_add(y->ptr.p_complex[i - i1 + 1], v);
+         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
+         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
       }
    } else {
       for (i = i1 + 1; i <= i2; i++) {
@@ -6194,20 +5831,20 @@ void hermitianmatrixvectormultiply(CMatrix a, bool isupper, ae_int_t i1, ae_int_
          bx1 = 1;
          bx2 = i - i1;
          ba1 = i1;
-         v = ae_v_cdotproduct(&x->ptr.p_complex[bx1], 1, "N", &a->ptr.pp_complex[i][ba1], 1, "N", bx2 - bx1 + 1);
-         y->ptr.p_complex[i - i1 + 1] = ae_c_add(y->ptr.p_complex[i - i1 + 1], v);
+         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
+         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
       // Add U*x to the result
-         v = x->ptr.p_complex[i - i1 + 1];
+         v = x->xC[i - i1 + 1];
          by1 = 1;
          by2 = i - i1;
          ba1 = i1;
-         ae_v_caddc(&y->ptr.p_complex[by1], 1, &a->ptr.pp_complex[i][ba1], 1, "Conj", by2 - by1 + 1, v);
+         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
       }
    }
-   ae_v_cmulc(&y->ptr.p_complex[1], 1, n, alpha);
+   ae_v_cmulc(&y->xC[1], 1, n, alpha);
 }
 
-void hermitianrank2update(CMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, CVector x, CVector y, CVector t, ae_complex alpha) {
+void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha) {
    ae_int_t i;
    ae_int_t tp1;
    ae_int_t tp2;
@@ -6216,21 +5853,21 @@ void hermitianrank2update(CMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, CVe
       for (i = i1; i <= i2; i++) {
          tp1 = i + 1 - i1;
          tp2 = i2 - i1 + 1;
-         v = ae_c_mul(alpha, x->ptr.p_complex[i + 1 - i1]);
-         ae_v_cmovec(&t->ptr.p_complex[tp1], 1, &y->ptr.p_complex[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         v = ae_c_mul(ae_c_conj(alpha), y->ptr.p_complex[i + 1 - i1]);
-         ae_v_caddc(&t->ptr.p_complex[tp1], 1, &x->ptr.p_complex[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         ae_v_cadd(&a->ptr.pp_complex[i][i], 1, &t->ptr.p_complex[tp1], 1, "N", i2 - i + 1);
+         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
+         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
+         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         ae_v_cadd(&a->xyC[i][i], 1, &t->xC[tp1], 1, "N", i2 - i + 1);
       }
    } else {
       for (i = i1; i <= i2; i++) {
          tp1 = 1;
          tp2 = i + 1 - i1;
-         v = ae_c_mul(alpha, x->ptr.p_complex[i + 1 - i1]);
-         ae_v_cmovec(&t->ptr.p_complex[tp1], 1, &y->ptr.p_complex[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         v = ae_c_mul(ae_c_conj(alpha), y->ptr.p_complex[i + 1 - i1]);
-         ae_v_caddc(&t->ptr.p_complex[tp1], 1, &x->ptr.p_complex[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         ae_v_cadd(&a->ptr.pp_complex[i][i1], 1, &t->ptr.p_complex[tp1], 1, "N", i - i1 + 1);
+         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
+         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
+         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         ae_v_cadd(&a->xyC[i][i1], 1, &t->xC[tp1], 1, "N", i - i1 + 1);
       }
    }
 }
@@ -6239,7 +5876,7 @@ void hermitianrank2update(CMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, CVe
 // === SBLAS Package ===
 // Depends on: APSERV
 namespace alglib_impl {
-void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVector x, double alpha, RVector y) {
+void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y) {
    ae_int_t i;
    ae_int_t ba1;
    ae_int_t by1;
@@ -6261,23 +5898,23 @@ void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_
 //
 // Calculate D*x first
    for (i = i1; i <= i2; i++) {
-      y->ptr.p_double[i - i1 + 1] = a->ptr.pp_double[i][i] * x->ptr.p_double[i - i1 + 1];
+      y->xR[i - i1 + 1] = a->xyR[i][i] * x->xR[i - i1 + 1];
    }
 // Add L*x + U*x
    if (isupper) {
       for (i = i1; i < i2; i++) {
       // Add L*x to the result
-         v = x->ptr.p_double[i - i1 + 1];
+         v = x->xR[i - i1 + 1];
          by1 = i - i1 + 2;
          by2 = n;
          ba1 = i + 1;
-         ae_v_addd(&y->ptr.p_double[by1], 1, &a->ptr.pp_double[i][ba1], 1, by2 - by1 + 1, v);
+         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
       // Add U*x to the result
          bx1 = i - i1 + 2;
          bx2 = n;
          ba1 = i + 1;
-         v = ae_v_dotproduct(&x->ptr.p_double[bx1], 1, &a->ptr.pp_double[i][ba1], 1, bx2 - bx1 + 1);
-         y->ptr.p_double[i - i1 + 1] += v;
+         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
+         y->xR[i - i1 + 1] += v;
       }
    } else {
       for (i = i1 + 1; i <= i2; i++) {
@@ -6285,20 +5922,20 @@ void symmetricmatrixvectormultiply(RMatrix a, bool isupper, ae_int_t i1, ae_int_
          bx1 = 1;
          bx2 = i - i1;
          ba1 = i1;
-         v = ae_v_dotproduct(&x->ptr.p_double[bx1], 1, &a->ptr.pp_double[i][ba1], 1, bx2 - bx1 + 1);
-         y->ptr.p_double[i - i1 + 1] += v;
+         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
+         y->xR[i - i1 + 1] += v;
       // Add U*x to the result
-         v = x->ptr.p_double[i - i1 + 1];
+         v = x->xR[i - i1 + 1];
          by1 = 1;
          by2 = i - i1;
          ba1 = i1;
-         ae_v_addd(&y->ptr.p_double[by1], 1, &a->ptr.pp_double[i][ba1], 1, by2 - by1 + 1, v);
+         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
       }
    }
-   ae_v_muld(&y->ptr.p_double[1], 1, n, alpha);
+   ae_v_muld(&y->xR[1], 1, n, alpha);
 }
 
-void symmetricrank2update(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVector x, RVector y, RVector t, double alpha) {
+void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha) {
    ae_int_t i;
    ae_int_t tp1;
    ae_int_t tp2;
@@ -6307,23 +5944,23 @@ void symmetricrank2update(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVe
       for (i = i1; i <= i2; i++) {
          tp1 = i + 1 - i1;
          tp2 = i2 - i1 + 1;
-         v = x->ptr.p_double[i + 1 - i1];
-         ae_v_moved(&t->ptr.p_double[tp1], 1, &y->ptr.p_double[tp1], 1, tp2 - tp1 + 1, v);
-         v = y->ptr.p_double[i + 1 - i1];
-         ae_v_addd(&t->ptr.p_double[tp1], 1, &x->ptr.p_double[tp1], 1, tp2 - tp1 + 1, v);
-         ae_v_muld(&t->ptr.p_double[tp1], 1, tp2 - tp1 + 1, alpha);
-         ae_v_add(&a->ptr.pp_double[i][i], 1, &t->ptr.p_double[tp1], 1, i2 - i + 1);
+         v = x->xR[i + 1 - i1];
+         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
+         v = y->xR[i + 1 - i1];
+         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
+         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
+         ae_v_add(&a->xyR[i][i], 1, &t->xR[tp1], 1, i2 - i + 1);
       }
    } else {
       for (i = i1; i <= i2; i++) {
          tp1 = 1;
          tp2 = i + 1 - i1;
-         v = x->ptr.p_double[i + 1 - i1];
-         ae_v_moved(&t->ptr.p_double[tp1], 1, &y->ptr.p_double[tp1], 1, tp2 - tp1 + 1, v);
-         v = y->ptr.p_double[i + 1 - i1];
-         ae_v_addd(&t->ptr.p_double[tp1], 1, &x->ptr.p_double[tp1], 1, tp2 - tp1 + 1, v);
-         ae_v_muld(&t->ptr.p_double[tp1], 1, tp2 - tp1 + 1, alpha);
-         ae_v_add(&a->ptr.pp_double[i][i1], 1, &t->ptr.p_double[tp1], 1, i - i1 + 1);
+         v = x->xR[i + 1 - i1];
+         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
+         v = y->xR[i + 1 - i1];
+         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
+         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
+         ae_v_add(&a->xyR[i][i1], 1, &t->xR[tp1], 1, i - i1 + 1);
       }
    }
 }
@@ -6331,7 +5968,7 @@ void symmetricrank2update(RMatrix a, bool isupper, ae_int_t i1, ae_int_t i2, RVe
 
 // === BLAS Package ===
 namespace alglib_impl {
-double vectornorm2(RVector x, ae_int_t i1, ae_int_t i2) {
+double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2) {
    ae_int_t n;
    ae_int_t ix;
    double absxi;
@@ -6344,14 +5981,14 @@ double vectornorm2(RVector x, ae_int_t i1, ae_int_t i2) {
       return result;
    }
    if (n == 1) {
-      result = fabs(x->ptr.p_double[i1]);
+      result = fabs(x->xR[i1]);
       return result;
    }
    scl = 0.0;
    ssq = 1.0;
    for (ix = i1; ix <= i2; ix++) {
-      if (x->ptr.p_double[ix] != 0.0) {
-         absxi = fabs(x->ptr.p_double[ix]);
+      if (x->xR[ix] != 0.0) {
+         absxi = fabs(x->xR[ix]);
          if (scl < absxi) {
             ssq = 1 + ssq * ae_sqr(scl / absxi);
             scl = absxi;
@@ -6364,63 +6001,63 @@ double vectornorm2(RVector x, ae_int_t i1, ae_int_t i2) {
    return result;
 }
 
-ae_int_t vectoridxabsmax(RVector x, ae_int_t i1, ae_int_t i2) {
+ae_int_t vectoridxabsmax(RVector *x, ae_int_t i1, ae_int_t i2) {
    ae_int_t i;
    ae_int_t result;
    result = i1;
    for (i = i1 + 1; i <= i2; i++) {
-      if (fabs(x->ptr.p_double[i]) > fabs(x->ptr.p_double[result])) {
+      if (fabs(x->xR[i]) > fabs(x->xR[result])) {
          result = i;
       }
    }
    return result;
 }
 
-ae_int_t columnidxabsmax(RMatrix x, ae_int_t i1, ae_int_t i2, ae_int_t j) {
+ae_int_t columnidxabsmax(RMatrix *x, ae_int_t i1, ae_int_t i2, ae_int_t j) {
    ae_int_t i;
    ae_int_t result;
    result = i1;
    for (i = i1 + 1; i <= i2; i++) {
-      if (fabs(x->ptr.pp_double[i][j]) > fabs(x->ptr.pp_double[result][j])) {
+      if (fabs(x->xyR[i][j]) > fabs(x->xyR[result][j])) {
          result = i;
       }
    }
    return result;
 }
 
-ae_int_t rowidxabsmax(RMatrix x, ae_int_t j1, ae_int_t j2, ae_int_t i) {
+ae_int_t rowidxabsmax(RMatrix *x, ae_int_t j1, ae_int_t j2, ae_int_t i) {
    ae_int_t j;
    ae_int_t result;
    result = j1;
    for (j = j1 + 1; j <= j2; j++) {
-      if (fabs(x->ptr.pp_double[i][j]) > fabs(x->ptr.pp_double[i][result])) {
+      if (fabs(x->xyR[i][j]) > fabs(x->xyR[i][result])) {
          result = j;
       }
    }
    return result;
 }
 
-double upperhessenberg1norm(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector work) {
+double upperhessenberg1norm(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
    ae_int_t i;
    ae_int_t j;
    double result;
    ae_assert(i2 - i1 == j2 - j1, "UpperHessenberg1Norm: I2-I1 != J2-J1!");
    for (j = j1; j <= j2; j++) {
-      work->ptr.p_double[j] = 0.0;
+      work->xR[j] = 0.0;
    }
    for (i = i1; i <= i2; i++) {
-      for (j = ae_maxint(j1, j1 + i - i1 - 1); j <= j2; j++) {
-         work->ptr.p_double[j] += fabs(a->ptr.pp_double[i][j]);
+      for (j = imax2(j1, j1 + i - i1 - 1); j <= j2; j++) {
+         work->xR[j] += fabs(a->xyR[i][j]);
       }
    }
    result = 0.0;
    for (j = j1; j <= j2; j++) {
-      result = ae_maxreal(result, work->ptr.p_double[j]);
+      result = rmax2(result, work->xR[j]);
    }
    return result;
 }
 
-void copymatrix(RMatrix a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
+void copymatrix(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
    ae_int_t isrc;
    ae_int_t idst;
    if (is1 > is2 || js1 > js2) {
@@ -6430,11 +6067,11 @@ void copymatrix(RMatrix a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js
    ae_assert(js2 - js1 == jd2 - jd1, "CopyMatrix: different sizes!");
    for (isrc = is1; isrc <= is2; isrc++) {
       idst = isrc - is1 + id1;
-      ae_v_move(&b->ptr.pp_double[idst][jd1], 1, &a->ptr.pp_double[isrc][js1], 1, jd2 - jd1 + 1);
+      ae_v_move(&b->xyR[idst][jd1], 1, &a->xyR[isrc][js1], 1, jd2 - jd1 + 1);
    }
 }
 
-void inplacetranspose(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector work) {
+void inplacetranspose(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t ips;
@@ -6449,13 +6086,13 @@ void inplacetranspose(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t
       ips = i + 1;
       jps = j1 + ips - i1;
       l = i2 - i;
-      ae_v_move(&work->ptr.p_double[1], 1, &a->ptr.pp_double[ips][j], a->stride, l);
-      ae_v_move(&a->ptr.pp_double[ips][j], a->stride, &a->ptr.pp_double[i][jps], 1, i2 - ips + 1);
-      ae_v_move(&a->ptr.pp_double[i][jps], 1, &work->ptr.p_double[1], 1, j2 - jps + 1);
+      ae_v_move(&work->xR[1], 1, &a->xyR[ips][j], a->stride, l);
+      ae_v_move(&a->xyR[ips][j], a->stride, &a->xyR[i][jps], 1, i2 - ips + 1);
+      ae_v_move(&a->xyR[i][jps], 1, &work->xR[1], 1, j2 - jps + 1);
    }
 }
 
-void copyandtranspose(RMatrix a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
+void copyandtranspose(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
    ae_int_t isrc;
    ae_int_t jdst;
    if (is1 > is2 || js1 > js2) {
@@ -6465,11 +6102,11 @@ void copyandtranspose(RMatrix a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_in
    ae_assert(js2 - js1 == id2 - id1, "CopyAndTranspose: different sizes!");
    for (isrc = is1; isrc <= is2; isrc++) {
       jdst = isrc - is1 + jd1;
-      ae_v_move(&b->ptr.pp_double[id1][jdst], b->stride, &a->ptr.pp_double[isrc][js1], 1, id2 - id1 + 1);
+      ae_v_move(&b->xyR[id1][jdst], b->stride, &a->xyR[isrc][js1], 1, id2 - id1 + 1);
    }
 }
 
-void matrixvectormultiply(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector y, ae_int_t iy1, ae_int_t iy2, double beta) {
+void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector *x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector *y, ae_int_t iy1, ae_int_t iy2, double beta) {
    ae_int_t i;
    double v;
    if (!trans) {
@@ -6482,15 +6119,15 @@ void matrixvectormultiply(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_i
    // beta*y
       if (beta == 0.0) {
          for (i = iy1; i <= iy2; i++) {
-            y->ptr.p_double[i] = 0.0;
+            y->xR[i] = 0.0;
          }
       } else {
-         ae_v_muld(&y->ptr.p_double[iy1], 1, iy2 - iy1 + 1, beta);
+         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
       }
    // alpha*A*x
       for (i = i1; i <= i2; i++) {
-         v = ae_v_dotproduct(&a->ptr.pp_double[i][j1], 1, &x->ptr.p_double[ix1], 1, j2 - j1 + 1);
-         y->ptr.p_double[iy1 + i - i1] += alpha * v;
+         v = ae_v_dotproduct(&a->xyR[i][j1], 1, &x->xR[ix1], 1, j2 - j1 + 1);
+         y->xR[iy1 + i - i1] += alpha * v;
       }
    } else {
    // y := alpha*A'*x + beta*y;
@@ -6502,15 +6139,15 @@ void matrixvectormultiply(RMatrix a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_i
    // beta*y
       if (beta == 0.0) {
          for (i = iy1; i <= iy2; i++) {
-            y->ptr.p_double[i] = 0.0;
+            y->xR[i] = 0.0;
          }
       } else {
-         ae_v_muld(&y->ptr.p_double[iy1], 1, iy2 - iy1 + 1, beta);
+         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
       }
    // alpha*A'*x
       for (i = i1; i <= i2; i++) {
-         v = alpha * x->ptr.p_double[ix1 + i - i1];
-         ae_v_addd(&y->ptr.p_double[iy1], 1, &a->ptr.pp_double[i][j1], 1, iy2 - iy1 + 1, v);
+         v = alpha * x->xR[ix1 + i - i1];
+         ae_v_addd(&y->xR[iy1], 1, &a->xyR[i][j1], 1, iy2 - iy1 + 1, v);
       }
    }
 }
@@ -6523,8 +6160,8 @@ double pythag2(double x, double y) {
    double result;
    xabs = fabs(x);
    yabs = fabs(y);
-   w = ae_maxreal(xabs, yabs);
-   z = ae_minreal(xabs, yabs);
+   w = rmax2(xabs, yabs);
+   z = rmin2(xabs, yabs);
    if (z == 0.0) {
       result = w;
    } else {
@@ -6533,7 +6170,7 @@ double pythag2(double x, double y) {
    return result;
 }
 
-void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector work) {
+void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work) {
    ae_int_t arows;
    ae_int_t acols;
    ae_int_t brows;
@@ -6566,30 +6203,30 @@ void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, a
    }
    crows = arows;
 // Test WORK
-   i = ae_maxint(arows, acols);
-   i = ae_maxint(brows, i);
-   i = ae_maxint(i, bcols);
-   work->ptr.p_double[1] = 0.0;
-   work->ptr.p_double[i] = 0.0;
+   i = imax2(arows, acols);
+   i = imax2(brows, i);
+   i = imax2(i, bcols);
+   work->xR[1] = 0.0;
+   work->xR[i] = 0.0;
 // Prepare C
    if (beta == 0.0) {
       for (i = ci1; i <= ci2; i++) {
          for (j = cj1; j <= cj2; j++) {
-            c->ptr.pp_double[i][j] = 0.0;
+            c->xyR[i][j] = 0.0;
          }
       }
    } else {
       for (i = ci1; i <= ci2; i++) {
-         ae_v_muld(&c->ptr.pp_double[i][cj1], 1, cj2 - cj1 + 1, beta);
+         ae_v_muld(&c->xyR[i][cj1], 1, cj2 - cj1 + 1, beta);
       }
    }
 // A*B
    if (!transa && !transb) {
       for (l = ai1; l <= ai2; l++) {
          for (r = bi1; r <= bi2; r++) {
-            v = alpha * a->ptr.pp_double[l][aj1 + r - bi1];
+            v = alpha * a->xyR[l][aj1 + r - bi1];
             k = ci1 + l - ai1;
-            ae_v_addd(&c->ptr.pp_double[k][cj1], 1, &b->ptr.pp_double[r][bj1], 1, cj2 - cj1 + 1, v);
+            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
          }
       }
       return;
@@ -6599,16 +6236,16 @@ void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, a
       if (arows * acols < brows * bcols) {
          for (r = bi1; r <= bi2; r++) {
             for (l = ai1; l <= ai2; l++) {
-               v = ae_v_dotproduct(&a->ptr.pp_double[l][aj1], 1, &b->ptr.pp_double[r][bj1], 1, aj2 - aj1 + 1);
-               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
+               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          return;
       } else {
          for (l = ai1; l <= ai2; l++) {
             for (r = bi1; r <= bi2; r++) {
-               v = ae_v_dotproduct(&a->ptr.pp_double[l][aj1], 1, &b->ptr.pp_double[r][bj1], 1, aj2 - aj1 + 1);
-               c->ptr.pp_double[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
+               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
             }
          }
          return;
@@ -6618,9 +6255,9 @@ void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, a
    if (transa && !transb) {
       for (l = aj1; l <= aj2; l++) {
          for (r = bi1; r <= bi2; r++) {
-            v = alpha * a->ptr.pp_double[ai1 + r - bi1][l];
+            v = alpha * a->xyR[ai1 + r - bi1][l];
             k = ci1 + l - aj1;
-            ae_v_addd(&c->ptr.pp_double[k][cj1], 1, &b->ptr.pp_double[r][bj1], 1, cj2 - cj1 + 1, v);
+            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
          }
       }
       return;
@@ -6631,22 +6268,22 @@ void matrixmatrixmultiply(RMatrix a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, a
          for (r = bi1; r <= bi2; r++) {
             k = cj1 + r - bi1;
             for (i = 1; i <= crows; i++) {
-               work->ptr.p_double[i] = 0.0;
+               work->xR[i] = 0.0;
             }
             for (l = ai1; l <= ai2; l++) {
-               v = alpha * b->ptr.pp_double[r][bj1 + l - ai1];
-               ae_v_addd(&work->ptr.p_double[1], 1, &a->ptr.pp_double[l][aj1], 1, crows, v);
+               v = alpha * b->xyR[r][bj1 + l - ai1];
+               ae_v_addd(&work->xR[1], 1, &a->xyR[l][aj1], 1, crows, v);
             }
-            ae_v_add(&c->ptr.pp_double[ci1][k], c->stride, &work->ptr.p_double[1], 1, ci2 - ci1 + 1);
+            ae_v_add(&c->xyR[ci1][k], c->stride, &work->xR[1], 1, ci2 - ci1 + 1);
          }
          return;
       } else {
          for (l = aj1; l <= aj2; l++) {
             k = ai2 - ai1 + 1;
-            ae_v_move(&work->ptr.p_double[1], 1, &a->ptr.pp_double[ai1][l], a->stride, k);
+            ae_v_move(&work->xR[1], 1, &a->xyR[ai1][l], a->stride, k);
             for (r = bi1; r <= bi2; r++) {
-               v = ae_v_dotproduct(&work->ptr.p_double[1], 1, &b->ptr.pp_double[r][bj1], 1, k);
-               c->ptr.pp_double[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
+               v = ae_v_dotproduct(&work->xR[1], 1, &b->xyR[r][bj1], 1, k);
+               c->xyR[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
             }
          }
          return;
@@ -6667,25 +6304,25 @@ static const double linmin_armijofactor = 1.3;
 // Normalizes direction/step pair: makes |D|=1, scales Stp.
 // If |D|=0, it returns, leavind D/Stp unchanged.
 // ALGLIB: Copyright 01.04.2010 by Sergey Bochkanov
-void linminnormalized(RVector d, double *stp, ae_int_t n) {
+void linminnormalized(RVector *d, double *stp, ae_int_t n) {
    double mx;
    double s;
    ae_int_t i;
 // first, scale D to avoid underflow/overflow durng squaring
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      mx = ae_maxreal(mx, fabs(d->ptr.p_double[i]));
+      mx = rmax2(mx, fabs(d->xR[i]));
    }
    if (mx == 0.0) {
       return;
    }
    s = 1 / mx;
-   ae_v_muld(d->ptr.p_double, 1, n, s);
+   ae_v_muld(d->xR, 1, n, s);
    *stp /= s;
 // normalize D
-   s = ae_v_dotproduct(d->ptr.p_double, 1, d->ptr.p_double, 1, n);
+   s = ae_v_dotproduct(d->xR, 1, d->xR, 1, n);
    s = 1 / sqrt(s);
-   ae_v_muld(d->ptr.p_double, 1, n, s);
+   ae_v_muld(d->xR, 1, n, s);
    *stp /= s;
 }
 
@@ -6703,7 +6340,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
    double theta;
    *info = 0;
 // CHECK THE INPUT PARAMETERS FOR ERRORS.
-   if (*brackt && (*stp <= ae_minreal(*stx, *sty) || *stp >= ae_maxreal(*stx, *sty)) || *dx * (*stp - *stx) >= 0.0 || stmax < stmin) {
+   if (*brackt && (*stp <= rmin2(*stx, *sty) || *stp >= rmax2(*stx, *sty)) || *dx * (*stp - *stx) >= 0.0 || stmax < stmin) {
       return;
    }
 // DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
@@ -6716,7 +6353,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
       *info = 1;
       bound = true;
       theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-      s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+      s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
       gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
       if (*stp < *stx) {
          gamma = -gamma;
@@ -6741,7 +6378,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
          *info = 2;
          bound = false;
          theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-         s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+         s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
          gamma = s * sqrt(ae_sqr(theta / s) - *dx / s * (dp / s));
          if (*stp > *stx) {
             gamma = -gamma;
@@ -6770,10 +6407,10 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
             *info = 3;
             bound = true;
             theta = 3 * (*fx - fp) / (*stp - (*stx)) + (*dx) + dp;
-            s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dx), fabs(dp)));
+            s = rmax2(fabs(theta), rmax2(fabs(*dx), fabs(dp)));
          // THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
          // TO INFINITY IN THE DIRECTION OF THE STEP.
-            gamma = s * sqrt(ae_maxreal(0.0, ae_sqr(theta / s) - *dx / s * (dp / s)));
+            gamma = s * sqrt(rmax2(0.0, ae_sqr(theta / s) - *dx / s * (dp / s)));
             if (*stp > *stx) {
                gamma = -gamma;
             }
@@ -6812,7 +6449,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
             bound = false;
             if (*brackt) {
                theta = 3 * (fp - (*fy)) / (*sty - (*stp)) + (*dy) + dp;
-               s = ae_maxreal(fabs(theta), ae_maxreal(fabs(*dy), fabs(dp)));
+               s = rmax2(fabs(theta), rmax2(fabs(*dy), fabs(dp)));
                gamma = s * sqrt(ae_sqr(theta / s) - *dy / s * (dp / s));
                if (*stp > *sty) {
                   gamma = -gamma;
@@ -6849,14 +6486,14 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
       *dx = dp;
    }
 // COMPUTE THE NEW STEP AND SAFEGUARD IT.
-   stpf = ae_minreal(stmax, stpf);
-   stpf = ae_maxreal(stmin, stpf);
+   stpf = rmin2(stmax, stpf);
+   stpf = rmax2(stmin, stpf);
    *stp = stpf;
    if (*brackt && bound) {
       if (*sty > *stx) {
-         *stp = ae_minreal(*stx + 0.66 * (*sty - (*stx)), *stp);
+         *stp = rmin2(*stx + 0.66 * (*sty - (*stx)), *stp);
       } else {
-         *stp = ae_maxreal(*stx + 0.66 * (*sty - (*stx)), *stp);
+         *stp = rmax2(*stx + 0.66 * (*sty - (*stx)), *stp);
       }
    }
 }
@@ -6975,7 +6612,7 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
 //
 // ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
 // JORGE J. MORE', DAVID J. THUENTE
-bool mcsrch(ae_int_t n, RVector x, double *f, RVector g, RVector s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector wa, linminstate *state, ae_int_t *stage) {
+bool mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
    ae_int_t i;
    double v;
    double p5;
@@ -7018,7 +6655,7 @@ Spawn:
    }
 // COMPUTE THE INITIAL GRADIENT IN THE SEARCH DIRECTION
 // AND CHECK THAT S IS A DESCENT DIRECTION.
-   v = ae_v_dotproduct(g->ptr.p_double, 1, s->ptr.p_double, 1, n);
+   v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
    state->dginit = v;
    if (state->dginit >= 0.0) {
       *stp = 0.0;
@@ -7032,7 +6669,7 @@ Spawn:
    state->dgtest = linmin_ftol * state->dginit;
    state->width = stpmax - linmin_stpmin;
    state->width1 = state->width / p5;
-   ae_v_move(wa->ptr.p_double, 1, x->ptr.p_double, 1, n);
+   ae_v_move(wa->xR, 1, x->xR, 1, n);
 // THE VARIABLES STX, FX, DGX CONTAIN THE VALUES OF THE STEP,
 // FUNCTION, AND DIRECTIONAL DERIVATIVE AT THE BEST STEP.
 // THE VARIABLES STY, FY, DGY CONTAIN THE VALUE OF THE STEP,
@@ -7080,13 +6717,13 @@ Spawn:
       }
    // EVALUATE THE FUNCTION AND GRADIENT AT STP
    // AND COMPUTE THE DIRECTIONAL DERIVATIVE.
-      ae_v_move(x->ptr.p_double, 1, wa->ptr.p_double, 1, n);
-      ae_v_addd(x->ptr.p_double, 1, s->ptr.p_double, 1, n, *stp);
+      ae_v_move(x->xR, 1, wa->xR, 1, n);
+      ae_v_addd(x->xR, 1, s->xR, 1, n, *stp);
    // NEXT
       *stage = 4; goto Pause; Resume4:
       *info = 0;
       ++*nfev;
-      v = ae_v_dotproduct(g->ptr.p_double, 1, s->ptr.p_double, 1, n);
+      v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
       state->dg = v;
       state->ftest1 = state->finit + *stp * state->dgtest;
    // TEST FOR CONVERGENCE.
@@ -7114,7 +6751,7 @@ Spawn:
          if (*info == 1 || *info == 5) {
             v = 0.0;
             for (i = 0; i < n; i++) {
-               v += (wa->ptr.p_double[i] - x->ptr.p_double[i]) * (wa->ptr.p_double[i] - x->ptr.p_double[i]);
+               v += (wa->xR[i] - x->xR[i]) * (wa->xR[i] - x->xR[i]);
             }
             if (*f >= state->finit || v == 0.0) {
                *info = 6;
@@ -7124,7 +6761,7 @@ Spawn:
       }
    // IN THE FIRST STAGE WE SEEK A STEP FOR WHICH THE MODIFIED
    // FUNCTION HAS A NONPOSITIVE VALUE AND NONNEGATIVE DERIVATIVE.
-      if (state->stage1 && *f <= state->ftest1 && state->dg >= ae_minreal(linmin_ftol, gtol) * state->dginit) {
+      if (state->stage1 && *f <= state->ftest1 && state->dg >= rmin2(linmin_ftol, gtol) * state->dginit) {
          state->stage1 = false;
       }
    // A MODIFIED FUNCTION IS USED TO PREDICT THE STEP ONLY IF
@@ -7193,7 +6830,7 @@ Pause:
 //     FMAX    -   maximum number of function evaluations
 //     State   -   optimization state
 // ALGLIB: Copyright 05.10.2010 by Sergey Bochkanov
-void armijocreate(ae_int_t n, RVector x, double f, RVector s, double stp, double stpmax, ae_int_t fmax, armijostate *state) {
+void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, double stpmax, ae_int_t fmax, armijostate *state) {
    if (state->x.cnt < n) {
       ae_vector_set_length(&state->x, n);
    }
@@ -7208,8 +6845,8 @@ void armijocreate(ae_int_t n, RVector x, double f, RVector s, double stp, double
    state->stplen = stp;
    state->fcur = f;
    state->n = n;
-   ae_v_move(state->xbase.ptr.p_double, 1, x->ptr.p_double, 1, n);
-   ae_v_move(state->s.ptr.p_double, 1, s->ptr.p_double, 1, n);
+   ae_v_move(state->xbase.xR, 1, x->xR, 1, n);
+   ae_v_move(state->s.xR, 1, s->xR, 1, n);
    state->PQ = -1;
 }
 
@@ -7249,8 +6886,8 @@ Spawn:
    if (v > state->stpmax && state->stpmax != 0.0) {
       v = state->stpmax;
    }
-   ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-   ae_v_addd(state->x.ptr.p_double, 1, state->s.ptr.p_double, 1, n, v);
+   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+   ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
    state->PQ = 0; goto Pause; Resume0:
    state->nfev++;
    if (state->f < state->fcur) {
@@ -7271,8 +6908,8 @@ Spawn:
          if (v > state->stpmax && state->stpmax != 0.0) {
             v = state->stpmax;
          }
-         ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-         ae_v_addd(state->x.ptr.p_double, 1, state->s.ptr.p_double, 1, n, v);
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
          state->PQ = 1; goto Pause; Resume1:
          state->nfev++;
       // make decision
@@ -7287,8 +6924,8 @@ Spawn:
    }
 // Decrease length
    v = state->stplen / linmin_armijofactor;
-   ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-   ae_v_addd(state->x.ptr.p_double, 1, state->s.ptr.p_double, 1, n, v);
+   ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+   ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
    state->PQ = 2; goto Pause; Resume2:
    state->nfev++;
    if (state->f < state->fcur) {
@@ -7306,8 +6943,8 @@ Spawn:
          }
       // evaluate F
          v = state->stplen / linmin_armijofactor;
-         ae_v_move(state->x.ptr.p_double, 1, state->xbase.ptr.p_double, 1, n);
-         ae_v_addd(state->x.ptr.p_double, 1, state->s.ptr.p_double, 1, n, v);
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
          state->PQ = 3; goto Pause; Resume3:
          state->nfev++;
       // make decision
@@ -7453,7 +7090,7 @@ static double xblas_xfastpow(double r, ae_int_t n) {
 //     R   -   SUM(w[i])
 //     RErr-   error estimate for R
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr) {
+static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t ks;
@@ -7492,7 +7129,7 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
       *r = 0.0;
       *rerr = mx * ae_machineepsilon;
       for (i = 0; i < n; i++) {
-         *r += w->ptr.p_double[i];
+         *r += w->xR[i];
       }
       return;
    }
@@ -7502,7 +7139,7 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
    while (s * mx < 0.5) {
       s *= 2;
    }
-   ae_v_muld(w->ptr.p_double, 1, n, s);
+   ae_v_muld(w->xR, 1, n, s);
    s = 1 / s;
 // find Chunk=2^M such that N*Chunk<2^29
 //
@@ -7517,18 +7154,18 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
    invchunk = 1 / chunk;
 // calculate result
    *r = 0.0;
-   ae_v_muld(w->ptr.p_double, 1, n, chunk);
+   ae_v_muld(w->xR, 1, n, chunk);
    while (true) {
       s *= invchunk;
       allzeros = true;
       ks = 0;
       for (i = 0; i < n; i++) {
-         v = w->ptr.p_double[i];
+         v = w->xR[i];
          k = TruncZ(v);
          if (v != (double)k) {
             allzeros = false;
          }
-         w->ptr.p_double[i] = chunk * (v - k);
+         w->xR[i] = chunk * (v - k);
          ks += k;
       }
       *r += s * ks;
@@ -7538,7 +7175,7 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
       }
    }
 // correct error
-   *rerr = ae_maxreal(*rerr, fabs(*r) * ae_machineepsilon);
+   *rerr = rmax2(*rerr, fabs(*r) * ae_machineepsilon);
 }
 
 // More precise dot-product. Absolute error of  subroutine  result  is  about
@@ -7558,7 +7195,7 @@ static void xblas_xsum(RVector w, double mx, ae_int_t n, double *r, double *rerr
 //                 during  calculation  of  (A,B)  and  errors  introduced by
 //                 rounding of A and B to fit in double (about 1 ulp).
 // ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-void xdot(RVector a, RVector b, ae_int_t n, RVector temp, double *r, double *rerr) {
+void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr) {
    ae_int_t i;
    double mx;
    double v;
@@ -7573,9 +7210,9 @@ void xdot(RVector a, RVector b, ae_int_t n, RVector temp, double *r, double *rer
    }
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      v = a->ptr.p_double[i] * b->ptr.p_double[i];
-      temp->ptr.p_double[i] = v;
-      mx = ae_maxreal(mx, fabs(v));
+      v = a->xR[i] * b->xR[i];
+      temp->xR[i] = v;
+      mx = rmax2(mx, fabs(v));
    }
    if (mx == 0.0) {
       *r = 0.0;
@@ -7602,7 +7239,7 @@ void xdot(RVector a, RVector b, ae_int_t n, RVector temp, double *r, double *rer
 //                 during  calculation  of  (A,B)  and  errors  introduced by
 //                 rounding of A and B to fit in double (about 1 ulp).
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double *rerr) {
+void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr) {
    ae_int_t i;
    double mx;
    double v;
@@ -7621,12 +7258,12 @@ void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double
 // calculate real part
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].x;
-      temp->ptr.p_double[2 * i] = v;
-      mx = ae_maxreal(mx, fabs(v));
-      v = -a->ptr.p_complex[i].y * b->ptr.p_complex[i].y;
-      temp->ptr.p_double[2 * i + 1] = v;
-      mx = ae_maxreal(mx, fabs(v));
+      v = a->xC[i].x * b->xC[i].x;
+      temp->xR[2 * i] = v;
+      mx = rmax2(mx, fabs(v));
+      v = -a->xC[i].y * b->xC[i].y;
+      temp->xR[2 * i + 1] = v;
+      mx = rmax2(mx, fabs(v));
    }
    if (mx == 0.0) {
       r->x = 0.0;
@@ -7637,12 +7274,12 @@ void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double
 // calculate imaginary part
    mx = 0.0;
    for (i = 0; i < n; i++) {
-      v = a->ptr.p_complex[i].x * b->ptr.p_complex[i].y;
-      temp->ptr.p_double[2 * i] = v;
-      mx = ae_maxreal(mx, fabs(v));
-      v = a->ptr.p_complex[i].y * b->ptr.p_complex[i].x;
-      temp->ptr.p_double[2 * i + 1] = v;
-      mx = ae_maxreal(mx, fabs(v));
+      v = a->xC[i].x * b->xC[i].y;
+      temp->xR[2 * i] = v;
+      mx = rmax2(mx, fabs(v));
+      v = a->xC[i].y * b->xC[i].x;
+      temp->xR[2 * i + 1] = v;
+      mx = rmax2(mx, fabs(v));
    }
    if (mx == 0.0) {
       r->y = 0.0;
@@ -7654,7 +7291,7 @@ void xcdot(CVector a, CVector b, ae_int_t n, RVector temp, ae_complex *r, double
    if (rerrx == 0.0 && rerry == 0.0) {
       *rerr = 0.0;
    } else {
-      *rerr = ae_maxreal(rerrx, rerry) * sqrt(1 + ae_sqr(ae_minreal(rerrx, rerry) / ae_maxreal(rerrx, rerry)));
+      *rerr = rmax2(rerrx, rerry) * sqrt(1 + ae_sqr(rmin2(rerrx, rerry) / rmax2(rerrx, rerry)));
    }
 }
 } // end of namespace alglib_impl
@@ -7676,7 +7313,7 @@ namespace alglib_impl {
 // NOTE: when IsCentered is True and all X[] are equal, this  function  fills
 //       X by zeros (exact zeros are used, not sum which is only approximately
 //       equal to zero).
-void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
+void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -7687,7 +7324,7 @@ void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
       return;
    }
    if (n == 1) {
-      x->ptr.p_double[0] = 0.0;
+      x->xR[0] = 0.0;
       return;
    }
    if (buf->ra1.cnt < n) {
@@ -7697,19 +7334,19 @@ void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
       ae_vector_set_length(&buf->ia1, n);
    }
    for (i = 0; i < n; i++) {
-      buf->ra1.ptr.p_double[i] = x->ptr.p_double[i];
-      buf->ia1.ptr.p_int[i] = i;
+      buf->ra1.xR[i] = x->xR[i];
+      buf->ia1.xZ[i] = i;
    }
    tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
 // Special test for all values being equal
-   if (buf->ra1.ptr.p_double[0] == buf->ra1.ptr.p_double[n - 1]) {
+   if (buf->ra1.xR[0] == buf->ra1.xR[n - 1]) {
       if (iscentered) {
          tmp = 0.0;
       } else {
          tmp = (double)(n - 1) / 2.0;
       }
       for (i = 0; i < n; i++) {
-         x->ptr.p_double[i] = tmp;
+         x->xR[i] = tmp;
       }
       return;
    }
@@ -7718,13 +7355,13 @@ void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
    while (i < n) {
       j = i + 1;
       while (j < n) {
-         if (buf->ra1.ptr.p_double[j] != buf->ra1.ptr.p_double[i]) {
+         if (buf->ra1.xR[j] != buf->ra1.xR[i]) {
             break;
          }
          j++;
       }
       for (k = i; k < j; k++) {
-         buf->ra1.ptr.p_double[k] = (double)(i + j - 1) / 2.0;
+         buf->ra1.xR[k] = (double)(i + j - 1) / 2.0;
       }
       i = j;
    }
@@ -7735,7 +7372,7 @@ void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
       voffs = 0.0;
    }
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[buf->ia1.ptr.p_int[i]] = buf->ra1.ptr.p_double[i] - voffs;
+      x->xR[buf->ia1.xZ[i]] = buf->ra1.xR[i] - voffs;
    }
 }
 
@@ -7747,14 +7384,14 @@ void rankx(RVector x, ae_int_t n, bool iscentered, apbuffers *buf) {
 //     Buf     -   temporary buffers
 //
 // Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
-void rankxuntied(RVector x, ae_int_t n, apbuffers *buf) {
+void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
    ae_int_t i;
 // Prepare
    if (n < 1) {
       return;
    }
    if (n == 1) {
-      x->ptr.p_double[0] = 0.0;
+      x->xR[0] = 0.0;
       return;
    }
    if (buf->ra1.cnt < n) {
@@ -7764,12 +7401,12 @@ void rankxuntied(RVector x, ae_int_t n, apbuffers *buf) {
       ae_vector_set_length(&buf->ia1, n);
    }
    for (i = 0; i < n; i++) {
-      buf->ra1.ptr.p_double[i] = x->ptr.p_double[i];
-      buf->ia1.ptr.p_int[i] = i;
+      buf->ra1.xR[i] = x->xR[i];
+      buf->ia1.xZ[i] = i;
    }
    tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
    for (i = 0; i < n; i++) {
-      x->ptr.p_double[buf->ia1.ptr.p_int[i]] = (double)i;
+      x->xR[buf->ia1.xZ[i]] = (double)i;
    }
 }
 } // end of namespace alglib_impl
@@ -7779,7 +7416,7 @@ namespace alglib_impl {
 // Stub function.
 //
 // ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcpreparechunkedgradientx(RVector weights, ae_int_t wcount, RVector hpcbuf) {
+static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
    bool result;
    result = false;
@@ -7800,7 +7437,7 @@ static bool hpccores_hpcpreparechunkedgradientx(RVector weights, ae_int_t wcount
 //         HPCChunkedGradient(...)
 //     HPCFinalizeChunkedGradient(Buf, Grad)
 //
-void hpcpreparechunkedgradient(RVector weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf) {
+void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf) {
    ae_int_t i;
    ae_int_t batch4size;
    ae_int_t chunksize;
@@ -7835,7 +7472,7 @@ void hpcpreparechunkedgradient(RVector weights, ae_int_t wcount, ae_int_t ntotal
    }
    if (!hpccores_hpcpreparechunkedgradientx(weights, wcount, &buf->hpcbuf)) {
       for (i = 0; i < wcount; i++) {
-         buf->hpcbuf.ptr.p_double[i] = 0.0;
+         buf->hpcbuf.xR[i] = 0.0;
       }
    }
    buf->wcount = wcount;
@@ -7848,7 +7485,7 @@ void hpcpreparechunkedgradient(RVector weights, ae_int_t wcount, ae_int_t ntotal
 // Stub function.
 //
 // ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcfinalizechunkedgradientx(RVector buf, ae_int_t wcount, RVector grad) {
+static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
    bool result;
    result = false;
@@ -7869,18 +7506,18 @@ static bool hpccores_hpcfinalizechunkedgradientx(RVector buf, ae_int_t wcount, R
 //         HPCChunkedGradient(...)
 //     HPCFinalizeChunkedGradient(Buf, Grad)
 //
-void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector grad) {
+void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad) {
    ae_int_t i;
    if (!hpccores_hpcfinalizechunkedgradientx(&buf->hpcbuf, buf->wcount, grad)) {
       for (i = 0; i < buf->wcount; i++) {
-         grad->ptr.p_double[i] += buf->hpcbuf.ptr.p_double[i];
+         grad->xR[i] += buf->hpcbuf.xR[i];
       }
    }
 }
 
 // Fast kernel for chunked gradient.
 //
-bool hpcchunkedgradient(RVector weights, ZVector structinfo, RVector columnmeans, RVector columnsigmas, RMatrix xy, ae_int_t cstart, ae_int_t csize, RVector batch4buf, RVector hpcbuf, double *e, bool naturalerrorfunc) {
+bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
    bool result;
    result = false;
@@ -7892,7 +7529,7 @@ bool hpcchunkedgradient(RVector weights, ZVector structinfo, RVector columnmeans
 
 // Fast kernel for chunked processing.
 //
-bool hpcchunkedprocess(RVector weights, ZVector structinfo, RVector columnmeans, RVector columnsigmas, RMatrix xy, ae_int_t cstart, ae_int_t csize, RVector batch4buf, RVector hpcbuf) {
+bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
    bool result;
    result = false;
@@ -8207,16 +7844,16 @@ static const ae_int_t ftbase_ftbasemaxsmoothfactor = 5;
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftpushentry2(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1) {
    if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+      imatrixresize(&plan->entries, imax2(2 * plan->entries.rows, 1), ftbase_colscnt);
    }
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = 0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = 0;
+   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.xyZ[*rowptr][ftbase_colparam2] = 0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam3] = 0;
    ++*rowptr;
 }
 
@@ -8243,7 +7880,7 @@ static void ftbase_ftpushentry(fasttransformplan *plan, ae_int_t *rowptr, ae_int
 }
 
 // Forward declaration for indirect recursion.
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt);
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt);
 
 // This subroutine precomputes data for complex Bluestein's  FFT  and  writes
 // them to array PrecR[] at specified offset. It  is  responsibility  of  the
@@ -8264,7 +7901,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
 // NOTE: this function performs internal M-point FFT. It allocates temporary
 //       plan which is destroyed after leaving this function.
 // ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector precr, ae_int_t offs) {
+static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector *precr, ae_int_t offs) {
    ae_frame _frame_block;
    ae_int_t i;
    double bx;
@@ -8273,20 +7910,20 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector pre
    NewObj(fasttransformplan, plan);
 // Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
    for (i = 0; i < 2 * m; i++) {
-      precr->ptr.p_double[offs + i] = 0.0;
+      precr->xR[offs + i] = 0.0;
    }
    for (i = 0; i < n; i++) {
       bx = cos(ae_pi / n * i * i);
       by = sin(ae_pi / n * i * i);
-      precr->ptr.p_double[offs + 2 * i] = bx;
-      precr->ptr.p_double[offs + 2 * i + 1] = by;
-      precr->ptr.p_double[offs + 2 * ((m - i) % m)] = bx;
-      precr->ptr.p_double[offs + 2 * ((m - i) % m) + 1] = by;
+      precr->xR[offs + 2 * i] = bx;
+      precr->xR[offs + 2 * i + 1] = by;
+      precr->xR[offs + 2 * ((m - i) % m)] = bx;
+      precr->xR[offs + 2 * ((m - i) % m) + 1] = by;
    }
 // Precomputed FFT
    ftcomplexfftplan(m, 1, &plan);
    for (i = 0; i < 2 * m; i++) {
-      precr->ptr.p_double[offs + 2 * m + i] = precr->ptr.p_double[offs + i];
+      precr->xR[offs + 2 * m + i] = precr->xR[offs + i];
    }
    ftbase_ftapplysubplan(&plan, 0, precr, offs + 2 * m, 0, &plan.buffer, 1);
    ae_frame_leave();
@@ -8310,7 +7947,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n, ae_int_t m, RVector pre
 // NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
 //       plan which is destroyed after leaving this function.
 // ALGLIB: Copyright 08.05.2013 by Sergey Bochkanov
-static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector precr, ae_int_t offs) {
+static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, RVector *precr, ae_int_t offs) {
    ae_frame _frame_block;
    ae_int_t q;
    ae_int_t kiq;
@@ -8321,8 +7958,8 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
    kiq = 1;
    for (q = 0; q < n - 1; q++) {
       v = -2 * ae_pi * kiq / n;
-      precr->ptr.p_double[offs + 2 * q] = cos(v);
-      precr->ptr.p_double[offs + 2 * q + 1] = sin(v);
+      precr->xR[offs + 2 * q] = cos(v);
+      precr->xR[offs + 2 * q + 1] = sin(v);
       kiq = kiq * riq % n;
    }
    ftcomplexfftplan(n - 1, 1, &plan);
@@ -8352,16 +7989,16 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n, ae_int_t rq, ae_int_t riq, 
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftpushentry4(fasttransformplan *plan, ae_int_t *rowptr, ae_int_t etype, ae_int_t eopcnt, ae_int_t eopsize, ae_int_t emcvsize, ae_int_t eparam0, ae_int_t eparam1, ae_int_t eparam2, ae_int_t eparam3) {
    if (*rowptr >= plan->entries.rows) {
-      imatrixresize(&plan->entries, ae_maxint(2 * plan->entries.rows, 1), ftbase_colscnt);
+      imatrixresize(&plan->entries, imax2(2 * plan->entries.rows, 1), ftbase_colscnt);
    }
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coltype] = etype;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandscnt] = eopcnt;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_coloperandsize] = eopsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam0] = eparam0;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam1] = eparam1;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam2] = eparam2;
-   plan->entries.ptr.pp_int[*rowptr][ftbase_colparam3] = eparam3;
+   plan->entries.xyZ[*rowptr][ftbase_coltype] = etype;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandscnt] = eopcnt;
+   plan->entries.xyZ[*rowptr][ftbase_coloperandsize] = eopsize;
+   plan->entries.xyZ[*rowptr][ftbase_colmicrovectorsize] = emcvsize;
+   plan->entries.xyZ[*rowptr][ftbase_colparam0] = eparam0;
+   plan->entries.xyZ[*rowptr][ftbase_colparam1] = eparam1;
+   plan->entries.xyZ[*rowptr][ftbase_colparam2] = eparam2;
+   plan->entries.xyZ[*rowptr][ftbase_colparam3] = eparam3;
    ++*rowptr;
 }
 
@@ -8395,8 +8032,8 @@ static void ftbase_ftfactorize(ae_int_t n, bool isroot, ae_int_t *n1, ae_int_t *
       ae_assert(k * k >= n, "FTFactorize: internal error during recursive factorization");
       for (j = k; j >= 2; j--) {
          if (n % j == 0) {
-            *n1 = ae_minint(n / j, j);
-            *n2 = ae_maxint(n / j, j);
+            *n1 = imin2(n / j, j);
+            *n2 = imax2(n / j, j);
             return;
          }
       }
@@ -8499,7 +8136,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
    ae_int_t row2;
    ae_int_t row3;
    ae_frame_make(&_frame_block);
-   NewObj(srealarray, localbuf);
+   NewObj(RVector, localbuf);
    ae_assert(n > 0, "FTComplexFFTPlan: N <= 0");
    ae_assert(k > 0, "FTComplexFFTPlan: K <= 0");
    ae_assert(!topmostplan || childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan");
@@ -8510,7 +8147,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
       // Handle prime-factor FFT with Bluestein's FFT.
       // Determine size of Bluestein's buffer.
          m = ftbasefindsmooth(2 * n - 1);
-         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize);
+         *bluesteinsize = imax2(2 * m, *bluesteinsize);
       // Generate plan
          ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n));
          ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0);
@@ -8518,7 +8155,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
          ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0);
          ftbase_ftcomplexfftplanrec(m, 1, true, true, rowptr, bluesteinsize, precrptr, preciptr, plan);
          row1 = *rowptr;
-         plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1 - row0;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
          ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0);
       // Fill precomputed buffer
          ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr);
@@ -8539,10 +8176,10 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
          ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0);
          row1 = *rowptr;
          ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
-         plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1 - row0;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
          row3 = *rowptr;
          ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
-         plan->entries.ptr.pp_int[row2][ftbase_colparam0] = row3 - row2;
+         plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
       }
       ae_frame_leave();
       return;
@@ -8582,14 +8219,14 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
          ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0);
          ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
          row1 = *rowptr;
-         plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1 - row0;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
          if (childplan) {
             ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0);
          }
       } else {
       // Handle prime-factor FFT's with Bluestein's FFT
          m = ftbasefindsmooth(2 * n - 1);
-         *bluesteinsize = ae_maxint(2 * m, *bluesteinsize);
+         *bluesteinsize = imax2(2 * m, *bluesteinsize);
          if (childplan) {
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n));
          }
@@ -8600,7 +8237,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
          ftbase_ftpushentry(plan, rowptr, ftbase_opjmp, 0, 0, 0, 0);
          ftbase_ftcomplexfftplanrec(m, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
          row1 = *rowptr;
-         plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1 - row0;
+         plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
          if (childplan) {
             ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0);
          }
@@ -8664,10 +8301,10 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n, ae_int_t k, bool childplan, b
    // Generate child subplans, insert refence to parent plans
       row1 = *rowptr;
       ftbase_ftcomplexfftplanrec(n1, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
-      plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1 - row0;
+      plan->entries.xyZ[row0][ftbase_colparam0] = row1 - row0;
       row3 = *rowptr;
       ftbase_ftcomplexfftplanrec(n2, 1, true, false, rowptr, bluesteinsize, precrptr, preciptr, plan);
-      plan->entries.ptr.pp_int[row2][ftbase_colparam0] = row3 - row2;
+      plan->entries.xyZ[row2][ftbase_colparam0] = row3 - row2;
    }
    ae_frame_leave();
 }
@@ -8744,7 +8381,7 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
    ae_int_t precisize;
    ae_frame_make(&_frame_block);
    SetObj(fasttransformplan, plan);
-   NewObj(srealarray, bluesteinbuf);
+   NewObj(RVector, bluesteinbuf);
 // Initial check for parameters
    ae_assert(n > 0, "FTComplexFFTPlan: N <= 0");
    ae_assert(k > 0, "FTComplexFFTPlan: K <= 0");
@@ -8777,8 +8414,8 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
    bluesteinsize = 1;
    ae_vector_set_length(&plan->buffer, 2 * n * k);
    ftbase_ftcomplexfftplanrec(n, k, true, true, &rowptr, &bluesteinsize, &precrptr, &preciptr, plan);
-   ae_vector_set_length(&bluesteinbuf.val, bluesteinsize);
-   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), srealarray_init, srealarray_copy, srealarray_free);
+   ae_vector_set_length(&bluesteinbuf, bluesteinsize);
+   ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), RVector_init, RVector_copy, RVector_free);
 // Check that actual amount of precomputed space used by transformation
 // plan is EXACTLY equal to amount of space allocated by us.
    ae_assert(precrptr == precrsize, "FTComplexFFTPlan: internal error (PrecRPtr != PrecRSize)");
@@ -8800,10 +8437,10 @@ void ftcomplexfftplan(ae_int_t n, ae_int_t k, fasttransformplan *plan) {
 //                     is unchanged and can be reused)
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-void ftapplyplan(fasttransformplan *plan, RVector a, ae_int_t offsa, ae_int_t repcnt) {
+void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa, ae_int_t repcnt) {
    ae_int_t plansize;
    ae_int_t i;
-   plansize = plan->entries.ptr.pp_int[0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[0][ftbase_colmicrovectorsize];
+   plansize = plan->entries.xyZ[0][ftbase_coloperandscnt] * plan->entries.xyZ[0][ftbase_coloperandsize] * plan->entries.xyZ[0][ftbase_colmicrovectorsize];
    for (i = 0; i < repcnt; i++) {
       ftbase_ftapplysubplan(plan, 0, a, offsa + plansize * i, 0, &plan->buffer, 1);
    }
@@ -8873,7 +8510,7 @@ bool ftbaseissmooth(ae_int_t n) {
 static void ftbase_ftbasefindsmoothrec(ae_int_t n, ae_int_t seed, ae_int_t leastfactor, ae_int_t *best) {
    ae_assert(ftbase_ftbasemaxsmoothfactor <= 5, "FTBaseFindSmoothRec: internal error!");
    if (seed >= n) {
-      *best = ae_minint(*best, seed);
+      *best = imin2(*best, seed);
       return;
    }
    if (leastfactor <= 2) {
@@ -8954,7 +8591,7 @@ double ftbasegetflopestimate(ae_int_t n) {
 // Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector bufa, RVector bufb, RVector bufc, RVector bufd) {
+static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t m, ae_int_t precoffs, ae_int_t subplan, RVector *bufa, RVector *bufb, RVector *bufc, RVector *bufd) {
    ae_int_t op;
    ae_int_t i;
    double x;
@@ -8976,17 +8613,17 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t 
       p0 = abase + aoffset + op * 2 * n;
       p1 = precoffs;
       for (i = 0; i < n; i++) {
-         x = a->ptr.p_double[p0];
-         y = a->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1];
-         by = -plan->precr.ptr.p_double[p1 + 1];
-         bufa->ptr.p_double[2 * i] = x * bx - y * by;
-         bufa->ptr.p_double[2 * i + 1] = x * by + y * bx;
+         x = a->xR[p0];
+         y = a->xR[p0 + 1];
+         bx = plan->precr.xR[p1];
+         by = -plan->precr.xR[p1 + 1];
+         bufa->xR[2 * i] = x * bx - y * by;
+         bufa->xR[2 * i + 1] = x * by + y * bx;
          p0 += 2;
          p1 += 2;
       }
       for (i = 2 * n; i < 2 * m; i++) {
-         bufa->ptr.p_double[i] = 0.0;
+         bufa->xR[i] = 0.0;
       }
    // Perform convolution of A and Z (using precomputed
    // FFT of Z stored in Plan structure).
@@ -8994,12 +8631,12 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t 
       p0 = 0;
       p1 = precoffs + 2 * m;
       for (i = 0; i < m; i++) {
-         ax = bufa->ptr.p_double[p0];
-         ay = bufa->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1];
-         by = plan->precr.ptr.p_double[p1 + 1];
-         bufa->ptr.p_double[p0] = ax * bx - ay * by;
-         bufa->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
+         ax = bufa->xR[p0];
+         ay = bufa->xR[p0 + 1];
+         bx = plan->precr.xR[p1];
+         by = plan->precr.xR[p1 + 1];
+         bufa->xR[p0] = ax * bx - ay * by;
+         bufa->xR[p0 + 1] = -(ax * by + ay * bx);
          p0 += 2;
          p1 += 2;
       }
@@ -9012,12 +8649,12 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t 
       p1 = 0;
       p2 = abase + aoffset + op * 2 * n;
       for (i = 0; i < n; i++) {
-         bx = plan->precr.ptr.p_double[p0];
-         by = plan->precr.ptr.p_double[p0 + 1];
-         rx = bufa->ptr.p_double[p1] / m;
-         ry = -bufa->ptr.p_double[p1 + 1] / m;
-         a->ptr.p_double[p2] = rx * bx - ry * (-by);
-         a->ptr.p_double[p2 + 1] = rx * (-by) + ry * bx;
+         bx = plan->precr.xR[p0];
+         by = plan->precr.xR[p0 + 1];
+         rx = bufa->xR[p1] / m;
+         ry = -bufa->xR[p1 + 1] / m;
+         a->xR[p2] = rx * bx - ry * (-by);
+         a->xR[p2 + 1] = rx * (-by) + ry * bx;
          p0 += 2;
          p1 += 2;
          p2 += 2;
@@ -9046,7 +8683,7 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, RVector a, ae_int_t 
 // Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector buf) {
+static void ftbase_ftradersfft(fasttransformplan *plan, RVector *a, ae_int_t abase, ae_int_t aoffset, ae_int_t operandscnt, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf) {
    ae_int_t opidx;
    ae_int_t i;
    ae_int_t q;
@@ -9069,15 +8706,15 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abas
       kq = 1;
       p0 = abase + aoffset + opidx * n * 2;
       p1 = aoffset + opidx * n * 2;
-      rx = a->ptr.p_double[p0];
-      ry = a->ptr.p_double[p0 + 1];
+      rx = a->xR[p0];
+      ry = a->xR[p0 + 1];
       x0 = rx;
       y0 = ry;
       for (q = 0; q < n - 1; q++) {
-         ax = a->ptr.p_double[p0 + 2 * kq];
-         ay = a->ptr.p_double[p0 + 2 * kq + 1];
-         buf->ptr.p_double[p1] = ax;
-         buf->ptr.p_double[p1 + 1] = ay;
+         ax = a->xR[p0 + 2 * kq];
+         ay = a->xR[p0 + 2 * kq + 1];
+         buf->xR[p1] = ax;
+         buf->xR[p1 + 1] = ay;
          rx += ax;
          ry += ay;
          kq = kq * rq % n;
@@ -9086,8 +8723,8 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abas
       p0 = abase + aoffset + opidx * n * 2;
       p1 = aoffset + opidx * n * 2;
       for (q = 0; q < n - 1; q++) {
-         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
-         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
+         a->xR[p0] = buf->xR[p1];
+         a->xR[p0 + 1] = buf->xR[p1 + 1];
          p0 += 2;
          p1 += 2;
       }
@@ -9096,39 +8733,39 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abas
       p0 = abase + aoffset + opidx * n * 2;
       p1 = precoffs;
       for (i = 0; i < n - 1; i++) {
-         ax = a->ptr.p_double[p0];
-         ay = a->ptr.p_double[p0 + 1];
-         bx = plan->precr.ptr.p_double[p1];
-         by = plan->precr.ptr.p_double[p1 + 1];
-         a->ptr.p_double[p0] = ax * bx - ay * by;
-         a->ptr.p_double[p0 + 1] = -(ax * by + ay * bx);
+         ax = a->xR[p0];
+         ay = a->xR[p0 + 1];
+         bx = plan->precr.xR[p1];
+         by = plan->precr.xR[p1 + 1];
+         a->xR[p0] = ax * bx - ay * by;
+         a->xR[p0 + 1] = -(ax * by + ay * bx);
          p0 += 2;
          p1 += 2;
       }
       ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset + opidx * n * 2, buf, 1);
       p0 = abase + aoffset + opidx * n * 2;
       for (i = 0; i < n - 1; i++) {
-         a->ptr.p_double[p0] /= n - 1;
-         a->ptr.p_double[p0 + 1] /= -(n - 1);
+         a->xR[p0] /= n - 1;
+         a->xR[p0 + 1] /= -(n - 1);
          p0 += 2;
       }
    // Result
-      buf->ptr.p_double[aoffset + opidx * n * 2] = rx;
-      buf->ptr.p_double[aoffset + opidx * n * 2 + 1] = ry;
+      buf->xR[aoffset + opidx * n * 2] = rx;
+      buf->xR[aoffset + opidx * n * 2 + 1] = ry;
       kiq = 1;
       p0 = aoffset + opidx * n * 2;
       p1 = abase + aoffset + opidx * n * 2;
       for (q = 0; q < n - 1; q++) {
-         buf->ptr.p_double[p0 + 2 * kiq] = x0 + a->ptr.p_double[p1];
-         buf->ptr.p_double[p0 + 2 * kiq + 1] = y0 + a->ptr.p_double[p1 + 1];
+         buf->xR[p0 + 2 * kiq] = x0 + a->xR[p1];
+         buf->xR[p0 + 2 * kiq + 1] = y0 + a->xR[p1 + 1];
          kiq = kiq * riq % n;
          p1 += 2;
       }
       p0 = abase + aoffset + opidx * n * 2;
       p1 = aoffset + opidx * n * 2;
       for (q = 0; q < n; q++) {
-         a->ptr.p_double[p0] = buf->ptr.p_double[p1];
-         a->ptr.p_double[p0 + 1] = buf->ptr.p_double[p1 + 1];
+         a->xR[p0] = buf->xR[p1];
+         a->xR[p0 + 1] = buf->xR[p1 + 1];
          p0 += 2;
          p1 += 2;
       }
@@ -9138,7 +8775,7 @@ static void ftbase_ftradersfft(fasttransformplan *plan, RVector a, ae_int_t abas
 #if 0
 // Recurrent subroutine for a InternalRealLinTranspose
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
+static void ftbase_fftirltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t idx1;
@@ -9148,12 +8785,12 @@ static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVec
    if (m == 0 || n == 0) {
       return;
    }
-   if (ae_maxint(m, n) <= 8) {
+   if (imax2(m, n) <= 8) {
       for (i = 0; i < m; i++) {
          idx1 = bstart + i;
          idx2 = astart + i * astride;
          for (j = 0; j < n; j++) {
-            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
+            b->xR[idx1] = a->xR[idx2];
             idx1 += bstride;
             idx2++;
          }
@@ -9197,7 +8834,7 @@ static void ftbase_fftirltrec(RVector a, ae_int_t astart, ae_int_t astride, RVec
 //   beginning from BStart position, with BStride stride
 // stride is measured in complex numbers, i.e. in real/image pairs.
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVector b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
+static void ftbase_ffticltrec(RVector *a, ae_int_t astart, ae_int_t astride, RVector *b, ae_int_t bstart, ae_int_t bstride, ae_int_t m, ae_int_t n) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t idx1;
@@ -9208,14 +8845,14 @@ static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVec
    if (m == 0 || n == 0) {
       return;
    }
-   if (ae_maxint(m, n) <= 8) {
+   if (imax2(m, n) <= 8) {
       m2 = 2 * bstride;
       for (i = 0; i < m; i++) {
          idx1 = bstart + 2 * i;
          idx2 = astart + 2 * i * astride;
          for (j = 0; j < n; j++) {
-            b->ptr.p_double[idx1] = a->ptr.p_double[idx2];
-            b->ptr.p_double[idx1 + 1] = a->ptr.p_double[idx2 + 1];
+            b->xR[idx1] = a->xR[idx2];
+            b->xR[idx1 + 1] = a->xR[idx2 + 1];
             idx1 += m2;
             idx2 += 2;
          }
@@ -9251,9 +8888,9 @@ static void ftbase_ffticltrec(RVector a, ae_int_t astart, ae_int_t astride, RVec
 
 // Linear transpose: transpose complex matrix stored in 1-dimensional array
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_internalcomplexlintranspose(RVector a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector buf) {
+static void ftbase_internalcomplexlintranspose(RVector *a, ae_int_t m, ae_int_t n, ae_int_t astart, RVector *buf) {
    ftbase_ffticltrec(a, astart, n, buf, 0, m, m, n);
-   ae_v_move(&a->ptr.p_double[astart], 1, buf->ptr.p_double, 1, 2 * m * n);
+   ae_v_move(&a->xR[astart], 1, buf->xR, 1, 2 * m * n);
 }
 
 // This subroutine applies complex reference FFT to input/output array A.
@@ -9271,7 +8908,7 @@ static void ftbase_internalcomplexlintranspose(RVector a, ae_int_t m, ae_int_t n
 // Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector buf) {
+static void ftbase_ftapplycomplexreffft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize, RVector *buf) {
    ae_int_t opidx;
    ae_int_t i;
    ae_int_t k;
@@ -9291,18 +8928,18 @@ static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t opera
          hre = 0.0;
          him = 0.0;
          for (k = 0; k < n; k++) {
-            re = a->ptr.p_double[offs + opidx * operandsize * 2 + 2 * k];
-            im = a->ptr.p_double[offs + opidx * operandsize * 2 + 2 * k + 1];
+            re = a->xR[offs + opidx * operandsize * 2 + 2 * k];
+            im = a->xR[offs + opidx * operandsize * 2 + 2 * k + 1];
             c = cos(-2 * ae_pi * k * i / n);
             s = sin(-2 * ae_pi * k * i / n);
             hre += c * re - s * im;
             him += c * im + s * re;
          }
-         buf->ptr.p_double[2 * i] = hre;
-         buf->ptr.p_double[2 * i + 1] = him;
+         buf->xR[2 * i] = hre;
+         buf->xR[2 * i + 1] = him;
       }
       for (i = 0; i < operandsize * 2; i++) {
-         a->ptr.p_double[offs + opidx * operandsize * 2 + i] = buf->ptr.p_double[i];
+         a->xR[offs + opidx * operandsize * 2 + i] = buf->xR[i];
       }
    }
 }
@@ -9319,7 +8956,7 @@ static void ftbase_ftapplycomplexreffft(RVector a, ae_int_t offs, ae_int_t opera
 // Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
+static void ftbase_ftapplycomplexcodeletfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
    ae_int_t opidx;
    ae_int_t n;
    ae_int_t aoffset;
@@ -9384,18 +9021,18 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
    if (n == 2) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset];
-         a0y = a->ptr.p_double[aoffset + 1];
-         a1x = a->ptr.p_double[aoffset + 2];
-         a1y = a->ptr.p_double[aoffset + 3];
+         a0x = a->xR[aoffset];
+         a0y = a->xR[aoffset + 1];
+         a1x = a->xR[aoffset + 2];
+         a1y = a->xR[aoffset + 3];
          v0 = a0x + a1x;
          v1 = a0y + a1y;
          v2 = a0x - a1x;
          v3 = a0y - a1y;
-         a->ptr.p_double[aoffset] = v0;
-         a->ptr.p_double[aoffset + 1] = v1;
-         a->ptr.p_double[aoffset + 2] = v2;
-         a->ptr.p_double[aoffset + 3] = v3;
+         a->xR[aoffset] = v0;
+         a->xR[aoffset + 1] = v1;
+         a->xR[aoffset + 2] = v2;
+         a->xR[aoffset + 3] = v3;
       }
       return;
    }
@@ -9404,12 +9041,12 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
       c2 = sin(2 * ae_pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset];
-         a0y = a->ptr.p_double[aoffset + 1];
-         a1x = a->ptr.p_double[aoffset + 2];
-         a1y = a->ptr.p_double[aoffset + 3];
-         a2x = a->ptr.p_double[aoffset + 4];
-         a2y = a->ptr.p_double[aoffset + 5];
+         a0x = a->xR[aoffset];
+         a0y = a->xR[aoffset + 1];
+         a1x = a->xR[aoffset + 2];
+         a1y = a->xR[aoffset + 3];
+         a2x = a->xR[aoffset + 4];
+         a2y = a->xR[aoffset + 5];
          t1x = a1x + a2x;
          t1y = a1y + a2y;
          a0x += t1x;
@@ -9424,26 +9061,26 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          a1y = s1y + m2y;
          a2x = s1x - m2x;
          a2y = s1y - m2y;
-         a->ptr.p_double[aoffset] = a0x;
-         a->ptr.p_double[aoffset + 1] = a0y;
-         a->ptr.p_double[aoffset + 2] = a1x;
-         a->ptr.p_double[aoffset + 3] = a1y;
-         a->ptr.p_double[aoffset + 4] = a2x;
-         a->ptr.p_double[aoffset + 5] = a2y;
+         a->xR[aoffset] = a0x;
+         a->xR[aoffset + 1] = a0y;
+         a->xR[aoffset + 2] = a1x;
+         a->xR[aoffset + 3] = a1y;
+         a->xR[aoffset + 4] = a2x;
+         a->xR[aoffset + 5] = a2y;
       }
       return;
    }
    if (n == 4) {
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset];
-         a0y = a->ptr.p_double[aoffset + 1];
-         a1x = a->ptr.p_double[aoffset + 2];
-         a1y = a->ptr.p_double[aoffset + 3];
-         a2x = a->ptr.p_double[aoffset + 4];
-         a2y = a->ptr.p_double[aoffset + 5];
-         a3x = a->ptr.p_double[aoffset + 6];
-         a3y = a->ptr.p_double[aoffset + 7];
+         a0x = a->xR[aoffset];
+         a0y = a->xR[aoffset + 1];
+         a1x = a->xR[aoffset + 2];
+         a1y = a->xR[aoffset + 3];
+         a2x = a->xR[aoffset + 4];
+         a2y = a->xR[aoffset + 5];
+         a3x = a->xR[aoffset + 6];
+         a3y = a->xR[aoffset + 7];
          t1x = a0x + a2x;
          t1y = a0y + a2y;
          t2x = a1x + a3x;
@@ -9452,14 +9089,14 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          m2y = a0y - a2y;
          m3x = a1y - a3y;
          m3y = a3x - a1x;
-         a->ptr.p_double[aoffset] = t1x + t2x;
-         a->ptr.p_double[aoffset + 1] = t1y + t2y;
-         a->ptr.p_double[aoffset + 4] = t1x - t2x;
-         a->ptr.p_double[aoffset + 5] = t1y - t2y;
-         a->ptr.p_double[aoffset + 2] = m2x + m3x;
-         a->ptr.p_double[aoffset + 3] = m2y + m3y;
-         a->ptr.p_double[aoffset + 6] = m2x - m3x;
-         a->ptr.p_double[aoffset + 7] = m2y - m3y;
+         a->xR[aoffset] = t1x + t2x;
+         a->xR[aoffset + 1] = t1y + t2y;
+         a->xR[aoffset + 4] = t1x - t2x;
+         a->xR[aoffset + 5] = t1y - t2y;
+         a->xR[aoffset + 2] = m2x + m3x;
+         a->xR[aoffset + 3] = m2y + m3y;
+         a->xR[aoffset + 6] = m2x - m3x;
+         a->xR[aoffset + 7] = m2y - m3y;
       }
       return;
    }
@@ -9472,18 +9109,18 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
       c5 = sin(v) - sin(2 * v);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         t1x = a->ptr.p_double[aoffset + 2] + a->ptr.p_double[aoffset + 8];
-         t1y = a->ptr.p_double[aoffset + 3] + a->ptr.p_double[aoffset + 9];
-         t2x = a->ptr.p_double[aoffset + 4] + a->ptr.p_double[aoffset + 6];
-         t2y = a->ptr.p_double[aoffset + 5] + a->ptr.p_double[aoffset + 7];
-         t3x = a->ptr.p_double[aoffset + 2] - a->ptr.p_double[aoffset + 8];
-         t3y = a->ptr.p_double[aoffset + 3] - a->ptr.p_double[aoffset + 9];
-         t4x = a->ptr.p_double[aoffset + 6] - a->ptr.p_double[aoffset + 4];
-         t4y = a->ptr.p_double[aoffset + 7] - a->ptr.p_double[aoffset + 5];
+         t1x = a->xR[aoffset + 2] + a->xR[aoffset + 8];
+         t1y = a->xR[aoffset + 3] + a->xR[aoffset + 9];
+         t2x = a->xR[aoffset + 4] + a->xR[aoffset + 6];
+         t2y = a->xR[aoffset + 5] + a->xR[aoffset + 7];
+         t3x = a->xR[aoffset + 2] - a->xR[aoffset + 8];
+         t3y = a->xR[aoffset + 3] - a->xR[aoffset + 9];
+         t4x = a->xR[aoffset + 6] - a->xR[aoffset + 4];
+         t4y = a->xR[aoffset + 7] - a->xR[aoffset + 5];
          t5x = t1x + t2x;
          t5y = t1y + t2y;
-         a->ptr.p_double[aoffset] += t5x;
-         a->ptr.p_double[aoffset + 1] += t5y;
+         a->xR[aoffset] += t5x;
+         a->xR[aoffset + 1] += t5y;
          m1x = c1 * t5x;
          m1y = c1 * t5y;
          m2x = c2 * (t1x - t2x);
@@ -9498,20 +9135,20 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          s3y = m3y - m4y;
          s5x = m3x + m5x;
          s5y = m3y + m5y;
-         s1x = a->ptr.p_double[aoffset] + m1x;
-         s1y = a->ptr.p_double[aoffset + 1] + m1y;
+         s1x = a->xR[aoffset] + m1x;
+         s1y = a->xR[aoffset + 1] + m1y;
          s2x = s1x + m2x;
          s2y = s1y + m2y;
          s4x = s1x - m2x;
          s4y = s1y - m2y;
-         a->ptr.p_double[aoffset + 2] = s2x + s3x;
-         a->ptr.p_double[aoffset + 3] = s2y + s3y;
-         a->ptr.p_double[aoffset + 4] = s4x + s5x;
-         a->ptr.p_double[aoffset + 5] = s4y + s5y;
-         a->ptr.p_double[aoffset + 6] = s4x - s5x;
-         a->ptr.p_double[aoffset + 7] = s4y - s5y;
-         a->ptr.p_double[aoffset + 8] = s2x - s3x;
-         a->ptr.p_double[aoffset + 9] = s2y - s3y;
+         a->xR[aoffset + 2] = s2x + s3x;
+         a->xR[aoffset + 3] = s2y + s3y;
+         a->xR[aoffset + 4] = s4x + s5x;
+         a->xR[aoffset + 5] = s4y + s5y;
+         a->xR[aoffset + 6] = s4x - s5x;
+         a->xR[aoffset + 7] = s4y - s5y;
+         a->xR[aoffset + 8] = s2x - s3x;
+         a->xR[aoffset + 9] = s2y - s3y;
       }
       return;
    }
@@ -9522,18 +9159,18 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
       c4 = sin(-ae_pi / 3);
       for (opidx = 0; opidx < operandscnt; opidx++) {
          aoffset = offs + opidx * operandsize * 2;
-         a0x = a->ptr.p_double[aoffset];
-         a0y = a->ptr.p_double[aoffset + 1];
-         a1x = a->ptr.p_double[aoffset + 2];
-         a1y = a->ptr.p_double[aoffset + 3];
-         a2x = a->ptr.p_double[aoffset + 4];
-         a2y = a->ptr.p_double[aoffset + 5];
-         a3x = a->ptr.p_double[aoffset + 6];
-         a3y = a->ptr.p_double[aoffset + 7];
-         a4x = a->ptr.p_double[aoffset + 8];
-         a4y = a->ptr.p_double[aoffset + 9];
-         a5x = a->ptr.p_double[aoffset + 10];
-         a5y = a->ptr.p_double[aoffset + 11];
+         a0x = a->xR[aoffset];
+         a0y = a->xR[aoffset + 1];
+         a1x = a->xR[aoffset + 2];
+         a1y = a->xR[aoffset + 3];
+         a2x = a->xR[aoffset + 4];
+         a2y = a->xR[aoffset + 5];
+         a3x = a->xR[aoffset + 6];
+         a3y = a->xR[aoffset + 7];
+         a4x = a->xR[aoffset + 8];
+         a4y = a->xR[aoffset + 9];
+         a5x = a->xR[aoffset + 10];
+         a5y = a->xR[aoffset + 11];
          v0 = a0x;
          v1 = a0y;
          a0x += a3x;
@@ -9588,18 +9225,18 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
          a4y = s1y + m2y;
          a5x = s1x - m2x;
          a5y = s1y - m2y;
-         a->ptr.p_double[aoffset] = a0x;
-         a->ptr.p_double[aoffset + 1] = a0y;
-         a->ptr.p_double[aoffset + 2] = a3x;
-         a->ptr.p_double[aoffset + 3] = a3y;
-         a->ptr.p_double[aoffset + 4] = a1x;
-         a->ptr.p_double[aoffset + 5] = a1y;
-         a->ptr.p_double[aoffset + 6] = a4x;
-         a->ptr.p_double[aoffset + 7] = a4y;
-         a->ptr.p_double[aoffset + 8] = a2x;
-         a->ptr.p_double[aoffset + 9] = a2y;
-         a->ptr.p_double[aoffset + 10] = a5x;
-         a->ptr.p_double[aoffset + 11] = a5y;
+         a->xR[aoffset] = a0x;
+         a->xR[aoffset + 1] = a0y;
+         a->xR[aoffset + 2] = a3x;
+         a->xR[aoffset + 3] = a3y;
+         a->xR[aoffset + 4] = a1x;
+         a->xR[aoffset + 5] = a1y;
+         a->xR[aoffset + 6] = a4x;
+         a->xR[aoffset + 7] = a4y;
+         a->xR[aoffset + 8] = a2x;
+         a->xR[aoffset + 9] = a2y;
+         a->xR[aoffset + 10] = a5x;
+         a->xR[aoffset + 11] = a5y;
       }
       return;
    }
@@ -9622,7 +9259,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector a, ae_int_t offs, ae_int_t o
 // Outputs:
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
+static void ftbase_ftapplycomplexcodelettwfft(RVector *a, ae_int_t offs, ae_int_t operandscnt, ae_int_t operandsize, ae_int_t microvectorsize) {
    ae_int_t opidx;
    ae_int_t mvidx;
    ae_int_t n;
@@ -9718,18 +9355,18 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0];
-            a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2];
-            a1y = a->ptr.p_double[aoffset2 + 1];
+            a0x = a->xR[aoffset0];
+            a0y = a->xR[aoffset0 + 1];
+            a1x = a->xR[aoffset2];
+            a1y = a->xR[aoffset2 + 1];
             v0 = a0x + a1x;
             v1 = a0y + a1y;
             v2 = a0x - a1x;
             v3 = a0y - a1y;
-            a->ptr.p_double[aoffset0] = v0;
-            a->ptr.p_double[aoffset0 + 1] = v1;
-            a->ptr.p_double[aoffset2] = v2 * (1 + twxm1) - v3 * twy;
-            a->ptr.p_double[aoffset2 + 1] = v3 * (1 + twxm1) + v2 * twy;
+            a->xR[aoffset0] = v0;
+            a->xR[aoffset0 + 1] = v1;
+            a->xR[aoffset2] = v2 * (1 + twxm1) - v3 * twy;
+            a->xR[aoffset2 + 1] = v3 * (1 + twxm1) + v2 * twy;
             aoffset0 += 2;
             aoffset2 += 2;
             if ((mvidx + 1) % ftbase_updatetw == 0) {
@@ -9760,12 +9397,12 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0];
-            a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2];
-            a1y = a->ptr.p_double[aoffset2 + 1];
-            a2x = a->ptr.p_double[aoffset4];
-            a2y = a->ptr.p_double[aoffset4 + 1];
+            a0x = a->xR[aoffset0];
+            a0y = a->xR[aoffset0 + 1];
+            a1x = a->xR[aoffset2];
+            a1y = a->xR[aoffset2 + 1];
+            a2x = a->xR[aoffset4];
+            a2y = a->xR[aoffset4 + 1];
             t1x = a1x + a2x;
             t1y = a1y + a2y;
             a0x += t1x;
@@ -9782,12 +9419,12 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
             a2y = s1y - m2y;
             tw2x = twx * twx - twy * twy;
             tw2y = 2 * twx * twy;
-            a->ptr.p_double[aoffset0] = a0x;
-            a->ptr.p_double[aoffset0 + 1] = a0y;
-            a->ptr.p_double[aoffset2] = a1x * twx - a1y * twy;
-            a->ptr.p_double[aoffset2 + 1] = a1y * twx + a1x * twy;
-            a->ptr.p_double[aoffset4] = a2x * tw2x - a2y * tw2y;
-            a->ptr.p_double[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
+            a->xR[aoffset0] = a0x;
+            a->xR[aoffset0 + 1] = a0y;
+            a->xR[aoffset2] = a1x * twx - a1y * twy;
+            a->xR[aoffset2 + 1] = a1y * twx + a1x * twy;
+            a->xR[aoffset4] = a2x * tw2x - a2y * tw2y;
+            a->xR[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
             aoffset0 += 2;
             aoffset2 += 2;
             aoffset4 += 2;
@@ -9820,14 +9457,14 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0];
-            a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2];
-            a1y = a->ptr.p_double[aoffset2 + 1];
-            a2x = a->ptr.p_double[aoffset4];
-            a2y = a->ptr.p_double[aoffset4 + 1];
-            a3x = a->ptr.p_double[aoffset6];
-            a3y = a->ptr.p_double[aoffset6 + 1];
+            a0x = a->xR[aoffset0];
+            a0y = a->xR[aoffset0 + 1];
+            a1x = a->xR[aoffset2];
+            a1y = a->xR[aoffset2 + 1];
+            a2x = a->xR[aoffset4];
+            a2y = a->xR[aoffset4 + 1];
+            a3x = a->xR[aoffset6];
+            a3y = a->xR[aoffset6 + 1];
             t1x = a0x + a2x;
             t1y = a0y + a2y;
             t2x = a1x + a3x;
@@ -9846,14 +9483,14 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
             a2y = t1y - t2y;
             a3x = m2x - m3x;
             a3y = m2y - m3y;
-            a->ptr.p_double[aoffset0] = t1x + t2x;
-            a->ptr.p_double[aoffset0 + 1] = t1y + t2y;
-            a->ptr.p_double[aoffset2] = a1x * twx - a1y * twy;
-            a->ptr.p_double[aoffset2 + 1] = a1y * twx + a1x * twy;
-            a->ptr.p_double[aoffset4] = a2x * tw2x - a2y * tw2y;
-            a->ptr.p_double[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
-            a->ptr.p_double[aoffset6] = a3x * tw3x - a3y * tw3y;
-            a->ptr.p_double[aoffset6 + 1] = a3y * tw3x + a3x * tw3y;
+            a->xR[aoffset0] = t1x + t2x;
+            a->xR[aoffset0 + 1] = t1y + t2y;
+            a->xR[aoffset2] = a1x * twx - a1y * twy;
+            a->xR[aoffset2 + 1] = a1y * twx + a1x * twy;
+            a->xR[aoffset4] = a2x * tw2x - a2y * tw2y;
+            a->xR[aoffset4 + 1] = a2y * tw2x + a2x * tw2y;
+            a->xR[aoffset6] = a3x * tw3x - a3y * tw3y;
+            a->xR[aoffset6 + 1] = a3y * tw3x + a3x * tw3y;
             aoffset0 += 2;
             aoffset2 += 2;
             aoffset4 += 2;
@@ -9894,16 +9531,16 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0];
-            a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2];
-            a1y = a->ptr.p_double[aoffset2 + 1];
-            a2x = a->ptr.p_double[aoffset4];
-            a2y = a->ptr.p_double[aoffset4 + 1];
-            a3x = a->ptr.p_double[aoffset6];
-            a3y = a->ptr.p_double[aoffset6 + 1];
-            a4x = a->ptr.p_double[aoffset8];
-            a4y = a->ptr.p_double[aoffset8 + 1];
+            a0x = a->xR[aoffset0];
+            a0y = a->xR[aoffset0 + 1];
+            a1x = a->xR[aoffset2];
+            a1y = a->xR[aoffset2 + 1];
+            a2x = a->xR[aoffset4];
+            a2y = a->xR[aoffset4 + 1];
+            a3x = a->xR[aoffset6];
+            a3y = a->xR[aoffset6 + 1];
+            a4x = a->xR[aoffset8];
+            a4y = a->xR[aoffset8 + 1];
             t1x = a1x + a4x;
             t1y = a1y + a4y;
             t2x = a2x + a3x;
@@ -9950,16 +9587,16 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
             a3y = s4y - s5y;
             a4x = s2x - s3x;
             a4y = s2y - s3y;
-            a->ptr.p_double[aoffset0] = q0x;
-            a->ptr.p_double[aoffset0 + 1] = q0y;
-            a->ptr.p_double[aoffset2] = a1x * twx - a1y * twy;
-            a->ptr.p_double[aoffset2 + 1] = a1x * twy + a1y * twx;
-            a->ptr.p_double[aoffset4] = a2x * tw2x - a2y * tw2y;
-            a->ptr.p_double[aoffset4 + 1] = a2x * tw2y + a2y * tw2x;
-            a->ptr.p_double[aoffset6] = a3x * tw3x - a3y * tw3y;
-            a->ptr.p_double[aoffset6 + 1] = a3x * tw3y + a3y * tw3x;
-            a->ptr.p_double[aoffset8] = a4x * tw4x - a4y * tw4y;
-            a->ptr.p_double[aoffset8 + 1] = a4x * tw4y + a4y * tw4x;
+            a->xR[aoffset0] = q0x;
+            a->xR[aoffset0 + 1] = q0y;
+            a->xR[aoffset2] = a1x * twx - a1y * twy;
+            a->xR[aoffset2 + 1] = a1x * twy + a1y * twx;
+            a->xR[aoffset4] = a2x * tw2x - a2y * tw2y;
+            a->xR[aoffset4 + 1] = a2x * tw2y + a2y * tw2x;
+            a->xR[aoffset6] = a3x * tw3x - a3y * tw3y;
+            a->xR[aoffset6 + 1] = a3x * tw3y + a3y * tw3x;
+            a->xR[aoffset8] = a4x * tw4x - a4y * tw4y;
+            a->xR[aoffset8 + 1] = a4x * tw4y + a4y * tw4x;
             aoffset0 += 2;
             aoffset2 += 2;
             aoffset4 += 2;
@@ -10000,18 +9637,18 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
          twxm1 = 0.0;
          twy = 0.0;
          for (mvidx = 0; mvidx < m; mvidx++) {
-            a0x = a->ptr.p_double[aoffset0];
-            a0y = a->ptr.p_double[aoffset0 + 1];
-            a1x = a->ptr.p_double[aoffset2];
-            a1y = a->ptr.p_double[aoffset2 + 1];
-            a2x = a->ptr.p_double[aoffset4];
-            a2y = a->ptr.p_double[aoffset4 + 1];
-            a3x = a->ptr.p_double[aoffset6];
-            a3y = a->ptr.p_double[aoffset6 + 1];
-            a4x = a->ptr.p_double[aoffset8];
-            a4y = a->ptr.p_double[aoffset8 + 1];
-            a5x = a->ptr.p_double[aoffset10];
-            a5y = a->ptr.p_double[aoffset10 + 1];
+            a0x = a->xR[aoffset0];
+            a0y = a->xR[aoffset0 + 1];
+            a1x = a->xR[aoffset2];
+            a1y = a->xR[aoffset2 + 1];
+            a2x = a->xR[aoffset4];
+            a2y = a->xR[aoffset4 + 1];
+            a3x = a->xR[aoffset6];
+            a3y = a->xR[aoffset6 + 1];
+            a4x = a->xR[aoffset8];
+            a4y = a->xR[aoffset8 + 1];
+            a5x = a->xR[aoffset10];
+            a5y = a->xR[aoffset10 + 1];
             v0 = a0x;
             v1 = a0y;
             a0x += a3x;
@@ -10074,18 +9711,18 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
             tw4y = 2 * tw2x * tw2y;
             tw5x = tw3x * tw2x - tw3y * tw2y;
             tw5y = tw3x * tw2y + tw3y * tw2x;
-            a->ptr.p_double[aoffset0] = a0x;
-            a->ptr.p_double[aoffset0 + 1] = a0y;
-            a->ptr.p_double[aoffset2] = a3x * twx - a3y * twy;
-            a->ptr.p_double[aoffset2 + 1] = a3y * twx + a3x * twy;
-            a->ptr.p_double[aoffset4] = a1x * tw2x - a1y * tw2y;
-            a->ptr.p_double[aoffset4 + 1] = a1y * tw2x + a1x * tw2y;
-            a->ptr.p_double[aoffset6] = a4x * tw3x - a4y * tw3y;
-            a->ptr.p_double[aoffset6 + 1] = a4y * tw3x + a4x * tw3y;
-            a->ptr.p_double[aoffset8] = a2x * tw4x - a2y * tw4y;
-            a->ptr.p_double[aoffset8 + 1] = a2y * tw4x + a2x * tw4y;
-            a->ptr.p_double[aoffset10] = a5x * tw5x - a5y * tw5y;
-            a->ptr.p_double[aoffset10 + 1] = a5y * tw5x + a5x * tw5y;
+            a->xR[aoffset0] = a0x;
+            a->xR[aoffset0 + 1] = a0y;
+            a->xR[aoffset2] = a3x * twx - a3y * twy;
+            a->xR[aoffset2 + 1] = a3y * twx + a3x * twy;
+            a->xR[aoffset4] = a1x * tw2x - a1y * tw2y;
+            a->xR[aoffset4 + 1] = a1y * tw2x + a1x * tw2y;
+            a->xR[aoffset6] = a4x * tw3x - a4y * tw3y;
+            a->xR[aoffset6 + 1] = a4y * tw3x + a4x * tw3y;
+            a->xR[aoffset8] = a2x * tw4x - a2y * tw4y;
+            a->xR[aoffset8 + 1] = a2y * tw4x + a2x * tw4y;
+            a->xR[aoffset10] = a5x * tw5x - a5y * tw5y;
+            a->xR[aoffset10 + 1] = a5y * tw5x + a5x * tw5y;
             aoffset0 += 2;
             aoffset2 += 2;
             aoffset4 += 2;
@@ -10112,7 +9749,7 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector a, ae_int_t offs, ae_int_t
 
 // Twiddle factors calculation
 // ALGLIB: Copyright 01.05.2009 by Sergey Bochkanov
-static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2) {
+static void ftbase_ffttwcalc(RVector *a, ae_int_t aoffset, ae_int_t n1, ae_int_t n2) {
    ae_int_t i;
    ae_int_t j2;
    ae_int_t n;
@@ -10193,21 +9830,21 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
       // * update twiddle factor (unconditional update)
       // * process second element
       // * conditional update of the twiddle factor
-         x = a->ptr.p_double[offs];
-         y = a->ptr.p_double[offs + 1];
+         x = a->xR[offs];
+         y = a->xR[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->ptr.p_double[offs] = tmpx;
-         a->ptr.p_double[offs + 1] = tmpy;
+         a->xR[offs] = tmpx;
+         a->xR[offs + 1] = tmpy;
          tmpx = (1 + twxm1) * twrowxm1 - twy * twrowy;
          twy += (1 + twxm1) * twrowy + twy * twrowxm1;
          twxm1 += tmpx;
-         x = a->ptr.p_double[offs + 2];
-         y = a->ptr.p_double[offs + 3];
+         x = a->xR[offs + 2];
+         y = a->xR[offs + 3];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->ptr.p_double[offs + 2] = tmpx;
-         a->ptr.p_double[offs + 3] = tmpy;
+         a->xR[offs + 2] = tmpx;
+         a->xR[offs + 3] = tmpy;
          offs += 4;
          if ((j2 + 1) % updatetw2 == 0 && j2 < halfn1 - 1) {
          // Recalculate twiddle factor
@@ -10224,12 +9861,12 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
       }
       if (n1 % 2 == 1) {
       // Handle residual chunk
-         x = a->ptr.p_double[offs];
-         y = a->ptr.p_double[offs + 1];
+         x = a->xR[offs];
+         y = a->xR[offs + 1];
          tmpx = x * (1 + twxm1) - y * twy;
          tmpy = x * twy + y * (1 + twxm1);
-         a->ptr.p_double[offs] = tmpx;
-         a->ptr.p_double[offs + 1] = tmpy;
+         a->xR[offs] = tmpx;
+         a->xR[offs + 1] = tmpy;
          offs += 2;
       }
    // update TwRow: TwRow(new) = TwRow(old)*TwBase
@@ -10271,7 +9908,7 @@ static void ftbase_ffttwcalc(RVector a, ae_int_t aoffset, ae_int_t n1, ae_int_t 
 //                     is unchanged and can be reused)
 //     A           -   transformed array
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
-static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector a, ae_int_t abase, ae_int_t aoffset, RVector buf, ae_int_t repcnt) {
+static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVector *a, ae_int_t abase, ae_int_t aoffset, RVector *buf, ae_int_t repcnt) {
    ae_frame _frame_block;
    ae_int_t rowidx;
    ae_int_t i;
@@ -10287,22 +9924,22 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
    ae_int_t chunksize;
    ae_int_t lastchunksize;
    ae_frame_make(&_frame_block);
-   RefObj(srealarray, bufa);
-   RefObj(srealarray, bufb);
-   RefObj(srealarray, bufc);
-   RefObj(srealarray, bufd);
-   ae_assert(plan->entries.ptr.pp_int[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header");
+   RefObj(RVector, bufa);
+   RefObj(RVector, bufb);
+   RefObj(RVector, bufc);
+   RefObj(RVector, bufd);
+   ae_assert(plan->entries.xyZ[subplan][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect subplan header");
    rowidx = subplan + 1;
-   while (plan->entries.ptr.pp_int[rowidx][ftbase_coltype] != ftbase_opend) {
-      operation = plan->entries.ptr.pp_int[rowidx][ftbase_coltype];
-      operandscnt = repcnt * plan->entries.ptr.pp_int[rowidx][ftbase_coloperandscnt];
-      operandsize = plan->entries.ptr.pp_int[rowidx][ftbase_coloperandsize];
-      microvectorsize = plan->entries.ptr.pp_int[rowidx][ftbase_colmicrovectorsize];
-      param0 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
-   // ae_int_t param1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam1]; //(@) Unused.
+   while (plan->entries.xyZ[rowidx][ftbase_coltype] != ftbase_opend) {
+      operation = plan->entries.xyZ[rowidx][ftbase_coltype];
+      operandscnt = repcnt * plan->entries.xyZ[rowidx][ftbase_coloperandscnt];
+      operandsize = plan->entries.xyZ[rowidx][ftbase_coloperandsize];
+      microvectorsize = plan->entries.xyZ[rowidx][ftbase_colmicrovectorsize];
+      param0 = plan->entries.xyZ[rowidx][ftbase_colparam0];
+   // ae_int_t param1 = plan->entries.xyZ[rowidx][ftbase_colparam1]; //(@) Unused.
    // Process "jump" operation
       if (operation == ftbase_opjmp) {
-         rowidx += plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         rowidx += plan->entries.xyZ[rowidx][ftbase_colparam0];
          continue;
       }
    // Process "parallel call" operation:
@@ -10311,17 +9948,17 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
    //   several parallel tasks
       if (operation == ftbase_opparallelcall) {
          parentsize = operandsize * microvectorsize;
-         childsize = plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandscnt] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_coloperandsize] * plan->entries.ptr.pp_int[rowidx + param0][ftbase_colmicrovectorsize];
-         ae_assert(plan->entries.ptr.pp_int[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header");
+         childsize = plan->entries.xyZ[rowidx + param0][ftbase_coloperandscnt] * plan->entries.xyZ[rowidx + param0][ftbase_coloperandsize] * plan->entries.xyZ[rowidx + param0][ftbase_colmicrovectorsize];
+         ae_assert(plan->entries.xyZ[rowidx + param0][ftbase_coltype] == ftbase_opstart, "FTApplySubPlan: incorrect child subplan header");
          ae_assert(parentsize == childsize, "FTApplySubPlan: incorrect child subplan header");
-         chunksize = ae_maxint(ftbase_recursivethreshold / childsize, 1);
+         chunksize = imax2(ftbase_recursivethreshold / childsize, 1);
          lastchunksize = operandscnt % chunksize;
          if (lastchunksize == 0) {
             lastchunksize = chunksize;
          }
          i = 0;
          while (i < operandscnt) {
-            chunksize = ae_minint(chunksize, operandscnt - i);
+            chunksize = imin2(chunksize, operandscnt - i);
             ftbase_ftapplysubplan(plan, rowidx + param0, a, abase, aoffset + i * childsize, buf, chunksize);
             i += chunksize;
          }
@@ -10353,7 +9990,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufb);
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufc);
          ae_shared_pool_retrieve(&plan->bluesteinpool, &_bufd);
-         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], &bufa->val, &bufb->val, &bufc->val, &bufd->val);
+         ftbase_ftbluesteinsfft(plan, a, abase, aoffset, operandscnt, operandsize, plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam2], rowidx + plan->entries.xyZ[rowidx][ftbase_colparam1], bufa, bufb, bufc, bufd);
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufa);
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufb);
          ae_shared_pool_recycle(&plan->bluesteinpool, &_bufc);
@@ -10363,14 +10000,14 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
       }
    // Process Rader's FFT
       if (operation == ftbase_opradersfft) {
-         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], plan->entries.ptr.pp_int[rowidx][ftbase_colparam3], buf);
+         ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx + plan->entries.xyZ[rowidx][ftbase_colparam0], plan->entries.xyZ[rowidx][ftbase_colparam1], plan->entries.xyZ[rowidx][ftbase_colparam2], plan->entries.xyZ[rowidx][ftbase_colparam3], buf);
          rowidx++;
          continue;
       }
    // Process "complex twiddle factors" operation
       if (operation == ftbase_opcomplexfftfactors) {
          ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
-         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
          n2 = operandsize / n1;
          for (i = 0; i < operandscnt; i++) {
             ftbase_ffttwcalc(a, abase + aoffset + i * operandsize * 2, n1, n2);
@@ -10381,7 +10018,7 @@ static void ftbase_ftapplysubplan(fasttransformplan *plan, ae_int_t subplan, RVe
    // Process "complex transposition" operation
       if (operation == ftbase_opcomplextranspose) {
          ae_assert(microvectorsize == 2, "FTApplySubPlan: MicrovectorSize != 1");
-         n1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
+         n1 = plan->entries.xyZ[rowidx][ftbase_colparam0];
          n2 = operandsize / n1;
          for (i = 0; i < operandscnt; i++) {
             ftbase_internalcomplexlintranspose(a, n1, n2, abase + aoffset + i * operandsize * 2, buf);

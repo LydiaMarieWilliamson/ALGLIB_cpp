@@ -20,61 +20,61 @@
 // Depends on: (AlgLibInternal) XBLAS
 // Depends on: (LinAlg) RCOND, SVD
 namespace alglib_impl {
-typedef struct {
+struct densesolverreport {
    double r1;
    double rinf;
-} densesolverreport;
+};
 void densesolverreport_init(void *_p, bool make_automatic);
 void densesolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void densesolverreport_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct densesolverlsreport {
    double r2;
    ae_matrix cx;
    ae_int_t n;
    ae_int_t k;
-} densesolverlsreport;
+};
 void densesolverlsreport_init(void *_p, bool make_automatic);
 void densesolverlsreport_copy(void *_dst, void *_src, bool make_automatic);
 void densesolverlsreport_free(void *_p, bool make_automatic);
 
-void rmatrixsolve(RMatrix a, ae_int_t n, RVector b, ae_int_t *info, densesolverreport *rep, RVector x);
-void rmatrixsolvefast(RMatrix a, ae_int_t n, RVector b, ae_int_t *info);
-void rmatrixsolvem(RMatrix a, ae_int_t n, RMatrix b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix x);
-void rmatrixsolvemfast(RMatrix a, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info);
-void rmatrixlusolve(RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *info, densesolverreport *rep, RVector x);
-void rmatrixlusolvefast(RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *info);
-void rmatrixlusolvem(RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x);
-void rmatrixlusolvemfast(RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info);
-void rmatrixmixedsolve(RMatrix a, RMatrix lua, ZVector p, ae_int_t n, RVector b, ae_int_t *info, densesolverreport *rep, RVector x);
-void rmatrixmixedsolvem(RMatrix a, RMatrix lua, ZVector p, ae_int_t n, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x);
-void cmatrixsolvem(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix x);
-void cmatrixsolvemfast(CMatrix a, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info);
-void cmatrixsolve(CMatrix a, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x);
-void cmatrixsolvefast(CMatrix a, ae_int_t n, CVector b, ae_int_t *info);
-void cmatrixlusolvem(CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x);
-void cmatrixlusolvemfast(CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info);
-void cmatrixlusolve(CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x);
-void cmatrixlusolvefast(CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *info);
-void cmatrixmixedsolvem(CMatrix a, CMatrix lua, ZVector p, ae_int_t n, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x);
-void cmatrixmixedsolve(CMatrix a, CMatrix lua, ZVector p, ae_int_t n, CVector b, ae_int_t *info, densesolverreport *rep, CVector x);
-void spdmatrixsolvem(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x);
-void spdmatrixsolvemfast(RMatrix a, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info);
-void spdmatrixsolve(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t *info, densesolverreport *rep, RVector x);
-void spdmatrixsolvefast(RMatrix a, ae_int_t n, bool isupper, RVector b, ae_int_t *info);
-void spdmatrixcholeskysolvem(RMatrix cha, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix x);
-void spdmatrixcholeskysolvemfast(RMatrix cha, ae_int_t n, bool isupper, RMatrix b, ae_int_t m, ae_int_t *info);
-void spdmatrixcholeskysolve(RMatrix cha, ae_int_t n, bool isupper, RVector b, ae_int_t *info, densesolverreport *rep, RVector x);
-void spdmatrixcholeskysolvefast(RMatrix cha, ae_int_t n, bool isupper, RVector b, ae_int_t *info);
-void hpdmatrixsolvem(CMatrix a, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x);
-void hpdmatrixsolvemfast(CMatrix a, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info);
-void hpdmatrixsolve(CMatrix a, ae_int_t n, bool isupper, CVector b, ae_int_t *info, densesolverreport *rep, CVector x);
-void hpdmatrixsolvefast(CMatrix a, ae_int_t n, bool isupper, CVector b, ae_int_t *info);
-void hpdmatrixcholeskysolvem(CMatrix cha, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix x);
-void hpdmatrixcholeskysolvemfast(CMatrix cha, ae_int_t n, bool isupper, CMatrix b, ae_int_t m, ae_int_t *info);
-void hpdmatrixcholeskysolve(CMatrix cha, ae_int_t n, bool isupper, CVector b, ae_int_t *info, densesolverreport *rep, CVector x);
-void hpdmatrixcholeskysolvefast(CMatrix cha, ae_int_t n, bool isupper, CVector b, ae_int_t *info);
-void rmatrixsolvels(RMatrix a, ae_int_t nrows, ae_int_t ncols, RVector b, double threshold, ae_int_t *info, densesolverlsreport *rep, RVector x);
+void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info);
+void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info);
+void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixlusolvefast(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info);
+void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info);
+void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x);
+void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info);
+void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
+void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info);
+void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x);
+void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info);
+void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
+void cmatrixlusolvefast(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info);
+void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x);
+void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
+void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info);
+void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info);
+void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x);
+void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info);
+void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x);
+void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info);
+void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x);
+void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info);
+void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
+void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info);
+void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x);
+void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info);
+void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x);
+void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info);
+void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, double threshold, ae_int_t *info, densesolverlsreport *rep, RVector *x);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1535,7 +1535,7 @@ void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t
 // === LINLSQR Package ===
 // Depends on: (LinAlg) SVD, NORMESTIMATOR
 namespace alglib_impl {
-typedef struct {
+struct linlsqrstate {
    normestimatorstate nes;
    ae_vector rx;
    ae_vector b;
@@ -1589,30 +1589,30 @@ typedef struct {
    ae_vector tmpd;
    ae_vector tmpx;
    ae_int_t PQ;
-} linlsqrstate;
+};
 void linlsqrstate_init(void *_p, bool make_automatic);
 void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic);
 void linlsqrstate_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct linlsqrreport {
    ae_int_t iterationscount;
    ae_int_t nmv;
    ae_int_t terminationtype;
-} linlsqrreport;
+};
 void linlsqrreport_init(void *_p, bool make_automatic);
 void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic);
 void linlsqrreport_free(void *_p, bool make_automatic);
 
 void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state);
 void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state);
-void linlsqrsetb(linlsqrstate *state, RVector b);
+void linlsqrsetb(linlsqrstate *state, RVector *b);
 void linlsqrsetprecunit(linlsqrstate *state);
 void linlsqrsetprecdiag(linlsqrstate *state);
 void linlsqrsetlambdai(linlsqrstate *state, double lambdai);
 bool linlsqriteration(linlsqrstate *state);
-void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector b);
+void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b);
 void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits);
-void linlsqrresults(linlsqrstate *state, RVector x, linlsqrreport *rep);
+void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep);
 void linlsqrsetxrep(linlsqrstate *state, bool needxrep);
 void linlsqrrestart(linlsqrstate *state);
 ae_int_t linlsqrpeekiterationscount(linlsqrstate *s);
@@ -1807,14 +1807,14 @@ void linlsqrrequesttermination(const linlsqrstate &state);
 // === POLYNOMIALSOLVER Package ===
 // Depends on: (LinAlg) TRFAC, EVD
 namespace alglib_impl {
-typedef struct {
+struct polynomialsolverreport {
    double maxerr;
-} polynomialsolverreport;
+};
 void polynomialsolverreport_init(void *_p, bool make_automatic);
 void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void polynomialsolverreport_free(void *_p, bool make_automatic);
 
-void polynomialsolve(RVector a, ae_int_t n, CVector x, polynomialsolverreport *rep);
+void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1863,7 +1863,7 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 // Depends on: (AlgLibInternal) LINMIN
 // Depends on: (LinAlg) FBLS
 namespace alglib_impl {
-typedef struct {
+struct nleqstate {
    ae_int_t n;
    ae_int_t m;
    double epsf;
@@ -1888,44 +1888,42 @@ typedef struct {
    ae_vector candstep;
    ae_vector rightpart;
    ae_vector cgbuf;
-} nleqstate;
+};
 void nleqstate_init(void *_p, bool make_automatic);
 void nleqstate_copy(void *_dst, void *_src, bool make_automatic);
 void nleqstate_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct nleqreport {
    ae_int_t iterationscount;
    ae_int_t nfunc;
    ae_int_t njac;
    ae_int_t terminationtype;
-} nleqreport;
+};
 void nleqreport_init(void *_p, bool make_automatic);
 void nleqreport_copy(void *_dst, void *_src, bool make_automatic);
 void nleqreport_free(void *_p, bool make_automatic);
 
-void nleqcreatelm(ae_int_t n, ae_int_t m, RVector x, nleqstate *state);
+void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state);
 void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits);
 void nleqsetxrep(nleqstate *state, bool needxrep);
 void nleqsetstpmax(nleqstate *state, double stpmax);
 bool nleqiteration(nleqstate *state);
-void nleqresults(nleqstate *state, RVector x, nleqreport *rep);
-void nleqresultsbuf(nleqstate *state, RVector x, nleqreport *rep);
-void nleqrestartfrom(nleqstate *state, RVector x);
+void nleqresults(nleqstate *state, RVector *x, nleqreport *rep);
+void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep);
+void nleqrestartfrom(nleqstate *state, RVector *x);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
 
-//                 LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
-//
-// DESCRIPTION:
-// This algorithm solves system of nonlinear equations
-//     F[0](x[0], ..., x[n-1])   = 0
-//     F[1](x[0], ..., x[n-1])   = 0
+// LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
+// This algorithm solves a system of nonlinear equations
+//     F[0](x[0], ..., x[N-1])   = 0
+//     F[1](x[0], ..., x[N-1])   = 0
 //     ...
-//     F[M-1](x[0], ..., x[n-1]) = 0
-// with M/N do not necessarily coincide.  Algorithm  converges  quadratically
+//     F[M-1](x[0], ..., x[N-1]) = 0
+// where M/N do not necessarily coincide. The algorithm converges quadratically
 // under following conditions:
 //     * the solution set XS is nonempty
 //     * for some xs in XS there exist such neighbourhood N(xs) that:
@@ -2101,17 +2099,17 @@ void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
 // === DIRECTSPARSESOLVERS Package ===
 // Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
-typedef struct {
+struct sparsesolverreport {
    ae_int_t terminationtype;
-} sparsesolverreport;
+};
 void sparsesolverreport_init(void *_p, bool make_automatic);
 void sparsesolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void sparsesolverreport_free(void *_p, bool make_automatic);
 
-void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b, sparsesolverreport *rep, RVector x);
-void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector b, sparsesolverreport *rep, RVector x);
-void sparsesolve(sparsematrix *a, ae_int_t n, RVector b, RVector x, sparsesolverreport *rep);
-void sparselusolve(sparsematrix *a, ZVector p, ZVector q, ae_int_t n, RVector b, RVector x, sparsesolverreport *rep);
+void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x);
+void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x);
+void sparsesolve(sparsematrix *a, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -2216,7 +2214,7 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 // === LINCG Package ===
 // Depends on: (LinAlg) SPARSE, MATGEN
 namespace alglib_impl {
-typedef struct {
+struct lincgstate {
    ae_vector rx;
    ae_vector b;
    ae_int_t n;
@@ -2253,30 +2251,30 @@ typedef struct {
    bool running;
    ae_vector tmpd;
    ae_int_t PQ;
-} lincgstate;
+};
 void lincgstate_init(void *_p, bool make_automatic);
 void lincgstate_copy(void *_dst, void *_src, bool make_automatic);
 void lincgstate_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct lincgreport {
    ae_int_t iterationscount;
    ae_int_t nmv;
    ae_int_t terminationtype;
    double r2;
-} lincgreport;
+};
 void lincgreport_init(void *_p, bool make_automatic);
 void lincgreport_copy(void *_dst, void *_src, bool make_automatic);
 void lincgreport_free(void *_p, bool make_automatic);
 
 void lincgcreate(ae_int_t n, lincgstate *state);
-void lincgsetstartingpoint(lincgstate *state, RVector x);
-void lincgsetb(lincgstate *state, RVector b);
+void lincgsetstartingpoint(lincgstate *state, RVector *x);
+void lincgsetb(lincgstate *state, RVector *b);
 void lincgsetprecunit(lincgstate *state);
 void lincgsetprecdiag(lincgstate *state);
 void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits);
 bool lincgiteration(lincgstate *state);
-void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector b);
-void lincgresults(lincgstate *state, RVector x, lincgreport *rep);
+void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector *b);
+void lincgresults(lincgstate *state, RVector *x, lincgreport *rep);
 void lincgsetrestartfreq(lincgstate *state, ae_int_t srf);
 void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq);
 void lincgsetxrep(lincgstate *state, bool needxrep);

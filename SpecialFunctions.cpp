@@ -812,9 +812,9 @@ double bivariatenormalcdf(double x, double y, double rho) {
       y = -y;
       s = (double)(ae_sign(rho));
       if (s > 0.0) {
-         fxys = normalcdf(-ae_maxreal(x, y));
+         fxys = normalcdf(-rmax2(x, y));
       } else {
-         fxys = ae_maxreal(0.0, normalcdf(-x) - normalcdf(y));
+         fxys = rmax2(0.0, normalcdf(-x) - normalcdf(y));
       }
       rangea = 0.0;
       rangeb = sqrt((1 - rho) * (1 + rho));
@@ -849,8 +849,8 @@ double bivariatenormalcdf(double x, double y, double rho) {
       v1 = v1 * 0.5 * (rangeb - rangea) / (2 * ae_pi);
       result = fxys - s * (v0 + v1);
    }
-   result = ae_maxreal(result, 0.0);
-   result = ae_minreal(result, 1.0);
+   result = rmax2(result, 0.0);
+   result = rmin2(result, 1.0);
    return result;
 }
 } // end of namespace alglib_impl
@@ -2176,7 +2176,7 @@ double hermitecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Hermite polynomial at x
-double hermitesum(RVector c, ae_int_t n, double x) {
+double hermitesum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -2185,7 +2185,7 @@ double hermitesum(RVector c, ae_int_t n, double x) {
    b2 = 0.0;
    result = 0.0;
    for (i = n; i >= 0; i--) {
-      result = 2 * (x * b1 - (i + 1) * b2) + c->ptr.p_double[i];
+      result = 2 * (x * b1 - (i + 1) * b2) + c->xR[i];
       b2 = b1;
       b1 = result;
    }
@@ -2199,16 +2199,16 @@ double hermitesum(RVector c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
-void hermitecoefficients(ae_int_t n, RVector c) {
+void hermitecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
    ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
-      c->ptr.p_double[i] = 0.0;
+      c->xR[i] = 0.0;
    }
-   c->ptr.p_double[n] = exp(n * log(2.0));
+   c->xR[n] = exp(n * log(2.0));
    for (i = 0; i < n / 2; i++) {
-      c->ptr.p_double[n - 2 * (i + 1)] = -c->ptr.p_double[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1);
+      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1);
    }
 }
 } // end of namespace alglib_impl
@@ -5799,27 +5799,27 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       ae_frame_leave();
       return;
    }
-   a.ptr.p_double[0] = 1.0;
+   a.xR[0] = 1.0;
    b = sqrt(1.0 - m);
-   c.ptr.p_double[0] = sqrt(m);
+   c.xR[0] = sqrt(m);
    twon = 1.0;
    i = 0;
-   while (!SmallAtR(c.ptr.p_double[i] / a.ptr.p_double[i], ae_machineepsilon)) {
+   while (!SmallAtR(c.xR[i] / a.xR[i], ae_machineepsilon)) {
       if (i > 7) {
          ae_assert(false, "Overflow in JacobianEllipticFunctions");
          break;
       }
-      ai = a.ptr.p_double[i];
+      ai = a.xR[i];
       i++;
-      c.ptr.p_double[i] = 0.5 * (ai - b);
+      c.xR[i] = 0.5 * (ai - b);
       t = sqrt(ai * b);
-      a.ptr.p_double[i] = 0.5 * (ai + b);
+      a.xR[i] = 0.5 * (ai + b);
       b = t;
       twon *= 2.0;
    }
-   phi = twon * a.ptr.p_double[i] * u;
+   phi = twon * a.xR[i] * u;
    do {
-      t = c.ptr.p_double[i] * sin(phi) / a.ptr.p_double[i];
+      t = c.xR[i] * sin(phi) / a.xR[i];
       b = phi;
       phi = (asin(t) + phi) / 2.0;
       i--;
@@ -6489,7 +6489,7 @@ double laguerrecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Laguerre polynomial at x
-double laguerresum(RVector c, ae_int_t n, double x) {
+double laguerresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -6498,7 +6498,7 @@ double laguerresum(RVector c, ae_int_t n, double x) {
    b2 = 0.0;
    result = 0.0;
    for (i = n; i >= 0; i--) {
-      result = (2 * i + 1 - x) * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->ptr.p_double[i];
+      result = (2 * i + 1 - x) * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->xR[i];
       b2 = b1;
       b1 = result;
    }
@@ -6512,13 +6512,13 @@ double laguerresum(RVector c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
-void laguerrecoefficients(ae_int_t n, RVector c) {
+void laguerrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
    ae_vector_set_length(c, n + 1);
-   c->ptr.p_double[0] = 1.0;
+   c->xR[0] = 1.0;
    for (i = 0; i < n; i++) {
-      c->ptr.p_double[i + 1] = -c->ptr.p_double[i] * (n - i) / (i + 1) / (i + 1);
+      c->xR[i + 1] = -c->xR[i] * (n - i) / (i + 1) / (i + 1);
    }
 }
 } // end of namespace alglib_impl
@@ -6825,7 +6825,7 @@ double legendrecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Legendre polynomial at x
-double legendresum(RVector c, ae_int_t n, double x) {
+double legendresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -6834,7 +6834,7 @@ double legendresum(RVector c, ae_int_t n, double x) {
    b2 = 0.0;
    result = 0.0;
    for (i = n; i >= 0; i--) {
-      result = (2 * i + 1) * x * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->ptr.p_double[i];
+      result = (2 * i + 1) * x * b1 / (i + 1) - (i + 1) * b2 / (i + 2) + c->xR[i];
       b2 = b1;
       b1 = result;
    }
@@ -6848,19 +6848,19 @@ double legendresum(RVector c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
-void legendrecoefficients(ae_int_t n, RVector c) {
+void legendrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
    ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
-      c->ptr.p_double[i] = 0.0;
+      c->xR[i] = 0.0;
    }
-   c->ptr.p_double[n] = 1.0;
+   c->xR[n] = 1.0;
    for (i = 1; i <= n; i++) {
-      c->ptr.p_double[n] = c->ptr.p_double[n] * (n + i) / 2 / i;
+      c->xR[n] = c->xR[n] * (n + i) / 2 / i;
    }
    for (i = 0; i < n / 2; i++) {
-      c->ptr.p_double[n - 2 * (i + 1)] = -c->ptr.p_double[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2 / (i + 1) / (2 * (n - i) - 1);
+      c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 2 / (i + 1) / (2 * (n - i) - 1);
    }
 }
 } // end of namespace alglib_impl
@@ -7062,7 +7062,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Chebyshev polynomial at x
-double chebyshevsum(RVector c, ae_int_t r, ae_int_t n, double x) {
+double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x) {
    double b1;
    double b2;
    ae_int_t i;
@@ -7070,14 +7070,14 @@ double chebyshevsum(RVector c, ae_int_t r, ae_int_t n, double x) {
    b1 = 0.0;
    b2 = 0.0;
    for (i = n; i >= 1; i--) {
-      result = 2 * x * b1 - b2 + c->ptr.p_double[i];
+      result = 2 * x * b1 - b2 + c->xR[i];
       b2 = b1;
       b1 = result;
    }
    if (r == 1) {
-      result = -b2 + x * b1 + c->ptr.p_double[0];
+      result = -b2 + x * b1 + c->xR[0];
    } else {
-      result = -b2 + 2 * x * b1 + c->ptr.p_double[0];
+      result = -b2 + 2 * x * b1 + c->xR[0];
    }
    return result;
 }
@@ -7089,19 +7089,19 @@ double chebyshevsum(RVector c, ae_int_t r, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
-void chebyshevcoefficients(ae_int_t n, RVector c) {
+void chebyshevcoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
    ae_vector_set_length(c, n + 1);
    for (i = 0; i <= n; i++) {
-      c->ptr.p_double[i] = 0.0;
+      c->xR[i] = 0.0;
    }
    if (n == 0 || n == 1) {
-      c->ptr.p_double[n] = 1.0;
+      c->xR[n] = 1.0;
    } else {
-      c->ptr.p_double[n] = exp((n - 1) * log(2.0));
+      c->xR[n] = exp((n - 1) * log(2.0));
       for (i = 0; i < n / 2; i++) {
-         c->ptr.p_double[n - 2 * (i + 1)] = -c->ptr.p_double[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1) / (n - i - 1);
+         c->xR[n - 2 * (i + 1)] = -c->xR[n - 2 * i] * (n - 2 * i) * (n - 2 * i - 1) / 4 / (i + 1) / (n - i - 1);
       }
    }
 }
@@ -7117,7 +7117,7 @@ void chebyshevcoefficients(ae_int_t n, RVector c) {
 //
 // Outputs:
 //     B   -   power series coefficients
-void fromchebyshev(RVector a, ae_int_t n, RVector b) {
+void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
    ae_int_t i;
    ae_int_t k;
    double e;
@@ -7125,36 +7125,36 @@ void fromchebyshev(RVector a, ae_int_t n, RVector b) {
    SetVector(b);
    ae_vector_set_length(b, n + 1);
    for (i = 0; i <= n; i++) {
-      b->ptr.p_double[i] = 0.0;
+      b->xR[i] = 0.0;
    }
    d = 0.0;
    i = 0;
    do {
       k = i;
       do {
-         e = b->ptr.p_double[k];
-         b->ptr.p_double[k] = 0.0;
+         e = b->xR[k];
+         b->xR[k] = 0.0;
          if (i <= 1 && k == i) {
-            b->ptr.p_double[k] = 1.0;
+            b->xR[k] = 1.0;
          } else {
             if (i != 0) {
-               b->ptr.p_double[k] = 2 * d;
+               b->xR[k] = 2 * d;
             }
             if (k > i + 1) {
-               b->ptr.p_double[k] -= b->ptr.p_double[k - 2];
+               b->xR[k] -= b->xR[k - 2];
             }
          }
          d = e;
          k++;
       } while (k <= n);
-      d = b->ptr.p_double[i];
+      d = b->xR[i];
       e = 0.0;
       k = i;
       while (k <= n) {
-         e += b->ptr.p_double[k] * a->ptr.p_double[k];
+         e += b->xR[k] * a->xR[k];
          k += 2;
       }
-      b->ptr.p_double[i] = e;
+      b->xR[i] = e;
       i++;
    } while (i <= n);
 }

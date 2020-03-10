@@ -553,8 +553,8 @@ double incompleteellipticintegrale(const double phi, const double m);
 // === HERMITE Package ===
 namespace alglib_impl {
 double hermitecalculate(ae_int_t n, double x);
-double hermitesum(RVector c, ae_int_t n, double x);
-void hermitecoefficients(ae_int_t n, RVector c);
+double hermitesum(RVector *c, ae_int_t n, double x);
+void hermitecoefficients(ae_int_t n, RVector *c);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1459,8 +1459,8 @@ double exponentialintegralen(const double x, const ae_int_t n);
 // === LAGUERRE Package ===
 namespace alglib_impl {
 double laguerrecalculate(ae_int_t n, double x);
-double laguerresum(RVector c, ae_int_t n, double x);
-void laguerrecoefficients(ae_int_t n, RVector c);
+double laguerresum(RVector *c, ae_int_t n, double x);
+void laguerrecoefficients(ae_int_t n, RVector *c);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1593,8 +1593,8 @@ double invchisquaredistribution(const double v, const double y);
 // === LEGENDRE Package ===
 namespace alglib_impl {
 double legendrecalculate(ae_int_t n, double x);
-double legendresum(RVector c, ae_int_t n, double x);
-void legendrecoefficients(ae_int_t n, RVector c);
+double legendresum(RVector *c, ae_int_t n, double x);
+void legendrecoefficients(ae_int_t n, RVector *c);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -1664,9 +1664,9 @@ double beta(const double a, const double b);
 // === CHEBYSHEV Package ===
 namespace alglib_impl {
 double chebyshevcalculate(ae_int_t r, ae_int_t n, double x);
-double chebyshevsum(RVector c, ae_int_t r, ae_int_t n, double x);
-void chebyshevcoefficients(ae_int_t n, RVector c);
-void fromchebyshev(RVector a, ae_int_t n, RVector b);
+double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x);
+void chebyshevcoefficients(ae_int_t n, RVector *c);
+void fromchebyshev(RVector *a, ae_int_t n, RVector *b);
 } // end of namespace alglib_impl
 
 namespace alglib {

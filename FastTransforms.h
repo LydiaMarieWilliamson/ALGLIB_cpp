@@ -19,12 +19,12 @@
 // === FFT Package ===
 // Depends on: (AlgLibInternal) FTBASE
 namespace alglib_impl {
-void fftc1d(CVector a, ae_int_t n);
-void fftc1dinv(CVector a, ae_int_t n);
-void fftr1d(RVector a, ae_int_t n, CVector f);
-void fftr1dinv(CVector f, ae_int_t n, RVector a);
-void fftr1dinternaleven(RVector a, ae_int_t n, RVector buf, fasttransformplan *plan);
-void fftr1dinvinternaleven(RVector a, ae_int_t n, RVector buf, fasttransformplan *plan);
+void fftc1d(CVector *a, ae_int_t n);
+void fftc1dinv(CVector *a, ae_int_t n);
+void fftr1d(RVector *a, ae_int_t n, CVector *f);
+void fftr1dinv(CVector *f, ae_int_t n, RVector *a);
+void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan *plan);
+void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan *plan);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -135,8 +135,8 @@ void fftr1dinv(const complex_1d_array &f, real_1d_array &a);
 // === FHT Package ===
 // Depends on: FFT
 namespace alglib_impl {
-void fhtr1d(RVector a, ae_int_t n);
-void fhtr1dinv(RVector a, ae_int_t n);
+void fhtr1d(RVector *a, ae_int_t n);
+void fhtr1dinv(RVector *a, ae_int_t n);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -173,16 +173,16 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n);
 // === CONV Package ===
 // Depends on: FFT
 namespace alglib_impl {
-void convc1d(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r);
-void convc1dinv(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r);
-void convc1dcircular(CVector s, ae_int_t m, CVector r, ae_int_t n, CVector c);
-void convc1dcircularinv(CVector a, ae_int_t m, CVector b, ae_int_t n, CVector r);
-void convr1d(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r);
-void convr1dinv(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r);
-void convr1dcircular(RVector s, ae_int_t m, RVector r, ae_int_t n, RVector c);
-void convr1dcircularinv(RVector a, ae_int_t m, RVector b, ae_int_t n, RVector r);
-void convc1dx(CVector a, ae_int_t m, CVector b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector r);
-void convr1dx(RVector a, ae_int_t m, RVector b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector r);
+void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
+void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
+void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c);
+void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r);
+void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
+void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
+void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c);
+void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r);
+void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r);
+void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -379,10 +379,10 @@ void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_
 // === CORR Package ===
 // Depends on: CONV
 namespace alglib_impl {
-void corrc1d(CVector signal, ae_int_t n, CVector pattern, ae_int_t m, CVector r);
-void corrc1dcircular(CVector signal, ae_int_t m, CVector pattern, ae_int_t n, CVector c);
-void corrr1d(RVector signal, ae_int_t n, RVector pattern, ae_int_t m, RVector r);
-void corrr1dcircular(RVector signal, ae_int_t m, RVector pattern, ae_int_t n, RVector c);
+void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r);
+void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, CVector *c);
+void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector *r);
+void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, RVector *c);
 } // end of namespace alglib_impl
 
 namespace alglib {

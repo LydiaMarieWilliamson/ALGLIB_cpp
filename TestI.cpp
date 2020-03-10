@@ -29,56 +29,51 @@ bool doc_test_complex(complex v, complex t, double _threshold) {
 }
 
 bool doc_test_bool_vector(const boolean_1d_array &v, const boolean_1d_array &t) {
-   ae_int_t i;
    if (v.length() != t.length())
       return false;
-   for (i = 0; i < v.length(); i++)
+   for (ae_int_t i = 0; i < v.length(); i++)
       if (v(i) != t(i))
          return false;
    return true;
 }
 
 bool doc_test_bool_matrix(const boolean_2d_array &v, const boolean_2d_array &t) {
-   ae_int_t i, j;
    if (v.rows() != t.rows())
       return false;
    if (v.cols() != t.cols())
       return false;
-   for (i = 0; i < v.rows(); i++)
-      for (j = 0; j < v.cols(); j++)
+   for (ae_int_t i = 0; i < v.rows(); i++)
+      for (ae_int_t j = 0; j < v.cols(); j++)
          if (v(i, j) != t(i, j))
             return false;
    return true;
 }
 
 bool doc_test_int_vector(const integer_1d_array &v, const integer_1d_array &t) {
-   ae_int_t i;
    if (v.length() != t.length())
       return false;
-   for (i = 0; i < v.length(); i++)
+   for (ae_int_t i = 0; i < v.length(); i++)
       if (v(i) != t(i))
          return false;
    return true;
 }
 
 bool doc_test_int_matrix(const integer_2d_array &v, const integer_2d_array &t) {
-   ae_int_t i, j;
    if (v.rows() != t.rows())
       return false;
    if (v.cols() != t.cols())
       return false;
-   for (i = 0; i < v.rows(); i++)
-      for (j = 0; j < v.cols(); j++)
+   for (ae_int_t i = 0; i < v.rows(); i++)
+      for (ae_int_t j = 0; j < v.cols(); j++)
          if (v(i, j) != t(i, j))
             return false;
    return true;
 }
 
 bool doc_test_real_vector(const real_1d_array &v, const real_1d_array &t, double _threshold) {
-   ae_int_t i;
    if (v.length() != t.length())
       return false;
-   for (i = 0; i < v.length(); i++) {
+   for (ae_int_t i = 0; i < v.length(); i++) {
       double s = _threshold >= 0 ? 1.0 : fabs(t(i));
       double threshold = fabs(_threshold);
       if (!NearAtR(v(i), t(i), s * threshold))
@@ -88,13 +83,12 @@ bool doc_test_real_vector(const real_1d_array &v, const real_1d_array &t, double
 }
 
 bool doc_test_real_matrix(const real_2d_array &v, const real_2d_array &t, double _threshold) {
-   ae_int_t i, j;
    if (v.rows() != t.rows())
       return false;
    if (v.cols() != t.cols())
       return false;
-   for (i = 0; i < v.rows(); i++)
-      for (j = 0; j < v.cols(); j++) {
+   for (ae_int_t i = 0; i < v.rows(); i++)
+      for (ae_int_t j = 0; j < v.cols(); j++) {
          double s = _threshold >= 0 ? 1.0 : fabs(t(i, j));
          double threshold = fabs(_threshold);
          if (!NearAtR(v(i, j), t(i, j), s * threshold))
@@ -104,10 +98,9 @@ bool doc_test_real_matrix(const real_2d_array &v, const real_2d_array &t, double
 }
 
 bool doc_test_complex_vector(const complex_1d_array &v, const complex_1d_array &t, double _threshold) {
-   ae_int_t i;
    if (v.length() != t.length())
       return false;
-   for (i = 0; i < v.length(); i++) {
+   for (ae_int_t i = 0; i < v.length(); i++) {
       double s = _threshold >= 0 ? 1.0 : abscomplex(t(i));
       double threshold = fabs(_threshold);
       if (!NearAtC(v(i), t(i), s * threshold))
@@ -117,13 +110,12 @@ bool doc_test_complex_vector(const complex_1d_array &v, const complex_1d_array &
 }
 
 bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &t, double _threshold) {
-   ae_int_t i, j;
    if (v.rows() != t.rows())
       return false;
    if (v.cols() != t.cols())
       return false;
-   for (i = 0; i < v.rows(); i++)
-      for (j = 0; j < v.cols(); j++) {
+   for (ae_int_t i = 0; i < v.rows(); i++)
+      for (ae_int_t j = 0; j < v.cols(); j++) {
          double s = _threshold >= 0 ? 1.0 : abscomplex(t(i, j));
          double threshold = fabs(_threshold);
          if (!NearAtC(v(i, j), t(i, j), s * threshold))
@@ -133,59 +125,53 @@ bool doc_test_complex_matrix(const complex_2d_array &v, const complex_2d_array &
 }
 
 template < class T > void spoil_vector_by_adding_element(T &x) {
-   ae_int_t i;
    T y = x;
    x.setlength(y.length() + 1);
-   for (i = 0; i < y.length(); i++)
+   for (ae_int_t i = 0; i < y.length(); i++)
       x(i) = y(i);
    x(y.length()) = 0;
 }
 
 template < class T > void spoil_vector_by_deleting_element(T &x) {
-   ae_int_t i;
    T y = x;
    x.setlength(y.length() - 1);
-   for (i = 0; i < y.length() - 1; i++)
+   for (ae_int_t i = 0; i < y.length() - 1; i++)
       x(i) = y(i);
 }
 
 template < class T > void spoil_matrix_by_adding_row(T &x) {
-   ae_int_t i, j;
    T y = x;
    x.setlength(y.rows() + 1, y.cols());
-   for (i = 0; i < y.rows(); i++)
-      for (j = 0; j < y.cols(); j++)
+   for (ae_int_t i = 0; i < y.rows(); i++)
+      for (ae_int_t j = 0; j < y.cols(); j++)
          x(i, j) = y(i, j);
-   for (j = 0; j < y.cols(); j++)
+   for (ae_int_t j = 0; j < y.cols(); j++)
       x(y.rows(), j) = 0;
 }
 
 template < class T > void spoil_matrix_by_deleting_row(T &x) {
-   ae_int_t i, j;
    T y = x;
    x.setlength(y.rows() - 1, y.cols());
-   for (i = 0; i < y.rows() - 1; i++)
-      for (j = 0; j < y.cols(); j++)
+   for (ae_int_t i = 0; i < y.rows() - 1; i++)
+      for (ae_int_t j = 0; j < y.cols(); j++)
          x(i, j) = y(i, j);
 }
 
 template < class T > void spoil_matrix_by_adding_col(T &x) {
-   ae_int_t i, j;
    T y = x;
    x.setlength(y.rows(), y.cols() + 1);
-   for (i = 0; i < y.rows(); i++)
-      for (j = 0; j < y.cols(); j++)
+   for (ae_int_t i = 0; i < y.rows(); i++)
+      for (ae_int_t j = 0; j < y.cols(); j++)
          x(i, j) = y(i, j);
-   for (i = 0; i < y.rows(); i++)
+   for (ae_int_t i = 0; i < y.rows(); i++)
       x(i, y.cols()) = 0;
 }
 
 template < class T > void spoil_matrix_by_deleting_col(T &x) {
-   ae_int_t i, j;
    T y = x;
    x.setlength(y.rows(), y.cols() - 1);
-   for (i = 0; i < y.rows(); i++)
-      for (j = 0; j < y.cols() - 1; j++)
+   for (ae_int_t i = 0; i < y.rows(); i++)
+      for (ae_int_t j = 0; j < y.cols() - 1; j++)
          x(i, j) = y(i, j);
 }
 
@@ -530,9 +516,7 @@ void s1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *pt
 }
 
 int main() {
-   bool _TotalResult = true;
-   bool _TestResult;
-   int _spoil_scenario;
+   bool AllOk = true;
    printf("C++ tests. Please wait...\n");
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    const ae_int_t _static_pool_size = 1000000;
@@ -541,8 +525,8 @@ int main() {
    alglib_impl::set_memory_pool(_static_pool, _static_pool_size);
    alglib_impl::memory_pool_stats(&_static_pool_used, &_static_pool_free);
    if (_static_pool_used != 0 || _static_pool_free < 0.95 * _static_pool_size || _static_pool_free > _static_pool_size) {
-      _TotalResult = false;
-      printf("FAILURE: memory pool usage stats are inconsistent!\n");
+      AllOk = false;
+      printf("Failure: memory pool usage stats are inconsistent!\n");
       return 1;
    }
    {
@@ -550,8 +534,8 @@ int main() {
       ae_int_t _static_pool_used2 = 0, _static_pool_free2 = 0;
       alglib_impl::memory_pool_stats(&_static_pool_used2, &_static_pool_free2);
       if (_static_pool_used2 <= _static_pool_used || _static_pool_free2 >= _static_pool_free || _static_pool_used + _static_pool_free != _static_pool_used2 + _static_pool_free2) {
-         _TotalResult = false;
-         printf("FAILURE: memory pool usage stats are inconsistent!\n");
+         AllOk = false;
+         printf("Failure: memory pool usage stats are inconsistent!\n");
          return 1;
       }
       a.setlength(1, 1); // make sure that destructor of /a/ is never called prior to this point
@@ -561,28 +545,26 @@ int main() {
    printf("Allocation counter activated...\n");
    alglib_impl::_use_alloc_counter = true;
    if (alglib_impl::_alloc_counter != 0) {
-      _TotalResult = false;
-      printf("FAILURE: alloc_counter is non-zero on start!\n");
+      AllOk = false;
+      printf("Failure: _alloc_counter is non-zero on start!\n");
    }
    {
       {
          real_1d_array x;
          x.setlength(1);
          if (alglib_impl::_alloc_counter == 0)
-            printf(":::: WARNING: ALLOC_COUNTER IS INACTIVE!!! :::::\n");
+            printf(":::: Warning: _alloc_counter IS INACTIVE!!! :::::\n");
       }
       if (alglib_impl::_alloc_counter != 0) {
-         printf("FAILURE: alloc_counter does not decrease!\n");
+         printf("Failure: _alloc_counter does not decrease!\n");
          return 1;
       }
    }
 #endif
    try {
-   //
    // printf("TEST nneighbor_d_1: Nearest neighbor search, KNN queries\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      bool Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
             if (_spoil_scenario == 0)
@@ -601,24 +583,22 @@ int main() {
             kdtreebuild(a, nx, ny, normtype, kdt);
             x = "[-1,0]";
             k = kdtreequeryknn(kdt, x, 1);
-            _TestResult = _TestResult && doc_test_int(k, 1);
+            Ok = Ok && doc_test_int(k, 1);
             kdtreequeryresultsx(kdt, r);
-            _TestResult = _TestResult && doc_test_real_matrix(r, "[[0,0]]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(r, "[[0,0]]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nneighbor_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nneighbor_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nneighbor_t_2: Subsequent queries; buffered functions must use previously allocated storage (if large enough), so buffer may contain some info from previous call\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
             if (_spoil_scenario == 0)
@@ -637,29 +617,27 @@ int main() {
             kdtreebuild(a, nx, ny, normtype, kdt);
             x = "[+2,0]";
             k = kdtreequeryknn(kdt, x, 2, true);
-            _TestResult = _TestResult && doc_test_int(k, 2);
+            Ok = Ok && doc_test_int(k, 2);
             kdtreequeryresultsx(kdt, rx);
-            _TestResult = _TestResult && doc_test_real_matrix(rx, "[[1,0],[1,1]]", 0.05);
+            Ok = Ok && doc_test_real_matrix(rx, "[[1,0],[1,1]]", 0.05);
             x = "[-2,0]";
             k = kdtreequeryknn(kdt, x, 1, true);
-            _TestResult = _TestResult && doc_test_int(k, 1);
+            Ok = Ok && doc_test_int(k, 1);
             kdtreequeryresultsx(kdt, rx);
-            _TestResult = _TestResult && doc_test_real_matrix(rx, "[[0,0],[1,1]]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(rx, "[[0,0],[1,1]]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nneighbor_t_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nneighbor_t_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nneighbor_d_2: Serialization of KD-trees\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
             if (_spoil_scenario == 0)
@@ -691,23 +669,21 @@ int main() {
             kdtreequeryresultsx(kdt0, r0);
             kdtreequeryknn(kdt1, x, 1);
             kdtreequeryresultsx(kdt1, r1);
-            _TestResult = _TestResult && doc_test_real_matrix(r0, "[[0,0]]", 0.05);
-            _TestResult = _TestResult && doc_test_real_matrix(r1, "[[0,0]]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(r0, "[[0,0]]", 0.05);
+            Ok = Ok && doc_test_real_matrix(r1, "[[0,0]]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nneighbor_d_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nneighbor_d_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST odesolver_d1: Solving y'=-y with ODE solver\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
          try {
             real_1d_array y = "[1]";
             if (_spoil_scenario == 0)
@@ -747,24 +723,22 @@ int main() {
             odesolverrkck(y, x, eps, h, s);
             odesolversolve(s, ode_function_1_diff);
             odesolverresults(s, m, xtbl, ytbl, rep);
-            _TestResult = _TestResult && doc_test_int(m, 4);
-            _TestResult = _TestResult && doc_test_real_vector(xtbl, "[0, 1, 2, 3]", 0.005);
-            _TestResult = _TestResult && doc_test_real_matrix(ytbl, "[[1], [0.367], [0.135], [0.050]]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(m, 4);
+            Ok = Ok && doc_test_real_vector(xtbl, "[0, 1, 2, 3]", 0.005);
+            Ok = Ok && doc_test_real_matrix(ytbl, "[[1], [0.367], [0.135], [0.050]]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "odesolver_d1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "odesolver_d1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST sparse_d_1: Basic operations with sparse matrices\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 1; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 1; _spoil_scenario++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix
@@ -794,13 +768,13 @@ int main() {
          //
             double v;
             v = sparseget(s, 0, 0);
-            _TestResult = _TestResult && doc_test_real(v, 2.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 2.0000, 0.005);
             v = sparseget(s, 0, 1);
-            _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 1.0000, 0.005);
             v = sparseget(s, 1, 0);
-            _TestResult = _TestResult && doc_test_real(v, 0.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 0.0000, 0.005);
             v = sparseget(s, 1, 1);
-            _TestResult = _TestResult && doc_test_real(v, 5.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 5.0000, 0.005);
          //
          // After successful creation we can use our matrix for linear operations.
          //
@@ -820,22 +794,20 @@ int main() {
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[]";
             sparsemv(s, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,-5.000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[1.000,-5.000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "sparse_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "sparse_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST sparse_d_crs: Advanced topic: creation in the CRS format.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 2; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 2; _spoil_scenario++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix in the
@@ -889,12 +861,12 @@ int main() {
          //
             double v;
             v = sparseget(s, 0, 0);
-            _TestResult = _TestResult && doc_test_real(v, 2.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 2.0000, 0.005);
             v = sparseget(s, 2, 3);
-            _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 1.0000, 0.005);
          // you may see that you can read zero elements (which are not stored) with sparseget()
             v = sparseget(s, 3, 2);
-            _TestResult = _TestResult && doc_test_real(v, 0.0000, 0.005);
+            Ok = Ok && doc_test_real(v, 0.0000, 0.005);
          //
          // After successful creation we can use our matrix for linear operations.
          // Lets calculate A*x for some x.
@@ -904,21 +876,19 @@ int main() {
                spoil_vector_by_deleting_element(x);
             real_1d_array y = "[]";
             sparsemv(s, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,-2.000,2.000,-9]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[1.000,-2.000,2.000,-9]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "sparse_d_crs");
+      if (!Ok) {
+         printf("%-32s Failed\n", "sparse_d_crs");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ablas_d_gemm: Matrix multiplication (single-threaded)\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          real_2d_array a = "[[2,1],[1,3]]";
          real_2d_array b = "[[2,1],[0,1]]";
@@ -969,25 +939,23 @@ int main() {
          ae_int_t ic = 0;
          ae_int_t jc = 0;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-         _TestResult = _TestResult && doc_test_real_matrix(c, "[[4,3],[2,4]]", 0.0001);
+         Ok = Ok && doc_test_real_matrix(c, "[[4,3],[2,4]]", 0.0001);
       //
       // Now we try to apply some simple transformation to operands: C:=A*B^T
       //
          optypeb = 1;
          rmatrixgemm(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-         _TestResult = _TestResult && doc_test_real_matrix(c, "[[5,1],[5,3]]", 0.0001);
+         Ok = Ok && doc_test_real_matrix(c, "[[5,1],[5,3]]", 0.0001);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ablas_d_gemm");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ablas_d_gemm");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ablas_d_syrk: Symmetric rank-K update (single-threaded)\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
       //
       // rmatrixsyrk() function allows us to calculate symmetric rank-K update
@@ -1030,19 +998,17 @@ int main() {
          rmatrixsyrk(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
       // output result.
       // IMPORTANT: lower triangle of C was NOT updated!
-         _TestResult = _TestResult && doc_test_real_matrix(c, "[[1,2],[0,4]]", 0.0001);
+         Ok = Ok && doc_test_real_matrix(c, "[[1,2],[0,4]]", 0.0001);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ablas_d_syrk");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ablas_d_syrk");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ablas_t_complex: Basis test for complex matrix functions (correctness and presence of SMP support)\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          complex_2d_array a;
          complex_2d_array b;
@@ -1052,20 +1018,18 @@ int main() {
          b = "[[2,1],[0,1]]";
          c = "[[0,0],[0,0]]";
          cmatrixgemm(2, 2, 2, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
-         _TestResult = _TestResult && doc_test_complex_matrix(c, "[[4i,3i],[2,4]]", 0.0001);
+         Ok = Ok && doc_test_complex_matrix(c, "[[4i,3i],[2,4]]", 0.0001);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ablas_t_complex");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ablas_t_complex");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_d_r1: Real matrix inverse\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             real_2d_array a = "[[1,-1],[1,1]]";
             if (_spoil_scenario == 0)
@@ -1085,25 +1049,23 @@ int main() {
             ae_int_t info;
             matinvreport rep;
             rmatrixinverse(a, info, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_matrix(a, "[[0.5,0.5],[-0.5,0.5]]", 0.00005);
-            _TestResult = _TestResult && doc_test_real(rep.r1, 0.5, 0.00005);
-            _TestResult = _TestResult && doc_test_real(rep.rinf, 0.5, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_matrix(a, "[[0.5,0.5],[-0.5,0.5]]", 0.00005);
+            Ok = Ok && doc_test_real(rep.r1, 0.5, 0.00005);
+            Ok = Ok && doc_test_real(rep.rinf, 0.5, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_d_r1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_d_r1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_d_c1: Complex matrix inverse\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             complex_2d_array a = "[[1i,-1],[1i,1]]";
             if (_spoil_scenario == 0)
@@ -1123,25 +1085,23 @@ int main() {
             ae_int_t info;
             matinvreport rep;
             cmatrixinverse(a, info, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_complex_matrix(a, "[[-0.5i,-0.5i],[-0.5,0.5]]", 0.00005);
-            _TestResult = _TestResult && doc_test_real(rep.r1, 0.5, 0.00005);
-            _TestResult = _TestResult && doc_test_real(rep.rinf, 0.5, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_complex_matrix(a, "[[-0.5i,-0.5i],[-0.5,0.5]]", 0.00005);
+            Ok = Ok && doc_test_real(rep.r1, 0.5, 0.00005);
+            Ok = Ok && doc_test_real(rep.rinf, 0.5, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_d_c1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_d_c1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_d_spd1: SPD matrix inverse\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             real_2d_array a = "[[2,1],[1,2]]";
             if (_spoil_scenario == 0)
@@ -1161,23 +1121,21 @@ int main() {
             ae_int_t info;
             matinvreport rep;
             spdmatrixinverse(a, info, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_d_spd1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_d_spd1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_d_hpd1: HPD matrix inverse\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             complex_2d_array a = "[[2,1],[1,2]]";
             if (_spoil_scenario == 0)
@@ -1197,97 +1155,87 @@ int main() {
             ae_int_t info;
             matinvreport rep;
             hpdmatrixinverse(a, info, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_complex_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_complex_matrix(a, "[[0.666666,-0.333333],[-0.333333,0.666666]]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_d_hpd1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_d_hpd1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_t_r1: Real matrix inverse: singular matrix\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          real_2d_array a = "[[1,-1],[-2,2]]";
          ae_int_t info;
          matinvreport rep;
          rmatrixinverse(a, info, rep);
-         _TestResult = _TestResult && doc_test_int(info, -3);
-         _TestResult = _TestResult && doc_test_real(rep.r1, 0.0, 0.00005);
-         _TestResult = _TestResult && doc_test_real(rep.rinf, 0.0, 0.00005);
+         Ok = Ok && doc_test_int(info, -3);
+         Ok = Ok && doc_test_real(rep.r1, 0.0, 0.00005);
+         Ok = Ok && doc_test_real(rep.rinf, 0.0, 0.00005);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_t_r1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_t_r1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_t_c1: Complex matrix inverse: singular matrix\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          complex_2d_array a = "[[1i,-1i],[-2,2]]";
          ae_int_t info;
          matinvreport rep;
          cmatrixinverse(a, info, rep);
-         _TestResult = _TestResult && doc_test_int(info, -3);
-         _TestResult = _TestResult && doc_test_real(rep.r1, 0.0, 0.00005);
-         _TestResult = _TestResult && doc_test_real(rep.rinf, 0.0, 0.00005);
+         Ok = Ok && doc_test_int(info, -3);
+         Ok = Ok && doc_test_real(rep.r1, 0.0, 0.00005);
+         Ok = Ok && doc_test_real(rep.rinf, 0.0, 0.00005);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_t_c1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_t_c1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_e_spd1: Attempt to use SPD function on nonsymmetrix matrix\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          real_2d_array a = "[[1,0],[1,1]]";
          ae_int_t info;
          matinvreport rep;
          spdmatrixinverse(a, info, rep);
-         _TestResult = false;
+         Ok = false;
       } catch(ap_error) {
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_e_spd1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_e_spd1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matinv_e_hpd1: Attempt to use SPD function on nonsymmetrix matrix\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
          complex_2d_array a = "[[1,0],[1,1]]";
          ae_int_t info;
          matinvreport rep;
          hpdmatrixinverse(a, info, rep);
-         _TestResult = false;
+         Ok = false;
       } catch(ap_error) {
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matinv_e_hpd1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matinv_e_hpd1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_d_1: Nonlinear optimization by L-BFGS\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1371,7 +1319,7 @@ int main() {
             minlbfgsreport rep;
             minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -1380,24 +1328,22 @@ int main() {
          //
             optguardreport ogrep;
             minlbfgsoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlbfgs_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlbfgs_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_d_2: Nonlinear optimization with additional settings and restarts\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1470,7 +1416,7 @@ int main() {
          // first run
             minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // second run - algorithm is restarted
             x = "[10,10]";
             if (_spoil_scenario == 18)
@@ -1482,31 +1428,29 @@ int main() {
             minlbfgsrestartfrom(state, x);
             minlbfgsoptimize(state, function1_grad);
             minlbfgsresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // check OptGuard integrity report. Why do we need it at all?
          // Well, try breaking the gradient by adding 1.0 to some
          // of its components - OptGuard should report it as error.
          // And it may also catch unintended errors too :)
             optguardreport ogrep;
             minlbfgsoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlbfgs_d_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlbfgs_d_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlbfgs_numdiff: Nonlinear optimization by L-BFGS with numerical differentiation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -1554,23 +1498,21 @@ int main() {
             minlbfgssetcond(state, epsg, epsf, epsx, maxits);
             minlbfgsoptimize(state, function1_func);
             minlbfgsresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlbfgs_numdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlbfgs_numdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST linlsqr_d_1: Solution of sparse linear systems with CG\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
          try {
          //
          // This example illustrates solution of sparse linear least squares problem
@@ -1640,23 +1582,21 @@ int main() {
             linlsqrcreate(5, 2, s);
             linlsqrsolvesparse(s, a, b);
             linlsqrresults(s, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[1.000,2.000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[1.000,2.000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "linlsqr_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "linlsqr_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minbleic_d_1: Nonlinear optimization with bound constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1760,8 +1700,8 @@ int main() {
             minbleicreport rep;
             minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -1770,24 +1710,22 @@ int main() {
          //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minbleic_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minbleic_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minbleic_d_2: Nonlinear optimization with linear inequality constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -1896,8 +1834,8 @@ int main() {
             minbleicreport rep;
             minbleicoptimize(state, function1_grad);
             minbleicresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2,4]", 0.005);
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[2,4]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -1906,24 +1844,22 @@ int main() {
          //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minbleic_d_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minbleic_d_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minbleic_numdiff: Nonlinear optimization with bound constraints and numerical differentiation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -2025,8 +1961,8 @@ int main() {
             minbleicreport rep;
             minbleicoptimize(state, function1_func);
             minbleicresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -2036,23 +1972,21 @@ int main() {
          //
             optguardreport ogrep;
             minbleicoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minbleic_numdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minbleic_numdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minqp_d_u1: Unconstrained dense quadratic programming\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2141,7 +2075,7 @@ int main() {
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
          //
          // Solve problem with BLEIC-based QP solver.
          //
@@ -2154,7 +2088,7 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
          //
          // Solve problem with DENSE-AUL solver.
          //
@@ -2169,22 +2103,20 @@ int main() {
             minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minqp_d_u1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minqp_d_u1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minqp_d_bc1: Bound constrained dense quadratic programming\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2284,8 +2216,8 @@ int main() {
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 4);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2.5,2]", 0.005);
+            Ok = Ok && doc_test_int(rep.terminationtype, 4);
+            Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
          //
          // Solve problem with BLEIC-based QP solver.
          //
@@ -2297,7 +2229,7 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2.5,2]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
          //
          // Solve problem with DENSE-AUL solver.
          //
@@ -2312,22 +2244,20 @@ int main() {
             minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2.5,2]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[2.5,2]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minqp_d_bc1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minqp_d_bc1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minqp_d_lc1: Linearly constrained dense quadratic programming\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1
@@ -2409,7 +2339,7 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
+            Ok = Ok && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
          //
          // Solve problem with DENSE-AUL solver.
          //
@@ -2424,7 +2354,7 @@ int main() {
             minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
+            Ok = Ok && doc_test_real_vector(x, "[1.500,0.500]", 0.05);
          //
          // Solve problem with QuickQP solver.
          //
@@ -2436,22 +2366,20 @@ int main() {
             minqpsetalgoquickqp(state, 0.0, 0.0, 0.0, 0, true);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, -5);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, -5);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minqp_d_lc1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minqp_d_lc1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minqp_d_u2: Unconstrained sparse quadratic programming\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = x0^2 + x1^2 -6*x0 - 4*x1,
@@ -2533,22 +2461,20 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[3,2]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[3,2]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minqp_d_u2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minqp_d_u2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minqp_d_nonconvex: Nonconvex quadratic programming\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of nonconvex function
@@ -2642,7 +2568,7 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2,2]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[2,2]", 0.005);
          //
          // Solve problem with DENSE-AUL solver.
          //
@@ -2661,7 +2587,7 @@ int main() {
             minqpsetalgodenseaul(state, 1.0e-9, 1.0e+4, 5);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[2,2]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[2,2]", 0.005);
          // Hmm... this problem is bounded from below (has solution) only under constraints.
          // What it we remove them?
          //
@@ -2682,22 +2608,20 @@ int main() {
             minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0);
             minqpoptimize(state);
             minqpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, -4);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, -4);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minqp_d_nonconvex");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minqp_d_nonconvex");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlp_basic: Basic linear programming example\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates how to minimize
@@ -2797,22 +2721,20 @@ int main() {
          // Solve
             minlpoptimize(state);
             minlpresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[0,1]", 0.0005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[0,1]", 0.0005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlp_basic");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlp_basic");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_inequality: Nonlinearly constrained optimization (inequality constraints)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -2957,7 +2879,7 @@ int main() {
             real_1d_array x1;
             minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
+            Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -2966,24 +2888,22 @@ int main() {
          //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minnlc_d_inequality");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minnlc_d_inequality");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_equality: Nonlinearly constrained optimization (equality constraints)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3125,7 +3045,7 @@ int main() {
             real_1d_array x1;
             minnlcoptimize(state, nlcfunc1_jac);
             minnlcresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[0.70710,-0.70710]", 0.005);
+            Ok = Ok && doc_test_real_vector(x1, "[0.70710,-0.70710]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -3134,24 +3054,22 @@ int main() {
          //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minnlc_d_equality");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minnlc_d_equality");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minnlc_d_mixed: Nonlinearly constrained optimization with mixed equality/inequality constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3300,7 +3218,7 @@ int main() {
          //
             minnlcoptimize(state, nlcfunc2_jac);
             minnlcresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[-0.70710,-0.70710,0.49306]", 0.005);
+            Ok = Ok && doc_test_real_vector(x1, "[-0.70710,-0.70710,0.49306]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -3309,24 +3227,22 @@ int main() {
          //
             optguardreport ogrep;
             minnlcoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minnlc_d_mixed");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minnlc_d_mixed");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minbc_d_1: Nonlinear optimization with box constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3430,7 +3346,7 @@ int main() {
             minbcreport rep;
             minbcoptimize(state, function1_grad);
             minbcresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -3439,24 +3355,22 @@ int main() {
          //
             optguardreport ogrep;
             minbcoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minbc_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minbc_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minbc_numdiff: Nonlinear optimization with bound constraints and numerical differentiation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3560,7 +3474,7 @@ int main() {
             minbcreport rep;
             minbcoptimize(state, function1_func);
             minbcresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-1,1]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-1,1]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -3570,23 +3484,21 @@ int main() {
          //
             optguardreport ogrep;
             minbcoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minbc_numdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minbc_numdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minns_d_unconstrained: Nonsmooth unconstrained optimization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3703,22 +3615,20 @@ int main() {
          //
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minns_d_unconstrained");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minns_d_unconstrained");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minns_d_diff: Nonsmooth unconstrained optimization with numerical differentiation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3814,22 +3724,20 @@ int main() {
          //
             minnsoptimize(state, nsfunc1_fvec);
             minnsresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x1, "[0.0000,0.0000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minns_d_diff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minns_d_diff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minns_d_bc: Nonsmooth box constrained optimization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 17; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -3968,22 +3876,20 @@ int main() {
          //
             minnsoptimize(state, nsfunc1_jac);
             minnsresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minns_d_bc");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minns_d_bc");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minns_d_nlc: Nonsmooth nonlinearly constrained optimization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4126,22 +4032,20 @@ int main() {
          //
             minnsoptimize(state, nsfunc2_jac);
             minnsresults(state, x1, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x1, "[1.0000,0.0000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minns_d_nlc");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minns_d_nlc");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST mincg_d_1: Nonlinear optimization by CG\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 15; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4225,7 +4129,7 @@ int main() {
             mincgreport rep;
             mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -4234,24 +4138,22 @@ int main() {
          //
             optguardreport ogrep;
             mincgoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "mincg_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "mincg_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST mincg_d_2: Nonlinear optimization with additional settings and restarts\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of f(x,y) = 100*(x+3)^4+(y-3)^4
@@ -4324,7 +4226,7 @@ int main() {
          // first run
             mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // second run - algorithm is restarted with mincgrestartfrom()
             x = "[10,10]";
             if (_spoil_scenario == 18)
@@ -4336,31 +4238,29 @@ int main() {
             mincgrestartfrom(state, x);
             mincgoptimize(state, function1_grad);
             mincgresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          // check OptGuard integrity report. Why do we need it at all?
          // Well, try breaking the gradient by adding 1.0 to some
          // of its components - OptGuard should report it as error.
          // And it may also catch unintended errors too :)
             optguardreport ogrep;
             mincgoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "mincg_d_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "mincg_d_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST mincg_numdiff: Nonlinear optimization by CG with numerical differentiation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 18; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of
@@ -4440,7 +4340,7 @@ int main() {
             mincgreport rep;
             mincgoptimize(state, function1_func);
             mincgresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,3]", 0.005);
          //
          // ...and to check OptGuard integrity report.
          //
@@ -4450,23 +4350,21 @@ int main() {
          //
             optguardreport ogrep;
             mincgoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc0suspected, false);
-            _TestResult = _TestResult && doc_test_bool(ogrep.nonc1suspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.nonc0suspected, false);
+            Ok = Ok && doc_test_bool(ogrep.nonc1suspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "mincg_numdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "mincg_numdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_d_v: Nonlinear least squares optimization using function vector only\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -4519,7 +4417,7 @@ int main() {
          //
             minlmoptimize(state, function1_fvec);
          //
-         // Test optimization results
+         // _spoil_scenario optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
@@ -4527,22 +4425,20 @@ int main() {
          //       checking it with OptGuard (see other examples).
          //
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_d_v");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_d_v");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_d_vj: Nonlinear least squares optimization using function vector and Jacobian\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -4607,11 +4503,11 @@ int main() {
          //
             minlmoptimize(state, function1_fvec, function1_jac);
          //
-         // Test optimization results
+         // _spoil_scenario optimization results
          //
             minlmreport rep;
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
          //
          // Check that OptGuard did not report errors
          //
@@ -4624,22 +4520,20 @@ int main() {
          //
             optguardreport ogrep;
             minlmoptguardresults(state, ogrep);
-            _TestResult = _TestResult && doc_test_bool(ogrep.badgradsuspected, false);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_bool(ogrep.badgradsuspected, false);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_d_vj");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_d_vj");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_d_fgh: Nonlinear Hessian-based optimization for general functions\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = 100*(x0+3)^4+(x1-3)^4
@@ -4674,22 +4568,20 @@ int main() {
             minlmsetcond(state, epsx, maxits);
             minlmoptimize(state, function1_func, function1_grad, function1_hess);
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_d_fgh");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_d_fgh");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_d_vb: Bound constrained nonlinear least squares optimization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -4758,7 +4650,7 @@ int main() {
          //
             minlmoptimize(state, function1_fvec);
          //
-         // Test optimization results
+         // _spoil_scenario optimization results
          //
          // NOTE: because we use numerical differentiation, we do not
          //       verify Jacobian correctness - it is always "correct".
@@ -4767,22 +4659,20 @@ int main() {
          //
             minlmreport rep;
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-1,+1]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[-1,+1]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_d_vb");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_d_vb");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_d_restarts: Efficient restarts of LM optimizer\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
@@ -4817,7 +4707,7 @@ int main() {
             minlmsetcond(state, epsx, maxits);
             minlmoptimize(state, function1_fvec);
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
          //
          // restart optimizer using minlmrestartfrom()
          //
@@ -4835,22 +4725,20 @@ int main() {
             minlmrestartfrom(state, x);
             minlmoptimize(state, function2_fvec);
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[0,1]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[0,1]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_d_restarts");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_d_restarts");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_t_1: Nonlinear least squares optimization, FJ scheme (obsolete, but supported)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array x = "[0,0]";
             if (_spoil_scenario == 0)
@@ -4873,22 +4761,20 @@ int main() {
             minlmsetcond(state, epsx, maxits);
             minlmoptimize(state, function1_func, function1_jac);
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_t_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_t_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST minlm_t_2: Nonlinear least squares optimization, FGJ scheme (obsolete, but supported)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array x = "[0,0]";
             if (_spoil_scenario == 0)
@@ -4911,22 +4797,20 @@ int main() {
             minlmsetcond(state, epsx, maxits);
             minlmoptimize(state, function1_func, function1_grad, function1_jac);
             minlmresults(state, x, rep);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[-3,+3]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[-3,+3]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "minlm_t_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "minlm_t_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_d_base: Basic functionality (moments, adev, median, percentile)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array x = "[0,1,4,9,16,25,36,49,64,81]";
             if (_spoil_scenario == 0)
@@ -4947,20 +4831,20 @@ int main() {
          // (mean, variance, skewness, kurtosis)
          //
             samplemoments(x, mean, variance, skewness, kurtosis);
-            _TestResult = _TestResult && doc_test_real(mean, 28.5, 0.01);
-            _TestResult = _TestResult && doc_test_real(variance, 801.1667, 0.01);
-            _TestResult = _TestResult && doc_test_real(skewness, 0.5751, 0.01);
-            _TestResult = _TestResult && doc_test_real(kurtosis, -1.2666, 0.01);
+            Ok = Ok && doc_test_real(mean, 28.5, 0.01);
+            Ok = Ok && doc_test_real(variance, 801.1667, 0.01);
+            Ok = Ok && doc_test_real(skewness, 0.5751, 0.01);
+            Ok = Ok && doc_test_real(kurtosis, -1.2666, 0.01);
          //
          // Average deviation
          //
             sampleadev(x, adev);
-            _TestResult = _TestResult && doc_test_real(adev, 23.2, 0.01);
+            Ok = Ok && doc_test_real(adev, 23.2, 0.01);
          //
          // Median and percentile
          //
             samplemedian(x, v);
-            _TestResult = _TestResult && doc_test_real(v, 20.5, 0.01);
+            Ok = Ok && doc_test_real(v, 20.5, 0.01);
             p = 0.5;
             if (_spoil_scenario == 3)
                p = NAN;
@@ -4969,22 +4853,20 @@ int main() {
             if (_spoil_scenario == 5)
                p = -INFINITY;
             samplepercentile(x, p, v);
-            _TestResult = _TestResult && doc_test_real(v, 20.5, 0.01);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 20.5, 0.01);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_d_base");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_d_base");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_d_c2: Correlation (covariance) between two random variables\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
          //
          // We have two samples - x and y, and want to measure dependency between them
@@ -5019,26 +4901,24 @@ int main() {
          // * Spearman rank correlation
          //
             v = cov2(x, y);
-            _TestResult = _TestResult && doc_test_real(v, 82.5, 0.001);
+            Ok = Ok && doc_test_real(v, 82.5, 0.001);
             v = pearsoncorr2(x, y);
-            _TestResult = _TestResult && doc_test_real(v, 0.9627, 0.001);
+            Ok = Ok && doc_test_real(v, 0.9627, 0.001);
             v = spearmancorr2(x, y);
-            _TestResult = _TestResult && doc_test_real(v, 1.000, 0.001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.000, 0.001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_d_c2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_d_c2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_d_cm: Correlation (covariance) between components of random vector\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // X is a sample matrix:
@@ -5063,26 +4943,24 @@ int main() {
          // (covariance) between I-th and J-th variables of X.
          //
             covm(x, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[1.80,0.60,-1.40],[0.60,0.70,-0.80],[-1.40,-0.80,14.70]]", 0.01);
+            Ok = Ok && doc_test_real_matrix(c, "[[1.80,0.60,-1.40],[0.60,0.70,-0.80],[-1.40,-0.80,14.70]]", 0.01);
             pearsoncorrm(x, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[1.000,0.535,-0.272],[0.535,1.000,-0.249],[-0.272,-0.249,1.000]]", 0.01);
+            Ok = Ok && doc_test_real_matrix(c, "[[1.000,0.535,-0.272],[0.535,1.000,-0.249],[-0.272,-0.249,1.000]]", 0.01);
             spearmancorrm(x, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[1.000,0.556,-0.306],[0.556,1.000,-0.750],[-0.306,-0.750,1.000]]", 0.01);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(c, "[[1.000,0.556,-0.306],[0.556,1.000,-0.750],[-0.306,-0.750,1.000]]", 0.01);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_d_cm");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_d_cm");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_d_cm2: Correlation (covariance) between two random vectors\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // X and Y are sample matrices:
@@ -5114,26 +4992,24 @@ int main() {
          // (covariance) between I-th variable of X and J-th variable of Y.
          //
             covm2(x, y, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[4.100,-3.250],[2.450,-1.500],[13.450,-5.750]]", 0.01);
+            Ok = Ok && doc_test_real_matrix(c, "[[4.100,-3.250],[2.450,-1.500],[13.450,-5.750]]", 0.01);
             pearsoncorrm2(x, y, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.519,-0.699],[0.497,-0.518],[0.596,-0.433]]", 0.01);
+            Ok = Ok && doc_test_real_matrix(c, "[[0.519,-0.699],[0.497,-0.518],[0.596,-0.433]]", 0.01);
             spearmancorrm2(x, y, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.541,-0.649],[0.216,-0.433],[0.433,-0.135]]", 0.01);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(c, "[[0.541,-0.649],[0.216,-0.433],[0.433,-0.135]]", 0.01);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_d_cm2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_d_cm2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_t_base: Tests ability to detect errors in inputs\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 34; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 34; _spoil_scenario++) {
          try {
             double mean;
             double variance;
@@ -5234,21 +5110,19 @@ int main() {
             if (_spoil_scenario == 33)
                p = -INFINITY;
             samplepercentile(x8, 10, p, v);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_t_base");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_t_base");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST basestat_t_covcorr: Tests ability to detect errors in inputs\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 126; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 126; _spoil_scenario++) {
          try {
             double v;
             real_2d_array c;
@@ -5570,21 +5444,19 @@ int main() {
             if (_spoil_scenario == 125)
                spoil_matrix_by_deleting_col(y15);
             spearmancorrm2(x15, y15, 5, 3, 2, c);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "basestat_t_covcorr");
+      if (!Ok) {
+         printf("%-32s Failed\n", "basestat_t_covcorr");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ssa_d_basic: Simple SSA analysis demo\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate SSA trend/noise separation for some toy problem:
@@ -5626,22 +5498,20 @@ int main() {
             real_1d_array trend;
             real_1d_array noise;
             ssaanalyzesequence(s, x, trend, noise);
-            _TestResult = _TestResult && doc_test_real_vector(trend, "[0.3815,0.5582,0.7810,1.0794,1.5041,2.0105]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(trend, "[0.3815,0.5582,0.7810,1.0794,1.5041,2.0105]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ssa_d_basic");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ssa_d_basic");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ssa_d_forecast: Simple SSA forecasting demo\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate SSA forecasting on some toy problem with clearly
@@ -5688,22 +5558,20 @@ int main() {
          // Well, we expected it to be [9,10,11]. There exists some difference,
          // which can be explained by the artificial noise in the dataset.
          //
-            _TestResult = _TestResult && doc_test_real_vector(trend, "[9.0005,9.9322,10.8051]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(trend, "[9.0005,9.9322,10.8051]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ssa_d_forecast");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ssa_d_forecast");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST ssa_d_realtime: Real-time SSA algorithm with fast incremental updates\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
          //
          // Suppose that you have a constant stream of incoming data, and you want
@@ -5783,7 +5651,7 @@ int main() {
             ssagetbasis(s1, a1, sv1, w, k);
          // Ok, we have our basis in a1[] and singular values at sv1[].
          // But is it good enough? Let's print it.
-            _TestResult = _TestResult && doc_test_real_matrix(a1, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
+            Ok = Ok && doc_test_real_matrix(a1, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
          // Ok, two vectors with 3 components each.
          // But how to understand that is it really good basis?
          // Let's compare it with direct SSA algorithm on the entire sequence.
@@ -5803,21 +5671,19 @@ int main() {
             ssasetalgotopkdirect(s2, 2);
             ssagetbasis(s2, a2, sv2, w, k);
          // it is exactly the same as one calculated with incremental approach!
-            _TestResult = _TestResult && doc_test_real_matrix(a2, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(a2, "[[0.510607,0.753611],[0.575201,0.058445],[0.639081,-0.654717]]", 0.0005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "ssa_d_realtime");
+      if (!Ok) {
+         printf("%-32s Failed\n", "ssa_d_realtime");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST linreg_d_basic: Linear regression used to build the very basic model and unpack coefficients\n"), fflush(stdout);
-   //
-      _TestResult = true;
+      Ok = true;
       try {
       //
       // In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
@@ -5832,22 +5698,20 @@ int main() {
          lrreport rep;
          real_1d_array c;
          lrbuildz(xy, 11, 1, info, model, rep);
-         _TestResult = _TestResult && doc_test_int(info, 1);
+         Ok = Ok && doc_test_int(info, 1);
          lrunpack(model, c, nvars);
-         _TestResult = _TestResult && doc_test_real_vector(c, "[1.98650,0.00000]", 0.00005);
+         Ok = Ok && doc_test_real_vector(c, "[1.98650,0.00000]", 0.00005);
       } catch(ap_error) {
-         _TestResult = false;
+         Ok = false;
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "linreg_d_basic");
+      if (!Ok) {
+         printf("%-32s Failed\n", "linreg_d_basic");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST filters_d_sma: SMA(k) filter\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate SMA(k) filtering for time series.
@@ -5864,22 +5728,20 @@ int main() {
          // We should get [5, 5.5, 6.5, 7.5] as result
          //
             filtersma(x, 2);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[5,5.5,6.5,7.5]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.5,7.5]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "filters_d_sma");
+      if (!Ok) {
+         printf("%-32s Failed\n", "filters_d_sma");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST filters_d_ema: EMA(alpha) filter\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate EMA(0.5) filtering for time series.
@@ -5896,22 +5758,20 @@ int main() {
          // We should get [5, 5.5, 6.25, 7.125] as result
          //
             filterema(x, 0.5);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[5,5.5,6.25,7.125]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[5,5.5,6.25,7.125]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "filters_d_ema");
+      if (!Ok) {
+         printf("%-32s Failed\n", "filters_d_ema");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST filters_d_lrma: LRMA(k) filter\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate LRMA(3) filtering for time series.
@@ -5928,22 +5788,20 @@ int main() {
          // We should get [7.0000, 8.0000, 8.1667, 8.8333, 11.6667, 12.5000] as result
          //
             filterlrma(x, 3);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "filters_d_lrma");
+      if (!Ok) {
+         printf("%-32s Failed\n", "filters_d_lrma");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST mcpd_simple1: Simple unconstrained MCPD model (no entry/exit states)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // The very simple MCPD example
@@ -6007,22 +5865,20 @@ int main() {
          // which means that "good" loans can become "bad" with 5% probability,
          // while "bad" loans will return to good state with 50% probability.
          //
-            _TestResult = _TestResult && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "mcpd_simple1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "mcpd_simple1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST mcpd_simple2: Simple MCPD model (no entry/exit states) with equality constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // Simple MCPD example
@@ -6097,22 +5953,20 @@ int main() {
          // while past due loans will become charged off with 25% probability or
          // return back to normal state with 50% probability.
          //
-            _TestResult = _TestResult && doc_test_real_matrix(p, "[[0.95,0.50,0.00],[0.05,0.25,0.00],[0.00,0.25,1.00]]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(p, "[[0.95,0.50,0.00],[0.05,0.25,0.00],[0.00,0.25,1.00]]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "mcpd_simple2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "mcpd_simple2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_regr: Regression problem with one output (2=>1)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple example on neural network: network is trained to reproduce
@@ -6161,22 +6015,20 @@ int main() {
             real_1d_array x = "[2,2]";
             real_1d_array y = "[0]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[4.000]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[4.000]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_regr");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_regr");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_regr_n: Regression problem with multiple outputs (2=>2)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Network with 2 inputs and 2 outputs is trained to reproduce vector function:
@@ -6227,22 +6079,20 @@ int main() {
             real_1d_array x = "[2,1]";
             real_1d_array y = "[0,0]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[3.000,2.000]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[3.000,2.000]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_regr_n");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_regr_n");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_cls2: Binary classification problem\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Suppose that we want to classify numbers as positive (class 0) and negative
@@ -6311,7 +6161,7 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // Test our neural network on strictly positive and strictly negative numbers.
+         // _spoil_scenario our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
          // of class indexes. Network returns two values (probabilities) instead of one
@@ -6329,10 +6179,10 @@ int main() {
          //
             x = "[1]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,0.000]", 0.05);
+            Ok = Ok && doc_test_real_vector(y, "[1.000,0.000]", 0.05);
             x = "[-1]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,1.000]", 0.05);
+            Ok = Ok && doc_test_real_vector(y, "[0.000,1.000]", 0.05);
          //
          // But what our network will return for 0, which is between classes 0 and 1?
          //
@@ -6342,22 +6192,20 @@ int main() {
          //
             x = "[0]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.500,0.500]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[0.500,0.500]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_cls2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_cls2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_cls3: Multiclass classification problem\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // Suppose that we want to classify numbers as positive (class 0) and negative
@@ -6419,7 +6267,7 @@ int main() {
          //
             mlptrainnetwork(trn, network, 5, rep);
          //
-         // Test our neural network on strictly positive and strictly negative numbers.
+         // _spoil_scenario our neural network on strictly positive and strictly negative numbers.
          //
          // IMPORTANT! Classifier network returns class membership probabilities instead
          // of class indexes. Network returns three values (probabilities) instead of one
@@ -6435,28 +6283,26 @@ int main() {
          //
             x = "[1]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[1.000,0.000,0.000]", 0.05);
+            Ok = Ok && doc_test_real_vector(y, "[1.000,0.000,0.000]", 0.05);
             x = "[-1]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,1.000,0.000]", 0.05);
+            Ok = Ok && doc_test_real_vector(y, "[0.000,1.000,0.000]", 0.05);
             x = "[0]";
             mlpprocess(network, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,0.000,1.000]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[0.000,0.000,1.000]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_cls3");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_cls3");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_trainerobject: Advanced example on trainer object\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // Trainer object is used to train network. It stores dataset, training settings,
@@ -6554,21 +6400,19 @@ int main() {
             mlptrainnetwork(trn, net1, 5, rep);
             mlptrainnetwork(trn, net2, 5, rep);
             mlptrainnetwork(trn, net3, 5, rep);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_trainerobject");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_trainerobject");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_crossvalidation: Cross-validation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example shows how to perform cross-validation with ALGLIB
@@ -6624,21 +6468,19 @@ int main() {
          // mlpkfoldcv(). Every CV round will return slightly different
          // estimates.
          //
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_crossvalidation");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_crossvalidation");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_ensembles_es: Early stopping ensembles\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example shows how to train early stopping ensebles.
@@ -6674,21 +6516,19 @@ int main() {
          //
             mlpecreate1(1, 4, 1, 50, ensemble);
             mlptrainensemblees(trn, ensemble, 5, rep);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_ensembles_es");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_ensembles_es");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST nn_parallel: Parallel training\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example shows how to use parallel functionality of ALGLIB.
@@ -6768,21 +6608,19 @@ int main() {
          // networks aretrained in total.
          //
             mlptrainensemblees(trn, ensemble, 5, rep);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "nn_parallel");
+      if (!Ok) {
+         printf("%-32s Failed\n", "nn_parallel");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST clst_ahc: Simple hierarchical clusterization with Euclidean distance function\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple clusterization example
@@ -6850,7 +6688,7 @@ int main() {
          //   |     |   |    |     |
          //   P2   P4   P3   P0   P1
          //
-            _TestResult = _TestResult && doc_test_int_matrix(rep.z, "[[2,4],[0,1],[3,6],[5,7]]");
+            Ok = Ok && doc_test_int_matrix(rep.z, "[[2,4],[0,1],[3,6],[5,7]]");
          //
          // We've built dendrogram above by reordering our dataset.
          //
@@ -6887,23 +6725,21 @@ int main() {
          // trees of height 0, while next two merges are performed on 0-1 and 1-2
          // pairs of trees correspondingly.
          //
-            _TestResult = _TestResult && doc_test_int_vector(rep.p, "[3,4,0,2,1]");
-            _TestResult = _TestResult && doc_test_int_matrix(rep.pm, "[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]");
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int_vector(rep.p, "[3,4,0,2,1]");
+            Ok = Ok && doc_test_int_matrix(rep.pm, "[[0,0,1,1,0,0],[3,3,4,4,0,0],[2,2,3,4,0,1],[0,1,2,4,1,2]]");
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "clst_ahc");
+      if (!Ok) {
+         printf("%-32s Failed\n", "clst_ahc");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST clst_kmeans: Simple k-means clusterization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple clusterization example
@@ -6950,7 +6786,7 @@ int main() {
          // in the second row. rep.cidx can be used to determine which center is
          // closest to some specific point of the dataset.
          //
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
          // We called clusterizersetpoints() with disttype=2 because k-means++
          // algorithm does NOT support metrics other than Euclidean. But what if we
          // try to use some other metric?
@@ -6960,22 +6796,20 @@ int main() {
          //
             clusterizersetpoints(s, xy, 0);
             clusterizerrunkmeans(s, 2, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, -5);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, -5);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "clst_kmeans");
+      if (!Ok) {
+         printf("%-32s Failed\n", "clst_kmeans");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST clst_linkage: Clusterization with different linkage types\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // We have a set of points in 1D space:
@@ -7009,29 +6843,27 @@ int main() {
             clusterizersetahcalgo(s, 0);
             clusterizerrunahc(s, rep);
             clusterizergetkclusters(rep, 2, cidx, cz);
-            _TestResult = _TestResult && doc_test_int_vector(cidx, "[1,1,1,0,0]");
+            Ok = Ok && doc_test_int_vector(cidx, "[1,1,1,0,0]");
          // use single linkage, reduce set down to 2 clusters.
          // print clusterization with clusterizergetkclusters(2).
          // P2 must belong to [P2,P3]
             clusterizersetahcalgo(s, 1);
             clusterizerrunahc(s, rep);
             clusterizergetkclusters(rep, 2, cidx, cz);
-            _TestResult = _TestResult && doc_test_int_vector(cidx, "[0,0,1,1,1]");
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int_vector(cidx, "[0,0,1,1,1]");
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "clst_linkage");
+      if (!Ok) {
+         printf("%-32s Failed\n", "clst_linkage");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST clst_distance: Clusterization with different metric types\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // We have three points in 4D space:
@@ -7064,7 +6896,7 @@ int main() {
             disttype = 2;
             clusterizersetpoints(s, xy, disttype);
             clusterizerrunahc(s, rep);
-            _TestResult = _TestResult && doc_test_int_matrix(rep.z, "[[1,2],[0,3]]");
+            Ok = Ok && doc_test_int_matrix(rep.z, "[[1,2],[0,3]]");
          // With Pearson correlation distance function (disttype=10) situation
          // is different - distance between P0 and P1 is zero, thus:
          // * first, we merge P0 and P1 to form C3=[P0,P1]
@@ -7072,7 +6904,7 @@ int main() {
             disttype = 10;
             clusterizersetpoints(s, xy, disttype);
             clusterizerrunahc(s, rep);
-            _TestResult = _TestResult && doc_test_int_matrix(rep.z, "[[0,1],[2,3]]");
+            Ok = Ok && doc_test_int_matrix(rep.z, "[[0,1],[2,3]]");
          // Finally, we try clustering with user-supplied distance matrix:
          //     [ 0 3 1 ]
          // P = [ 3 0 3 ], where P[i,j] = dist(Pi,Pj)
@@ -7083,22 +6915,20 @@ int main() {
             real_2d_array d = "[[0,3,1],[3,0,3],[1,3,0]]";
             clusterizersetdistances(s, d, true);
             clusterizerrunahc(s, rep);
-            _TestResult = _TestResult && doc_test_int_matrix(rep.z, "[[0,2],[1,3]]");
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int_matrix(rep.z, "[[0,2],[1,3]]");
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "clst_distance");
+      if (!Ok) {
+         printf("%-32s Failed\n", "clst_distance");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST clst_kclusters: Obtaining K top clusters from clusterization tree\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // We have a set of points in 2D space:
@@ -7132,28 +6962,26 @@ int main() {
          // with K=5, every points is assigned to its own cluster:
          // C0=P0, C1=P1 and so on...
             clusterizergetkclusters(rep, 5, cidx, cz);
-            _TestResult = _TestResult && doc_test_int_vector(cidx, "[0,1,2,3,4]");
+            Ok = Ok && doc_test_int_vector(cidx, "[0,1,2,3,4]");
          // with K=1 we have one large cluster C0=[P0,P1,P2,P3,P4,P5]
             clusterizergetkclusters(rep, 1, cidx, cz);
-            _TestResult = _TestResult && doc_test_int_vector(cidx, "[0,0,0,0,0]");
+            Ok = Ok && doc_test_int_vector(cidx, "[0,0,0,0,0]");
          // with K=3 we have three clusters C0=[P3], C1=[P2,P4], C2=[P0,P1]
             clusterizergetkclusters(rep, 3, cidx, cz);
-            _TestResult = _TestResult && doc_test_int_vector(cidx, "[2,2,1,0,1]");
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int_vector(cidx, "[2,2,1,0,1]");
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "clst_kclusters");
+      if (!Ok) {
+         printf("%-32s Failed\n", "clst_kclusters");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST randomforest_cls: Simple classification with random forests\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
@@ -7207,36 +7035,34 @@ int main() {
          // with such settings (100% of the training set is used) you can expect
          // zero classification error. Beautiful results, but remember - in real life
          // you do not need zero TRAINING SET error, you need good generalization.
-            _TestResult = _TestResult && doc_test_real(rep.relclserror, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(rep.relclserror, 0.0000, 0.00005);
          // now, let's perform some simple processing with dfprocess()
             real_1d_array x = "[+1,0]";
             real_1d_array y = "[]";
             dfprocess(forest, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[+1,0]", 0.0005);
+            Ok = Ok && doc_test_real_vector(y, "[+1,0]", 0.0005);
          // another option is to use dfprocess0() which returns just first component
          // of the output vector y. ideal for regression problems and binary classifiers.
             double y0;
             y0 = dfprocess0(forest, x);
-            _TestResult = _TestResult && doc_test_real(y0, 1.000, 0.0005);
+            Ok = Ok && doc_test_real(y0, 1.000, 0.0005);
          // finally, you can use dfclassify() which returns most probable class index (i.e. argmax y[i]).
             ae_int_t i;
             i = dfclassify(forest, x);
-            _TestResult = _TestResult && doc_test_int(i, 0);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(i, 0);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "randomforest_cls");
+      if (!Ok) {
+         printf("%-32s Failed\n", "randomforest_cls");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST randomforest_reg: Simple classification with decision forest\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple regression example: model f(x,y)=x+y
@@ -7281,37 +7107,35 @@ int main() {
          // with such settings (full sample is used) you can expect zero RMS error on the
          // training set. Beautiful results, but remember - in real life you do not
          // need zero TRAINING SET error, you need good generalization.
-            _TestResult = _TestResult && doc_test_real(rep.rmserror, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(rep.rmserror, 0.0000, 0.00005);
          // now, let's perform some simple processing with dfprocess()
             real_1d_array x = "[+1,+1]";
             real_1d_array y = "[]";
             dfprocess(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[+2]", 0.0005);
+            Ok = Ok && doc_test_real_vector(y, "[+2]", 0.0005);
          // another option is to use dfprocess0() which returns just first component
          // of the output vector y. ideal for regression problems and binary classifiers.
             double y0;
             y0 = dfprocess0(model, x);
-            _TestResult = _TestResult && doc_test_real(y0, 2.000, 0.0005);
+            Ok = Ok && doc_test_real(y0, 2.000, 0.0005);
          // there also exist another convenience function, dfclassify(),
          // but it does not work for regression problems - it always returns -1.
             ae_int_t i;
             i = dfclassify(model, x);
-            _TestResult = _TestResult && doc_test_int(i, -1);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(i, -1);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "randomforest_reg");
+      if (!Ok) {
+         printf("%-32s Failed\n", "randomforest_reg");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST knn_cls: Simple classification with KNN model\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple classification example: classify points (x,y) in 2D space
@@ -7362,36 +7186,34 @@ int main() {
          // with such settings (k=1 is used) you can expect zero classification
          // error on training set. Beautiful results, but remember - in real life
          // you do not need zero TRAINING SET error, you need good generalization.
-            _TestResult = _TestResult && doc_test_real(rep.relclserror, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(rep.relclserror, 0.0000, 0.00005);
          // now, let's perform some simple processing with knnprocess()
             real_1d_array x = "[+1,0]";
             real_1d_array y = "[]";
             knnprocess(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[+1,0]", 0.0005);
+            Ok = Ok && doc_test_real_vector(y, "[+1,0]", 0.0005);
          // another option is to use knnprocess0() which returns just first component
          // of the output vector y. ideal for regression problems and binary classifiers.
             double y0;
             y0 = knnprocess0(model, x);
-            _TestResult = _TestResult && doc_test_real(y0, 1.000, 0.0005);
+            Ok = Ok && doc_test_real(y0, 1.000, 0.0005);
          // finally, you can use knnclassify() which returns most probable class index (i.e. argmax y[i]).
             ae_int_t i;
             i = knnclassify(model, x);
-            _TestResult = _TestResult && doc_test_int(i, 0);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(i, 0);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "knn_cls");
+      if (!Ok) {
+         printf("%-32s Failed\n", "knn_cls");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST knn_reg: Simple classification with KNN model\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // The very simple regression example: model f(x,y)=x+y
@@ -7438,37 +7260,35 @@ int main() {
          // with such settings (k=1 is used) you can expect zero RMS error on the
          // training set. Beautiful results, but remember - in real life you do not
          // need zero TRAINING SET error, you need good generalization.
-            _TestResult = _TestResult && doc_test_real(rep.rmserror, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(rep.rmserror, 0.0000, 0.00005);
          // now, let's perform some simple processing with knnprocess()
             real_1d_array x = "[+1,+1]";
             real_1d_array y = "[]";
             knnprocess(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[+2]", 0.0005);
+            Ok = Ok && doc_test_real_vector(y, "[+2]", 0.0005);
          // another option is to use knnprocess0() which returns just first component
          // of the output vector y. ideal for regression problems and binary classifiers.
             double y0;
             y0 = knnprocess0(model, x);
-            _TestResult = _TestResult && doc_test_real(y0, 2.000, 0.0005);
+            Ok = Ok && doc_test_real(y0, 2.000, 0.0005);
          // there also exist another convenience function, knnclassify(),
          // but it does not work for regression problems - it always returns -1.
             ae_int_t i;
             i = knnclassify(model, x);
-            _TestResult = _TestResult && doc_test_int(i, -1);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(i, -1);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "knn_reg");
+      if (!Ok) {
+         printf("%-32s Failed\n", "knn_reg");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST autogk_d1: Integrating f=exp(x) by adaptive integrator\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // This example demonstrates integration of f=exp(x) on [0,1]:
@@ -7496,22 +7316,20 @@ int main() {
             autogksmooth(a, b, s);
             autogkintegrate(s, int_function_1_func);
             autogkresults(s, v, rep);
-            _TestResult = _TestResult && doc_test_real(v, 1.7182, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.7182, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "autogk_d1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "autogk_d1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST fft_complex_d1: Complex FFT: simple example\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // first we demonstrate forward FFT:
@@ -7525,28 +7343,26 @@ int main() {
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(z);
             fftc1d(z);
-            _TestResult = _TestResult && doc_test_complex_vector(z, "[4i,0,0,0]", 0.0001);
+            Ok = Ok && doc_test_complex_vector(z, "[4i,0,0,0]", 0.0001);
          //
          // now we convert [4i, 0, 0, 0] back to [1i,1i,1i,1i]
          // with backward FFT
          //
             fftc1dinv(z);
-            _TestResult = _TestResult && doc_test_complex_vector(z, "[1i,1i,1i,1i]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex_vector(z, "[1i,1i,1i,1i]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "fft_complex_d1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "fft_complex_d1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST fft_complex_d2: Complex FFT: advanced example\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // first we demonstrate forward FFT:
@@ -7560,27 +7376,25 @@ int main() {
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(z);
             fftc1d(z);
-            _TestResult = _TestResult && doc_test_complex_vector(z, "[1+1i, -1-1i, -1-1i, 1+1i]", 0.0001);
+            Ok = Ok && doc_test_complex_vector(z, "[1+1i, -1-1i, -1-1i, 1+1i]", 0.0001);
          //
          // now we convert result back with backward FFT
          //
             fftc1dinv(z);
-            _TestResult = _TestResult && doc_test_complex_vector(z, "[0,1,0,1i]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex_vector(z, "[0,1,0,1i]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "fft_complex_d2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "fft_complex_d2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST fft_real_d1: Real FFT: simple example\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // first we demonstrate forward FFT:
@@ -7596,28 +7410,26 @@ int main() {
             complex_1d_array f;
             real_1d_array x2;
             fftr1d(x, f);
-            _TestResult = _TestResult && doc_test_complex_vector(f, "[4,0,0,0]", 0.0001);
+            Ok = Ok && doc_test_complex_vector(f, "[4,0,0,0]", 0.0001);
          //
          // now we convert [4, 0, 0, 0] back to [1,1,1,1]
          // with backward FFT
          //
             fftr1dinv(f, x2);
-            _TestResult = _TestResult && doc_test_real_vector(x2, "[1,1,1,1]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x2, "[1,1,1,1]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "fft_real_d1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "fft_real_d1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST fft_real_d2: Real FFT: advanced example\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // first we demonstrate forward FFT:
@@ -7638,12 +7450,12 @@ int main() {
             complex_1d_array f;
             real_1d_array x2;
             fftr1d(x, f);
-            _TestResult = _TestResult && doc_test_complex_vector(f, "[10, -2+2i, -2, -2-2i]", 0.0001);
+            Ok = Ok && doc_test_complex_vector(f, "[10, -2+2i, -2, -2-2i]", 0.0001);
          //
          // now we convert [10, -2+2i, -2, -2-2i] back to [1,2,3,4]
          //
             fftr1dinv(f, x2);
-            _TestResult = _TestResult && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
+            Ok = Ok && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
          //
          // remember that F is self-adjoint? It means that we can pass just half
          // (slightly larger than half) of F to inverse real FFT and still get our result.
@@ -7656,22 +7468,20 @@ int main() {
          //
             f = "[10, -2+2i, -2]";
             fftr1dinv(f, 4, x2);
-            _TestResult = _TestResult && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x2, "[1,2,3,4]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "fft_real_d2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "fft_real_d2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST fft_complex_e1: error detection in backward FFT\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
             complex_1d_array z = "[0,2,0,-2]";
             if (_spoil_scenario == 0)
@@ -7681,22 +7491,20 @@ int main() {
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(z);
             fftc1dinv(z);
-            _TestResult = _TestResult && doc_test_complex_vector(z, "[0,1i,0,-1i]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex_vector(z, "[0,1i,0,-1i]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "fft_complex_e1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "fft_complex_e1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST idw_d_mstab: Simple model built with IDW-MSTAB algorithm\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example illustrates basic concepts of the IDW models:
@@ -7758,22 +7566,20 @@ int main() {
          // Step 4: model was built, evaluate its value
          //
             v = idwcalc2(model, 1.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 3.000, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 3.000, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "idw_d_mstab");
+      if (!Ok) {
+         printf("%-32s Failed\n", "idw_d_mstab");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST idw_d_serialize: IDW model serialization/unserialization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example shows how to serialize and unserialize IDW model.
@@ -7809,7 +7615,7 @@ int main() {
             idwbuildersetalgomstab(builder, 5.0);
             idwfit(builder, model, rep);
             v = idwcalc2(model, 1.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 3.000, 0.005);
+            Ok = Ok && doc_test_real(v, 3.000, 0.005);
          //
          // Serialization + unserialization to a different instance
          // of the model class.
@@ -7820,22 +7626,20 @@ int main() {
          // Evaluate unserialized model at the same point
          //
             v = idwcalc2(model2, 1.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 3.000, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 3.000, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "idw_d_serialize");
+      if (!Ok) {
+         printf("%-32s Failed\n", "idw_d_serialize");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_linear: Piecewise linear spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
          //
          // We use piecewise linear spline to interpolate f(x)=x^2 sampled
@@ -7874,22 +7678,20 @@ int main() {
             spline1dbuildlinear(x, y, s);
          // calculate S(0.25) - it is quite different from 0.25^2=0.0625
             v = spline1dcalc(s, t);
-            _TestResult = _TestResult && doc_test_real(v, 0.125, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 0.125, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline1d_d_linear");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline1d_d_linear");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_cubic: Cubic spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
          //
          // We use cubic spline to interpolate f(x)=x^2 sampled
@@ -7931,34 +7733,32 @@ int main() {
             spline1dinterpolant s;
             ae_int_t natural_bound_type = 2;
          //
-         // Test exact boundary conditions: build S(x), calculare S(0.25)
+         // _spoil_scenario exact boundary conditions: build S(x), calculare S(0.25)
          // (almost same as original function)
          //
             spline1dbuildcubic(x, y, s);
             v = spline1dcalc(s, t);
-            _TestResult = _TestResult && doc_test_real(v, 0.0625, 0.00001);
+            Ok = Ok && doc_test_real(v, 0.0625, 0.00001);
          //
-         // Test natural boundary conditions: build S(x), calculare S(0.25)
+         // _spoil_scenario natural boundary conditions: build S(x), calculare S(0.25)
          // (small interpolation error)
          //
             spline1dbuildcubic(x, y, 5, natural_bound_type, 0.0, natural_bound_type, 0.0, s);
             v = spline1dcalc(s, t);
-            _TestResult = _TestResult && doc_test_real(v, 0.0580, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 0.0580, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline1d_d_cubic");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline1d_d_cubic");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_monotone: Monotone interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
          //
          // Spline built witn spline1dbuildcubic() can be non-monotone even when
@@ -8002,32 +7802,30 @@ int main() {
          // you may see that spline is really monotonic
             double v;
             v = spline1dcalc(s, -0.5);
-            _TestResult = _TestResult && doc_test_real(v, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(v, 0.0000, 0.00005);
             v = spline1dcalc(s, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.0000, 0.00005);
+            Ok = Ok && doc_test_real(v, 0.0000, 0.00005);
             v = spline1dcalc(s, +0.5);
-            _TestResult = _TestResult && doc_test_real(v, 0.5000, 0.00005);
+            Ok = Ok && doc_test_real(v, 0.5000, 0.00005);
             v = spline1dcalc(s, 1.0);
-            _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.00005);
+            Ok = Ok && doc_test_real(v, 1.0000, 0.00005);
             v = spline1dcalc(s, 1.5);
-            _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.00005);
+            Ok = Ok && doc_test_real(v, 1.0000, 0.00005);
             v = spline1dcalc(s, 2.0);
-            _TestResult = _TestResult && doc_test_real(v, 1.0000, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.0000, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline1d_d_monotone");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline1d_d_monotone");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_griddiff: Differentiation on the grid using cubic splines\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
          //
          // We use cubic spline to do grid differentiation, i.e. having
@@ -8074,29 +7872,27 @@ int main() {
          // We calculate first derivatives: they must be equal to 2*x
          //
             spline1dgriddiffcubic(x, y, d1);
-            _TestResult = _TestResult && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
+            Ok = Ok && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
          //
          // Now test griddiff2, which returns first AND second derivatives.
          // First derivative is 2*x, second is equal to 2.0
          //
             spline1dgriddiff2cubic(x, y, d1, d2);
-            _TestResult = _TestResult && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
-            _TestResult = _TestResult && doc_test_real_vector(d2, "[ 2.0,  2.0, 2.0,  2.0,  2.0]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(d1, "[-2.0, -1.0, 0.0, +1.0, +2.0]", 0.0001);
+            Ok = Ok && doc_test_real_vector(d2, "[ 2.0,  2.0, 2.0,  2.0,  2.0]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline1d_d_griddiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline1d_d_griddiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline1d_d_convdiff: Resampling using cubic splines\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
          //
          // We use cubic spline to do resampling, i.e. having
@@ -8150,37 +7946,35 @@ int main() {
          //
          //
             spline1dconvcubic(x_old, y_old, x_new, y_new);
-            _TestResult = _TestResult && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
+            Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
          //
          // Then, conversion with differentiation (first derivatives only)
          //
          //
             spline1dconvdiffcubic(x_old, y_old, x_new, y_new, d1_new);
-            _TestResult = _TestResult && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
-            _TestResult = _TestResult && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
+            Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
+            Ok = Ok && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
          //
          // Finally, conversion with first and second derivatives
          //
          //
             spline1dconvdiff2cubic(x_old, y_old, x_new, y_new, d1_new, d2_new);
-            _TestResult = _TestResult && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
-            _TestResult = _TestResult && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
-            _TestResult = _TestResult && doc_test_real_vector(d2_new, "[2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]", 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y_new, "[1.0000, 0.5625, 0.2500, 0.0625, 0.0000, 0.0625, 0.2500, 0.5625, 1.0000]", 0.0001);
+            Ok = Ok && doc_test_real_vector(d1_new, "[-2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]", 0.0001);
+            Ok = Ok && doc_test_real_vector(d2_new, "[2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0]", 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline1d_d_convdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline1d_d_convdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST parametric_rdp: Parametric Ramer-Douglas-Peucker approximation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
          //
          // We use RDP algorithm to approximate parametric 2D curve given by
@@ -8244,23 +8038,21 @@ int main() {
             if (_spoil_scenario == 6)
                limiteps = -INFINITY;
             parametricrdpfixed(x, npoints, ndimensions, limitcnt, limiteps, y, idxy, nsections);
-            _TestResult = _TestResult && doc_test_int(nsections, 2);
-            _TestResult = _TestResult && doc_test_int_vector(idxy, "[0,2,3]");
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(nsections, 2);
+            Ok = Ok && doc_test_int_vector(idxy, "[0,2,3]");
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "parametric_rdp");
+      if (!Ok) {
+         printf("%-32s Failed\n", "parametric_rdp");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline3d_trilinear: Trilinear spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
          try {
          //
          // We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled
@@ -8334,22 +8126,20 @@ int main() {
             spline3dbuildtrilinearv(x, 2, y, 2, z, 2, f, 1, s);
          // calculate S(0.5,0.5,0.5)
             v = spline3dcalc(s, vx, vy, vz);
-            _TestResult = _TestResult && doc_test_real(v, 1.2500, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.2500, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline3d_trilinear");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline3d_trilinear");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline3d_vector: Vector-valued trilinear spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 22; _spoil_scenario++) {
          try {
          //
          // We use trilinear vector-valued spline to interpolate {f0,f1}={x+xy+z,x+xy+yz+z}
@@ -8431,22 +8221,20 @@ int main() {
          // calculate S(0.5,0.5,0.5) - we have vector of values instead of single value
             real_1d_array v;
             spline3dcalcv(s, vx, vy, vz, v);
-            _TestResult = _TestResult && doc_test_real_vector(v, "[1.2500,1.5000]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(v, "[1.2500,1.5000]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline3d_vector");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline3d_vector");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_d_calcdiff: Interpolation and differentiation using barycentric representation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate polynomial interpolation and differentiation
@@ -8487,34 +8275,32 @@ int main() {
             polynomialbuild(x, y, p);
          // barycentric interpolation is demonstrated
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
          // barycentric differentation is demonstrated
             barycentricdiff1(p, t, v, dv);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && doc_test_real(dv, -3.0, 0.00005);
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && doc_test_real(dv, -3.0, 0.00005);
          // second derivatives with barycentric representation
             barycentricdiff1(p, t, v, dv);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && doc_test_real(dv, -3.0, 0.00005);
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && doc_test_real(dv, -3.0, 0.00005);
             barycentricdiff2(p, t, v, dv, d2v);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && doc_test_real(dv, -3.0, 0.00005);
-            _TestResult = _TestResult && doc_test_real(d2v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && doc_test_real(dv, -3.0, 0.00005);
+            Ok = Ok && doc_test_real(d2v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_d_calcdiff");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_d_calcdiff");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_d_conv: Conversion between power basis and barycentric representation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
          //
          // Here we demonstrate conversion of y=x^2-x
@@ -8545,25 +8331,23 @@ int main() {
             polynomialpow2bar(a, p);
          // now we have barycentric interpolation; we can use it for interpolation
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.005);
+            Ok = Ok && doc_test_real(v, 2.0, 0.005);
          // we can also convert back from barycentric representation to power basis
             polynomialbar2pow(p, a2);
-            _TestResult = _TestResult && doc_test_real_vector(a2, "[0,-1,+1]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(a2, "[0,-1,+1]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_d_conv");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_d_conv");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_d_spec: Polynomial interpolation on special grids (equidistant, Chebyshev I/II)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
          //
          // Temporaries:
@@ -8610,13 +8394,13 @@ int main() {
          //
             polynomialbuildeqdist(0.0, 2.0, y_eqdist, p_eqdist);
             polynomialbar2pow(p_eqdist, a_eqdist);
-            _TestResult = _TestResult && doc_test_real_vector(a_eqdist, "[0,-1,+1]", 0.00005);
+            Ok = Ok && doc_test_real_vector(a_eqdist, "[0,-1,+1]", 0.00005);
             polynomialbuildcheb1(-1, +1, y_cheb1, p_cheb1);
             polynomialbar2pow(p_cheb1, a_cheb1);
-            _TestResult = _TestResult && doc_test_real_vector(a_cheb1, "[0,-1,+1]", 0.00005);
+            Ok = Ok && doc_test_real_vector(a_cheb1, "[0,-1,+1]", 0.00005);
             polynomialbuildcheb2(-1, +1, y_cheb2, p_cheb2);
             polynomialbar2pow(p_cheb2, a_cheb2);
-            _TestResult = _TestResult && doc_test_real_vector(a_cheb2, "[0,-1,+1]", 0.00005);
+            Ok = Ok && doc_test_real_vector(a_cheb2, "[0,-1,+1]", 0.00005);
          //
          // Now we demonstrate polynomial interpolation without construction
          // of the barycentricinterpolant structure.
@@ -8631,26 +8415,24 @@ int main() {
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y_eqdist, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
             v = polynomialcalccheb1(-1, +1, y_cheb1, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
             v = polynomialcalccheb2(-1, +1, y_cheb2, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_d_spec");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_d_spec");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_1: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
             real_1d_array x = "[0,1,2]";
             if (_spoil_scenario == 0)
@@ -8679,22 +8461,20 @@ int main() {
             double v;
             polynomialbuild(x, y, 3, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_2: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -8714,22 +8494,20 @@ int main() {
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, 3, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_3: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
             if (_spoil_scenario == 0)
@@ -8749,22 +8527,20 @@ int main() {
             double v;
             polynomialbuildcheb1(-1.0, +1.0, y, 3, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_3");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_3");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_4: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -8798,22 +8574,20 @@ int main() {
             double v;
             polynomialbuildcheb2(a, b, y, 3, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_4");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_4");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_5: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -8831,22 +8605,20 @@ int main() {
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, 3, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_5");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_5");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_6: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
             if (_spoil_scenario == 0)
@@ -8878,22 +8650,20 @@ int main() {
                b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, 3, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_6");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_6");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_7: Polynomial interpolation, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -8925,22 +8695,20 @@ int main() {
                b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, 3, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_7");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_7");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_8: Polynomial interpolation: y=x^2-x, equidistant grid, barycentric form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -8958,22 +8726,20 @@ int main() {
             double v;
             polynomialbuildeqdist(0.0, 2.0, y, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_8");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_8");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_9: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind), barycentric form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
             if (_spoil_scenario == 0)
@@ -9005,22 +8771,20 @@ int main() {
             double v;
             polynomialbuildcheb1(a, b, y, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_9");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_9");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_10: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind), barycentric form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -9052,22 +8816,20 @@ int main() {
             double v;
             polynomialbuildcheb2(a, b, y, p);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_10");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_10");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_11: Polynomial interpolation: y=x^2-x, equidistant grid\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -9083,22 +8845,20 @@ int main() {
                t = -INFINITY;
             double v;
             v = polynomialcalceqdist(0.0, 2.0, y, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_11");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_11");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_12: Polynomial interpolation: y=x^2-x, Chebyshev grid (first kind)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
             real_1d_array y = "[-0.116025,0.000000,1.616025]";
             if (_spoil_scenario == 0)
@@ -9128,22 +8888,20 @@ int main() {
                b = -INFINITY;
             double v;
             v = polynomialcalccheb1(a, b, y, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_12");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_12");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST polint_t_13: Polynomial interpolation: y=x^2-x, Chebyshev grid (second kind)\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 11; _spoil_scenario++) {
          try {
             real_1d_array y = "[0,0,2]";
             if (_spoil_scenario == 0)
@@ -9173,22 +8931,20 @@ int main() {
                b = -INFINITY;
             double v;
             v = polynomialcalccheb2(a, b, y, t);
-            _TestResult = _TestResult && doc_test_real(v, 6.0, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 6.0, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "polint_t_13");
+      if (!Ok) {
+         printf("%-32s Failed\n", "polint_t_13");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlf: Nonlinear fitting using function value only\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 24; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 24; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -9253,8 +9009,8 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
          //
          // Fitting with weights
          // (you can change weights and see how it changes result)
@@ -9274,23 +9030,21 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_nlf");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_nlf");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfg: Nonlinear fitting using gradient\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -9344,8 +9098,8 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
          //
          // Fitting with weights
          // (you can change weights and see how it changes result)
@@ -9365,23 +9119,21 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_nlfg");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_nlfg");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfgh: Nonlinear fitting using gradient and Hessian\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 21; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate exponential fitting
@@ -9435,8 +9187,8 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
          //
          // Fitting with weights
          // (you can change weights and see how it changes result)
@@ -9456,23 +9208,21 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func, function_cx_1_grad, function_cx_1_hess);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.5]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[1.5]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_nlfgh");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_nlfgh");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlfb: Bound contstrained nonlinear fitting using function value only\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate exponential fitting by
@@ -9550,22 +9300,20 @@ int main() {
             lsfitsetcond(state, epsx, maxits);
             lsfitfit(state, function_cx_1_func);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.0]", 0.05);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(c, "[1.0]", 0.05);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_nlfb");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_nlfb");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_nlscale: Nonlinear fitting with custom scaling and bound constraints\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 27; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 27; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate fitting by
@@ -9665,23 +9413,21 @@ int main() {
             lsfitsetscale(state, s);
             lsfitfit(state, function_debt_func);
             lsfitresults(state, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 2);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[4.142560e+12, 0.434240, 0.565376]", -0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 2);
+            Ok = Ok && doc_test_real_vector(c, "[4.142560e+12, 0.434240, 0.565376]", -0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_nlscale");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_nlscale");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_lin: Unconstrained (general) linear least squares fitting with and without weights\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 13; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate linear fitting by f(x|a) = a*exp(0.5*x).
@@ -9716,8 +9462,8 @@ int main() {
          // Linear fitting without weights
          //
             lsfitlinear(y, fmatrix, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.98650]", 0.00005);
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_vector(c, "[1.98650]", 0.00005);
          //
          // Linear fitting with individual weights.
          // Slightly different result is returned.
@@ -9734,23 +9480,21 @@ int main() {
             if (_spoil_scenario == 12)
                spoil_vector_by_deleting_element(w);
             lsfitlinearw(y, w, fmatrix, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[1.983354]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_vector(c, "[1.983354]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_lin");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_lin");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_linc: Constrained (general) linear least squares fitting with and without weights\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate linear fitting by f(x|a,b) = a*x+b
@@ -9813,8 +9557,8 @@ int main() {
          // Constrained fitting without weights
          //
             lsfitlinearc(y, fmatrix, cmatrix, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[0,0.932933]", 0.0005);
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_vector(c, "[0,0.932933]", 0.0005);
          //
          // Constrained fitting with individual weights
          //
@@ -9830,23 +9574,21 @@ int main() {
             if (_spoil_scenario == 19)
                spoil_vector_by_deleting_element(w);
             lsfitlinearwc(y, w, fmatrix, cmatrix, info, c, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && doc_test_real_vector(c, "[0,0.938322]", 0.0005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && doc_test_real_vector(c, "[0,0.938322]", 0.0005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_linc");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_linc");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_pol: Unconstrained polynomial fitting\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 20; _spoil_scenario++) {
          try {
          //
          // This example demonstrates polynomial fitting.
@@ -9908,7 +9650,7 @@ int main() {
          //
             polynomialfit(x, y, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.011, 0.002);
+            Ok = Ok && doc_test_real(v, 2.011, 0.002);
          //
          // Fitting with individual weights
          //
@@ -9936,22 +9678,20 @@ int main() {
                spoil_vector_by_adding_element(dc);
             polynomialfitwc(x, y, w, xc, yc, dc, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.023, 0.002);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.023, 0.002);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_pol");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_pol");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_polc: Constrained polynomial fitting\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 29; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 29; _spoil_scenario++) {
          try {
          //
          // This example demonstrates polynomial fitting.
@@ -10045,22 +9785,20 @@ int main() {
             double v;
             polynomialfitwc(x, y, w, xc, yc, dc, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.000, 0.001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.000, 0.001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_polc");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_polc");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_d_spline: Unconstrained fitting by penalized regression spline\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 19; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 19; _spoil_scenario++) {
          try {
          //
          // In this example we demonstrate penalized spline fitting of noisy data
@@ -10110,9 +9848,9 @@ int main() {
             if (_spoil_scenario == 12)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
+            Ok = Ok && doc_test_int(info, 1);
             v = spline1dcalc(s, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.10, 0.01);
+            Ok = Ok && doc_test_real(v, 0.10, 0.01);
          //
          // Fit with VERY large amount of smoothing (rho = 10.0)
          // and large number of basis functions (M=50).
@@ -10128,9 +9866,9 @@ int main() {
             if (_spoil_scenario == 15)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
+            Ok = Ok && doc_test_int(info, 1);
             v = spline1dcalc(s, 1.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.969, 0.001);
+            Ok = Ok && doc_test_real(v, 0.969, 0.001);
          //
          // In real life applications you may need some moderate degree of fitting,
          // so we try to fit once more with rho=3.0.
@@ -10143,22 +9881,20 @@ int main() {
             if (_spoil_scenario == 18)
                rho = -INFINITY;
             spline1dfitpenalized(x, y, 50, rho, info, s, rep);
-            _TestResult = _TestResult && doc_test_int(info, 1);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(info, 1);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_d_spline");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_d_spline");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_1: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 10; _spoil_scenario++) {
          try {
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
             if (_spoil_scenario == 0)
@@ -10190,22 +9926,20 @@ int main() {
             double v;
             polynomialfit(x, y, 11, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.011, 0.002);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.011, 0.002);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_t_polfit_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_t_polfit_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_2: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 14; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 14; _spoil_scenario++) {
          try {
             real_1d_array x = "[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]";
             if (_spoil_scenario == 0)
@@ -10249,22 +9983,20 @@ int main() {
             double v;
             polynomialfitwc(x, y, w, 11, xc, yc, dc, 0, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.023, 0.002);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.023, 0.002);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_t_polfit_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_t_polfit_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_polfit_3: Polynomial fitting, full list of parameters.\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 23; _spoil_scenario++) {
          try {
             real_1d_array x = "[1.0,1.0]";
             if (_spoil_scenario == 0)
@@ -10326,22 +10058,20 @@ int main() {
             double v;
             polynomialfitwc(x, y, w, 2, xc, yc, dc, 1, m, info, p, rep);
             v = barycentriccalc(p, t);
-            _TestResult = _TestResult && doc_test_real(v, 2.000, 0.001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.000, 0.001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_t_polfit_3");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_t_polfit_3");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_4pl: 4-parameter logistic fitting\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
          try {
             real_1d_array x = "[1,2,3,4,5,6,7,8]";
             if (_spoil_scenario == 0)
@@ -10368,34 +10098,32 @@ int main() {
             double d;
             lsfitreport rep;
          //
-         // Test logisticfit4() on carefully designed data with a priori known answer.
+         // _spoil_scenario logisticfit4() on carefully designed data with a priori known answer.
          //
             logisticfit4(x, y, n, a, b, c, d, rep);
-            _TestResult = _TestResult && doc_test_real(a, -1.000, 0.01);
-            _TestResult = _TestResult && doc_test_real(b, 1.200, 0.01);
-            _TestResult = _TestResult && doc_test_real(c, 0.900, 0.01);
-            _TestResult = _TestResult && doc_test_real(d, 1.000, 0.01);
+            Ok = Ok && doc_test_real(a, -1.000, 0.01);
+            Ok = Ok && doc_test_real(b, 1.200, 0.01);
+            Ok = Ok && doc_test_real(c, 0.900, 0.01);
+            Ok = Ok && doc_test_real(d, 1.000, 0.01);
          //
          // Evaluate model at point x=0.5
          //
             double v;
             v = logisticcalc4(0.5, a, b, c, d);
-            _TestResult = _TestResult && doc_test_real(v, -0.33874308, 0.001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, -0.33874308, 0.001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_t_4pl");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_t_4pl");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lsfit_t_5pl: 5-parameter logistic fitting\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 8; _spoil_scenario++) {
          try {
             real_1d_array x = "[1,2,3,4,5,6,7,8]";
             if (_spoil_scenario == 0)
@@ -10423,35 +10151,33 @@ int main() {
             double g;
             lsfitreport rep;
          //
-         // Test logisticfit5() on carefully designed data with a priori known answer.
+         // _spoil_scenario logisticfit5() on carefully designed data with a priori known answer.
          //
             logisticfit5(x, y, n, a, b, c, d, g, rep);
-            _TestResult = _TestResult && doc_test_real(a, -1.000, 0.01);
-            _TestResult = _TestResult && doc_test_real(b, 1.200, 0.01);
-            _TestResult = _TestResult && doc_test_real(c, 0.900, 0.01);
-            _TestResult = _TestResult && doc_test_real(d, 1.000, 0.01);
-            _TestResult = _TestResult && doc_test_real(g, 1.200, 0.01);
+            Ok = Ok && doc_test_real(a, -1.000, 0.01);
+            Ok = Ok && doc_test_real(b, 1.200, 0.01);
+            Ok = Ok && doc_test_real(c, 0.900, 0.01);
+            Ok = Ok && doc_test_real(d, 1.000, 0.01);
+            Ok = Ok && doc_test_real(g, 1.200, 0.01);
          //
          // Evaluate model at point x=0.5
          //
             double v;
             v = logisticcalc5(0.5, a, b, c, d, g);
-            _TestResult = _TestResult && doc_test_real(v, -0.2354656824, 0.001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, -0.2354656824, 0.001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lsfit_t_5pl");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lsfit_t_5pl");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_bilinear: Bilinear spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
          try {
          //
          // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
@@ -10500,22 +10226,20 @@ int main() {
             spline2dbuildbilinearv(x, 3, y, 2, f, 1, s);
          // calculate S(0.25,0.50)
             v = spline2dcalc(s, vx, vy);
-            _TestResult = _TestResult && doc_test_real(v, 1.1250, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.1250, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_bilinear");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_bilinear");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_bicubic: Bilinear spline interpolation\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
          try {
          //
          // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
@@ -10567,27 +10291,25 @@ int main() {
             spline2dbuildbicubicv(x, 3, y, 2, f, 1, s);
          // calculate S(0.25,0.50)
             v = spline2dcalc(s, vx, vy);
-            _TestResult = _TestResult && doc_test_real(v, 1.0625, 0.00005);
+            Ok = Ok && doc_test_real(v, 1.0625, 0.00005);
          // calculate derivatives
             spline2ddiff(s, vx, vy, v, dx, dy, dxy);
-            _TestResult = _TestResult && doc_test_real(v, 1.0625, 0.00005);
-            _TestResult = _TestResult && doc_test_real(dx, 0.5000, 0.00005);
-            _TestResult = _TestResult && doc_test_real(dy, 2.0000, 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 1.0625, 0.00005);
+            Ok = Ok && doc_test_real(dx, 0.5000, 0.00005);
+            Ok = Ok && doc_test_real(dy, 2.0000, 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_bicubic");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_bicubic");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_fit_blocklls: Fitting bicubic spline to irregular data\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
          //
          // We use bicubic spline to reproduce f(x,y)=1/(1+x^2+2*y^2) sampled
@@ -10645,24 +10367,22 @@ int main() {
          // evaluate results - function value at the grid is reproduced exactly
             double v;
             v = spline2dcalc(s, -1, 1);
-            _TestResult = _TestResult && doc_test_real(v, 0.333000, 0.005);
+            Ok = Ok && doc_test_real(v, 0.333000, 0.005);
          // check maximum error - it must be nearly zero
-            _TestResult = _TestResult && doc_test_real(rep.maxerror, 0.000, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(rep.maxerror, 0.000, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_fit_blocklls");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_fit_blocklls");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_unpack: Unpacking bilinear spline\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
          //
          // We build bilinear spline for f(x,y)=x+2*y+3*xy for (x,y) in [0,1].
@@ -10704,22 +10424,20 @@ int main() {
             spline2dbuildbilinearv(x, 2, y, 2, f, 1, s);
          // unpack and test
             spline2dunpackv(s, m, n, d, c);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_matrix(c, "[[0, 1, 0, 1, 0,2,0,0, 1,3,0,0, 0,0,0,0, 0,0,0,0 ]]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_unpack");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_unpack");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_copytrans: Copy and transform\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 16; _spoil_scenario++) {
          try {
          //
          // We build bilinear spline for f(x,y)=x+2*y for (x,y) in [0,1].
@@ -10761,12 +10479,12 @@ int main() {
             spline2dcopy(s, snew);
             spline2dlintransxy(snew, 2.0, 0.0, 4.0, 0.0);
             v = spline2dcalc(snew, 0.25, 0.25);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.00005);
+            Ok = Ok && doc_test_real(v, 2.500, 0.00005);
          // copy spline, apply transformation SNew:=2*S+3
             spline2dcopy(s, snew);
             spline2dlintransf(snew, 2.0, 3.0);
             v = spline2dcalc(snew, 0.5, 1.0);
-            _TestResult = _TestResult && doc_test_real(v, 8.000, 0.00005);
+            Ok = Ok && doc_test_real(v, 8.000, 0.00005);
          //
          // Same example, but for vector spline (f0,f1) = {x+2*y, 2*x+y}
          //
@@ -10785,27 +10503,25 @@ int main() {
             spline2dcopy(s, snew);
             spline2dlintransxy(snew, 2.0, 0.0, 4.0, 0.0);
             spline2dcalcv(snew, 0.25, 0.25, vr);
-            _TestResult = _TestResult && doc_test_real_vector(vr, "[2.500,2.000]", 0.00005);
+            Ok = Ok && doc_test_real_vector(vr, "[2.500,2.000]", 0.00005);
          // copy spline, apply transformation SNew:=2*S+3
             spline2dcopy(s, snew);
             spline2dlintransf(snew, 2.0, 3.0);
             spline2dcalcv(snew, 0.5, 1.0, vr);
-            _TestResult = _TestResult && doc_test_real_vector(vr, "[8.000,7.000]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(vr, "[8.000,7.000]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_copytrans");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_copytrans");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST spline2d_vector: Copy and transform\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 12; _spoil_scenario++) {
          try {
          //
          // We build bilinear vector-valued spline (f0,f1) = {x+2*y, 2*x+y}
@@ -10843,22 +10559,20 @@ int main() {
             real_1d_array vr;
             spline2dbuildbilinearv(x, 2, y, 2, f, 2, s);
             spline2dcalcv(s, 0.1, 0.3, vr);
-            _TestResult = _TestResult && doc_test_real_vector(vr, "[0.700,0.500]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(vr, "[0.700,0.500]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "spline2d_vector");
+      if (!Ok) {
+         printf("%-32s Failed\n", "spline2d_vector");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST rbf_d_hrbf: Simple model built with HRBF algorithm\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example illustrates basic concepts of the RBF models: creation, modification,
@@ -10889,7 +10603,7 @@ int main() {
             rbfmodel model;
             rbfcreate(2, 1, model);
             v = rbfcalc2(model, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
+            Ok = Ok && doc_test_real(v, 0.000, 0.005);
          //
          // Step 2: we add dataset.
          //
@@ -10908,7 +10622,7 @@ int main() {
                spoil_matrix_by_neginf(xy);
             rbfsetpoints(model, xy);
             v = rbfcalc2(model, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
+            Ok = Ok && doc_test_real(v, 0.000, 0.005);
          //
          // Step 3: rebuild model
          //
@@ -10925,7 +10639,7 @@ int main() {
             rbfreport rep;
             rbfsetalgohierarchical(model, 1.0, 3, 0.0);
             rbfbuildmodel(model, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
          //
          // Step 4: model was built
          //
@@ -10933,22 +10647,20 @@ int main() {
          // value of the new model.
          //
             v = rbfcalc2(model, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 2.500, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "rbf_d_hrbf");
+      if (!Ok) {
+         printf("%-32s Failed\n", "rbf_d_hrbf");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST rbf_d_vector: Working with vector functions\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
          //
          // Suppose that we have set of 2-dimensional points with associated VECTOR
@@ -10981,7 +10693,7 @@ int main() {
             if (_spoil_scenario == 2)
                spoil_vector_by_neginf(x);
             rbfcalc(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
+            Ok = Ok && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
          //
          // Step 2: we add dataset.
          //
@@ -11002,7 +10714,7 @@ int main() {
          // We added points, but model was not rebuild yet.
          // If we call rbfcalc(), we still will get 0.0 as result.
             rbfcalc(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
+            Ok = Ok && doc_test_real_vector(y, "[0.000,0.000]", 0.005);
          //
          // Step 3: rebuild model
          //
@@ -11019,7 +10731,7 @@ int main() {
             rbfreport rep;
             rbfsetalgohierarchical(model, 1.0, 3, 0.0);
             rbfbuildmodel(model, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
          //
          // Step 4: model was built
          //
@@ -11027,22 +10739,20 @@ int main() {
          // value of the new model.
          //
             rbfcalc(model, x, y);
-            _TestResult = _TestResult && doc_test_real_vector(y, "[0.000,-1.000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(y, "[0.000,-1.000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "rbf_d_vector");
+      if (!Ok) {
+         printf("%-32s Failed\n", "rbf_d_vector");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST rbf_d_polterm: RBF models - working with polynomial term\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example show how to work with polynomial term
@@ -11093,12 +10803,12 @@ int main() {
             real_2d_array xwr;
             real_2d_array c;
             rbfbuildmodel(model, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
             rbfunpack(model, nx, ny, xwr, nc, c, modelversion);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.500,0.000,2.500]]", 0.005);
+            Ok = Ok && doc_test_real_matrix(c, "[[0.500,0.000,2.500]]", 0.005);
          // asymptotic behavior of our function is linear
             v = rbfcalc2(model, 1000.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 502.50, 0.05);
+            Ok = Ok && doc_test_real(v, 502.50, 0.05);
          //
          // Instead of linear term we can use constant term. In this case
          // we will get model which has form
@@ -11112,12 +10822,12 @@ int main() {
          //
             rbfsetconstterm(model);
             rbfbuildmodel(model, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
             rbfunpack(model, nx, ny, xwr, nc, c, modelversion);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.000,0.000,2.500]]", 0.005);
+            Ok = Ok && doc_test_real_matrix(c, "[[0.000,0.000,2.500]]", 0.005);
          // asymptotic behavior of our function is constant
             v = rbfcalc2(model, 1000.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
+            Ok = Ok && doc_test_real(v, 2.500, 0.005);
          //
          // Finally, we can use zero term. Just plain RBF without polynomial
          // part:
@@ -11126,27 +10836,25 @@ int main() {
          //
             rbfsetzeroterm(model);
             rbfbuildmodel(model, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
             rbfunpack(model, nx, ny, xwr, nc, c, modelversion);
-            _TestResult = _TestResult && doc_test_real_matrix(c, "[[0.000,0.000,0.000]]", 0.005);
+            Ok = Ok && doc_test_real_matrix(c, "[[0.000,0.000,0.000]]", 0.005);
          // asymptotic behavior of our function is just zero constant
             v = rbfcalc2(model, 1000.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 0.000, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "rbf_d_polterm");
+      if (!Ok) {
+         printf("%-32s Failed\n", "rbf_d_polterm");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST rbf_d_serialize: Serialization/unserialization\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
          //
          // This example show how to serialize and unserialize RBF model
@@ -11175,7 +10883,7 @@ int main() {
             rbfsetpoints(model0, xy);
             rbfsetalgohierarchical(model0, 1.0, 3, 0.0);
             rbfbuildmodel(model0, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
          //
          // Serialization - it looks easy,
          // but you should carefully read next section.
@@ -11184,9 +10892,9 @@ int main() {
             rbfunserialize(s, model1);
          // both models return same value
             v = rbfcalc2(model0, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
+            Ok = Ok && doc_test_real(v, 2.500, 0.005);
             v = rbfcalc2(model1, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
+            Ok = Ok && doc_test_real(v, 2.500, 0.005);
          //
          // Previous section shows that model state is saved/restored during
          // serialization. However, some properties are NOT serialized.
@@ -11219,25 +10927,23 @@ int main() {
          //
             rbfbuildmodel(model0, rep);
             v = rbfcalc2(model0, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 2.500, 0.005);
+            Ok = Ok && doc_test_real(v, 2.500, 0.005);
             rbfbuildmodel(model1, rep);
             v = rbfcalc2(model1, 0.0, 0.0);
-            _TestResult = _TestResult && doc_test_real(v, 0.000, 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(v, 0.000, 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "rbf_d_serialize");
+      if (!Ok) {
+         printf("%-32s Failed\n", "rbf_d_serialize");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_d_1: Determinant calculation, real matrix, short form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             real_2d_array b = "[[1,2],[2,1]]";
             if (_spoil_scenario == 0)
@@ -11256,22 +10962,20 @@ int main() {
                spoil_matrix_by_deleting_col(b);
             double a;
             a = rmatrixdet(b);
-            _TestResult = _TestResult && doc_test_real(a, -3, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(a, -3, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_d_2: Determinant calculation, real matrix, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             real_2d_array b = "[[5,4],[4,5]]";
             if (_spoil_scenario == 0)
@@ -11286,22 +10990,20 @@ int main() {
                spoil_matrix_by_deleting_col(b);
             double a;
             a = rmatrixdet(b, 2);
-            _TestResult = _TestResult && doc_test_real(a, 9, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(a, 9, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_d_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_d_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_d_3: Determinant calculation, complex matrix, short form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             complex_2d_array b = "[[1+1i,2],[2,1-1i]]";
             if (_spoil_scenario == 0)
@@ -11320,22 +11022,20 @@ int main() {
                spoil_matrix_by_deleting_col(b);
             complex a;
             a = cmatrixdet(b);
-            _TestResult = _TestResult && doc_test_complex(a, -2, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, -2, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_d_3");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_d_3");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_d_4: Determinant calculation, complex matrix, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             complex a;
             complex_2d_array b = "[[5i,4],[4i,5]]";
@@ -11350,22 +11050,20 @@ int main() {
             if (_spoil_scenario == 4)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b, 2);
-            _TestResult = _TestResult && doc_test_complex(a, complex(0, 9), 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, complex(0, 9), 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_d_4");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_d_4");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_d_5: Determinant calculation, complex matrix with zero imaginary part, short form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 7; _spoil_scenario++) {
          try {
             complex a;
             complex_2d_array b = "[[9,1],[2,1]]";
@@ -11384,22 +11082,20 @@ int main() {
             if (_spoil_scenario == 6)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b);
-            _TestResult = _TestResult && doc_test_complex(a, 7, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, 7, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_d_5");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_d_5");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_0: Determinant calculation, real matrix, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             double a;
             real_2d_array b = "[[3,4],[-4,3]]";
@@ -11414,22 +11110,20 @@ int main() {
             if (_spoil_scenario == 4)
                spoil_matrix_by_deleting_col(b);
             a = rmatrixdet(b, 2);
-            _TestResult = _TestResult && doc_test_real(a, 25, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(a, 25, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_0");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_0");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_1: Determinant calculation, real matrix, LU, short form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
             double a;
             real_2d_array b = "[[1,2],[2,5]]";
@@ -11453,22 +11147,20 @@ int main() {
             if (_spoil_scenario == 8)
                spoil_vector_by_deleting_element(p);
             a = rmatrixludet(b, p);
-            _TestResult = _TestResult && doc_test_real(a, -5, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(a, -5, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_2: Determinant calculation, real matrix, LU, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             double a;
             real_2d_array b = "[[5,4],[4,5]]";
@@ -11486,22 +11178,20 @@ int main() {
             if (_spoil_scenario == 5)
                spoil_vector_by_deleting_element(p);
             a = rmatrixludet(b, p, 2);
-            _TestResult = _TestResult && doc_test_real(a, 25, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real(a, 25, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_2");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_2");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_3: Determinant calculation, complex matrix, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 5; _spoil_scenario++) {
          try {
             complex a;
             complex_2d_array b = "[[5i,4],[-4,5i]]";
@@ -11516,22 +11206,20 @@ int main() {
             if (_spoil_scenario == 4)
                spoil_matrix_by_deleting_col(b);
             a = cmatrixdet(b, 2);
-            _TestResult = _TestResult && doc_test_complex(a, -9, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, -9, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_3");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_3");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_4: Determinant calculation, complex matrix, LU, short form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 9; _spoil_scenario++) {
          try {
             complex a;
             complex_2d_array b = "[[1,2],[2,5i]]";
@@ -11555,22 +11243,20 @@ int main() {
             if (_spoil_scenario == 8)
                spoil_vector_by_deleting_element(p);
             a = cmatrixludet(b, p);
-            _TestResult = _TestResult && doc_test_complex(a, complex(0, -5), 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, complex(0, -5), 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_4");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_4");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST matdet_t_5: Determinant calculation, complex matrix, LU, full form\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 6; _spoil_scenario++) {
          try {
             complex a;
             complex_2d_array b = "[[5,4i],[4,5]]";
@@ -11588,22 +11274,20 @@ int main() {
             if (_spoil_scenario == 5)
                spoil_vector_by_deleting_element(p);
             a = cmatrixludet(b, p, 2);
-            _TestResult = _TestResult && doc_test_complex(a, 25, 0.0001);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_complex(a, 25, 0.0001);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "matdet_t_5");
+      if (!Ok) {
+         printf("%-32s Failed\n", "matdet_t_5");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST solvesks_d_1: Solving positive definite sparse system using Skyline (SKS) solver\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
          try {
          //
          // This example demonstrates creation/initialization of the sparse matrix
@@ -11659,22 +11343,20 @@ int main() {
             real_1d_array x;
             bool isuppertriangle = true;
             sparsesolvesks(s, n, isuppertriangle, b, rep, x);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[1.0000, 2.0000, 3.0000, 4.0000]", 0.00005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_real_vector(x, "[1.0000, 2.0000, 3.0000, 4.0000]", 0.00005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "solvesks_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "solvesks_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
-   //
+      AllOk = AllOk && Ok;
    // printf("TEST lincg_d_1: Solution of sparse linear systems with CG\n"), fflush(stdout);
-   //
-      _TestResult = true;
-      for (_spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
+      Ok = true;
+      for (int _spoil_scenario = -1; _spoil_scenario < 4; _spoil_scenario++) {
          try {
          //
          // This example illustrates solution of sparse linear systems with
@@ -11759,18 +11441,18 @@ int main() {
             lincgcreate(5, s);
             lincgsolvesparse(s, a, true, b);
             lincgresults(s, x, rep);
-            _TestResult = _TestResult && doc_test_int(rep.terminationtype, 1);
-            _TestResult = _TestResult && doc_test_real_vector(x, "[1.000,2.000,1.000,2.000,1.000]", 0.005);
-            _TestResult = _TestResult && _spoil_scenario == -1;
+            Ok = Ok && doc_test_int(rep.terminationtype, 1);
+            Ok = Ok && doc_test_real_vector(x, "[1.000,2.000,1.000,2.000,1.000]", 0.005);
+            Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {
-            _TestResult = _TestResult && _spoil_scenario != -1;
+            Ok = Ok && _spoil_scenario != -1;
          }
       }
-      if (!_TestResult) {
-         printf("%-32s FAILED\n", "lincg_d_1");
+      if (!Ok) {
+         printf("%-32s Failed\n", "lincg_d_1");
          fflush(stdout);
       }
-      _TotalResult = _TotalResult && _TestResult;
+      AllOk = AllOk && Ok;
    } catch(...) {
       printf("Unhandled exception was raised!\n");
       return 1;
@@ -11781,10 +11463,10 @@ int main() {
    alglib_impl::ae_free_disposed_items();
 #   endif
    if (alglib_impl::_alloc_counter != 0) {
-      printf("FAILURE: alloc_counter is non-zero on end!\n");
+      printf("Failure: _alloc_counter is non-zero on end!\n");
       return 1;
    } else
       printf("OK\n");
 #endif
-   return _TotalResult ? 0 : 1;
+   return AllOk ? 0 : 1;
 }

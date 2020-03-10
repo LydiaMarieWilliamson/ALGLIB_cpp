@@ -21,13 +21,13 @@
 // Depends on: (SpecialFunctions) GAMMAFUNC
 // Depends on: (LinAlg) EVD
 namespace alglib_impl {
-void gqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t *info, RVector x, RVector w);
-void gqgenerategausslobattorec(RVector alpha, RVector beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector x, RVector w);
-void gqgenerategaussradaurec(RVector alpha, RVector beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector x, RVector w);
-void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector w);
-void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector x, RVector w);
-void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector x, RVector w);
-void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector x, RVector w);
+void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w);
+void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -235,11 +235,11 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 // === GKQ Package ===
 // Depends on: GQ
 namespace alglib_impl {
-void gkqgeneraterec(RVector alpha, RVector beta, double mu0, ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RVector wgauss);
-void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RVector wgauss);
-void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector x, RVector wkronrod, RVector wgauss);
-void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector x, RVector wkronrod, RVector wgauss);
-void gkqlegendretbl(ae_int_t n, RVector x, RVector wkronrod, RVector wgauss, double *eps);
+void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
+void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss);
+void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -396,16 +396,16 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 // === AUTOGK Package ===
 // Depends on: GKQ
 namespace alglib_impl {
-typedef struct {
+struct autogkreport {
    ae_int_t terminationtype;
    ae_int_t nfev;
    ae_int_t nintervals;
-} autogkreport;
+};
 void autogkreport_init(void *_p, bool make_automatic);
 void autogkreport_copy(void *_dst, void *_src, bool make_automatic);
 void autogkreport_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct autogkinternalstate {
    double a;
    double b;
    double eps;
@@ -426,12 +426,12 @@ typedef struct {
    ae_vector wr;
    ae_int_t n;
    ae_int_t PQ;
-} autogkinternalstate;
+};
 void autogkinternalstate_init(void *_p, bool make_automatic);
 void autogkinternalstate_copy(void *_dst, void *_src, bool make_automatic);
 void autogkinternalstate_free(void *_p, bool make_automatic);
 
-typedef struct {
+struct autogkstate {
    double a;
    double b;
    double alpha;
@@ -449,7 +449,7 @@ typedef struct {
    ae_int_t terminationtype;
    ae_int_t nfev;
    ae_int_t nintervals;
-} autogkstate;
+};
 void autogkstate_init(void *_p, bool make_automatic);
 void autogkstate_copy(void *_dst, void *_src, bool make_automatic);
 void autogkstate_free(void *_p, bool make_automatic);
