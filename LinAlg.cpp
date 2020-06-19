@@ -13641,7 +13641,6 @@ namespace alglib_impl {
 //      Courant Institute, Argonne National Lab, and Rice University
 //      February 29, 1992
 static bool rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVector *isgn, double *est, ae_int_t *kase) {
-   ae_int_t itmax;
    ae_int_t i;
    double t;
    bool flg;
@@ -13652,7 +13651,11 @@ static bool rcond_rmatrixestimatenorm(ae_int_t n, RVector *v, RVector *x, ZVecto
    AutoS double altsgn;
    AutoS double estold;
    AutoS double temp;
-   itmax = 5;
+   const ae_int_t itmax = 5;
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (*kase != 0) switch (jump) {
       case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5;
@@ -14475,11 +14478,13 @@ static bool rcond_cmatrixestimatenorm(ae_int_t n, CVector *v, CVector *x, double
    AutoS double altsgn;
    AutoS double estold;
    AutoS double temp;
-   ae_int_t itmax;
-   double safmin;
 // Executable Statements ..
-   itmax = 5;
-   safmin = ae_minrealnumber;
+   const ae_int_t itmax = 5;
+   const double safmin = ae_minrealnumber;
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (*kase != 0) switch (jump) {
       case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5;
@@ -20953,11 +20958,11 @@ bool fblscgiteration(fblslincgstate *state) {
    AutoS double betak;
    AutoS double v1;
    AutoS double v2;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
@@ -22552,11 +22557,11 @@ bool normestimatoriteration(normestimatorstate *state) {
    AutoS double v;
    AutoS double growth;
    AutoS double bestgrowth;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
@@ -23007,7 +23012,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
                *a = *d + z;
                *d -= bcmax / z * bcmis;
             // Compute B and the rotation matrix
-               tau = pythag2(*c, z);
+               tau = safepythag2(*c, z);
                *cs = z / tau;
                *sn = *c / tau;
                *b -= *c;
@@ -23016,7 +23021,7 @@ static void hsschur_aux2x2schur(double *a, double *b, double *c, double *d, doub
             // Complex eigenvalues, or real (almost) equal eigenvalues.
             // Make diagonal elements equal.
                sigma = *b + (*c);
-               tau = pythag2(sigma, temp);
+               tau = safepythag2(sigma, temp);
                *cs = sqrt(0.5 * (1 + fabs(sigma) / tau));
                *sn = -p / (tau * (*cs)) * hsschur_extschursign(1.0, sigma);
             // Compute [ AA  BB ] = [ A  B ] [ CS -SN ]
@@ -23705,7 +23710,7 @@ void internalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int
                      temp = 1 / rmax2(fabs(vv.xR[itemp]), smlnum);
                      p1 = nv + 1;
                      ae_v_muld(&vv.xR[1], 1, p1, temp);
-                     absw = pythag2(wr->xR[j], wi->xR[j]);
+                     absw = safepythag2(wr->xR[j], wi->xR[j]);
                      temp *= absw * absw;
                      matrixvectormultiply(h, l, l + nv + 1, l, l + nv, false, &vv, 1, nv + 1, 1.0, &v, 1, nv + 2, temp);
                      nv += 2;
@@ -24282,11 +24287,11 @@ bool eigsubspaceiteration(eigsubspacestate *state) {
    AutoS double vv;
    AutoS double v;
    AutoS ae_int_t convcnt;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0;
       default: goto Exit;

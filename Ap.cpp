@@ -31,13 +31,7 @@
 #   endif
 #endif
 
-namespace alglib_impl {
-// Core Code (Vectors, Matrices, Memory Management, etc.)
 // OS-specific includes
-#ifdef AE_USE_CPP
-} // end of namespace alglib_impl
-#endif
-
 #if AE_OS == AE_POSIX
 #   include <time.h>
 #   include <unistd.h>
@@ -56,13 +50,12 @@ namespace alglib_impl {
 #   include <windows.h>
 #endif
 
-#ifdef AE_USE_CPP
 namespace alglib_impl {
-#endif
+// Core Code (Vectors, Matrices, Memory Management, etc.)
 // local definitions
 #define x_nb 16
 #define AE_DATA_ALIGN 64
-#define AE_PTR_ALIGN sizeof(void*)
+#define AE_PTR_ALIGN sizeof(void *)
 #define AE_LITTLE_ENDIAN 1
 #define AE_BIG_ENDIAN 2
 #define AE_MIXED_ENDIAN 3
@@ -72,47 +65,13 @@ namespace alglib_impl {
 #define AE_LOCK_TESTS_BEFORE_YIELD 16
 #define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
-// IDs for set_dbg_value
-#define _ALGLIB_USE_ALLOC_COUNTER             0
-#define _ALGLIB_USE_DBG_COUNTERS              1
-#define _ALGLIB_USE_VENDOR_KERNELS          100
-#define _ALGLIB_VENDOR_MEMSTAT              101
-#define _ALGLIB_DEBUG_WORKSTEALING          200
-#define _ALGLIB_WSDBG_NCORES                201
-#define _ALGLIB_WSDBG_PUSHROOT_OK           202
-#define _ALGLIB_WSDBG_PUSHROOT_FAILED       203
-#define _ALGLIB_SET_GLOBAL_THREADING       1001
-#define _ALGLIB_SET_NWORKERS               1002
-
-// IDs for get_dbg_value
-#define _ALGLIB_GET_ALLOC_COUNTER             0
-#define _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE     1
-#define _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT    2
-#define _ALGLIB_GET_CORES_COUNT            1000
-#define _ALGLIB_GET_GLOBAL_THREADING       1001
-#define _ALGLIB_GET_NWORKERS               1002
-
-// Lock.
-//
-// This is internal structure which implements lock functionality.
-struct _lock {
-#if AE_OS == AE_POSIX
-   pthread_mutex_t mutex;
-#elif AE_OS == AE_WINDOWS
-   volatile ae_int_t *volatile p_lock;
-   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
-#else
-   bool is_locked;
-#endif
-};
-
 // Global flags, split into several char-sized variables in order
 // to avoid problem with non-atomic reads/writes (single-byte ops
 // are atomic on all modern architectures);
 //
 // Following variables are included:
 // * threading-related settings
-unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
+static unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
 
 // DESCRIPTION: recommended number of active workers:
 //              * positive value >= 1 is used to specify exact number of active workers
@@ -129,9 +88,9 @@ unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _
 #   if AE_NWORKERS <= 0
 #      error AE_NWORKERS must be positive number or not defined at all.
 #   endif
-ae_int_t _alglib_cores_to_use = 0;
+static ae_int_t _alglib_cores_to_use = 0;
 #else
-ae_int_t _alglib_cores_to_use = 0;
+static ae_int_t _alglib_cores_to_use = 0;
 #endif
 
 // Debug counters
@@ -144,12 +103,6 @@ bool _use_vendor_kernels = true;
 bool debug_workstealing = false; // Debug workstealing environment? False by default.
 ae_int_t dbgws_pushroot_ok = 0;
 ae_int_t dbgws_pushroot_failed = 0;
-
-#ifdef AE_SMP_DEBUGCOUNTERS
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
-__declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
-#endif
 
 // Allocation debugging
 bool _force_malloc_failure = false;
@@ -167,7 +120,7 @@ static unsigned char *sm_mem = NULL;
 #endif
 
 // These declarations are used to ensure that
-// sizeof(bool)=1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void*).
+// sizeof(bool)=1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
 // they will lead to syntax error otherwise (array size will be negative).
 //
 // you can remove them, if you want - they are not used anywhere.
@@ -182,70 +135,45 @@ static char _ae_int_t_must_be_pointer_sized[1 - 2*((int)sizeof(ae_int_t) - (int)
 // It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
 static volatile ae_int_t ae_never_change_it = 1;
 
-void ae_set_dbg_flag(ae_int64_t flag_id, ae_int64_t flag_val) {
-   if (flag_id == _ALGLIB_USE_ALLOC_COUNTER) {
-      _use_alloc_counter = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_USE_DBG_COUNTERS) {
-      _use_dbg_counters = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_USE_VENDOR_KERNELS) {
-      _use_vendor_kernels = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_DEBUG_WORKSTEALING) {
-      debug_workstealing = flag_val != 0;
-      return;
-   }
-   if (flag_id == _ALGLIB_SET_GLOBAL_THREADING) {
-      ae_set_global_threading((ae_uint64_t) flag_val);
-      return;
-   }
-   if (flag_id == _ALGLIB_SET_NWORKERS) {
-      _alglib_cores_to_use = (ae_int_t) flag_val;
-      return;
+void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
+   switch (flag_id) {
+      case _ALGLIB_ALLOC_COUNTER: _use_alloc_counter = flag_val != 0; break;
+      case _ALGLIB_TOTAL_ALLOC_SIZE: _use_dbg_counters = flag_val != 0; break;
+      case _ALGLIB_USE_VENDOR_KERNELS: _use_vendor_kernels = flag_val != 0; break;
+      case _ALGLIB_DEBUG_WORKSTEALING: debug_workstealing = flag_val != 0; break;
+      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t) flag_val); break;
+      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
    }
 }
 
-ae_int64_t ae_get_dbg_value(ae_int64_t id) {
-   if (id == _ALGLIB_GET_ALLOC_COUNTER)
-      return _alloc_counter;
-   if (id == _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE)
-      return _dbg_alloc_total;
-   if (id == _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT)
-      return _alloc_counter_total;
-   if (id == _ALGLIB_VENDOR_MEMSTAT) {
+ae_int64_t ae_get_dbg_value(debug_flag_t id) {
+   switch (id) {
+      case _ALGLIB_ALLOC_COUNTER: return _alloc_counter;
+      case _ALGLIB_TOTAL_ALLOC_SIZE: return _dbg_alloc_total;
+      case _ALGLIB_TOTAL_ALLOC_COUNT: return _alloc_counter_total;
 #if defined AE_MKL
-      return ae_mkl_memstat();
+      case _ALGLIB_VENDOR_MEMSTAT: return ae_mkl_memstat();
 #else
-      return 0;
+      case _ALGLIB_VENDOR_MEMSTAT: return 0;
 #endif
+   // Work-stealing counters
+#if defined AE_SMP
+      case _ALGLIB_WSDBG_NCORES: return ae_cores_count();
+#else
+      case _ALGLIB_WSDBG_NCORES: return 0;
+#endif
+      case _ALGLIB_WSDBG_PUSHROOT_OK: return dbgws_pushroot_ok;
+      case _ALGLIB_WSDBG_PUSHROOT_FAILED: return dbgws_pushroot_failed;
+#if defined AE_SMP
+      case _ALGLIB_CORES_COUNT: return ae_cores_count();
+#else
+      case _ALGLIB_CORES_COUNT: return 0;
+#endif
+      case _ALGLIB_GLOBAL_THREADING: return (ae_int64_t) ae_get_global_threading();
+      case _ALGLIB_NWORKERS: return (ae_int64_t) _alglib_cores_to_use;
+   // Unknown value.
+      default: return 0;
    }
-// workstealing counters
-   if (id == _ALGLIB_WSDBG_NCORES)
-#if defined AE_SMP
-      return ae_cores_count();
-#else
-      return 0;
-#endif
-   if (id == _ALGLIB_WSDBG_PUSHROOT_OK)
-      return dbgws_pushroot_ok;
-   if (id == _ALGLIB_WSDBG_PUSHROOT_FAILED)
-      return dbgws_pushroot_failed;
-   if (id == _ALGLIB_GET_CORES_COUNT)
-#if defined AE_SMP
-      return ae_cores_count();
-#else
-      return 0;
-#endif
-   if (id == _ALGLIB_GET_GLOBAL_THREADING)
-      return (ae_int64_t) ae_get_global_threading();
-   if (id == _ALGLIB_GET_NWORKERS)
-      return (ae_int64_t) _alglib_cores_to_use;
-// unknown value
-   return 0;
 }
 
 // This function sets default (global) threading model:
@@ -267,7 +195,7 @@ ae_uint64_t ae_get_global_threading() {
 }
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
-   union _u {
+   union {
       const void *ptr;
       ae_int_t iptr;
    } u;
@@ -282,6 +210,31 @@ void *ae_align(void *ptr, size_t alignment) {
    return result;
 }
 
+// The number of cores in the system: values < 1 may be returned.
+ae_int_t ae_cores_count();
+
+// This function causes the calling thread to relinquish the CPU.
+// The thread is moved to the end of the queue and some other thread gets to run.
+// NOTE:
+// *	this function should NOT be called when AE_OS is AE_OTHER_OS - the whole program will be abnormally terminated.
+void ae_yield();
+
+#if AE_OS == AE_POSIX
+ae_int_t ae_cores_count() { return sysconf(_SC_NPROCESSORS_ONLN); }
+//(@) Was: ae_int_t ae_cores_count() { long Cores = sysconf(_SC_NPROCESSORS_ONLN); return Cores <= 0 ? 1 : Cores; }
+void ae_yield() { sched_yield(); }
+#elif AE_OS == AE_WINDOWS
+ae_int_t ae_cores_count() {
+   SYSTEM_INFO sysInfo;
+   GetSystemInfo(&sysInfo);
+   return (ae_int_t)sysInfo.dwNumberOfProcessors;
+}
+void ae_yield() { if (!SwitchToThread()) Sleep(0); }
+#else
+ae_int_t ae_cores_count() { return 1; }
+void ae_yield() { abort(); }
+#endif
+
 // This function maps nworkers  number  (which  can  be  positive,  zero  or
 // negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
 // to "effective", strictly positive workers count.
@@ -295,23 +248,12 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
 // determine cores count
 #if defined AE_NWORKERS
    ncores = AE_NWORKERS;
-#elif AE_OS == AE_POSIX
-   {
-      long r = sysconf(_SC_NPROCESSORS_ONLN);
-      ncores = r <= 0 ? 1 : r;
-   }
-#elif AE_OS == AE_WINDOWS
-   SYSTEM_INFO sysInfo;
-   GetSystemInfo(&sysInfo);
-   ncores = (ae_int_t)(sysInfo.dwNumberOfProcessors);
 #else
-   ncores = 1;
+   ncores = ae_cores_count();
 #endif
    AE_CRITICAL_ASSERT(ncores >= 1);
 // map nworkers to its effective value
-   if (nworkers >= 1)
-      return nworkers > ncores ? ncores : nworkers;
-   return ncores + nworkers >= 1 ? ncores + nworkers : 1;
+   return nworkers >= 1? (nworkers > ncores ? ncores : nworkers): (ncores + nworkers >= 1 ? ncores + nworkers : 1);
 }
 
 // This function belongs to the family of  "optional  atomics",  i.e.  atomic
@@ -331,7 +273,7 @@ void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
 #if AE_OS == AE_WINDOWS
    while (true) {
    // perform conversion between ae_int_t* and void** without compiler warnings about indirection levels.
-      union _u {
+      union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
@@ -366,7 +308,7 @@ void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
 #if AE_OS == AE_WINDOWS
    while (true) {
    // perform conversion between ae_int_t* and void** without compiler warnings about indirection levels.
-      union _u {
+      union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
@@ -615,14 +557,6 @@ void aligned_free(void *block) {
    if (_use_alloc_counter)
       ae_optional_atomic_sub_i(&_alloc_counter, 1);
 #endif
-}
-
-void *eternal_malloc(size_t size) {
-   if (size == 0)
-      return NULL;
-   if (_force_malloc_failure)
-      return NULL;
-   return malloc(size);
 }
 
 // Allocate memory with automatic alignment.
@@ -1362,7 +1296,7 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
 //   do anything)
 // * for independent vectors of different sizes it allocates storage in  DST
 //   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+//   ACT_NEW_LOCATION, and DST->owner is set to true.
 // * for  independent  vectors   of  same  sizes  it does not perform memory
 //   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
 //   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
@@ -1381,13 +1315,13 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src) {
       return;
    }
    if (dst->cnt != src->cnt || dst->datatype != src->datatype) {
-      if (dst->owner == OWN_AE) ae_free(dst->x_ptr);
+      if (dst->owner) ae_free(dst->x_ptr);
       dst->x_ptr = ae_malloc((size_t)(src->cnt * ae_sizeof(src->datatype)));
       if (src->cnt != 0 && dst->x_ptr == NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_x_set_vector: out of memory");
       dst->last_action = ACT_NEW_LOCATION;
       dst->cnt = src->cnt;
       dst->datatype = src->datatype;
-      dst->owner = OWN_AE;
+      dst->owner = true;
    } else {
       if (dst->last_action == ACT_UNCHANGED) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_SAME_LOCATION) dst->last_action = ACT_SAME_LOCATION;
@@ -1407,7 +1341,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src) {
 //   do anything)
 // * for independent matrices of different sizes it allocates storage in DST
 //   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+//   ACT_NEW_LOCATION, and DST->owner is set to true.
 // * for  independent  matrices  of  same  sizes  it does not perform memory
 //   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
 //   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
@@ -1430,7 +1364,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       return;
    }
    if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
-      if (dst->owner == OWN_AE) ae_free(dst->x_ptr);
+      if (dst->owner) ae_free(dst->x_ptr);
       dst->rows = src->rows;
       dst->cols = src->cols;
       dst->stride = src->cols;
@@ -1438,7 +1372,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       dst->x_ptr = ae_malloc((size_t)(dst->rows * ((ae_int_t) dst->stride) * ae_sizeof(src->datatype)));
       if (dst->rows != 0 && dst->stride != 0 && dst->x_ptr == NULL) ae_break(ERR_OUT_OF_MEMORY, "ae_x_set_matrix: out of memory");
       dst->last_action = ACT_NEW_LOCATION;
-      dst->owner = OWN_AE;
+      dst->owner = true;
    } else {
       if (dst->last_action == ACT_UNCHANGED) dst->last_action = ACT_SAME_LOCATION;
       else if (dst->last_action == ACT_SAME_LOCATION) dst->last_action = ACT_SAME_LOCATION;
@@ -1465,12 +1399,12 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
 // * dst is assumed to be initialized. Its contents is freed before attaching to src.
 // * this function doesn't need TopFr because it can't fail (assuming correctly initialized src)
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
-   if (dst->owner == OWN_AE) ae_free(dst->x_ptr);
+   if (dst->owner) ae_free(dst->x_ptr);
    dst->x_ptr = src->xX;
    dst->last_action = ACT_NEW_LOCATION;
    dst->cnt = src->cnt;
    dst->datatype = src->datatype;
-   dst->owner = OWN_CALLER;
+   dst->owner = false;
 }
 
 // This function attaches x_matrix to ae_matrix's contents.
@@ -1484,14 +1418,14 @@ void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
 // * dst is assumed to be initialized. Its contents is freed before attaching to src.
 // * this function doesn't need TopFr because it can't fail (assuming correctly initialized src)
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
-   if (dst->owner == OWN_AE) ae_free(dst->x_ptr);
+   if (dst->owner) ae_free(dst->x_ptr);
    dst->rows = src->rows;
    dst->cols = src->cols;
    dst->stride = src->stride;
    dst->datatype = src->datatype;
    dst->x_ptr = src->xyR[0];
    dst->last_action = ACT_NEW_LOCATION;
-   dst->owner = OWN_CALLER;
+   dst->owner = false;
 }
 
 // This function clears x_vector. It does nothing  if vector is not owned by
@@ -1499,8 +1433,7 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
 //
 // dst                 vector
 void x_vector_free(x_vector *dst, bool make_automatic) {
-   if (dst->owner == OWN_AE)
-      aligned_free(dst->x_ptr);
+   if (dst->owner) aligned_free(dst->x_ptr);
    dst->x_ptr = NULL;
    dst->cnt = 0;
 }
@@ -2091,28 +2024,28 @@ bool x_force_hermitian(x_matrix *a) {
 
 bool ae_is_symmetric(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_is_symmetric(&x);
 }
 
 bool ae_is_hermitian(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_is_hermitian(&x);
 }
 
 bool ae_force_symmetric(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_force_symmetric(&x);
 }
 
 bool ae_force_hermitian(ae_matrix *a) {
    x_matrix x;
-   x.owner = OWN_CALLER;
+   x.owner = false;
    ae_x_attach_to_matrix(&x, a);
    return x_force_hermitian(&x);
 }
@@ -2253,7 +2186,7 @@ static bool ae_str2bool(const char *buf, const char **pasttheend) {
 // buf         buffer, at least 12 characters wide
 //             (11 chars for value, one for trailing zero)
 static void ae_int2str(ae_int_t v, char *buf) {
-   union _u {
+   union {
       ae_int_t ival;
       unsigned char bytes[9];
    } u;
@@ -2349,7 +2282,7 @@ static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
    const char *emsg = "ae_str2int: unable to read integer value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
-   union _u {
+   union {
       ae_int_t ival;
       unsigned char bytes[9];
    } u;
@@ -2446,7 +2379,7 @@ static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
 // buf         buffer, at least 12 characters wide
 //             (11 chars for value, one for trailing zero)
 static void ae_double2str(double v, char *buf) {
-   union _u {
+   union {
       double dval;
       unsigned char bytes[9];
    } u;
@@ -2504,7 +2437,7 @@ static double ae_str2double(const char *buf, const char **pasttheend) {
    const char *emsg = "ae_str2double: unable to read double value from stream";
    ae_int_t sixbits[12];
    ae_int_t sixbitsread, i;
-   union _u { double dval; unsigned char bytes[9]; } u;
+   union { double dval; unsigned char bytes[9]; } u;
 // skip leading spaces
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r') buf++;
 // Handle special cases
@@ -2565,168 +2498,128 @@ void ae_spin_wait(ae_int_t cnt) {
          ae_never_change_it--;
 }
 
-// This function causes the calling thread to relinquish the CPU. The thread
-// is moved to the end of the queue and some other thread gets to run.
-//
-// NOTE: this function should NOT be called when AE_OS is AE_OTHER_OS -  the
-//       whole program will be abnormally terminated.
-void ae_yield() {
-#if AE_OS == AE_POSIX
-   sched_yield();
-#elif AE_OS == AE_WINDOWS
-   if (!SwitchToThread())
-      Sleep(0);
-#else
-   abort();
-#endif
-}
+// Lock.
+// This is the internal structure which implements lock functionality.
+struct _lock;
 
-// This function initializes _lock structure which  is  internally  used  by
-// ae_lock high-level structure.
-//
-// _lock structure is statically allocated, no malloc() calls  is  performed
-// during its allocation. However, you have to call  _ae_free_lock_raw()  in
-// order to deallocate this lock properly.
-void _ae_init_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_init(&p->mutex, NULL);
-#elif AE_OS == AE_WINDOWS
-   p->p_lock = (ae_int_t *) ae_align((void *)(&p->buf), AE_LOCK_ALIGNMENT);
-   p->p_lock[0] = 0;
-#else
-   p->is_locked = false;
-#endif
-}
+// This function initializes a _lock structure which is internally used by ae_lock high-level structure.
+// The _lock structure is statically allocated, no malloc() calls are performed during its allocation.
+// However, you have to call _ae_free_lock_raw() in order to deallocate this lock properly.
+static inline void _ae_init_lock_raw(_lock *p);
 
-// This function acquires _lock structure.
-//
-// It is low-level workhorse utilized by ae_acquire_lock().
-void _ae_acquire_lock_raw(_lock *p) {
+// This function acquires a _lock structure.
+// It is the low-level workhorse function used by ae_acquire_lock().
+static inline void _ae_acquire_lock_raw(_lock *p);
+
+// This function releases a _lock structure.
+// It is the low-level workhorse function used by ae_release_lock().
+static inline void _ae_release_lock_raw(_lock *p);
+
+// This function frees _lock structure.
+static inline void _ae_free_lock_raw(_lock *p);
+
 #if AE_OS == AE_POSIX
+struct _lock {
+   pthread_mutex_t mutex;
+};
+static inline void _ae_init_lock_raw(_lock *p) { pthread_mutex_init(&p->mutex, NULL); }
+static inline void _ae_acquire_lock_raw(_lock *p) {
    ae_int_t cnt = 0;
-   while (true) {
-      if (pthread_mutex_trylock(&p->mutex) == 0)
-         return;
+   while (pthread_mutex_trylock(&p->mutex) != 0) {
       ae_spin_wait(AE_LOCK_CYCLES);
-      cnt++;
-      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
+      if (++cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0)
          ae_yield();
    }
+}
+static inline void _ae_release_lock_raw(_lock *p) { pthread_mutex_unlock(&p->mutex); }
+static inline void _ae_free_lock_raw(_lock *p) { pthread_mutex_destroy(&p->mutex); }
 #elif AE_OS == AE_WINDOWS
+struct _lock {
+   volatile ae_int_t *volatile p_lock;
+   char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
+};
+static inline void _ae_init_lock_raw(_lock *p) {
+   p->p_lock = (ae_int_t *) ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
+   p->p_lock[0] = 0;
+}
+static inline void _ae_acquire_lock_raw(_lock *p) {
+#ifdef AE_SMP_DEBUGCOUNTERS
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_acquisitions = 0;
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits = 0;
+   __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
+#   define BumpLock(X) (InterlockedIncrement((LONG volatile *)(X)))
+#else
+#   define BumpLock(X) (X)
+#endif
    ae_int_t cnt = 0;
-#   ifdef AE_SMP_DEBUGCOUNTERS
-   InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_acquisitions);
-#   endif
-   while (true) {
-      if (InterlockedCompareExchange((LONG volatile *)p->p_lock, 1, 0) == 0)
-         return;
+   BumpLock(&_ae_dbg_lock_acquisitions);
+   while (InterlockedCompareExchange((LONG volatile *)p->p_lock, 1, 0) != 0) {
       ae_spin_wait(AE_LOCK_CYCLES);
-#   ifdef AE_SMP_DEBUGCOUNTERS
-      InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_spinwaits);
-#   endif
-      cnt++;
-      if (cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0) {
-#   ifdef AE_SMP_DEBUGCOUNTERS
-         InterlockedIncrement((LONG volatile *)&_ae_dbg_lock_yields);
-#   endif
+      BumpLock(&_ae_dbg_lock_spinwaits);
+      if (++cnt % AE_LOCK_TESTS_BEFORE_YIELD == 0) {
+         BumpLock(&_ae_dbg_lock_yields);
          ae_yield();
       }
    }
+}
+static inline void _ae_release_lock_raw(_lock *p) { InterlockedExchange((LONG volatile *)p->p_lock, 0); }
+static inline void _ae_free_lock_raw(_lock *p) { }
 #else
+struct _lock {
+   bool is_locked;
+};
+static inline void _ae_init_lock_raw(_lock *p) { p->is_locked = false; }
+static inline void _ae_acquire_lock_raw(_lock *p) {
    AE_CRITICAL_ASSERT(!p->is_locked);
    p->is_locked = true;
-#endif
 }
-
-// This function releases _lock structure.
-//
-// It is low-level lock function which is used by ae_release_lock.
-void _ae_release_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_unlock(&p->mutex);
-#elif AE_OS == AE_WINDOWS
-   InterlockedExchange((LONG volatile *)p->p_lock, 0);
-#else
-   p->is_locked = false;
+static inline void _ae_release_lock_raw(_lock *p) { p->is_locked = false; }
+static inline void _ae_free_lock_raw(_lock *p) { }
 #endif
-}
 
-// This function frees _lock structure.
-void _ae_free_lock_raw(_lock *p) {
-#if AE_OS == AE_POSIX
-   pthread_mutex_destroy(&p->mutex);
-#endif
-}
-
-// This function initializes ae_lock structure.
-//
+// This function initializes a free ae_lock structure.
 // Inputs:
-//     lock                -   pointer to lock structure, must be zero-filled
-//     make_automatic                -   if true, lock object is added to automatic
-//                             memory management list.
-//
-// NOTE: as a special exception, this function allows you to specify TopFr == NULL.
-//       In this case all exception arising during construction
-//       are handled as critical failures, with abort() being called.
-//       make_automatic must be false on such calls.
-void ae_init_lock(ae_lock *lock, bool make_automatic) {
-   _lock *p;
-   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
-   if (TopFr == NULL) {
+//	lock:		a pointer to the lock structure, must be zero-filled
+//	is_static:	true if the lock is to be made "eternal";
+//			i.e. expected to persist until the end of the execution of the program.
+//	make_automatic:	true if the lock object is to be added to automatic memory management list.
+// NOTES:
+// *	as a special exception, this function allows you to specify TopFr == NULL.
+//	In this case all exception arising during construction are handled as critical failures, with abort() being called.
+//	make_automatic must be false on such calls.
+// *	Eternal locks can not be deallocated (cleared) and do not increase debug allocation counters.
+//	Errors during allocation of eternal locks are considered critical exceptions and handled by calling abort().
+void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
+   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof *lock));
+   bool is_auto = !is_static && TopFr != NULL;
+   if (!is_auto) {
       AE_CRITICAL_ASSERT(!make_automatic);
       ae_state_init();
-      ae_init_lock(lock, false);
-      ae_state_clear();
-      return;
    }
-   lock->eternal = false;
-   ae_db_init(&lock->db, sizeof(_lock), make_automatic);
-   lock->lock_ptr = lock->db.ptr;
-   p = (_lock *) lock->lock_ptr;
-   _ae_init_lock_raw(p);
+   lock->is_static = is_static;
+   size_t size = sizeof(_lock);
+   ae_db_init(&lock->db, size, make_automatic);
+   lock->lock_ptr = !is_static? lock->db.ptr: size == 0 || _force_malloc_failure? NULL: malloc(size);
+   _ae_init_lock_raw((_lock *) lock->lock_ptr);
+   if (!is_auto) ae_state_clear();
 }
 
-// This function initializes "eternal" ae_lock structure which  is  expected
-// to persist until the end of the execution of the program.  Eternal  locks
-// can not be deallocated (cleared) and  do  not  increase debug  allocation
-// counters.  Errors  during  allocation  of eternal  locks  are  considered
-// critical exceptions and handled by calling abort().
-//
-// Inputs:
-//     lock                -   pointer to lock structure, must be zero-filled
-//     make_automatic                -   if true, lock object is added to automatic
-//                             memory management list.
-void ae_init_lock_eternal(ae_lock *lock) {
-   _lock *p;
-   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
-   lock->eternal = true;
-   lock->lock_ptr = eternal_malloc(sizeof(_lock));
-   p = (_lock *) lock->lock_ptr;
-   _ae_init_lock_raw(p);
-}
-
-// This function acquires lock. In case lock is busy, we perform several
-// iterations inside tight loop before trying again.
+// This function acquires a lock.
+// In case lock is busy, we perform several iterations inside tight loop before trying again.
 void ae_acquire_lock(ae_lock *lock) {
-   _lock *p;
-   p = (_lock *) lock->lock_ptr;
-   _ae_acquire_lock_raw(p);
+   _ae_acquire_lock_raw((_lock *) lock->lock_ptr);
 }
 
-// This function releases lock.
+// This function releases a lock.
 void ae_release_lock(ae_lock *lock) {
-   _lock *p;
-   p = (_lock *) lock->lock_ptr;
-   _ae_release_lock_raw(p);
+   _ae_release_lock_raw((_lock *) lock->lock_ptr);
 }
 
-// This function frees ae_lock structure.
+// This function frees a lock.
 void ae_free_lock(ae_lock *lock) {
-   _lock *p;
-   AE_CRITICAL_ASSERT(!lock->eternal);
-   p = (_lock *) lock->lock_ptr;
-   if (p != NULL)
-      _ae_free_lock_raw(p);
+   AE_CRITICAL_ASSERT(!lock->is_static);
+   _lock *p = (_lock *) lock->lock_ptr;
+   if (p != NULL) _ae_free_lock_raw(p);
    ae_db_free(&lock->db);
 }
 
@@ -2759,7 +2652,7 @@ void ae_shared_pool_init(void *_dst, bool make_automatic) {
    dst->frame_entry.deallocator = ae_shared_pool_destroy;
    dst->frame_entry.ptr = dst;
    if (make_automatic) ae_db_attach(&dst->frame_entry);
-   ae_init_lock(&dst->pool_lock, false);
+   ae_init_lock(&dst->pool_lock, false, false);
 }
 
 // This function clears all dynamically allocated fields of the pool except
@@ -6408,47 +6301,21 @@ complex csqr(const complex &z) {
    return complex(z.x * z.x - z.y * z.y, 2 * z.x * z.y);
 }
 
-void setnworkers(ae_int_t nworkers) {
 #ifdef AE_HPC
-   alglib_impl::ae_set_cores_to_use(nworkers);
-#endif
-}
-
-void setglobalthreading(const xparams settings) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_global_threading(settings);
-#endif
-}
-
-ae_int_t getnworkers() {
-#ifdef AE_HPC
-   return alglib_impl::ae_get_cores_to_use();
+void setnworkers(ae_int_t nworkers) { alglib_impl::ae_set_cores_to_use(nworkers); }
+void setglobalthreading(const xparams settings) { alglib_impl::ae_set_global_threading(settings); }
+ae_int_t getnworkers() { return alglib_impl::ae_get_cores_to_use(); }
+ae_int_t _ae_cores_count() { return alglib_impl::ae_cores_count(); }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { alglib_impl::ae_set_global_threading(flg_value); }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return alglib_impl::ae_get_global_threading(); }
 #else
-   return 1;
+void setnworkers(ae_int_t nworkers) { }
+void setglobalthreading(const xparams settings) { }
+ae_int_t getnworkers() { return 1; }
+ae_int_t _ae_cores_count() { return 1; }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return _ALGLIB_FLG_THREADING_SERIAL; }
 #endif
-}
-
-ae_int_t _ae_cores_count() {
-#ifdef AE_HPC
-   return alglib_impl::ae_cores_count();
-#else
-   return 1;
-#endif
-}
-
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) {
-#ifdef AE_HPC
-   alglib_impl::ae_set_global_threading(flg_value);
-#endif
-}
-
-alglib_impl::ae_uint64_t _ae_get_global_threading() {
-#ifdef AE_HPC
-   return alglib_impl::ae_get_global_threading();
-#else
-   return _ALGLIB_FLG_THREADING_SERIAL;
-#endif
-}
 
 // Level 1 BLAS functions
 double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
@@ -7459,10 +7326,10 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   is_frozen_proxy = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, 0, datatype, false);
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, 0, datatype, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -7472,10 +7339,10 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      is_frozen_proxy = false, This = NULL, set_error_flag(msg); return;
+      owner = true, This = NULL, set_error_flag(msg); return;
 #endif
    }
-   is_frozen_proxy = true, This = e_ptr;
+   owner = false, This = e_ptr;
 }
 
 ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype) {
@@ -7484,12 +7351,12 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
    alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::ae_vector_wrapper: source is not initialized");
    alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_vector_wrrapper::ae_vector_wrapper: datatype check failed");
-   is_frozen_proxy = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_copy(This, rhs.This, false);
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -7499,7 +7366,7 @@ void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::setlength: This == NULL (array was not correctly initialized)");
-   alglib_impl::ae_assert(!is_frozen_proxy, "ae_vector_wrapper::setlength: This is frozen proxy array");
+   alglib_impl::ae_assert(owner, "ae_vector_wrapper::setlength: This is frozen proxy array");
    alglib_impl::ae_vector_set_length(This, iLen);
    alglib_impl::ae_state_clear();
 }
@@ -7508,7 +7375,7 @@ ae_int_t ae_vector_wrapper::length() const { return This == NULL? 0: This->cnt; 
 
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr) {
    if (This == &Obj) ae_vector_free(This, false);
-   is_frozen_proxy = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init_attach_to_x(This, new_ptr, false);
+   owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init_attach_to_x(This, new_ptr, false);
 }
 
 const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs) {
@@ -7518,7 +7385,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
    alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized destination)");
    alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_vector_wrapper::assign: incorrect assignment to array (types do not match)");
-   if (is_frozen_proxy) alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
+   if (!owner) alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
    if (rhs.This->cnt != This->cnt) ae_vector_set_length(This, rhs.This->cnt);
    memcpy(This->xX, rhs.This->xX, This->cnt*alglib_impl::ae_sizeof(This->datatype));
    alglib_impl::ae_state_clear();
@@ -7535,7 +7402,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
    {
       alglib_impl::ae_state_init();
       TryCatch()
-      is_frozen_proxy = false, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)(svec.size()), datatype, false);
+      owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)(svec.size()), datatype, false);
       alglib_impl::ae_state_clear();
    }
       for (i = 0; i < svec.size(); i++) switch (datatype) {
@@ -7634,14 +7501,14 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(!is_frozen_proxy, "read_1d_array::attach_to_ptr: unable to attach proxy object to something else");
+   alglib_impl::ae_assert(owner, "read_1d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(iLen > 0, "read_1d_array::attach_to_ptr: non-positive length");
    x.cnt = iLen;
    x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
+   x.owner = false;
    x.last_action = alglib_impl::ACT_UNCHANGED;
    x.x_ptr = pContent;
    attach_to(&x);
@@ -7689,10 +7556,10 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   is_frozen_proxy = false, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, 0, 0, datatype, false);
+   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, 0, 0, datatype, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -7702,10 +7569,10 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl:
 #if !defined AE_NO_EXCEPTIONS
       ThrowError(msg);
 #else
-      is_frozen_proxy = false, This = NULL, set_error_flag(msg); return;
+      owner = true, This = NULL, set_error_flag(msg); return;
 #endif
    }
-   is_frozen_proxy = true, This = e_ptr;
+   owner = false, This = e_ptr;
 }
 
 ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype) {
@@ -7714,10 +7581,10 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   is_frozen_proxy = false, This = NULL;
+   owner = true, This = NULL;
    if (rhs.This != NULL) {
       alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed");
       This = &Obj, memset(This, 0, sizeof *This), ae_matrix_copy(This, rhs.This, false);
@@ -7732,7 +7599,7 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::setlength: p_mat == NULL (array was not correctly initialized)");
-   alglib_impl::ae_assert(!is_frozen_proxy, "ae_matrix_wrapper::setlength: attempt to resize proxy array");
+   alglib_impl::ae_assert(owner, "ae_matrix_wrapper::setlength: attempt to resize proxy array");
    alglib_impl::ae_matrix_set_length(This, rows, cols);
    alglib_impl::ae_state_clear();
 }
@@ -7744,7 +7611,7 @@ ae_int_t ae_matrix_wrapper::getstride() const { return This == NULL? 0: This->st
 
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr) {
    if (This == &Obj) ae_matrix_free(This, false);
-   is_frozen_proxy = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init_attach_to_x(This, new_ptr, false);
+   owner = false, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init_attach_to_x(This, new_ptr, false);
 }
 
 const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
@@ -7755,7 +7622,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
    alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to matrix (uninitialized destination)");
    alglib_impl::ae_assert(rhs.This != NULL, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to array (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to array (types dont match)");
-   if (is_frozen_proxy) {
+   if (!owner) {
       alglib_impl::ae_assert(rhs.This->rows == This->rows, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to proxy array (sizes dont match)");
       alglib_impl::ae_assert(rhs.This->cols == This->cols, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to proxy array (sizes dont match)");
    }
@@ -7775,7 +7642,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
    {
       alglib_impl::ae_state_init();
       TryCatch()
-      is_frozen_proxy = false, This = &Obj, memset(This, 0, sizeof *This);
+      owner = true, This = &Obj, memset(This, 0, sizeof *This);
       if (smat.size() != 0)
          ae_matrix_init(This, (ae_int_t)(smat.size()), (ae_int_t)(smat[0].size()), datatype, false);
       else
@@ -7895,16 +7762,16 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
 #if !defined AE_NO_EXCEPTIONS
       ThrowErrorMsg();
 #else
-      is_frozen_proxy = false, This = NULL, set_error_msg(); return;
+      owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(!is_frozen_proxy, "real_2d_array::attach_to_ptr: unable to attach proxy object to something else");
+   alglib_impl::ae_assert(owner, "real_2d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(irows > 0 && icols > 0, "real_2d_array::attach_to_ptr: non-positive length");
    x.rows = irows;
    x.cols = icols;
    x.stride = icols;
    x.datatype = alglib_impl::DT_REAL;
-   x.owner = alglib_impl::OWN_CALLER;
+   x.owner = false;
    x.last_action = alglib_impl::ACT_UNCHANGED;
    x.x_ptr = pContent;
    attach_to(&x);

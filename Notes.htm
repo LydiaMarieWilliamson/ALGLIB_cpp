@@ -598,41 +598,37 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 ∙	The reprogramming, itself, will be under GPL, except that recoding, repairs, and other additions made,
 	particularly in DSP, file {en/de}-coding, video/music/sound processing, time-frequency analysis,
 	will be made available for the commercial version to use, except those derived from other GPL-sources.
+∙	Full integration of a C++ version of the Time Frequency Toolkit (currently in MATLAB)
+	or the equivalent into FastTransforms is planned.
 ∙	Full integration of GMP (as part of the expanded FastTransforms / DSP module)
-	and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules).
+	and a C/C++ version of LAPACK (as part of the expanded LinAlg and Solvers modules) are both planned.
 ∙	DSP and Time-Frequency analysis; file-transfer; voice generation/recognition, computer vision, sound and video production
+	is also planned.
+∙	Expansion of serialization/deserialization routines to include I/O for different file formats.
+∙	Possible integration with a refactored C++ version FFMPEG++, of FFMPEG, is undergoing evaluation.
+∙	Possible integration of a refactored C++ GUI-free version of Audacity is undergoing evaluation.
 ∙	For POSIX non-compliant configurations, the user assumes primary responsibility for maintenance.
 	No support will be provided, but corrections or fixes reported will be noted, tested (where possible) and added.
 ∙	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16 manual.
-∙	C99 compiler would be needed for alglib_impl -- not tested or verified.
-∙	TestC works with alglib_impl and is C.
+∙	The alglib_impl namespace in ALGLIB was mostly in C, as was TestC.cpp.
 ∙	Support for C is now moved away from in favor of nativizing the C++ code.
 	The Idw{0,1}.c files are a demonstration of possible future directions; we're also re-examining ALGLIB Version 2.
 	The ALGLIB library's infrastructure is naturally tailored for C++; laden with idioms that practically scream out "C++!".
-	Trying to make this suitable for C (and to then put a C++ wrapper on top of this)
-	would be much like trying to rewrite a Russian classic, like Alexander Pushkin's "Eugene Onegin" in English,
-	to frame it in contemporary US American life, and then translate the result back into Russian.
-	(It qualifies as 19th century Russian Hip Hop or rap that could actually be put into a contemporary hip hop DJ loop, but that's a major reworking.)
-	The two languages are over 5000 years removed from their common ancestor, with deep incongruities that are material to any translation project.
 ∙	Test{I,X,Y,Z} work with alglib and are C++.
 ∙	The Makefile and revisions have only been tried with Linux:x86:GCC.
 ∙	The revision to handle the rounding on the FP unit was only added in for Linux:x86:GCC.
 ∙	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
-	Included in the "structural" changes was a normalization of the ordering (determined automatically with the aid of the compiler)
-	of the routines and extraction of a dependency list; and various equivalence transforms. 
+	The initial "structural" changes made, before actual recoding included a normalization of the ordering
+	(determined automatically with the aid of the compiler) of the routines and extraction of a dependency list;
+	and various equivalence transforms. 
 ∙	The God-objects in alglib_impl (ae_state) and RCOMM routines were removed.
-	This means that some of the static or global variables they are replaced by would need to be made thread-local (as indicated).
+	For the time being, static and global variable are no longer thread-local.
 	Only the commercial version has support for multi-processors or multi-threading;
 	but a small amount of it has crept into the GPL version in test_x and inherited, from this, in ALGLIB++'s TestX file.
-∙	The partial compilation dependency includes are not present;
-	instead, the modules are collated and the minimal dependency network is sorted out and documented separately.
+∙	The partial compilation dependency includes from ALGLIB are not present.
+	Instead, the modules are collated and the minimal dependency network is sorted out and documented separately.
 	Intra-module and extra-module dependencies are distinguished.
 	There's enough information here to separate out the modules and create a suitable Makefile.
-∙	No non-commercial support for multi-threading, my recommendation is to keep it out of the GPL code (and out of TestX);
-	except maybe to provide a version of the GPL with it suitable for 2011 C or C++,
-	with the native support provided for threading using the thread-local attribute.
-	If ALGLIB continues to phase multi-threaded support into its GPL code (with or without C/C++-11)
-	it will lose the market to sell it its commercial version in.
 ∙	The order of
 		minlm_lmprepare(...), minlmsetacctype(...), minlmsetcond(...)
 	is switched to:
@@ -667,10 +663,8 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	―	Type_copy(Type *A, const Type *B),
 	―	Type_free(Type *A),
 	―	Type_move(Type *A, const Type *B).
-∙	Different/expanded version of the testing routines for the SpecialFunctions modules, including forward/inverse pair testing.
-∙	A possible redefinition of the SpecialFunctions module using the interpolation methods in ALGLIB itself.
-∙	Full integration of the Time Frequency Toolkit (currently in MATLAB) or the equivalent into FastTransforms.
-∙	Expansion of serialization/deserialization routines to include I/O for different file formats.
+∙	Different/expanded version of the testing routines is planned for SpecialFunctions, including forward/inverse pair testing.
+∙	A possible redefinition of SpecialFunctions using the interpolation methods in ALGLIB itself is planned.
 </pre>
 </p>
 <p>
@@ -678,8 +672,9 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 <pre class=narration>
 00	Comment-layout was redone to make comments conspicuous to "grep" and other search utilities.
 	Elimination of parameter comments for ae_{vector,matrix} and replacement by pointer typedefs {B,C,R,Z}{Vector,Matrix}.
-00	Indent was used to normalize the layout.
+	Indent was used to normalize the layout.
 01	The original version: ALGLIB 3.15.0.
+	Many of the revisions described in the previous section were implemented here and in the previous stage.
 02	The allocation counters were fully turned on.
 03	The rcomm-related structures removed and replaced by an integer "stage" variable; the AutoS macro added (for "static Thread_local").
 04	The FP operations removed, except for the FP comparison operations.
@@ -746,9 +741,10 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Corrections in the comments &amp; printouts; e.g.
 		"launcn" → "launch" "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
 		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
-		"⋯intial⋯" → "⋯initial⋯".
+		"⋯intial⋯" → "⋯initial⋯",
+		"VIMP⋯" → "VIPM⋯".
 	Normalized all test routines and flags in TestC.cpp to true on success, false on failure.
-	Normalize comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
+	Normalized comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
 	First round of normalization of comments &amp; documentation.
 33	Further cleanup of unused/stub/legacy code from ALGLIB:
 	Normalized test routines and flags in Test{X,Z}.cpp to *Ok; and true on success, false on error.
@@ -781,6 +777,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 		ae_str2{bool,int,int64,double}(), ae_{bool,int,int64,double}2str()
 		my_stricmp() filter_spaces() str_{vector,matrix}_create()
 		parse_{bool,int,real,complex}_delim() _parse_real_delim() arraytostring()
+	Made all _alglib* global variables in Ap.cpp static.
 	Inverted my_stricmp() into a bool-returning function and renamed it strimatch().
 	Remade CPU_SSE2 = 1 in Ap.h into an enum typedef ae_cpuid_t.
 	Lifted the return type of ae_cpuid() in Ap.cpp and the type of CurCPU to ae_cpuid_t.
@@ -794,9 +791,48 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Removed countnz{1,2}() from AlgLibInternal.{cpp,h} ― they are unused.
 	Removed idivup() from AlgLibInternal.{cpp,h}; replacing idivup(a,b) by the operation (a + b - 1) / b.
 	Removed rmul{2,3}() from AlgLibInternal.{cpp,h}; replacing rmul2(a,b) by (double)a * b, rmul3(a,b,c) by (double)a * b * c.
-34	Preliminary work for the inclusion of multi-threading (mostly still forthcoming).
-	Consolidation of all system-dependent routines for locks and threads.
-	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
+34	Preliminary work for the inclusion of a new multi-threading / concurrency core.
+	OS-dependent low-level lock routines in Ap.cpp are consolidated.
+	Consolidation of all system-dependent routines for locks and threads in Test{C,X}.cpp and Ap.{cpp,h}.
+	―	mutex-related system-dependent primitives are encapsulated in TestC.cpp.
+	―	thread-readed system-dependent primitives are encapsulated in Test{C,X}.cpp; some of them are tied to Ap.{cpp,h}.
+	Still deciding on the multi-threading/concurrency architecture to devise and use.
+	Assessing different implementations of the Pi Calculus as candidates.
+	Further distancing from C to C++: AE_USE_CPP and AE_USE_CPP_BOOL are assumed and removed.
+	AE_USE_CPP_SERIALIZATION and AE_USE_CPP_ERROR_HANDLING are assumed, but left intact.
+	Consolidation of all system-dependent routines for locks and threads in Test{C,X}.cpp and Ap.{cpp,h}.
+	―	Synthesis of alglib_impl::ae_count_cores()
+	Made all _alglib* global variables in Ap.cpp static.
+	eternal_malloc() embedded in ae_init_lock_eternal() and eliminated.
+	ae_init_lock_eternal(ae_lock *lock) combined into ae_init_lock(ae_lock *lock, bool make_automatic) as:
+	―	ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
+	with
+	―	is_static = true, make_automatic = false for ae_init_lock_eternal(),
+	―	is_static = false for ae_init_lock().
+	Renamed ae_lock::eternal ae_lock::is_static.
+	OWN_CALLER, OWN_AE remade into boolean (OWN_CALLER = false, OWN_AE = true)
+	{x_string,x_vector,x_matrix}::owner redefined from enum { OWN_CALLER, OWN_AE } to boolean.
+	ae_{vector,matrix}_wrapper::is_frozen_proxy inverted and renamed ae_{vector,matrix}_wrapper::owner.
+	AE_{{,PARALLEL_}SINGLECORE,{SEQUENTIAL_,PARALLEL_}MULTICORE} remade into an enum; AE_NOENV = 0 added.
+	AE_TEST renamed into a constant TestEnv as declared as the enum type.
+	Multi-branch #if conditionals for the enum made into switch statements.
+	Remade both sets of debug flags
+	―	_ALGLIB_USE_{ALLOC_COUNTER,DBG_COUNTERS,VENDOR_KERNELS}
+	―	_ALGLIB_VENDOR_MEMSTAT
+	―	_ALGLIB_DEBUG_WORKSTEALING
+	―	_ALGLIB_WSDBG_{NCORES,PUSHROOT_{OK,FAILED}}
+	―	_ALGLIB_SET_{GLOBAL_THREADING,NWORKERS}
+	―	_ALGLIB_GET_{ALLOC_COUNTER,CUMULATIVE_ALLOC_{SIZE,COUNT},CORES_COUNT,GLOBAL_THREADING,NWORKERS}
+	into an enum debug_flag_t, renaming and merging them where they overlap
+	Renamed ae_set_dbg_flag() as ae_set_dbg_value() - as indicated in the comments in ALGLIB.
+	Converted all multi-branch statements involving debug_flag_t into switch statements.
+	Raised the prototypes of ae_[sg]et_dbg_value() to:
+	―	void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
+	―	ae_int64_t ae_get_dbg_value(debug_flag_t id);
+	Removed pythag2() from AlgLibInternal.{cpp,h} - it is a duplicate of safepythag2(); replaced pythag2() in LinAlg.cpp by safepythag2().
+35	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
+	References to MinCGSetGradientCheck() in the comments removed.
+	The *SetGradientCheck() functions have almost all been replaced by OptGuard functions in version 3.16.0.
 </pre>
 </p>
 <p>
@@ -900,6 +936,9 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 33	2278 3497 3510 3279 1583852957 227
 34	2288 3521 3500 3274 1583869463 // (Ended early to make a last-minute change to the display format of TestC.cpp.)
 34	2262 3413 3510 3248 1583869582 218
+34	2278 3521 3510 3245 1586305481 213 // Resumed from a temporary suspension, bunkering down to await the passing of a worldwide plague.
+35	2278 3402 3449 3266 1589855728 221 // Minor changes, following reconciliation with the main (and internal) branch of ALGLIB++.
+35	2252 3485 3510 3265 1592593244 234
 </pre>
 </p>
 </div>

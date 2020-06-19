@@ -4840,11 +4840,11 @@ bool linlsqriteration(linlsqrstate *state) {
    AutoS ae_int_t summn;
    AutoS double bnorm;
    AutoS ae_int_t i;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6;
@@ -6017,11 +6017,11 @@ bool nleqiteration(nleqstate *state) {
    AutoS double mu;
    AutoS double stepnorm;
    AutoS bool b;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3; case 4: goto Resume4;
       default: goto Exit;
@@ -7102,11 +7102,11 @@ bool lincgiteration(lincgstate *state) {
    AutoS double uvar;
    AutoS double bnorm;
    AutoS double v;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6; case 7: goto Resume7;

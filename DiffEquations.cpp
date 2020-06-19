@@ -160,11 +160,11 @@ bool odesolveriteration(odesolverstate *state) {
    AutoS double err;
    AutoS double maxgrowpow;
    AutoS ae_int_t klimit;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0;
       default: goto Exit;

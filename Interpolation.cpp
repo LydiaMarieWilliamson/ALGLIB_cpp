@@ -17370,11 +17370,11 @@ bool lsfititeration(lsfitstate *state) {
    AutoS ae_int_t j;
    AutoS ae_int_t j1;
    AutoS ae_int_t info;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4;/*case 5: goto Resume5;*/case 6: goto Resume6; case 7: goto Resume7;

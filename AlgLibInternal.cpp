@@ -6152,24 +6152,6 @@ void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_
    }
 }
 
-double pythag2(double x, double y) {
-   double w;
-   double xabs;
-   double yabs;
-   double z;
-   double result;
-   xabs = fabs(x);
-   yabs = fabs(y);
-   w = rmax2(xabs, yabs);
-   z = rmin2(xabs, yabs);
-   if (z == 0.0) {
-      result = w;
-   } else {
-      result = w * sqrt(1 + ae_sqr(z / w));
-   }
-   return result;
-}
-
 void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work) {
    ae_int_t arows;
    ae_int_t acols;
@@ -6615,14 +6597,11 @@ static void linmin_mcstep(double *stx, double *fx, double *dx, double *sty, doub
 bool mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *stp, double stpmax, double gtol, ae_int_t *info, ae_int_t *nfev, RVector *wa, linminstate *state, ae_int_t *stage) {
    ae_int_t i;
    double v;
-   double p5;
-   double p66;
-   double zero;
 // init
-   p5 = 0.5;
-   p66 = 0.66;
+   const double p5 = 0.5;
+   const double p66 = 0.66;
    state->xtrapf = 4.0;
-   zero = 0.0;
+   const double zero = 0.0;
    if (stpmax == 0.0) {
       stpmax = linmin_defstpmax;
    }
@@ -6632,13 +6611,17 @@ bool mcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *s
    if (*stp > stpmax) {
       *stp = stpmax;
    }
-// Main cycle
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (*stage > 0) switch (*stage) {
    // case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4;
       default: goto Exit;
    }
 Spawn:
+// Main cycle
 // NEXT
    *stage = 2;
 // Resume2:
@@ -6855,11 +6838,11 @@ void armijocreate(ae_int_t n, RVector *x, double f, RVector *s, double stp, doub
 bool armijoiteration(armijostate *state) {
    AutoS double v;
    AutoS ae_int_t n;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;

@@ -8439,8 +8439,6 @@ void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1r
 //                     * -8    internal integrity control  detected  infinite
 //                             or NAN values in  function/gradient.  Abnormal
 //                             termination signalled.
-//                     * -7    gradient verification failed.
-//                             See MinCGSetGradientCheck() for more information.
 //                     *  1    relative function improvement is no more than
 //                             EpsF.
 //                     *  2    relative step is no more than EpsX.

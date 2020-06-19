@@ -5903,7 +5903,7 @@ void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f);
 //                       decision forests
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
 
@@ -5918,7 +5918,7 @@ void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval);
 //                     * 0 = baseline dense RDF
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype);
 
@@ -5934,7 +5934,7 @@ void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype
 //                     * 2 = strong split at the best point of the range (default)
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength);
 

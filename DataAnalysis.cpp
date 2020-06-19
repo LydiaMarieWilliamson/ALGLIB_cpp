@@ -14131,21 +14131,22 @@ static void logit_mnlmcstep(double *stx, double *fx, double *dx, double *sty, do
 // JORGE J. MORE', DAVID J. THUENTE
 static bool logit_mnlmcsrch(ae_int_t n, RVector *x, double *f, RVector *g, RVector *s, double *stp, ae_int_t *info, ae_int_t *nfev, RVector *wa, logitmcstate *state, ae_int_t *stage) {
    double v;
-   double p5;
-   double p66;
-   double zero;
 // init
-   p5 = 0.5;
-   p66 = 0.66;
+   const double p5 = 0.5;
+   const double p66 = 0.66;
    state->xtrapf = 4.0;
-   zero = 0.0;
-// Main cycle
+   const double zero = 0.0;
+// Manually threaded two-way signalling.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (*stage > 0) switch (*stage) {
    // case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       case 4: goto Resume4;
       default: goto Exit;
    }
 Spawn:
+// Main cycle
 // NEXT
    *stage = 2;
 // Resume2:
@@ -18750,11 +18751,11 @@ static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int
    AutoS ae_int_t cursize;
    AutoS ae_int_t idx0;
    AutoS ae_int_t idx1;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (session->PQ >= 0) switch (session->PQ) {
       case 0: goto Resume0;
       default: goto Exit;
@@ -24271,7 +24272,7 @@ void dfbuildersetsubsampleratio(decisionforestbuilder *s, double f) {
 //                       decision forests
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetseed(decisionforestbuilder *s, ae_int_t seedval) {
    s->rdfglobalseed = seedval;
@@ -24288,7 +24289,7 @@ void dfbuildersetseed(decisionforestbuilder *s, ae_int_t seedval) {
 //                     * 0 = baseline dense RDF
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfalgo(decisionforestbuilder *s, ae_int_t algotype) {
    ae_assert(algotype == 0, "dfbuildersetrdfalgo: unexpected algotype");
@@ -24307,7 +24308,7 @@ void dfbuildersetrdfalgo(decisionforestbuilder *s, ae_int_t algotype) {
 //                     * 2 = strong split at the best point of the range (default)
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfsplitstrength(decisionforestbuilder *s, ae_int_t splitstrength) {
    ae_assert(splitstrength == 0 || splitstrength == 1 || splitstrength == 2, "dfbuildersetrdfsplitstrength: unexpected split type");
@@ -28213,7 +28214,7 @@ void dfbuildersetsubsampleratio(const decisionforestbuilder &s, const double f) 
 //                       decision forests
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval) {
    alglib_impl::ae_state_init();
@@ -28233,7 +28234,7 @@ void dfbuildersetseed(const decisionforestbuilder &s, const ae_int_t seedval) {
 //                     * 0 = baseline dense RDF
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype) {
    alglib_impl::ae_state_init();
@@ -28254,7 +28255,7 @@ void dfbuildersetrdfalgo(const decisionforestbuilder &s, const ae_int_t algotype
 //                     * 2 = strong split at the best point of the range (default)
 //
 // Outputs:
-//     S           -   decision forest builder, see
+//     S           -   decision forest builder
 // ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 void dfbuildersetrdfsplitstrength(const decisionforestbuilder &s, const ae_int_t splitstrength) {
    alglib_impl::ae_state_init();

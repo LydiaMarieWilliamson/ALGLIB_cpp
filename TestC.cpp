@@ -2449,11 +2449,11 @@ static bool testsparseunit_generatenext(sparsegenerator *g, RMatrix *da, sparsem
    AutoS double v;
    SetMatrix(da);
    SetObj(sparsematrix, sa);
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (g->PQ >= 0) switch (g->PQ) {
       case 0: goto Resume0; case 1: goto Resume1;
       default: goto Exit;
@@ -22739,7 +22739,7 @@ static bool testminbleicunit_testother() {
 // * run BLEIC algorithm from initial point x0 for target function f=0.5*x'*A*x
 //   and check that it stops at x0 (less than 1E-12 away from it)
    n = 20;
-   for (pass = 0; pass <= 20000; pass++) {
+   for (pass = 0; pass < 20000; pass++) { //(@) Was originally ... pass <= 20000 ...
       spdmatrixrndcond(n, 1.0E3, &fulla);
       for (i = 0; i < n; i++) {
          for (j = 0; j < n; j++) {
@@ -32828,7 +32828,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    NewMatrix(ax, 0, 0, DT_REAL);
    NewMatrix(bt, 0, 0, DT_REAL);
    NewVector(pivots, 0, DT_INT);
-   ae_vector_set_length(xx, n);
+// ae_vector_set_length(xx, n); //(@) Superseded by the next call of this function on xx.
    ae_vector_set_length(c, n);
    ae_matrix_set_length(a, m, n);
    ae_vector_set_length(xx, n + m);
@@ -65692,7 +65692,7 @@ bool testratint() {
    bcOk = bcOk && NearAtR(t, v0, v0 * threshold);
 // Testing "No Poles" interpolation
    maxerr = 0.0;
-   for (pass = 1; pass < passcount; pass++) {
+   for (pass = 0; pass < passcount; pass++) { //(@) Was originally for (pass = 1; ...)
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&y, 1);
       x.xR[0] = ae_randommid();
@@ -75292,8 +75292,8 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
    DupVector(delta);
    NewVector(irerr, 0, DT_REAL);
    NewVector(orerr, 0, DT_REAL);
-   ae_assert(n > 0, "SearchErr: invalid parameter N(N <= 0).");
-   ae_assert(ny > 0, "SearchErr: invalid parameter NY(NY <= 0).");
+   ae_assert(n > 0, "testrbfunit_searcherr: invalid parameter N(N <= 0).");
+   ae_assert(ny > 0, "testrbfunit_searcherr: invalid parameter NY(NY <= 0).");
    oralerr = 1.0E-1;
    iralerr = 1.0E-2;
    lb = 25;
@@ -75342,7 +75342,7 @@ static bool testrbfunit_searcherr(RMatrix *y0, RMatrix *y1, ae_int_t n, ae_int_t
             }
          }
       } else {
-         ae_assert(false, "SearchErr: invalid argument ErrType(ErrType neither 1 nor 2)");
+         ae_assert(false, "testrbfunit_searcherr: invalid argument ErrType(ErrType neither 1 nor 2)");
       }
    }
    Ok = true;
@@ -84400,58 +84400,65 @@ bool testalglibbasics() {
 }
 
 // === main testing unit ===
+// Configuration-dependent functions for mutexs and threads.
 #if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <unistd.h>
 #   include <pthread.h>
-#endif
-#if AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+typedef pthread_mutex_t MutEx_t;
+inline void acquire_mutex(MutEx_t *L) { pthread_mutex_lock(L); }
+inline void release_mutex(MutEx_t *L) { pthread_mutex_unlock(L); }
+inline void init_mutex(MutEx_t *L) { pthread_mutex_init(L, NULL); }
+inline void free_mutex(MutEx_t *L) { pthread_mutex_destroy(L); }
+typedef const pthread_attr_t ThAttr_t;
+typedef void *ThArg_t;
+typedef void *ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+typedef pthread_t Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { return pthread_create(Th, Attr, Op, Arg); }
+inline void join_threads(long N, Thread_t *Bundle) { for (int T = 0; T < N; T++) pthread_join(Bundle[T], NULL); }
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   include <windows.h>
+typedef CRITICAL_SECTION MutEx_t;
+inline void acquire_mutex(MutEx_t *L) { EnterCriticalSection(L); }
+inline void release_mutex(MutEx_t *L) { LeaveCriticalSection(L); }
+inline void init_mutex(MutEx_t *L) { InitializeCriticalSection(L); }
+inline void free_mutex(MutEx_t *L) { DeleteCriticalSection(L); }
+typedef LPSECURITY_ATTRIBUTES ThAttr_t;
+typedef LPVOID ThArg_t;
+typedef DWORD WINAPI ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)0;
+typedef LPTHREAD_START_ROUTINE ThOp_t;
+typedef HANDLE Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { *Th = CreateThread(Attr, 0, Op, Arg, 0, NULL); return *Th != NULL; }
+inline void join_threads(long N, Thread_t *Bundle) { WaitForMultipleObjects(N, Bundle, TRUE, INFINITE); }
+#else
+// These are totally bogus stubs.
+// You need to replace them with whatever specializations you need for your target configuration.
+typedef void *MutEx_t;
+inline void acquire_mutex(MutEx_t *L) { }
+inline void release_mutex(MutEx_t *L) { }
+inline void init_mutex(MutEx_t *L) { }
+inline void free_mutex(MutEx_t *L) { }
+typedef void *ThAttr_t;
+typedef void *ThArg_t;
+typedef void ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+struct Thread_t { ThAttr_t Attr; ThOp_t Op; ThArg_t Arg; };
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { Th->Attr = Attr, Th->Op = Op, Th->Arg = Arg; return 0; }
+inline void join_threads(long N, Thread_t *Bundle) { }
 #endif
 
-#define AE_SINGLECORE           1
-#define AE_SEQUENTIAL_MULTICORE 2
-#define AE_PARALLEL_SINGLECORE 3
-#define AE_PARALLEL_MULTICORE 4
-#define AE_SKIP_TEST 5
+static const enum {
+   AE_NOENV, AE_SINGLECORE, AE_SEQUENTIAL_MULTICORE, AE_PARALLEL_SINGLECORE, AE_PARALLEL_MULTICORE, AE_SKIP_TEST
+} TestMode = AE_SINGLECORE;
 
-unsigned seed;
 int global_failure_flag = 0;
 bool use_smp = false;
 
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-pthread_mutex_t tests_lock;
-pthread_mutex_t print_lock;
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-CRITICAL_SECTION tests_lock;
-CRITICAL_SECTION print_lock;
-#else
-void *tests_lock = NULL;
-void *print_lock = NULL;
-#endif
-
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-void acquire_lock(pthread_mutex_t *p_lock) {
-   pthread_mutex_lock(p_lock);
-}
-
-void release_lock(pthread_mutex_t *p_lock) {
-   pthread_mutex_unlock(p_lock);
-}
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-void acquire_lock(CRITICAL_SECTION *p_lock) {
-   EnterCriticalSection(p_lock);
-}
-
-void release_lock(CRITICAL_SECTION *p_lock) {
-   LeaveCriticalSection(p_lock);
-}
-#else
-void acquire_lock(void **p_lock) {
-}
-
-void release_lock(void **p_lock) {
-}
-#endif
+MutEx_t tests_mutex;
+MutEx_t print_mutex;
 
 bool call_unittest(bool (*testfunc)()) {
 #ifndef AE_USE_CPP_ERROR_HANDLING
@@ -84480,13 +84487,7 @@ bool call_unittest(bool (*testfunc)()) {
 #endif
 }
 
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-void *tester_function(void *T) {
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-DWORD WINAPI tester_function(LPVOID T) {
-#else
-void tester_function(void *T) {
-#endif
+ThRet_t tester_function(ThArg_t T) {
    struct {
       const char *name;
       bool (*testfunc)();
@@ -84583,25 +84584,22 @@ void tester_function(void *T) {
    const size_t tests = sizeof unittests/sizeof unittests[0];
    int unittests_processed = 0;
    while (true) {
-   // try to acquire test record
-      acquire_lock(&tests_lock);
-      int idx = unittests_processed++;
-      release_lock(&tests_lock);
-      if (idx >= tests) break;
-   // Call unit test
-      bool Ok = call_unittest(unittests[idx].testfunc);
+   // Try to acquire the test record.
+      acquire_mutex(&tests_mutex);
+      int test = unittests_processed++;
+      release_mutex(&tests_mutex);
+      if (test >= tests) break;
+   // Call the unit test.
+      bool Ok = call_unittest(unittests[test].testfunc);
       if (!Ok) global_failure_flag = 1;
-      acquire_lock(&print_lock);
-      printf("%2d/%d: %-32s %s\n", idx, tests, unittests[idx].name, Ok? "Ok": "Failed");
+   // Display the test results.
+      acquire_mutex(&print_mutex);
+      printf("%2d/%d: %-32s %s\n", test + 1, tests, unittests[test].name, Ok? "Ok": "Failed");
       if (!silent) putchar('\n');
       fflush(stdout);
-      release_lock(&print_lock);
+      release_mutex(&print_mutex);
    }
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   return NULL;
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   return 0;
-#endif
+   return ThNoRet;
 }
 
 int main(int argc, char **argv) {
@@ -84610,27 +84608,19 @@ int main(int argc, char **argv) {
       double a;
       ae_int32_t p[2];
    } u;
+   unsigned seed;
    if (argc == 2)
       seed = (unsigned)atoi(argv[1]);
    else {
       time_t t;
       seed = (unsigned)time(&t);
    }
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   pthread_mutex_init(&tests_lock, NULL);
-   pthread_mutex_init(&print_lock, NULL);
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   InitializeCriticalSection(&tests_lock);
-   InitializeCriticalSection(&print_lock);
-#endif
+   init_mutex(&tests_mutex);
+   init_mutex(&print_mutex);
 // SMP settings
-#if AE_TEST == AE_PARALLEL_MULTICORE || AE_TEST == AE_SEQUENTIAL_MULTICORE
-   use_smp = true;
-#else
-   use_smp = false;
-#endif
+   use_smp = TestMode == AE_PARALLEL_MULTICORE || TestMode == AE_SEQUENTIAL_MULTICORE;
 // Seed
-   printf("SEED: %u\n", (unsigned int)seed);
+   printf("Seed: %u\n", (unsigned int)seed);
    srand(seed);
 // Compiler
 #if AE_COMPILER == AE_GNUC
@@ -84669,15 +84659,15 @@ int main(int argc, char **argv) {
 #endif
 // Cores count
 #ifdef _ALGLIB_HAS_WORKSTEALING
-   printf("CORES: %d\n", (int)ae_cores_count());
+   printf("Cores: %d\n", (int)ae_cores_count());
 #else
-   printf("CORES: 1 (serial version)\n");
+   printf("Cores: 1 (serial version)\n");
 #endif
 // Support for vendor libraries
 #ifdef AE_MKL
-   printf("LIBS: MKL (Intel)\n");
+   printf("Libs: MKL (Intel)\n");
 #else
-   printf("LIBS:\n");
+   printf("Libs:\n");
 #endif
 // CPUID results
    printf("CPUID: %s\n", CurCPU & CPU_SSE2 ? "sse2" : "");
@@ -84690,21 +84680,14 @@ int main(int argc, char **argv) {
    printf("OS: Other\n");
 #endif
 // Testing mode
-#if AE_TEST == 0 || AE_TEST == AE_SINGLECORE
-   printf("Testing Mode: single core\n");
-#elif AE_TEST == AE_PARALLEL_SINGLECORE
-   printf("Testing Mode: single core, parallel\n");
-#elif AE_TEST == AE_SEQUENTIAL_MULTICORE
-   printf("Testing Mode: milti-core, sequential\n");
-#elif AE_TEST == AE_PARALLEL_MULTICORE
-   printf("Testing Mode: milti-core, parallel\n");
-#elif AE_TEST == AE_SKIP_TEST
-   printf("Testing Mode: just compiling\n");
-   printf("Done in 0 seconds\n");
-   return 0;
-#else
-#   error Unknown AE_TEST being passed
-#endif
+   switch (TestMode) {
+      case AE_NOENV: case AE_SINGLECORE: printf("Testing Mode: single core\n"); break;
+      case AE_PARALLEL_SINGLECORE: printf("Testing Mode: single core, parallel\n"); break;
+      case AE_SEQUENTIAL_MULTICORE: printf("Testing Mode: milti-core, sequential\n"); break;
+      case AE_PARALLEL_MULTICORE: printf("Testing Mode: milti-core, parallel\n"); break;
+      case AE_SKIP_TEST: printf("Testing Mode: just compiling\nDone in 0 seconds\n"); return 0;
+      default: printf("Testing Mode: unknown\n"); return 1;
+   }
 // now we are ready to test!
    time(&time_0);
 #ifdef _ALGLIB_HAS_WORKSTEALING
@@ -84713,60 +84696,34 @@ int main(int argc, char **argv) {
    if (!smpOk) return 1;
 #endif
    fflush(stdout);
-#if AE_TEST == 0 || AE_TEST == AE_SINGLECORE || AE_TEST == AE_SEQUENTIAL_MULTICORE || AE_TEST == AE_SKIP_TEST
-   tester_function(NULL);
-#elif AE_TEST == AE_PARALLEL_MULTICORE || AE_TEST == AE_PARALLEL_SINGLECORE
-#   ifdef _ALGLIB_HAS_WORKSTEALING
-   ae_set_cores_to_use(0);
-#   endif
-#   if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   {
-      long cpu_cnt;
-      pthread_t *threads = NULL;
-      int idx;
-      cpu_cnt = sysconf(_SC_NPROCESSORS_ONLN);
-      ae_assert(cpu_cnt >= 1, "processors count is less than 1", NULL);
-      threads = (pthread_t *) malloc(sizeof(pthread_t) * cpu_cnt);
-      ae_assert(threads != NULL, "malloc failure", NULL);
-      for (idx = 0; idx < cpu_cnt; idx++) {
-         int status = pthread_create(&threads[idx], NULL, tester_function, NULL);
-         if (status != 0) {
-            printf("Failed to create thread\n");
-            abort();
-         }
-      }
-      for (idx = 0; idx < cpu_cnt; idx++)
-         pthread_join(threads[idx], NULL);
-   }
-#   elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   {
-      SYSTEM_INFO sysInfo;
-      HANDLE *hThreads = NULL;
-      int idx;
-      GetSystemInfo(&sysInfo);
-      ae_assert(sysInfo.dwNumberOfProcessors >= 1, "processors count is less than 1", NULL);
-      hThreads = (HANDLE *) malloc(sizeof(HANDLE) * sysInfo.dwNumberOfProcessors);
-      ae_assert(hThreads != NULL, "malloc failure", NULL);
-      for (idx = 0; idx < sysInfo.dwNumberOfProcessors; idx++)
-         hThreads[idx] = CreateThread(NULL, 0, tester_function, NULL, 0, NULL);
-      WaitForMultipleObjects(sysInfo.dwNumberOfProcessors, hThreads, TRUE, INFINITE);
-   }
-#   else
-#      error Unable to determine OS (define AE_OS, AE_DEBUG4WINDOWS or AE_DEBUG4POSIX)
-#   endif
-#else
-#   error Unexpected test mode
+   switch (TestMode) {
+      case AE_NOENV: case AE_SINGLECORE: case AE_SEQUENTIAL_MULTICORE: case AE_SKIP_TEST:
+         tester_function(NULL);
+      break;
+      case AE_PARALLEL_MULTICORE: case AE_PARALLEL_SINGLECORE: {
+#ifdef _ALGLIB_HAS_WORKSTEALING
+         ae_set_cores_to_use(0);
 #endif
+         long cpu_cnt = ae_cores_count();
+         ae_assert(cpu_cnt >= 1, "processors count is less than 1");
+         Thread_t *Bundle = (Thread_t *) malloc(cpu_cnt * sizeof *Bundle);
+         ae_assert(Bundle != NULL, "malloc failure");
+         for (int cpu = 0; cpu < cpu_cnt; cpu++) {
+            int status = init_thread(&Bundle[cpu], NULL, tester_function, NULL);
+            if (status != 0) {
+               printf("Failed to create thread\n");
+               abort();
+            }
+         }
+         join_threads(cpu_cnt, Bundle);
+      }
+      default: printf("Unexpected test mode\n"); return 1;
+   }
    time(&time_1);
    printf("Done in %ld seconds\n", (long)difftime(time_1, time_0));
 // Free structures
-#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
-   pthread_mutex_destroy(&tests_lock);
-   pthread_mutex_destroy(&print_lock);
-#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
-   DeleteCriticalSection(&tests_lock);
-   DeleteCriticalSection(&print_lock);
-#endif
+   free_mutex(&tests_mutex);
+   free_mutex(&print_mutex);
 #ifdef AE_HPC
    ae_free_disposed_items();
    ae_complete_finalization_before_exit();

@@ -1,6 +1,6 @@
 ALGLIB++, like its predecessor ALGLIB, is a source-code library meant for direct inclusion in application projects.
 
-There are no static libraries or executables to compile and no dependencies on other software libraries.
+There are no libraries or executables to compile and no dependencies on other software libraries.
 A Makefile has been provided to implement the equivalent of "make test" or "make check" for the Linux:x86:GCC configuration.
 If compiling out of the box for this, or other configurations on POSIX, use this first, and experiment with different settings.
 If testing for the first time, it's recommended to run each test separately:
@@ -20,6 +20,9 @@ Further details on integrating ALGLIB++ into applications may be found in the AL
 
 ALGLIB++ is based on ALGLIB and tracks its upgrades which were, themselves, automatically translated from an internal codebase written in AlgoPascal.
 The most recent upgrades are the following:
+∙	ALGLIB 4.0 (forthcoming)
+∙	ALGLIB 3.17.0 (forthcoming)
+∙	ALGLIB 3.16.1 (forthcoming)
 ∙	ALGLIB 3.16.0 (source code generated 2019-12-19)
 ∙	ALGLIB 3.15.0 (source code generated 2019-02-20)
 ∙	ALGLIB 3.14.0 (source code generated 2018-06-16)
@@ -32,4 +35,4 @@ ALGLIB++ is licensed under the same GPL restrictions as the GPL version of ALGLI
 ALGLIB++ undergoes a process of automated upgrade/reengineering/refactoring/testing.
 It does not use version numbers but, instead, is marked by the timestamp of the most recent test.
 The latest updates of the testing and development sequence are listed in section A6 of the ALGLIB++ Supplementary Sections (Notes.htm).
-The timestamp of the current revision is 1583869582.
+The timestamp of the current revision is 1592593244.

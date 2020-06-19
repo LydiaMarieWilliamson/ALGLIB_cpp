@@ -36,8 +36,6 @@
 #   include <vector>
 #endif
 
-#define AE_USE_CPP
-
 // Definitions
 #define AE_OTHER_CPU	0
 #define AE_INTEL	1
@@ -153,12 +151,9 @@
 namespace alglib_impl {
 // Core Code (Vectors, Matrices, Memory Management, etc.)
 
-// if we work under C++ environment, define several conditions
-#ifdef AE_USE_CPP
-#   define AE_USE_CPP_BOOL
-#   define AE_USE_CPP_SERIALIZATION
-#   include <iostream>
-#endif
+// We are working under a C++ environment: define several conditions.
+#define AE_USE_CPP_SERIALIZATION
+#include <iostream>
 
 // define ae_int32_t, ae_int64_t, ae_int_t, bool, ae_complex, ae_error_type and ae_datatype
 
@@ -196,21 +191,19 @@ typedef unsigned long long ae_uint64_t;
 typedef ptrdiff_t ae_int_t;
 #endif
 
-#if !defined AE_USE_CPP_BOOL
-typedef enum { false = 0, true = 1 } bool;
-#endif
-
 struct ae_complex { double x, y; } ;
 typedef enum { ERR_OK = 0, ERR_OUT_OF_MEMORY = 1, ERR_XARRAY_TOO_LARGE = 2, ERR_ASSERTION_FAILED = 3 } ae_error_type;
 typedef enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 } ae_datatype;
 typedef enum { CPU_SSE2 = 1 } ae_cpuid_t;
+extern const ae_cpuid_t CurCPU;
 
 // other definitions
-enum { OWN_CALLER = 1, OWN_AE = 2 };
 enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
+ae_int_t ae_cores_count();
+void ae_yield();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v);
 void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v);
@@ -218,7 +211,6 @@ void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v);
 void *aligned_malloc(size_t size, size_t alignment);
 void *aligned_extract_ptr(void *block);
 void aligned_free(void *block);
-void *eternal_malloc(size_t size);
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
 void set_memory_pool(void *ptr, size_t size);
 void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free);
@@ -277,20 +269,16 @@ void ae_frame_leave();
 struct ae_vector {
 // Number of elements in array, cnt >= 0
    ae_int_t cnt;
-
 // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
    ae_datatype datatype;
-
 // If xX points to memory owned and managed by ae_vector itself,
 // this field is false. If vector was attached to x_vector structure
 // with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
-
 // ae_dyn_block structure which manages data in xX. This structure
 // is responsible for automatic deletion of object when its frame
 // is destroyed.
    ae_dyn_block data;
-
 // Pointer to data.
 // User usually works with this field.
    union {
@@ -318,12 +306,10 @@ struct ae_matrix {
    ae_int_t cols;
    ae_int_t stride;
    ae_datatype datatype;
-
 // If xX points to memory owned and managed by ae_vector itself,
 // this field is false. If vector was attached to x_vector structure
 // with ae_vector_init_attach_to_x(), this field is true.
    bool is_attached;
-
    ae_dyn_block data;
    union {
       void *xX;
@@ -349,42 +335,30 @@ typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
 // Serializer:
-//
-// * ae_stream_writer type is a function pointer for stream  writer  method;
-//   this pointer is used by X-core for out-of-core serialization  (say,  to
-//   serialize ALGLIB structure directly to managed C# stream).
-//
-//   This function accepts two parameters: pointer to  ANSI  (7-bit)  string
-//   and pointer-sized integer passed to serializer  during  initialization.
-//   String being passed is a part of the data stream; aux paramerer may  be
-//   arbitrary value intended to be used by actual implementation of  stream
-//   writer. String parameter may include spaces and  linefeed  symbols,  it
-//   should be written to stream as is.
-//
-//   The return value is true on success, false on failure.
-//
-// * ae_stream_reader type is a function pointer for stream  reader  method;
-//   this pointer is used by X-core for out-of-core unserialization (say, to
-//   unserialize ALGLIB structure directly from managed C# stream).
-//
-//   This function accepts three parameters: pointer-sized integer passed to
-//   serializer  during  initialization; number  of  symbols  to  read  from
-//   stream; pointer to buffer used to store next  token  read  from  stream
-//   (ANSI encoding is used, buffer is large enough to store all symbols and
-//   trailing zero symbol).
-//
-//   Number of symbols to read is always positive.
-//
-//   After being called by X-core, this function must:
-//   * skip all space and linefeed characters from the current  position  at
-//     the stream and until first non-space non-linefeed character is found
-//   * read exactly cnt symbols  from  stream  to  buffer;  check  that  all
-//     symbols being read are non-space non-linefeed ones
-//   * append trailing zero symbol to buffer
-//   * return value true on sucess, false if even one of the conditions above fails.
-//     When the reader returns false, contents of buf is not used.
-typedef bool (*ae_stream_writer)(const char *p_string, ae_int_t aux);
-typedef bool (*ae_stream_reader)(ae_int_t aux, ae_int_t cnt, char *p_buf);
+// *	ae_stream_writer is the type expected for pointers to serializer stream-writing functions,
+//	which are used by the X-core for out-of-core serialization (e.g., directly to a C++ stream).
+//	This function accepts:
+//	-	S:	a pointer to an ANSI (7-bit) string, which is a part of the data stream and
+//			and may include spaces and linefeed symbols, and should be written to the stream as is; and
+//	-	Aux:	a pointer-sized integer passed to the serializer during initialization,
+//			which may be any value meant to be used by the actual implementation of the stream writer.
+//	The function should return true for success or false for failure.
+typedef bool (*ae_stream_writer)(const char *S, ae_int_t Aux);
+// *	ae_stream_reader is the type expected for pointers to serializer stream-reading functions,
+//	which are used by the X-core for out-of-core unserialization (e.g., directly from a C++ stream).
+//	This function accepts:
+//	-	Aux:	a pointer-sized integer passed to the serializer during initialization;
+//	-	N:	the number of symbols to be read from the stream, with N > 0 required; and
+//	-	S:	a pointer to the buffer used to store the next token read from the stream
+//			(ANSI encoding is used, the buffer should be large enough to store all symbols and a trailing '\0').
+//	After being called by the X-core, this function must:
+//	-	skip all space and linefeed characters from the current position at the stream
+//		up to the first non-space non-linefeed character
+//	-	read exactly N symbols from the stream to the buffer; checking that they are all non-space non-linefeed ones
+//	-	append a trailing '\0' to the buffer
+//	-	return value true for success, false if any of the conditions above fails,
+//		in w hich case, the contents of S are not used.
+typedef bool (*ae_stream_reader)(ae_int_t Aux, ae_int_t N, char *S);
 typedef enum {
    AE_SM_DEFAULT = 0, AE_SM_ALLOC = 1, AE_SM_READY2S = 2,
    AE_SM_TO_STRING = 10, AE_SM_TO_CPPSTRING = 11, AE_SM_TO_STREAM = 12,
@@ -397,9 +371,8 @@ struct ae_serializer {
    ae_int_t entries_saved;
    ae_int_t bytes_asked;
    ae_int_t bytes_written;
-
 #ifdef AE_USE_CPP_SERIALIZATION
-   std::string * out_cppstr;
+   std::string *out_cppstr;
 #endif
    char *out_str;       // Pointer to the current position at the output buffer; advanced with each write operation.
    const char *in_str;  // Pointer to the current position at the input  buffer; advanced with each read  operation.
@@ -416,42 +389,38 @@ void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes)
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer);
 
 #ifdef AE_USE_CPP_SERIALIZATION
-void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf);
 void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf);
-void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream);
+void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf);
 void ae_serializer_ustart_stream(ae_serializer *serializer, const std::istream *stream);
+void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream);
 #endif
-void ae_serializer_sstart_str(ae_serializer *serializer, char *buf);
 void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
-void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
+void ae_serializer_sstart_str(ae_serializer *serializer, char *buf);
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
+void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
 
-void ae_serializer_serialize_bool(ae_serializer *serializer, bool v);
-void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v);
-void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v);
-void ae_serializer_serialize_double(ae_serializer *serializer, double v);
-void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 bool ae_serializer_unserialize_bool(ae_serializer *serializer);
+void ae_serializer_serialize_bool(ae_serializer *serializer, bool v);
 ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer);
+void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v);
 ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer);
+void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v);
 double ae_serializer_unserialize_double(ae_serializer *serializer);
+void ae_serializer_serialize_double(ae_serializer *serializer, double v);
 void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
+void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 void ae_serializer_stop(ae_serializer *serializer);
 
 // x-string (zero-terminated):
-//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-//                 If vector is owned by caller, X-interface  will  just set
-//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
-//                 will call ae_free/x_free/aligned_free family functions.
-//
+//     owner       Determines what to do on realloc().
+//                 false: The vector is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
 //     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
 //                 contents is either: unchanged, stored at the same location,
 //                 stored at the new location.
 //                 this field is set on return from X.
-//
 //     ptr         pointer to the actual data
-//
 // Members of this structure are ae_int64_t to avoid alignment problems.
 struct x_string {
    ALIGNED ae_int64_t owner;
@@ -461,14 +430,10 @@ struct x_string {
 
 // x-vector:
 //     cnt         number of elements
-//
 //     datatype    one of the DT_XXXX values
-//
-//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-//                 If vector is owned by caller, X-interface  will  just set
-//                 x_ptr to NULL before realloc(). If it is owned by X,
-//                 it will call ae_free/x_free/aligned_free family functions.
-//
+//     owner       Determines what to do on realloc().
+//                 false: The vector is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
+//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
 //     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
 //                 contents is either: unchanged, stored at the same location,
 //                 stored at the new location.
@@ -476,9 +441,7 @@ struct x_string {
 //                 used by caller as hint when deciding what to do with data
 //                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
 //                 reallocation or copying is required).
-//
 //     x_ptr       pointer to the actual data
-//
 // Members of this structure are ae_int64_t to avoid alignment problems.
 struct x_vector {
    ae_int64_t cnt;
@@ -498,18 +461,12 @@ void x_vector_free(x_vector *dst, bool make_automatic);
 
 // x-matrix:
 //     rows        number of rows. may be zero only when cols is zero too.
-//
 //     cols        number of columns. may be zero only when rows is zero too.
-//
 //     stride      stride, i.e. distance between first elements of rows (in bytes)
-//
 //     datatype    one of the DT_XXXX values
-//
-//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-//                 If vector is owned by caller, X-interface  will  just set
-//                 x_ptr to NULL before realloc(). If it is owned by X,
-//                 it will call ae_free/x_free/aligned_free family functions.
-//
+//     owner       Determines what to do on realloc().
+//                 false: The vector is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
+//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
 //     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
 //                 contents is either: unchanged, stored at the same location,
 //                 stored at the new location.
@@ -517,9 +474,7 @@ void x_vector_free(x_vector *dst, bool make_automatic);
 //                 used by caller as hint when deciding what to do with data
 //                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
 //                 reallocation or copying is required).
-//
 //     x_ptr       pointer to the actual data, stored rowwise
-//
 // Members of this structure are ae_int64_t to avoid alignment problems.
 struct x_matrix {
    ae_int64_t rows;
@@ -572,7 +527,6 @@ void ae_smart_ptr_release(ae_smart_ptr *dst);
 #define SetObj(Type, P)	Type##_free(P, true)
 
 // Lock.
-//
 // This structure provides OS-independent non-reentrant lock:
 // * under Windows/Posix systems it uses system-provided locks
 // * under Boost it uses OS-independent lock provided by Boost package
@@ -586,20 +540,17 @@ struct ae_lock {
 // Pointer to _lock structure. This pointer has type void* in order to
 // make header file OS-independent (lock declaration depends on OS).
    void *lock_ptr;
-// For eternal=false this field manages pointer to _lock structure.
-//
+// For is_static == false this field manages pointer to _lock structure.
 // ae_dyn_block structure is responsible for automatic deletion of
 // the memory allocated for the pointer when its frame is destroyed.
    ae_dyn_block db;
 // Whether we have eternal lock object (used by thread pool) or
 // transient lock. Eternal locks are allocated without using ae_dyn_block
 // structure and do not allow deallocation.
-   bool eternal;
+   bool is_static;
 };
 
-void ae_yield();
-void ae_init_lock(ae_lock *lock, bool make_automatic);
-void ae_init_lock_eternal(ae_lock *lock);
+void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
 void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
@@ -653,14 +604,44 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
 void ae_shared_pool_reset(ae_shared_pool *pool);
 
-void ae_set_dbg_flag(ae_int64_t flag_id, ae_int64_t flag_val);
-ae_int64_t ae_get_dbg_value(ae_int64_t id);
+// Id values for ae_[sg]et_debug_value().
+typedef enum {
+// set get
+   _ALGLIB_ALLOC_COUNTER = 0, _ALGLIB_TOTAL_ALLOC_SIZE = 1,
+// get
+   _ALGLIB_TOTAL_ALLOC_COUNT = 2,
+// set
+   _ALGLIB_USE_VENDOR_KERNELS = 100, _ALGLIB_VENDOR_MEMSTAT = 101,
+   _ALGLIB_DEBUG_WORKSTEALING = 200, _ALGLIB_WSDBG_NCORES = 201,
+   _ALGLIB_WSDBG_PUSHROOT_OK = 202, _ALGLIB_WSDBG_PUSHROOT_FAILED = 203,
+// get
+   _ALGLIB_CORES_COUNT = 1000,
+// set get
+   _ALGLIB_GLOBAL_THREADING = 1001, _ALGLIB_NWORKERS = 1002,
+#if 0
+// For compatibility:
+// get
+   _ALGLIB_GET_ALLOC_COUNTER = _ALGLIB_ALLOC_COUNTER,
+   _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE = _ALGLIB_TOTAL_ALLOC_SIZE,
+   _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT = _ALGLIB_TOTAL_ALLOC_COUNT,
+   _ALGLIB_GET_CORES_COUNT = _ALGLIB_CORES_COUNT,
+   _ALGLIB_GET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
+   _ALGLIB_GET_NWORKERS = _ALGLIB_NWORKERS,
+// set
+   _ALGLIB_USE_DBG_COUNTERS = _ALGLIB_CUMULATIVE_ALLOC_SIZE,
+   _ALGLIB_SET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
+   _ALGLIB_SET_NWORKERS = _ALGLIB_NWORKERS,
+#endif
+} debug_flag_t;
+
+void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
+ae_int64_t ae_get_dbg_value(debug_flag_t id);
+
 void ae_set_global_threading(ae_uint64_t flg_value);
 ae_uint64_t ae_get_global_threading();
 
 // Service functions
 void ae_assert(bool cond, const char *msg);
-extern const ae_cpuid_t CurCPU;
 
 // Real math functions:
 // * standard functions
@@ -923,7 +904,6 @@ struct complex {
    double x, y;
 };
 
-const complex operator/(const complex &A, const complex &B);
 bool operator==(const complex &A, const complex &B);
 bool operator!=(const complex &A, const complex &B);
 const complex operator+(const complex &A);
@@ -945,7 +925,6 @@ complex conj(const complex &A);
 complex csqr(const complex &A);
 
 // Level 1 BLAS functions
-//
 // NOTES:
 // * destination and source should NOT overlap
 // * stride is assumed to be positive, but it is not
@@ -1110,14 +1089,14 @@ protected:
 // Whether this wrapper object is frozen proxy (you may read array, may
 // modify its value, but can not deallocate its memory or resize it) or not.
 //
-// If is_frozen_proxy == true and if:
+// If owner == false and if:
 // * This == &Obj, it means that wrapper works with its own ae_vector
 //   structure, but this structure points to externally allocated memory.
 //   This memory is NOT owned by ae_vector object.
 // * This != &Obj, it means that wrapper works with externally allocated
 //   and managed ae_vector structure. Both memory pointed by ae_vector and
 //   ae_vector structure itself are not owned by wrapper object.
-   bool is_frozen_proxy;
+   bool owner;
 };
 
 struct boolean_1d_array: public ae_vector_wrapper {
@@ -1284,14 +1263,14 @@ protected:
    alglib_impl::ae_matrix Obj;
 // Whether this wrapper object is frozen proxy (you may read array, may
 // modify its value, but can not deallocate its memory or resize it) or not.
-// If is_frozen_proxy == true and if:
+// If owner == false and if:
 // * This == &Obj, it means that wrapper works with its own ae_vector
 //   structure, but this structure points to externally allocated memory.
 //   This memory is NOT owned by ae_vector object.
 // * This != &Obj, it means that wrapper works with externally allocated
 //   and managed ae_vector structure. Both memory pointed by ae_vector and
 //   ae_vector structure itself are not owned by wrapper object.
-   bool is_frozen_proxy;
+   bool owner;
 };
 
 struct boolean_2d_array: public ae_matrix_wrapper {
@@ -1383,6 +1362,34 @@ struct complex_2d_array: public ae_matrix_wrapper {
 #endif
 };
 
+#if 0
+// Constants and functions introduced for compatibility with AlgoPascal
+extern const double machineepsilon, maxrealnumber, minrealnumber;
+#endif
+
+bool isneginf(double x);
+bool isposinf(double x);
+
+int minint(int x, int y);
+int maxint(int x, int y);
+int sign(double x);
+int RoundZ(double x);
+int TruncZ(double x);
+int FloorZ(double x);
+int CeilZ(double x);
+
+double minreal(double x, double y);
+double maxreal(double x, double y);
+double sqr(double x);
+
+double randomreal();
+double randommid();
+ae_int_t randominteger(ae_int_t maxv);
+bool randombool(double p = 0.5);
+
+static const int CSV_DEFAULT = 0x0;
+static const int CSV_SKIP_HEADERS = 0x1;
+
 // CSV operations: reading CSV file to real matrix.
 //
 // This function reads CSV  file  and  stores  its  contents  to  double
@@ -1426,31 +1433,6 @@ struct complex_2d_array: public ae_matrix_wrapper {
 #if !defined AE_NO_EXCEPTIONS
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out);
 #endif
-
-// Constants and functions introduced for compatibility with AlgoPascal
-extern const double machineepsilon, maxrealnumber, minrealnumber;
-static const int CSV_DEFAULT = 0x0;
-static const int CSV_SKIP_HEADERS = 0x1;
-
-bool isneginf(double x);
-bool isposinf(double x);
-
-int minint(int x, int y);
-int maxint(int x, int y);
-int sign(double x);
-int RoundZ(double x);
-int TruncZ(double x);
-int FloorZ(double x);
-int CeilZ(double x);
-
-double minreal(double x, double y);
-double maxreal(double x, double y);
-double sqr(double x);
-
-double randomreal();
-double randommid();
-ae_int_t randominteger(ae_int_t maxv);
-bool randombool(double p = 0.5);
 } // end of namespace alglib
 
 #endif // OnceOnly

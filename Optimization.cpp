@@ -4166,11 +4166,11 @@ void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae
 bool smoothnessmonitorprobe(smoothnessmonitor *monitor) {
    AutoS ae_int_t i;
    AutoS ae_int_t j;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (monitor->ProbePQ >= 0) switch (monitor->ProbePQ) {
       case 0: goto Resume0;
       default: goto Exit;
@@ -4236,11 +4236,11 @@ bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *uns
    AutoS double vp;
    AutoS double vm;
    AutoS double vc;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (monitor->PQ >= 0) switch (monitor->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
@@ -10201,7 +10201,7 @@ void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n) 
 
 // Sets linear/quadratic terms for QP-IPM solver
 //
-// If you initialized solver with VIMPInitDenseWithSlacks(), NMain below is a
+// If you initialized solver with VIPMInitDenseWithSlacks(), NMain below is a
 // number of non-slack variables. In other cases, NMain=N.
 //
 // Inputs:
@@ -12603,11 +12603,11 @@ static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate
    AutoS double stepknlagval;
    AutoS bool hessianupdateperformed;
    AutoS double stp;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (meritstate->PQ >= 0) switch (meritstate->PQ) {
       case 0: goto Resume0; case 1: goto Resume1;/* case 2: goto Resume2; */case 3: goto Resume3;
       default: goto Exit;
@@ -12655,7 +12655,7 @@ Spawn:
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj);
    smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, localstp, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn);
    f1 = nlcsqp_meritfunction(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->lagmult, &meritstate->tmpmerit);
-   if (f1 >= f0) { // if (!f1 < f0)) might be necessary to use, instead.
+   if (f1 >= f0) { // if (!(f1 < f0)) might be necessary to use, instead.
    // Full step increases merit function. Let's compute second order
    // correction to the constraint model and recompute trial step D:
    // * use original linearization of the target
@@ -13003,11 +13003,11 @@ bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS double setscaleto;
    AutoS double prevtrustrad;
    AutoS ae_int_t subiterationidx;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
@@ -13970,11 +13970,11 @@ bool minlbfgsiteration(minlbfgsstate *state) {
    AutoS ae_int_t mcinfo;
    AutoS double v;
    AutoS double vv;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -17495,11 +17495,11 @@ bool minbleiciteration(minbleicstate *state) {
    AutoS double penalty;
    AutoS double ginit;
    AutoS double gdecay;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -28797,11 +28797,11 @@ static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *stat
    AutoS double f1;
    AutoS double nu;
    AutoS double localstp;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state13->Ph13PQ >= 0) switch (state13->Ph13PQ) {
       case 0: goto Resume0; case 1: goto Resume1;/* case 2: goto Resume2; */case 3: goto Resume3;
       default: goto Exit;
@@ -29232,11 +29232,11 @@ static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2
    AutoS double gammaprev;
    AutoS double f0;
    AutoS double f1;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state2->Ph2PQ >= 0) switch (state2->Ph2PQ) {
       case 0: goto Resume0;/* case 1: goto Resume1; */case 2: goto Resume2;
       default: goto Exit;
@@ -29689,11 +29689,11 @@ bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool usert
    AutoS double multiplyby;
    AutoS double setscaleto;
    AutoS double prevtrustrad;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       case 3: goto Resume3; case 4: goto Resume4;
@@ -31555,11 +31555,11 @@ static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor)
    AutoS double v0;
    AutoS double v1;
    AutoS double v2;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->AulPQ >= 0) switch (state->AulPQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2;
       default: goto Exit;
@@ -31929,11 +31929,11 @@ bool minnlciteration(minnlcstate *state) {
    AutoS ae_int_t nh;
    AutoS double vleft;
    AutoS double vright;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -34918,11 +34918,11 @@ bool minbciteration(minbcstate *state) {
    AutoS double gdecay;
    AutoS bool activationstatus;
    AutoS double activationstep;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -38132,11 +38132,11 @@ static bool minns_agsiteration(minnsstate *state) {
    AutoS ae_int_t backtrackits;
    AutoS ae_int_t maxbacktrackits;
    AutoS bool fullsample;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->AgsPQ >= 0) switch (state->AgsPQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
@@ -38730,11 +38730,11 @@ bool minnsiteration(minnsstate *state) {
    AutoS double v;
    AutoS double xp;
    AutoS double xm;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
       default: goto Exit;
@@ -40040,11 +40040,11 @@ bool minasaiteration(minasastate *state) {
    AutoS bool b;
    AutoS bool stepfound;
    AutoS ae_int_t diffcnt;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -41282,11 +41282,11 @@ bool mincgiteration(mincgstate *state) {
    AutoS double betak;
    AutoS double v;
    AutoS double vv;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;
@@ -41929,8 +41929,6 @@ void mincgoptguardnonc1test1results(mincgstate *state, optguardnonc1test1report 
 //                     * -8    internal integrity control  detected  infinite
 //                             or NAN values in  function/gradient.  Abnormal
 //                             termination signalled.
-//                     * -7    gradient verification failed.
-//                             See MinCGSetGradientCheck() for more information.
 //                     *  1    relative function improvement is no more than
 //                             EpsF.
 //                     *  2    relative step is no more than EpsX.
@@ -43005,8 +43003,6 @@ void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1r
 //                     * -8    internal integrity control  detected  infinite
 //                             or NAN values in  function/gradient.  Abnormal
 //                             termination signalled.
-//                     * -7    gradient verification failed.
-//                             See MinCGSetGradientCheck() for more information.
 //                     *  1    relative function improvement is no more than
 //                             EpsF.
 //                     *  2    relative step is no more than EpsX.
@@ -43797,11 +43793,11 @@ static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambd
    AutoS double v;
    AutoS ae_int_t n;
    AutoS ae_int_t m;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume0; case 1: goto Resume1;
       default: goto Exit;
@@ -44103,11 +44099,11 @@ bool minlmiteration(minlmstate *state) {
    AutoS double fnew;
    AutoS ae_int_t i;
    AutoS ae_int_t k;
-// Reverse communication preparations
-// I know it looks ugly, but it works the same way anywhere from C++ to Python.
-// This code initializes locals by:
-// * random values determined during code generation - on first subroutine call
-// * values from previous call - on subsequent calls
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
    if (state->PQ >= 0) switch (state->PQ) {
       case 0: goto Resume00; case 1: goto Resume01; case 2: goto Resume02; case 3: goto Resume03;
       case 4: goto Resume04; case 5: goto Resume05; case 6: goto Resume06; case 7: goto Resume07;

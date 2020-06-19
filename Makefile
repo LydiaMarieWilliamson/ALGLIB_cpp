@@ -16,7 +16,7 @@ Mods=Ap AlgLibInternal AlgLibMisc DataAnalysis DiffEquations FastTransforms Inte
 Objs=$(Mods:%=%$O)
 Srcs=$(Mods:%=%.cpp)
 ModsY=Ap AlgLibInternal AlgLibMisc LinAlg
-ObjY=$(ModsY:%=%.o)
+ObjY=$(ModsY:%=%$O)
 
 all: test
 Ap$O: Ap.cpp
@@ -60,7 +60,7 @@ TestI$X: ${Objs} TestI$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestX$X: ${Objs} TestX$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
-TestY$X: ${ObjY} TestY.o
+TestY$X: ${ObjY} TestY$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestZ$X: $(Srcs) TestZ.cpp
 	${Cpp} ${CcOpt} $^ ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=AE_SERIAL_UNSAFE -o $@

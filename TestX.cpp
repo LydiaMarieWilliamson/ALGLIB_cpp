@@ -6,8 +6,32 @@
 
 #if AE_OS == AE_POSIX
 #   include <pthread.h>
+typedef const pthread_attr_t ThAttr_t;
+typedef void *ThArg_t;
+typedef void *ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+typedef pthread_t Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { return pthread_create(Th, Attr, Op, Arg); }
 #elif AE_OS == AE_WINDOWS
 #   include <windows.h>
+typedef LPSECURITY_ATTRIBUTES ThAttr_t;
+typedef LPVOID ThArg_t;
+typedef DWORD WINAPI *ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)0;
+typedef LPTHREAD_START_ROUTINE ThOp_t;
+typedef HANDLE Thread_t;
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { *Th = CreateThread(Attr, 0, Op, Arg, 0, NULL); return *Th != NULL; }
+#else
+// These are totally bogus stubs.
+// You need to replace them with whatever specializations you need for your target configuration.
+typedef void *ThAttr_t;
+typedef void *ThArg_t;
+typedef void ThRet_t;
+const ThRet_t ThNoRet = (ThRet_t)NULL;
+typedef ThRet_t (*ThOp_t)(ThArg_t);
+struct Thread_t { ThAttr_t Attr; ThOp_t Op; ThArg_t Arg; };
+inline int init_thread(Thread_t *Th, ThAttr_t *Attr, ThOp_t Op, ThArg_t Arg) { Th->Attr = Attr, Th->Op = Op, Th->Arg = Arg; return 0; }
 #endif
 
 using namespace alglib;
@@ -211,33 +235,18 @@ void file_put_contents(const char *filename, const char *contents) {
    fclose(f);
 }
 
-#if AE_OS == AE_POSIX
 struct async_rbf_record {
    rbfmodel * p_model;
    rbfreport * p_report;
    bool thread_finished;
 };
 
-void *async_build_rbf_model(void *T) {
+ThRet_t async_build_rbf_model(ThArg_t T) {
    async_rbf_record *p = (async_rbf_record *) T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
-   return NULL;
+   return ThNoRet;
 }
-#elif AE_OS == AE_WINDOWS
-struct async_rbf_record {
-   rbfmodel * p_model;
-   rbfreport * p_report;
-   bool thread_finished;
-};
-
-DWORD WINAPI async_build_rbf_model(LPVOID T) {
-   async_rbf_record *p = (async_rbf_record *) T;
-   rbfbuildmodel(*(p->p_model), *(p->p_report));
-   p->thread_finished = true;
-   return 0;
-}
-#endif
 
 #if defined AE_DEBUG4POSIX
 #   include <sys/time.h>
@@ -1538,35 +1547,23 @@ int main() {
       async_rec.p_model = &rbf;
       async_rec.p_report = &rep;
       async_rec.thread_finished = false;
-#   if AE_OS == AE_POSIX
-      pthread_t thread;
-      if (pthread_create(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
+      Thread_t thread;
+      if (init_thread(&thread, NULL, async_build_rbf_model, &async_rec) != 0) {
          printf(fmt_str, "* Progress/termination (RBF)", "Failed");
          printf(">>> unable to create background thread\n");
          fflush(stdout);
          return 1;
       }
-#   elif AE_OS == AE_WINDOWS
-      if (CreateThread(NULL, 0, async_build_rbf_model, &async_rec, 0, NULL) == NULL) {
-         printf(fmt_str, "* Progress/termination (RBF)", "Failed");
-         printf(">>> unable to create background thread\n");
-         fflush(stdout);
-         return 1;
-      }
-#   else
-#      error Unable to determine OS, unexpected here
-#   endif
 //(@) Drop down to alglib_impl here, because the state and frame accesses are no longer thread-safe.
       for (double last_progress = 0.0; last_progress < 0.001; ) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         Ok = Ok && new_progress >= last_progress;
-         Ok = Ok && new_progress <= 0.1;      // we expect to terminate well before reaching 10%
+         Ok = Ok && new_progress >= last_progress && new_progress <= 0.1; // We expect to terminate well before reaching 10%.
          last_progress = new_progress;
       }
       alglib_impl::rbfrequesttermination(rbf.c_ptr());
       while (!async_rec.thread_finished) {
          double new_progress = alglib_impl::rbfpeekprogress(rbf.c_ptr());
-         Ok = Ok && (new_progress <= 0.1 || new_progress == 1.0);   // we expect to terminate well before reaching 10%
+         Ok = Ok && (new_progress <= 0.1 || new_progress == 1.0); // We expect to terminate well before reaching 10%.
       }
       Ok = Ok && rbfpeekprogress(rbf) == 1;
       Ok = Ok && rep.terminationtype == 8;
@@ -1576,7 +1573,7 @@ int main() {
       if (!Ok)
          return 1;
 #else
-      printf(fmt_str, "* Progress/termination (RBF)", "??");
+      printf(fmt_str, "* Progress/termination (RBF)", "Multi-threading test disabled");
       fflush(stdout);
       if (!Ok)
          return 1;
