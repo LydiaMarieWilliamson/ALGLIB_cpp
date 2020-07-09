@@ -1145,9 +1145,10 @@ Both ALGLIB++ and the ALGLIB code it inherited contain several routines adapted 
 A more complete implementation of the latest version of LAPACK is being prepared for inclusion with ALGLIB++ &mdash; in fact, a C++ translation of the entire package: LAPACK++.
 </p>
 <p>
-Each Level 1 BLAS function accepts input stride and output stride, which are expected to be positive.
-Input and output vectors should not overlap.
-Functions operating with complex vectors accept an additional parameter <code>conj_src</code>, which specifies whether input vector is conjugated or not.
+Each Level 1 BLAS function accepts an input vector <code>A</code> and output vector <code>B</code>, which are assumed to be non-overlapping; and an input stride <code>dA</code> and output stride <code>dB</code>, which are expected to be positive.
+For functions operating with complex vectors, the parameters <code>CjA</code> and <code>CjB</code>, wherever they appear, specify respectively whether <code>A</code> and <code>B</code> is to be conjugated or not.
+Strings which start in 'N' or 'n' (e.g. "No conj") specify no conjugation.
+All other strings specify conjugation, though "Conj" is recommended for use in such cases.
 </p>
 <p>
 For each real/complex function there exists "simple" companion which accepts no stride or conjugation modifier.
@@ -1167,58 +1168,57 @@ vmove(cvec + 2, 1, cmat[0], 1, "Conj", 2); // Now cvec is [3i, 9, -3i,  1].
 <p>
 Here is full list of Level 1 BLAS functions implemented in ALGLIB++:
 </p>
-
 <pre class=source>
-<b>double</b> vdotproduct(<b>const</b> <b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n);
-<b>double</b> vdotproduct(<b>const</b> <b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n);
-complex vdotproduct(<b>const</b> complex *a, ae_int_t a_stride, <b>const</b> char *a_conj, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n);
-complex vdotproduct(<b>const</b> complex *a, <b>const</b> complex *b, ae_int_t n);
+<b>double</b> vdotproduct(<b>const</b> <b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N);
+<b>double</b> vdotproduct(<b>const</b> <b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N);
+complex vdotproduct(<b>const</b> complex *A, ae_int_t dA, <b>const</b> char *CjA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N);
+complex vdotproduct(<b>const</b> complex *A, <b>const</b> complex *B, ae_int_t N);
 
-<b>void</b> vmove(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n);
-<b>void</b> vmove(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n);
-<b>void</b> vmove(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n);
-<b>void</b> vmove(complex *a, <b>const</b> complex *b, ae_int_t n);
+<b>void</b> vmove(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N);
+<b>void</b> vmove(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N);
+<b>void</b> vmove(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N);
+<b>void</b> vmove(complex *A, <b>const</b> complex *B, ae_int_t N);
 
-<b>void</b> vmoveneg(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n);
-<b>void</b> vmoveneg(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n);
-<b>void</b> vmoveneg(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n);
-<b>void</b> vmoveneg(complex *a, <b>const</b> complex *b, ae_int_t n);
+<b>void</b> vmoveneg(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N);
+<b>void</b> vmoveneg(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N);
+<b>void</b> vmoveneg(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N);
+<b>void</b> vmoveneg(complex *A, <b>const</b> complex *B, ae_int_t N);
 
-<b>void</b> vmove(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmove(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmove(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmove(complex *a, <b>const</b> complex *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmove(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, complex alpha);
-<b>void</b> vmove(complex *a, <b>const</b> complex *b, ae_int_t n, complex alpha);
+<b>void</b> vmove(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmove(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmove(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmove(complex *A, <b>const</b> complex *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmove(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, complex Alpha);
+<b>void</b> vmove(complex *A, <b>const</b> complex *B, ae_int_t N, complex Alpha);
 
-<b>void</b> vadd(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n);
-<b>void</b> vadd(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n);
-<b>void</b> vadd(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n);
-<b>void</b> vadd(complex *a, <b>const</b> complex *b, ae_int_t n);
-<b>void</b> vadd(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vadd(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vadd(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vadd(complex *a, <b>const</b> complex *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vadd(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, complex alpha);
-<b>void</b> vadd(complex *a, <b>const</b> complex *b, ae_int_t n, complex alpha);
+<b>void</b> vadd(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N);
+<b>void</b> vadd(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N);
+<b>void</b> vadd(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N);
+<b>void</b> vadd(complex *A, <b>const</b> complex *B, ae_int_t N);
+<b>void</b> vadd(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vadd(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vadd(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vadd(complex *A, <b>const</b> complex *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vadd(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, complex Alpha);
+<b>void</b> vadd(complex *A, <b>const</b> complex *B, ae_int_t N, complex Alpha);
 
-<b>void</b> vsub(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n);
-<b>void</b> vsub(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n);
-<b>void</b> vsub(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n);
-<b>void</b> vsub(complex *a, <b>const</b> complex *b, ae_int_t n);
-<b>void</b> vsub(<b>double</b> *a, ae_int_t a_stride, <b>const</b> <b>double</b> *b, ae_int_t b_stride, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vsub(<b>double</b> *a, <b>const</b> <b>double</b> *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vsub(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vsub(complex *a, <b>const</b> complex *b, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vsub(complex *a, ae_int_t a_stride, <b>const</b> complex *b, ae_int_t b_stride, <b>const</b> char *b_conj, ae_int_t n, complex alpha);
-<b>void</b> vsub(complex *a, <b>const</b> complex *b, ae_int_t n, complex alpha);
+<b>void</b> vsub(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N);
+<b>void</b> vsub(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N);
+<b>void</b> vsub(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N);
+<b>void</b> vsub(complex *A, <b>const</b> complex *B, ae_int_t N);
+<b>void</b> vsub(<b>double</b> *A, ae_int_t dA, <b>const</b> <b>double</b> *B, ae_int_t dB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vsub(<b>double</b> *A, <b>const</b> <b>double</b> *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vsub(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vsub(complex *A, <b>const</b> complex *B, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vsub(complex *A, ae_int_t dA, <b>const</b> complex *B, ae_int_t dB, <b>const</b> char *CjB, ae_int_t N, complex Alpha);
+<b>void</b> vsub(complex *A, <b>const</b> complex *B, ae_int_t N, complex Alpha);
 
-<b>void</b> vmul(<b>double</b> *a, ae_int_t a_stride, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmul(<b>double</b> *a, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmul(complex *a, ae_int_t a_stride, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmul(complex *a, ae_int_t n, <b>double</b> alpha);
-<b>void</b> vmul(complex *a, ae_int_t a_stride, ae_int_t n, complex alpha);
-<b>void</b> vmul(complex *a, ae_int_t n, complex alpha);
+<b>void</b> vmul(<b>double</b> *A, ae_int_t dA, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmul(<b>double</b> *A, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmul(complex *A, ae_int_t dA, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmul(complex *A, ae_int_t N, <b>double</b> Alpha);
+<b>void</b> vmul(complex *A, ae_int_t dA, ae_int_t N, complex Alpha);
+<b>void</b> vmul(complex *A, ae_int_t N, complex Alpha);
 </pre>
 <p>
 <a name=gs_csv class=sheader></a><h3>5.10. Reading Data from CSV Files</h3>

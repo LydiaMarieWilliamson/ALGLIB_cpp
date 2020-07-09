@@ -25,13 +25,13 @@
 #include <ctype.h>
 #if defined AE_CPU && AE_CPU == AE_INTEL
 #   if AE_COMPILER == AE_GNUC
-#      include <fpu_control.h> // For _FPU_SETCW
+#      include <fpu_control.h> // For _FPU_SETCW.
 #   elif AE_COMPILER == AE_MSVC
 #      include <intrin.h>
 #   endif
 #endif
 
-// OS-specific includes
+// OS-specific includes.
 #if AE_OS == AE_POSIX
 #   include <time.h>
 #   include <unistd.h>
@@ -45,106 +45,258 @@
 #   include <process.h>
 #endif
 
-// Debugging helpers for Windows
+// Debugging helpers for Windows.
 #ifdef AE_DEBUG4WINDOWS
 #   include <windows.h>
 #endif
 
 namespace alglib_impl {
 // Core Code (Vectors, Matrices, Memory Management, etc.)
-// local definitions
-#define x_nb 16
-#define AE_DATA_ALIGN 64
-#define AE_PTR_ALIGN sizeof(void *)
-#define AE_LITTLE_ENDIAN 1
-#define AE_BIG_ENDIAN 2
-#define AE_MIXED_ENDIAN 3
-#define AE_SER_ENTRY_LENGTH 11
-#define AE_SER_ENTRIES_PER_ROW 5
-#define AE_LOCK_CYCLES 512
-#define AE_LOCK_TESTS_BEFORE_YIELD 16
-#define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
+// Local definitions.
+#define AE_DATA_ALIGN	0x40
+#define AE_PTR_ALIGN	sizeof(void *)
 
-// Global flags, split into several char-sized variables in order
-// to avoid problem with non-atomic reads/writes (single-byte ops
-// are atomic on all modern architectures);
-//
-// Following variables are included:
-// * threading-related settings
-static unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL >> _ALGLIB_FLG_THREADING_SHIFT;
+#define AE_LITTLE_ENDIAN	1
+#define AE_BIG_ENDIAN		2
+#define AE_MIXED_ENDIAN		3
 
-// DESCRIPTION: recommended number of active workers:
-//              * positive value >= 1 is used to specify exact number of active workers
-//              * 0 means that ALL available cores are used
-//              * negative value means that all cores EXCEPT for cores_to_use will be used
-//                (say, -1 means that all cores except for one will be used). At least one
-//                core will be used in this case, even if you assign -9999999 to this field.
-//
-//              Default value =  0 (fully parallel execution) when AE_NWORKERS is not defined
-//                            =  0 for manually defined number of cores (AE_NWORKERS is defined)
-// PROTECTION:  not needed; runtime modification is possible, but we do not need exact
-//              synchronization.
-#if defined AE_NWORKERS
-#   if AE_NWORKERS <= 0
-#      error AE_NWORKERS must be positive number or not defined at all.
-#   endif
-static ae_int_t _alglib_cores_to_use = 0;
-#else
-static ae_int_t _alglib_cores_to_use = 0;
-#endif
+#define AE_SER_ENTRY_LENGTH	11
+#define AE_SER_ENTRIES_PER_ROW	5
 
-// Debug counters
+// These declarations are used to ensure, at compile-time, that
+//	sizeof(bool) == 1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
+// They are implemented by the following general method to verify ConstA == ConstB:
+//	static char DummyArray[1 -  2*(ConstA - ConstB)*(ConstA - ConstB)];
+// that would lead to a syntax error if the constraint failed (by declaring a negative array size).
+// You can remove them, if you want, since they are not used anywhere else.
+#define EquateConst(Arr, A, B)	static char Arr[1 - 2*((A) - (B))*((A) - (B))];
+EquateConst(_ae_bool_must_be_8_bits_wide, (int)sizeof(bool), 1);
+EquateConst(_ae_int32_t_must_be_32_bits_wide, (int)sizeof(ae_int32_t), 4);
+EquateConst(_ae_int64_t_must_be_64_bits_wide, (int)sizeof(ae_int64_t), 8);
+EquateConst(_ae_uint64_t_must_be_64_bits_wide, (int)sizeof(ae_uint64_t), 8);
+EquateConst(_ae_int_t_must_be_pointer_sized, (int)sizeof(ae_int_t), (int)sizeof(void *));
+#undef EquateConst
+
+// Allocation tracking, for debugging.
 ae_int_t _alloc_counter = 0;
 ae_int_t _alloc_counter_total = 0;
 bool _use_alloc_counter = false;
-ae_int_t _dbg_alloc_total = 0;
-bool _use_dbg_counters = false;
-bool _use_vendor_kernels = true;
-bool debug_workstealing = false; // Debug workstealing environment? False by default.
-ae_int_t dbgws_pushroot_ok = 0;
-ae_int_t dbgws_pushroot_failed = 0;
 
-// Allocation debugging
+// Allocation debugging.
 bool _force_malloc_failure = false;
 ae_int_t _malloc_failure_after = 0;
 
-// Fields for memory allocation over static array
-#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
-#   endif
-static ae_int_t sm_page_size = 0;
-static ae_int_t sm_page_cnt = 0;
-static ae_int_t *sm_page_tbl = NULL;
-static unsigned char *sm_mem = NULL;
-#endif
+//(@) Originally a part of the global environment structure, these should all be made thread-local.
+// A pointer to the jmp_buf for cases when C-style exception handling is used.
+// It may be NULL.
+AutoS jmp_buf *volatile CurBreakAt;
+// Set the jump buffer for error handling.
+void ae_state_set_break_jump(jmp_buf *buf) { CurBreakAt = buf; }
 
-// These declarations are used to ensure that
-// sizeof(bool)=1, sizeof(ae_int32_t) == 4, sizeof(ae_int64_t) == 8, sizeof(ae_int_t) == sizeof(void *).
-// they will lead to syntax error otherwise (array size will be negative).
-//
-// you can remove them, if you want - they are not used anywhere.
-//
-static char _ae_bool_must_be_8_bits_wide[1 - 2*((int)sizeof(bool) - 1)*((int)sizeof(bool) - 1)];
-static char _ae_int32_t_must_be_32_bits_wide[1 - 2*((int)sizeof(ae_int32_t) - 4)*((int)sizeof(ae_int32_t) - 4)];
-static char _ae_int64_t_must_be_64_bits_wide[1 - 2*((int)sizeof(ae_int64_t) - 8)*((int)sizeof(ae_int64_t) - 8)];
-static char _ae_uint64_t_must_be_64_bits_wide[1 - 2*((int)sizeof(ae_uint64_t) - 8)*((int)sizeof(ae_uint64_t) - 8)];
-static char _ae_int_t_must_be_pointer_sized[1 - 2*((int)sizeof(ae_int_t) - (int)sizeof(void *))*((int)sizeof(ae_int_t) - (int)sizeof(void *))];
+// The ae_error_type of the last error and a legible message for it; filled when an exception is thrown.
+AutoS ae_error_type volatile CurStatus;
+AutoS const char *volatile CurMsg;
 
-// This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
-// It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
-static volatile ae_int_t ae_never_change_it = 1;
+// Flags: call-local settings for ALGLIB++.
+AutoS ae_uint64_t CurFlags;
+// Set CurFlags.
+void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
 
-void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
-   switch (flag_id) {
-      case _ALGLIB_ALLOC_COUNTER: _use_alloc_counter = flag_val != 0; break;
-      case _ALGLIB_TOTAL_ALLOC_SIZE: _use_dbg_counters = flag_val != 0; break;
-      case _ALGLIB_USE_VENDOR_KERNELS: _use_vendor_kernels = flag_val != 0; break;
-      case _ALGLIB_DEBUG_WORKSTEALING: debug_workstealing = flag_val != 0; break;
-      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t) flag_val); break;
-      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
-   }
+// pointer to the top block in a stack of frames which hold dynamically allocated objects.
+AutoS ae_frame *volatile TopFr;
+
+// The stack and frame boundary special blocks.
+static unsigned char DynBottom = 1, DynFrame = 2;
+
+// Make a new stack frame for the environment.
+// tmp points to the place in the dynamic block that marks where the frame begins.
+// The dynamic block is assumed to be initialized by thecaller and must be left alone
+// (no changes, deallocations, or reuse) until ae_leave_frame() is called.
+// tmp may be a global or (preferrably) local variable.
+void ae_frame_make(ae_frame *tmp) { tmp->p_next = TopFr, tmp->deallocator = NULL, tmp->ptr = &DynFrame, TopFr = tmp; }
+
+// Leave the current stack frame and deallocate all automatic dynamic blocks which were attached to this frame.
+void ae_frame_leave() {
+   for (; TopFr->ptr != &DynFrame && TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
+      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
+   if (TopFr->ptr == &DynFrame) TopFr = TopFr->p_next;
 }
+
+// Initializes the ALGLIB++ frame stack environment.
+// NOTE:
+// *	Stacks contain no frames, so ae_make_frame() must be called before attaching dynamic blocks.
+//	Without it ae_leave_frame() will cycle forever -- as intended.
+void ae_state_init() {
+// The base of the current stack of frames.
+// p_next points to itself because a correct program should be able to detect end of the list by looking at the ptr field.
+// NULL p_next may be used to distinguish automatic blocks (in the list) from non-automatic (not in the list).
+   static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
+// Set the status indicators and clear the frame.
+   CurFlags = 0x0, CurBreakAt = NULL, CurMsg = "", TopFr = &BotFr;
+}
+
+// Clear the ALGLIB++ frrame stack environment, freeing all the dynamic data in it that it controls.
+void ae_state_clear() {
+   if (TopFr == NULL) return;
+   for (; TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
+      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
+   TopFr = NULL;
+}
+
+// Abnormally abort the program, using one of several ways:
+// *	if TopFr != NULL and CurBreakAt points to a jmp_buf - longjmp() to the return site.
+// *	else abort().
+// In all cases, for TopFr != NULL, set the CurStatus and CurMsg fields.
+// Clear the frame stack, if any, ae_state_clear().
+static void ae_break(ae_error_type error_type, const char *msg) {
+   if (TopFr == NULL) abort();
+   ae_state_clear();
+   CurStatus = error_type;
+   CurMsg = msg;
+   if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
+}
+
+// Assertion.
+// Upon failure with TopFr != NULL, gracefully exit ALGLIB++, removing all frames and deallocating registered dynamic data structures.
+// Otherwise, just abort().
+// IMPORTANT:
+// *	This function ALWAYS evaluates cond, and cannot be replaced by macros which do nothing.
+//	In particular, when invoked, a function call may be used as the cond argument, and it will be carried out.
+void ae_assert(bool cond, const char *msg) {
+   if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
+}
+
+static void ae_impose(bool cond, const char *msg) {
+   if (!cond) fprintf(stderr, msg), abort();
+}
+
+#define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
+
+// Make flags variables into one or more char-sized variables in order to avoid problem with non-atomic reads/writes
+// (single-byte ops are atomic on all contemporary CPUs);
+#define _ALGLIB_FLG_THREADING_MASK          0x7
+#define _ALGLIB_FLG_THREADING_SHIFT         0
+static unsigned char _alglib_global_threading_flags = SerTH >> _ALGLIB_FLG_THREADING_SHIFT;
+
+// Get/Set the default (global) threading model:
+// *	serial execution
+// *	multithreading, if CoresToUse allows it
+ae_uint64_t ae_get_global_threading() {
+   return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
+}
+
+void ae_set_global_threading(ae_uint64_t flg_value) {
+   flg_value &= _ALGLIB_FLG_THREADING_MASK;
+   AE_CRITICAL_ASSERT(flg_value == SerTH || flg_value == ParTH);
+   _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
+}
+
+// The recommended number of active workers:
+// *	The exact number of cores to use if AE_NWORKERS > 0
+// *	ALL available cores, if AE_NWORKERS == 0
+// *	max(_alglib_cores_to_use + AE_NWORKERS, 1), if AE_NWORKERS < 0.
+// *	Default value = 0: either full parallelism if AE_NWORKERS is not defined,
+//	or a manually-set number of cores if AE_NWORKERS is defined.
+// PROTECTION:
+// *	not needed; runtime modification is possible, but we do not need exact synchronization.
+#if defined AE_NWORKERS && AE_NWORKERS <= 0
+#   error AE_NWORKERS must be positive number or not defined at all.
+#endif
+static ae_int_t _alglib_cores_to_use = 0;
+
+// CPUID
+// Information about features the CPU and compiler support.
+// You must tell ALGLIB++ what CPU family is used by defining AE_CPU (without this hint zero will be returned).
+// NOTE:
+// *	The results of this function depend on both CPU and compiler;
+//	if the compiler doesn't support SSE intrinsics, then the function won't set the corresponding flag.
+static ae_cpuid_t ae_cpuid() {
+// Determine the CPU characteristics and perform CPU-specific initializations.
+// Previous calls are cached to speed things up.
+// There is no synchronization, but this can be safely done on a per-thread basis,
+// provided that simultaneous writes by different cores to the same location will be executed in serial manner,
+// which is true of contemporary architectures.
+   static volatile bool _ae_cpuid_initialized = false, _ae_cpuid_has_sse2 = false;
+// If not initialized, then determine the system properties.
+   if (!_ae_cpuid_initialized) {
+#if defined AE_CPU && AE_CPU == AE_INTEL
+   { // SSE2
+#   if defined AE_HAS_SSE2_INTRINSICS
+#      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+      ae_int_t a, b, c, d;
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+      if (d&0x04000000) _ae_cpuid_has_sse2 = true;
+#      elif AE_COMPILER == AE_MSVC
+      int CPUInfo[4];
+      __cpuid(CPUInfo, 1);
+      if (CPUInfo[3]&0x04000000) _ae_cpuid_has_sse2 = true;
+#      endif
+#   endif
+   } { // Perform one more CPUID call to generate memory fence
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
+      ae_int_t a, b, c, d;
+      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
+#   elif AE_COMPILER == AE_MSVC
+      int CPUInfo[4];
+      __cpuid(CPUInfo, 1);
+#   endif
+   } { // Perform other CPU-related initializations.
+#   if AE_COMPILER == AE_GNUC
+      unsigned CpuMode = 0x27f; // Set rounding for floating-point math to double precision for x86/x64 processors under GCC.
+      asm("fldcw %0" : : "m"(*&CpuMode));
+#   endif
+   }
+#endif
+   // Set the initialization flag.
+      _ae_cpuid_initialized = true;
+   }
+   return _ae_cpuid_has_sse2 ? CPU_SSE2 : (ae_cpuid_t)0;
+}
+
+const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
+
+// The number of cores in the system: values < 1 may be returned.
+ae_int_t ae_cores_count() {
+#if AE_OS == AE_POSIX
+   return sysconf(_SC_NPROCESSORS_ONLN);
+#   if 0 //(@) Was:
+// long Cores = sysconf(_SC_NPROCESSORS_ONLN);
+// return Cores <= 0 ? 1 : Cores;
+#   endif
+#elif AE_OS == AE_WINDOWS
+   SYSTEM_INFO sysInfo;
+   GetSystemInfo(&sysInfo);
+   return (ae_int_t)sysInfo.dwNumberOfProcessors;
+#else
+   return 1;
+#endif
+}
+
+// Map the nworkers number (which can be positive, zero for "all cores" or negative, e.g. -1 meaning "all cores -1")
+// to an "effective", strictly positive workers count.
+//
+// This is meant for use by debugging/testing code which tests different numbers of worker threads.
+// It is NOT aligned in any way with the ALGLIB++ multithreading framework
+// (i.e. it can return a non-zero worker count even for single-threaded GPLed ALGLIB++).
+ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
+// Determine the cores count.
+#if defined AE_NWORKERS
+   ae_int_t ncores = AE_NWORKERS;
+#else
+   ae_int_t ncores = ae_cores_count();
+#endif
+   AE_CRITICAL_ASSERT(ncores >= 1);
+// Map nworkers to its effective value.
+   return nworkers >= 1? (nworkers > ncores ? ncores : nworkers): (ncores + nworkers >= 1 ? ncores + nworkers : 1);
+}
+
+// Debug counters and flags.
+static ae_int_t _dbg_alloc_total = 0;
+static bool _use_dbg_counters = false;
+static bool _use_vendor_kernels = true;
+static bool debug_workstealing = false; // Debug workstealing environment? false by default.
+static ae_int_t dbgws_pushroot_ok = 0;
+static ae_int_t dbgws_pushroot_failed = 0;
 
 ae_int64_t ae_get_dbg_value(debug_flag_t id) {
    switch (id) {
@@ -156,7 +308,7 @@ ae_int64_t ae_get_dbg_value(debug_flag_t id) {
 #else
       case _ALGLIB_VENDOR_MEMSTAT: return 0;
 #endif
-   // Work-stealing counters
+   // Work-stealing counters.
 #if defined AE_SMP
       case _ALGLIB_WSDBG_NCORES: return ae_cores_count();
 #else
@@ -176,22 +328,15 @@ ae_int64_t ae_get_dbg_value(debug_flag_t id) {
    }
 }
 
-// This function sets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
-void ae_set_global_threading(ae_uint64_t flg_value) {
-   flg_value &= _ALGLIB_FLG_THREADING_MASK;
-   AE_CRITICAL_ASSERT(flg_value == _ALGLIB_FLG_THREADING_SERIAL || flg_value == _ALGLIB_FLG_THREADING_PARALLEL);
-   _alglib_global_threading_flags = (unsigned char)(flg_value >> _ALGLIB_FLG_THREADING_SHIFT);
-}
-
-// This function gets default (global) threading model:
-// * serial execution
-// * multithreading, if cores_to_use allows it
-//
-ae_uint64_t ae_get_global_threading() {
-   return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
+void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
+   switch (flag_id) {
+      case _ALGLIB_ALLOC_COUNTER: _use_alloc_counter = flag_val != 0; break;
+      case _ALGLIB_TOTAL_ALLOC_SIZE: _use_dbg_counters = flag_val != 0; break;
+      case _ALGLIB_USE_VENDOR_KERNELS: _use_vendor_kernels = flag_val != 0; break;
+      case _ALGLIB_DEBUG_WORKSTEALING: debug_workstealing = flag_val != 0; break;
+      case _ALGLIB_GLOBAL_THREADING: ae_set_global_threading((ae_uint64_t) flag_val); break;
+      case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
+   }
 }
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
@@ -210,212 +355,112 @@ void *ae_align(void *ptr, size_t alignment) {
    return result;
 }
 
-// The number of cores in the system: values < 1 may be returned.
-ae_int_t ae_cores_count();
+// The "optional atomic" functions:
+// i.e. functions which either perform atomic changes - or do nothing at all,
+// if current compiler settings cannot generate atomic code.
+// They are synchronized, i.e. either all of them work - or none of them do.
 
-// This function causes the calling thread to relinquish the CPU.
-// The thread is moved to the end of the queue and some other thread gets to run.
+// Perform atomic addition on a pointer-sized and pointer-size aligned value.
 // NOTE:
-// *	this function should NOT be called when AE_OS is AE_OTHER_OS - the whole program will be abnormally terminated.
-void ae_yield();
-
-#if AE_OS == AE_POSIX
-ae_int_t ae_cores_count() { return sysconf(_SC_NPROCESSORS_ONLN); }
-//(@) Was: ae_int_t ae_cores_count() { long Cores = sysconf(_SC_NPROCESSORS_ONLN); return Cores <= 0 ? 1 : Cores; }
-void ae_yield() { sched_yield(); }
-#elif AE_OS == AE_WINDOWS
-ae_int_t ae_cores_count() {
-   SYSTEM_INFO sysInfo;
-   GetSystemInfo(&sysInfo);
-   return (ae_int_t)sysInfo.dwNumberOfProcessors;
-}
-void ae_yield() { if (!SwitchToThread()) Sleep(0); }
-#else
-ae_int_t ae_cores_count() { return 1; }
-void ae_yield() { abort(); }
-#endif
-
-// This function maps nworkers  number  (which  can  be  positive,  zero  or
-// negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
-// to "effective", strictly positive workers count.
-//
-// This  function  is  intended  to  be used by debugging/testing code which
-// tests different number of worker threads. It is NOT aligned  in  any  way
-// with ALGLIB multithreading framework (i.e. it can return  non-zero worker
-// count even for single-threaded GPLed ALGLIB).
-ae_int_t ae_get_effective_workers(ae_int_t nworkers) {
-   ae_int_t ncores;
-// determine cores count
-#if defined AE_NWORKERS
-   ncores = AE_NWORKERS;
-#else
-   ncores = ae_cores_count();
-#endif
-   AE_CRITICAL_ASSERT(ncores >= 1);
-// map nworkers to its effective value
-   return nworkers >= 1? (nworkers > ncores ? ncores : nworkers): (ncores + nworkers >= 1 ? ncores + nworkers : 1);
-}
-
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
-//
-// This particular function performs atomic addition on pointer-sized  value,
-// which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
-void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
+// *	This function is not keyed in for high performance, so use it only when necessary.
+static void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
+#if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100*__GNUC__ + __GNUC__ >= 470
+   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
+#elif AE_OS == AE_WINDOWS
    while (true) {
-   // perform conversion between ae_int_t* and void** without compiler warnings about indirection levels.
+   // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
       union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
       u.iptr = p;
-   // atomic read for initial value
+   // Atomic read the initial value, convert it to a 1-byte pointer, then increment and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-   // increment cached value and store
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)(((char *)v0) + v), v0) == v0)
          break;
    }
-#elif AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100*__GNUC__ + __GNUC__ >= 470
-   __atomic_add_fetch(p, v, __ATOMIC_RELAXED);
 #else
    *p += v; // At least do something for older compilers!
 #endif
 }
 
-// This function belongs to the family of  "optional  atomics",  i.e.  atomic
-// functions which either perform atomic changes - or do nothing at  all,  if
-// current compiler settings do not allow us to generate atomic code.
-//
-// All "optional atomics" are synchronized, i.e. either all of them work - or
-// no one of the works.
-//
-// This  particular  function  performs  atomic  subtraction on pointer-sized
-// value, which must be pointer-size aligned.
-//
-// NOTE: this function is not intended to be extremely high performance  one,
-//       so use it only when necessary.
-void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
+// Perform atomic subtraction on a pointer-sized and pointer-size aligned value.
+// NOTE:
+// *	This function is not keyed in for high performance, so use it only when necessary.
+static void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v) {
    AE_CRITICAL_ASSERT(ae_misalignment(p, sizeof(void *)) == 0);
-#if AE_OS == AE_WINDOWS
+#if AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100*__GNUC__ + __GNUC__ >= 470
+   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
+#elif AE_OS == AE_WINDOWS
    while (true) {
-   // perform conversion between ae_int_t* and void** without compiler warnings about indirection levels.
+   // Convert between ae_int_t * and void ** without compiler warnings about indirection levels.
       union {
          PVOID volatile *volatile ptr;
          volatile ae_int_t *volatile iptr;
       } u;
       u.iptr = p;
-   // atomic read for initial value, convert it to 1-byte pointer
+   // Atomic read the initial value, convert it to a 1-byte pointer, then decrement and store it.
       PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
-   // increment cached value and store
       if (InterlockedCompareExchangePointer(u.ptr, (PVOID)(((char *)v0) - v), v0) == v0)
          break;
    }
-#elif AE_COMPILER == AE_GNUC && AE_CPU == AE_INTEL && 100*__GNUC__ + __GNUC__ >= 470
-   __atomic_sub_fetch(p, v, __ATOMIC_RELAXED);
 #else
    *p -= v; // At least do something for older compilers!
 #endif
 }
 
-// jmp_buf pointer for internal C-style exception handling
-AutoS jmp_buf *volatile CurBreakAt;
-
-// This function sets jump buffer for error handling.
-// At may be NULL.
-void ae_state_set_break_jump(jmp_buf *At) { CurBreakAt = At; }
-
-// ae_error_type of the last error (filled when exception is thrown)
-AutoS ae_error_type volatile CurStatus;
-
-// human-readable message (filled when exception is thrown)
-AutoS const char *volatile CurMsg;
-
-// pointer to the top block in a stack of frames which hold dynamically allocated objects.
-AutoS ae_frame *volatile TopFr;
-
-// This function abnormally aborts program, using one of several ways:
-//
-// * for TopFr != NULL and CurBreakAt being initialized with  call  to
-//   ae_state_set_break_jump() - it performs longjmp() to return site.
-// * otherwise, abort() is called
-// In all cases, for  TopFr != NULL function sets CurStatus and CurMsg fields.
-// It also clears TopFr with ae_state_clear().
-void ae_break(ae_error_type error_type, const char *msg) {
-   if (TopFr != NULL) {
-      ae_state_clear();
-      CurStatus = error_type;
-      CurMsg = msg;
-      if (CurBreakAt != NULL) longjmp(*CurBreakAt, 1); else abort();
-   } else abort();
-}
-
-// Assertion
-// For TopFr != NULL it allows to gracefully leave ALGLIB session,
-// removing all frames and deallocating registered dynamic data structure.
-// For TopFr == NULL it just abort()'s program.
-// IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
-//            replaced by macro which does nothing. So, you may place actual
-//            function calls at cond, and these will always be performed.
-void ae_assert(bool cond, const char *msg) {
-   if (!cond) ae_break(ERR_ASSERTION_FAILED, msg);
-}
-
-void ae_impose(bool cond, const char *msg) {
-   if (!cond) fprintf(stderr, msg), abort();
-}
-
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
+// Fields for memory allocation over static array.
+#   if AE_THREADING != NonTH
+#      error Basis static malloc is thread-unsafe; define AE_THREADING=NonTH to prove that you know it
+#   endif
+
+static ae_int_t sm_page_size = 0;
+static ae_int_t sm_page_cnt = 0;
+static ae_int_t *sm_page_tbl = NULL;
+static unsigned char *sm_mem = NULL;
+
 void set_memory_pool(void *ptr, size_t size) {
-// Integrity checks
+// Integrity checks.
    AE_CRITICAL_ASSERT(sm_page_size == 0);
    AE_CRITICAL_ASSERT(sm_page_cnt == 0);
    AE_CRITICAL_ASSERT(sm_page_tbl == NULL);
    AE_CRITICAL_ASSERT(sm_mem == NULL);
    AE_CRITICAL_ASSERT(size > 0);
-// Align pointer
-   size -= ae_misalignment(ptr, sizeof(ae_int_t));
-   ptr = ae_align(ptr, sizeof(ae_int_t));
-// Calculate page size and page count, prepare pointers to page table and memory
-   sm_page_size = 256;
-   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);        // We expect to have memory for at least one page + table entry + alignment.
-   sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof(ae_int_t));
+// Align the pointer.
+   size -= ae_misalignment(ptr, sizeof *sm_page_tbl);
+   ptr = ae_align(ptr, sizeof *sm_page_tbl);
+// Calculate the page size and page count, prepare pointers to page table and memory.
+   sm_page_size = 0x100;
+// We expect to have memory for at least one page + table entry + alignment.
+   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof *sm_page_tbl) + sm_page_size);
+   sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    sm_page_tbl = (ae_int_t *) ptr;
    sm_mem = (unsigned char *)ae_align(sm_page_tbl + sm_page_cnt, sm_page_size);
-// Mark all pages as free
-   memset(sm_page_tbl, 0, sm_page_cnt * sizeof(ae_int_t));
+// Mark all pages as free.
+   memset(sm_page_tbl, 0, sm_page_cnt * sizeof *sm_page_tbl);
 }
 
-void *ae_static_malloc(size_t size, size_t alignment) {
-   int rq_pages, i, j, cur_len;
+static void *ae_static_malloc(size_t size, size_t alignment) {
    AE_CRITICAL_ASSERT(size >= 0);
    AE_CRITICAL_ASSERT(sm_page_size > 0);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    AE_CRITICAL_ASSERT(sm_page_tbl != NULL);
    AE_CRITICAL_ASSERT(sm_mem != NULL);
-   if (size == 0)
+   if (size == 0 || _force_malloc_failure)
       return NULL;
-   if (_force_malloc_failure)
-      return NULL;
-// check that page alignment and requested alignment match each other
+// Check that the page alignment and requested alignment match each other.
    AE_CRITICAL_ASSERT(alignment <= sm_page_size);
    AE_CRITICAL_ASSERT((sm_page_size % alignment) == 0);
-// search long enough sequence of pages
-   rq_pages = size / sm_page_size;
+// Search a long enough sequence of pages.
+   int rq_pages = size / sm_page_size;
    if (size % sm_page_size)
       rq_pages++;
-   cur_len = 0;
-   for (i = 0; i < sm_page_cnt;) {
-   // determine length of the sequence of free pages
+   int cur_len = 0;
+   for (int i = 0; i < sm_page_cnt; ) {
+   // Determine the length of the free page sequence.
       if (sm_page_tbl[i] == 0)
          cur_len++;
       else {
@@ -424,57 +469,54 @@ void *ae_static_malloc(size_t size, size_t alignment) {
          i += sm_page_tbl[i];
          continue;
       }
-   // found it?
+   // Found it?
       if (cur_len >= rq_pages) {
-      // update counters (if flag is set)
+      // Update whichever counters the use-flags are set for.
          if (_use_alloc_counter) {
             ae_optional_atomic_add_i(&_alloc_counter, 1);
             ae_optional_atomic_add_i(&_alloc_counter_total, 1);
          }
          if (_use_dbg_counters)
             ae_optional_atomic_add_i(&_dbg_alloc_total, size);
-      // mark pages and return
-         for (j = 0; j < rq_pages; j++)
+      // Mark pages and return.
+         for (int j = 0; j < rq_pages; j++)
             sm_page_tbl[i - j] = -1;
          sm_page_tbl[i - (rq_pages - 1)] = rq_pages;
          return sm_mem + (i - (rq_pages - 1)) * sm_page_size;
       }
-   // next element
+   // The next page.
       i++;
    }
    return NULL;
 }
 
-void ae_static_free(void *block) {
-   ae_int_t page_idx, page_cnt, i;
+static void ae_static_free(void *block) {
    if (block == NULL)
       return;
-   page_idx = (unsigned char *)block - sm_mem;
+   ae_int_t page_idx = (unsigned char *)block - sm_mem;
    AE_CRITICAL_ASSERT(page_idx >= 0);
    AE_CRITICAL_ASSERT((page_idx % sm_page_size) == 0);
    page_idx /= sm_page_size;
    AE_CRITICAL_ASSERT(page_idx < sm_page_cnt);
-   page_cnt = sm_page_tbl[page_idx];
+   ae_int_t page_cnt = sm_page_tbl[page_idx];
    AE_CRITICAL_ASSERT(page_cnt >= 1);
-   for (i = 0; i < page_cnt; i++)
+   for (ae_int_t i = 0; i < page_cnt; i++)
       sm_page_tbl[page_idx + i] = 0;
-// update counters (if flag is set)
+// Update the counters (if the use-flag is set).
    if (_use_alloc_counter)
       ae_optional_atomic_sub_i(&_alloc_counter, 1);
 }
 
 void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free) {
-   int i;
    AE_CRITICAL_ASSERT(sm_page_size > 0);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    AE_CRITICAL_ASSERT(sm_page_tbl != NULL);
    AE_CRITICAL_ASSERT(sm_mem != NULL);
-// scan page table
-   *bytes_used = 0;
-   *bytes_free = 0;
-   for (i = 0; i < sm_page_cnt;) {
+// Scan the page table.
+   *bytes_free = *bytes_used = 0;
+   for (int i = 0; i < sm_page_cnt;) {
       if (sm_page_tbl[i] == 0) {
-         (*bytes_free)++;
+         ++*bytes_free;
          i++;
       } else {
          AE_CRITICAL_ASSERT(sm_page_tbl[i] > 0);
@@ -492,56 +534,45 @@ void *aligned_malloc(size_t size, size_t alignment) {
    return ae_static_malloc(size, alignment);
 #else
    char *result = NULL;
-   if (size == 0)
+   if (size == 0 || _force_malloc_failure || _malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after)
       return NULL;
-   if (_force_malloc_failure)
-      return NULL;
-   if (_malloc_failure_after > 0 && _alloc_counter_total >= _malloc_failure_after)
-      return NULL;
-// allocate
+// Allocate.
    if (alignment <= 1) {
-   // no alignment, just call alloc
-      void *block;
-      void **p;;
-      block = malloc(sizeof(void *) + size);
+   // No alignment, just call malloc().
+      void *block = malloc(sizeof block + size);
       if (block == NULL)
          return NULL;
-      p = (void **)block;
-      *p = block;
-      result = (char *)((char *)block + sizeof(void *));
+      *(void **)block = block;
+      result = (char *)((char *)block + sizeof block);
    } else {
-   // align
-      void *block;
-      block = malloc(alignment - 1 + sizeof(void *) + size);
+   // Align.
+      void *block = malloc(alignment - 1 + sizeof block + size);
       if (block == NULL)
          return NULL;
-      result = (char *)block + sizeof(void *);
+      result = (char *)block + sizeof block;
 #   if 0
-      if ((result - (char *)0) % alignment != 0)
-         result += alignment - (result - (char *)0) % alignment;
+      if ((result - (char *)NULL) % alignment != 0)
+         result += alignment - (result - (char *)NULL) % alignment;
 #   endif
       result = (char *)ae_align(result, alignment);
-      *((void **)(result - sizeof(void *))) = block;
+      *(void **)(result - sizeof block) = block;
    }
-// update counters (if flag is set)
+// Update whichever counters the use-flags are set for.
    if (_use_alloc_counter) {
       ae_optional_atomic_add_i(&_alloc_counter, 1);
       ae_optional_atomic_add_i(&_alloc_counter_total, 1);
    }
    if (_use_dbg_counters)
       ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t) size);
-// return
    return (void *)result;
 #endif
 }
 
-void *aligned_extract_ptr(void *block) {
+static void *aligned_extract_ptr(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    return NULL;
 #else
-   if (block == NULL)
-      return NULL;
-   return *((void **)((char *)block - sizeof(void *)));
+   return block == NULL ? NULL : *(void **)((char *)block - sizeof block);
 #endif
 }
 
@@ -549,10 +580,9 @@ void aligned_free(void *block) {
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    ae_static_free(block);
 #else
-   void *p;
    if (block == NULL)
       return;
-   p = aligned_extract_ptr(block);
+   void *p = aligned_extract_ptr(block);
    free(p);
    if (_use_alloc_counter)
       ae_optional_atomic_sub_i(&_alloc_counter, 1);
@@ -560,17 +590,12 @@ void aligned_free(void *block) {
 }
 
 // Allocate memory with automatic alignment.
-//
-// Returns NULL when zero size is specified.
-//
-// Error handling:
-// * if TopFr == NULL, returns NULL on allocation error
-// * if TopFr != NULL, calls ae_break() on allocation error
+// Return NULL when size == 0 is specified.
+// Upon failure with TopFr != NULL, call ae_break(), otherwise return NULL.
 void *ae_malloc(size_t size) {
-   void *result;
    if (size == 0)
       return NULL;
-   result = aligned_malloc(size, AE_DATA_ALIGN);
+   void *result = aligned_malloc(size, AE_DATA_ALIGN);
    if (result == NULL && TopFr != NULL)
       ae_break(ERR_OUT_OF_MEMORY, "ae_malloc: out of memory");
    return result;
@@ -581,29 +606,68 @@ void ae_free(void *p) {
       aligned_free(p);
 }
 
-// Sets pointers to the matrix rows.
-//
-// * dst must be correctly initialized matrix
-// * dst->data.ptr points to the beginning of memory block  allocated  for
-//   row pointers.
-// * dst->ptr - undefined (initialized during algorithm processing)
-// * storage parameter points to the beginning of actual storage
-void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
-   char *p_base;
-   void **pp_ptr;
-   ae_int_t i;
-   if (dst->rows > 0 && dst->cols > 0) {
-      p_base = (char *)storage;
-      pp_ptr = (void **)dst->data.ptr;
-      dst->xyX = pp_ptr;
-      for (i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
-         pp_ptr[i] = p_base;
-   } else
-      dst->xyX = NULL;
+// Attach block to the dynamic block list for the ALGLIB++ environment.
+// This function does NOT generate exceptions.
+// NOTE:
+// *	Avoid calling it for the special blocks which mark frame boundaries!
+static void ae_db_attach(ae_dyn_block *block) { block->p_next = TopFr, TopFr = block; }
+
+// Allocate and initialize a dynamic block of size >= 0 bytes for the ALGLIB++ environment.
+// It is assumed to be uninitialized, its fields are ignored.
+// make_automatic indicates that the block is to be added to the dynamic block list.
+// Upon allocation failure with TopFr != NULL, call ae_break(), leaving block in a valid (but empty) state.
+// NOTES:
+// *	Avoid calling it for blocks which are already in the list.
+//	Use ae_db_realloc() for already allocated blocks.
+// *	No memory allocation is performed for initialization with size == 0.
+void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
+//(@) Zero-check removed.
+// NOTE:
+// *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
+   ae_assert(size >= 0, "ae_db_init: negative size");
+   block->ptr = NULL;
+   if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
+   if (size != 0) block->ptr = ae_malloc((size_t)size);
+   block->deallocator = ae_free;
 }
 
-// Returns size of datatype.
-// Zero for dynamic types like strings or multiple precision types.
+// Reallocate the dynamic block (assumed to be initialized) to size bytes for the ALGLIB++ environment.
+// Delete the old contents but preserve the automatic state.
+// Upon allocation failure with TopFr != NULL, call ae_break(), leaving block in a valid (but empty) state.
+// NOTE:
+// *	Avoid calling it for the special blocks which mark frame boundaries!
+void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
+// NOTE:
+// *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
+   ae_assert(size >= 0, "ae_db_realloc: negative size");
+   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
+   block->ptr = ae_malloc((size_t)size);
+   block->deallocator = ae_free;
+}
+
+// Clear the dynamic block (assumed to be initialized), releasing all dynamically allocated memory.
+// The dynamic block may be in the automatic management list - in this case it will NOT be removed from the list.
+// NOTE:
+// *	Avoid calling it for the special blocks which mark frame boundaries!
+void ae_db_free(ae_dyn_block *block) {
+   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
+   block->deallocator = ae_free;
+}
+
+// Swap dynamic blocks block1 and block2 (pointers and deallocators)
+// leaving other parameters (automatic management settings, etc.) unchanged.
+// NOTE:
+// *	Avoid calling it for the special blocks which mark frame boundaries!
+void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
+   void *volatile ptr = block1->ptr;
+   void (*deallocator)(void *) = block1->deallocator;
+   block1->ptr = block2->ptr;
+   block1->deallocator = block2->deallocator;
+   block2->ptr = ptr;
+   block2->deallocator = deallocator;
+}
+
+// The size of datatype or zero for dynamic types like strings or multiple precision types.
 ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
    // case DT_BYTE: // The same as alglib_impl::DT_BOOL.
@@ -615,291 +679,45 @@ ae_int_t ae_sizeof(ae_datatype datatype) {
    }
 }
 
-// Checks that n bytes pointed by ptr are zero.
-//
-// This function is used in the constructors to check that  instance  fields
-// on entry are correctly initialized by zeros.
-bool ae_check_zeros(const void *ptr, ae_int_t n) {
-   ae_int_t nu, nr, i;
-   unsigned long long c = 0x0;
-// determine leading and trailing lengths
-   nu = n / sizeof(unsigned long long);
-   nr = n % sizeof(unsigned long long);
-// handle leading nu long long elements
-   if (nu > 0) {
-      const unsigned long long *p_ull;
-      p_ull = (const unsigned long long *)ptr;
-      for (i = 0; i < nu; i++)
-         c |= p_ull[i];
-   }
-// handle trailing nr char elements
-   if (nr > 0) {
-      const unsigned char *p_uc;
-      p_uc = ((const unsigned char *)ptr) + nu * sizeof(unsigned long long);
-      for (i = 0; i < nr; i++)
-         c |= p_uc[i];
-   }
-// done
-   return c == 0x0;
-}
-
-// Flags: call-local settings for ALGLIB
-AutoS ae_uint64_t CurFlags;
-
-// This function sets current state's flags.
-// buf may be NULL.
-void ae_state_set_flags(ae_uint64_t flags) { CurFlags = flags; }
-
-unsigned char DynBottom = 1, DynFrame = 2;
-
-// This function makes new stack frame.
-//
-// This function takes two parameters: environment state and pointer to  the
-// dynamic block which will be used as indicator  of  the  frame  beginning.
-// This dynamic block must be initialized by caller and mustn't  be changed/
-// deallocated/reused till ae_leave_frame called. It may be global or  local
-// variable (local is even better).
-void ae_frame_make(ae_frame *Fr) { Fr->p_next = TopFr, Fr->deallocator = NULL, Fr->ptr = &DynFrame, TopFr = Fr; }
-
-// This function leaves current stack frame and deallocates all automatic
-// dynamic blocks which were attached to this frame.
-void ae_frame_leave() {
-   for (; TopFr->ptr != &DynFrame && TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
-      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
-   if (TopFr->ptr == &DynFrame) TopFr = TopFr->p_next;
-}
-
-// This function initializes ALGLIB environment state.
-// NOTES:
-// * stacks contain no frames, so ae_make_frame() must be called before
-//   attaching dynamic blocks. Without it ae_leave_frame() will cycle
-//   forever (which is intended behavior).
-void ae_state_init() {
-// The base of the current stack of frames which hold dynamically allocated objects.
-// p_next points to itself because:
-// * correct program should be able to detect end of the list
-//   by looking at the ptr field.
-// * NULL p_next may be used to distinguish automatic blocks
-//   (in the list) from non-automatic (not in the list)
-   static ae_frame BotFr = { &BotFr, NULL, &DynBottom };
-// Set the status indicators and clear the frame.
-   CurFlags = 0x0, CurBreakAt = NULL, CurMsg = "", TopFr = &BotFr;
-}
-
-// This function clears ALGLIB environment state.
-// All dynamic data controlled by state are freed.
-void ae_state_clear() {
-   if (TopFr == NULL) return;
-   for (; TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
-      if (TopFr->ptr != NULL && TopFr->deallocator != NULL) TopFr->deallocator(TopFr->ptr);
-   TopFr = NULL;
-}
-
-// This function attaches block to the dynamic block list of the current state.
-// block               block
-// This function does NOT generate exceptions.
-// NOTES:
-// * never call it for special blocks which marks frame boundaries!
-void ae_db_attach(ae_dyn_block *block) { block->p_next = TopFr, TopFr = block; }
-
-// This function initializes dynamic block for the current state:
-// block               destination block, MUST be zero-filled on entry
-// size                size (in bytes), >= 0.
-// make_automatic                if true, vector is added to the dynamic block list
-//
-// block is assumed to be uninitialized, its fields are ignored. You may
-// call this function with zero size in order to register block in the
-// dynamic list.
-//
-// Error handling: calls ae_break() on allocation error. Block is left in
-// valid state (empty, but valid).
-//
-// NOTES:
-// * never call it for blocks which are already in the list; use ae_db_realloc
-//   for already allocated blocks.
-//
-// NOTE: no memory allocation is performed for initialization with size=0
-void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic) {
-   AE_CRITICAL_ASSERT(ae_check_zeros(block, sizeof(*block)));
-// NOTE: these strange dances around block->ptr are necessary
-//       in order to correctly handle possible exceptions during
-//       memory allocation.
-   ae_assert(size >= 0, "ae_db_init: negative size");
-   block->ptr = NULL;
-   if (make_automatic) ae_db_attach(block); else block->p_next = NULL;
-   if (size != 0) block->ptr = ae_malloc((size_t)size);
-   block->deallocator = ae_free;
-}
-
-// This function realloc's dynamic block of the current state:
-//
-// block               destination block (initialized)
-// size                new size (in bytes)
-//
-// block is assumed to be initialized.
-//
-// This function:
-// * deletes old contents
-// * preserves automatic state
-//
-// Error handling: calls ae_break() on allocation error. Block is left in
-// valid state - empty, but valid.
-//
-// NOTES:
-// * never call it for special blocks which mark frame boundaries!
-void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
-// NOTE: these strange dances around block->ptr are necessary
-//       in order to correctly handle possible exceptions during
-//       memory allocation.
-   ae_assert(size >= 0, "ae_db_realloc: negative size");
-   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
-   block->ptr = ae_malloc((size_t)size);
-   block->deallocator = ae_free;
-}
-
-// This function clears dynamic block (releases  all  dynamically  allocated
-// memory). Dynamic block may be in automatic management list - in this case
-// it will NOT be removed from list.
-//
-// block               destination block (initialized)
-//
-// NOTES:
-// * never call it for special blocks which marks frame boundaries!
-void ae_db_free(ae_dyn_block *block) {
-   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
-   block->deallocator = ae_free;
-}
-
-// This function swaps contents of two dynamic blocks (pointers and
-// deallocators) leaving other parameters (automatic management settings,
-// etc.) unchanged.
-//
-// NOTES:
-// * never call it for special blocks which marks frame boundaries!
-void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
-   void (*deallocator)(void *) = NULL;
-   void *volatile ptr;
-   ptr = block1->ptr;
-   deallocator = block1->deallocator;
-   block1->ptr = block2->ptr;
-   block1->deallocator = block2->deallocator;
-   block2->ptr = ptr;
-   block2->deallocator = deallocator;
-}
-
-// This function creates ae_vector.
-// Vector size may be zero. Vector contents is uninitialized.
-//
-// dst                 destination vector, MUST be zero-filled (we  check  it
-//                     and call abort() if *dst is non-zero; the rationale is
-//                     that we can not correctly handle errors in constructors
-//                     without zero-filling).
-// size                vector size, may be zero
-// datatype            guess what...
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
-// NOTE: no memory allocation is performed for initialization with size=0
+// Make dst into a new datatype ae_vector of size >= 0.
+// Its contents are assumed to be uninitialized. and its fields are ignored.
+// make_automatic indicates whether or not the vector is to be added to the dynamic block list.
+// Upon allocation failure or size < 0, call ae_break().
+// NOTE:
+// *	No memory allocation is performed for initialization with size == 0.
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic) {
-// Integrity checks
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
+// Integrity checks.
+//(@) Zero-check removed.
    ae_assert(size >= 0, "ae_vector_init: negative size");
-// prepare for possible errors during allocation
+// Prepare for possible errors during allocation.
    dst->cnt = 0;
    dst->xX = NULL;
-// init
-   ae_db_init(&dst->data, size * ae_sizeof(datatype), make_automatic);
+// Initialize.
+   ae_db_init(&dst->data, (size_t)(size * ae_sizeof(datatype)), make_automatic);
    dst->cnt = size;
-   dst->datatype = datatype;
    dst->xX = dst->data.ptr;
+   dst->datatype = datatype;
    dst->is_attached = false;
 }
 
-// This function creates copy of ae_vector. New copy of the data is created,
-// which is managed and owned by newly initialized vector.
-//
-// dst                 destination vector, MUST be zero-filled (we  check  it
-//                     and call abort() if *dst is non-zero; the rationale is
-//                     that we can not correctly handle errors in constructors
-//                     without zero-filling).
-// src                 well, it is source
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
+// Copy ae_vector src into ae_vector dst.
 // dst is assumed to be uninitialized, its fields are ignored.
+// The fields copied to dst are to be managed and owned by dst.
+// make_automatic indicates whether or not the vector is to be added to the dynamic block list.
+// Upon allocation failure, call ae_break().
 void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic) {
    ae_vector_init(dst, src->cnt, src->datatype, make_automatic);
    if (src->cnt != 0) memmove(dst->xX, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
 
-// This function initializes ae_vector using X-structure as source. New copy
-// of data is created, which is owned/managed by ae_vector  structure.  Both
-// structures (source and destination) remain completely  independent  after
-// this call.
-//
-// dst                 destination vector, MUST be zero-filled (we  check  it
-//                     and call abort() if *dst is non-zero; the rationale is
-//                     that we can not correctly handle errors in constructors
-//                     without zero-filling).
-// src                 well, it is source
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic) {
-   ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, make_automatic);
-   if (src->cnt > 0) memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
-}
-
-// This function initializes ae_vector using X-structure as source.
-//
-// New vector is attached to source:
-// * DST shares memory with SRC
-// * both DST and SRC are writable - all writes to DST  change  elements  of
-//   SRC and vice versa.
-// * DST can be reallocated with ae_vector_set_length(), in  this  case  SRC
-//   remains untouched
-// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-//
-// NOTE: is_attached field is set  to  true  in  order  to  indicate  that
-//       vector does not own its memory.
-//
-// dst                 destination vector
-// src                 well, it is source
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic) {
-   volatile ae_int_t cnt;
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-   cnt = (ae_int_t) src->cnt;
-// ensure that size is correct
-   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x: 32/64 overflow");
-   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x: negative length");
-// prepare for possible errors during allocation
-   dst->cnt = 0;
-   dst->xX = NULL;
-   dst->datatype = (ae_datatype) src->datatype;
-// zero-size init in order to correctly register in the frame
-   ae_db_init(&dst->data, 0, make_automatic);
-// init
-   dst->cnt = cnt;
-   dst->xX = src->x_ptr;
-   dst->is_attached = true;
-}
-
-// This function changes length of ae_vector.
-//
-// dst                 destination vector
-// newsize             vector size, may be zero
-//
-// Error handling: calls ae_break() on allocation error
-//
-// NOTES:
-// * vector must be initialized
-// * all contents is free during setlength() call
-// * new size may be zero.
+// Resize the ae_vector dst to size newsize >= 0.
+// dst must be initialized.
+// Its contents are freed by setlength().
+// Upon allocation failure with TopFr != NULL, call ae_break(), otherwise return an indication of success or failure.
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
    ae_assert(newsize >= 0, "ae_vector_set_length: negative size");
    if (dst->cnt == newsize) return;
-// realloc, being ready for exception during reallocation (cnt=ptr=0 on entry)
+// Reallocate; preparing first for possible errors.
    dst->cnt = 0;
    dst->xX = NULL;
    ae_db_realloc(&dst->data, newsize * ae_sizeof(dst->datatype));
@@ -907,40 +725,25 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize) {
    dst->xX = dst->data.ptr;
 }
 
-// This function resized ae_vector, preserving previously existing elements.
-// Values of elements added during vector growth is undefined.
-//
-// dst                 destination vector
-// newsize             vector size, may be zero
-// state               ALGLIB environment state, can not be NULL
-//
-// Error handling: calls ae_break() on allocation error
-//
-// NOTES:
-// * vector must be initialized
-// * new size may be zero.
+// Resize the ae_vector dst to size newsize >= 0, preserving previously existing elements.
+// dst must be initialized.
+// The values of elements added during vector growth are undefined.
+// Upon allocation error, call ae_break().
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize) {
-   ae_int_t bytes_total;
    NewVector(tmp, newsize, dst->datatype);
-   bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
+   ae_int_t bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
    if (bytes_total > 0)
       memmove(tmp.xX, dst->xX, bytes_total);
    ae_swap_vectors(dst, &tmp);
    ae_vector_free(&tmp, true);
 }
 
-// This  function  provides  "FREE"  functionality  for vector (contents is
-// cleared, all internal structures are free, but structure still left in valid state).
-//
-// The  function clears vector contents (releases all dynamically  allocated
-// memory). Vector may be in automatic management list  -  in this  case  it
-// will NOT be removed from list.
-//
-// IMPORTANT: this function does NOT invalidates dst; it just  releases  all
-// dynamically allocated storage, but dst still may be used  after  call  to
-// ae_vector_set_length().
-//
-// dst                 destination vector
+// The "FREE" functionality for vector dst (cleared contents and freeing all internal structures).
+// Clear vector dst (releasing all dynamically allocated memory).
+// dst may be on the frame - in which case it will NOT be removed from the list.
+// IMPORTANT:
+// *	This function does NOT invalidate dst; it just releases all dynamically allocated storage,
+//	but dst still may be used after calling ae_vector_set_length().
 void ae_vector_free(ae_vector *dst, bool make_automatic) {
    dst->cnt = 0;
    ae_db_free(&dst->data);
@@ -948,18 +751,14 @@ void ae_vector_free(ae_vector *dst, bool make_automatic) {
    dst->is_attached = false;
 }
 
-// This function efficiently swaps contents of two vectors, leaving other
-// pararemeters (automatic management, etc.) unchanged.
+// Efficiently swap ae_vector vec1 with ae_vector vec2, leaving other pararemeters (automatic management, etc.) intact.
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
-   ae_int_t cnt;
-   ae_datatype datatype;
-   void *p_ptr;
    ae_impose(!vec1->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
    ae_impose(!vec2->is_attached, "ae_swap_vectors: internal error, attempt to swap vectors attached to X-object");
    ae_db_swap(&vec1->data, &vec2->data);
-   cnt = vec1->cnt;
-   datatype = vec1->datatype;
-   p_ptr = vec1->xX;
+   ae_int_t cnt = vec1->cnt;
+   ae_datatype datatype = vec1->datatype;
+   void *p_ptr = vec1->xX;
    vec1->cnt = vec2->cnt;
    vec1->datatype = vec2->datatype;
    vec1->xX = vec2->xX;
@@ -968,240 +767,132 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
    vec2->xX = p_ptr;
 }
 
-// This function creates ae_matrix.
-//
-// Matrix size may be zero, in such cases both rows and cols are zero.
-// Matrix contents is uninitialized.
-//
-// dst                 destination matrix, must be zero-filled
-// rows                rows count
-// cols                cols count
-// datatype            element type
-// make_automatic                if true, matrix will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-//
-// NOTE: no memory allocation is performed for initialization with rows=cols=0
-void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic) {
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-   ae_assert(rows >= 0 && cols >= 0, "ae_matrix_init: negative length");
-// if one of rows/cols is zero, another MUST be too; perform quick exit
-   if (rows == 0 || cols == 0) {
-      dst->rows = 0;
-      dst->cols = 0;
-      dst->is_attached = false;
+// Lay out the raster for matrix dst from storage.
+// *	dst must be a correctly initialized matrix.
+// *	dst->data.ptr points to the beginning of memory block allocated for row pointers.
+// *	dst->ptr - undefined (initialized during algorithm processing).
+// *	storage points to the beginning of actual storage.
+static void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
+   if (dst->cols > 0 && dst->rows > 0) {
+      char *p_base = (char *)storage;
+      void **pp_ptr = (void **)dst->data.ptr;
+      dst->xyX = pp_ptr;
+      for (ae_int_t i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
+         pp_ptr[i] = p_base;
+   } else
       dst->xyX = NULL;
-      dst->stride = 0;
-      dst->datatype = datatype;
-      ae_db_init(&dst->data, 0, make_automatic);
-      return;
-   }
-// init, being ready for exception during allocation (rows=cols=ptr=NULL on entry)
-   dst->is_attached = false;
-   dst->rows = 0;
-   dst->cols = 0;
-   dst->xyX = NULL;
-   dst->stride = cols;
-   while (dst->stride * ae_sizeof(datatype) % AE_DATA_ALIGN != 0) dst->stride++;
+}
+
+// Make dst into a new rows x cols datatype ae_matrix.
+// The matrix size may be zero, in such cases both cols and rows will be zero.
+// Its contents are assumed to be uninitialized. and its fields are ignored.
+// make_automatic indicates whether or not the matrix is to be added to the dynamic block list,
+// as opposed to being a global object or field of some other object.
+// Upon allocation failure or cols < 0 or rows < 0, call ae_break().
+// NOTE:
+// *	No memory allocation is performed for initialization with cols == 0 or rows == 0.
+void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic) {
+//(@) Zero-check removed.
+   ae_assert(cols >= 0 && rows >= 0, "ae_matrix_init: negative length");
+// If either cols or rows is 0, then they both must be made so.
+   if (cols == 0) rows = 0; else if (rows == 0) cols = 0;
+// Initialize.
    dst->datatype = datatype;
+   dst->stride = cols;
+// Prepare for possible errors during allocation.
+   dst->rows = dst->cols = 0;
+   dst->xyX = NULL;
+   dst->is_attached = false;
+// If cols and rows are 0; perform a quick exit.
+   if (cols == 0 || rows == 0) { ae_db_init(&dst->data, 0, make_automatic); return; }
+// Initialize, preparing for possible errors during allocation.
+   for (; dst->stride * ae_sizeof(datatype) % AE_DATA_ALIGN != 0; dst->stride++);
    ae_db_init(&dst->data, rows * ((ae_int_t) sizeof(void *) + dst->stride * ae_sizeof(datatype)) + AE_DATA_ALIGN - 1, make_automatic);
-   dst->rows = rows;
    dst->cols = cols;
+   dst->rows = rows;
+// Set the pointers to the matrix rows.
    ae_matrix_update_row_pointers(dst, ae_align((char *)dst->data.ptr + rows * sizeof(void *), AE_DATA_ALIGN));
 }
 
-// This function creates copy of ae_matrix. A new copy of the data is created.
-//
-// dst                 destination matrix, must be zero-filled
-// src                 well, it is source
-// make_automatic                if true, matrix will be registered in the frame of the current state;
-//
+// Copy ae_matrix src to ae_matrix dst.
 // dst is assumed to be uninitialized, its fields are ignored.
+// make_automatic indicates whether or not dst is to be added to the dynamic block list,
+// as opposed to being a global object or field of some other object.
+// Upon allocation failure, called ae_break().
 void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic) {
-   ae_int_t i;
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, make_automatic);
-   if (src->rows != 0 && src->cols != 0) {
+   if (src->cols != 0 && src->rows != 0)
       if (dst->stride == src->stride)
          memmove(dst->xyX[0], src->xyX[0], (size_t)(src->rows * src->stride * ae_sizeof(src->datatype)));
-      else for (i = 0; i < dst->rows; i++)
+      else for (ae_int_t i = 0; i < dst->rows; i++)
          memmove(dst->xyX[i], src->xyX[i], (size_t)(dst->cols * ae_sizeof(dst->datatype)));
-   }
 }
 
-// This function initializes ae_matrix using X-structure as source. New copy
-// of data is created, which is owned/managed by ae_matrix  structure.  Both
-// structures (source and destination) remain completely  independent  after
-// this call.
-//
-// dst                 destination matrix, must be zero-filled
-// src                 well, it is source
-// make_automatic                if true, matrix will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
-   char *p_src_row;
-   char *p_dst_row;
-   ae_int_t row_size;
-   ae_int_t i;
-   ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, make_automatic);
-   if (src->rows != 0 && src->cols != 0) {
-      p_src_row = (char *)src->x_ptr;
-      p_dst_row = (char *)(dst->xyX[0]);
-      row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
-      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
-         memmove(p_dst_row, p_src_row, (size_t)(row_size));
-   }
-}
-
-// This function initializes ae_matrix using X-structure as source.
-//
-// New matrix is attached to source:
-// * DST shares memory with SRC
-// * both DST and SRC are writable - all writes to DST  change  elements  of
-//   SRC and vice versa.
-// * DST can be reallocated with ae_matrix_set_length(), in  this  case  SRC
-//   remains untouched
-// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-//
-// dst                 destination matrix, must be zero-filled
-// src                 well, it is source
-// make_automatic                if true, matrix will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
-   ae_int_t rows, cols;
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-   rows = (ae_int_t) src->rows;
-   cols = (ae_int_t) src->cols;
-// check that X-source is densely packed
-   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x: unsupported stride");
-// ensure that size is correct
-   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x: 32/64 overflow");
-   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x: 32/64 overflow");
-   ae_assert(rows >= 0 && cols >= 0, "ae_matrix_init_attach_to_x: negative length");
-// if one of rows/cols is zero, another MUST be too
-   if (rows == 0 || cols == 0) {
-      rows = 0;
-      cols = 0;
-   }
-// init, being ready for allocation error
-   dst->is_attached = true;
-   dst->rows = 0;
-   dst->cols = 0;
-   dst->stride = cols;
-   dst->datatype = (ae_datatype) src->datatype;
-   dst->xyX = NULL;
-   ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), make_automatic);
-   dst->rows = rows;
-   dst->cols = cols;
-   if (dst->rows > 0 && dst->cols > 0) {
-      ae_int_t i, rowsize;
-      char *p_row;
-      void **pp_ptr;
-      p_row = (char *)src->x_ptr;
-      rowsize = dst->stride * ae_sizeof(dst->datatype);
-      pp_ptr = (void **)dst->data.ptr;
-      dst->xyX = pp_ptr;
-      for (i = 0; i < dst->rows; i++, p_row += rowsize) pp_ptr[i] = p_row;
-   }
-}
-
-// This function changes length of ae_matrix.
-//
-// dst                 destination matrix
-// rows                size, may be zero
-// cols                size, may be zero
-//
-// Error handling:
-// * if TopFr == NULL, returns false on allocation error
-// * if TopFr != NULL, calls ae_break() on allocation error
-// * returns true on success
-//
-// NOTES:
-// * matrix must be initialized
-// * all contents is freed during setlength() call
-// * new size may be zero.
+// Resize ae_matrix dst to size rows x cols.
+// Either cols, rows or both may be 0.
+// The matrix dst must be initialized.
+// Its contents are freed after setlength().
+// Upon allocation failure with TopFr != NULL, call ae_break(), otherwise return an indication of success or failure.
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols) {
-   ae_assert(rows >= 0 && cols >= 0, "ae_matrix_set_length: negative length");
-   if (dst->rows == rows && dst->cols == cols) return;
-// prepare stride
+   ae_assert(cols >= 0 && rows >= 0, "ae_matrix_set_length: negative length");
+   if (dst->cols == cols && dst->rows == rows) return;
+// Prepare the stride.
    dst->stride = cols;
    while (dst->stride * ae_sizeof(dst->datatype) % AE_DATA_ALIGN != 0) dst->stride++;
-// realloc, being ready for an exception during reallocation (rows=cols=0 on entry)
-   dst->rows = 0;
-   dst->cols = 0;
+// Prepare for possible errors during reallocation.
+   dst->rows = dst->cols = 0;
    dst->xyX = NULL;
    ae_db_realloc(&dst->data, rows * ((ae_int_t) sizeof(void *) + dst->stride * ae_sizeof(dst->datatype)) + AE_DATA_ALIGN - 1);
-   dst->rows = rows;
    dst->cols = cols;
-// update pointers to rows
+   dst->rows = rows;
+// Set the pointers to the matrix rows.
    ae_matrix_update_row_pointers(dst, ae_align((char *)dst->data.ptr + dst->rows * sizeof(void *), AE_DATA_ALIGN));
 }
 
-// This  function  provides  "FREE"  functionality  for matrix (contents is
-// cleared, but structure still left in valid state).
-//
-// The  function clears matrix contents (releases all dynamically  allocated
-// memory). Matrix may be in automatic management list  -  in this  case  it
-// will NOT be removed from list.
-//
-// IMPORTANT: this function does NOT invalidates dst; it just  releases  all
-// dynamically allocated storage, but dst still may be used  after  call  to
-// ae_matrix_set_length().
-//
-// dst                 destination matrix
+// The "FREE" functionality for ae_matrix dst.
+// Clear the contents of matrix dst,
+// Clear the contents of matrix dst, eleasing all dynamically allocated memory, but leaving the structure intact in a valid state.
+// dst may be on the frame - in which case it will NOT be removed from the list.
+// IMPORTANT:
+// *	This function does NOT invalidate dst; it just releases all dynamically allocated storage,
+//	but dst still may be used after calling ae_matrix_set_length().
 void ae_matrix_free(ae_matrix *dst, bool make_automatic) {
-   dst->rows = 0;
-   dst->cols = 0;
+   dst->rows = dst->cols = 0;
    dst->stride = 0;
    ae_db_free(&dst->data);
    dst->xX = 0;
    dst->is_attached = false;
 }
 
-// This function efficiently swaps contents of two vectors, leaving other
-// pararemeters (automatic management, etc.) unchanged.
+// Efficiently swap ae_matrix mat1 with ae_matrix mat2, leaving other pararemeters (automatic management, etc.) intact.
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
-   ae_int_t rows;
-   ae_int_t cols;
-   ae_int_t stride;
-   ae_datatype datatype;
-   void *p_ptr;
    ae_impose(!mat1->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
    ae_impose(!mat2->is_attached, "ae_swap_matrices: internal error, attempt to swap matrices attached to X-object");
    ae_db_swap(&mat1->data, &mat2->data);
-   rows = mat1->rows;
-   cols = mat1->cols;
-   stride = mat1->stride;
-   datatype = mat1->datatype;
-   p_ptr = mat1->xX;
-   mat1->rows = mat2->rows;
+   ae_int_t cols = mat1->cols;
+   ae_int_t rows = mat1->rows;
+   ae_int_t stride = mat1->stride;
+   ae_datatype datatype = mat1->datatype;
+   void *p_ptr = mat1->xX;
    mat1->cols = mat2->cols;
+   mat1->rows = mat2->rows;
    mat1->stride = mat2->stride;
    mat1->datatype = mat2->datatype;
    mat1->xX = mat2->xX;
-   mat2->rows = rows;
    mat2->cols = cols;
+   mat2->rows = rows;
    mat2->stride = stride;
    mat2->datatype = datatype;
    mat2->xX = p_ptr;
 }
 
-// This function creates smart pointer structure.
-//
-// dst                 destination smart pointer, must be zero-filled
-// subscriber          pointer to pointer which receives updates in the
-//                     internal object stored in ae_smart_ptr. Any update to
-//                     dst->ptr is translated to subscriber. Can be NULL.
-// make_automatic                if true, pointer will be registered in the frame of the current state;
-//
-// Error handling:
-// * on failure calls ae_break() with TopFr == NULL. Usually it  results
-//   in abort() call.
-//
-// After initialization, smart pointer stores NULL pointer.
+// Make dst into a new smart Pointer dst.
+// dst is assumed to be uninitialized, but pre-allocated, by aliasing subscriber (which may be NULL) with dst->ptr.
+// After initialization, dst stores the NULL pointer.
+// make_automatic indicates whether or not dst is to be added to the dynamic block list.
+// Upon allocation failure, call ae_break().
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic) {
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
+//(@) Zero-check removed.
    dst->subscriber = subscriber;
    dst->ptr = NULL;
    if (dst->subscriber != NULL) *(dst->subscriber) = dst->ptr;
@@ -1212,13 +903,8 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic
    if (make_automatic) ae_db_attach(&dst->frame_entry);
 }
 
-// This function clears smart pointer structure.
-//
-// dst                 destination smart pointer.
-//
-// After call to this function smart pointer contains NULL reference,  which
-// is  propagated  to  its  subscriber  (in  cases  non-NULL  subscruber was
-// specified during pointer creation).
+// Free the smart pointer _dst so that it contains the NULL reference,
+// The change is propagated to its subscriber, if the _dst was created with a non-NULL subscriber.
 void ae_smart_ptr_free(void *_dst) {
    ae_smart_ptr *dst = (ae_smart_ptr *) _dst;
    if (dst->is_owner && dst->ptr != NULL) {
@@ -1232,51 +918,30 @@ void ae_smart_ptr_free(void *_dst) {
    if (dst->subscriber != NULL) *(dst->subscriber) = NULL;
 }
 
-// This function assigns pointer to ae_smart_ptr structure.
-//
-// dst                 destination smart pointer.
-// new_ptr             new pointer to assign
-// is_owner            whether smart pointer owns new_ptr
-// is_dynamic          whether object is dynamic - clearing such object
-//                     requires BOTH calling destructor function AND calling
-//                     ae_free() for memory occupied by object.
-// fre                 destructor function
-//
-// In case smart pointer already contains non-NULL value and owns this value,
-// it is freed before assigning new pointer.
-//
-// Changes in pointer are propagated to its  subscriber  (in  case  non-NULL
-// subscriber was specified during pointer creation).
-//
-// You can specify NULL new_ptr, in which case is_owner/free are ignored.
+// Assign pointer new_ptr to smart pointer dst.
+// Any non-NULL value already contained in and owned by dst is freed beforehand.
+// The change is propagated to its subscriber, if dst was created with a non-NULL subscriber.
+// is_owner indicates whether dst is to own new_ptr.
+// free is the function used to free it.
+// is_dynamic indicates whether dst is to be dynamic,
+// so that clearing dst would require BOTH calling ae_free() on it AND free() on the memory occupied by dst.
+// You can specify NULL new_ptr, in which case is_owner, free() and is_dynamic are all ignored.
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic)) {
    if (dst->is_owner && dst->ptr != NULL) {
       dst->free(dst->ptr, false);
       if (dst->is_dynamic) ae_free(dst->ptr);
    }
-   if (new_ptr != NULL) {
-      dst->ptr = new_ptr;
-      dst->is_owner = is_owner;
-      dst->is_dynamic = is_dynamic;
-      dst->free = free;
-   } else {
-      dst->ptr = NULL;
-      dst->is_owner = false;
-      dst->is_dynamic = false;
-      dst->free = NULL;
-   }
+   bool not_null = new_ptr != NULL;
+   dst->ptr = new_ptr;
+   dst->is_owner = not_null && is_owner;
+   dst->is_dynamic = not_null && is_dynamic;
+   dst->free = not_null ? free : NULL;
    if (dst->subscriber != NULL) *(dst->subscriber) = dst->ptr;
 }
 
-// This function releases pointer owned by ae_smart_ptr structure:
-// * all internal fields are set to NULL
-// * destructor function for internal pointer is NOT called even when we own
-//   this pointer. After this call ae_smart_ptr releases  ownership  of  its
-//   pointer and passes it to caller.
-// * changes in pointer are propagated to its subscriber (in  case  non-NULL
-//   subscriber was specified during pointer creation).
-//
-// dst                 destination smart pointer.
+// Release the pointer owned by the smart Pointer dst by NULLing all internal fields
+// and passing any ownership it has to the caller, instead of applying the destructor function to the internal pointer.
+// The change is propagated to its subscriber, if the smart pointer was created with subscriber != NULL.
 void ae_smart_ptr_release(ae_smart_ptr *dst) {
    dst->is_owner = false;
    dst->is_dynamic = false;
@@ -1286,32 +951,59 @@ void ae_smart_ptr_release(ae_smart_ptr *dst) {
       *(dst->subscriber) = NULL;
 }
 
-// This function copies contents of ae_vector (SRC) to x_vector (DST).
-//
-// This function should not be called for  DST  which  is  attached  to  SRC
-// (opposite situation, when SRC is attached to DST, is possible).
-//
-// Depending on situation, following actions are performed
-// * for SRC attached to DST, this function performs no actions (no need  to
-//   do anything)
-// * for independent vectors of different sizes it allocates storage in  DST
-//   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to true.
-// * for  independent  vectors   of  same  sizes  it does not perform memory
-//   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
-//   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
-//   ACT_NEW_LOCATION), DST->owner is unmodified.
-//
-// dst                 destination vector
-// src                 source, vector in x-format
-//
-// NOTES:
-// * dst is assumed to be initialized. Its contents is freed before  copying
-//   data  from src  (if  size / type  are  different)  or  overwritten  (if
-//   possible given destination size).
+// Copy x_vector src into ae_vector dst.
+// dst is assumed to be uninitialized, its fields are ignored.
+// The newly-created copy of src is to be owned/managed by dst.
+// Both src and dst remain completely independent afterwards.
+// make_automatic indicates whether or not the vector will be registered in the ALGLIB++ environment.
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic) {
+   ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, make_automatic);
+   if (src->cnt > 0) memmove(dst->xX, src->x_ptr, (size_t)(((ae_int_t) src->cnt) * ae_sizeof((ae_datatype) src->datatype)));
+}
+
+// Copy x_vector src into ae_vector dst.
+// dst is assumed to be uninitialized, its fields are ignored.
+// make_automatic indicates whether or not the vector will be registered in the ALGLIB++ environment.
+// The new vector is attached to the source:
+// ∙	dst shares memory with src: a write to one changes both.
+// ∙	dst can be reallocated with ae_vector_set_length(), but src remains untouched.
+// ∙	src, however, can NOT be reallocated as long as dst exists
+// ∙	dst->is_attached is set to true to indicate that dst does not own its memory.
+// Upon allocation failure, call ae_break().
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic) {
+//(@) Zero-check removed.
+   volatile ae_int_t cnt = (ae_int_t) src->cnt;
+// Ensure the correct size.
+   ae_assert(cnt == src->cnt, "ae_vector_init_attach_to_x: 32/64 overflow");
+   ae_assert(cnt >= 0, "ae_vector_init_attach_to_x: negative length");
+// Prepare for possible errors during allocation.
+   dst->cnt = 0;
+   dst->xX = NULL;
+   dst->datatype = (ae_datatype) src->datatype;
+// Zero-size initialize in order to correctly register in the frame.
+   ae_db_init(&dst->data, 0, make_automatic);
+// Initialize.
+   dst->cnt = cnt;
+   dst->xX = src->x_ptr;
+   dst->is_attached = true;
+}
+
+// Copy ae_vector src to x_vector dst.
+// Not meant for use when dst is attached to src, though it may be used when src is attached to dst.
+// One of the following is then applied:
+// *	if src is attached to dst, no action is required or done,
+// *	for independent vectors of different sizes: allocate storage in dst and copy src to dst.
+//	dst->last_action is set to ACT_NEW_LOCATION, and dst->owner is set to true.
+// *	for independent vectors of the same sizes: no (re)allocation is required or done.
+//	Just copy src to the already-existing place.
+//	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
+// NOTE:
+// *	dst is assumed to be initialized.
+//	Its contents is freed before copying data from src (if the size/type are different)
+//	or overwritten (if possible, given the destination size).
 void ae_x_set_vector(x_vector *dst, ae_vector *src) {
    if (src->xX == dst->x_ptr) {
-   // src->ptr points to the beginning of dst, attached matrices, no need to copy
+   // src->ptr points to the beginning of dst, attached matrices, no need to copy.
       return;
    }
    if (dst->cnt != src->cnt || dst->datatype != src->datatype) {
@@ -1331,36 +1023,101 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src) {
    if (src->cnt) memmove(dst->x_ptr, src->xX, (size_t)(src->cnt * ae_sizeof(src->datatype)));
 }
 
-// This function copies contents of ae_matrix to x_matrix.
-//
-// This function should not be called for  DST  which  is  attached  to  SRC
-// (opposite situation, when SRC is attached to DST, is possible).
-//
-// Depending on situation, following actions are performed
-// * for SRC attached to DST, this function performs no actions (no need  to
-//   do anything)
-// * for independent matrices of different sizes it allocates storage in DST
-//   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-//   ACT_NEW_LOCATION, and DST->owner is set to true.
-// * for  independent  matrices  of  same  sizes  it does not perform memory
-//   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
-//   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
-//   ACT_NEW_LOCATION), DST->owner is unmodified.
-//
-// dst                 destination vector
-// src                 source, matrix in x-format
-//
+// Attach the x_vector dst to the contents of the ae_vector src.
+// Ownership of memory allocated is not changed (it is still managed the ae_vector).
 // NOTES:
-// * dst is assumed to be initialized. Its contents is freed before  copying
-//   data  from src  (if  size / type  are  different)  or  overwritten  (if
-//   possible given destination size).
+// *	dst is assumed to be initialized.
+//	Its contents is freed before attaching to src.
+// *	assuming correctly initialized src, this function can't fail, and so doesn't need TopFr.
+void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
+   if (dst->owner) ae_free(dst->x_ptr);
+   dst->x_ptr = src->xX;
+   dst->last_action = ACT_NEW_LOCATION;
+   dst->cnt = src->cnt;
+   dst->datatype = src->datatype;
+   dst->owner = false;
+}
+
+// Clear the x_vector dst.
+// Do nothing if vector is not owned by ALGLIB++ environment.
+void x_vector_free(x_vector *dst, bool make_automatic) {
+   if (dst->owner) aligned_free(dst->x_ptr);
+   dst->x_ptr = NULL;
+   dst->cnt = 0;
+}
+
+// Copy x_matrix src into ae_matrix dst.
+// dst is assumed to be uninitialized, its fields are ignored.
+// The newly-created copy of src is to be owned/managed by dst.
+// Both src and dst remain completely independent afterwards.
+// make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
+   ae_matrix_init(dst, (ae_int_t) src->rows, (ae_int_t) src->cols, (ae_datatype) src->datatype, make_automatic);
+   if (src->cols != 0 && src->rows != 0) {
+      char *p_src_row = (char *)src->x_ptr;
+      char *p_dst_row = (char *)(dst->xyX[0]);
+      ae_int_t row_size = ae_sizeof((ae_datatype) src->datatype) * (ae_int_t) src->cols;
+      for (ae_int_t i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof((ae_datatype) src->datatype), p_dst_row += dst->stride * ae_sizeof((ae_datatype) src->datatype))
+         memmove(p_dst_row, p_src_row, (size_t)(row_size));
+   }
+}
+
+// Copy x_matrix src into ae_matrix dst.
+// dst is assumed to be uninitialized, its fields are ignored.
+// make_automatic indicates whether or not the matrix will be registered in the ALGLIB++ environment.
+// The new matrix is attached to the source:
+// ∙	dst shares memory with src: a write to one changes both.
+// ∙	dst can be reallocated with ae_matrix_set_length(), but src remains untouched.
+// ∙	src, however, can NOT be reallocated as long as dst exists
+// ∙	dst->is_attached is set to true to indicate that dst does not own its memory.
+// Upon allocation failure, call ae_break().
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic) {
+//(@) Zero-check removed.
+   ae_int_t cols = (ae_int_t) src->cols;
+   ae_int_t rows = (ae_int_t) src->rows;
+// Check that the X-source is densely packed.
+   ae_assert(src->cols == src->stride, "ae_matrix_init_attach_to_x: unsupported stride");
+// Ensure the correct size.
+   ae_assert(cols == src->cols, "ae_matrix_init_attach_to_x: 32/64 overflow");
+   ae_assert(rows == src->rows, "ae_matrix_init_attach_to_x: 32/64 overflow");
+   ae_assert(cols >= 0 && rows >= 0, "ae_matrix_init_attach_to_x: negative length");
+// If either cols or rows is 0, then they both must be made so.
+   if (cols == 0) rows = 0; else if (rows == 0) cols = 0;
+// Initialize.
+   dst->datatype = (ae_datatype) src->datatype;
+   dst->stride = cols;
+   dst->is_attached = true;
+// Prepare for possible errors during allocation.
+   dst->rows = dst->cols = 0;
+   dst->xyX = NULL;
+   ae_db_init(&dst->data, rows * (ae_int_t) sizeof(void *), make_automatic);
+   dst->cols = cols;
+   dst->rows = rows;
+   if (dst->cols > 0 && dst->rows > 0) {
+      char *p_row = (char *)src->x_ptr;
+      ae_int_t rowsize = dst->stride * ae_sizeof(dst->datatype);
+      void **pp_ptr = (void **)dst->data.ptr;
+      dst->xyX = pp_ptr;
+      for (ae_int_t i = 0; i < dst->rows; i++, p_row += rowsize) pp_ptr[i] = p_row;
+   }
+}
+
+// Copy ae_matrix src to x_matrix dst.
+// Not meant for use when dst is attached to src, though it may be used when src is attached to dst.
+// One of the following is then applied:
+// *	if src is attached to dst, no action is required or done,
+// *	for independent vectors of different sizes: allocate storage in dst and copy src to dst.
+//	dst->last_action is set to ACT_NEW_LOCATION, and dst->owner is set to true.
+// *	for independent vectors of the same sizes: no (re)allocation is required or done.
+//	Just copy src to the already-existing place.
+//	dst->last_action is set to ACT_SAME_LOCATION (unless it was ACT_NEW_LOCATION), dst->owner is unmodified.
+// NOTE:
+// *	dst is assumed to be initialized.
+//	Its contents is freed before copying data from src (if the size/type are different)
+//	or overwritten (if possible, given the destination size).
 void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
-   char *p_src_row;
-   char *p_dst_row;
-   ae_int_t i;
-   ae_int_t row_size;
    if (src->xyX != NULL && src->xyX[0] == dst->x_ptr) {
-   // src->ptr points to the beginning of dst, attached matrices, no need to copy
+   // src->ptr points to the beginning of dst, attached matrices, no need to copy.
       return;
    }
    if (dst->rows != src->rows || dst->cols != src->cols || dst->datatype != src->datatype) {
@@ -1380,47 +1137,24 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src) {
       else ae_assert(false, "ae_x_set_matrix: internal error");
    }
    if (src->rows != 0 && src->cols != 0) {
-      p_src_row = (char *)(src->xyX[0]);
-      p_dst_row = (char *)dst->x_ptr;
-      row_size = ae_sizeof(src->datatype) * src->cols;
-      for (i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof(src->datatype), p_dst_row += dst->stride * ae_sizeof(src->datatype))
+      char *p_src_row = (char *)(src->xyX[0]);
+      char *p_dst_row = (char *)dst->x_ptr;
+      ae_int_t row_size = ae_sizeof(src->datatype) * src->cols;
+      for (ae_int_t i = 0; i < src->rows; i++, p_src_row += src->stride * ae_sizeof(src->datatype), p_dst_row += dst->stride * ae_sizeof(src->datatype))
          memmove(p_dst_row, p_src_row, (size_t)(row_size));
    }
 }
 
-// This function attaches x_vector to ae_vector's contents.
-// Ownership of memory allocated is not changed (it is still managed by
-// ae_matrix).
-//
-// dst                 destination vector
-// src                 source, vector in x-format
-//
+// Attach the x_matrix dst to the contents of the ae_matrix src.
+// Ownership of memory allocated is not changed (it is still managed the ae_matrix).
 // NOTES:
-// * dst is assumed to be initialized. Its contents is freed before attaching to src.
-// * this function doesn't need TopFr because it can't fail (assuming correctly initialized src)
-void ae_x_attach_to_vector(x_vector *dst, ae_vector *src) {
-   if (dst->owner) ae_free(dst->x_ptr);
-   dst->x_ptr = src->xX;
-   dst->last_action = ACT_NEW_LOCATION;
-   dst->cnt = src->cnt;
-   dst->datatype = src->datatype;
-   dst->owner = false;
-}
-
-// This function attaches x_matrix to ae_matrix's contents.
-// Ownership of memory allocated is not changed (it is still managed by
-// ae_matrix).
-//
-// dst                 destination vector
-// src                 source, matrix in x-format
-//
-// NOTES:
-// * dst is assumed to be initialized. Its contents is freed before attaching to src.
-// * this function doesn't need TopFr because it can't fail (assuming correctly initialized src)
+// *	dst is assumed to be initialized.
+//	Its contents is freed before attaching to src.
+// *	assuming correctly initialized src, this function can't fail, and so doesn't need TopFr.
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    if (dst->owner) ae_free(dst->x_ptr);
-   dst->rows = src->rows;
    dst->cols = src->cols;
+   dst->rows = src->rows;
    dst->stride = src->stride;
    dst->datatype = src->datatype;
    dst->x_ptr = src->xyR[0];
@@ -1428,465 +1162,259 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src) {
    dst->owner = false;
 }
 
-// This function clears x_vector. It does nothing  if vector is not owned by
-// ALGLIB environment.
-//
-// dst                 vector
-void x_vector_free(x_vector *dst, bool make_automatic) {
-   if (dst->owner) aligned_free(dst->x_ptr);
-   dst->x_ptr = NULL;
-   dst->cnt = 0;
-}
-
-// CPUID
-//
-// Returns information about features CPU and compiler support.
-//
-// You must tell ALGLIB what CPU family is used by defining AE_CPU symbol
-// (without this hint zero will be returned).
-//
-// Note: results of this function depend on both CPU and compiler;
-// if compiler doesn't support SSE intrinsics, function won't set
-// corresponding flag.
-// static volatile bool _ae_cpuid_initialized = false; //(@) Removed: reduced to a start-up routine to initialize CurCPU, in place of ae_cpuid() calls.
-// static volatile bool _ae_cpuid_has_sse2 = false; //(@) Removed: integrated into CurCPU.
-static ae_cpuid_t ae_cpuid() {
-   bool HasSse2 = false;
-// Determine system properties
-#if defined AE_CPU && AE_CPU == AE_INTEL
-   { // SSE2
-#   if defined AE_HAS_SSE2_INTRINSICS
-#      if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
-      ae_int_t a, b, c, d;
-      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-      if (d&0x04000000) HasSse2 = true;
-#      elif AE_COMPILER == AE_MSVC
-      int CPUInfo[4];
-      __cpuid(CPUInfo, 1);
-      if (CPUInfo[3]&0x04000000) HasSse2 = true;
-#      endif
-#   endif
-   } { // Perform one more CPUID call to generate memory fence
-#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC
-      ae_int_t a, b, c, d;
-      __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
-#   elif AE_COMPILER == AE_MSVC
-      int CPUInfo[4];
-      __cpuid(CPUInfo, 1);
-#   endif
-   } { // Perform other CPU-related initializations.
-#   if AE_COMPILER == AE_GNUC
-      unsigned CpuMode = 0x27f; // Set rounding for floating-point math to double precision for x86/x64 processors under GCC.
-      asm("fldcw %0" : : "m"(*&CpuMode));
-#   endif
-   }
-#endif
-   return HasSse2? CPU_SSE2: (ae_cpuid_t)0;
-}
-
-// Determine CPU characteristics and perform CPU-specific initializations.
-// This can be safely done on a per-thread basis provided that:
-// simultaneous writes by different cores to the same location will be executed in serial manner,
-// which is true of contemporary architectures.
-const/* AutoS */ae_cpuid_t CurCPU = ae_cpuid();
-
-// Real math functions
-static ae_int_t GetByteOrder() {
-// determine the byte order
-// two types are supported: big-endian and little-endian.
-// mixed-endian hardware is NOT supported.
-//
-// 1983 is used as magic number because its non-periodic double
-// representation allow us to easily distinguish between upper
-// and lower halfs and to detect mixed endian hardware.
-   union { double a; ae_int32_t p[2]; } u; u.a = 1.0 / 1983.0;
-   if (u.p[1] == (ae_int32_t) 0x3f408642) return AE_LITTLE_ENDIAN;
-   if (u.p[0] == (ae_int32_t) 0x3f408642) return AE_BIG_ENDIAN;
-   return AE_MIXED_ENDIAN; //(@) Originally this prompted an abort().
-}
-
-// determine byte order and initialize precomputed IEEE special quantities.
-// byte order types: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
-static const ae_int_t ByteOrder = GetByteOrder();
-
-bool isposinf(double x) { return isinf(x) && !signbit(x); }
-bool isneginf(double x) { return isinf(x) && signbit(x); }
-
-ae_int_t imin2(ae_int_t x, ae_int_t y) { return x > y ? y : x; }
-
-// This function returns min(x,y,z)
-ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z) {
-   ae_int_t xy = x < y ? x : y;
-   return xy < z ? xy : z;
-}
-
-ae_int_t imax2(ae_int_t x, ae_int_t y) { return x > y ? x : y; }
-
-// This function returns max(x,y,z)
-ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z) {
-   ae_int_t xy = x > y ? x : y;
-   return xy > z ? xy : z;
-}
-
-ae_int_t ae_iabs(ae_int_t x) { return x >= 0? x: -x; }
-ae_int_t ae_sign(double x) { return x > 0? +1: x < 0? -1: 0; }
-ae_int_t RoundZ(double x) { return (ae_int_t)round(x); }
-ae_int_t TruncZ(double x) { return (ae_int_t)trunc(x); }
-ae_int_t FloorZ(double x) { return (ae_int_t)floor(x); }
-ae_int_t CeilZ(double x) { return (ae_int_t)ceil(x); }
-
-double rmin2(double x, double y) { return x > y ? y : x; }
-
-// This function returns max(x,y,z)
-double rmax3(double x, double y, double z) {
-   double xy = x > y ? x : y;
-   return xy > z ? xy : z;
-}
-
-double rmax2(double x, double y) { return x > y ? x : y; }
-
-// This function returns max(|x|,|y|,|z|)
-double rmaxabs3(double x, double y, double z) {
-   x = fabs(x), y = fabs(y), z = fabs(z);
-   double xy = x > y ? x : y;
-   return xy > z ? xy : z;
-}
-
-double ae_sqr(double x) { return x*x; }
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
-   return x <= b1? b1: x >= b2? b2: x;
-}
-
-// 'bounds' value: maps X to [B1,B2]
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-double rboundval(double x, double b1, double b2) {
-   return x <= b1? b1: x >= b2? b2: x;
-}
-
-double ae_randomreal() {
-   const double mx = (double)RAND_MAX + 1.0;
-   return (rand() + rand() / mx) / mx;
-}
-
-double ae_randommid() {
-   const double mx = (double)RAND_MAX + 1.0;
-   return 2.0*(rand() + rand() / mx) / mx - 1.0;
-}
-
-ae_int_t ae_randominteger(ae_int_t maxv) { return rand() % maxv; }
-bool ae_randombool(double p) {
-   const double mx = (double)RAND_MAX + 1.0;
-   return rand() + rand()/mx <= p*mx;
-}
+static const ae_int_t x_nb = 16; // A cut-off for recursion in the divide-and-conquer x_matrix routines.
 
 // Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t *n1, ae_int_t *n2) {
-   ae_int_t r;
    if (n <= nb) {
       *n1 = n;
       *n2 = 0;
+   } else if (n % nb != 0) {
+      *n2 = n % nb;
+      *n1 = n - (*n2);
    } else {
-      if (n % nb != 0) {
-         *n2 = n % nb;
-         *n1 = n - (*n2);
-      } else {
-         *n2 = n / 2;
-         *n1 = n - (*n2);
-         if (*n1 % nb == 0) {
-            return;
-         }
-         r = nb - *n1 % nb;
-         *n1 += r;
-         *n2 -= r;
+      *n2 = n / 2;
+      *n1 = n - (*n2);
+      if (*n1 % nb == 0) {
+         return;
       }
+      ae_int_t r = nb - *n1 % nb;
+      *n1 += r;
+      *n2 -= r;
    }
 }
 
 static double x_safepythag2(double x, double y) {
-   double w;
-   double xabs;
-   double yabs;
-   double z;
-   xabs = fabs(x);
-   yabs = fabs(y);
-   w = xabs > yabs ? xabs : yabs;
-   z = xabs < yabs ? xabs : yabs;
+   double xabs = fabs(x);
+   double yabs = fabs(y);
+   double w = xabs > yabs ? xabs : yabs;
+   double z = xabs < yabs ? xabs : yabs;
    if (z == 0)
       return w;
    else {
-      double t;
-      t = z / w;
+      double t = z / w;
       return w * sqrt(1 + t * t);
    }
 }
 
-// this function checks difference between offdiagonal blocks BL and BU
-// (see below). Block BL is specified by offsets (offset0,offset1)  and
-// sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between elements of BL and BU^T
-//
+// Verify the symmetry of the len0 x len1 off-diagonal block at (offset0, offset1) with its symmetric counterpart.
+// Also, accumulate updates on:
+// ∙	*mx:	the componentwise maximum of a,
+// ∙	*err:	the maximum componentwise difference between the lower block and the transpose of its upper counterpart.
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// try to split problem into two smaller ones
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         is_symmetric_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
-         is_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         is_symmetric_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
-         is_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
-      }
-      return;
-   } else {
-   // base case
-      double *p1, *p2, *prow, *pcol;
-      double v;
-      ae_int_t i, j;
-      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // Reduce to smaller cases.
+      double  *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      double  *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         double *pcol = p2 + i;
+         double *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             if (!isfinite(*pcol) || !isfinite(*prow)) {
                *nonfinite = true;
             } else {
-               v = fabs(*pcol);
-               *mx = *mx > v ? *mx : v;
-               v = fabs(*prow);
-               *mx = *mx > v ? *mx : v;
-               v = fabs(*pcol - *prow);
-               *err = *err > v ? *err : v;
+               double xa = fabs(*pcol);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = fabs(*prow);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = fabs(*pcol - *prow);
+               *err = *err > xya ? *err : xya;
             }
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // The base case.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         is_symmetric_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
+         is_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         is_symmetric_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
+         is_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
+      }
    }
 }
 
-// this function checks that diagonal block A0 is symmetric.
-// Block A0 is specified by its offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between A0 and A0^T
-//
+// Verify that the diagonal len x len block at (offset, offset) is symmetric.
+// Also, accumulate updates on:
+// ∙	*mx:	the componentwise maximum of a,
+// ∙	*err:	the maximum componentwise difference between the block and its transpose.
 static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err) {
-   double *p, *prow, *pcol;
-   double v;
-   ae_int_t i, j;
-// try to split problem into two smaller ones
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         double *pcol = p + i;
+         double *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++) {
+            if (!isfinite(*pcol) || !isfinite(*prow)) {
+               *nonfinite = true;
+            } else {
+               double xa = fabs(*pcol);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = fabs(*prow);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = fabs(*pcol - *prow);
+               *err = *err > xya ? *err : xya;
+            }
+         }
+         double norm = fabs(p[i + i * a->stride]);
+         *mx = *mx > norm ? *mx : norm;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       is_symmetric_rec_diag_stat(a, offset, n1, nonfinite, mx, err);
       is_symmetric_rec_diag_stat(a, offset + n1, n2, nonfinite, mx, err);
       is_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
-      return;
-   }
-// base case
-   p = (double *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!isfinite(*pcol) || !isfinite(*prow)) {
-            *nonfinite = true;
-         } else {
-            v = fabs(*pcol);
-            *mx = *mx > v ? *mx : v;
-            v = fabs(*prow);
-            *mx = *mx > v ? *mx : v;
-            v = fabs(*pcol - *prow);
-            *err = *err > v ? *err : v;
-         }
-      }
-      v = fabs(p[i + i * a->stride]);
-      *mx = *mx > v ? *mx : v;
    }
 }
 
-// this function checks difference between offdiagonal blocks BL and BU
-// (see below). Block BL is specified by offsets (offset0,offset1)  and
-// sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between elements of BL and BU^H
-//
+static bool x_is_symmetric(x_matrix *a) {
+   if (a->datatype != DT_REAL || a->cols != a->rows) return false;
+   else if (a->cols == 0 || a->rows == 0) return true;
+   ae_state_init();
+   double mx = 0.0;
+   double err = 0.0;
+   bool nonfinite = false;
+   is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err);
+   return !nonfinite && (mx == 0.0 || err / mx <= 1.0E-14);
+}
+
+// Verify the Hermitian conjugacy of the len0 x len1 off-diagonal block at (offset0, offset1) with its symmetric counterpart.
+// Also, accumulate updates on:
+// *	*mx:	the componentwise maximum of a
+// ∙	*err:	the maximum componentwise difference between the lower block and the Hermitian conjugate of its upper counterpart.
 static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
-// try to split problem into two smaller ones
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         is_hermitian_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
-         is_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         is_hermitian_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
-         is_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
-      }
-      return;
-   } else {
-   // base case
-      ae_complex *p1, *p2, *prow, *pcol;
-      double v;
-      ae_int_t i, j;
-      p1 = (ae_complex *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      ae_complex *p1 = (ae_complex *)(a->x_ptr) + offset0 * a->stride + offset1;
+      ae_complex *p2 = (ae_complex *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         ae_complex *pcol = p2 + i;
+         ae_complex *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
                *nonfinite = true;
             } else {
-               v = x_safepythag2(pcol->x, pcol->y);
-               *mx = *mx > v ? *mx : v;
-               v = x_safepythag2(prow->x, prow->y);
-               *mx = *mx > v ? *mx : v;
-               v = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
-               *err = *err > v ? *err : v;
+               double xa = x_safepythag2(pcol->x, pcol->y);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = x_safepythag2(prow->x, prow->y);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
+               *err = *err > xya ? *err : xya;
             }
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         is_hermitian_rec_off_stat(a, offset0, offset1, n1, len1, nonfinite, mx, err);
+         is_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1, nonfinite, mx, err);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         is_hermitian_rec_off_stat(a, offset0, offset1, len0, n1, nonfinite, mx, err);
+         is_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2, nonfinite, mx, err);
+      }
    }
 }
 
-// this function checks that diagonal block A0 is Hermitian.
-// Block A0 is specified by its offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
-//  this subroutine updates current values of:
-//  a) mx       maximum value of A[i,j] found so far
-//  b) err      componentwise difference between A0 and A0^H
-//
+// Verify that the len x len diagonal block at (offset, offset) is Hermitian.
+// Also, accumulate updates on:
+// ∙	*mx:	the componentwise maximum of a
+// ∙	*err:	the maximum componentwise difference between the block and its Hermitian conjugate.
 static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err) {
-   ae_complex *p, *prow, *pcol;
-   double v;
-   ae_int_t i, j;
-// try to split problem into two smaller ones
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      ae_complex *p = (ae_complex *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         ae_complex *pcol = p + i;
+         ae_complex *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++) {
+            if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
+               *nonfinite = true;
+            } else {
+               double xa = x_safepythag2(pcol->x, pcol->y);
+               *mx = *mx > xa ? *mx : xa;
+               double ya = x_safepythag2(prow->x, prow->y);
+               *mx = *mx > ya ? *mx : ya;
+               double xya = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
+               *err = *err > xya ? *err : xya;
+            }
+         }
+         if (!isfinite(p[i + i * a->stride].x) || !isfinite(p[i + i * a->stride].y)) {
+            *nonfinite = true;
+         } else {
+            double xa = fabs(p[i + i * a->stride].x);
+            *mx = *mx > xa ? *mx : xa;
+            double ya = fabs(p[i + i * a->stride].y);
+            *err = *err > ya ? *err : ya;
+         }
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       is_hermitian_rec_diag_stat(a, offset, n1, nonfinite, mx, err);
       is_hermitian_rec_diag_stat(a, offset + n1, n2, nonfinite, mx, err);
       is_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1, nonfinite, mx, err);
-      return;
-   }
-// base case
-   p = (ae_complex *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++) {
-         if (!isfinite(pcol->x) || !isfinite(pcol->y) || !isfinite(prow->x) || !isfinite(prow->y)) {
-            *nonfinite = true;
-         } else {
-            v = x_safepythag2(pcol->x, pcol->y);
-            *mx = *mx > v ? *mx : v;
-            v = x_safepythag2(prow->x, prow->y);
-            *mx = *mx > v ? *mx : v;
-            v = x_safepythag2(pcol->x - prow->x, pcol->y + prow->y);
-            *err = *err > v ? *err : v;
-         }
-      }
-      if (!isfinite(p[i + i * a->stride].x) || !isfinite(p[i + i * a->stride].y)) {
-         *nonfinite = true;
-      } else {
-         v = fabs(p[i + i * a->stride].x);
-         *mx = *mx > v ? *mx : v;
-         v = fabs(p[i + i * a->stride].y);
-         *err = *err > v ? *err : v;
-      }
    }
 }
 
-// this function copies offdiagonal block BL to its symmetric counterpart
-// BU (see below). Block BL is specified by offsets (offset0,offset1)
-// and sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
-//
+static bool x_is_hermitian(x_matrix *a) {
+   if (a->datatype != DT_COMPLEX || a->cols != a->rows) return false;
+   else if (a->cols == 0 || a->rows == 0) return true;
+   ae_state_init();
+   double mx = 0.0;
+   double err = 0.0;
+   bool nonfinite = false;
+   is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err);
+   return !nonfinite && (mx == 0.0 || err / mx <= 1.0E-14);
+}
+
+// Copy the transpose of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// try to split problem into two smaller ones
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         force_symmetric_rec_off_stat(a, offset0, offset1, n1, len1);
-         force_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         force_symmetric_rec_off_stat(a, offset0, offset1, len0, n1);
-         force_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
-      }
-      return;
-   } else {
-   // base case
-      double *p1, *p2, *prow, *pcol;
-      ae_int_t i, j;
-      p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         double *pcol = p2 + i;
+         double *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             *pcol = *prow;
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         force_symmetric_rec_off_stat(a, offset0, offset1, n1, len1);
+         force_symmetric_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         force_symmetric_rec_off_stat(a, offset0, offset1, len0, n1);
+         force_symmetric_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
+      }
    }
 }
 
-// this function copies lower part of diagonal block A0 to its upper part
-// Block is specified by offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
+// Copy the transpose of the lower part of the len x len diagonal block at (offset, offset) to its upper part.
 static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
-   double *p, *prow, *pcol;
-   ae_int_t i, j;
-// try to split problem into two smaller ones
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      double *p = (double *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         double *pcol = p + i;
+         double *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++)
+            *pcol = *prow;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       force_symmetric_rec_diag_stat(a, offset, n1);
@@ -1894,131 +1422,65 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
       force_symmetric_rec_off_stat(a, offset + n1, offset, n2, n1);
       return;
    }
-// base case
-   p = (double *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++)
-         *pcol = *prow;
-   }
 }
 
-// this function copies Hermitian transpose of offdiagonal block BL to
-// its symmetric counterpart BU (see below). Block BL is specified by
-// offsets (offset0,offset1) and sizes (len0,len1).
-//
-//     [ .          ]
-//     [   A0  BU   ]
-// A = [   BL  A1   ]
-//     [          . ]
+static bool x_force_symmetric(x_matrix *a) {
+   if (a->datatype != DT_REAL || a->cols != a->rows) return false;
+   if (a->cols > 0 && a->rows > 0) force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
+   return true;
+}
+
+// Copy the Hermitian conjugate of the len0 x len1 off-diagonal block at (offset0, offset1) to its symmetric counterpart.
 static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1) {
-// try to split problem into two smaller ones
-   if (len0 > x_nb || len1 > x_nb) {
-      ae_int_t n1, n2;
-      if (len0 > len1) {
-         x_split_length(len0, x_nb, &n1, &n2);
-         force_hermitian_rec_off_stat(a, offset0, offset1, n1, len1);
-         force_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
-      } else {
-         x_split_length(len1, x_nb, &n1, &n2);
-         force_hermitian_rec_off_stat(a, offset0, offset1, len0, n1);
-         force_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
-      }
-      return;
-   } else {
-   // base case
-      ae_complex *p1, *p2, *prow, *pcol;
-      ae_int_t i, j;
-      p1 = (ae_complex *)(a->x_ptr) + offset0 * a->stride + offset1;
-      p2 = (ae_complex *)(a->x_ptr) + offset1 * a->stride + offset0;
-      for (i = 0; i < len0; i++) {
-         pcol = p2 + i;
-         prow = p1 + i * a->stride;
-         for (j = 0; j < len1; j++) {
+   if (len0 <= x_nb && len1 <= x_nb) { // The base case.
+      ae_complex *p1 = (ae_complex *)(a->x_ptr) + offset0 * a->stride + offset1;
+      ae_complex *p2 = (ae_complex *)(a->x_ptr) + offset1 * a->stride + offset0;
+      for (ae_int_t i = 0; i < len0; i++) {
+         ae_complex *pcol = p2 + i;
+         ae_complex *prow = p1 + i * a->stride;
+         for (ae_int_t j = 0; j < len1; j++) {
             *pcol = *prow;
             pcol += a->stride;
             prow++;
          }
       }
+   } else { // Reduce to smaller cases.
+      if (len0 > len1) {
+         ae_int_t n1, n2;
+         x_split_length(len0, x_nb, &n1, &n2);
+         force_hermitian_rec_off_stat(a, offset0, offset1, n1, len1);
+         force_hermitian_rec_off_stat(a, offset0 + n1, offset1, n2, len1);
+      } else {
+         ae_int_t n1, n2;
+         x_split_length(len1, x_nb, &n1, &n2);
+         force_hermitian_rec_off_stat(a, offset0, offset1, len0, n1);
+         force_hermitian_rec_off_stat(a, offset0, offset1 + n1, len0, n2);
+      }
    }
 }
 
-// this function copies Hermitian transpose of lower part of
-// diagonal block A0 to its upper part Block is specified by offset and size.
-//
-//     [ .          ]
-//     [   A0       ]
-// A = [       .    ]
-//     [          . ]
-//
+// Copy the Hermitian conjugate of the lower part of the len x len diagonal block at (offset, offset) to the upper part.
 static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len) {
-   ae_complex *p, *prow, *pcol;
-   ae_int_t i, j;
-// try to split problem into two smaller ones
-   if (len > x_nb) {
+   if (len <= x_nb) { // The base case.
+      ae_complex *p = (ae_complex *)(a->x_ptr) + offset * a->stride + offset;
+      for (ae_int_t i = 0; i < len; i++) {
+         ae_complex *pcol = p + i;
+         ae_complex *prow = p + i * a->stride;
+         for (ae_int_t j = 0; j < i; j++, pcol += a->stride, prow++)
+            *pcol = *prow;
+      }
+   } else { // Reduce to smaller cases.
       ae_int_t n1, n2;
       x_split_length(len, x_nb, &n1, &n2);
       force_hermitian_rec_diag_stat(a, offset, n1);
       force_hermitian_rec_diag_stat(a, offset + n1, n2);
       force_hermitian_rec_off_stat(a, offset + n1, offset, n2, n1);
-      return;
-   }
-// base case
-   p = (ae_complex *)(a->x_ptr) + offset * a->stride + offset;
-   for (i = 0; i < len; i++) {
-      pcol = p + i;
-      prow = p + i * a->stride;
-      for (j = 0; j < i; j++, pcol += a->stride, prow++)
-         *pcol = *prow;
    }
 }
 
-bool x_is_symmetric(x_matrix *a) {
-   double mx, err;
-   bool nonfinite;
-   if (a->datatype != DT_REAL) return false;
-   if (a->cols != a->rows) return false;
-   if (a->cols == 0 || a->rows == 0) return true;
-   ae_state_init();
-   mx = 0;
-   err = 0;
-   nonfinite = false;
-   is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err);
-   if (nonfinite) return false;
-   if (mx == 0) return true;
-   return err / mx <= 1.0E-14;
-}
-
-bool x_is_hermitian(x_matrix *a) {
-   double mx, err;
-   bool nonfinite;
-   if (a->datatype != DT_COMPLEX) return false;
-   if (a->cols != a->rows) return false;
-   if (a->cols == 0 || a->rows == 0) return true;
-   ae_state_init();
-   mx = 0;
-   err = 0;
-   nonfinite = false;
-   is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err);
-   if (nonfinite) return false;
-   if (mx == 0) return true;
-   return err / mx <= 1.0E-14;
-}
-
-bool x_force_symmetric(x_matrix *a) {
-   if (a->datatype != DT_REAL) return false;
-   if (a->cols != a->rows) return false;
-   if (a->cols == 0 || a->rows == 0) return true;
-   force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
-   return true;
-}
-
-bool x_force_hermitian(x_matrix *a) {
-   if (a->datatype != DT_COMPLEX) return false;
-   if (a->cols != a->rows) return false;
-   if (a->cols == 0 || a->rows == 0) return true;
-   force_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows);
+static bool x_force_hermitian(x_matrix *a) {
+   if (a->datatype != DT_COMPLEX || a->cols != a->rows) return false;
+   if (a->cols > 0 && a->rows > 0) force_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows);
    return true;
 }
 
@@ -2050,472 +1512,55 @@ bool ae_force_hermitian(ae_matrix *a) {
    return x_force_hermitian(&x);
 }
 
-// This function converts six-bit value (from 0 to 63)  to  character  (only
-// digits, lowercase and uppercase letters, minus and underscore are used).
-//
-// If v is negative or greater than 63, this function returns '?'.
-static char _sixbits2char_tbl[64] = {
-   '0', '1', '2', '3', '4', '5', '6', '7',
-   '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-   'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-   'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-   'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
-   'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-   'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-   'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
-};
+//(@) ae_yield(), originally had external linkage, but isn't documented in the API or used elsewhere.
 
-char ae_sixbits2char(ae_int_t v) {
-   if (v < 0 || v > 63)
-      return '?';
-   return _sixbits2char_tbl[v];
-// v is correct, process it
-#if 0
-   if (v < 10)
-      return '0' + v;
-   v -= 10;
-   if (v < 26)
-      return 'A' + v;
-   v -= 26;
-   if (v < 26)
-      return 'a' + v;
-   v -= 26;
-   return v == 0 ? '-' : '_';
+// Make the calling thread relinquish the CPU.
+// The thread is moved to the end of the queue and some other thread gets to run.
+// NOTE:
+// *	this function should NOT be called when AE_OS is AE_OTHER_OS - the whole program will be abnormally terminated.
+static void ae_yield() {
+#if AE_OS == AE_POSIX
+   sched_yield();
+#elif AE_OS == AE_WINDOWS
+   if (!SwitchToThread()) Sleep(0);
+#else
+   abort();
 #endif
 }
 
-// This function converts character to six-bit value (from 0 to 63).
-//
-// This function is inverse of ae_sixbits2char()
-// If c is not correct character, this function returns -1.
-static ae_int_t _ae_char2sixbits_tbl[] = {
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, -1, -1, -1,
-   -1, -1, -1, -1, -1, 62, -1, -1,
-   0, 1, 2, 3, 4, 5, 6, 7,
-   8, 9, -1, -1, -1, -1, -1, -1,
-   -1, 10, 11, 12, 13, 14, 15, 16,
-   17, 18, 19, 20, 21, 22, 23, 24,
-   25, 26, 27, 28, 29, 30, 31, 32,
-   33, 34, 35, -1, -1, -1, -1, 63,
-   -1, 36, 37, 38, 39, 40, 41, 42,
-   43, 44, 45, 46, 47, 48, 49, 50,
-   51, 52, 53, 54, 55, 56, 57, 58,
-   59, 60, 61, -1, -1, -1, -1, -1
-};
-
-ae_int_t ae_char2sixbits(char c) {
-   return (c >= 0 && c < 127) ? _ae_char2sixbits_tbl[(int)c] : -1;
-}
-
-// This function converts three bytes (24 bits) to four six-bit values
-// (24 bits again).
-//
-// src     pointer to three bytes
-// dst     pointer to four ints
-void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
-   dst[0] = src[0] & 0x3F;
-   dst[1] = (src[0] >> 6) | ((src[1] & 0x0F) << 2);
-   dst[2] = (src[1] >> 4) | ((src[2] & 0x03) << 4);
-   dst[3] = src[2] >> 2;
-}
-
-// This function converts four six-bit values (24 bits) to three bytes
-// (24 bits again).
-//
-// src     pointer to four ints
-// dst     pointer to three bytes
-void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
-   dst[0] = (unsigned char)(src[0] | ((src[1] & 0x03) << 6));
-   dst[1] = (unsigned char)((src[1] >> 2) | ((src[2] & 0x0F) << 4));
-   dst[2] = (unsigned char)((src[2] >> 4) | (src[3] << 2));
-}
-
-// This function serializes boolean value into buffer
-//
-// v           boolean value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-static void ae_bool2str(bool v, char *buf) {
-   char c = v ? '1' : '0';
-   ae_int_t i;
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = c;
-   buf[AE_SER_ENTRY_LENGTH] = 0;
-}
-
-// This function unserializes boolean value from buffer
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, trailing spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-//
-// This function raises an error in case unexpected symbol is found
-static bool ae_str2bool(const char *buf, const char **pasttheend) {
-   bool was0, was1;
-   const char *emsg = "ae_str2bool: unable to read boolean value from stream";
-   was0 = false;
-   was1 = false;
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      if (*buf == '0') {
-         was0 = true;
-         buf++;
-         continue;
-      }
-      if (*buf == '1') {
-         was1 = true;
-         buf++;
-         continue;
-      }
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   }
-   *pasttheend = buf;
-   if (was0 == was1)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   return was1;
-}
-
-// This function serializes integer value into buffer
-//
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-static void ae_int2str(ae_int_t v, char *buf) {
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
-   unsigned char c;
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill u.bytes by zeros or ones (depending on sign of v)
-// 2. we copy v to u.ival
-// 3. if we run on big endian architecture, we reorder u.bytes
-// 4. now we have signed 64-bit representation of v stored in u.bytes
-// 5. additionally, we set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
-   c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
-   u.ival = v;
-   for (i = sizeof(ae_int_t); i <= 8; i++)      // <= 8 is preferred because it avoids unnecessary compiler warnings.
-      u.bytes[i] = c;
-   u.bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function serializes 64-bit integer value into buffer
-//
-// v           integer value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-// state       ALGLIB environment state
-static void ae_int642str(ae_int64_t v, char *buf) {
-   unsigned char bytes[9];
-   ae_int_t i;
-   ae_int_t sixbits[12];
-// copy v to array of chars, sign extending it and
-// converting to little endian order
-//
-// because we don't want to mention size of ae_int_t explicitly,
-// we do it as follows:
-// 1. we fill bytes by zeros or ones (depending on sign of v)
-// 2. we memmove v to bytes
-// 3. if we run on big endian architecture, we reorder bytes
-// 4. now we have signed 64-bit representation of v stored in bytes
-// 5. additionally, we set 9th byte of bytes to zero in order to
-//    simplify conversion to six-bit representation
-   memset(bytes, v < 0 ? 0xFF : 0x00, 8);
-   memmove(bytes, &v, 8);
-   bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-// convert to six-bit representation, output
-//
-// NOTE: last 12th element of sixbits is always zero, we do not output it
-   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function unserializes integer value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, trailing spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-//
-// This function raises an error in case unexpected symbol is found
-static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
-   const char *emsg = "ae_str2int: unable to read integer value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union {
-      ae_int_t ival;
-      unsigned char bytes[9];
-   } u;
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(ae_int_t) - 1 - i];
-         u.bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-   return u.ival;
-}
-
-// This function unserializes 64-bit integer value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, trailing spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-// state       ALGLIB environment state
-//
-// This function raises an error in case unexpected symbol is found
-static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
-   const char *emsg = "ae_str2int64: unable to read integer value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   unsigned char bytes[9];
-   ae_int64_t result;
-// 1. skip leading spaces
-// 2. read and decode six-bit digits
-// 3. set trailing digits to zeros
-// 4. convert to little endian 64-bit integer representation
-// 5. convert to big endian representation, if needed
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
-      buf++;
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread == 0)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   for (i = sixbitsread; i < 12; i++)
-      sixbits[i] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(ae_int_t) / 2); i++) {
-         unsigned char tc;
-         tc = bytes[i];
-         bytes[i] = bytes[sizeof(ae_int_t) - 1 - i];
-         bytes[sizeof(ae_int_t) - 1 - i] = tc;
-      }
-   }
-   memmove(&result, bytes, sizeof(result));
-   return result;
-}
-
-// This function serializes double value into buffer
-//
-// v           double value to be serialized
-// buf         buffer, at least 12 characters wide
-//             (11 chars for value, one for trailing zero)
-static void ae_double2str(double v, char *buf) {
-   union {
-      double dval;
-      unsigned char bytes[9];
-   } u;
-   ae_int_t i;
-   ae_int_t sixbits[12];
-// handle special quantities
-   if (isnan(v)) {
-      const char *s = ".nan_______";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-   if (isposinf(v)) {
-      const char *s = ".posinf____";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-   if (isneginf(v)) {
-      const char *s = ".neginf____";
-      memmove(buf, s, strlen(s) + 1);
-      return;
-   }
-// process general case:
-// 1. copy v to array of chars
-// 2. set 9th byte of u.bytes to zero in order to
-//    simplify conversion to six-bit representation
-// 3. convert to little endian (if needed)
-// 4. convert to six-bit representation
-//    (last 12th element of sixbits is always zero, we do not output it)
-   u.dval = v;
-   u.bytes[8] = 0;
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
-      }
-   }
-   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
-   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
-   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
-   for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
-      buf[i] = ae_sixbits2char(sixbits[i]);
-   buf[AE_SER_ENTRY_LENGTH] = 0x00;
-}
-
-// This function unserializes double value from string
-//
-// buf         buffer which contains value; leading spaces/tabs/newlines are
-//             ignored, trailing spaces/tabs/newlines are treated as  end  of
-//             the boolean value.
-//
-// This function raises an error in case unexpected symbol is found
-static double ae_str2double(const char *buf, const char **pasttheend) {
-   const char *emsg = "ae_str2double: unable to read double value from stream";
-   ae_int_t sixbits[12];
-   ae_int_t sixbitsread, i;
-   union { double dval; unsigned char bytes[9]; } u;
-// skip leading spaces
-   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r') buf++;
-// Handle special cases
-   if (*buf == '.') {
-      const char *s_nan = ".nan_______";
-      const char *s_posinf = ".posinf____";
-      const char *s_neginf = ".neginf____";
-      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) { *pasttheend = buf + strlen(s_nan); return NAN; }
-      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) { *pasttheend = buf + strlen(s_posinf); return +INFINITY; }
-      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) { *pasttheend = buf + strlen(s_neginf); return -INFINITY; }
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   }
-// General case:
-// 1. read and decode six-bit digits
-// 2. check that all 11 digits were read
-// 3. set last 12th digit to zero (needed for simplicity of conversion)
-// 4. convert to 8 bytes
-// 5. convert to big endian representation, if needed
-   sixbitsread = 0;
-   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
-      ae_int_t d;
-      d = ae_char2sixbits(*buf);
-      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
-         ae_break(ERR_ASSERTION_FAILED, emsg);
-      sixbits[sixbitsread] = d;
-      sixbitsread++;
-      buf++;
-   }
-   *pasttheend = buf;
-   if (sixbitsread != AE_SER_ENTRY_LENGTH)
-      ae_break(ERR_ASSERTION_FAILED, emsg);
-   sixbits[AE_SER_ENTRY_LENGTH] = 0;
-   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
-   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
-   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
-   if (ByteOrder == AE_BIG_ENDIAN) {
-      for (i = 0; i < (ae_int_t)(sizeof(double) / 2); i++) {
-         unsigned char tc;
-         tc = u.bytes[i];
-         u.bytes[i] = u.bytes[sizeof(double) - 1 - i];
-         u.bytes[sizeof(double) - 1 - i] = tc;
-      }
-   }
-   return u.dval;
-}
-
-// This function performs given number of spin-wait iterations
-void ae_spin_wait(ae_int_t cnt) {
-// these strange operations with ae_never_change_it are necessary to
-// prevent compiler optimization of the loop.
-   volatile ae_int_t i;
-// very unlikely because no one will wait for such amount of cycles
+// Perform a given number of spin-wait iterations.
+static void ae_spin_wait(ae_int_t cnt) {
+// This variable is used to prevent some tricky optimizations which may degrade multi-threaded performance.
+// It was used by the SMP version to prevent optimizations that would remove objects that can nowadays be declared "volatile".
+   static volatile ae_int_t ae_never_change_it = 1;
+// These strange operations with ae_never_change_it are necessary to prevent compiler optimization of the loop.
+// Very unlikely because no one will wait for such amount of cycles.
    if (cnt > 0x12345678)
       ae_never_change_it = cnt % 10;
-// spin wait, test condition which will never be true
-   for (i = 0; i < cnt; i++)
+// Spin wait, test a condition which will never be true.
+   for (ae_int_t i = 0; i < cnt; i++)
       if (ae_never_change_it > 0)
          ae_never_change_it--;
 }
 
-// Lock.
-// This is the internal structure which implements lock functionality.
+// Internal OS-dependent lock routines.
+static const int AE_LOCK_ALIGNMENT = 0x10, AE_LOCK_CYCLES = 0x200, AE_LOCK_TESTS_BEFORE_YIELD = 0x10;
+
+// The internal OS-dependent lock structure.
 struct _lock;
 
-// This function initializes a _lock structure which is internally used by ae_lock high-level structure.
-// The _lock structure is statically allocated, no malloc() calls are performed during its allocation.
-// However, you have to call _ae_free_lock_raw() in order to deallocate this lock properly.
+// Initialize a _lock p to be internally used by the high-level ae_lock structure.
+// It is statically allocated, no malloc() calls are performed during its allocation,
+// but _ae_free_lock_raw() must be used to deallocate it properly.
 static inline void _ae_init_lock_raw(_lock *p);
 
-// This function acquires a _lock structure.
-// It is the low-level workhorse function used by ae_acquire_lock().
+// Acquire a _lock p; the low-level workhorse function used by ae_acquire_lock().
 static inline void _ae_acquire_lock_raw(_lock *p);
 
-// This function releases a _lock structure.
-// It is the low-level workhorse function used by ae_release_lock().
+// Release a _lock p; the low-level workhorse function used by ae_release_lock().
 static inline void _ae_release_lock_raw(_lock *p);
 
-// This function frees _lock structure.
+// Free the _lock p.
 static inline void _ae_free_lock_raw(_lock *p);
 
 #if AE_OS == AE_POSIX
@@ -2561,6 +1606,7 @@ static inline void _ae_acquire_lock_raw(_lock *p) {
          ae_yield();
       }
    }
+#undef BumpLock
 }
 static inline void _ae_release_lock_raw(_lock *p) { InterlockedExchange((LONG volatile *)p->p_lock, 0); }
 static inline void _ae_free_lock_raw(_lock *p) { }
@@ -2577,20 +1623,18 @@ static inline void _ae_release_lock_raw(_lock *p) { p->is_locked = false; }
 static inline void _ae_free_lock_raw(_lock *p) { }
 #endif
 
-// This function initializes a free ae_lock structure.
-// Inputs:
-//	lock:		a pointer to the lock structure, must be zero-filled
-//	is_static:	true if the lock is to be made "eternal";
-//			i.e. expected to persist until the end of the execution of the program.
-//	make_automatic:	true if the lock object is to be added to automatic memory management list.
+// Initialize a free Lock lock.
 // NOTES:
-// *	as a special exception, this function allows you to specify TopFr == NULL.
-//	In this case all exception arising during construction are handled as critical failures, with abort() being called.
+// *	make_automatic indicates whether or not the lock is to be added to automatic memory management list.
+// *	As a special exception, this function allows you to specify TopFr == NULL.
+//	In this case, exceptions arising during construction are handled as critical failures, resulting in abort().
 //	make_automatic must be false on such calls.
+// *	is_static indicates that lock is to be made "eternal" (i.e. static),
+//	which is expected to persist until the end of the execution of the program.
 // *	Eternal locks can not be deallocated (cleared) and do not increase debug allocation counters.
-//	Errors during allocation of eternal locks are considered critical exceptions and handled by calling abort().
+//	Errors during allocation of static locks are considered critical exceptions and handled by calling abort().
 void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
-   AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof *lock));
+//(@) Zero-check removed.
    bool is_auto = !is_static && TopFr != NULL;
    if (!is_auto) {
       AE_CRITICAL_ASSERT(!make_automatic);
@@ -2599,23 +1643,23 @@ void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
    lock->is_static = is_static;
    size_t size = sizeof(_lock);
    ae_db_init(&lock->db, size, make_automatic);
-   lock->lock_ptr = !is_static? lock->db.ptr: size == 0 || _force_malloc_failure? NULL: malloc(size);
+   lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
    _ae_init_lock_raw((_lock *) lock->lock_ptr);
    if (!is_auto) ae_state_clear();
 }
 
-// This function acquires a lock.
-// In case lock is busy, we perform several iterations inside tight loop before trying again.
+// Acquire a lock.
+// If the lock is busy and ae_yield() is supported, we ae_yield() after retrying several times, with tight spin waits in between.
 void ae_acquire_lock(ae_lock *lock) {
    _ae_acquire_lock_raw((_lock *) lock->lock_ptr);
 }
 
-// This function releases a lock.
+// Releases a lock.
 void ae_release_lock(ae_lock *lock) {
    _ae_release_lock_raw((_lock *) lock->lock_ptr);
 }
 
-// This function frees a lock.
+// Free a lock.
 void ae_free_lock(ae_lock *lock) {
    AE_CRITICAL_ASSERT(!lock->is_static);
    _lock *p = (_lock *) lock->lock_ptr;
@@ -2623,24 +1667,18 @@ void ae_free_lock(ae_lock *lock) {
    ae_db_free(&lock->db);
 }
 
+// A reduced form ae_shared_pool_free() suitable for use as the deallocation function on a frame.
 static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false); }
 
-// This function creates ae_shared_pool structure.
-//
-// dst                 destination shared pool, must be zero-filled
-//                     already allocated, but not initialized.
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
-// Error handling:
-// * on failure calls ae_break() with TopFr == NULL. Usually it results
-//   in abort() call.
-//
-// dst is assumed to be uninitialized, its fields are ignored.
+// A new ae_shared_pool structure for _dst.
+// _dst is assumed to be pre-allocated, and uninitialized, its fields are ignored.
+// make_automatic indicates whether or not _dst is to be removed after leaving the current frame
+// as opposed to being the field of some other object.
+// Upon allocation failure, call ae_break().
 void ae_shared_pool_init(void *_dst, bool make_automatic) {
-   ae_shared_pool *dst;
-   dst = (ae_shared_pool *) _dst;
-   AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
-// init
+   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+//(@) Zero-check removed.
+// Initialize.
    dst->seed_object = NULL;
    dst->recycled_objects = NULL;
    dst->recycled_entries = NULL;
@@ -2655,95 +1693,88 @@ void ae_shared_pool_init(void *_dst, bool make_automatic) {
    ae_init_lock(&dst->pool_lock, false, false);
 }
 
-// This function clears all dynamically allocated fields of the pool except
-// for the lock. It does NOT try to acquire pool_lock.
-//
-// NOTE: this function is NOT thread-safe, it is not protected by lock.
+// Clear all dynamically allocated fields of the ae_shared_pool dst except for the lock.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automatic) {
-   ae_shared_pool_entry *ptr, *tmp;
-// free seed
+// Free the seed.
    if (dst->seed_object != NULL) {
       dst->free((void *)dst->seed_object, make_automatic);
       ae_free((void *)dst->seed_object);
       dst->seed_object = NULL;
    }
-// free recycled objects
-   for (ptr = dst->recycled_objects; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+// Free the recycled objects.
+   for (ae_shared_pool_entry *ptr = dst->recycled_objects; ptr != NULL; ) {
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
       dst->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
       ptr = tmp;
    }
    dst->recycled_objects = NULL;
-// free recycled entries
-   for (ptr = dst->recycled_entries; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+// Free the recycled entries.
+   for (ae_shared_pool_entry *ptr = dst->recycled_entries; ptr != NULL;) {
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
       ae_free(ptr);
       ptr = tmp;
    }
    dst->recycled_entries = NULL;
 }
 
-// This function creates copy of ae_shared_pool.
-//
-// dst                 destination pool, must be zero-filled
-// src                 source pool
-// make_automatic                if true, vector will be registered in the frame of the current state;
-//
-// dst is assumed to be uninitialized, its fields are ignored.
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when lock can be used by another thread.
+// Copy the ae_shared_pool _src into the previously-allocated ae_shared_pool _dst.
+// _dst is assumed to be uninitialized and its fields are ignored.
+// make_automatic indicates whether or not _dst is to be removed after leaving the current frame.
+// as opposed to being the field of some other object.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
-   ae_shared_pool *dst, *src;
-   ae_shared_pool_entry *ptr;
-   dst = (ae_shared_pool *) _dst;
-   src = (ae_shared_pool *) _src;
+   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+   ae_shared_pool *src = (ae_shared_pool *) _src;
    ae_shared_pool_init(dst, make_automatic);
-// copy non-pointer fields
+// Copy the non-pointer fields.
    dst->size_of_object = src->size_of_object;
    dst->init = src->init;
    dst->copy = src->copy;
    dst->free = src->free;
-// copy seed object
+// Copy the seed object.
    if (src->seed_object != NULL) {
       dst->seed_object = ae_malloc(dst->size_of_object);
       memset(dst->seed_object, 0, dst->size_of_object);
       dst->copy(dst->seed_object, src->seed_object, false);
    }
-// copy recycled objects
+// Copy the recycled objects.
    dst->recycled_objects = NULL;
-   for (ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *) ptr->next_entry) {
-      ae_shared_pool_entry *tmp;
-   // allocate entry, immediately add to the recycled list (we do not want to lose it in case of future malloc failures).
-      tmp = (ae_shared_pool_entry *) ae_malloc(sizeof(ae_shared_pool_entry));
-      memset(tmp, 0, sizeof(*tmp));
+   for (ae_shared_pool_entry *ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *) ptr->next_entry) {
+   // Allocate an entry, immediately add it to the recycled list (we do not want to lose it in case of future malloc failures).
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ae_malloc(sizeof *tmp);
+      memset(tmp, 0, sizeof *tmp);
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
-   // prepare place for object, copy() it
+   // Prepare a place for the object and copy() it.
       tmp->obj = ae_malloc(dst->size_of_object);
       memset(tmp->obj, 0, dst->size_of_object);
       dst->copy(tmp->obj, ptr->obj, false);
    }
-// recycled entries are not copied because they do not store any information
+// Recycled entries are not copied because they do not store any information.
    dst->recycled_entries = NULL;
-// enumeration counter is reset on copying
+// The enumeration counter is reset on copying.
    dst->enumeration_counter = NULL;
-// initialize frame record
+// Initialize the frame record.
    dst->frame_entry.deallocator = ae_shared_pool_destroy;
    dst->frame_entry.ptr = dst;
 }
 
-// This function performs destruction of the pool object.
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when pool can be used by another thread.
+// Free the ae_shared_pool _dst.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_free(void *_dst, bool make_automatic) {
    ae_shared_pool *dst = (ae_shared_pool *) _dst;
-// clear seed and lists
+// Clear the seed and lists.
    ae_shared_pool_internalclear(dst, make_automatic);
-// clear fields
+// Clear the fields.
    dst->seed_object = NULL;
    dst->recycled_objects = NULL;
    dst->recycled_entries = NULL;
@@ -2755,144 +1786,112 @@ void ae_shared_pool_free(void *_dst, bool make_automatic) {
    if (!make_automatic) ae_free_lock(&dst->pool_lock);
 }
 
-// This function returns True, if internal seed object was set.  It  returns
-// False for un-seeded pool.
-//
-// dst                 destination pool (initialized by constructor function)
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when lock can be used by another thread.
+// True if and only if the already-initialized ae_shared_pool dst is seeded; i.e. if its internal seed object is set.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 bool ae_shared_pool_is_initialized(ae_shared_pool *dst) {
    return dst->seed_object != NULL;
 }
 
-// This function sets internal seed object. All objects owned by the pool
-// (current seed object, recycled objects) are automatically freed.
-//
-// dst                 destination pool (initialized by constructor function)
-// seed_object         new seed object
-// size_of_object      sizeof(), used to allocate memory
-// init                constructor function
-// copy                copy constructor
-// clear               destructor function
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when lock can be used by another thread.
+// Seed the already-initialized ae_shared_pool dst by setting its internal seed object to seed_object:size_of_object,
+// freeing everything owned by dst (the current seed object and recycled objects).
+// The make, copy and free functions are set respectively to init(), copy() and free().
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic)) {
-// free internal objects
+// Free the internal objects.
    ae_shared_pool_internalclear(dst, false);
-// set non-pointer fields
+// Set the non-pointer fields.
    dst->size_of_object = size_of_object;
    dst->init = init;
    dst->copy = copy;
    dst->free = free;
-// set seed object
+// Set the seed object and its size.
    dst->seed_object = ae_malloc(size_of_object);
    memset(dst->seed_object, 0, size_of_object);
    copy(dst->seed_object, seed_object, false);
 }
 
-// This  function  retrieves  a  copy  of  the seed object from the pool and
-// stores it to target smart pointer ptr.
-//
-// In case target pointer owns non-NULL  value,  it  is  deallocated  before
-// storing value retrieved from pool. Target pointer becomes  owner  of  the
-// value which was retrieved from pool.
-//
-// pool                pool
-// pptr                pointer to ae_smart_ptr structure
-//
-// NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
-//       operation and can be used simultaneously from several threads.
+// Copy the seed object from the ae_shared_pool pool into the target ae_smart_ptr ptr, making pptr its owner.
+// Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
+// NOTE:
+// *	This function IS thread-safe.
+//	It acquires a pool lock during its operation and can be used simultaneously from several threads.
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-   void *new_obj;
-// assert that pool was seeded
+// Require pool to be seeded.
    ae_assert(pool->seed_object != NULL, "ae_shared_pool_retrieve: shared pool is not seeded");
-// acquire lock
+// Acquire a lock.
    ae_acquire_lock(&pool->pool_lock);
-// try to reuse recycled objects
-   if (pool->recycled_objects != NULL) {
-      ae_shared_pool_entry *result;
-   // retrieve entry/object from list of recycled objects
-      result = pool->recycled_objects;
+   if (pool->recycled_objects != NULL) { // Try to reuse recycled objects.
+   // Retrieve an entry/object from the list of recycled objects.
+      ae_shared_pool_entry *result = pool->recycled_objects;
       pool->recycled_objects = (ae_shared_pool_entry *) pool->recycled_objects->next_entry;
-      new_obj = result->obj;
+      void *new_obj = result->obj;
       result->obj = NULL;
-   // move entry to list of recycled entries
+   // Recycle the entry.
       result->next_entry = pool->recycled_entries;
       pool->recycled_entries = result;
-   // release lock
+   // Release the lock.
       ae_release_lock(&pool->pool_lock);
-   // assign object to smart pointer
+   // Assign the object to the smart pointer.
       ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
-      return;
+   } else {
+   // Release the lock; we do not need it anymore because the copy constructor does not modify the source variable.
+      ae_release_lock(&pool->pool_lock);
+   // Create a new object from the seed.
+      void *new_obj = ae_malloc(pool->size_of_object);
+      memset(new_obj, 0, pool->size_of_object);
+   // Immediately assign the object to the smart pointer (so as not to lose it, in case of future failures).
+      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
+   // Do the actual copying.
+   //(@) Before this line, the smart pointer points to a zero-filled instance. (No longer applicable.)
+      pool->copy(new_obj, pool->seed_object, false);
    }
-// release lock; we do not need it anymore because copy constructor does not modify source variable
-   ae_release_lock(&pool->pool_lock);
-// create new object from seed, immediately assign object to smart pointer (do not want to lose it in case of future failures).
-   new_obj = ae_malloc(pool->size_of_object);
-   memset(new_obj, 0, pool->size_of_object);
-   ae_smart_ptr_assign(pptr, new_obj, true, true, pool->free);
-// perform actual copying; before this line smartptr points to zero-filled instance
-   pool->copy(new_obj, pool->seed_object, false);
 }
 
-// This function recycles object owned by smart  pointer  by  moving  it  to
-// internal storage of the shared pool.
-//
-// Source pointer must own the object. After function is over, it owns NULL
-// pointer.
-//
-// pool                pool
-// pptr                pointer to ae_smart_ptr structure
-//
-// NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
-//       operation and can be used simultaneously from several threads.
+// Recycle the object owned by the smart pointer pptr by moving it into the ae_shared_pool pool.
+// pptr must own the object.
+// Afterwards, it owns the NULL pointer.
+// NOTE:
+// *	This function IS thread-safe.
+//	It acquires a pool lock during its operation and can be used simultaneously from several threads.
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-   ae_shared_pool_entry *new_entry;
-// assert that pool was seeded
+// Require pool to be seeded and pptr to be non-NULL and to own the object.
    ae_assert(pool->seed_object != NULL, "ae_shared_pool_recycle: shared pool is not seeded");
-// assert that pointer non-null and owns the object
    ae_assert(pptr->is_owner, "ae_shared_pool_recycle: pptr does not own its pointer");
    ae_assert(pptr->ptr != NULL, "ae_shared_pool_recycle: pptr is NULL");
-// acquire lock
+// Acquire the lock and the shared pool entry (reusing an entry from recycled_entries, if there are any).
    ae_acquire_lock(&pool->pool_lock);
-// acquire shared pool entry (reuse one from recycled_entries or allocate new one)
+   ae_shared_pool_entry *new_entry;
    if (pool->recycled_entries != NULL) {
-   // reuse previously allocated entry
       new_entry = pool->recycled_entries;
       pool->recycled_entries = (ae_shared_pool_entry *) new_entry->next_entry;
    } else {
-   // Allocate memory for new entry.
-   //
-   // NOTE: we release pool lock during allocation because ae_malloc() may raise
-   //       exception and we do not want our pool to be left in the locked state.
+   // NOTE:
+   // *	Unlock the pool first
+   //	so as to prevent the pool from being left in a locked state in case ae_malloc() raises an exception.
       ae_release_lock(&pool->pool_lock);
-      new_entry = (ae_shared_pool_entry *) ae_malloc(sizeof(ae_shared_pool_entry));
+      new_entry = (ae_shared_pool_entry *) ae_malloc(sizeof *new_entry);
       ae_acquire_lock(&pool->pool_lock);
    }
-// add object to the list of recycled objects
+// Recycle the object, the lock object and the source pointer.
    new_entry->obj = pptr->ptr;
    new_entry->next_entry = pool->recycled_objects;
    pool->recycled_objects = new_entry;
-// release lock object
    ae_release_lock(&pool->pool_lock);
-// release source pointer
    ae_smart_ptr_release(pptr);
 }
 
-// This function clears internal list of  recycled  objects,  but  does  not
-// change seed object managed by the pool.
-//
-// pool                pool
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when lock can be used by another thread.
+// Clear the internal list of recycled objects, keeping intact the seed object managed by the ae_shared_pool pool.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
-   ae_shared_pool_entry *ptr, *tmp;
-// clear recycled objects
-   for (ptr = pool->recycled_objects; ptr != NULL;) {
-      tmp = (ae_shared_pool_entry *) ptr->next_entry;
+// Clear the recycled objects.
+   for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL; ) {
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
       pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
@@ -2901,78 +1900,53 @@ void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
    pool->recycled_objects = NULL;
 }
 
-// This function allows to enumerate recycled elements of the  shared  pool.
-// It stores pointer to the first recycled object in the smart pointer.
-//
+// Allow the recycled elements of the ae_shared_pool pool to be enumerated.
+// The pointer to the first recycled object is stored in the smart pointer pptr.
 // IMPORTANT:
-// * in case target pointer owns non-NULL  value,  it  is deallocated before
-//   storing value retrieved from pool.
-// * recycled object IS NOT removed from pool
-// * target pointer DOES NOT become owner of the new value
-// * this function IS NOT thread-safe
-// * you SHOULD NOT modify shared pool during enumeration (although you  can
-//   modify state of the objects retrieved from pool)
-// * in case there is no recycled objects in the pool, NULL is stored to pptr
-// * in case pool is not seeded, NULL is stored to pptr
-//
-// pool                pool
-// pptr                pointer to ae_smart_ptr structure
+// *	The recycled object is KEPT in pool and ownership is NOT passed to pptr.
+// *	If there are no recycled objects left in pool or pool is not seeded, NULL is stored into pptr.
+// *	Any non-NULL pointer owned by pptr is deallocated before storing the value retrieved from pool.
+// *	This function IS NOT thread-safe
+// *	You should NOT modify pool during enumeration (although you can modify the state of the objects retrieved from pool).
 void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-// modify internal enumeration counter
+// Modify the internal enumeration counter.
    pool->enumeration_counter = pool->recycled_objects;
-// exit on empty list
-   if (pool->enumeration_counter == NULL) {
+// Exit on an empty list.
+   if (pool->enumeration_counter == NULL)
       ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
-      return;
-   }
-// assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
+// Assign the object to a smart pointer.
+   else
+      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
 }
 
-// This function allows to enumerate recycled elements of the  shared  pool.
-// It stores pointer to the next recycled object in the smart pointer.
-//
-// IMPORTANT:
-// * in case target pointer owns non-NULL  value,  it  is deallocated before
-//   storing value retrieved from pool.
-// * recycled object IS NOT removed from pool
-// * target pointer DOES NOT become owner of the new value
-// * this function IS NOT thread-safe
-// * you SHOULD NOT modify shared pool during enumeration (although you  can
-//   modify state of the objects retrieved from pool)
-// * in case there is no recycled objects left in the pool, NULL is stored.
-// * in case pool is not seeded, NULL is stored.
-//
-// pool                pool
-// pptr                pointer to ae_smart_ptr structure
+// Allow the recycled elements of the ae_shared_pool pool to be enumerated.
+// The pointer to the next recycled object is stored in the smart pointer pptr.
+// In all other respects, this is the same as ae_shared_pool_first_recycled().
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
-// exit on end of list
+// Exit on the end of list.
    if (pool->enumeration_counter == NULL) {
       ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
       return;
    }
-// modify internal enumeration counter
+// Modify the internal enumeration counter.
    pool->enumeration_counter = (ae_shared_pool_entry *) pool->enumeration_counter->next_entry;
-// exit on empty list
-   if (pool->enumeration_counter == NULL) {
+// Exit on an empty list.
+   if (pool->enumeration_counter == NULL)
       ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
-      return;
-   }
-// assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
+// Assign the object to a smart pointer.
+   else
+      ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->free);
 }
 
-// This function clears internal list of recycled objects and  seed  object.
-// However, pool still can be used (after initialization with another seed).
-//
-// pool                pool
-//
-// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-//       you should NOT call it when lock can be used by another thread.
+// Clear the internal list of recycled objects and the seed object from the ae_shared_pool pool,
+// while leaving pool intact for reseeding and subsequent reuse.
+// NOTE:
+// *	This function is NOT thread-safe.
+//	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_reset(ae_shared_pool *pool) {
-// clear seed and lists
+// Clear the seed and lists.
    ae_shared_pool_internalclear(pool, false);
-// clear fields
+// Clear the fields.
    pool->seed_object = NULL;
    pool->recycled_objects = NULL;
    pool->recycled_entries = NULL;
@@ -2983,70 +1957,140 @@ void ae_shared_pool_reset(ae_shared_pool *pool) {
    pool->free = NULL;
 }
 
-// This function initializes serializer
+// Convert the six-bit value v in the range [0,0100) to digits, letters, minuses and underscores.
+// Any v outside the range [0,0100) is convereted to   '?'.
+static char ae_sixbits2char(ae_int_t v) {
+   static char _sixbits2char_tbl[0100] = {
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
+      'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+      'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+      'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '-', '_'
+   };
+   const size_t CharN = sizeof _sixbits2char_tbl/sizeof _sixbits2char_tbl[0];
+   return v >= 0 && v < CharN ? _sixbits2char_tbl[v] : '?';
+#if 0
+// v is correct, process it.
+   return
+      v < 10 ? '0' + v : 
+      (v -= 10) < 26 ? 'A' + v : 
+      (v -= 26) < 26 ? 'a' + v : 
+      (v -= 26) == 0 ? '-' : '_';
+#endif
+}
+
+// This inverse of ae_sixbits2char().
+// Convert any character c in the range of ae_sixbits2char() to a six-bit value in the range [0, 0100).
+// Convert any other character c to -1.
+static ae_int_t ae_char2sixbits(char c) {
+   static ae_int_t _ae_char2sixbits_tbl[0x80] = {
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1,
+       0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+      -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+      25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, 63,
+      -1, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
+      51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1
+   };
+   const size_t Bit6N = sizeof _ae_char2sixbits_tbl/sizeof _ae_char2sixbits_tbl[0];
+   return c >= 0 && c < Bit6N ? _ae_char2sixbits_tbl[(int)c] : -1;
+}
+
+// Convert the 3 x 8-bit array src into the 4 x 6-bit array dst.
+static void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst) {
+   dst[0] = src[0] & 0x3F;
+   dst[1] = (src[0] >> 6) | ((src[1] & 0x0F) << 2);
+   dst[2] = (src[1] >> 4) | ((src[2] & 0x03) << 4);
+   dst[3] = src[2] >> 2;
+}
+
+// Convert the 4 x 6-bit array src into the 3 x 8-bit array dst.
+static void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
+   dst[0] = (unsigned char)(src[0] | ((src[1] & 0x03) << 6));
+   dst[1] = (unsigned char)((src[1] >> 2) | ((src[2] & 0x0F) << 4));
+   dst[2] = (unsigned char)((src[2] >> 4) | (src[3] << 2));
+}
+
+// Initialize the serializer.
 void ae_serializer_init(ae_serializer *serializer) {
    serializer->mode = AE_SM_DEFAULT;
-   serializer->entries_needed = 0;
-   serializer->bytes_asked = 0;
+   serializer->bytes_asked = serializer->entries_needed = 0;
 }
 
 void ae_serializer_alloc_start(ae_serializer *serializer) {
    serializer->mode = AE_SM_ALLOC;
-   serializer->entries_needed = 0;
-   serializer->bytes_asked = 0;
+   serializer->bytes_asked = serializer->entries_needed = 0;
 }
 
 void ae_serializer_alloc_entry(ae_serializer *serializer) {
    serializer->entries_needed++;
 }
 
-void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t n;
-   n = bytes->cnt;
-   n = n / 8 + (n % 8 > 0 ? 1 : 0);
-   serializer->entries_needed += 1 + n;
-}
-
-// After allocation phase is done, this function returns  required  size  of
-// the output string buffer (including trailing zero symbol). Actual size of
-// the data being stored can be a few characters smaller than requested.
+// After  the allocation is done, return the required size of the output string buffer (including trailing '\0').
+// The actual size of the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer) {
-   ae_int_t rows, lastrowsize, result;
    serializer->mode = AE_SM_READY2S;
-// if no entries needes (degenerate case)
-   if (serializer->entries_needed == 0) {
-      serializer->bytes_asked = 4;      // A pair of chars for \r\n, one for dot, one for trailing zero.
-      return serializer->bytes_asked;
-   }
-// non-degenerate case
-   rows = serializer->entries_needed / AE_SER_ENTRIES_PER_ROW;
-   lastrowsize = AE_SER_ENTRIES_PER_ROW;
+// If no entries are needed (the degenerate case).
+   if (serializer->entries_needed == 0)
+      return serializer->bytes_asked = 4; // A pair of chars for "\r\n", one for '.', one for the '\0'.
+// The non-degenerate case.
+   ae_int_t rows = serializer->entries_needed / AE_SER_ENTRIES_PER_ROW;
+   ae_int_t lastrowsize = AE_SER_ENTRIES_PER_ROW;
    if (serializer->entries_needed % AE_SER_ENTRIES_PER_ROW) {
       lastrowsize = serializer->entries_needed % AE_SER_ENTRIES_PER_ROW;
       rows++;
    }
-// calculate result size
-// Data size + ' ' symbols + '\n' symbols + trailing '.' + trailing '\0'.
-   result = ((rows - 1) * AE_SER_ENTRIES_PER_ROW + lastrowsize) * AE_SER_ENTRY_LENGTH;
-   result += (rows - 1) * (AE_SER_ENTRIES_PER_ROW - 1) + (lastrowsize - 1);
-   result += rows * 2;
-   result++;
-   result++;
-   serializer->bytes_asked = result;
-   return result;
+// The result size: data size + ' ' & '\n' symbols + trailing '.' & '\0'.
+   return serializer->bytes_asked = ((rows - 1) * AE_SER_ENTRIES_PER_ROW + lastrowsize) * (AE_SER_ENTRY_LENGTH + 1) + rows + 2;
 }
+
+// Determine the byte order.
+// Only big-endian and little-endian are supported for ByteOrder, not mixed-endian hardware.
+static ae_int_t GetByteOrder() {
+// 1983 is used as the magic number because its non-periodic double representation
+// allow us to easily distinguish between the upper and lower halves and to detect mixed endian hardware.
+   union { double a; ae_int32_t p[2]; } u; u.a = 1.0 / 1983.0;
+   return
+      u.p[1] == (ae_int32_t) 0x3f408642 ? AE_LITTLE_ENDIAN : 
+      u.p[0] == (ae_int32_t) 0x3f408642 ? AE_BIG_ENDIAN : 
+      AE_MIXED_ENDIAN; //(@) Originally this prompted an abort().
+}
+
+static const ae_int_t ByteOrder = GetByteOrder();
 
 #ifdef AE_USE_CPP_SERIALIZATION
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf) {
    serializer->mode = AE_SM_TO_CPPSTRING;
    serializer->out_cppstr = buf;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf) {
    serializer->mode = AE_SM_FROM_STRING;
    serializer->in_str = buf->c_str();
+}
+
+static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
+   std::istream * stream = reinterpret_cast < std::istream * >(aux);
+   if (cnt <= 0)
+      return false; // Unexpected cnt.
+   while (true) {
+      int c = stream->get();
+      if (c < 0 || c > 0xff)
+         return false; // Failure!
+      else if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+         p_buf[0] = (char)c;
+         break;
+      }
+   }
+   for (int k = 1; k < cnt; k++) {
+      int c = stream->get();
+      if (c < 0 || c > 0xff || c == ' ' || c == '\t' || c == '\n' || c == '\r')
+         return false; // Failure!
+      p_buf[k] = (char)c;
+   }
+   p_buf[cnt] = 0;
+   return true; // Success.
 }
 
 static bool cpp_writer(const char *p_string, ae_int_t aux) {
@@ -3055,35 +2099,11 @@ static bool cpp_writer(const char *p_string, ae_int_t aux) {
    return !stream->bad();
 }
 
-static bool cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf) {
-   std::istream * stream = reinterpret_cast < std::istream * >(aux);
-   int c;
-   if (cnt <= 0)
-      return false; // unexpected cnt.
-   while (true) {
-      c = stream->get();
-      if (c < 0 || c > 255)
-         return false;      // failure!
-      if (c != ' ' && c != '\t' && c != '\n' && c != '\r')
-         break;
-   }
-   p_buf[0] = (char)c;
-   for (int k = 1; k < cnt; k++) {
-      c = stream->get();
-      if (c < 0 || c > 255 || c == ' ' || c == '\t' || c == '\n' || c == '\r')
-         return false;      // failure!
-      p_buf[k] = (char)c;
-   }
-   p_buf[cnt] = 0;
-   return true;    // success
-}
-
 void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream) {
    serializer->mode = AE_SM_TO_STREAM;
    serializer->stream_writer = cpp_writer;
    serializer->stream_aux = reinterpret_cast < ae_int_t > (stream);
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_stream(ae_serializer *serializer, const std::istream *stream) {
@@ -3097,8 +2117,7 @@ void ae_serializer_sstart_str(ae_serializer *serializer, char *buf) {
    serializer->mode = AE_SM_TO_STRING;
    serializer->out_str = buf;
    serializer->out_str[0] = 0;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf) {
@@ -3110,8 +2129,7 @@ void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer wri
    serializer->mode = AE_SM_TO_STREAM;
    serializer->stream_writer = writer;
    serializer->stream_aux = aux;
-   serializer->entries_saved = 0;
-   serializer->bytes_written = 0;
+   serializer->bytes_written = serializer->entries_saved = 0;
 }
 
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux) {
@@ -3120,21 +2138,68 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
    serializer->stream_aux = aux;
 }
 
+// Unserialize a boolean value from the string buf, up to *pasttheend.
+static bool ae_str2bool(const char *buf, const char **pasttheend) {
+   const char *emsg = "ae_str2bool: unable to read boolean value from stream";
+   bool was0 = false;
+   bool was1 = false;
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != '\0' )
+      if (*buf == '0') {
+         was0 = true;
+         buf++;
+      } else if (*buf == '1') {
+         was1 = true;
+         buf++;
+      } else ae_break(ERR_ASSERTION_FAILED, emsg);
+   *pasttheend = buf;
+   if (was0 == was1)
+      ae_break(ERR_ASSERTION_FAILED, emsg);
+   return was1;
+}
+
+// Unserialize a boolean value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
+bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING: return ae_str2bool(serializer->in_str, &serializer->in_str);
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 3];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_bool: error reading from stream");
+         return ae_str2bool(buf, &p);
+      }
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_bool: unable to read boolean value from stream");
+   }
+   return false;
+}
+
+// Serialize the boolean value v into the buffer buf.
+static void ae_bool2str(bool v, char *buf) {
+   char c = v ? '1' : '0';
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = c;
+   buf[AE_SER_ENTRY_LENGTH] = '\0';
+}
+
+// Serialize the boolean value v to serializer.
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
-   char buf[AE_SER_ENTRY_LENGTH + 3];
    const char *emsg = "ae_serializer_serialize_bool: serialization integrity error";
-   ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
+   char buf[AE_SER_ENTRY_LENGTH + 3];
+// Prepare the serialization, check consistency.
    ae_bool2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "<" because we need space for trailing zero.
+   ae_int_t bytes_appended = (ae_int_t) strlen(buf);
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
-// append to buffer
+// Append to the buffer.
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
@@ -3152,21 +2217,116 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, bool v) {
    }
 }
 
+// Unserialize an integer value from the string buf, up to *pasttheend.
+static ae_int_t ae_str2int(const char *buf, const char **pasttheend) {
+   const char *emsg = "ae_str2int: unable to read integer value from stream";
+// *	Skip leading spaces.
+// *	Read and decode six-bit digits.
+// *	Set trailing digits to zeros.
+// *	Convert to little endian 64-bit integer representation.
+// *	Convert to big endian representation, if needed.
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
+   }
+   *pasttheend = buf;
+   if (sixbitsread == 0)
+      ae_break(ERR_ASSERTION_FAILED, emsg);
+   for (ae_int_t i = sixbitsread; i < 12; i++)
+      sixbits[i] = 0;
+   union {
+      ae_int_t ival;
+      unsigned char bytes[9];
+   } u;
+   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof u.ival - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
+      }
+   return u.ival;
+}
+
+// Unserialize an integer value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
+ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING: return ae_str2int(serializer->in_str, &serializer->in_str);
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 3];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int: error reading from stream");
+         return ae_str2int(buf, &p);
+      }
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int: integrity check failed");
+   }
+   return 0;
+}
+
+// Serialize the integer value v into the buffer buf.
+static void ae_int2str(ae_int_t v, char *buf) {
+// Copy v to array of chars, sign extending it and converting it to little endian order.
+// In order to avoid explicit mention of the size of the ae_int_t type, we:
+// *	fill u.bytes by zeros or ones (depending on the sign of v),
+// *	copy v to u.ival,
+// *	reorder u.bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in u.bytes,
+// *	additionally, zero the last byte of u.bytes to simplify conversion to six-bit form.
+   unsigned char c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
+   union {
+      ae_int_t ival;
+      unsigned char bytes[9];
+   } u;
+   u.ival = v;
+   const size_t un = sizeof u.ival, us = sizeof u.bytes;
+   for (ae_int_t i = un; i < us; i++) // i < us is preferred because it avoids unnecessary compiler warnings.
+      u.bytes[i] = c;
+   u.bytes[us - 1] = '\0';
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0,  i1 = un - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
+      }
+// Convert to six-bit representation, output.
+// NOTE:
+// *	The last element of sixbits is always zero, and is not output.
+   ae_int_t sixbits[12];
+   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
+}
+
+// Serialize the integer value v to serializer.
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
-   char buf[AE_SER_ENTRY_LENGTH + 3];
    const char *emsg = "ae_serializer_serialize_int: serialization integrity error";
-   ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
+   char buf[AE_SER_ENTRY_LENGTH + 3];
+// Prepare the serialization and check consistency.
    ae_int2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "<" because we need space for trailing zero.
+   ae_int_t bytes_appended = (ae_int_t) strlen(buf);
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
-// append to buffer
+// Append to the buffer.
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
@@ -3184,21 +2344,109 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v) {
    }
 }
 
+// Unserialize a 64-bit integer value from the string buf, up to *pasttheend.
+static ae_int64_t ae_str2int64(const char *buf, const char **pasttheend) {
+   const char *emsg = "ae_str2int64: unable to read integer value from stream";
+// *	Skip leading spaces.
+// *	Read and decode six-bit digits.
+// *	Set trailing digits to zeros.
+// *	Convert to little endian 64-bit integer representation.
+// *	Convert to big endian representation, if needed.
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
+      buf++;
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
+   }
+   *pasttheend = buf;
+   if (sixbitsread == 0)
+      ae_break(ERR_ASSERTION_FAILED, emsg);
+   for (ae_int_t i = sixbitsread; i < 12; i++)
+      sixbits[i] = 0;
+   unsigned char bytes[9];
+   ae_foursixbits2threebytes(sixbits + 0, bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, bytes + 6);
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof(ae_int_t) - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = bytes[i0];
+         bytes[i0] = bytes[i1];
+         bytes[i1] = tc;
+      }
+   ae_int64_t result;
+   memmove(&result, bytes, sizeof result);
+   return result;
+}
+
+// Unserialize a 64-bit integer value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
+ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING: return ae_str2int64(serializer->in_str, &serializer->in_str);
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 3];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int64: error reading from stream");
+         return ae_str2int64(buf, &p);
+      }
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int64: integrity check failed");
+   }
+   return 0L;
+}
+
+// Serialize the 64-bit integer value v into the buffer buf.
+static void ae_int642str(ae_int64_t v, char *buf) {
+// Copy v to an array of chars, sign extending it and converting to little endian order.
+// In order to avoid explicit mention of the size of the ae_int64_t type, we:
+// *	fill bytes by zeros or ones (depending on the sign of v),
+// *	memmove v to bytes,
+// *	reorder bytes (for big endian architectures), to obtain a signed 64-bit representation of v stored in bytes,
+// *	additionally, zero the last byte of bytes to simplify conversion to six-bit form.
+   unsigned char bytes[9];
+   memset(bytes, v < 0 ? 0xFF : 0x00, 8);
+   memmove(bytes, &v, 8);
+   bytes[8] = 0;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof(ae_int_t) - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = bytes[i0];
+         bytes[i0] = bytes[i1];
+         bytes[i1] = tc;
+      }
+// Convert to six-bit representation, output.
+// NOTE:
+// *	The last element of sixbits is always zero, we do not output it.
+   ae_int_t sixbits[12];
+   ae_threebytes2foursixbits(bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(bytes + 6, sixbits + 8);
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
+}
+
+// Serialize the 64-bit integer value v to serializer.
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
-   char buf[AE_SER_ENTRY_LENGTH + 3];
    const char *emsg = "ae_serializer_serialize_int64: serialization integrity error";
-   ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
+   char buf[AE_SER_ENTRY_LENGTH + 3];
+// Prepare the serialization, check consistency.
    ae_int642str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
       strcat(buf, " ");
    else
       strcat(buf, "\r\n");
-   bytes_appended = (ae_int_t) strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "<" because we need space for trailing zero.
+   ae_int_t bytes_appended = (ae_int_t) strlen(buf);
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
-// append to buffer
+// Append to the buffer.
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
@@ -3216,11 +2464,118 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v) {
    }
 }
 
+// Unserialize a double value from string buf, up to *pasttheend.
+static double ae_str2double(const char *buf, const char **pasttheend) {
+   const char *emsg = "ae_str2double: unable to double double value from stream";
+// Skip leading spaces.
+   while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r') buf++;
+   if (*buf == '.') { // Special cases.
+      const char *s_nan = ".nan_______";
+      const char *s_posinf = ".posinf____";
+      const char *s_neginf = ".neginf____";
+      if (strncmp(buf, s_nan, strlen(s_nan)) == 0) { *pasttheend = buf + strlen(s_nan); return NAN; }
+      if (strncmp(buf, s_posinf, strlen(s_posinf)) == 0) { *pasttheend = buf + strlen(s_posinf); return +INFINITY; }
+      if (strncmp(buf, s_neginf, strlen(s_neginf)) == 0) { *pasttheend = buf + strlen(s_neginf); return -INFINITY; }
+      ae_break(ERR_ASSERTION_FAILED, emsg);
+   }
+// The general case:
+// *	Read and decode six-bit digits.
+// *	Check that all 11 digits were read.
+// *	Set the last digit to zero (needed to simplify the conversion).
+// *	Convert to 8 bytes.
+// *	Convert to big endian representation, if needed.
+   ae_int_t sixbits[12];
+   ae_int_t sixbitsread = 0;
+   while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
+      ae_int_t d = ae_char2sixbits(*buf);
+      if (d < 0 || sixbitsread >= AE_SER_ENTRY_LENGTH)
+         ae_break(ERR_ASSERTION_FAILED, emsg);
+      sixbits[sixbitsread] = d;
+      sixbitsread++;
+      buf++;
+   }
+   *pasttheend = buf;
+   if (sixbitsread != AE_SER_ENTRY_LENGTH)
+      ae_break(ERR_ASSERTION_FAILED, emsg);
+   sixbits[AE_SER_ENTRY_LENGTH] = 0;
+   union { double dval; unsigned char bytes[9]; } u;
+   ae_foursixbits2threebytes(sixbits + 0, u.bytes + 0);
+   ae_foursixbits2threebytes(sixbits + 4, u.bytes + 3);
+   ae_foursixbits2threebytes(sixbits + 8, u.bytes + 6);
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 =  sizeof u.dval - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
+      }
+   return u.dval;
+}
+
+// Unserialize a double value from serializer.
+// Leading whitespaces are ignored, a trailing whitespace terminates the string.
+// Raise an error in case an unexpected symbol is found.
+double ae_serializer_unserialize_double(ae_serializer *serializer) {
+   switch (serializer->mode) {
+      case AE_SM_FROM_STRING: return ae_str2double(serializer->in_str, &serializer->in_str);
+      case AE_SM_FROM_STREAM: {
+         char buf[AE_SER_ENTRY_LENGTH + 3];
+         const char *p = buf;
+         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_double: error reading from stream");
+         return ae_str2double(buf, &p);
+       }
+      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_double: unable to read double value from stream");
+   }
+   return 0.0;
+}
+
+// Serialize the double value v into the buffer buf.
+static void ae_double2str(double v, char *buf) {
+// Handle the special cases, first.
+   if (isnan(v)) {
+      const char *s = ".nan_______";
+      memmove(buf, s, strlen(s) + 1);
+      return;
+   } else if (isposinf(v)) {
+      const char *s = ".posinf____";
+      memmove(buf, s, strlen(s) + 1);
+      return;
+   } else if (isneginf(v)) {
+      const char *s = ".neginf____";
+      memmove(buf, s, strlen(s) + 1);
+      return;
+   }
+// Handle the general case:
+// *	copy v to array of chars,
+// *	set the last byte of u.bytes to zero in order to simplify conversion to six-bit representation,
+// *	convert to little endian (if needed),
+// *	convert to six-bit representation (last last element of sixbits is always zero, and is not output).
+   union {
+      double dval;
+      unsigned char bytes[9];
+   } u;
+   u.dval = v;
+   u.bytes[8] = 0;
+   if (ByteOrder == AE_BIG_ENDIAN)
+      for (ae_int_t i0 = 0, i1 = sizeof u.dval - 1; i0 < i1; i0++, i1--) {
+         unsigned char tc = u.bytes[i0];
+         u.bytes[i0] = u.bytes[i1];
+         u.bytes[i1] = tc;
+      }
+   ae_int_t sixbits[12];
+   ae_threebytes2foursixbits(u.bytes + 0, sixbits + 0);
+   ae_threebytes2foursixbits(u.bytes + 3, sixbits + 4);
+   ae_threebytes2foursixbits(u.bytes + 6, sixbits + 8);
+   for (ae_int_t i = 0; i < AE_SER_ENTRY_LENGTH; i++)
+      buf[i] = ae_sixbits2char(sixbits[i]);
+   buf[AE_SER_ENTRY_LENGTH] = 0x00;
+}
+
 void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
-   char buf[AE_SER_ENTRY_LENGTH + 3];
    const char *emsg = "ae_serializer_serialize_double: serialization integrity error";
    ae_int_t bytes_appended;
-// prepare serialization, check consistency
+// At least 11 characters for the value, plus 1 for the trailing '\0'.
+   char buf[AE_SER_ENTRY_LENGTH + 3];
+// Prepare the serialization, check consistency.
    ae_double2str(v, buf);
    serializer->entries_saved++;
    if (serializer->entries_saved % AE_SER_ENTRIES_PER_ROW)
@@ -3228,9 +2583,9 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
    else
       strcat(buf, "\r\n");
    bytes_appended = (ae_int_t) strlen(buf);
-   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // strict "<" because we need space for trailing zero.
+   ae_assert(serializer->bytes_written + bytes_appended < serializer->bytes_asked, emsg); // Strict "<", to make room for the trailing '\0'.
    serializer->bytes_written += bytes_appended;
-// append to buffer
+// Append to the buffer.
 #ifdef AE_USE_CPP_SERIALIZATION
    switch (serializer->mode) {
       case AE_SM_TO_CPPSTRING:
@@ -3248,126 +2603,32 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v) {
    }
 }
 
-void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t chunk_size, entries_count;
-   chunk_size = 8;
-// save array length
-   ae_serializer_serialize_int(serializer, bytes->cnt);
-// determine entries count
-   entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
-   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
-      ae_int64_t tmpi;
-      ae_int_t elen;
-      elen = bytes->cnt - eidx * chunk_size;
-      elen = elen > chunk_size ? chunk_size : elen;
-      memset(&tmpi, 0, sizeof(tmpi));
-      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
-      ae_serializer_serialize_int64(serializer, tmpi);
-   }
-}
-
-bool ae_serializer_unserialize_bool(ae_serializer *serializer) {
-   switch (serializer->mode) {
-      case AE_SM_FROM_STRING: return ae_str2bool(serializer->in_str, &serializer->in_str);
-      case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 3];
-         const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_bool: error reading from stream");
-         return ae_str2bool(buf, &p);
-      }
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_bool: integrity check failed");
-   }
-   return false;
-}
-
-ae_int_t ae_serializer_unserialize_int(ae_serializer *serializer) {
-   switch (serializer->mode) {
-      case AE_SM_FROM_STRING: return ae_str2int(serializer->in_str, &serializer->in_str);
-      case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 3];
-         const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int: error reading from stream");
-         return ae_str2int(buf, &p);
-      }
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int: integrity check failed");
-   }
-   return 0;
-}
-
-ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer) {
-   switch (serializer->mode) {
-      case AE_SM_FROM_STRING: return ae_str2int64(serializer->in_str, &serializer->in_str);
-      case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 3];
-         const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_int64: error reading from stream");
-         return ae_str2int64(buf, &p);
-      }
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_int64: integrity check failed");
-   }
-   return 0L;
-}
-
-double ae_serializer_unserialize_double(ae_serializer *serializer) {
-   switch (serializer->mode) {
-      case AE_SM_FROM_STRING: return ae_str2double(serializer->in_str, &serializer->in_str);
-      case AE_SM_FROM_STREAM: {
-         char buf[AE_SER_ENTRY_LENGTH + 3];
-         const char *p = buf;
-         ae_assert(serializer->stream_reader(serializer->stream_aux, AE_SER_ENTRY_LENGTH, buf), "ae_serializer_unserialize_double: error reading from stream");
-         return ae_str2double(buf, &p);
-       }
-      default: ae_break(ERR_ASSERTION_FAILED, "ae_serializer_unserialize_double: integrity check failed");
-   }
-   return 0.0;
-}
-
-void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
-   ae_int_t chunk_size, n, entries_count;
-   chunk_size = 8;
-// read array length, allocate output
-   n = ae_serializer_unserialize_int(serializer);
-   ae_vector_set_length(bytes, n);
-// determine entries count, read entries
-   entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
-   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
-      ae_int_t elen;
-      ae_int64_t tmp64;
-      elen = n - eidx * chunk_size;
-      elen = elen > chunk_size ? chunk_size : elen;
-      tmp64 = ae_serializer_unserialize_int64(serializer);
-      memmove(bytes->xU + eidx * chunk_size, &tmp64, elen);
-   }
-}
-
 void ae_serializer_stop(ae_serializer *serializer) {
    switch (serializer->mode) {
 #ifdef AE_USE_CPP_SERIALIZATION
       case AE_SM_TO_CPPSTRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // strict "<" because we need space for trailing zero.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          *serializer->out_cppstr += ".";
       break;
 #endif
       case AE_SM_TO_STRING:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // strict "<" because we need space for trailing zero.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          strcat(serializer->out_str, ".");
          serializer->out_str++;
       break;
       case AE_SM_TO_STREAM:
-         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // strict "<" because we need space for trailing zero.
+         ae_assert(serializer->bytes_written + 1 < serializer->bytes_asked, "ae_serializer_stop: integrity check failed"); // Strict "<", to make room for the trailing '\0'.
          serializer->bytes_written++;
          ae_assert(serializer->stream_writer(".", serializer->stream_aux), "ae_serializer_stop: error writing to stream");
       break;
+   // For compatibility with the pre-3.11 serializer, which does not require a trailing '.', we do not test for a trailing '.'.
+   // Anyway, because the string is not a stream, we do not have to read ALL trailing symbols.
       case AE_SM_FROM_STRING:
-      // because input string may be from pre-3.11 serializer,
-      // which does not include trailing dot, we do not test
-      // string for presence of "." symbol. Anyway, because string
-      // is not stream, we do not have to read ALL trailing symbols.
       break;
       case AE_SM_FROM_STREAM: {
-      // Read trailing dot, perform integrity check
+      // Read trailing '.', perform an integrity check.
          char buf[2];
          ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf), "ae_serializer_stop: error reading from stream");
          ae_assert(buf[0] == '.', "ae_serializer_stop: trailing . is not found in the stream");
@@ -3377,29 +2638,134 @@ void ae_serializer_stop(ae_serializer *serializer) {
    }
 }
 
-// Complex math functions
-ae_complex ae_c_neg(ae_complex lhs) {
-   return ae_complex_from_d(-lhs.x, -lhs.y);
+void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes) {
+   ae_int_t n = bytes->cnt;
+   serializer->entries_needed += 1 + n / 8 + (n % 8 > 0 ? 1 : 0);
 }
 
-ae_complex ae_c_conj(ae_complex lhs) {
-   return ae_complex_from_d(+lhs.x, -lhs.y);
+void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
+   ae_int_t chunk_size = 8;
+// Read the array length, allocate output.
+   ae_int_t n = ae_serializer_unserialize_int(serializer);
+   ae_vector_set_length(bytes, n);
+// Count and read the entries.
+   ae_int_t entries_count = n / chunk_size + (n % chunk_size > 0 ? 1 : 0);
+   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
+      ae_int64_t tmp64 = ae_serializer_unserialize_int64(serializer);
+      memmove(bytes->xU + eidx * chunk_size, &tmp64, imin2(n - eidx * chunk_size, chunk_size));
+   }
 }
 
-ae_complex ae_c_sqr(ae_complex lhs) {
-   double x = lhs.x, y = lhs.y;
+void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes) {
+   ae_int_t chunk_size = 8;
+// save array length
+   ae_serializer_serialize_int(serializer, bytes->cnt);
+// determine entries count
+   ae_int_t entries_count = bytes->cnt / chunk_size + (bytes->cnt % chunk_size > 0 ? 1 : 0);
+   for (ae_int_t eidx = 0; eidx < entries_count; eidx++) {
+      ae_int64_t tmpi;
+      ae_int_t elen;
+      elen = bytes->cnt - eidx * chunk_size;
+      elen = elen > chunk_size ? chunk_size : elen;
+      memset(&tmpi, 0, sizeof tmpi);
+      memmove(&tmpi, bytes->xU + eidx * chunk_size, elen);
+      ae_serializer_serialize_int64(serializer, tmpi);
+   }
+}
+
+bool isneginf(double x) { return isinf(x) && signbit(x); }
+bool isposinf(double x) { return isinf(x) && !signbit(x); }
+
+ae_int_t imin2(ae_int_t x, ae_int_t y) { return x > y ? y : x; }
+
+// This function returns min(x,y,z)
+ae_int_t imin3(ae_int_t x, ae_int_t y, ae_int_t z) {
+   ae_int_t xy = x < y ? x : y;
+   return xy < z ? xy : z;
+}
+
+ae_int_t imax2(ae_int_t x, ae_int_t y) { return x > y ? x : y; }
+
+// This function returns max(x,y,z)
+ae_int_t imax3(ae_int_t x, ae_int_t y, ae_int_t z) {
+   ae_int_t xy = x > y ? x : y;
+   return xy > z ? xy : z;
+}
+
+ae_int_t ae_iabs(ae_int_t x) { return x >= 0 ? x : -x; }
+ae_int_t ae_sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+ae_int_t RoundZ(double x) { return (ae_int_t)round(x); }
+ae_int_t TruncZ(double x) { return (ae_int_t)trunc(x); }
+ae_int_t FloorZ(double x) { return (ae_int_t)floor(x); }
+ae_int_t CeilZ(double x) { return (ae_int_t)ceil(x); }
+
+double rmin2(double x, double y) { return x > y ? y : x; }
+
+double rmax2(double x, double y) { return x > y ? x : y; }
+
+// Return max(x,y,z).
+double rmax3(double x, double y, double z) {
+   double xy = x > y ? x : y;
+   return xy > z ? xy : z;
+}
+
+// Return max(|x|,|y|,|z|).
+double rmaxabs3(double x, double y, double z) {
+   x = fabs(x), y = fabs(y), z = fabs(z);
+   double xy = x > y ? x : y;
+   return xy > z ? xy : z;
+}
+
+double ae_sqr(double x) { return x*x; }
+
+// Clip x to [b1, b2], mapping to the nearest endpoint if outside the interval.
+// This assumes b1 < b2.
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+// Integer version.
+ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2) {
+   return x <= b1 ? b1 : x >= b2 ? b2 : x;
+}
+// Real version.
+double rboundval(double x, double b1, double b2) {
+   return x <= b1 ? b1 : x >= b2 ? b2 : x;
+}
+
+double ae_randomreal() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
+}
+
+double ae_randommid() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return 2.0*(rand() + rand() / mx) / mx - 1.0;
+}
+
+ae_int_t ae_randominteger(ae_int_t maxv) { return rand() % maxv; }
+
+bool ae_randombool(double p) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p*mx;
+}
+
+// Complex math functions.
+ae_complex ae_c_neg(ae_complex A) {
+   return ae_complex_from_d(-A.x, -A.y);
+}
+
+ae_complex ae_c_conj(ae_complex A) {
+   return ae_complex_from_d(+A.x, -A.y);
+}
+
+ae_complex ae_c_sqr(ae_complex A) {
+   double x = A.x, y = A.y;
    return ae_complex_from_d(x * x - y * y, 2.0 * x * y);
 }
 
 double ae_c_abs(ae_complex z) {
-   double w;
-   double xabs;
-   double yabs;
-   double v;
-   xabs = fabs(z.x);
-   yabs = fabs(z.y);
-   w = xabs > yabs ? xabs : yabs;
-   v = xabs < yabs ? xabs : yabs;
+   double xabs = fabs(z.x);
+   double yabs = fabs(z.y);
+   double w = xabs > yabs ? xabs : yabs;
+   double v = xabs < yabs ? xabs : yabs;
    if (v == 0)
       return w;
    else {
@@ -3408,633 +2774,479 @@ double ae_c_abs(ae_complex z) {
    }
 }
 
-bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 == x2 && y1 == y2;
+bool ae_c_eq(ae_complex A, ae_complex B) {
+   return A.x == B.x && A.y == B.y;
 }
 
-bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 != x2 || y1 != y2;
+bool ae_c_neq(ae_complex A, ae_complex B) {
+   return A.x != B.x || A.y != B.y;
 }
 
-ae_complex ae_c_add(ae_complex lhs, ae_complex rhs) {
-   return ae_complex_from_d(lhs.x + rhs.x, lhs.y + rhs.y);
+ae_complex ae_c_add(ae_complex A, ae_complex B) {
+   return ae_complex_from_d(A.x + B.x, A.y + B.y);
 }
 
-ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs) {
-   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
+ae_complex ae_c_mul(ae_complex A, ae_complex B) {
+   double x1 = A.x, y1 = A.y, x2 = B.x, y2 = B.y;
    return ae_complex_from_d(x1 * x2 - y1 * y2, x1 * y2 + y1 * x2);
 }
 
-ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs) {
-   return ae_complex_from_d(lhs.x - rhs.x, lhs.y - rhs.y);
+ae_complex ae_c_sub(ae_complex A, ae_complex B) {
+   return ae_complex_from_d(A.x - B.x, A.y - B.y);
 }
 
-ae_complex ae_c_div(ae_complex lhs, ae_complex rhs) {
-   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
-   double e;
-   double f;
+ae_complex ae_c_div(ae_complex A, ae_complex B) {
+   double x1 = A.x, y1 = A.y, x2 = B.x, y2 = B.y;
    if (fabs(y2) < fabs(x2)) {
-      e = y2 / x2;
-      f = x2 + y2 * e;
+      double e = y2 / x2;
+      double f = x2 + y2 * e;
       return ae_complex_from_d((x1 + y1 * e) / f, (y1 - x1 * e) / f);
    } else {
-      e = x2 / y2;
-      f = y2 + x2 * e;
+      double e = x2 / y2;
+      double f = y2 + x2 * e;
       return ae_complex_from_d((x1 * e + y1) / f, (y1 * e - x1) / f);
    }
 }
 
-bool ae_c_eq_d(ae_complex lhs, double rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs;
-   volatile double y1 = lhs.y;
-   volatile double y2 = 0.0;
-   return x1 == x2 && y1 == y2;
+bool ae_c_eq_d(ae_complex A, double B) {
+   return A.x == B && A.y == 0.0;
 }
 
-bool ae_c_neq_d(ae_complex lhs, double rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs;
-   volatile double y1 = lhs.y;
-   volatile double y2 = 0.0;
-   return x1 != x2 || y1 != y2;
+bool ae_c_neq_d(ae_complex A, double B) {
+   return A.x != B || A.y != 0.0;
 }
 
-ae_complex ae_c_add_d(ae_complex lhs, double rhs) {
-   return ae_complex_from_d(lhs.x + rhs, lhs.y);
+ae_complex ae_c_add_d(ae_complex A, double B) {
+   return ae_complex_from_d(A.x + B, A.y);
 }
 
-ae_complex ae_c_mul_d(ae_complex lhs, double rhs) {
-   return ae_complex_from_d(lhs.x * rhs, lhs.y * rhs);
+ae_complex ae_c_mul_d(ae_complex A, double B) {
+   return ae_complex_from_d(A.x * B, A.y * B);
 }
 
-ae_complex ae_c_sub_d(ae_complex lhs, double rhs) {
-   return ae_complex_from_d(lhs.x - rhs, lhs.y);
+ae_complex ae_c_sub_d(ae_complex A, double B) {
+   return ae_complex_from_d(A.x - B, A.y);
 }
 
-ae_complex ae_c_d_sub(double lhs, ae_complex rhs) {
-   return ae_complex_from_d(lhs - rhs.x, -rhs.y);
+ae_complex ae_c_d_sub(double A, ae_complex B) {
+   return ae_complex_from_d(A - B.x, -B.y);
 }
 
-ae_complex ae_c_div_d(ae_complex lhs, double rhs) {
-   return ae_complex_from_d(lhs.x / rhs, lhs.y / rhs);
+ae_complex ae_c_div_d(ae_complex A, double B) {
+   return ae_complex_from_d(A.x / B, A.y / B);
 }
 
-ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
-   double x2 = rhs.x, y2 = rhs.y;
-   double e;
-   double f;
+ae_complex ae_c_d_div(double A, ae_complex B) {
+   double x2 = B.x, y2 = B.y;
    if (fabs(y2) < fabs(x2)) {
-      e = y2 / x2;
-      f = x2 + y2 * e;
-      return ae_complex_from_d(lhs / f, -lhs * e / f);
+      double e = y2 / x2;
+      double f = x2 + y2 * e;
+      return ae_complex_from_d(A / f, -A * e / f);
    } else {
-      e = x2 / y2;
-      f = y2 + x2 * e;
-      return ae_complex_from_d(lhs * e / f, -lhs / f);
+      double e = x2 / y2;
+      double f = y2 + x2 * e;
+      return ae_complex_from_d(A * e / f, -A / f);
    }
 }
 
-// Complex BLAS operations
-ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0.0, ry = 0.0;
-   ae_int_t i;
-   bool bconj0 = !(conj0[0] == 'N' || conj0[0] == 'n');
-   bool bconj1 = !(conj1[0] == 'N' || conj1[0] == 'n');
-   if (bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   return ae_complex_from_d(rx, ry);
+// Level 1 Complex BLAS operations.
+// Handle the case of unit stride specially and separately with optimization.
+
+ae_complex ae_v_cdotproduct(const ae_complex *A, ae_int_t dA, const char *CjA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   double Cx = 0.0, Cy = 0.0;
+   bool ConjA = CjA[0] != 'N' && CjA[0] != 'n';
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (ConjA)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+   return ae_complex_from_d(Cx, Cy);
 }
 
-void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
+void ae_v_cmove(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = B->x;
+            A->y = -B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-            *vdst = *vsrc;
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++)
+            *A = *B;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = B->x;
+            A->y = -B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++)
-            *vdst = *vsrc;
-      }
-   }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+            *A = *B;
 }
 
-void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
+void ae_v_cmoveneg(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = -B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = -B->y;
          }
-      }
-   }
 }
 
-void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
+void ae_v_cmoved(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
          }
-      }
-   }
 }
 
-void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
+void ae_v_cmovec(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double ax = Alpha.x, ay = Alpha.y;
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = ax * B->x + ay * B->y;
+            A->y = -ax * B->y + ay * B->x;
          }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = ax * B->x - ay * B->y;
+            A->y = ax * B->y + ay * B->x;
          }
-      }
-   } else {
-   // highly optimized case
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = ax * B->x + ay * B->y;
+            A->y = -ax * B->y + ay * B->x;
          }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = ax * B->x - ay * B->y;
+            A->y = ax * B->y + ay * B->x;
          }
-      }
-   }
 }
 
-void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
+void ae_v_cadd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y -= B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y += B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y -= B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y += B->y;
          }
-      }
-   }
 }
 
-void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
+void ae_v_caddd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
          }
-      }
-   } else {
-   // optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
          }
-      }
-   }
 }
 
-void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
+void ae_v_caddc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double ax = Alpha.x, ay = Alpha.y;
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += ax * B->x + ay * B->y;
+            A->y -= ax * B->y - ay * B->x;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += ax * B->x - ay * B->y;
+            A->y += ax * B->y + ay * B->x;
          }
-      }
-   } else {
-   // highly optimized case
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += ax * B->x + ay * B->y;
+            A->y -= ax * B->y - ay * B->x;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += ax * B->x - ay * B->y;
+            A->y += ax * B->y + ay * B->x;
          }
-      }
-   }
 }
 
-void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
+void ae_v_csub(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y += B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y -= B->y;
          }
-      }
-   } else {
-   // highly optimized case
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y += B->y;
          }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y -= B->y;
          }
+}
+
+void ae_v_csubd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   ae_v_caddd(A, dA, B, dB, CjB, N, -Alpha);
+}
+
+void ae_v_csubc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha) {
+   ae_v_caddc(A, dA, B, dB, CjB, N, ae_complex_from_d(-Alpha.x, -Alpha.y));
+}
+
+void ae_v_cmuld(ae_complex *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   }
-}
-
-void ae_v_csubd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   ae_v_caddd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
-}
-
-void ae_v_csubc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   ae_v_caddc(vdst, stride_dst, vsrc, stride_src, conj_src, n, ae_complex_from_d(-alpha.x, -alpha.y));
-}
-
-void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         A->x *= Alpha;
+         A->y *= Alpha;
       }
-   } else {
-   // optimized case
-      for (i = 0; i < n; i++, vdst++) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
+}
+
+void ae_v_cmulc(ae_complex *A, ae_int_t dA, ae_int_t N, ae_complex Alpha) {
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-   }
-}
-
-void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
       }
-   } else {
-   // highly optimized case
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst++) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
-      }
-   }
 }
 
-// Real BLAS operations
-double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0.0;
-   ae_int_t i;
-   if (stride0 != 1 || stride1 != 1) {
-   // slow general code
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1)
-         result += (*v0) * (*v1);
-   } else {
-   // optimized code for stride=1
-      ae_int_t n4 = n / 4;
-      ae_int_t nleft = n % 4;
-      for (i = 0; i < n4; i++, v0 += 4, v1 += 4)
-         result += v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2] + v0[3] * v1[3];
-      for (i = 0; i < nleft; i++, v0++, v1++)
-         result += v0[0] * v1[0];
-   }
-   return result;
+// Level 1 Real BLAS operations
+// Handle the case of unit stride specially and separately with optimization.
+//(@) In ae_v_{dotproduct,move,moveneg,moved,add,addd,sub,subd}(), _ialglib_vcopy()
+//(@) this case originally cut the loop counter in half (or quarter) and did two (or four) steps per loop.
+//(@) This was removed, the need for it was not clearly explained and it appears to have no visible effect on performance.
+
+double ae_v_dotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   double C = 0.0;
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         C += A[0] * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         C += (*A) * (*B);
+   return C;
 }
 
-void ae_v_move(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = *vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = vsrc[0];
-         vdst[1] = vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = vsrc[0];
-   }
+void ae_v_move(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = *B;
 }
 
-void ae_v_moveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = -*vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = -vsrc[0];
-         vdst[1] = -vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = -vsrc[0];
-   }
+void ae_v_moveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = -B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = -*B;
 }
 
-void ae_v_moved(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = alpha * (*vsrc);
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = alpha * vsrc[0];
-         vdst[1] = alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = alpha * vsrc[0];
-   }
+void ae_v_moved(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = Alpha * (*B);
 }
 
-void ae_v_add(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += *vsrc;
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += vsrc[0];
-         vdst[1] += vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += vsrc[0];
-   }
+void ae_v_add(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] += B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += *B;
 }
 
-void ae_v_addd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += alpha * (*vsrc);
-   } else {
-   // optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += alpha * vsrc[0];
-         vdst[1] += alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += alpha * vsrc[0];
-   }
+void ae_v_addd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] += Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += Alpha * (*B);
 }
 
-void ae_v_sub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst -= *vsrc;
-   } else {
-   // highly optimized case
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] -= vsrc[0];
-         vdst[1] -= vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] -= vsrc[0];
-   }
+void ae_v_sub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] -= B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= *B;
 }
 
-void ae_v_subd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_v_addd(vdst, stride_dst, vsrc, stride_src, n, -alpha);
+void ae_v_subd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+// Equivalent to ae_v_addd(A, dA, B, dB, N, -Alpha);
+   if (dA == 1 && dB == 1)
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] -= Alpha * B[0];
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= Alpha * (*B);
 }
 
-void ae_v_muld(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   // general unoptimized case
-      for (i = 0; i < n; i++, vdst += stride_dst)
-         *vdst *= alpha;
-   } else {
-   // highly optimized case
-      for (i = 0; i < n; i++, vdst++)
-         *vdst *= alpha;
-   }
+void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1)
+      for (ae_int_t n = 0; n < N; n++, A++)
+         *A *= Alpha;
+   else
+      for (ae_int_t n = 0; n < N; n++, A += dA)
+         *A *= Alpha;
 }
 
-// Linear Algebra
-#define alglib_simd_alignment 16
-#define alglib_r_block        32
-#define alglib_half_r_block   16
-#define alglib_twice_r_block  64
-#define alglib_c_block        16
-#define alglib_half_c_block    8
-#define alglib_twice_c_block  32
+#if 0
+// Global and local constants and variables.
+const double ae_machineepsilon = 5.0E-16, ae_maxrealnumber = 1.0E300, ae_minrealnumber = 1.0E-300;
+const double ae_pi = 3.1415926535897932384626433832795;
+#endif 
 
-// This subroutine calculates fast 32x32 real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using either generic C code or native optimizations (if available)
-//
+// Optimized shared C/C++ linear algebra code.
+static const ae_int_t alglib_simd_alignment = 0x10;
+static const ae_int_t alglib_r_block = 0x20, alglib_half_r_block = alglib_r_block/2, alglib_twice_r_block = 2*alglib_r_block;
+static const ae_int_t alglib_c_block = 0x10, alglib_half_c_block = alglib_c_block/2, alglib_twice_c_block = 2*alglib_c_block;
+
+// A fast 32 x 32 real matrix-vector product:
+//	y = beta y + alpha A x
+// with available native optimizations or else generic C code
 // IMPORTANT:
-// * A must be stored in row-major order,
-//   stride is alglib_r_block,
-//   aligned on alglib_simd_alignment boundary
-// * X must be aligned on alglib_simd_alignment boundary
-// * Y may be non-aligned
-void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k;
-   const double *pa0, *pa1, *pb;
-   pa0 = a;
-   pa1 = a + alglib_r_block;
-   pb = x;
-   for (i = 0; i < 16; i++) {
+// *	a must be stored in row-major order with stride = alglib_r_block, aligned on an alglib_simd_alignment boundary
+// *	x must be aligned on an alglib_simd_alignment boundary
+// *	y may be non-aligned
+static void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+   const double *pa0 = a;
+   const double *pa1 = a + alglib_r_block;
+   const double *pb = x;
+   for (ae_int_t i = 0; i < 16; i++) {
       double v0 = 0.0, v1 = 0.0;
-      for (k = 0; k < 4; k++) {
+      for (ae_int_t k = 0; k < 4; k++) {
          v0 += pa0[0] * pb[0];
          v1 += pa1[0] * pb[0];
          v0 += pa0[1] * pb[1];
@@ -4057,9 +3269,8 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
       }
       y[0] = beta * y[0] + alpha * v0;
       y[stride] = beta * y[stride] + alpha * v1;
-   // now we've processed rows I and I+1,
-   // pa0 and pa1 are pointing to rows I+1 and I+2.
-   // move to I+2 and I+3.
+   // Now we've processed rows I and I + 1,
+   // Move pa0 and pa1 from rows I + 1 and I + 2 to rows I + 2 and I + 3.
       pa0 += alglib_r_block;
       pa1 += alglib_r_block;
       pb = x;
@@ -4067,94 +3278,73 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
    }
 }
 
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-// * y may be non-aligned
-// * both A and x must have same offset with respect to 16-byte boundary:
-//   either both are aligned, or both are aligned with offset 8. Function
-//   will crash your system if you try to call it with misaligned or
-//   incorrectly aligned data.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// The m x n real matrix-vector product (32 x 32 optimized version):
+//	y = beta y + alpha a x
+// using generic C code, optimized with _ialglib_mv_32 if (m, n) == (32, 32).
+// If beta == 0.0, y is overwritten by alpha a x and if alpha == 0.0, y is multiplied by beta.
+// However, the y = beta y operation here is not done efficiently as a scalar-vector product, and should NOT be used this way.
+// IMPORTANT:
+// *	(m, n) is in [0, alglib_r_block] x [0, alglib_r_block].
+// *	a must be in row-major order with stride = alglib_r_block.
+// *	y may be non-aligned
+// *	both a and x must have same offset with respect to a 16-byte boundary:
+//	either both are aligned, or both are aligned with offset 8.
+//	You will crash your system if you try to use this with misaligned or incorrectly aligned data.
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-   ae_int_t i, k, n2;
-   ae_int_t mb3, mtail, nhead, nb8, nb2, ntail;
-   const double *pa0, *pa1, *pa2, *pb;
-   __m128d v0, v1, v2, va0, va1, va2, vx, vtmp;
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
+// Handle the special cases:
+// *	alpha == 0.0 or m n == 0
    if (m == 0)
       return;
-   if (alpha == 0.0 || n == 0) {
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
+   else if (alpha == 0.0 || n == 0) {
+      if (beta == 0.0)
+         for (ae_int_t i = 0; i < m; i++) {
             *y = 0.0;
             y += stride;
          }
-      } else {
-         for (i = 0; i < m; i++) {
+      else
+         for (ae_int_t i = 0; i < m; i++) {
             *y *= beta;
             y += stride;
          }
-      }
       return;
    }
-// Handle general case: nonzero alpha, n and m
-//
-// We divide problem as follows...
-//
+// Handle the general case: m n != 0 and alpha != 0.0.
+// We divide the problem as follows...
 // Rows M are divided into:
-// - mb3 blocks, each 3xN
-// - mtail blocks, each 1xN
-//
-// Within a row, elements are divided  into:
-// - nhead 1x1 blocks (used to align the rest, either 0 or 1)
-// - nb8 1x8 blocks, aligned to 16-byte boundary
-// - nb2 1x2 blocks, aligned to 16-byte boundary
-// - ntail 1x1 blocks, aligned too (altough we don't rely on it)
-//
-   n2 = n / 2;
-   mb3 = m / 3;
-   mtail = m % 3;
-   nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
-   nb8 = (n - nhead) / 8;
-   nb2 = (n - nhead - 8 * nb8) / 2;
-   ntail = n - nhead - 8 * nb8 - 2 * nb2;
-   for (i = 0; i < mb3; i++) {
-      double row0, row1, row2;
-      row0 = 0;
-      row1 = 0;
-      row2 = 0;
-      pb = x;
-      pa0 = a;
-      pa1 = a + alglib_r_block;
-      pa2 = a + alglib_twice_r_block;
+// -	mb3 3 x n blocks,
+// -	mtail 1 x n blocks.
+// Within each row, the elements are divided into:
+// -	nhead 1 x 1 blocks (used to align the rest, either 0 or 1),
+// -	nb8 1 x 8 blocks, aligned to 16-byte boundary,
+// -	nb2 1 x 2 blocks, aligned to 16-byte boundary,
+// -	ntail 1 x 1 blocks, aligned too (altough we don't rely on it).
+   ae_int_t n2 = n / 2;
+   ae_int_t mb3 = m / 3;
+   ae_int_t mtail = m % 3;
+   ae_int_t nhead = ae_misalignment(a, alglib_simd_alignment) == 0 ? 0 : 1;
+   ae_int_t nb8 = (n - nhead) / 8;
+   ae_int_t nb2 = (n - nhead - 8 * nb8) / 2;
+   ae_int_t ntail = n - nhead - 8 * nb8 - 2 * nb2;
+   for (ae_int_t i = 0; i < mb3; i++) {
+      double row0 = 0.0;
+      double row1 = 0.0;
+      double row2 = 0.0;
+      const double *pb = x;
+      const double *pa0 = a;
+      const double *pa1 = a + alglib_r_block;
+      const double *pa2 = a + alglib_twice_r_block;
       a += 3 * alglib_r_block;
+      __m128d v0, v1, v2;
       if (nhead == 1) {
-         vx = _mm_load_sd(pb);
+         __m128d vx = _mm_load_sd(pb);
          v0 = _mm_load_sd(pa0);
          v1 = _mm_load_sd(pa1);
          v2 = _mm_load_sd(pa2);
@@ -4170,14 +3360,15 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          v1 = _mm_setzero_pd();
          v2 = _mm_setzero_pd();
       }
-      for (k = 0; k < nb8; k++) {
-      // this code is a shuffle of simultaneous dot product.
-      // see below for commented unshuffled original version.
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
+      for (ae_int_t k = 0; k < nb8; k++) {
+#   if 1
+      // A shuffle of the code for a simultaneous dot product.
+      // See below for the commented-out unshuffled original version.
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
          va0 = _mm_mul_pd(va0, vx);
-         va2 = _mm_load_pd(pa2);
+         __m128d va2 = _mm_load_pd(pa2);
          v0 = _mm_add_pd(va0, v0);
          va1 = _mm_mul_pd(va1, vx);
          va0 = _mm_load_pd(pa0 + 2);
@@ -4217,12 +3408,12 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa1 += 8;
          pa2 += 8;
          pb += 8;
-#   if 0
-      // this is unshuffled version of code above
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
+#   else
+      // The unshuffled version of the code above.
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
+         __m128d va2 = _mm_load_pd(pa2);
          va0 = _mm_mul_pd(va0, vx);
          va1 = _mm_mul_pd(va1, vx);
          va2 = _mm_mul_pd(va2, vx);
@@ -4261,11 +3452,11 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          v2 = _mm_add_pd(va2, v2);
 #   endif
       }
-      for (k = 0; k < nb2; k++) {
-         vx = _mm_load_pd(pb);
-         va0 = _mm_load_pd(pa0);
-         va1 = _mm_load_pd(pa1);
-         va2 = _mm_load_pd(pa2);
+      for (ae_int_t k = 0; k < nb2; k++) {
+         __m128d vx = _mm_load_pd(pb);
+         __m128d va0 = _mm_load_pd(pa0);
+         __m128d va1 = _mm_load_pd(pa1);
+         __m128d va2 = _mm_load_pd(pa2);
          va0 = _mm_mul_pd(va0, vx);
          v0 = _mm_add_pd(va0, v0);
          va1 = _mm_mul_pd(va1, vx);
@@ -4277,11 +3468,11 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa2 += 2;
          pb += 2;
       }
-      for (k = 0; k < ntail; k++) {
-         vx = _mm_load1_pd(pb);
-         va0 = _mm_load1_pd(pa0);
-         va1 = _mm_load1_pd(pa1);
-         va2 = _mm_load1_pd(pa2);
+      for (ae_int_t k = 0; k < ntail; k++) {
+         __m128d vx = _mm_load1_pd(pb);
+         __m128d va0 = _mm_load1_pd(pa0);
+         __m128d va1 = _mm_load1_pd(pa1);
+         __m128d va2 = _mm_load1_pd(pa2);
          va0 = _mm_mul_sd(va0, vx);
          v0 = _mm_add_sd(v0, va0);
          va1 = _mm_mul_sd(va1, vx);
@@ -4289,7 +3480,7 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          va2 = _mm_mul_sd(va2, vx);
          v2 = _mm_add_sd(v2, va2);
       }
-      vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
+      __m128d vtmp = _mm_add_pd(_mm_unpacklo_pd(v0, v1), _mm_unpackhi_pd(v0, v1));
       _mm_storel_pd(&row0, vtmp);
       _mm_storeh_pd(&row1, vtmp);
       v2 = _mm_add_sd(_mm_shuffle_pd(v2, v2, 1), v2);
@@ -4305,13 +3496,12 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       }
       y += 3 * stride;
    }
-   for (i = 0; i < mtail; i++) {
-      double row0;
-      row0 = 0;
-      pb = x;
-      pa0 = a;
+   for (ae_int_t i = 0; i < mtail; i++) {
+      double row0 = 0;
+      const double *pb = x;
+      const double *pa0 = a;
       a += alglib_r_block;
-      for (k = 0; k < n2; k++) {
+      for (ae_int_t k = 0; k < n2; k++) {
          row0 += pb[0] * pa0[0] + pb[1] * pa0[1];
          pa0 += 2;
          pb += 2;
@@ -4327,65 +3517,50 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
 }
 #endif
 
-// This function calculates MxN real matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-// product is calculated (only beta is updated); however, this update  is not
-// efficient  and  this  function  should  NOT  be used for multiplication of
-// vector and scalar.
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_r_block, 0 <= N <= alglib_r_block
-// * A must be stored in row-major order with stride equal to alglib_r_block
-void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
-// Handle special cases:
-// - alpha is zero or n is zero
-// - m is zero
+// The m x n real matrix-vector product:
+//	y = beta y + alpha a x
+// with generic C code, optimized with _ialglib_mv_32() if (m, n) == (32, 32).
+// If beta == 0.0, y is overwritten by alpha a x and if alpha == 0.0, y is multiplied by beta.
+// However, the y = beta y operation here is not done efficiently as a scalar-vector product, and should NOT be used this way.
+// Important:
+// ∙	(m, n) is in [0, alglib_r_block] x [0, alglib_r_block].
+// ∙	a must be in row-major order with stride = alglib_r_block.
+static void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta) {
+// Handle the special cases:
+// *	alpha == 0.0 or m n == 0
    if (m == 0)
       return;
-   if (alpha == 0.0 || n == 0) {
-      ae_int_t i;
-      if (beta == 0.0) {
-         for (i = 0; i < m; i++) {
+   else if (alpha == 0.0 || n == 0) {
+      if (beta == 0.0)
+         for (ae_int_t i = 0; i < m; i++) {
             *y = 0.0;
             y += stride;
          }
-      } else {
-         for (i = 0; i < m; i++) {
+      else
+         for (ae_int_t i = 0; i < m; i++) {
             *y *= beta;
             y += stride;
          }
-      }
       return;
    }
-// Handle general case: nonzero alpha, n and m
-//
-   if (m == 32 && n == 32) {
-   // 32x32, may be we have something better than general implementation
+// Handle the general case: mn != 0 and alpha != 0.0.
+   if (m == 32 && n == 32)
+   // The 32 x 32 case is specially optimized.
       _ialglib_mv_32(a, x, y, stride, alpha, beta);
-   } else {
-      ae_int_t i, k, m2, n8, n2, ntrail2;
-      const double *pa0, *pa1, *pb;
-   // First M/2 rows of A are processed in pairs.
-   // optimized code is used.
-      m2 = m / 2;
-      n8 = n / 8;
-      ntrail2 = (n - 8 * n8) / 2;
-      for (i = 0; i < m2; i++) {
+   else {
+   // Optimized by doing the first M/2 pairs of rows of a pairwise.
+      ae_int_t m2 = m / 2;
+      ae_int_t n8 = n / 8;
+      ae_int_t ntrail2 = (n - 8 * n8) / 2;
+      for (ae_int_t i = 0; i < m2; i++) {
          double v0 = 0.0, v1 = 0.0;
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-         pa1 = a + alglib_r_block;
+      // 'a' points to the part of the matrix which is not processed yet.
+         const double *pb = x;
+         const double *pa0 = a;
+         const double *pa1 = a + alglib_r_block;
          a += alglib_twice_r_block;
-      // 8 elements per iteration
-         for (k = 0; k < n8; k++) {
+      // 8 elements per iteration.
+         for (ae_int_t k = 0; k < n8; k++) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
             v0 += pa0[1] * pb[1];
@@ -4406,8 +3581,8 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
             pa1 += 8;
             pb += 8;
          }
-      // 2 elements per iteration
-         for (k = 0; k < ntrail2; k++) {
+      // 2 elements per iteration.
+         for (ae_int_t k = 0; k < ntrail2; k++) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
             v0 += pa0[1] * pb[1];
@@ -4416,41 +3591,40 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
             pa1 += 2;
             pb += 2;
          }
-      // last element, if needed
-         if (n % 2 != 0) {
+      // The last element, if needed.
+         if (n % 2) {
             v0 += pa0[0] * pb[0];
             v1 += pa1[0] * pb[0];
          }
-      // final update
-         if (beta != 0) {
+      // The final update.
+         if (beta != 0.0) {
             y[0] = beta * y[0] + alpha * v0;
             y[stride] = beta * y[stride] + alpha * v1;
          } else {
             y[0] = alpha * v0;
             y[stride] = alpha * v1;
          }
-      // move to the next pair of elements
+      // Move to the next pair of elements.
          y += 2 * stride;
       }
-   // Last (odd) row is processed with less optimized code.
-      if (m % 2 != 0) {
+   // For odd m, the last row is done with the less optimized code.
+      if (m % 2) {
          double v0 = 0.0;
-      // 'a' points to the part of the matrix which
-      // is not processed yet
-         pb = x;
-         pa0 = a;
-      // 2 elements per iteration
-         n2 = n / 2;
-         for (k = 0; k < n2; k++) {
+      // 'a' points to the part of the matrix which is not processed yet.
+         const double *pb = x;
+         const double *pa0 = a;
+      // 2 elements per iteration.
+         ae_int_t n2 = n / 2;
+         for (ae_int_t k = 0; k < n2; k++) {
             v0 += pa0[0] * pb[0] + pa0[1] * pb[1];
             pa0 += 2;
             pb += 2;
          }
-      // last element, if needed
-         if (n % 2 != 0)
+      // The last element, if needed.
+         if (n % 2)
             v0 += pa0[0] * pb[0];
-      // final update
-         if (beta != 0)
+      // The final update.
+         if (beta != 0.0)
             y[0] = beta * y[0] + alpha * v0;
          else
             y[0] = alpha * v0;
@@ -4458,69 +3632,50 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
    }
 }
 
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// A fast m x n complex matrix-vector product (SSE2-optimized version)
+//	y = beta y + alpha a x
+// with generic C code for complex a, x, y, alpha and beta.
+// If beta == 0.0, y is overwritten by alpha a x but if alpha == 0.0, we still do y = alpha a x (to properly handle infinities/NANs).
+// Important:
+// *	(m, n) is in [0, alglib_c_block] x [0, alglib_c_block].
+// *	a must be in row-major order as (double, double) with stride = alglib_c_block double-pairs.
+// *	y may point to either vector cy (Complex) or dy (double precision pairs).
+// *	Either cy or dy must be NULL, but not both.
+// *	Both a and x must be aligned, but y may be non-aligned.
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
-   ae_int_t i, j, m2;
-   const double *pa0, *pa1, *parow, *pb;
-   __m128d vbeta, vbetax, vbetay;
-   __m128d valpha, valphax, valphay;
-   m2 = m / 2;
-   parow = a;
+   ae_int_t m2 = m / 2;
+   const double *parow = a;
    if (cy != NULL) {
       dy = (double *)cy;
       cy = NULL;
    }
-   vbeta = _mm_loadh_pd(_mm_load_sd(&beta.x), &beta.y);
-   vbetax = _mm_unpacklo_pd(vbeta, vbeta);
-   vbetay = _mm_unpackhi_pd(vbeta, vbeta);
-   valpha = _mm_loadh_pd(_mm_load_sd(&alpha.x), &alpha.y);
-   valphax = _mm_unpacklo_pd(valpha, valpha);
-   valphay = _mm_unpackhi_pd(valpha, valpha);
-   for (i = 0; i < m2; i++) {
-      __m128d vx, vy, vt0, vt1, vt2, vt3, vt4, vt5, vrx, vry, vtx, vty;
-      pa0 = parow;
-      pa1 = parow + 2 * alglib_c_block;
-      pb = x;
-      vx = _mm_setzero_pd();
-      vy = _mm_setzero_pd();
-      for (j = 0; j < n; j++) {
-         vt0 = _mm_load1_pd(pb);
-         vt1 = _mm_load1_pd(pb + 1);
-         vt2 = _mm_load_pd(pa0);
-         vt3 = _mm_load_pd(pa1);
-         vt5 = _mm_unpacklo_pd(vt2, vt3);
-         vt4 = _mm_unpackhi_pd(vt2, vt3);
+   __m128d vbeta = _mm_loadh_pd(_mm_load_sd(&beta.x), &beta.y);
+   __m128d vbetax = _mm_unpacklo_pd(vbeta, vbeta);
+   __m128d vbetay = _mm_unpackhi_pd(vbeta, vbeta);
+   __m128d valpha = _mm_loadh_pd(_mm_load_sd(&alpha.x), &alpha.y);
+   __m128d valphax = _mm_unpacklo_pd(valpha, valpha);
+   __m128d valphay = _mm_unpackhi_pd(valpha, valpha);
+   for (ae_int_t i = 0; i < m2; i++) {
+      const double *pa0 = parow;
+      const double *pa1 = parow + 2 * alglib_c_block;
+      const double *pb = x;
+      __m128d vx = _mm_setzero_pd();
+      __m128d vy = _mm_setzero_pd();
+      for (ae_int_t j = 0; j < n; j++) {
+         __m128d vt0 = _mm_load1_pd(pb);
+         __m128d vt1 = _mm_load1_pd(pb + 1);
+         __m128d vt2 = _mm_load_pd(pa0);
+         __m128d vt3 = _mm_load_pd(pa1);
+         __m128d vt5 = _mm_unpacklo_pd(vt2, vt3);
+         __m128d vt4 = _mm_unpackhi_pd(vt2, vt3);
          vt2 = vt5;
          vt3 = vt4;
          vt2 = _mm_mul_pd(vt2, vt0);
@@ -4535,17 +3690,18 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa1 += 2;
          pb += 2;
       }
+      __m128d vrx, vry;
       if (beta.x == 0.0 && beta.y == 0.0) {
          vrx = _mm_setzero_pd();
          vry = _mm_setzero_pd();
       } else {
-         vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
-         vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
+         __m128d vtx = _mm_loadh_pd(_mm_load_sd(dy + 0), dy + 2 * stride + 0);
+         __m128d vty = _mm_loadh_pd(_mm_load_sd(dy + 1), dy + 2 * stride + 1);
          vrx = _mm_sub_pd(_mm_mul_pd(vbetax, vtx), _mm_mul_pd(vbetay, vty));
          vry = _mm_add_pd(_mm_mul_pd(vbetax, vty), _mm_mul_pd(vbetay, vtx));
       }
-      vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
-      vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
+      __m128d vtx = _mm_sub_pd(_mm_mul_pd(valphax, vx), _mm_mul_pd(valphay, vy));
+      __m128d vty = _mm_add_pd(_mm_mul_pd(valphax, vy), _mm_mul_pd(valphay, vx));
       vrx = _mm_add_pd(vrx, vtx);
       vry = _mm_add_pd(vry, vty);
       _mm_storel_pd(dy + 0, vrx);
@@ -4557,10 +3713,9 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
    }
    if (m % 2) {
       double v0 = 0.0, v1 = 0.0;
-      double tx, ty;
-      pa0 = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
+      const double *pa0 = parow;
+      const double *pb = x;
+      for (ae_int_t j = 0; j < n; j++) {
          v0 += pa0[0] * pb[0];
          v1 += pa0[0] * pb[1];
          v0 -= pa0[1] * pb[1];
@@ -4568,6 +3723,7 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
          pa0 += 2;
          pb += 2;
       }
+      double tx, ty;
       if (beta.x == 0.0 && beta.y == 0.0) {
          tx = 0.0;
          ty = 0.0;
@@ -4585,36 +3741,23 @@ static void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
 }
 #endif
 
-// This subroutine calculates fast MxN complex matrix-vector product:
-//
-//     y := beta*y + alpha*A*x
-//
-// using generic C code, where A, x, y, alpha and beta are complex.
-//
-// If beta is zero, we do not use previous values of y (they are  overwritten
-// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-// important when A or x contain infinities/NANs).
-//
-// IMPORTANT:
-// * 0 <= M <= alglib_c_block, 0 <= N <= alglib_c_block
-// * A must be stored in row-major order, as sequence of double precision
-//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-//   in doubles).
-// * Y may be referenced by cy (pointer to ae_complex) or
-//   dy (pointer to array of double precision pair) depending on what type of
-//   output you wish. Pass pointer to Y as one of these parameters,
-//   AND SET OTHER PARAMETER TO NULL.
-// * both A and x must be aligned; y may be non-aligned.
-void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
-   ae_int_t i, j;
-   const double *pa, *parow, *pb;
-   parow = a;
-   for (i = 0; i < m; i++) {
+// A fast m x n complex matrix-vector product
+//	y = beta y + alpha a x
+// with generic C code for complex a, x, y, alpha and beta.
+// If beta == 0.0, y is overwritten by alpha a x but if alpha == 0.0, we still do y = alpha a x (to properly handle infinities/NANs).
+// Important:
+// *	(m, n) is in [0, alglib_c_block] x [0, alglib_c_block].
+// *	a must be in row-major order as (double, double) with stride = alglib_c_block double-pairs.
+// *	y may point to either vector cy (Complex) or dy (double precision pairs).
+// *	Either cy or dy must be NULL, but not both.
+// *	Both a and x must be aligned, but y may be non-aligned.
+static void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta) {
+   const double *parow = a;
+   for (ae_int_t i = 0; i < m; i++) {
       double v0 = 0.0, v1 = 0.0;
-      pa = parow;
-      pb = x;
-      for (j = 0; j < n; j++) {
+      const double *pa = parow;
+      const double *pb = x;
+      for (ae_int_t j = 0; j < n; j++) {
          v0 += pa[0] * pb[0];
          v1 += pa[0] * pb[1];
          v0 -= pa[1] * pb[1];
@@ -4639,135 +3782,93 @@ void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_c
    }
 }
 
-// This subroutine sets vector to zero
-void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++)
+// Set the real n-vector p to zero.
+static void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride) {
+   if (stride == 1)
+      for (ae_int_t i = 0; i < n; i++, p++)
          *p = 0.0;
-   } else {
-      for (i = 0; i < n; i++, p += stride)
+   else
+      for (ae_int_t i = 0; i < n; i++, p += stride)
          *p = 0.0;
-   }
 }
 
-// This subroutine sets vector to zero
-void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
-   ae_int_t i;
-   if (stride == 1) {
-      for (i = 0; i < n; i++, p++) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   } else {
-      for (i = 0; i < n; i++, p += stride) {
-         p->x = 0.0;
-         p->y = 0.0;
-      }
-   }
+// Set the complex n-vector p to zero.
+static void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride) {
+   if (stride == 1)
+      for (ae_int_t i = 0; i < n; i++, p++)
+         p->y = p->x = 0.0;
+   else
+      for (ae_int_t i = 0; i < n; i++, p += stride)
+         p->y = p->x = 0.0;
 }
 
-// This subroutine copies unaligned real vector
-void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
-   ae_int_t i, n2;
-   if (stridea == 1 && strideb == 1) {
-      n2 = n / 2;
-      for (i = n2; i != 0; i--, a += 2, b += 2) {
-         b[0] = a[0];
-         b[1] = a[1];
-      }
-      if (n % 2 != 0)
-         b[0] = a[0];
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += strideb)
+// Copy the unaligned real vector a to b.
+static void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb) {
+   if (stridea == 1 && strideb == 1)
+      for (ae_int_t i = n; i != 0; i--, a++, b++)
          *b = *a;
-   }
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb)
+         *b = *a;
 }
 
-// This subroutine copies unaligned complex vector
-// (passed as ae_complex*)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+// Copy the unaligned complex vector a to b (passed as ae_complex *).
+// *	The strideb is in complex numbers rather than double-pairs.
+// *	conj may be "N" (no conj.) or "C" (conj.)
+static void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+   strideb *= 2; // Multiply by sizeof(ae_complex)/sizeof(double).
+   if (conj[0] == 'N' || conj[0] == 'n')
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a->x;
          b[1] = a->y;
       }
-   } else {
-      for (i = 0; i < n; i++, a += stridea, b += 2 * strideb) {
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a->x;
          b[1] = -a->y;
       }
-   }
 }
 
-// This subroutine copies unaligned complex vector (passed as double*)
-//
-// 1. strideb is stride measured in complex numbers, not doubles
-// 2. conj may be "N" (no conj.) or "C" (conj.)
-void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
-   ae_int_t i;
-// more general case
-   if (conj[0] == 'N' || conj[0] == 'n') {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+// Copy the unaligned complex vector a to b (passed as double *).
+// *	The strideb is in complex numbers rather than double-pairs.
+// *	conj may be "N" (no conj.) or "C" (conj.)
+static void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj) {
+   stridea *= 2, strideb *= 2; // Multiply by sizeof(ae_complex)/sizeof(double).
+   if (conj[0] == 'N' || conj[0] == 'n')
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a[0];
          b[1] = a[1];
       }
-   } else {
-      for (i = 0; i < n; i++, a += 2 * stridea, b += 2 * strideb) {
+   else
+      for (ae_int_t i = 0; i < n; i++, a += stridea, b += strideb) {
          b[0] = a[0];
          b[1] = -a[1];
       }
-   }
 }
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will be undefined. If (2) is failed,  call
-// to this function will probably crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// Copy the real non-aligned non-contigous m x n matrix a (SSE2-optimized version)
+// to an m x n or n x m submatrix of the aligned contiguous alglib_r_block x alglib_r_block matrix b.
+// Use transposition if op != 0.
+// The stride is stride for a, alglib_r_block for b.
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, mb2;
-   const double *psrc0, *psrc1;
-   double *pdst;
    if (op == 0) {
-      ae_int_t nb8, ntail;
-      nb8 = n / 8;
-      ntail = n - 8 * nb8;
-      for (i = 0, psrc0 = a; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
-         pdst = b;
-         for (j = 0; j < nb8; j++) {
-            __m128d v0, v1;
-            v0 = _mm_loadu_pd(psrc0);
+      ae_int_t nb8 = n / 8;
+      ae_int_t ntail = n - 8 * nb8;
+      const double *psrc0 = a;
+      for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_r_block, psrc0 = a) {
+         double *pdst = b;
+         for (ae_int_t j = 0; j < nb8; j++) {
+            __m128d v0 = _mm_loadu_pd(psrc0);
             _mm_store_pd(pdst, v0);
-            v1 = _mm_loadu_pd(psrc0 + 2);
+            __m128d v1 = _mm_loadu_pd(psrc0 + 2);
             _mm_store_pd(pdst + 2, v1);
             v1 = _mm_loadu_pd(psrc0 + 4);
             _mm_store_pd(pdst + 4, v1);
@@ -4776,32 +3877,28 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
             pdst += 8;
             psrc0 += 8;
          }
-         for (j = 0; j < ntail; j++)
+         for (ae_int_t j = 0; j < ntail; j++)
             pdst[j] = psrc0[j];
       }
    } else {
-      const double *arow0, *arow1;
-      double *bcol0, *bcol1, *pdst0, *pdst1;
-      ae_int_t nb4, ntail, n2;
-      n2 = n / 2;
-      mb2 = m / 2;
-      nb4 = n / 4;
-      ntail = n - 4 * nb4;
-      arow0 = a;
-      arow1 = a + stride;
-      bcol0 = b;
-      bcol1 = b + 1;
-      for (i = 0; i < mb2; i++) {
-         psrc0 = arow0;
-         psrc1 = arow1;
-         pdst0 = bcol0;
-         pdst1 = bcol1;
-         for (j = 0; j < nb4; j++) {
-            __m128d v0, v1, v2, v3;
-            v0 = _mm_loadu_pd(psrc0);
-            v1 = _mm_loadu_pd(psrc1);
-            v2 = _mm_loadu_pd(psrc0 + 2);
-            v3 = _mm_loadu_pd(psrc1 + 2);
+      ae_int_t n2 = n / 2;
+      ae_int_t mb2 = m / 2;
+      ae_int_t nb4 = n / 4;
+      ae_int_t ntail = n - 4 * nb4;
+      const double *arow0 = a;
+      const double *arow1 = a + stride;
+      double *bcol0 = b;
+      double *bcol1 = b + 1;
+      for (ae_int_t i = 0; i < mb2; i++) {
+         const double *psrc0 = arow0;
+         const double *psrc1 = arow1;
+         double *pdst0 = bcol0;
+         double *pdst1 = bcol1;
+         for (ae_int_t j = 0; j < nb4; j++) {
+            __m128d v0 = _mm_loadu_pd(psrc0);
+            __m128d v1 = _mm_loadu_pd(psrc1);
+            __m128d v2 = _mm_loadu_pd(psrc0 + 2);
+            __m128d v3 = _mm_loadu_pd(psrc1 + 2);
             _mm_store_pd(pdst0, _mm_unpacklo_pd(v0, v1));
             _mm_store_pd(pdst0 + alglib_r_block, _mm_unpackhi_pd(v0, v1));
             _mm_store_pd(pdst0 + 2 * alglib_r_block, _mm_unpacklo_pd(v2, v3));
@@ -4811,7 +3908,7 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
             psrc0 += 4;
             psrc1 += 4;
          }
-         for (j = 0; j < ntail; j++) {
+         for (ae_int_t j = 0; j < ntail; j++) {
             pdst0[0] = psrc0[0];
             pdst1[0] = psrc1[0];
             pdst0 += alglib_r_block;
@@ -4825,251 +3922,206 @@ static void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae
          bcol1 += 2;
       }
       if (m % 2) {
-         psrc0 = arow0;
-         pdst0 = bcol0;
-         for (j = 0; j < n2; j++) {
+         const double *psrc0 = arow0;
+         double *pdst0 = bcol0;
+         for (ae_int_t j = 0; j < n2; j++) {
             pdst0[0] = psrc0[0];
             pdst0[alglib_r_block] = psrc0[1];
             pdst0 += alglib_twice_r_block;
             psrc0 += 2;
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst0[0] = psrc0[0];
       }
    }
 }
 #endif
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_r_block
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_r_block, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+// Copy the real non-aligned non-contigous m x n matrix a
+// to an m x n or n x m submatrix of the aligned contiguous alglib_r_block x alglib_r_block matrix b.
+// Use transposition if op != 0.
+// The stride is stride for a, alglib_r_block for b.
+static void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b) {
+   ae_int_t n2 = n / 2;
+   if (op == 0)
+      for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_r_block) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += stride, b++, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
+   else
+      for (ae_int_t i = 0; i < m; i++, a += stride, b++) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += alglib_twice_r_block, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[alglib_r_block] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   }
 }
 
-// This subroutine copies matrix from  aligned contigous storage to non-
-// aligned non-contigous storage
-//
-// A:
-// * MxN
-// * aligned
-// * contigous
-// * stride is alglib_r_block
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-// * non-aligned, non-contigous
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
-   ae_int_t i, j, n2;
-   const double *psrc;
-   double *pdst;
-   if (op == 0) {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a += alglib_r_block, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += 2) {
+// Copy an m x n submatrix of the real non-aligned non-contigous stride x stride matrix a to the aligned contigous m x n or n x m matrix b.
+// Use transposition if op != 0.
+// The stride is alglib_r_block for a, stride for b.
+static void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride) {
+   ae_int_t n2 = n / 2;
+   if (op == 0)
+      for (ae_int_t i = 0; i < m; i++, a += alglib_r_block, b += stride) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += 2) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[1];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
-   } else {
-      n2 = n / 2;
-      for (i = 0, psrc = a; i < m; i++, a++, b += stride, psrc = a) {
-         for (j = 0, pdst = b; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
+   else
+      for (ae_int_t i = 0; i < m; i++, a++, b += stride) {
+         const double *psrc = a;
+         double *pdst = b;
+         for (ae_int_t j = 0; j < n2; j++, pdst += 2, psrc += alglib_twice_r_block) {
             pdst[0] = psrc[0];
             pdst[1] = psrc[alglib_r_block];
          }
-         if (n % 2 != 0)
+         if (n % 2)
             pdst[0] = psrc[0];
       }
+}
+
+// Copy the complex aligned contigous m x n matrix a to an m x n or n x m submatrix of the non-aligned non-contigous 2 x stride x stride matrix b.
+// Copy as is or use transposition, Hermitian conjugate or conjugate, respectively if Op == 0, 1, 2 or 3.
+// The stride is stride for a, alglib_c_block double-pairs for b.
+static void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
+   switch (op) {
+      case 0:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_twice_c_block) {
+            const ae_complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += 2, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = psrc->y;
+            }
+         }
+      break;
+      case 1:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += 2) {
+            const ae_complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = psrc->y;
+            }
+         }
+      break;
+      case 2:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += 2) {
+            const ae_complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = -psrc->y;
+            }
+         }
+      break;
+      case 3:
+         for (ae_int_t i = 0; i < m; i++, a += stride, b += alglib_twice_c_block) {
+            const ae_complex *psrc = a;
+            double *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst += 2, psrc++) {
+               pdst[0] = psrc->x;
+               pdst[1] = -psrc->y;
+            }
+         }
+      break;
    }
 }
 
-// This subroutine copies matrix from  non-aligned non-contigous storage
-// to aligned contigous storage
-//
-// A:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * may be transformed during copying (as prescribed by op)
-// * pointer to ae_complex is passed
-//
-// B:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
-void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b) {
-   ae_int_t i, j;
-   const ae_complex *psrc;
-   double *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
+// Copy the complex aligned contigous m x n matrix a to an m x n or n x m submatrix of the non-aligned non-contigous 2 x stride x stride matrix b.
+// Copy as is or use transposition, Hermitian conjugate or conjugate, respectively if op == 0, 1, 2 or 3.
+// The stride is stride for a, alglib_c_block double-pairs for b.
+static void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
+   switch (op) {
+      case 0:
+         for (ae_int_t i = 0; i < m; i++, a += alglib_twice_c_block, b += stride) {
+            const double *psrc = a;
+            ae_complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += 2) {
+               pdst->x = psrc[0];
+               pdst->y = psrc[1];
+            }
          }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = psrc->y;
+      break;
+      case 1:
+         for (ae_int_t i = 0; i < m; i++, a += 2, b += stride) {
+            const double *psrc = a;
+            ae_complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+               pdst->x = psrc[0];
+               pdst->y = psrc[1];
+            }
          }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += 2, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += alglib_twice_c_block, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
+      break;
+      case 2:
+         for (ae_int_t i = 0; i < m; i++, a += 2, b += stride) {
+            const double *psrc = a;
+            ae_complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
+               pdst->x = psrc[0];
+               pdst->y = -psrc[1];
+            }
          }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += stride, b += alglib_twice_c_block, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst += 2, psrc++) {
-            pdst[0] = psrc->x;
-            pdst[1] = -psrc->y;
+      break;
+      case 3:
+         for (ae_int_t i = 0; i < m; i++, a += alglib_twice_c_block, b += stride) {
+            const double *psrc = a;
+            ae_complex *pdst = b;
+            for (ae_int_t j = 0; j < n; j++, pdst++, psrc += 2) {
+               pdst->x = psrc[0];
+               pdst->y = -psrc[1];
+            }
          }
+      break;
    }
 }
 
-// This subroutine copies matrix from aligned contigous storage to
-// non-aligned non-contigous storage
-//
-// A:
-// * 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
-// * aligned
-// * stride is alglib_c_block
-// * pointer to double is passed
-// * may be transformed during copying (as prescribed by op)
-//
-// B:
-// * MxN
-// * non-aligned
-// * non-contigous
-// * pointer to ae_complex is passed
-//
-// Transformation types:
-// * 0 - no transform
-// * 1 - transposition
-// * 2 - conjugate transposition
-// * 3 - conjugate, but no  transposition
-void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride) {
-   ae_int_t i, j;
-   const double *psrc;
-   ae_complex *pdst;
-   if (op == 0) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
-         }
-   }
-   if (op == 1) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = psrc[1];
-         }
-   }
-   if (op == 2) {
-      for (i = 0, psrc = a; i < m; i++, a += 2, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += alglib_twice_c_block) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
-         }
-   }
-   if (op == 3) {
-      for (i = 0, psrc = a; i < m; i++, a += alglib_twice_c_block, b += stride, psrc = a)
-         for (j = 0, pdst = b; j < n; j++, pdst++, psrc += 2) {
-            pdst->x = psrc[0];
-            pdst->y = -psrc[1];
-         }
-   }
-}
-
-// Real GEMM kernel
-bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
-   int i;
-   double *crow;
-   double _abuf[alglib_r_block + alglib_simd_alignment];
-   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+// Real GEMM kernel.
+static bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
    if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || alpha == 0.0)
       return false;
-// Check for SSE2 support
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// copy b
+// Copy or transpose b.
+   double _bbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const b = (double *)ae_align(_bbuf, alglib_simd_alignment);
    if (optypeb == 0)
       mcopyblock(k, n, _b, 1, _b_stride, b);
    else
       mcopyblock(n, k, _b, 0, _b_stride, b);
-// multiply B by A (from the right, by rows)
-// and store result in C
-   crow = _c;
+// Multiply b by a (from the right, by rows) into c.
+   double _abuf[alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_abuf, alglib_simd_alignment);
+   bool BetaIs0 = beta == 0.0;
+   double *crow = _c;
    if (optypea == 0) {
       const double *arow = _a;
-      for (i = 0; i < m; i++) {
+      for (ae_int_t i = 0; i < m; i++) {
          _ialglib_vcopy(k, arow, 1, abuf, 1);
-         if (beta == 0)
+         if (BetaIs0)
             _ialglib_vzero(n, crow, 1);
          rmv(n, k, b, abuf, crow, 1, alpha, beta);
          crow += _c_stride;
@@ -5077,9 +4129,9 @@ bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, doub
       }
    } else {
       const double *acol = _a;
-      for (i = 0; i < m; i++) {
+      for (ae_int_t i = 0; i < m; i++) {
          _ialglib_vcopy(k, acol, _a_stride, abuf, 1);
-         if (beta == 0)
+         if (BetaIs0)
             _ialglib_vzero(n, crow, 1);
          rmv(n, k, b, abuf, crow, 1, alpha, beta);
          crow += _c_stride;
@@ -5089,51 +4141,57 @@ bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, doub
    return true;
 }
 
-// Complex GEMM kernel
-bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
-   const ae_complex *arow;
-   ae_complex *crow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
-   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
-   ae_int_t brows;
-   ae_int_t bcols;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+// Complex GEMM kernel.
+static bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
    if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
       return false;
-// Check for SSE2 support
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
-// copy b
-   brows = optypeb == 0 ? k : n;
-   bcols = optypeb == 0 ? n : k;
-   if (optypeb == 0)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
-   if (optypeb == 1)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
-   if (optypeb == 2)
-      _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
-// multiply B by A (from the right, by rows)
-// and store result in C
-   arow = _a;
-   crow = _c;
-   for (i = 0; i < m; i++) {
-      if (optypea == 0) {
-         _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
-         arow += _a_stride;
-      } else if (optypea == 1) {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
-         arow++;
-      } else {
-         _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
-         arow++;
+// Copy, transpose, conjugate or Hermitianize b.
+   double _loc_b[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const b = (double *)ae_align(_loc_b, alglib_simd_alignment);
+   ae_int_t bcols = optypeb == 0 ? n : k;
+   ae_int_t brows = optypeb == 0 ? k : n;
+   switch (optypeb) {
+      default:
+      case 0:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 1, _b_stride, b);
+      break;
+      case 1:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 0, _b_stride, b);
+      break;
+      case 2:
+         _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
+      break;
+   }
+// Multiply b by a (from the right, by rows) into c.
+   double _loc_abuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   bool BetaIs0 = beta.x == 0.0 && beta.y == 0.0;
+   const ae_complex *arow = _a;
+   ae_complex *crow = _c;
+   for (ae_int_t i = 0; i < m; i++) {
+      switch (optypea) {
+         case 0:
+            _ialglib_vcopy_complex(k, arow, 1, abuf, 1, "No conj");
+            arow += _a_stride;
+         break;
+         case 1:
+            _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "No conj");
+            arow++;
+         break;
+         default:
+         case 2:
+            _ialglib_vcopy_complex(k, arow, _a_stride, abuf, 1, "Conj");
+            arow++;
+         break;
       }
-      if (beta.x == 0.0 && beta.y == 0.0)
+      if (BetaIs0)
          _ialglib_vzero_complex(n, crow, 1);
       cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
       crow += _c_stride;
@@ -5141,104 +4199,37 @@ bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, 
    return true;
 }
 
-// complex TRSM kernel
-bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
-   if (m > alglib_c_block || n > alglib_c_block)
-      return false;
-// Check for SSE2 support
-#ifdef AE_HAS_SSE2_INTRINSICS
-   if (CurCPU & CPU_SSE2) {
-      cmv = &_ialglib_cmv_sse2;
-   }
-#endif
-// Prepare
-   _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
-   _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         pdiag[0] = 1.0;
-         pdiag[1] = 0.0;
-      }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = ae_complex_from_d(-beta.x, -beta.y);
-         _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
-   } else {
-      for (i = n - 1, pdiag = abuf + 2 * ((n - 1) * alglib_c_block + (n - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = ae_complex_from_d(-beta.x, -beta.y);
-         _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
-         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
-      }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
-   }
-   return true;
-}
-
-// real TRSM kernel
-bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
+// Real Right TRSM kernel.
+static bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
    if (m > alglib_r_block || n > alglib_r_block)
       return false;
-// Check for SSE2 support
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// Prepare
+// Prepare.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    mcopyblock(n, n, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 0, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1)
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += alglib_r_block + 1)
          *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve Y*A^-1=X where A is upper or lower triangular
-   if (uppera) {
-      for (i = 0, pdiag = abuf; i < n; i++, pdiag += alglib_r_block + 1) {
+   }
+// Solve y a^-1 == x, where a is upper or lower triangular.
+   double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += alglib_r_block + 1) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
          _ialglib_vcopy(i, abuf + i, alglib_r_block, tmpbuf, 1);
@@ -5246,7 +4237,8 @@ bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_s
       }
       _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
    } else {
-      for (i = n - 1, pdiag = abuf + (n - 1) * alglib_r_block + (n - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+      double *pdiag = abuf + (n - 1) * alglib_r_block + (n - 1);
+      for (ae_int_t i = n - 1; i >= 0; i--, pdiag -= alglib_r_block + 1) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
          _ialglib_vcopy(n - 1 - i, pdiag + alglib_r_block, alglib_r_block, tmpbuf + i + 1, 1);
@@ -5257,106 +4249,90 @@ bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_s
    return true;
 }
 
-// complex TRSM kernel
-bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
-   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
+// Complex Right TRSM kernel.
+static bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
-// Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;
    }
 #endif
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
-   _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
-   _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
+// Prepare.
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
          pdiag[0] = 1.0;
          pdiag[1] = 0.0;
       }
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + 2 * ((m - 1) * alglib_c_block + (m - 1)); i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = ae_complex_from_d(-beta.x, -beta.y);
-         _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
-         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+   }
+// Solve y a^-1 == x, where a is upper or lower triangular.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < n; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
+         ae_complex beta = ae_c_d_div(1.0, tmp_c);
+         ae_complex alpha = ae_complex_from_d(-beta.x, -beta.y);
+         _ialglib_vcopy_dcomplex(i, abuf + 2 * i, alglib_c_block, tmpbuf, 1, "No conj");
+         cmv(m, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
-         ae_complex tmp_c;
-         ae_complex beta;
-         ae_complex alpha;
-         tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
-         beta = ae_c_d_div(1.0, tmp_c);
-         alpha = ae_complex_from_d(-beta.x, -beta.y);
-         _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
-         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      double *pdiag = abuf + 2 * (n - 1) * (alglib_c_block + 1);
+      for (ae_int_t i = n - 1; i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
+         ae_complex beta = ae_c_d_div(1.0, tmp_c);
+         ae_complex alpha = ae_complex_from_d(-beta.x, -beta.y);
+         _ialglib_vcopy_dcomplex(n - 1 - i, pdiag + 2 * alglib_c_block, alglib_c_block, tmpbuf, 1, "No conj");
+         cmv(m, n - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
       }
-      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    }
    return true;
 }
 
-// real TRSM kernel
-bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
-// local buffers
-   double *pdiag, *arow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+// Real Left TRSM kernel
+static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
    double _loc_tmpbuf[alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   bool uppera;
-   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
-   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
    if (m > alglib_r_block || n > alglib_r_block)
       return false;
-// Check for SSE2 support
+   void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
+   void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 #ifdef AE_HAS_SSE2_INTRINSICS
+// Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       rmv = &_ialglib_rmv_sse2;
       mcopyblock = &_ialglib_mcopyblock_sse2;
    }
 #endif
-// Prepare
-// Transpose X (so we may use mv, which calculates A*x, but not x*A)
+// Prepare.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    mcopyblock(m, m, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    mcopyblock(m, n, _x, 1, _x_stride, xbuf);
-   if (isunit)
-      for (i = 0, pdiag = abuf; i < m; i++, pdiag += alglib_r_block + 1)
+// Transpose x (so we may use mv, which calculates a x, but not x a).
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += alglib_r_block + 1)
          *pdiag = 1.0;
-   if (optype == 0)
-      uppera = isupper;
-   else
-      uppera = !isupper;
-// Solve A^-1*Y^T=X^T where A is upper or lower triangular
-   if (uppera) {
-      for (i = m - 1, pdiag = abuf + (m - 1) * alglib_r_block + (m - 1); i >= 0; i--, pdiag -= alglib_r_block + 1) {
+   }
+// Solve a^-1 y^T == x^T, where a is upper or lower triangular.
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf + (m - 1) * (alglib_r_block + 1);
+      for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= alglib_r_block + 1) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
          _ialglib_vcopy(m - 1 - i, pdiag + 1, 1, tmpbuf + i + 1, 1);
@@ -5364,7 +4340,8 @@ bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_st
       }
       _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    } else {
-      for (i = 0, pdiag = abuf, arow = abuf; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
+      double *pdiag = abuf, *arow = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += alglib_r_block + 1, arow += alglib_r_block) {
          double beta = 1.0 / (*pdiag);
          double alpha = -beta;
          _ialglib_vcopy(i, arow, 1, tmpbuf, 1);
@@ -5375,125 +4352,209 @@ bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_st
    return true;
 }
 
-// complex SYRK kernel
-bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_complex c_alpha, c_beta;
-   ae_int_t i;
+// Complex Left TRSM kernel.
+static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+   if (m > alglib_c_block || n > alglib_c_block)
+      return false;
+#ifdef AE_HAS_SSE2_INTRINSICS
+   void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+// Check for SSE2 support.
+   if (CurCPU & CPU_SSE2) {
+      cmv = &_ialglib_cmv_sse2;
+   }
+#endif
+// Prepare.
    double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
-   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
+   _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
+   double _loc_xbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
+   _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
+// Transpose x (so we may use mv, which calculates a x, but not x a).
+   if (isunit) {
+      double *pdiag = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += 2 * (alglib_c_block + 1)) {
+         pdiag[0] = 1.0;
+         pdiag[1] = 0.0;
+      }
+   }
+// Solve a^-1 y^T = x^T, where a is upper or lower triangular.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   if ((optype == 0) == isupper) {
+      double *pdiag = abuf + 2 * (m - 1) * (alglib_c_block + 1);
+      for (ae_int_t i = m - 1; i >= 0; i--, pdiag -= 2 * (alglib_c_block + 1)) {
+         ae_complex tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
+         ae_complex beta = ae_c_d_div(1.0, tmp_c);
+         ae_complex alpha = ae_complex_from_d(-beta.x, -beta.y);
+         _ialglib_vcopy_dcomplex(m - 1 - i, pdiag + 2, 1, tmpbuf, 1, "No conj");
+         cmv(n, m - 1 - i, xbuf + 2 * (i + 1), tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+   } else {
+      double *pdiag = abuf, *arow = abuf;
+      for (ae_int_t i = 0; i < m; i++, pdiag += 2 * (alglib_c_block + 1), arow += 2 * alglib_c_block) {
+         ae_complex tmp_c = ae_complex_from_d(pdiag[0], pdiag[1]);
+         ae_complex beta = ae_c_d_div(1.0, tmp_c);
+         ae_complex alpha = ae_complex_from_d(-beta.x, -beta.y);
+         _ialglib_vcopy_dcomplex(i, arow, 1, tmpbuf, 1, "No conj");
+         cmv(n, i, xbuf, tmpbuf, NULL, xbuf + 2 * i, alglib_c_block, alpha, beta);
+      }
+      _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
+   }
+   return true;
+}
+
+// Real SYRK/HERK kernel.
+static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
+   if (n > alglib_r_block || k > alglib_r_block)
+      return false;
+   else if (n == 0)
+      return true;
+// Copy a and c, and transformed the task to "a a^T"-form.
+// If beta == 0.0, then zero out c and ignore it.
+// If alpha == 0.0 or k == 0 then ignore a.
+//(@) The SSE2-optimized form of _ialglib_mcopyblock() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   if (alpha == 0.0)
+      k = 0;
+   else if (k > 0)
+      if (optypea == 0)
+         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
+      else
+         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
+   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
+   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
+   if (beta == 0.0) {
+      double *crow = cbuf;
+      if (isupper)
+         for (ae_int_t i = 0; i < n; i++, crow += alglib_r_block)
+            _ialglib_vzero(n - i, crow + i, 1);
+      else
+         for (ae_int_t i = 0; i < n; i++, crow += alglib_r_block)
+            _ialglib_vzero(i + 1, crow, 1);
+   }
+// Update c.
+//(@) The SSE2-optimized form of _ialglib_rmv() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double *arow = abuf, *crow = cbuf;
+   if (isupper)
+      for (ae_int_t i = 0; i < n; i++, arow += alglib_r_block, crow += alglib_r_block)
+         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
+   else
+      for (ae_int_t i = 0; i < n; i++, arow += alglib_r_block, crow += alglib_r_block)
+         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
+// Copy back.
+   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
+   return true;
+}
+
+// Complex SYRK/HERK kernel.
+static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
    if (n > alglib_c_block || k > alglib_c_block)
       return false;
-   if (n == 0)
+   else if (n == 0)
       return true;
-// copy A and C, task is transformed to "A*A^H"-form.
-// if beta == 0, then C is filled by zeros (and not referenced)
-//
-// alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   c_alpha = ae_complex_from_d(alpha);
-   c_beta = ae_complex_from_d(beta);
-   if (alpha == 0)
+// Copy a and c, transforming to "a a^H"-form.
+// If beta == 0.0, then set c to 0 and ignore it.
+// If alpha == 0.0 or k == 0 then ignore a.
+   double _loc_abuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
+   if (alpha == 0.0)
       k = 0;
-   if (k > 0) {
+   else if (k > 0)
       if (optypea == 0)
          _ialglib_mcopyblock_complex(n, k, _a, 3, _a_stride, abuf);
       else
          _ialglib_mcopyblock_complex(k, n, _a, 1, _a_stride, abuf);
-   }
+   double _loc_cbuf[2 * alglib_c_block * alglib_c_block + alglib_simd_alignment];
+   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
    _ialglib_mcopyblock_complex(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += 2 * alglib_c_block)
+   if (beta == 0.0) {
+      double *crow = cbuf;
+      for (ae_int_t i = 0; i < n; i++, crow += 2 * alglib_c_block)
          if (isupper)
             _ialglib_vzero(2 * (n - i), crow + 2 * i, 1);
          else
             _ialglib_vzero(2 * (i + 1), crow, 1);
    }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+// Update c.
+//(@) The SSE2-optimized form of _ialglib_cmv() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+   double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
+   double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
+   double *arow = abuf, *crow = cbuf;
+   ae_complex c_alpha = ae_complex_from_d(alpha);
+   ae_complex c_beta = ae_complex_from_d(beta);
+   if (isupper)
+      for (ae_int_t i = 0; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
          _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
          _ialglib_cmv(n - i, k, arow, tmpbuf, NULL, crow + 2 * i, 1, c_alpha, c_beta);
       }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
+   else
+      for (ae_int_t i = 0; i < n; i++, arow += 2 * alglib_c_block, crow += 2 * alglib_c_block) {
          _ialglib_vcopy_dcomplex(k, arow, 1, tmpbuf, 1, "Conj");
          _ialglib_cmv(i + 1, k, abuf, tmpbuf, NULL, crow, 1, c_alpha, c_beta);
       }
-   }
-// copy back
+// Copy back.
    _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
    return true;
 }
 
-// real SYRK kernel
-bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
-// local buffers
-   double *arow, *crow;
-   ae_int_t i;
-   double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double _loc_cbuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
-   double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
-   double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
-   if (n > alglib_r_block || k > alglib_r_block)
+// Real rank-1 kernel.
+// Deprecated version.
+static bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
+// Quick exit.
+   if (m <= 0 || n <= 0)
       return false;
-   if (n == 0)
-      return true;
-// copy A and C, task is transformed to "A*A^T"-form.
-// if beta == 0, then C is filled by zeros (and not referenced)
-//
-// alpha == 0 or k == 0 are correctly processed (A is not referenced)
-   if (alpha == 0)
-      k = 0;
-   if (k > 0) {
-      if (optypea == 0)
-         _ialglib_mcopyblock(n, k, _a, 0, _a_stride, abuf);
-      else
-         _ialglib_mcopyblock(k, n, _a, 1, _a_stride, abuf);
-   }
-   _ialglib_mcopyblock(n, n, _c, 0, _c_stride, cbuf);
-   if (beta == 0) {
-      for (i = 0, crow = cbuf; i < n; i++, crow += alglib_r_block)
-         if (isupper)
-            _ialglib_vzero(n - i, crow + i, 1);
-         else
-            _ialglib_vzero(i + 1, crow, 1);
-   }
-// update C
-   if (isupper) {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(n - i, k, arow, arow, crow + i, 1, alpha, beta);
+// Locals.
+   ae_int_t m2 = m / 2;
+   ae_int_t n2 = n / 2;
+   ae_int_t stride2 = 2 * _a_stride;
+// Update the rows and columns by twos, handling the odd ones separately.
+   double *arow0 = _a;
+   double *arow1 = arow0 + _a_stride;
+   double *pu = _u;
+   double *vtmp = _v;
+   for (ae_int_t i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+      double *pv = vtmp, *dst0 = arow0, *dst1 = arow1;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+         dst0[0] += pu[0] * pv[0];
+         dst0[1] += pu[0] * pv[1];
+         dst1[0] += pu[1] * pv[0];
+         dst1[1] += pu[1] * pv[1];
       }
-   } else {
-      for (i = 0, arow = abuf, crow = cbuf; i < n; i++, arow += alglib_r_block, crow += alglib_r_block) {
-         _ialglib_rmv(i + 1, k, abuf, arow, crow, 1, alpha, beta);
+      if (n % 2) {
+         dst0[0] += pu[0] * pv[0];
+         dst1[0] += pu[1] * pv[0];
       }
    }
-// copy back
-   _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
+   if (m % 2) {
+      double *pv = vtmp, *dst0 = arow0;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, pv += 2) {
+         dst0[0] += pu[0] * pv[0];
+         dst0[1] += pu[0] * pv[1];
+      }
+      if (n % 2)
+         dst0[0] += pu[0] * pv[0];
+   }
    return true;
 }
 
-// complex rank-1 kernel
-bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
-// Locals
-   ae_complex *arow, *pu, *pv, *vtmp, *dst;
-   ae_int_t n2 = n / 2;
-   ae_int_t i, j;
-// Quick exit
+// Complex rank-1 kernel.
+static bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
+// Quick exit.
    if (m <= 0 || n <= 0)
       return false;
-// update pairs of rows
-   arow = _a;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m; i++, arow += _a_stride, pu++) {
-   // update by two
-      for (j = 0, pv = vtmp, dst = arow; j < n2; j++, dst += 2, pv += 2) {
+// Locals.
+   ae_int_t n2 = n / 2;
+// Update the rows and columns by twos, handling the one ones separately.
+   ae_complex *arow = _a;
+   ae_complex *pu = _u;
+   ae_complex *vtmp = _v;
+   for (ae_int_t i = 0; i < m; i++, arow += _a_stride, pu++) {
+      ae_complex *pv = vtmp, *dst = arow;
+      for (ae_int_t j = 0; j < n2; j++, dst += 2, pv += 2) {
          double ux = pu[0].x;
          double uy = pu[0].y;
          double v0x = pv[0].x;
@@ -5505,8 +4566,7 @@ bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_s
          dst[1].x += ux * v1x - uy * v1y;
          dst[1].y += ux * v1y + uy * v1x;
       }
-   // final update
-      if (n % 2 != 0) {
+      if (n % 2) {
          double ux = pu[0].x;
          double uy = pu[0].y;
          double vx = pv[0].x;
@@ -5518,216 +4578,142 @@ bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_s
    return true;
 }
 
-// real rank-1 kernel
-// deprecated version
-bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
-   ae_int_t m2 = m / 2;
-   ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
-   ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-// Quick exit
-   if (m <= 0 || n <= 0)
-      return false;
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
-         dst0[0] += pu[0] * pv[0];
-         dst0[1] += pu[0] * pv[1];
-         dst1[0] += pu[1] * pv[0];
-         dst1[1] += pu[1] * pv[1];
-      }
-   // final update
-      if (n % 2 != 0) {
-         dst0[0] += pu[0] * pv[0];
-         dst1[0] += pu[1] * pv[0];
-      }
-   }
-// update last row
-   if (m % 2 != 0) {
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
-         dst0[0] += pu[0] * pv[0];
-         dst0[1] += pu[0] * pv[1];
-      }
-   // final update
-      if (n % 2 != 0)
-         dst0[0] += pu[0] * pv[0];
-   }
-   return true;
-}
-
-// real rank-1 kernel
-// deprecated version
-bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
-// Locals
-   double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
-   ae_int_t m2 = m / 2;
-   ae_int_t n2 = n / 2;
-   ae_int_t stride = _a_stride;
-   ae_int_t stride2 = 2 * _a_stride;
-   ae_int_t i, j;
-// Quick exit
+// Real rank-1 kernel.
+// Deprecated version.
+static bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
+// Quick exit.
    if (m <= 0 || n <= 0 || alpha == 0.0)
       return false;
-// update pairs of rows
-   arow0 = _a;
-   arow1 = arow0 + stride;
-   pu = _u;
-   vtmp = _v;
-   for (i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
+// Locals.
+   ae_int_t m2 = m / 2;
+   ae_int_t n2 = n / 2;
+   ae_int_t stride2 = 2 * _a_stride;
+// Update the rows and columns by twos, handling the odd ones separately.
+   double *arow0 = _a;
+   double *arow1 = arow0 + _a_stride;
+   double *pu = _u;
+   double *vtmp = _v;
+   for (ae_int_t i = 0; i < m2; i++, arow0 += stride2, arow1 += stride2, pu += 2) {
       double au0 = alpha * pu[0];
       double au1 = alpha * pu[1];
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0, dst1 = arow1; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
+      double *pv = vtmp, *dst0 = arow0, *dst1 = arow1;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, dst1 += 2, pv += 2) {
          dst0[0] += au0 * pv[0];
          dst0[1] += au0 * pv[1];
          dst1[0] += au1 * pv[0];
          dst1[1] += au1 * pv[1];
       }
-   // final update
-      if (n % 2 != 0) {
+      if (n % 2) {
          dst0[0] += au0 * pv[0];
          dst1[0] += au1 * pv[0];
       }
    }
-// update last row
-   if (m % 2 != 0) {
+   if (m % 2) {
       double au0 = alpha * pu[0];
-   // update by two
-      for (j = 0, pv = vtmp, dst0 = arow0; j < n2; j++, dst0 += 2, pv += 2) {
+      double *pv = vtmp, *dst0 = arow0;
+      for (ae_int_t j = 0; j < n2; j++, dst0 += 2, pv += 2) {
          dst0[0] += au0 * pv[0];
          dst0[1] += au0 * pv[1];
       }
-   // final update
-      if (n % 2 != 0)
+      if (n % 2)
          dst0[0] += au0 * pv[0];
    }
    return true;
 }
 
-// Interface functions for efficient kernels
+// Interface functions for efficient kernels.
+// For KerGemmRF(), KerGemmCF(), KerTrsmRCF(), KerTrsmRRF(), KerTrsmLCF(), KerTrsmLRF(), KerHerkCF(), KerSyrkRF():
+// For:
+//	_ialglib_i_rmatrixgemmf, _ialglib_i_rmatrixrighttrsmf, _ialglib_i_rmatrixlefttrsmf, _ialglib_i_rmatrixsyrkf,
+//	_ialglib_i_cmatrixgemmf, _ialglib_i_cmatrixrighttrsmf, _ialglib_i_cmatrixlefttrsmf, _ialglib_i_cmatrixherkf:
+// ∙	handle the degenerate cases like zero matrices by ALGLIB++ - greatly simplifies passing data to ALGLIB++ kernel,
+// ∙	handle the generla cases with the optimized ALGLIB++ kernel.
+
 bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_rmatrixgemm(m, n, k, alpha, _a->xyR[ia] + ja, _a->stride, optypea, _b->xyR[ib] + jb, _b->stride, optypeb, beta, _c->xyR[ic] + jc, _c->stride);
 }
 
 bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha.x == 0.0 && alpha.y == 0 || k == 0 || n == 0 || m == 0)
+   if (alpha.x == 0.0 && alpha.y == 0.0 || k == 0 || n == 0 || m == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_cmatrixgemm(m, n, k, alpha, _a->xyC[ia] + ja, _a->stride, optypea, _b->xyC[ib] + jb, _b->stride, optypeb, beta, _c->xyC[ic] + jc, _c->stride);
 }
 
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (m == 0 || n == 0)
-      return false;
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
-}
-
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_rmatrixrighttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
-   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
+   return _ialglib_cmatrixrighttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
       return false;
-// handle with optimized ALGLIB kernel
    return _ialglib_rmatrixlefttrsm(m, n, &a->xyR[i1][j1], a->stride, isupper, isunit, optype, &x->xyR[i2][j2], x->stride);
 }
 
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
-   if (alpha == 0.0 || k == 0 || n == 0)
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+   if (m == 0 || n == 0)
       return false;
-// ALGLIB kernel
-   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
+   return _ialglib_cmatrixlefttrsm(m, n, &a->xyC[i1][j1], a->stride, isupper, isunit, optype, &x->xyC[i2][j2], x->stride);
 }
 
 bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-// handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0)
       return false;
-// ALGLIB kernel
    return _ialglib_rmatrixsyrk(n, k, alpha, &a->xyR[ia][ja], a->stride, optypea, beta, &c->xyR[ic][jc], c->stride, isupper);
 }
 
-bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
-   return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+   if (alpha == 0.0 || k == 0 || n == 0)
+      return false;
+   return _ialglib_cmatrixherk(n, k, alpha, &a->xyC[ia][ja], a->stride, optypea, beta, &c->xyC[ic][jc], c->stride, isupper);
 }
 
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixrank1(m, n, &a->xyR[ia][ja], a->stride, &u->xR[uoffs], &v->xR[voffs]);
 }
 
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+   return _ialglib_cmatrixrank1(m, n, &a->xyC[ia][ja], a->stride, &u->xC[uoffs], &v->xC[voffs]);
+}
+
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixger(m, n, &a->xyR[ia][ja], a->stride, alpha, &u->xR[uoffs], &v->xR[voffs]);
 }
 
-// This function reads rectangular matrix A given by two column pointers col0
-// and  col1  and  stride src_stride and moves it into  contiguous row-by-row
-// storage given by dst.
-//
-// dst must be aligned, col0 and col1 may be non-aligned.
-//
-// It can handle following special cases:
-// * col1 == NULL        in this case second column of A is filled by zeros
-// * src_stride == 1     efficient SSE-based code is used
-// * col1-col0 == 1      efficient SSE-based code is used
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// Pack the matrix (col0, col1) with stride src_stride and length n row-by-row into the contiguous matrix dst (SSE2-optimized version).
+// dst must be aligned, col0 and col1 may be non-aligned.
+// It can handle following special cases:
+// *	col1 == NULL:				the second column is treated as 0,
+// *	src_stride == 1 or col1 - col0 == 1:	efficient SSE-based code is used.
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-// handle special case: col1 == NULL
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
+   if (col1 == NULL) // Handle the special case: col1 == NULL.
+      for (ae_int_t j = 0; j < n; j++) {
          dst[0] = *col0;
          dst[1] = 0.0;
          col0 += src_stride;
          dst += 2;
       }
-      return;
-   }
-// handle unit stride
-   if (src_stride == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
+   else if (src_stride == 1) { // Handle the case for unit stride.
+      ae_int_t n2 = n / 2;
+      for (ae_int_t j = 0; j < n2; j++) {
+         __m128d v0 = _mm_loadu_pd(col0);
          col0 += 2;
-         v1 = _mm_loadu_pd(col1);
+         __m128d v1 = _mm_loadu_pd(col1);
          col1 += 2;
          _mm_store_pd(dst, _mm_unpacklo_pd(v0, v1));
          _mm_store_pd(dst + 2, _mm_unpackhi_pd(v0, v1));
@@ -5737,16 +4723,12 @@ static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int
          dst[0] = *col0;
          dst[1] = *col1;
       }
-      return;
-   }
-// handle col1-col0 == 1
-   if (col1 - col0 == 1) {
-      __m128d v0, v1;
-      n2 = n / 2;
-      stride2 = 2 * src_stride;
-      for (j = 0; j < n2; j++) {
-         v0 = _mm_loadu_pd(col0);
-         v1 = _mm_loadu_pd(col0 + src_stride);
+   } else if (col1 - col0 == 1) { // Handle the case: col1 - col0 == 1.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = 2 * src_stride;
+      for (ae_int_t j = 0; j < n2; j++) {
+         __m128d v0 = _mm_loadu_pd(col0);
+         __m128d v1 = _mm_loadu_pd(col0 + src_stride);
          _mm_store_pd(dst, v0);
          _mm_store_pd(dst + 2, v1);
          col0 += stride2;
@@ -5756,110 +4738,88 @@ static void _ialglib_pack_n2_sse2(double *col0, double *col1, ae_int_t n, ae_int
          dst[0] = col0[0];
          dst[1] = col0[1];
       }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
+   } else { // The general case.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = 2 * src_stride;
+      for (ae_int_t j = 0; j < n2; j++) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+         dst[2] = col0[src_stride];
+         dst[3] = col1[src_stride];
+         col0 += stride2;
+         col1 += stride2;
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+      }
    }
 }
 #endif
 
-// This function reads rectangular matrix A given by two column pointers
-// col0 and col1 and stride src_stride and moves it into contiguous row-
-// by-row storage given by dst.
-//
-// It can handle following special cases:
-// * col1 == NULL    in this case second column of A is filled by zeros
+// Pack the matrix (col0, col1) with stride src_stride and length n row-by-row into the contiguous matrix dst.
+// dst must be aligned, col0 and col1 may be non-aligned.
+// It can handle following special case:
+// *	col1 == NULL:				the second column is treated as 0,
 void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst) {
-   ae_int_t n2, j, stride2;
-// handle special case
-   if (col1 == NULL) {
-      for (j = 0; j < n; j++) {
+   if (col1 == NULL) // Handle the special case: col1 == NULL.
+      for (ae_int_t j = 0; j < n; j++) {
          dst[0] = *col0;
          dst[1] = 0.0;
          col0 += src_stride;
          dst += 2;
       }
-      return;
-   }
-// handle general case
-   n2 = n / 2;
-   stride2 = src_stride * 2;
-   for (j = 0; j < n2; j++) {
-      dst[0] = *col0;
-      dst[1] = *col1;
-      dst[2] = col0[src_stride];
-      dst[3] = col1[src_stride];
-      col0 += stride2;
-      col1 += stride2;
-      dst += 4;
-   }
-   if (n % 2) {
-      dst[0] = *col0;
-      dst[1] = *col1;
+   else { // Handle the general case.
+      ae_int_t n2 = n / 2;
+      ae_int_t stride2 = src_stride * 2;
+      for (ae_int_t j = 0; j < n2; j++) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+         dst[2] = col0[src_stride];
+         dst[3] = col1[src_stride];
+         col0 += stride2;
+         col1 += stride2;
+         dst += 4;
+      }
+      if (n % 2) {
+         dst[0] = *col0;
+         dst[1] = *col1;
+      }
    }
 }
 
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// Calculate (SSE2-optimized)
+//	r = alpha a' b + beta r
+// where
+// *	a and b are aligned k x 2 matrices stored in contiguous row-by-row storage,
+// *	r is a 2 x 2 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if alpha == 0.0, we still calculate a' b even though it is multiplied by zero afterwards.
+// The format of the result for r, based on store_mode, is as follows:
+// *	store_mode == 0:	the full r is stored
+// *	store_mode == 1:	only the first row of r is stored
+// *	store_mode == 2:	only the first column of r is stored
+// *	store_mode == 3:	only the top left element of r is stored
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// VA and VB store result as follows:
-//
-//        [ VD[0]  VE[0] ]
-// A'*B = [              ]
-//        [ VE[1]  VD[1] ]
-//
-   __m128d va, vb, vd, ve, vt, r0, r1, valpha, vbeta;
-   ae_int_t t, k2;
-// calculate product
-   k2 = k / 2;
-   vd = _mm_setzero_pd();
-   ve = _mm_setzero_pd();
-   for (t = 0; t < k2; t++) {
-      vb = _mm_load_pd(b);
-      va = _mm_load_pd(a);
-      vt = vb;
+// Calculate the 2 x 2 matrix product the k x 2 matrices va and vb and store the result as follows:
+//	a' b	=	/ vd[0] ve[0] \
+//			\ ve[1] vd[1] /
+   ae_int_t k2 = k / 2;
+   __m128d vd = _mm_setzero_pd();
+   __m128d ve = _mm_setzero_pd();
+   for (ae_int_t t = 0; t < k2; t++) {
+      __m128d vb = _mm_load_pd(b);
+      __m128d va = _mm_load_pd(a);
+      __m128d vt = vb;
       vb = _mm_mul_pd(va, vb);
       vt = _mm_shuffle_pd(vt, vt, 1);
       vd = _mm_add_pd(vb, vd);
@@ -5877,85 +4837,78 @@ static void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, a
       b += 4;
    }
    if (k % 2) {
-      va = _mm_load_pd(a);
-      vb = _mm_load_pd(b);
-      vt = _mm_shuffle_pd(vb, vb, 1);
+      __m128d va = _mm_load_pd(a);
+      __m128d vb = _mm_load_pd(b);
+      __m128d vt = _mm_shuffle_pd(vb, vb, 1);
       vd = _mm_add_pd(_mm_mul_pd(va, vb), vd);
       ve = _mm_add_pd(_mm_mul_pd(va, vt), ve);
    }
-// r0 is first row of alpha*A'*B, r1 is second row
-   valpha = _mm_load1_pd(&alpha);
-   r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
-   r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
-// store
-   if (store_mode == 0) {
-      if (beta == 0) {
-         _mm_storeu_pd(r, r0);
-         _mm_storeu_pd(r + stride, r1);
-      } else {
-         vbeta = _mm_load1_pd(&beta);
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
-         _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
+// r0 is the first row of alpha a' b, r1 is the second row.
+   __m128d valpha = _mm_load1_pd(&alpha);
+   __m128d r0 = _mm_mul_pd(_mm_unpacklo_pd(vd, ve), valpha);
+   __m128d r1 = _mm_mul_pd(_mm_unpackhi_pd(ve, vd), valpha);
+// Format and store the result r.
+   switch (store_mode) {
+      case 0:
+         if (beta == 0.0) {
+            _mm_storeu_pd(r, r0);
+            _mm_storeu_pd(r + stride, r1);
+         } else {
+            __m128d vbeta = _mm_load1_pd(&beta);
+            _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r0));
+            _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r1));
+         }
+      break;
+      case 1:
+         if (beta == 0.0)
+            _mm_storeu_pd(r, r0);
+         else
+            _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&beta)), r0));
+      break;
+      case 2: {
+         double buf[4];
+         _mm_storeu_pd(buf, r0);
+         _mm_storeu_pd(buf + 2, r1);
+         if (beta == 0.0) {
+            r[0] = buf[0];
+            r[stride] = buf[2];
+         } else {
+            r[0] = beta * r[0] + buf[0];
+            r[stride] = beta * r[stride] + buf[2];
+         }
       }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0)
-         _mm_storeu_pd(r, r0);
-      else
-         _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), _mm_load1_pd(&beta)), r0));
-      return;
-   }
-   if (store_mode == 2) {
-      double buf[4];
-      _mm_storeu_pd(buf, r0);
-      _mm_storeu_pd(buf + 2, r1);
-      if (beta == 0) {
-         r[0] = buf[0];
-         r[stride] = buf[2];
-      } else {
-         r[0] = beta * r[0] + buf[0];
-         r[stride] = beta * r[stride] + buf[2];
+      break;
+      case 3: {
+         double buf[2];
+         _mm_storeu_pd(buf, r0);
+         if (beta == 0.0)
+            r[0] = buf[0];
+         else
+            r[0] = beta * r[0] + buf[0];
       }
-      return;
-   }
-   if (store_mode == 3) {
-      double buf[2];
-      _mm_storeu_pd(buf, r0);
-      if (beta == 0)
-         r[0] = buf[0];
-      else
-         r[0] = beta * r[0] + buf[0];
-      return;
+      break;
    }
 }
 #endif
 
-// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A and B must be aligned; R may be non-aligned.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero -
-// just ignored).
-//
-// However, when alpha is zero, we still calculate A'*B, which is
-// multiplied by zero afterwards.
-//
-// Function accepts additional parameter store_mode:
-// * if 0, full R is stored
-// * if 1, only first row of R is stored
-// * if 2, only first column of R is stored
-// * if 3, only top left element of R is stored
+// Calculate
+//	r = alpha a' b + beta r
+// where
+// *	a and b are aligned k x 2 matrices stored in contiguous row-by-row storage,
+// *	r is a 2 x 2 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if alpha == 0.0, we still calculate a' b even though it is multiplied by zero afterwards.
+// The format of the result for r, based on store_mode, is as follows:
+// *	store_mode == 0:	the full r is stored
+// *	store_mode == 1:	only the first row of r is stored
+// *	store_mode == 2:	only the first column of r is stored
+// *	store_mode == 3:	only the top left element of r is stored
 void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode) {
-   double v00, v01, v10, v11;
-   ae_int_t t;
-   v00 = 0.0;
-   v01 = 0.0;
-   v10 = 0.0;
-   v11 = 0.0;
-   for (t = 0; t < k; t++) {
+   double v00 = 0.0;
+   double v01 = 0.0;
+   double v10 = 0.0;
+   double v11 = 0.0;
+   for (ae_int_t t = 0; t < k; t++) {
       v00 += a[0] * b[0];
       v01 += a[0] * b[1];
       v10 += a[1] * b[0];
@@ -5963,105 +4916,82 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
       a += 2;
       b += 2;
    }
-   if (store_mode == 0) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-         r[stride] = alpha * v10;
-         r[stride + 1] = alpha * v11;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-         r[stride] = beta * r[stride] + alpha * v10;
-         r[stride + 1] = beta * r[stride + 1] + alpha * v11;
-      }
-      return;
-   }
-   if (store_mode == 1) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[1] = alpha * v01;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[1] = beta * r[1] + alpha * v01;
-      }
-      return;
-   }
-   if (store_mode == 2) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-         r[stride] = alpha * v10;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-         r[stride] = beta * r[stride] + alpha * v10;
-      }
-      return;
-   }
-   if (store_mode == 3) {
-      if (beta == 0) {
-         r[0] = alpha * v00;
-      } else {
-         r[0] = beta * r[0] + alpha * v00;
-      }
-      return;
+   switch (store_mode) {
+      case 0:
+         if (beta == 0.0) {
+            r[0] = alpha * v00;
+            r[1] = alpha * v01;
+            r[stride] = alpha * v10;
+            r[stride + 1] = alpha * v11;
+         } else {
+            r[0] = beta * r[0] + alpha * v00;
+            r[1] = beta * r[1] + alpha * v01;
+            r[stride] = beta * r[stride] + alpha * v10;
+            r[stride + 1] = beta * r[stride + 1] + alpha * v11;
+         }
+      break;
+      case 1:
+         if (beta == 0.0) {
+            r[0] = alpha * v00;
+            r[1] = alpha * v01;
+         } else {
+            r[0] = beta * r[0] + alpha * v00;
+            r[1] = beta * r[1] + alpha * v01;
+         }
+      break;
+      case 2:
+         if (beta == 0.0) {
+            r[0] = alpha * v00;
+            r[stride] = alpha * v10;
+         } else {
+            r[0] = beta * r[0] + alpha * v00;
+            r[stride] = beta * r[stride] + alpha * v10;
+         }
+      break;
+      case 3:
+         if (beta == 0.0) {
+            r[0] = alpha * v00;
+         } else {
+            r[0] = beta * r[0] + alpha * v00;
+         }
+      break;
    }
 }
 
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
-//
-// This function supports SSE2; it can be used when:
-// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-// 2. CurCPU contains CPU_SSE2 (checked at run-time)
-//
-// If (1) is failed, this function will still be defined and callable, but it
-// will do nothing.  If (2)  is  failed , call to this function will probably
-// crash your system.
-//
-// If  you  want  to  know  whether  it  is safe to call it, you should check CurCPU.
-// If CPU_SSE2 bit is set, this function is callable and will do its work.
 #if defined AE_HAS_SSE2_INTRINSICS
+// Calculate
+//	r = alpha a' (b0|b1) + beta r
+// where
+// *	a, b0 and b1 are alinged k x 2 matrices stored in contiguous row-by-row storage,
+//	b0 and b1 are two separate matrices stored in different locations,
+// *	r is a 2 x 4 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if alpha == 0.0, we still calculate the MM product even though it is multiplied by zero afterwards.
+// Unlike the mm22 functions, this function does NOT support partial output formats for r - we always store the full 2 x 4 matrix.
+// This function supports SSE2; it can be used when:
+// *	AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 	Otherwise, this function will be undefined.
+// *	CurCPU contains CPU_SSE2 (checked at run-time)
+//	Otherwise, calling this function will probably crash your system.
+// If you want to know whether it is safe to call it, you should check CurCPU.
+// If CPU_SSE2 bit is set, this function is callable and will do its work.
 static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
-// We calculate product of two Kx2 matrices (result is 2x2).
-// V0, V1, V2, V3 store result as follows:
-//
-//     [ V0[0]  V1[1] V2[0]  V3[1] ]
-// R = [                           ]
-//     [ V1[0]  V0[1] V3[0]  V2[1] ]
-//
-// VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
-// VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
-// (both vars store same data - either B0 or B1). Results from multiplication
-// by VA0/VA1 are stored in VB0/VB1 too.
-//
-   __m128d v0, v1, v2, v3, va0, va1, vb0, vb1;
-   __m128d r00, r01, r10, r11, valpha, vbeta;
-   ae_int_t t;
-   v0 = _mm_setzero_pd();
-   v1 = _mm_setzero_pd();
-   v2 = _mm_setzero_pd();
-   v3 = _mm_setzero_pd();
-   for (t = 0; t < k; t++) {
-      va0 = _mm_load_pd(a);
-      vb0 = _mm_load_pd(b0);
-      va1 = _mm_load_pd(a);
+// Calculate thed 2 x 2 matrix product of two k x 2 matrices and store the result in v0, v1, v2 and v3 as follows:
+//	r =	/ v0[0] v1[1] v2[0] v3[1] \
+//		\ v1[0] v0[1] v3[0] v2[1] /
+// vA0 is the current 1 x 2 block of a, va1 is the shuffle of va0,
+// vB0 and vB1 are the two copies of the 1 x 2 blocks of b0 or b1 (both are the same copy - either b0 or b1).
+// The results from multiplication by va0/va1 are stored in vb0/vb1 too.
+   __m128d v0 = _mm_setzero_pd();
+   __m128d v1 = _mm_setzero_pd();
+   __m128d v2 = _mm_setzero_pd();
+   __m128d v3 = _mm_setzero_pd();
+   for (ae_int_t t = 0; t < k; t++) {
+      __m128d va0 = _mm_load_pd(a);
+      __m128d vb0 = _mm_load_pd(b0);
+      __m128d va1 = _mm_load_pd(a);
       vb0 = _mm_mul_pd(va0, vb0);
-      vb1 = _mm_load_pd(b0);
+      __m128d vb1 = _mm_load_pd(b0);
       v0 = _mm_add_pd(v0, vb0);
       vb1 = _mm_mul_pd(va1, vb1);
       vb0 = _mm_load_pd(b1);
@@ -6075,32 +5005,27 @@ static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0
       b0 += 2;
       b1 += 2;
    }
-// shuffle V1 and V3 (conversion to more convenient storage format):
-//
-//     [ V0[0]  V1[0] V2[0]  V3[0] ]
-// R = [                           ]
-//     [ V1[1]  V0[1] V3[1]  V2[1] ]
-//
-// unpack results to
-//
-// [ r00 r01 ]
-// [ r10 r11 ]
-//
-   valpha = _mm_load1_pd(&alpha);
+// Shuffle v1 and v3 (converting to more convenient storage format):
+//	r =	/ v0[0] v1[0] v2[0] v3[0] \
+//		\ v1[1] v0[1] v3[1] v2[1] /
+// and unpack the results to
+//	/ r00 r01 \
+//	\ r10 r11 /
+   __m128d valpha = _mm_load1_pd(&alpha);
    v1 = _mm_shuffle_pd(v1, v1, 1);
    v3 = _mm_shuffle_pd(v3, v3, 1);
-   r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
-   r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
-   r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
-   r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
-// store
-   if (beta == 0) {
+   __m128d r00 = _mm_mul_pd(_mm_unpacklo_pd(v0, v1), valpha);
+   __m128d r10 = _mm_mul_pd(_mm_unpackhi_pd(v1, v0), valpha);
+   __m128d r01 = _mm_mul_pd(_mm_unpacklo_pd(v2, v3), valpha);
+   __m128d r11 = _mm_mul_pd(_mm_unpackhi_pd(v3, v2), valpha);
+// Store the result.
+   if (beta == 0.0) {
       _mm_storeu_pd(r, r00);
       _mm_storeu_pd(r + 2, r01);
       _mm_storeu_pd(r + stride, r10);
       _mm_storeu_pd(r + stride + 2, r11);
    } else {
-      vbeta = _mm_load1_pd(&beta);
+      __m128d vbeta = _mm_load1_pd(&beta);
       _mm_storeu_pd(r, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r), vbeta), r00));
       _mm_storeu_pd(r + 2, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + 2), vbeta), r01));
       _mm_storeu_pd(r + stride, _mm_add_pd(_mm_mul_pd(_mm_loadu_pd(r + stride), vbeta), r10));
@@ -6109,23 +5034,15 @@ static void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0
 }
 #endif
 
-// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-// stored in non-contiguous row-by-row storage.
-//
-// A, B0 and B1 must be aligned; R may be non-aligned.
-//
-// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-// locations.
-//
-// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-// ignored).
-//
-// However,  when  alpha  is  zero , we still calculate MM product,  which is
-// multiplied by zero afterwards.
-//
-// Unlike mm22 functions, this function does NOT support partial  output of R
-// - we always store full 2x4 matrix.
+// Calculate
+//	r = alpha a' (b0|b1) + beta r
+// where
+// *	a, b0 and b1 are alinged k x 2 matrices stored in contiguous row-by-row storage,
+//	b0 and b1 are two separate matrices stored in different locations,
+// *	r is a 2 x 4 matrix stored in non-contiguous row-by-row storage and may be non-aligned.
+// If beta == 0.0, then r is ignored, rather than multiplied by zero.
+// but if alpha == 0.0, we still calculate the MM product even though it is multiplied by zero afterwards.
+// Unlike the mm22 functions, this function does NOT support partial output formats for r - we always store the full 2 x 4 matrix.
 void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride) {
    _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
    _ialglib_mm22(alpha, a, b1, k, beta, r + 2, stride, 0);
@@ -6133,11 +5050,7 @@ void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const doub
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Global and local constants/variables
-const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
-const ae_int_t ByteOrder = alglib_impl::ByteOrder;
-
-// Exception handling
+// Exception handling.
 #if !defined AE_NO_EXCEPTIONS
 ap_error::ap_error() { msg = alglib_impl::CurMsg; }
 ap_error::ap_error(const char *Msg) { msg = Msg; }
@@ -6145,7 +5058,7 @@ void ap_error::make_assertion(bool Cond) { if (!Cond) ThrowError(""); }
 void ap_error::make_assertion(bool Cond, const char *Msg) { if (!Cond) ThrowError(Msg); }
 #else
 static const char *_alglib_last_error = NULL;
-static void set_error_flag(const char *Msg) { _alglib_last_error = Msg == NULL? "set_error_flag: unknown error": Msg; }
+static void set_error_flag(const char *Msg) { _alglib_last_error = Msg == NULL ? "set_error_flag : unknown error": Msg; }
 void set_error_msg() { _alglib_last_error = alglib_impl::CurMsg; }
 
 bool get_error_flag(const char **MsgP) {
@@ -6157,135 +5070,156 @@ bool get_error_flag(const char **MsgP) {
 void clear_error_flag() { _alglib_last_error = NULL; }
 #endif
 
-const xparams xdefault = 0x0, serial = _ALGLIB_FLG_THREADING_SERIAL, parallel = _ALGLIB_FLG_THREADING_PARALLEL;
+#if 0
+// Global and local constants and variables.
+const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
+const double pi = 3.1415926535897932384626433832795;
+#endif 
+
+// Standard functions.
+bool isneginf(double x) { return isinf(x) && signbit(x); }
+bool isposinf(double x) { return isinf(x) && !signbit(x); }
+
+int minint(int x, int y) { return x > y ? y : x; }
+int maxint(int x, int y) { return x > y ? x : y; }
+int sign(double x) { return x > 0 ? +1 : x < 0 ? -1 : 0; }
+int RoundZ(double x) { return int(round(x)); }
+int TruncZ(double x) { return int(trunc(x)); }
+int FloorZ(double x) { return int(floor(x)); }
+int CeilZ(double x) { return int(ceil(x)); }
+
+double minreal(double x, double y) { return x > y ? y : x; }
+double maxreal(double x, double y) { return x > y ? x : y; }
+double sqr(double x) { return x*x; }
+
+double randomreal() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return (rand() + rand() / mx) / mx;
+}
+
+double randommid() {
+   const double mx = (double)RAND_MAX + 1.0;
+   return 2.0*(rand() + rand() / mx) / mx - 1.0;
+}
+
+ae_int_t randominteger(ae_int_t maxv) { return ((ae_int_t) rand()) % maxv; }
+
+bool randombool(double p) {
+   const double mx = (double)RAND_MAX + 1.0;
+   return rand() + rand()/mx <= p*mx;
+}
 
 // Complex number with double precision.
 complex &complex::operator=(const double &v) { x = v, y = 0.0; return *this; }
-complex &complex::operator+=(const double &v) { x += v; return *this; }
-complex &complex::operator-=(const double &v) { x -= v; return *this; }
-complex &complex::operator*=(const double &v) { x *= v, y *= v; return *this; }
-complex &complex::operator/=(const double &v) { x /= v, y /= v; return *this; }
 complex &complex::operator=(const complex &z) { x = z.x, y = z.y; return *this; }
+complex &complex::operator+=(const double &v) { x += v; return *this; }
 complex &complex::operator+=(const complex &z) { x += z.x, y += z.y; return *this; }
+complex &complex::operator-=(const double &v) { x -= v; return *this; }
 complex &complex::operator-=(const complex &z) { x -= z.x, y -= z.y; return *this; }
+complex &complex::operator*=(const double &v) { x *= v, y *= v; return *this; }
 complex &complex::operator*=(const complex &z) { double t = x*z.x - y*z.y; y = x*z.y + y*z.x, x = t; return *this; }
+complex &complex::operator/=(const double &v) { x /= v, y /= v; return *this; }
 
 complex &complex::operator/=(const complex &z) {
    double x2 = z.x, y2 = z.y;
-   double e;
-   double f;
    if (fabs(y2) < fabs(x2)) {
-      e = y2 / x2;
-      f = x2 + y2 * e;
+      double e = y2 / x2;
+      double f = x2 + y2 * e;
       return *this = complex((x + y * e) / f, (y - x * e) / f);
    } else {
-      e = x2 / y2;
-      f = y2 + x2 * e;
+      double e = x2 / y2;
+      double f = y2 + x2 * e;
       return *this = complex((x * e + y) / f, (y * e - x) / f);
    }
 }
 
-// alglib_impl-alglib gateway
+// alglib_impl-alglib gateway.
 static inline alglib_impl::ae_complex ae_complex_from_c(complex z) { return alglib_impl::ae_complex_from_d(z.x, z.y); }
 
 #if !defined AE_NO_EXCEPTIONS
 std::string complex::tostring(int _dps) const {
-   char mask[32];
-   char buf_x[32];
-   char buf_y[32];
-   char buf_zero[32];
    int dps = _dps >= 0 ? _dps : -_dps;
    if (dps <= 0 || dps >= 20)
       ThrowError("complex::tostring(): incorrect dps");
-// handle IEEE special quantities
+// Handle IEEE special quantities.
    if (isnan(x) || isnan(y))
       return "NAN";
-   if (isinf(x) || isinf(y))
+   else if (isinf(x) || isinf(y))
       return "INF";
-// generate mask
-   if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask))
+// Generate the mask.
+   char mask[0x20];
+   if (sprintf(mask, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof mask)
       ThrowError("complex::tostring(): buffer overflow");
-// print |x|, |y| and zero with same mask and compare
-   if (sprintf(buf_x, mask, (double)(fabs(x))) >= (int)sizeof(buf_x))
+// Print |x|, |y| and zero with the same mask and compare.
+   char buf_x[0x20];
+   if (sprintf(buf_x, mask, (double)(fabs(x))) >= (int)sizeof buf_x)
       ThrowError("complex::tostring(): buffer overflow");
-   if (sprintf(buf_y, mask, (double)(fabs(y))) >= (int)sizeof(buf_y))
+   char buf_y[0x20];
+   if (sprintf(buf_y, mask, (double)(fabs(y))) >= (int)sizeof buf_y)
       ThrowError("complex::tostring(): buffer overflow");
-   if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof(buf_zero))
+   char buf_zero[0x20];
+   if (sprintf(buf_zero, mask, 0.0) >= (int)sizeof buf_zero)
       ThrowError("complex::tostring(): buffer overflow");
-// different zero/nonzero patterns
+// Different zero/nonzero patterns.
    if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(x > 0 ? "" : "-") + buf_x + (y > 0 ? "+" : "-") + buf_y + "i";
-   if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
+   else if (strcmp(buf_x, buf_zero) != 0 && strcmp(buf_y, buf_zero) == 0)
       return std::string(x > 0 ? "" : "-") + buf_x;
-   if (strcmp(buf_x, buf_zero) == 0 && strcmp(buf_y, buf_zero) != 0)
+   else if (strcmp(buf_x, buf_zero) == 0 && strcmp(buf_y, buf_zero) != 0)
       return std::string(y > 0 ? "" : "-") + buf_y + "i";
-   return std::string("0");
+   else return std::string("0");
 }
 #endif
 
-bool operator==(const complex &lhs, const complex &rhs) {
-   volatile double x1 = lhs.x;
-   volatile double x2 = rhs.x;
-   volatile double y1 = lhs.y;
-   volatile double y2 = rhs.y;
-   return x1 == x2 && y1 == y2;
-}
+bool operator==(const complex &A, const complex &B) { return A.x == B.x && A.y == B.y; }
+bool operator!=(const complex &A, const complex &B) { return A.x != B.x || A.y != B.y; }
 
-bool operator!=(const complex &lhs, const complex &rhs) { return !(lhs == rhs); }
-const complex operator+(const complex &lhs) { return lhs; }
-const complex operator-(const complex &lhs) { return complex(-lhs.x, -lhs.y); }
-const complex operator+(const complex &lhs, const complex &rhs) { complex r = lhs; r += rhs; return r; }
-const complex operator+(const complex &lhs, const double &rhs) { complex r = lhs; r += rhs; return r; }
-const complex operator+(const double &lhs, const complex &rhs) { complex r = rhs; r += lhs; return r; }
-const complex operator-(const complex &lhs, const complex &rhs) { complex r = lhs; r -= rhs; return r; }
-const complex operator-(const complex &lhs, const double &rhs) { complex r = lhs; r -= rhs; return r; }
-const complex operator-(const double &lhs, const complex &rhs) { complex r = lhs; r -= rhs; return r; }
-const complex operator*(const complex &lhs, const complex &rhs) { return complex(lhs.x*rhs.x - lhs.y*rhs.y, lhs.x*rhs.y + lhs.y*rhs.x); }
-const complex operator*(const complex &lhs, const double &rhs) { return complex(lhs.x*rhs, lhs.y*rhs); }
-const complex operator*(const double &lhs, const complex &rhs) { return complex(lhs*rhs.x, lhs*rhs.y); }
+const complex operator+(const complex &A) { return A; }
+const complex operator-(const complex &A) { return complex(-A.x, -A.y); }
+const complex operator+(const complex &A, const complex &B) { complex r = A; r += B; return r; }
+const complex operator+(const complex &A, const double &B) { complex r = A; r += B; return r; }
+const complex operator+(const double &A, const complex &B) { complex r = B; r += A; return r; }
+const complex operator-(const complex &A, const complex &B) { complex r = A; r -= B; return r; }
+const complex operator-(const complex &A, const double &B) { complex r = A; r -= B; return r; }
+const complex operator-(const double &A, const complex &B) { complex r = A; r -= B; return r; }
+const complex operator*(const complex &A, const complex &B) { return complex(A.x*B.x - A.y*B.y, A.x*B.y + A.y*B.x); }
+const complex operator*(const complex &A, const double &B) { return complex(A.x*B, A.y*B); }
+const complex operator*(const double &A, const complex &B) { return complex(A*B.x, A*B.y); }
 
-const complex operator/(const complex &lhs, const complex &rhs) {
-   double x1 = lhs.x, y1 = lhs.y, x2 = rhs.x, y2 = rhs.y;
-   double e;
-   double f;
+const complex operator/(const complex &A, const complex &B) {
+   double x1 = A.x, y1 = A.y, x2 = B.x, y2 = B.y;
    if (fabs(y2) < fabs(x2)) {
-      e = y2 / x2;
-      f = x2 + y2 * e;
+      double e = y2 / x2;
+      double f = x2 + y2 * e;
       return complex((x1 + y1 * e) / f, (y1 - x1 * e) / f);
    } else {
-      e = x2 / y2;
-      f = y2 + x2 * e;
+      double e = x2 / y2;
+      double f = y2 + x2 * e;
       return complex((x1 * e + y1) / f, (y1 * e - x1) / f);
    }
 }
 
-const complex operator/(const double &lhs, const complex &rhs) {
-   double x2 = rhs.x, y2 = rhs.y;
-   double e;
-   double f;
+const complex operator/(const double &A, const complex &B) {
+   double x2 = B.x, y2 = B.y;
    if (fabs(y2) < fabs(x2)) {
-      e = y2 / x2;
-      f = x2 + y2 * e;
-      return complex(lhs / f, -lhs * e / f);
+      double e = y2 / x2;
+      double f = x2 + y2 * e;
+      return complex(A / f, -A * e / f);
    } else {
-      e = x2 / y2;
-      f = y2 + x2 * e;
-      return complex(lhs * e / f, -lhs / f);
+      double e = x2 / y2;
+      double f = y2 + x2 * e;
+      return complex(A * e / f, -A / f);
    }
 }
 
-const complex operator/(const complex &lhs, const double &rhs) { return complex(lhs.x / rhs, lhs.y / rhs); }
+const complex operator/(const complex &A, const double &B) { return complex(A.x / B, A.y / B); }
 
-double abscomplex(const complex &z) {
-   double w;
-   double xabs;
-   double yabs;
-   double v;
-   xabs = fabs(z.x);
-   yabs = fabs(z.y);
-   w = xabs > yabs ? xabs : yabs;
-   v = xabs < yabs ? xabs : yabs;
-   if (v == 0)
+double abscomplex(const complex &A) {
+   double xabs = fabs(A.x);
+   double yabs = fabs(A.y);
+   double w = xabs > yabs ? xabs : yabs;
+   double v = xabs < yabs ? xabs : yabs;
+   if (v == 0.0)
       return w;
    else {
       double t = v / w;
@@ -6293,705 +5227,513 @@ double abscomplex(const complex &z) {
    }
 }
 
-complex conj(const complex &z) {
-   return complex(z.x, -z.y);
+complex conj(const complex &A) {
+   return complex(A.x, -A.y);
 }
 
-complex csqr(const complex &z) {
-   return complex(z.x * z.x - z.y * z.y, 2 * z.x * z.y);
+complex csqr(const complex &A) {
+   double x = A.x, y = A.y;
+   return complex(x * x - y * y, 2.0 * x * y);
 }
 
-#ifdef AE_HPC
-void setnworkers(ae_int_t nworkers) { alglib_impl::ae_set_cores_to_use(nworkers); }
-void setglobalthreading(const xparams settings) { alglib_impl::ae_set_global_threading(settings); }
-ae_int_t getnworkers() { return alglib_impl::ae_get_cores_to_use(); }
-ae_int_t _ae_cores_count() { return alglib_impl::ae_cores_count(); }
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { alglib_impl::ae_set_global_threading(flg_value); }
-alglib_impl::ae_uint64_t _ae_get_global_threading() { return alglib_impl::ae_get_global_threading(); }
-#else
-void setnworkers(ae_int_t nworkers) { }
-void setglobalthreading(const xparams settings) { }
-ae_int_t getnworkers() { return 1; }
-ae_int_t _ae_cores_count() { return 1; }
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
-alglib_impl::ae_uint64_t _ae_get_global_threading() { return _ALGLIB_FLG_THREADING_SERIAL; }
+#if 0
+static const ae_int_t ByteOrder = alglib_impl::ByteOrder;
 #endif
 
-// Level 1 BLAS functions
-double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n) {
-   double result = 0.0;
-   ae_int_t i;
-   if (stride0 != 1 || stride1 != 1) {
-   //
-   // slow general code
-   //
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1)
-         result += (*v0) * (*v1);
-   } else {
-   //
-   // optimized code for stride=1
-   //
-      ae_int_t n4 = n / 4;
-      ae_int_t nleft = n % 4;
-      for (i = 0; i < n4; i++, v0 += 4, v1 += 4)
-         result += v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2] + v0[3] * v1[3];
-      for (i = 0; i < nleft; i++, v0++, v1++)
-         result += v0[0] * v1[0];
+#ifdef AE_HPC
+ae_int_t getnworkers() { return alglib_impl::ae_get_cores_to_use(); }
+void setnworkers(ae_int_t nworkers) { alglib_impl::ae_set_cores_to_use(nworkers); }
+ae_int_t _ae_cores_count() { return alglib_impl::ae_cores_count(); }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return alglib_impl::ae_get_global_threading(); }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { alglib_impl::ae_set_global_threading(flg_value); }
+void setglobalthreading(const xparams settings) { alglib_impl::ae_set_global_threading(settings); }
+#else
+ae_int_t getnworkers() { return 1; }
+void setnworkers(ae_int_t nworkers) { }
+ae_int_t _ae_cores_count() { return 1; }
+alglib_impl::ae_uint64_t _ae_get_global_threading() { return SerTH; }
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value) { }
+void setglobalthreading(const xparams settings) { }
+#endif
+
+// Level 1 Real BLAS functions.
+// Handle the case of unit stride specially and separately with optimization.
+//(@) In the double v{dotproduct,move,moveneg,add}()
+//(@) this case originally cut the loop counter in half (or quarter) and did two (or four) steps per loop.
+//(@) This was removed, the need for it was not clearly explained and it appears to have no visible effect on performance.
+
+double vdotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   double C = 0.0;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         C += (*A) * (*B);
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         C += (*A) * (*B);
+   return C;
+}
+
+double vdotproduct(const double *A, const double *B, ae_int_t N) {
+   return vdotproduct(A, 1, B, 1, N);
+}
+
+complex vdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   double Cx = 0.0, Cy = 0.0;
+   bool ConjA = CjA[0] != 'N' && CjA[0] != 'n';
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (ConjA)
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = -A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+   else
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = -B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            double Ax = A->x, Ay = A->y;
+            double Bx = B->x, By = B->y;
+            Cx += Ax * Bx - Ay * By;
+            Cy += Ax * By + Ay * Bx;
+         }
+   return complex(Cx, Cy);
+}
+
+complex vdotproduct(const complex *A, const complex *B, ae_int_t N) {
+   return vdotproduct(A, 1, "N", B, 1, "N", N);
+}
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A = *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = *B;
+}
+
+void vmove(double *A, const double *B, ae_int_t N) {
+   vmove(A, 1, B, 1, N);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = B->x;
+            A->y = -B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++)
+            *A = *B;
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = B->x;
+            A->y = -B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+            *A = *B;
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N) {
+   vmove(A, 1, B, 1, "N", N);
+}
+
+void vmoveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         A[0] = -B[0];
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = -*B;
+}
+
+void vmoveneg(double *A, const double *B, ae_int_t N) {
+   vmoveneg(A, 1, B, 1, N);
+}
+
+void vmoveneg(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = -B->x;
+            A->y = -B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = -B->x;
+            A->y = -B->y;
+         }
+}
+
+void vmoveneg(complex *A, const complex *B, ae_int_t N) {
+   vmoveneg(A, 1, B, 1, "N", N);
+}
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A = Alpha * (*B);
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A = Alpha * (*B);
+}
+
+void vmove(double *A, const double *B, ae_int_t N, double Alpha) {
+   vmove(A, 1, B, 1, N, Alpha);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = -Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Alpha * B->x;
+            A->y = Alpha * B->y;
+         }
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vmove(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Ax * B->x + Ay * B->y;
+            A->y = -Ax * B->y + Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x = Ax * B->x - Ay * B->y;
+            A->y = Ax * B->y + Ay * B->x;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Ax * B->x + Ay * B->y;
+            A->y = -Ax * B->y + Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x = Ax * B->x - Ay * B->y;
+            A->y = Ax * B->y + Ay * B->x;
+         }
+}
+
+void vmove(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vmove(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A += *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += *B;
+}
+
+void vadd(double *A, const double *B, ae_int_t N) {
+   vadd(A, 1, B, 1, N);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y -= B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += B->x;
+            A->y += B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y -= B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += B->x;
+            A->y += B->y;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N) {
+   vadd(A, 1, B, 1, "N", N);
+}
+
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A += Alpha * (*B);
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A += Alpha * (*B);
+}
+
+void vadd(double *A, const double *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, N, Alpha);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y -= Alpha * B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Alpha * B->x;
+            A->y += Alpha * B->y;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Ax * B->x + Ay * B->y;
+            A->y -= Ax * B->y - Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x += Ax * B->x - Ay * B->y;
+            A->y += Ax * B->y + Ay * B->x;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Ax * B->x + Ay * B->y;
+            A->y -= Ax * B->y - Ay * B->x;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x += Ax * B->x - Ay * B->y;
+            A->y += Ax * B->y + Ay * B->x;
+         }
+}
+
+void vadd(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vadd(A, 1, B, 1, "N", N, Alpha);
+}
+
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N) {
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++, B++)
+         *A -= *B;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA, B += dB)
+         *A -= *B;
+}
+
+void vsub(double *A, const double *B, ae_int_t N) {
+   vsub(A, 1, B, 1, N);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N) {
+   bool ConjB = CjB[0] != 'N' && CjB[0] != 'n';
+   if (dA == 1 && dB == 1) // The optimized case for unit stride.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y += B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A++, B++) {
+            A->x -= B->x;
+            A->y -= B->y;
+         }
+   else // The general case.
+      if (ConjB)
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y += B->y;
+         }
+      else
+         for (ae_int_t n = 0; n < N; n++, A += dA, B += dB) {
+            A->x -= B->x;
+            A->y -= B->y;
+         }
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N) {
+   vsub(A, 1, B, 1, "N", N);
+}
+
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha) {
+   vadd(A, dA, B, dB, N, -Alpha);
+}
+
+void vsub(double *A, const double *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, N, -Alpha);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha) {
+   vadd(A, dA, B, dB, CjB, N, -Alpha);
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N, double Alpha) {
+   vadd(A, 1, B, 1, "N", N, -Alpha);
+}
+
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha) {
+   vadd(A, dA, B, dB, CjB, N, -Alpha);
+}
+
+void vsub(complex *A, const complex *B, ae_int_t N, complex Alpha) {
+   vadd(A, 1, B, 1, "N", N, -Alpha);
+}
+
+void vmul(double *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++)
+         *A *= Alpha;
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA)
+         *A *= Alpha;
+}
+
+void vmul(double *A, ae_int_t N, double Alpha) {
+   vmul(A, 1, N, Alpha);
+}
+
+void vmul(complex *A, ae_int_t dA, ae_int_t N, double Alpha) {
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         A->x *= Alpha;
+         A->y *= Alpha;
+      }
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         A->x *= Alpha;
+         A->y *= Alpha;
+      }
+}
+
+void vmul(complex *A, ae_int_t N, double Alpha) {
+   vmul(A, 1, N, Alpha);
+}
+
+void vmul(complex *A, ae_int_t dA, ae_int_t N, complex Alpha) {
+   double Ax = Alpha.x, Ay = Alpha.y;
+   if (dA == 1) // The optimized case for unit stride.
+      for (ae_int_t n = 0; n < N; n++, A++) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
+      }
+   else // The general case.
+      for (ae_int_t n = 0; n < N; n++, A += dA) {
+         double Bx = A->x, By = A->y;
+         A->x = Ax * Bx - Ay * By;
+         A->y = Ax * By + Ay * Bx;
+      }
+}
+
+void vmul(complex *A, ae_int_t N, complex Alpha) {
+   vmul(A, 1, N, Alpha);
+}
+
+// Matrices and Vectors: I/O.
+
+static bool strimatch(const char *s1, const char *s2) {
+// Handle the special cases.
+   bool NoS1 = s1 == NULL, NoS2 = s2 == NULL;
+   if (NoS1 || NoS2) return NoS1 == NoS2;
+// Compare.
+   else while (true) {
+      int c1 = *s1++, c2 = *s2++;
+      bool NoC1 = c1 == '\0', NoC2 = c2 == '\0';
+      if (NoC1 || NoC2) return NoC1 == NoC2;
+      c1 = tolower(c1), c2 = tolower(c2);
+      if (c1 != c2) return false;
    }
-   return result;
-}
-
-double vdotproduct(const double *v1, const double *v2, ae_int_t N) {
-   return vdotproduct(v1, 1, v2, 1, N);
-}
-
-complex vdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
-   double rx = 0.0, ry = 0.0;
-   ae_int_t i;
-   bool bconj0 = !(conj0[0] == 'N' || conj0[0] == 'n');
-   bool bconj1 = !(conj1[0] == 'N' || conj1[0] == 'n');
-   if (bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = -v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = -v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   if (!bconj0 && !bconj1) {
-      double v0x, v0y, v1x, v1y;
-      for (i = 0; i < n; i++, v0 += stride0, v1 += stride1) {
-         v0x = v0->x;
-         v0y = v0->y;
-         v1x = v1->x;
-         v1y = v1->y;
-         rx += v0x * v1x - v0y * v1y;
-         ry += v0x * v1y + v0y * v1x;
-      }
-   }
-   return complex(rx, ry);
-}
-
-complex vdotproduct(const complex *v1, const complex *v2, ae_int_t N) {
-   return vdotproduct(v1, 1, "N", v2, 1, "N", N);
-}
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = vsrc[0];
-         vdst[1] = vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = vsrc[0];
-   }
-}
-
-void vmove(double *vdst, const double *vsrc, ae_int_t N) {
-   vmove(vdst, 1, vsrc, 1, N);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-            *vdst = *vsrc;
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++)
-            *vdst = *vsrc;
-      }
-   }
-}
-
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vmove(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vmoveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = -*vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = -vsrc[0];
-         vdst[1] = -vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = -vsrc[0];
-   }
-}
-
-void vmoveneg(double *vdst, const double *vsrc, ae_int_t N) {
-   vmoveneg(vdst, 1, vsrc, 1, N);
-}
-
-void vmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = -vsrc->x;
-            vdst->y = -vsrc->y;
-         }
-      }
-   }
-}
-
-void vmoveneg(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vmoveneg(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst = alpha * (*vsrc);
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] = alpha * vsrc[0];
-         vdst[1] = alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] = alpha * vsrc[0];
-   }
-}
-
-void vmove(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vmove(vdst, 1, vsrc, 1, N, alpha);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = -alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = alpha * vsrc->x;
-            vdst->y = alpha * vsrc->y;
-         }
-      }
-   }
-}
-
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
-   vmove(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
-         }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x + ay * vsrc->y;
-            vdst->y = -ax * vsrc->y + ay * vsrc->x;
-         }
-      } else {
-         double ax = alpha.x, ay = alpha.y;
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x = ax * vsrc->x - ay * vsrc->y;
-            vdst->y = ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   }
-}
-
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha) {
-   vmove(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += vsrc[0];
-         vdst[1] += vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += vsrc[0];
-   }
-}
-
-void vadd(double *vdst, const double *vsrc, ae_int_t N) {
-   vadd(vdst, 1, vsrc, 1, N);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vadd(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst += alpha * (*vsrc);
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] += alpha * vsrc[0];
-         vdst[1] += alpha * vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] += alpha * vsrc[0];
-   }
-}
-
-void vadd(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, N, alpha);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y -= alpha * vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += alpha * vsrc->x;
-            vdst->y += alpha * vsrc->y;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x + ay * vsrc->y;
-            vdst->y -= ax * vsrc->y - ay * vsrc->x;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x += ax * vsrc->x - ay * vsrc->y;
-            vdst->y += ax * vsrc->y + ay * vsrc->x;
-         }
-      }
-   }
-}
-
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", N, alpha);
-}
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n) {
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src)
-         *vdst -= *vsrc;
-   } else {
-   //
-   // optimized case
-   //
-      ae_int_t n2 = n / 2;
-      for (i = 0; i < n2; i++, vdst += 2, vsrc += 2) {
-         vdst[0] -= vsrc[0];
-         vdst[1] -= vsrc[1];
-      }
-      if (n % 2 != 0)
-         vdst[0] -= vsrc[0];
-   }
-}
-
-void vsub(double *vdst, const double *vsrc, ae_int_t N) {
-   vsub(vdst, 1, vsrc, 1, N);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   bool bconj = !(conj_src[0] == 'N' || conj_src[0] == 'n');
-   ae_int_t i;
-   if (stride_dst != 1 || stride_src != 1) {
-   //
-   // general unoptimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst += stride_dst, vsrc += stride_src) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      }
-   } else {
-   //
-   // optimized case
-   //
-      if (bconj) {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y += vsrc->y;
-         }
-      } else {
-         for (i = 0; i < n; i++, vdst++, vsrc++) {
-            vdst->x -= vsrc->x;
-            vdst->y -= vsrc->y;
-         }
-      }
-   }
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t N) {
-   vsub(vdst, 1, vsrc, 1, "N", N);
-}
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, n, -alpha);
-}
-
-void vsub(double *vdst, const double *vsrc, ae_int_t N, double alpha) {
-   vadd(vdst, 1, vsrc, 1, N, -alpha);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t n, double alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", n, -alpha);
-}
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha) {
-   vadd(vdst, stride_dst, vsrc, stride_src, conj_src, n, -alpha);
-}
-
-void vsub(complex *vdst, const complex *vsrc, ae_int_t n, complex alpha) {
-   vadd(vdst, 1, vsrc, 1, "N", n, -alpha);
-}
-
-void vmul(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst)
-         *vdst *= alpha;
-   } else {
-   //
-   // optimized case
-   //
-      for (i = 0; i < n; i++, vdst++)
-         *vdst *= alpha;
-   }
-}
-
-void vmul(double *vdst, ae_int_t N, double alpha) {
-   vmul(vdst, 1, N, alpha);
-}
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
-      }
-   } else {
-   //
-   // optimized case
-   //
-      for (i = 0; i < n; i++, vdst++) {
-         vdst->x *= alpha;
-         vdst->y *= alpha;
-      }
-   }
-}
-
-void vmul(complex *vdst, ae_int_t N, double alpha) {
-   vmul(vdst, 1, N, alpha);
-}
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha) {
-   ae_int_t i;
-   if (stride_dst != 1) {
-   //
-   // general unoptimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst += stride_dst) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
-      }
-   } else {
-   //
-   // optimized case
-   //
-      double ax = alpha.x, ay = alpha.y;
-      for (i = 0; i < n; i++, vdst++) {
-         double dstx = vdst->x, dsty = vdst->y;
-         vdst->x = ax * dstx - ay * dsty;
-         vdst->y = ax * dsty + ay * dstx;
-      }
-   }
-}
-
-void vmul(complex *vdst, ae_int_t N, complex alpha) {
-   vmul(vdst, 1, N, alpha);
 }
 
 #if !defined AE_NO_EXCEPTIONS
-//
-// This function filters out all spaces from the string.
-// It returns string allocated with ae_malloc().
+// Filter out all the spaces from the string s.
+// Return a string allocated with ae_malloc().
 // On allocaction failure returns NULL.
-//
 static char *filter_spaces(const char *s) {
-   size_t i, n;
-   char *r;
-   char *r0;
-   n = strlen(s);
-   r = (char *)alglib_impl::ae_malloc(n + 1);
+   size_t n = strlen(s);
+   char *r = (char *)alglib_impl::ae_malloc(n + 1);
    if (r == NULL) return r;
-   for (i = 0, r0 = r; i <= n; i++, s++)
+   char *r0 = r;
+   for (size_t i = 0; i <= n; i++, s++)
       if (!isspace(*s)) {
          *r0 = *s;
          r0++;
@@ -7000,37 +5742,31 @@ static char *filter_spaces(const char *s) {
 }
 
 static void str_vector_create(const char *src, bool match_head_only, std::vector<const char *> *p_vec) {
-// parse beginning of the string.
-// try to handle "[]" string
+// Parse the beginning of the string.
+// Try to handle "[]".
    p_vec->clear();
    if (*src != '[')
       ThrowError("Incorrect initializer for vector");
-   src++;
-   if (*src == ']')
+   else if (*++src == ']')
       return;
    p_vec->push_back(src);
-   while (true) {
-      if (*src == 0)
+   while (true)
+      if (*src == '\0')
          ThrowError("Incorrect initializer for vector");
-      if (*src == ']') {
-         if (src[1] == 0 || !match_head_only)
+      else if (*src == ']')
+         if (src[1] == '\0' || !match_head_only)
             return;
-         ThrowError("Incorrect initializer for vector");
-      }
-      if (*src == ',') {
-         p_vec->push_back(src + 1);
-         src++;
-         continue;
-      }
-      src++;
-   }
+         else
+            ThrowError("Incorrect initializer for vector");
+      else if (*src++ == ',')
+         p_vec->push_back(src);
 }
 
 static void str_matrix_create(const char *src, std::vector< std::vector<const char *> > *p_mat) {
    p_mat->clear();
-// Try to handle "[[]]" string
+// Try to handle "[[]]".
    if (strcmp(src, "[[]]") == 0) return;
-// Parse non-empty string
+// Parse a non-empty string.
    if (*src != '[') ThrowError("Incorrect initializer for matrix");
    src++;
    while (true) {
@@ -7041,121 +5777,83 @@ static void str_matrix_create(const char *src, std::vector< std::vector<const ch
       src = strchr(src, ']');
       if (src == NULL)
          ThrowError("Incorrect initializer for matrix");
-      src++;
-      if (*src == ',') {
+      else if (*++src == ',')
          src++;
-         continue;
-      }
-      if (*src == ']')
+      else if (*src == ']')
          break;
-      ThrowError("Incorrect initializer for matrix");
+      else
+         ThrowError("Incorrect initializer for matrix");
    }
-   src++;
-   if (*src != 0)
+   if (*++src != '\0')
       ThrowError("Incorrect initializer for matrix");
-}
-
-// Internal functions
-static bool strimatch(const char *s1, const char *s2) {
-// handle special cases
-   bool NoS1 = s1 == NULL, NoS2 = s2 == NULL;
-   if (NoS1 || NoS2) return NoS1 == NoS2;
-// compare
-   while (true) {
-      int c1 = *s1++, c2 = *s2++;
-      bool NoC1 = c1 == '\0', NoC2 = c2 == '\0';
-      if (NoC1 || NoC2) return NoC1 == NoC2;
-      c1 = tolower(c1), c2 = tolower(c2);
-      if (c1 != c2) return false;
-   }
 }
 
 static bool parse_bool_delim(const char *s, const char *delim) {
-   const char *p;
+// Try to parse "false", "true" or otherwise fail.
+   const char *p = "false";
    char buf[8];
-// try to parse false
-   p = "false";
-   memset(buf, 0, sizeof(buf));
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return false;
    }
-// try to parse true
    p = "true";
-   memset(buf, 0, sizeof(buf));
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, strlen(p));
    if (strimatch(buf, p)) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          ThrowError("Cannot parse value");
       return true;
    }
-// error
    ThrowError("Cannot parse value");
 }
 
 static ae_int_t parse_int_delim(const char *s, const char *delim) {
-   const char *p;
-   long long_val;
-   volatile ae_int_t ae_val;
-   p = s;
-//
-// check string structure:
-// * leading sign
-// * at least one digit
-// * delimiter
-//
+   const char *p = s;
+// Check the string structure for a leading sign, at least one digit and a delimiter.
    if (*s == '-' || *s == '+')
       s++;
-   if (*s == 0 || strchr("1234567890", *s) == NULL)
+   if (*s == '\0' || strchr("1234567890", *s) == NULL)
       ThrowError("Cannot parse value");
-   while (*s != 0 && strchr("1234567890", *s) != NULL)
+   while (*s != '\0' && strchr("1234567890", *s) != NULL)
       s++;
-   if (*s == 0 || strchr(delim, *s) == NULL)
+   if (*s == '\0' || strchr(delim, *s) == NULL)
       ThrowError("Cannot parse value");
-// convert and ensure that value fits into ae_int_t
+// Convert and ensure that the value fits into ae_int_t.
    s = p;
-   long_val = atol(s);
-   ae_val = long_val;
+   long long_val = atol(s);
+   volatile ae_int_t ae_val = long_val;
    if (ae_val != long_val)
       ThrowError("Cannot parse value");
    return ae_val;
 }
 
 static bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s) {
-   const char *p;
-   char *t;
-   bool has_digits;
-   char buf[64];
-   int isign;
-   lconv *loc;
-   p = s;
-//
-// check string structure and decide what to do
-//
-   isign = 1;
+   const char *p = s;
+// Check the string structure and decide what to do.
+   int isign = 1;
    if (*s == '-' || *s == '+') {
       isign = *s == '-' ? -1 : +1;
       s++;
    }
-   memset(buf, 0, sizeof(buf));
+   char buf[0x40];
+   memset(buf, 0, sizeof buf);
    strncpy(buf, s, 3);
    if (!strimatch(buf, "nan") && !strimatch(buf, "inf")) {
-   //
-   // [sign] [ddd] [.] [ddd] [e|E[sign]ddd]
-   //
-      has_digits = false;
-      if (*s != 0 && strchr("1234567890", *s) != NULL) {
+   // [Sign] [Digits] [.] [Digits] [e|E [Sign] Digits]
+      bool has_digits = false;
+      if (*s != '\0' && strchr("1234567890", *s) != NULL) {
          has_digits = true;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
       if (*s == '.')
          s++;
-      if (*s != 0 && strchr("1234567890", *s) != NULL) {
+      if (*s != '\0' && strchr("1234567890", *s) != NULL) {
          has_digits = true;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
       if (!has_digits)
@@ -7164,38 +5862,32 @@ static bool _parse_real_delim(const char *s, const char *delim, double *result, 
          s++;
          if (*s == '-' || *s == '+')
             s++;
-         if (*s == 0 || strchr("1234567890", *s) == NULL)
+         if (*s == '\0' || strchr("1234567890", *s) == NULL)
             return false;
-         while (*s != 0 && strchr("1234567890", *s) != NULL)
+         while (*s != '\0' && strchr("1234567890", *s) != NULL)
             s++;
       }
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
-   //
-   // finite value conversion
-   //
-      if (*new_s - p >= (int)sizeof(buf))
+   // Finite value conversion.
+      if (*new_s - p >= (int)sizeof buf)
          return false;
       strncpy(buf, p, (size_t)(*new_s - p));
-      buf[*new_s - p] = 0;
-      loc = localeconv();
-      t = strchr(buf, '.');
+      buf[*new_s - p] = '\0';
+      lconv *loc = localeconv();
+      char *t = strchr(buf, '.');
       if (t != NULL)
          *t = *loc->decimal_point;
       *result = atof(buf);
       return true;
    } else {
-   //
-   // check delimiter and update *new_s
-   //
+   // Check the delimiter and update *new_s.
       s += 3;
-      if (*s == 0 || strchr(delim, *s) == NULL)
+      if (*s == '\0' || strchr(delim, *s) == NULL)
          return false;
       *new_s = s;
-   //
-   // NAN, INF conversion
-   //
+   // NAN, INF conversion.
       if (strimatch(buf, "nan"))
          *result = NAN;
       if (strimatch(buf, "inf"))
@@ -7213,13 +5905,13 @@ static double parse_real_delim(const char *s, const char *delim) {
 }
 
 static complex parse_complex_delim(const char *s, const char *delim) {
+// Parse as a real value.
    double d_result;
    const char *new_s;
-   complex c_result;
-// parse as real value
    if (_parse_real_delim(s, delim, &d_result, &new_s))
       return d_result;
-// parse as "a+bi" or "a-bi"
+// Parse as "x + yi" or "x - yi".
+   complex c_result;
    if (_parse_real_delim(s, "+-", &c_result.x, &new_s)) {
       s = new_s;
       if (!_parse_real_delim(s, "i", &c_result.y, &new_s))
@@ -7229,13 +5921,13 @@ static complex parse_complex_delim(const char *s, const char *delim) {
          ThrowError("Cannot parse value");
       return c_result;
    }
-// parse as complex value "bi+a" or "bi-a"
+// Parse as a complex value "yi + x" or "yi - x".
    if (_parse_real_delim(s, "i", &c_result.y, &new_s)) {
       s = new_s + 1;
-      if (*s == 0)
+      if (*s == '\0')
          ThrowError("Cannot parse value");
       if (strchr(delim, *s) != NULL) {
-         c_result.x = 0;
+         c_result.x = 0.0;
          return c_result;
       }
       if (strchr("+-", *s) != NULL) {
@@ -7245,53 +5937,45 @@ static complex parse_complex_delim(const char *s, const char *delim) {
       }
       ThrowError("Cannot parse value");
    }
-// error
+// Error.
    ThrowError("Cannot parse value");
 }
 
 static std::string arraytostring(const bool *ptr, ae_int_t n) {
-   std::string result;
-   ae_int_t i;
-   result = "[";
-   for (i = 0; i < n; i++) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
       if (i != 0)
          result += ",";
       result += ptr[i] ? "true" : "false";
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
 static std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
-   std::string result;
-   ae_int_t i;
-   char buf[64];
-   result = "[";
-   for (i = 0; i < n; i++) {
-      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf))
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
+      char buf[0x40];
+      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof buf)
           ThrowError("arraytostring(): buffer overflow");
       result += buf;
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
 static std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
-   std::string result;
-   ae_int_t i;
-   char buf[64];
-   char mask1[64];
-   char mask2[64];
    int dps = _dps >= 0 ? _dps : -_dps;
-   result = "[";
-   if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof(mask1))
+   std::string result = "[";
+   char mask1[0x40];
+   if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof mask1)
       ThrowError("arraytostring(): buffer overflow");
-   if (sprintf(mask2, ",%s", mask1) >= (int)sizeof(mask2))
+   char mask2[0x40];
+   if (sprintf(mask2, ",%s", mask1) >= (int)sizeof mask2)
       ThrowError("arraytostring(): buffer overflow");
-   for (i = 0; i < n; i++) {
-      buf[0] = 0;
+   for (ae_int_t i = 0; i < n; i++) {
+      char buf[0x40];
+      buf[0] = '\0';
       if (isfinite(ptr[i])) {
-         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof(buf))
+         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof buf)
              ThrowError("arraytostring(): buffer overflow");
       } else if (isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
@@ -7301,25 +5985,21 @@ static std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
          strcpy(buf, i == 0 ? "-INF" : ",-INF");
       result += buf;
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 
 static std::string arraytostring(const complex *ptr, ae_int_t n, int dps) {
-   std::string result;
-   ae_int_t i;
-   result = "[";
-   for (i = 0; i < n; i++) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < n; i++) {
       if (i != 0)
          result += ",";
       result += ptr[i].tostring(dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
 
-// Matrices and vectors
+// Matrices and Vectors: Wrappers.
 ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_init();
    TryX {
@@ -7354,9 +6034,10 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::ae_vector_wrapper: source is not initialized");
-   alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_vector_wrrapper::ae_vector_wrapper: datatype check failed");
-   owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_copy(This, rhs.This, false);
+   if (rhs.This != NULL)
+      alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_vector_wrrapper::ae_vector_wrapper: datatype check failed");
+   owner = true, This = &Obj, memset(This, 0, sizeof *This),
+   rhs.This == NULL? ae_vector_init(This, 0, datatype, false): ae_vector_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
@@ -7371,7 +6052,7 @@ void ae_vector_wrapper::setlength(ae_int_t iLen) {
    alglib_impl::ae_state_clear();
 }
 
-ae_int_t ae_vector_wrapper::length() const { return This == NULL? 0: This->cnt; }
+ae_int_t ae_vector_wrapper::length() const { return This == NULL ? 0 : This->cnt; }
 
 void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr) {
    if (This == &Obj) ae_vector_free(This, false);
@@ -7383,6 +6064,7 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized destination)");
+// Assignment to proxy object.
    alglib_impl::ae_assert(rhs.This != NULL, "ae_vector_wrapper::assign: incorrect assignment (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_vector_wrapper::assign: incorrect assignment to array (types do not match)");
    if (!owner) alglib_impl::ae_assert(rhs.This->cnt == This->cnt, "ae_vector_wrapper::assign: incorrect assignment to proxy array (sizes do not match)");
@@ -7395,7 +6077,6 @@ const ae_vector_wrapper &ae_vector_wrapper::assign(const ae_vector_wrapper &rhs)
 #if !defined AE_NO_EXCEPTIONS
 ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
    std::vector<const char *> svec;
-   size_t i;
    char *p = filter_spaces(s); if (p == NULL) ThrowError("ae_vector_wrapper:ae_vector_wrapper: allocation error");
    try {
       str_vector_create(p, true, &svec);
@@ -7405,7 +6086,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
       owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_vector_init(This, (ae_int_t)(svec.size()), datatype, false);
       alglib_impl::ae_state_clear();
    }
-      for (i = 0; i < svec.size(); i++) switch (datatype) {
+      for (ae_int_t i = 0; i < svec.size(); i++) switch (datatype) {
       // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
          case alglib_impl::DT_BOOL: This->xB[i] = parse_bool_delim(svec[i], ",]"); break;
          case alglib_impl::DT_INT: This->xZ[i] = parse_int_delim(svec[i], ",]"); break;
@@ -7420,82 +6101,86 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
 }
 #endif
 
-boolean_1d_array::boolean_1d_array():ae_vector_wrapper(alglib_impl::DT_BOOL) { }
-boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) { }
-boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_BOOL) { }
-const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast < const boolean_1d_array &>(assign(rhs)); }
+boolean_1d_array::boolean_1d_array(): ae_vector_wrapper(alglib_impl::DT_BOOL) { }
+boolean_1d_array::boolean_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_1d_array::boolean_1d_array(const boolean_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_BOOL) { }
+#if !defined AE_NO_EXCEPTIONS
+boolean_1d_array::boolean_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_BOOL) { }
+std::string boolean_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&(operator()(0)), length()); }
+#endif
 boolean_1d_array::~boolean_1d_array() { }
+
+const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs) { return static_cast < const boolean_1d_array &>(assign(rhs)); }
 const bool &boolean_1d_array::operator()(ae_int_t i) const { return This->xB[i]; }
 bool &boolean_1d_array::operator()(ae_int_t i) { return This->xB[i]; }
 const bool &boolean_1d_array::operator[](ae_int_t i) const { return This->xB[i]; }
 bool &boolean_1d_array::operator[](ae_int_t i) { return This->xB[i]; }
 
 void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
-   ae_int_t i;
-// setlength, with exception-free error handling fallback code
+// Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen) return;
-// copy
-   for (i = 0; i < iLen; i++) This->xB[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xB[i] = pContent[i];
 }
 
-bool *boolean_1d_array::getcontent() { return This->xB; }
 const bool *boolean_1d_array::getcontent() const { return This->xB; }
+bool *boolean_1d_array::getcontent() { return This->xB; }
 
+integer_1d_array::integer_1d_array(): ae_vector_wrapper(alglib_impl::DT_INT) { }
+integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_INT) { }
+integer_1d_array::integer_1d_array(const integer_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
-boolean_1d_array::boolean_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_BOOL) { }
-std::string boolean_1d_array::tostring() const { return length() == 0? "[]": arraytostring(&(operator()(0)), length()); }
+integer_1d_array::integer_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_INT) { }
+std::string integer_1d_array::tostring() const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length()); }
 #endif
-
-integer_1d_array::integer_1d_array():ae_vector_wrapper(alglib_impl::DT_INT) { }
-integer_1d_array::integer_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_INT) { }
-integer_1d_array::integer_1d_array(const integer_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_INT) { }
-const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) { return static_cast < const integer_1d_array &>(assign(rhs)); }
 integer_1d_array::~integer_1d_array() { }
+
+const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs) { return static_cast < const integer_1d_array &>(assign(rhs)); }
 const ae_int_t &integer_1d_array::operator()(ae_int_t i) const { return This->xZ[i]; }
 ae_int_t &integer_1d_array::operator()(ae_int_t i) { return This->xZ[i]; }
 const ae_int_t &integer_1d_array::operator[](ae_int_t i) const { return This->xZ[i]; }
 ae_int_t &integer_1d_array::operator[](ae_int_t i) { return This->xZ[i]; }
 
 void integer_1d_array::setcontent(ae_int_t iLen, const ae_int_t *pContent) {
-   ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen) return;
-// copy
-   for (i = 0; i < iLen; i++) This->xZ[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xZ[i] = pContent[i];
 }
 
-ae_int_t *integer_1d_array::getcontent() { return This->xZ; }
 const ae_int_t *integer_1d_array::getcontent() const { return This->xZ; }
+ae_int_t *integer_1d_array::getcontent() { return This->xZ; }
 
+real_1d_array::real_1d_array(): ae_vector_wrapper(alglib_impl::DT_REAL) { }
+real_1d_array::real_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_REAL) { }
+real_1d_array::real_1d_array(const real_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
-integer_1d_array::integer_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_INT) { }
-std::string integer_1d_array::tostring() const { return length() == 0? "[]": arraytostring(&operator()(0), length()); }
+real_1d_array::real_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_REAL) { }
+std::string real_1d_array::tostring(int dps) const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length(), dps); }
 #endif
-
-real_1d_array::real_1d_array():ae_vector_wrapper(alglib_impl::DT_REAL) { }
-real_1d_array::real_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_REAL) { }
-real_1d_array::real_1d_array(const real_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_REAL) { }
-const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) { return static_cast < const real_1d_array &>(assign(rhs)); }
 real_1d_array::~real_1d_array() { }
+
+const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) { return static_cast < const real_1d_array &>(assign(rhs)); }
 const double &real_1d_array::operator()(ae_int_t i) const { return This->xR[i]; }
 double &real_1d_array::operator()(ae_int_t i) { return This->xR[i]; }
 const double &real_1d_array::operator[](ae_int_t i) const { return This->xR[i]; }
 double &real_1d_array::operator[](ae_int_t i) { return This->xR[i]; }
 
 void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
-   ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen) return;
-// copy
-   for (i = 0; i < iLen; i++) This->xR[i] = pContent[i];
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xR[i] = pContent[i];
 }
 
-// TODO: convert to constructor!!!!!!!
+const double *real_1d_array::getcontent() const { return This->xR; }
+double *real_1d_array::getcontent() { return This->xR; }
+
+// TODO: Convert to a constructor!
 void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
-   alglib_impl::x_vector x;
    alglib_impl::ae_state_init();
    TryX {
 #if !defined AE_NO_EXCEPTIONS
@@ -7506,6 +6191,7 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    }
    alglib_impl::ae_assert(owner, "read_1d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(iLen > 0, "read_1d_array::attach_to_ptr: non-positive length");
+   alglib_impl::x_vector x;
    x.cnt = iLen;
    x.datatype = alglib_impl::DT_REAL;
    x.owner = false;
@@ -7515,40 +6201,31 @@ void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::ae_state_clear();
 }
 
-double *real_1d_array::getcontent() { return This->xR; }
-const double *real_1d_array::getcontent() const { return This->xR; }
-
+complex_1d_array::complex_1d_array(): ae_vector_wrapper(alglib_impl::DT_COMPLEX) { }
+complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p): ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_1d_array::complex_1d_array(const complex_1d_array &rhs): ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
-real_1d_array::real_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_REAL) { }
-std::string real_1d_array::tostring(int dps) const { return length() == 0? "[]": arraytostring(&operator()(0), length(), dps); }
+complex_1d_array::complex_1d_array(const char *s): ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) { }
+std::string complex_1d_array::tostring(int dps) const { return length() == 0 ? "[]" : arraytostring(&operator()(0), length(), dps); }
 #endif
-
-complex_1d_array::complex_1d_array():ae_vector_wrapper(alglib_impl::DT_COMPLEX) { }
-complex_1d_array::complex_1d_array(alglib_impl::ae_vector *p):ae_vector_wrapper(p, alglib_impl::DT_COMPLEX) { }
-complex_1d_array::complex_1d_array(const complex_1d_array &rhs):ae_vector_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
-const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) { return static_cast < const complex_1d_array &>(assign(rhs)); }
 complex_1d_array::~complex_1d_array() { }
+
+const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs) { return static_cast < const complex_1d_array &>(assign(rhs)); }
 const complex &complex_1d_array::operator()(ae_int_t i) const { return *(const complex *)(This->xC + i); }
 complex &complex_1d_array::operator()(ae_int_t i) { return *(complex *)(This->xC + i); }
 const complex &complex_1d_array::operator[](ae_int_t i) const { return *(const complex *)(This->xC + i); }
 complex &complex_1d_array::operator[](ae_int_t i) { return *(complex *)(This->xC + i); }
 
 void complex_1d_array::setcontent(ae_int_t iLen, const complex *pContent) {
-   ae_int_t i;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(iLen);
-   if (This == NULL || This->cnt != iLen) return;
-// copy
-   for (i = 0; i < iLen; i++) This->xC[i] = ae_complex_from_c(pContent[i]);
+// Copy, if its size matches.
+   if (This != NULL && This->cnt == iLen)
+      for (ae_int_t i = 0; i < iLen; i++) This->xC[i] = ae_complex_from_c(pContent[i]);
 }
 
-complex *complex_1d_array::getcontent() { return (complex *)This->xC; }
 const complex *complex_1d_array::getcontent() const { return (const complex *)This->xC; }
-
-#if !defined AE_NO_EXCEPTIONS
-complex_1d_array::complex_1d_array(const char *s):ae_vector_wrapper(s, alglib_impl::DT_COMPLEX) { }
-std::string complex_1d_array::tostring(int dps) const { return length() == 0? "[]": arraytostring(&operator()(0), length(), dps); }
-#endif
+complex *complex_1d_array::getcontent() { return (complex *)This->xC; }
 
 ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
    alglib_impl::ae_state_init();
@@ -7584,17 +6261,16 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
       owner = true, This = NULL, set_error_msg(); return;
 #endif
    }
-   owner = true, This = NULL;
-   if (rhs.This != NULL) {
+   if (rhs.This != NULL)
       alglib_impl::ae_assert(rhs.This->datatype == datatype, "ae_matrix_wrapper::ae_matrix_wrapper: datatype check failed");
-      This = &Obj, memset(This, 0, sizeof *This), ae_matrix_copy(This, rhs.This, false);
-   }
+   owner = true, This = &Obj, memset(This, 0, sizeof *This);
+   rhs.This == NULL? ae_matrix_init(This, 0, 0, datatype, false): ae_matrix_copy(This, rhs.This, false);
    alglib_impl::ae_state_clear();
 }
 
 ae_matrix_wrapper::~ae_matrix_wrapper() { if (This == &Obj) ae_matrix_free(This, false); }
 
-// TODO: automatic allocation of NULL ptr!!!!!
+// TODO: Automatic allocation of NULL pointer!
 void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -7604,10 +6280,10 @@ void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    alglib_impl::ae_state_clear();
 }
 
-ae_int_t ae_matrix_wrapper::rows() const { return This == NULL? 0: This->rows; }
-ae_int_t ae_matrix_wrapper::cols() const { return This == NULL? 0: This->cols; }
+ae_int_t ae_matrix_wrapper::cols() const { return This == NULL ? 0 : This->cols; }
+ae_int_t ae_matrix_wrapper::rows() const { return This == NULL ? 0 : This->rows; }
+ae_int_t ae_matrix_wrapper::getstride() const { return This == NULL ? 0 : This->stride; }
 bool ae_matrix_wrapper::isempty() const { return rows() == 0 || cols() == 0; }
-ae_int_t ae_matrix_wrapper::getstride() const { return This == NULL? 0: This->stride; }
 
 void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr) {
    if (This == &Obj) ae_matrix_free(This, false);
@@ -7615,11 +6291,11 @@ void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr) {
 }
 
 const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs) {
-   ae_int_t i;
    if (this == &rhs) return *this;
    alglib_impl::ae_state_init();
    TryCatch(*this)
    alglib_impl::ae_assert(This != NULL, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to matrix (uninitialized destination)");
+// Assignment to proxy object.
    alglib_impl::ae_assert(rhs.This != NULL, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to array (uninitialized source)");
    alglib_impl::ae_assert(rhs.This->datatype == This->datatype, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to array (types dont match)");
    if (!owner) {
@@ -7627,7 +6303,7 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
       alglib_impl::ae_assert(rhs.This->cols == This->cols, "ae_matrix_wrapper::ae_matrix_wrapper: incorrect assignment to proxy array (sizes dont match)");
    }
    if (rhs.This->rows != This->rows || rhs.This->cols != This->cols) ae_matrix_set_length(This, rhs.This->rows, rhs.This->cols);
-   for (i = 0; i < This->rows; i++) memcpy(This->xyX[i], rhs.This->xyX[i], This->cols * alglib_impl::ae_sizeof(This->datatype));
+   for (ae_int_t i = 0; i < This->rows; i++) memcpy(This->xyX[i], rhs.This->xyX[i], This->cols * alglib_impl::ae_sizeof(This->datatype));
    alglib_impl::ae_state_clear();
    return *this;
 }
@@ -7635,21 +6311,17 @@ const ae_matrix_wrapper &ae_matrix_wrapper::assign(const ae_matrix_wrapper &rhs)
 #if !defined AE_NO_EXCEPTIONS
 ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
    std::vector< std::vector<const char *> > smat;
-   size_t i, j;
    char *p = filter_spaces(s); if (p == NULL) ThrowError("ae_matrix_wrapper::ae_matrix_wrapper: allocation error");
    try {
       str_matrix_create(p, &smat);
    {
       alglib_impl::ae_state_init();
       TryCatch()
-      owner = true, This = &Obj, memset(This, 0, sizeof *This);
-      if (smat.size() != 0)
-         ae_matrix_init(This, (ae_int_t)(smat.size()), (ae_int_t)(smat[0].size()), datatype, false);
-      else
-         ae_matrix_init(This, 0, 0, datatype, false);
+      ae_int_t rows = smat.size(), cols = rows == 0? 0: smat[0].size();
+      owner = true, This = &Obj, memset(This, 0, sizeof *This), ae_matrix_init(This, rows, cols, datatype, false);
       alglib_impl::ae_state_clear();
    }
-      for (i = 0; i < smat.size(); i++) for (j = 0; j < smat[0].size(); j++) switch (datatype) {
+      for (size_t i = 0; i < smat.size(); i++) for (size_t j = 0; j < smat[0].size(); j++) switch (datatype) {
       // case alglib_impl::DT_BYTE: // The same as alglib_impl::DT_BOOL.
          case alglib_impl::DT_BOOL: This->xyB[i][j] = parse_bool_delim(smat[i][j], ",]"); break;
          case alglib_impl::DT_INT: This->xyZ[i][j] = parse_int_delim(smat[i][j], ",]"); break;
@@ -7664,10 +6336,23 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
 }
 #endif
 
-boolean_2d_array::boolean_2d_array():ae_matrix_wrapper(alglib_impl::DT_BOOL) { }
-boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) { }
-boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(): ae_matrix_wrapper(alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_BOOL) { }
+boolean_2d_array::boolean_2d_array(const boolean_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_BOOL) { }
+#if !defined AE_NO_EXCEPTIONS
+boolean_2d_array::boolean_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_BOOL) { }
+std::string boolean_2d_array::tostring() const {
+   if (isempty()) return "[[]]";
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
+      if (i != 0) result += ",";
+      result += arraytostring(&operator()(i, 0), cols());
+   }
+   return result += "]";
+}
+#endif
 boolean_2d_array::~boolean_2d_array() { }
+
 const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs) { return static_cast < const boolean_2d_array &>(assign(rhs)); }
 const bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyB[i][j]; }
 bool &boolean_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyB[i][j]; }
@@ -7675,35 +6360,30 @@ const bool *boolean_2d_array::operator[](ae_int_t i) const { return This->xyB[i]
 bool *boolean_2d_array::operator[](ae_int_t i) { return This->xyB[i]; }
 
 void boolean_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent) {
-   ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols) return;
-// copy
-   for (i = 0; i < irows; i++) for (j = 0; j < icols; j++) This->xyB[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyB[i][j] = pContent[i * icols + j];
 }
 
+integer_2d_array::integer_2d_array(): ae_matrix_wrapper(alglib_impl::DT_INT) { }
+integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_INT) { }
+integer_2d_array::integer_2d_array(const integer_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_INT) { }
 #if !defined AE_NO_EXCEPTIONS
-boolean_2d_array::boolean_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_BOOL) { }
-
-std::string boolean_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
+integer_2d_array::integer_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_INT) { }
+std::string integer_2d_array::tostring() const {
    if (isempty()) return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
       if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols());
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
-
-integer_2d_array::integer_2d_array():ae_matrix_wrapper(alglib_impl::DT_INT) { }
-integer_2d_array::integer_2d_array(const integer_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_INT) { }
-integer_2d_array::integer_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_INT) { }
 integer_2d_array::~integer_2d_array() { }
+
 const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs) { return static_cast < const integer_2d_array &>(assign(rhs)); }
 const ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyZ[i][j]; }
 ae_int_t &integer_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyZ[i][j]; }
@@ -7711,35 +6391,30 @@ const ae_int_t *integer_2d_array::operator[](ae_int_t i) const { return This->xy
 ae_int_t *integer_2d_array::operator[](ae_int_t i) { return This->xyZ[i]; }
 
 void integer_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent) {
-   ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols) return;
-// copy
-   for (i = 0; i < irows; i++) for (j = 0; j < icols; j++) This->xyZ[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyZ[i][j] = pContent[i * icols + j];
 }
 
+real_2d_array::real_2d_array(): ae_matrix_wrapper(alglib_impl::DT_REAL) { }
+real_2d_array::real_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_REAL) { }
+real_2d_array::real_2d_array(const real_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) { }
 #if !defined AE_NO_EXCEPTIONS
-integer_2d_array::integer_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_INT) { }
-
-std::string integer_2d_array::tostring() const {
-   std::string result;
-   ae_int_t i;
+real_2d_array::real_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_REAL) { }
+std::string real_2d_array::tostring(int dps) const {
    if (isempty()) return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
       if (i != 0) result += ",";
-      result += arraytostring(&operator()(i, 0), cols());
+      result += arraytostring(&operator()(i, 0), cols(), dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
-
-real_2d_array::real_2d_array():ae_matrix_wrapper(alglib_impl::DT_REAL) { }
-real_2d_array::real_2d_array(const real_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_REAL) { }
-real_2d_array::real_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_REAL) { }
 real_2d_array::~real_2d_array() { }
+
 const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) { return static_cast < const real_2d_array &>(assign(rhs)); }
 const double &real_2d_array::operator()(ae_int_t i, ae_int_t j) const { return This->xyR[i][j]; }
 double &real_2d_array::operator()(ae_int_t i, ae_int_t j) { return This->xyR[i][j]; }
@@ -7747,16 +6422,14 @@ const double *real_2d_array::operator[](ae_int_t i) const { return This->xyR[i];
 double *real_2d_array::operator[](ae_int_t i) { return This->xyR[i]; }
 
 void real_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const double *pContent) {
-   ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols) return;
-// copy
-   for (i = 0; i < irows; i++) for (j = 0; j < icols; j++) This->xyR[i][j] = pContent[i * icols + j];
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++) This->xyR[i][j] = pContent[i * icols + j];
 }
 
 void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent) {
-   alglib_impl::x_matrix x;
    alglib_impl::ae_state_init();
    TryX {
 #if !defined AE_NO_EXCEPTIONS
@@ -7767,6 +6440,7 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    }
    alglib_impl::ae_assert(owner, "real_2d_array::attach_to_ptr: unable to attach proxy object to something else");
    alglib_impl::ae_assert(irows > 0 && icols > 0, "real_2d_array::attach_to_ptr: non-positive length");
+   alglib_impl::x_matrix x;
    x.rows = irows;
    x.cols = icols;
    x.stride = icols;
@@ -7778,27 +6452,23 @@ void real_2d_array::attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pConte
    alglib_impl::ae_state_clear();
 }
 
+complex_2d_array::complex_2d_array(): ae_matrix_wrapper(alglib_impl::DT_COMPLEX) { }
+complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p): ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) { }
+complex_2d_array::complex_2d_array(const complex_2d_array &rhs): ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
 #if !defined AE_NO_EXCEPTIONS
-real_2d_array::real_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_REAL) { }
-
-std::string real_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
+complex_2d_array::complex_2d_array(const char *s): ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) { }
+std::string complex_2d_array::tostring(int dps) const {
    if (isempty()) return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
+   std::string result = "[";
+   for (ae_int_t i = 0; i < rows(); i++) {
       if (i != 0) result += ",";
       result += arraytostring(&operator()(i, 0), cols(), dps);
    }
-   result += "]";
-   return result;
+   return result += "]";
 }
 #endif
-
-complex_2d_array::complex_2d_array():ae_matrix_wrapper(alglib_impl::DT_COMPLEX) { }
-complex_2d_array::complex_2d_array(const complex_2d_array &rhs):ae_matrix_wrapper(rhs, alglib_impl::DT_COMPLEX) { }
-complex_2d_array::complex_2d_array(alglib_impl::ae_matrix *p):ae_matrix_wrapper(p, alglib_impl::DT_COMPLEX) { }
 complex_2d_array::~complex_2d_array() { }
+
 const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs) { return static_cast < const complex_2d_array &>(assign(rhs)); }
 const complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) const { return *(const complex *)(This->xyC[i] + j); }
 complex &complex_2d_array::operator()(ae_int_t i, ae_int_t j) { return *(complex *)(This->xyC[i] + j); }
@@ -7806,135 +6476,68 @@ const complex *complex_2d_array::operator[](ae_int_t i) const { return (const co
 complex *complex_2d_array::operator[](ae_int_t i) { return (complex *)(This->xyC[i]); }
 
 void complex_2d_array::setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent) {
-   ae_int_t i, j;
-// setlength(), handle possible exception-free errors
+// Handle possible exception-free errors.
    setlength(irows, icols);
-   if (This == NULL || This->rows != irows || This->cols != icols) return;
-// copy
-   for (i = 0; i < irows; i++) for (j = 0; j < icols; j++) {
-      This->xyC[i][j] = ae_complex_from_c(pContent[i * icols + j]);
-   }
+// Copy, if its size matches.
+   if (This != NULL && This->cols == icols && This->rows == irows)
+      for (ae_int_t i = 0; i < irows; i++) for (ae_int_t j = 0; j < icols; j++)
+         This->xyC[i][j] = ae_complex_from_c(pContent[i * icols + j]);
 }
 
 #if !defined AE_NO_EXCEPTIONS
-complex_2d_array::complex_2d_array(const char *s):ae_matrix_wrapper(s, alglib_impl::DT_COMPLEX) { }
+const int CSV_DEFAULT = 0x0, CSV_SKIP_HEADERS = 0x1;
 
-std::string complex_2d_array::tostring(int dps) const {
-   std::string result;
-   ae_int_t i;
-   if (isempty()) return "[[]]";
-   result = "[";
-   for (i = 0; i < rows(); i++) {
-      if (i != 0) result += ",";
-      result += arraytostring(&operator()(i, 0), cols(), dps);
-   }
-   result += "]";
-   return result;
-}
-#endif
-
-// standard functions
-bool isneginf(double x) { return isinf(x) && signbit(x); }
-bool isposinf(double x) { return isinf(x) && !signbit(x); }
-
-int minint(int x, int y) { return x > y ? y : x; }
-int maxint(int x, int y) { return x > y ? x : y; }
-int sign(double x) { return x > 0? +1: x < 0? -1: 0; }
-int RoundZ(double x) { return int(round(x)); }
-int TruncZ(double x) { return int(trunc(x)); }
-int FloorZ(double x) { return int(floor(x)); }
-int CeilZ(double x) { return int(ceil(x)); }
-
-double minreal(double x, double y) { return x > y ? y : x; }
-double maxreal(double x, double y) { return x > y ? x : y; }
-double sqr(double x) { return x*x; }
-
-double randomreal() {
-   const double mx = (double)RAND_MAX + 1.0;
-   return (rand() + rand() / mx) / mx;
-}
-
-double randommid() {
-   const double mx = (double)RAND_MAX + 1.0;
-   return 2.0*(rand() + rand() / mx) / mx - 1.0;
-}
-
-ae_int_t randominteger(ae_int_t maxv) { return ((ae_int_t) rand()) % maxv; }
-
-bool randombool(double p) {
-   const double mx = (double)RAND_MAX + 1.0;
-   return rand() + rand()/mx <= p*mx;
-}
-
-// CSV functions
-#if !defined AE_NO_EXCEPTIONS
+// CSV function.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out) {
-   int flag;
-//
-// Parameters
-//
+// Parameters.
    bool skip_first_row = (flags & CSV_SKIP_HEADERS) != 0;
-//
-// Prepare empty output array
-//
+// Prepare an empty output array.
    out.setlength(0, 0);
-//
-// Open file, determine size, read contents
-//
+// Open the file, determine its size and read its contents.
    FILE *f_in = fopen(filename, "rb");
    if (f_in == NULL)
       ThrowError("read_csv: unable to open input file");
-   flag = fseek(f_in, 0, SEEK_END);
+   int flag = fseek(f_in, 0, SEEK_END);
    AE_CRITICAL_ASSERT(flag == 0);
    long int _filesize = ftell(f_in);
    AE_CRITICAL_ASSERT(_filesize >= 0);
-   if (_filesize == 0) {
-   // empty file, return empty array, success
+   if (_filesize == 0) { // An empty file: return an empty array, success.
       fclose(f_in);
       return;
    }
    size_t filesize = _filesize;
    std::vector<char> v_buf;
    v_buf.resize(filesize + 2, 0);
-   char *p_buf = &v_buf[0]; //(#) This is NOT equivalent to char *p_buf = v_buf!
+   char *p_buf = &v_buf[0]; //(@) This is NOT equivalent to char *p_buf = v_buf!
    flag = fseek(f_in, 0, SEEK_SET);
    AE_CRITICAL_ASSERT(flag == 0);
    size_t bytes_read = fread((void *)p_buf, 1, filesize, f_in);
    AE_CRITICAL_ASSERT(bytes_read == filesize);
    fclose(f_in);
-//
-// Normalize file contents:
-// * replace 0x0 by spaces
-// * remove trailing spaces and newlines
-// * append trailing '\n' and '\0' characters
-// Return if file contains only spaces/newlines.
-//
+// Normalize the file contents:
+// *	replace '\0' by ' '.
+// *	remove the trailing ' ' and '\n' characters.
+// *	append trailing '\n' and '\0' characters.
+// Return if the file contains only ' ' and '\n' characters.
    for (size_t i = 0; i < filesize; i++)
       if (p_buf[i] == 0)
          p_buf[i] = ' ';
-   for (; filesize > 0;) {
+   for (; filesize > 0; filesize--) {
       char c = p_buf[filesize - 1];
-      if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
-         filesize--;
-         continue;
-      }
-      break;
+      if (c != ' ' && c != '\t' && c != '\n' && c != '\r') break;
    }
    if (filesize == 0)
       return;
-   p_buf[filesize] = '\n';
-   p_buf[filesize + 1] = '\0';
-   filesize += 2;
-//
-// Scan dataset.
-//
-   size_t rows_count = 0, cols_count = 0, max_length = 0;
+   p_buf[filesize++] = '\n';
+   p_buf[filesize++] = '\0';
+// Scan the dataset.
+   size_t cols_count = 0, rows_count = 0, max_length = 0;
    std::vector<size_t> offsets, lengths;
-   for (size_t row_start = 0; p_buf[row_start] != 0x0;) {
-   // determine row length
-      size_t row_length;
-      for (row_length = 0; p_buf[row_start + row_length] != '\n'; row_length++);
-   // determine cols count, perform integrity check
+   for (size_t row_start = 0; p_buf[row_start] != 0x0; rows_count++) {
+   // Size of the row.
+      size_t row_length = 0;
+      for (; p_buf[row_start + row_length] != '\n'; row_length++);
+   // Count the columns and perform an integrity check.
       size_t cur_cols_cnt = 1;
       for (size_t idx = 0; idx < row_length; idx++)
          if (p_buf[row_start + idx] == separator)
@@ -7942,7 +6545,7 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
       if (cols_count > 0 && cols_count != cur_cols_cnt)
          ThrowError("read_csv: non-rectangular contents, rows have different sizes");
       cols_count = cur_cols_cnt;
-   // store offsets and lengths of the fields
+   // Store the offsets and lengths of the fields.
       size_t cur_offs = 0;
       for (size_t idx = 0; idx < row_length + 1; idx++)
          if (p_buf[row_start + idx] == separator || p_buf[row_start + idx] == '\n') {
@@ -7951,19 +6554,17 @@ void read_csv(const char *filename, char separator, int flags, real_2d_array &ou
             max_length = idx - cur_offs > max_length ? idx - cur_offs : max_length;
             cur_offs = idx + 1;
          }
-   // advance row start
-      rows_count++;
+   // Advance row_start.
       row_start += row_length + 1;
    }
    AE_CRITICAL_ASSERT(rows_count >= 1);
    AE_CRITICAL_ASSERT(cols_count >= 1);
    AE_CRITICAL_ASSERT(cols_count * rows_count == offsets.size());
    AE_CRITICAL_ASSERT(cols_count * rows_count == lengths.size());
-   if (rows_count == 1 && skip_first_row)       // empty output, return
+// Return on empty output.
+   if (rows_count == 1 && skip_first_row)
       return;
-//
-// Convert
-//
+// Convert.
    size_t row0 = skip_first_row ? 1 : 0;
    size_t row1 = rows_count;
    lconv *loc = localeconv();

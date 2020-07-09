@@ -696,12 +696,12 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 16	Wrapped the ConstT, TryCatch() and TryX code; and redid the reinterpret_cast and const_cast items in the alglib namespace code.
 17	Wrapped up the New{Obj,Vector,Matrix,Block}/RefObj/Dup{Vector,Matrix} code; _Type_{init,copy,free}() renamed Type_{init,copy,free}().
 18	The FP comparison macros were removed.
-19	Normalized the rcomm routines, and the *mcsrch() routines, into this form.
+19	Normalized the RCOMM routines, and the *mcsrch() routines, into this form.
 	Remade *mcsrch(...,&amp;stage) into a boolean that returns the condition stage != 0.
 	The state variable is made to revert to -1 upon exit.
 	Removed the ae_len_v function.
 	Normalized comparison operators in loops and &amp;X[0] to X (except in 1 place in Ap.cpp).
-20	Normalized other routines that have the same form as RCOMM
+20	Normalized other routines that have the same form as the RCOMM routines
 	LinAlg.cpp: rcond_rmatrixestimatenorm, rcond_cmatrixestimatenorm
 	Remade rcond_rmatrixestimatenorm(n,v,x,isgn,&amp;est,&amp;kase) into a boolean that returns the condition kase != 0.
 	Remade rcond_cmatrixestimatenorm(n,v,x,&amp;est,&amp;kase,isave,rsave) into booleans that return the condition kase != 0.
@@ -830,9 +830,45 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	―	void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 	―	ae_int64_t ae_get_dbg_value(debug_flag_t id);
 	Removed pythag2() from AlgLibInternal.{cpp,h} - it is a duplicate of safepythag2(); replaced pythag2() in LinAlg.cpp by safepythag2().
-35	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
-	References to MinCGSetGradientCheck() in the comments removed.
+35	References to MinCGSetGradientCheck() in the comments removed.
 	The *SetGradientCheck() functions have almost all been replaced by OptGuard functions in version 3.16.0.
+	Reorder Ap.{cpp,h} &amp; reconcile with the internal version of AlgLib.
+	―	Remade AE_LOCK_ALIGNMENT, AE_LOCK_CYCLES, AE_LOCK_TESTS_BEFORE_YIELD into integer contants local to Ap.cpp.
+	―	Remade _ALGLIB_FLG_THREADING_MASK, _ALGLIB_FLG_THREADING_SHIFT as manifest constants local to Ap.cpp.
+	―	The constants DynBottom, DynFrame made local in Ap.cpp
+	―	ae_db_attach(), ae_break(), ae_optional_atomic_{add,sub}_i(), ae_yield(),
+	 	x_is_symmetric(), x_is_hermitian(), x_force_symmetric(), x_force_hermitian(),
+	 	aligned_extract_ptr(), ae_matrix_update_row_pointers(),
+	 	ae_static_malloc(), ae_static_free(),
+	 	ae_sixbits2char(), ae_char2sixbits(), ae_threebytes2foursixbits(), ae_foursixbits2threebytes()
+		all made local to Ap.cpp.
+	―	ae_never_change_it, _sixbits2char_tbl[], _ae_char2sixbits_tbl[] in Ap.cpp made local respectively to ae_spin_wait(), ae_sixbits2char() and _ae_char2sixbits().
+	―	_ialglib_vzero(), _ialglib_vzero_complex(),
+		_ialglib_vcopy(), _ialglib_vcopy_complex(), _ialglib_vcopy_dcomplex(),
+		_ialglib_mcopyblock(), _ialglib_mcopyunblock(), _ialglib_mcopyblock_complex(), _ialglib_mcopyunblock_complex(),
+	 	_ialglib_mv_32(), _ialglib_rmatrixger() made local in Ap.cpp,
+	 	_ialglib_rmv(), _ialglib_rmatrixgemm(), _ialglib_rmatrixrighttrsm(), _ialglib_rmatrixlefttrsm(),
+	 	_ialglib_cmv(), _ialglib_cmatrixgemm(), _ialglib_cmatrixrighttrsm(), _ialglib_cmatrixlefttrsm(),
+	 	_ialglib_rmatrixsyrk(), _ialglib_rmatrixrank1(),
+	 	_ialglib_cmatrixherk(), _ialglib_cmatrixrank1()
+		all made local to Ap.cpp.
+	― 	_dbg_alloc_total, _use_dbg_counters, _use_vendor_kernels
+	  	debug_workstealing, dbgws_pushroot_ok, dbgws_pushroot_failed
+		all made local in Ap.cpp.
+	― 	x_nb, alglib_simd_alignment
+	 	alglib_r_block, alglib_half_r_block/2, alglib_twice_r_block,
+	 	alglib_c_block, alglib_half_c_block/2, alglib_twice_c_block
+		all remade as ae_int_t constants.
+	―	alglib::ByteOrder made local in Ap.cpp and commented out (it's not used).
+	―	Combined the threading model names AE_{SERIAL_UNSAFE,SERIAL,PARALLEL}
+		and flags _ALGLIB_FLG_THREADING_{USE_GLOBAL,SERIAL,PARALLEL} into {Non,Ser,Par}TH.
+	―	Replaced the threading flag names "xdefault, "serial" and "parallel" respectively by NonTH, SerTH and ParTH.
+	―	Removed x_string from Ap.h - it is not used anywhere.
+		Removed ALIGNED from Ap.h - it is not used anywhere else, other than in x_string.
+	―	CSV_DEFAULT, CSV_SKIP_HEADERS definitions in Ap.h moved to Ap.cpp and reduced in Ap.h to declarations.
+	―	Removed ae_check_zeros(); placing, instead, the responsibility for zero-initialization into the constructor wrappers.
+	―	Synthesized the constructor macro NewSerializer().
+36	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
 </pre>
 </p>
 <p>
@@ -939,6 +975,10 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 34	2278 3521 3510 3245 1586305481 213 // Resumed from a temporary suspension, bunkering down to await the passing of a worldwide plague.
 35	2278 3402 3449 3266 1589855728 221 // Minor changes, following reconciliation with the main (and internal) branch of ALGLIB++.
 35	2252 3485 3510 3265 1592593244 234
+35	2198 3460 3438 3262 1593720351 223
+35	2262 3413 3426 3282 1593794381 217
+35	2294 3449 3498 3287 1593905439 212
+35	2326 3449 3510 3289 1594326522 226
 </pre>
 </p>
 </div>

@@ -36,12 +36,13 @@
 #   include <vector>
 #endif
 
-// Definitions
+// The CPU type.
 #define AE_OTHER_CPU	0
 #define AE_INTEL	1
 #define AE_SPARC	2
 
-// OS definitions
+// The OS type.
+// Use OtherOS if the OS has not yet been defined.
 #define AE_OTHER_OS	0
 #define AE_WINDOWS	1
 #define AE_POSIX	2
@@ -54,40 +55,36 @@
 #   define _ALGLIB_USE_LINUX_EXTENSIONS
 #endif
 
-// threading models for AE_THREADING
-#define AE_PARALLEL                 100
-#define AE_SERIAL                   101
-#define AE_SERIAL_UNSAFE            102
+// The threading models for AE_THREADING / state flags.
+#define NonTH	0	// Serial Unsafe / Use Global.
+#define SerTH	1	// Serial.
+#define ParTH	2	// Parallel.
 #if !defined AE_THREADING
-#   define AE_THREADING AE_PARALLEL
+#   define AE_THREADING ParTH
 #endif
 
-// malloc types for AE_MALLOC
-#define AE_STDLIB_MALLOC            200
-#define AE_BASIC_STATIC_MALLOC      201
+// The memory allocation types for AE_MALLOC.
+#define AE_STDLIB_MALLOC	200
+#define AE_BASIC_STATIC_MALLOC	201
 #if !defined AE_MALLOC
 #   define AE_MALLOC AE_STDLIB_MALLOC
 #endif
 
-#define AE_LOCK_ALIGNMENT 16
-
-// The compiler type and compiler-specific definitions.
+// The compiler type and compiler-specific definitions and includes.
 #define AE_OTHERC	0
 #define AE_MSVC		1
 #define AE_GNUC		2
 #define AE_SUNC		3
 #if defined __GNUC__
 #   define AE_COMPILER AE_GNUC
-#   define ALIGNED __attribute__((aligned(8)))
 #elif defined __SUNPRO_C || defined __SUNPRO_CC
 #   define AE_COMPILER AE_SUNC
-#   define ALIGNED
 #elif defined _MSC_VER
 #   define AE_COMPILER AE_MSVC
-#   define ALIGNED __declspec(align(8))
 #   if defined InAlgLib && !defined AE_ALL_WARNINGS
 // Disable some irrelevant warnings.
-//(#) Originally preceded the headers other than Ap.h in TestC.cpp and followed them in the program module *.cpp files.
+//(@) Originally preceded the headers other than Ap.h in TestC.cpp and followed them in the program module *.cpp files.
+//(@) None of this has actually been tested on Windows yet.
 #      pragma warning(disable:4100)
 #      pragma warning(disable:4127)
 #      pragma warning(disable:4611)
@@ -96,7 +93,6 @@
 #   endif
 #else
 #   define AE_COMPILER AE_OTHERC
-#   define ALIGNED
 #endif
 
 // Solaris Studio C/C++, IBM XL C/C++, GNU C, CLang, IntelC++ Compiler (Linux): _thread static
@@ -108,13 +104,6 @@
 // The keywords "auto" and "Thread_local"/"thread_local" in C/C++ have mutually exclusive uses
 // and can therefore be considered as different cases of the same concept!
 #define AutoS static // "auto static": static thread-local variables in block or file scope.
-
-// state flags
-#define _ALGLIB_FLG_THREADING_MASK          0x7
-#define _ALGLIB_FLG_THREADING_SHIFT         0
-#define _ALGLIB_FLG_THREADING_USE_GLOBAL    0x0
-#define _ALGLIB_FLG_THREADING_SERIAL        0x1
-#define _ALGLIB_FLG_THREADING_PARALLEL      0x2
 
 // Now we are ready to include the remaining headers.
 // #include <ctype.h>
@@ -153,10 +142,12 @@ namespace alglib_impl {
 
 // We are working under a C++ environment: define several conditions.
 #define AE_USE_CPP_SERIALIZATION
-#include <iostream>
+// #include <iostream> //(@) Already included.
 
-// define ae_int32_t, ae_int64_t, ae_int_t, bool, ae_complex, ae_error_type and ae_datatype
-
+// Define ae_int32_t, ae_int64_t, ae_uint64_t, ae_int_t, ae_complex, ae_error_type and ae_datatype.
+// A boolean type was also originally (and unnecessarily) defined.
+// For C (as of 2011): one needs only to include <stdbool.h> to define "bool", "false" and "true".
+// For C++: it is already a part of the language.
 #if defined AE_INT32_T
 typedef AE_INT32_T ae_int32_t;
 #elif defined AE_HAVE_STDINT
@@ -194,93 +185,125 @@ typedef ptrdiff_t ae_int_t;
 struct ae_complex { double x, y; } ;
 typedef enum { ERR_OK = 0, ERR_OUT_OF_MEMORY = 1, ERR_XARRAY_TOO_LARGE = 2, ERR_ASSERTION_FAILED = 3 } ae_error_type;
 typedef enum { DT_BOOL = 1, DT_BYTE = 1, DT_INT = 2, DT_REAL = 3, DT_COMPLEX = 4 } ae_datatype;
+
+// Allocation-tracking: inactive by default.
+// Turned on when needed for debugging purposes.
+// _alloc_counter is incremented by 1 on malloc(), decremented on free().
+// _alloc_counter_total is only incremented by 1.
+extern ae_int_t _alloc_counter;
+extern ae_int_t _alloc_counter_total;
+extern bool _use_alloc_counter;
+
+// Malloc debugging:
+// Set to force ALGLIB++ malloc() to fail.
+// Useful to debug errors-handling during memory allocation.
+extern bool _force_malloc_failure;
+// If 0 and if _use_alloc_counter is set: the upper limit of _alloc_counter before forcing ALGLIB++ malloc() to fail.
+// Otherwise, this value has no effect.
+extern ae_int_t _malloc_failure_after;
+
+void ae_state_set_break_jump(jmp_buf *buf);
+void ae_state_set_flags(ae_uint64_t flags);
+
+// Frame marker.
+typedef struct ae_dyn_block ae_frame;
+
+void ae_frame_make(ae_frame *tmp);
+void ae_frame_leave();
+
+void ae_state_init();
+void ae_state_clear();
+
+void ae_assert(bool cond, const char *msg);
+
+// The threading model type.
+ae_uint64_t ae_get_global_threading();
+void ae_set_global_threading(ae_uint64_t flg_value);
+
+// Service functions.
 typedef enum { CPU_SSE2 = 1 } ae_cpuid_t;
 extern const ae_cpuid_t CurCPU;
+ae_int_t ae_cores_count();
+ae_int_t ae_get_effective_workers(ae_int_t nworkers);
 
-// other definitions
-enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
+// Id values for ae_[sg]et_debug_value().
+typedef enum {
+// get set
+   _ALGLIB_ALLOC_COUNTER = 0, _ALGLIB_TOTAL_ALLOC_SIZE = 1,
+// get
+   _ALGLIB_TOTAL_ALLOC_COUNT = 2,
+// set
+   _ALGLIB_USE_VENDOR_KERNELS = 100, _ALGLIB_VENDOR_MEMSTAT = 101,
+   _ALGLIB_DEBUG_WORKSTEALING = 200, _ALGLIB_WSDBG_NCORES = 201,
+   _ALGLIB_WSDBG_PUSHROOT_OK = 202, _ALGLIB_WSDBG_PUSHROOT_FAILED = 203,
+// get
+   _ALGLIB_CORES_COUNT = 1000,
+// get set
+   _ALGLIB_GLOBAL_THREADING = 1001, _ALGLIB_NWORKERS = 1002,
+#if 0
+// For compatibility:
+// get
+   _ALGLIB_GET_ALLOC_COUNTER = _ALGLIB_ALLOC_COUNTER,
+   _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE = _ALGLIB_TOTAL_ALLOC_SIZE,
+   _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT = _ALGLIB_TOTAL_ALLOC_COUNT,
+   _ALGLIB_GET_CORES_COUNT = _ALGLIB_CORES_COUNT,
+   _ALGLIB_GET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
+   _ALGLIB_GET_NWORKERS = _ALGLIB_NWORKERS,
+// set
+   _ALGLIB_USE_DBG_COUNTERS = _ALGLIB_CUMULATIVE_ALLOC_SIZE,
+   _ALGLIB_SET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
+   _ALGLIB_SET_NWORKERS = _ALGLIB_NWORKERS,
+#endif
+} debug_flag_t;
+ae_int64_t ae_get_dbg_value(debug_flag_t id);
+void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
-ae_int_t ae_cores_count();
-void ae_yield();
-ae_int_t ae_get_effective_workers(ae_int_t nworkers);
-void ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v);
-void ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v);
-
-void *aligned_malloc(size_t size, size_t alignment);
-void *aligned_extract_ptr(void *block);
-void aligned_free(void *block);
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
 void set_memory_pool(void *ptr, size_t size);
 void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free);
 #endif
+void *aligned_malloc(size_t size, size_t alignment);
+void aligned_free(void *block);
 
 void *ae_malloc(size_t size);
 void ae_free(void *p);
-ae_int_t ae_sizeof(ae_datatype datatype);
-bool ae_check_zeros(const void *ptr, ae_int_t n);
 
-// dynamic block which may be automatically deallocated during stack unwinding
-//
-// p_next          next block in the stack unwinding list.
-//                 NULL means that this block is not in the list
-// deallocator     deallocator function which should be used to deallocate block.
-//                 NULL for "special" blocks (frame/stack boundaries)
-// ptr             pointer which should be passed to the deallocator.
-//                 may be null (for zero-size block), DYN_BOTTOM or DYN_FRAME
-//                 for "special" blocks (frame/stack boundaries).
-//
-// valgrind_hint   is a special field which stores a special hint pointer for Valgrind and other similar memory checking tools.
-//                 It is always set at run-time to to (ptr == NULL? NULL: aligned_extract_ptr(ptr)).
-//                 This compensates to the manual alignment that ALGLIB does with pointers obtained via malloc,
-//                 since ptr usually points to location past the beginning of the actuallly allocated memory.
-//                 In such cases memory testing tools would report "(possibly) lost" memory.
-//                 This field locates the actual base pointer
-//                 and is meant only for use as a hint for Valgrind - NOT for anything else.
+// Dynamic block which may be automatically deallocated during stack unwinding.
 typedef void (*ae_deallocator)(void *);
 struct ae_dyn_block {
+// The next block in the stack unwinding list; or NULL if this block is not in the list.
    struct ae_dyn_block *volatile p_next;
-// void *deallocator;
-   ae_deallocator deallocator;
+// The block deallocation function; or NULL for the stack frame/boundary "special" blocks.
+   ae_deallocator deallocator; // Was: void *deallocator;
+// The argument for deallocator(); or NULL for 0-size blocks, or the DYN_BOTTOM or DYN_FRAME stack frame/boundary "special" blocks.
    void *volatile ptr;
-// void *valgrind_hint; // Redundant: it is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
+// A "hint" pointer for Valgrind and other similar memory checking tools,
+// that saves what malloc() actually returned, or NULL if the feature is disabled or lost.
+// It is always set at run-time to to (ptr == NULL? NULL: aligned_extract_ptr(ptr)).
+// Memory testing tools may sometimes report "(possibly) lost" memory for the pointers that ALGLIB++ assigns,
+// since it aligns pointers in such a way that X usually points beyond the actual allocated memory's start.
+   void *valgrind_hint; // It is always set to (ptr == NULL? NULL: aliged_extract_ptr(ptr)).
 };
-
-void ae_db_attach(ae_dyn_block *block);
 void ae_db_init(ae_dyn_block *block, ae_int_t size, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
 #define NewBlock(B, N)			ae_dyn_block B; memset(&B, 0, sizeof B), ae_db_init(&B, N, true)
 
-void ae_state_init();
-void ae_state_clear();
-void ae_state_set_break_jump(jmp_buf *buf);
-void ae_state_set_flags(ae_uint64_t flags);
-void ae_break(ae_error_type error_type, const char *msg);
-
-// frame marker
-typedef struct ae_dyn_block ae_frame;
-
-void ae_frame_make(ae_frame *tmp);
-void ae_frame_leave();
+ae_int_t ae_sizeof(ae_datatype datatype);
 
 struct ae_vector {
-// Number of elements in array, cnt >= 0
+// The number of elements in the vector; cnt >= 0.
    ae_int_t cnt;
-// Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
+// Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX.
    ae_datatype datatype;
-// If xX points to memory owned and managed by ae_vector itself,
-// this field is false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is true.
+// True if and only if the ae_vector was attached to an x_vector by ae_vector_init_attach_to_x().
    bool is_attached;
-// ae_dyn_block structure which manages data in xX. This structure
-// is responsible for automatic deletion of object when its frame
-// is destroyed.
+// The ae_dyn_block structure which manages the data in xX and deletes it when its frame is freed.
    ae_dyn_block data;
-// Pointer to data.
-// User usually works with this field.
+// A generic pointer or pointer to the data with the matching datatype.
    union {
       void *xX;
       bool *xB;
@@ -290,7 +313,6 @@ struct ae_vector {
       ae_complex *xC;
    };
 };
-
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, bool make_automatic);
 void ae_vector_copy(ae_vector *dst, ae_vector *src, bool make_automatic);
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize);
@@ -306,11 +328,10 @@ struct ae_matrix {
    ae_int_t cols;
    ae_int_t stride;
    ae_datatype datatype;
-// If xX points to memory owned and managed by ae_vector itself,
-// this field is false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is true.
+// True if and only if the ae_matrix was attached to an x_matrix by ae_matrix_init_attach_to_x().
    bool is_attached;
    ae_dyn_block data;
+// A generic pointer, raster pointer or pointer to the data with the matching datatype.
    union {
       void *xX;
       void **xyX;
@@ -320,7 +341,6 @@ struct ae_matrix {
       ae_complex **xyC;
    };
 };
-
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, bool make_automatic);
 void ae_matrix_copy(ae_matrix *dst, ae_matrix *src, bool make_automatic);
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols);
@@ -331,8 +351,189 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 #define SetMatrix(P)			ae_matrix_free(P, true)
 
 // Used for better documenting function parameters.
+// TODO: Remake ae_vector and ae_matrix as template types.
 typedef ae_vector BVector, ZVector, RVector, CVector;
 typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
+
+struct ae_smart_ptr {
+// Pointers respectively to the subscriber and the object; all changes in ptr are translated to subscriber.
+   void **subscriber, *ptr;
+// True if the smart pointer owns ptr.
+   bool is_owner;
+// True if ptr points to a dynamic object, whose clearing requires calling both .free() ae_free().
+   bool is_dynamic;
+// The deallocation function for the pointer; clears all dynamically allocated memory.
+   void (*free)(void *, bool make_automatic);
+// The frame entry; used to ensure automatic deallocation of the smart pointer in case of an exception/exit.
+   ae_dyn_block frame_entry;
+};
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
+void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr *.
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
+void ae_smart_ptr_release(ae_smart_ptr *dst);
+#define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
+#define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
+#define SetObj(Type, P)	Type##_free(P, true)
+
+// The X-interface.
+enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION = 2, ACT_NEW_LOCATION = 3 };
+
+#if 0 //(@) Not used anywhere.
+// x-strings (zero-terminated): members are ae_int64_t to avoid alignment problems.
+#   if AE_COMPILER == AE_GNUC
+#      define ALIGNED __attribute__((aligned(8)))
+#   elif AE_COMPILER == AE_MSVC
+#      define ALIGNED __declspec(align(8))
+#   else
+#      define ALIGNED
+#   endif
+struct x_string {
+// Determines what to do on realloc().
+// If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+// It it is owned by X, it will call one of the *_free() functions.
+   ALIGNED ae_int64_t owner;		// bool owner;
+// Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
+//	ACT_UNCHANGED:		unchanged.
+//	ACT_SAME_LOCATION:	stored at the same location, or
+//	ACT_NEW_LOCATION:	stored at a new location.
+// ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
+   ALIGNED ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
+// A pointer to the actual data.
+   ALIGNED char *ptr;			// union { void *ptr; ae_int64_t portable_alignment_enforcer; };
+};
+#endif
+
+// x-vectors: members are ae_int64_t aligned to avoid alignment problems.
+struct x_vector {
+// The vector size; i.e., the number of elements.
+   ae_int64_t cnt;		// ae_int_t N;
+// One of the DT_* values.
+   ae_int64_t datatype;		// ae_datatype datatype;
+// Determines what to do on realloc().
+// If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+// It it is owned by X, it will call one of the *_free() functions.
+   ae_int64_t owner;		// bool owner;
+// Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
+//	ACT_UNCHANGED:		unchanged.
+//	ACT_SAME_LOCATION:	stored at the same location, or
+//	ACT_NEW_LOCATION:	stored at a new location.
+// ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
+   ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
+// A pointer to the actual data - with enforced alignment.
+   union {
+      void *x_ptr;
+      ae_int64_t portable_alignment_enforcer;
+   };
+};
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic);
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic);
+void ae_x_set_vector(x_vector *dst, ae_vector *src);
+void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
+void x_vector_free(x_vector *dst, bool make_automatic);
+
+// x-matrices: members are ae_int64_t to avoid alignment problems.
+struct x_matrix {
+// The matrix size.
+// If either dimension is 0, then both must be.
+   ae_int64_t cols, rows;	// ae_int_t cols, rows;
+// The stride, i.e. byte-distance between first elements of the matrix rows.
+   ae_int64_t stride;		// ae_int_t stride;
+// One of the DT_* values.
+   ae_int64_t datatype;		// ae_datatype datatype;
+// Determines what to do on realloc().
+// If the object is owned by the caller, the X-interface will just set ptr to NULL before realloc().
+// It it is owned by X, it will call one of the *_free() functions.
+   ae_int64_t owner;		// bool owner;
+// Set on return from the X interface and may be used by the caller as a hint for deciding what to do with the buffer.
+//	ACT_UNCHANGED:		unchanged.
+//	ACT_SAME_LOCATION:	stored at the same location, or
+//	ACT_NEW_LOCATION:	stored at a new location.
+// ACT_{UNCHANGED,SAME_LOCATION} mean no reallocation or copying is required.
+   ae_int64_t last_action;	// enum { ACT_UNCHANGED = 1, ACT_SAME_LOCATION, ACT_NEW_LOCATION } last_action;
+// A pointer to the actual matrix data, stored rowwise - with enforced alignment.
+   union {
+      void *x_ptr;
+      ae_int64_t portable_alignment_enforcer;
+   };
+};
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
+void ae_x_set_matrix(x_matrix *dst, ae_matrix *src);
+void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src);
+
+bool ae_is_symmetric(ae_matrix *a);
+bool ae_is_hermitian(ae_matrix *a);
+bool ae_force_symmetric(ae_matrix *a);
+bool ae_force_hermitian(ae_matrix *a);
+
+// An OS-independent non-reentrant lock:
+// *	under Posix and Windows systems it uses system-provided locks
+// *	under Boost it uses the OS-independent lock provided by the Boost package
+// *	when no OS is defined, it uses a "fake lock" (just stub, which is not thread-safe):
+//	a)	the "fake lock" can be in locked or free mode,
+//	b)	the "fake lock" can be used only from the thread which created it,
+//	c)	when the thread acquires a free lock, it immediately returns,
+//	d)	when the thread acquires a busy lock, the program is terminated
+//		(because the lock is already acquired and no one else can free it).
+struct ae_lock {
+// Pointer to _lock structure.
+// This pointer has type void * in order to make the header file OS-independent (the lock declaration depends on OS).
+   void *lock_ptr;
+// For is_static == false this field manages the pointer to the _lock structure.
+// The frame that is responsible for deallocation when the frame is freed.
+   ae_frame db;
+// True if we have a static lock (used by a thread pool) or transient lock.
+// Static locks are allocated without using the frame and cannot be deallocated.
+   bool is_static;
+};
+
+void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
+void ae_acquire_lock(ae_lock *lock);
+void ae_release_lock(ae_lock *lock);
+void ae_free_lock(ae_lock *lock);
+
+// Shared pool: the data structure used to provide thread-safe access to a pool of temporary variables.
+struct ae_shared_pool_entry {
+   void *volatile obj, *volatile next_entry;
+};
+struct ae_shared_pool {
+// The lock object which protects the pool.
+   ae_lock pool_lock;
+// The seed object: used to create new instances of temporaries.
+   void *volatile seed_object;
+// The list of recycled Objects:
+// *	entries in this list store pointers to recycled objects,
+// *	move from this list the first entry of each object retrieved to recycled_entries, and return the caller its obj field.
+   ae_shared_pool_entry *volatile recycled_objects;
+// The list of recycled Entries:
+// *	entries which are not used to store recycled objects;
+//	move the entry of each recycled object retrieved to this list,
+// *	get an entry for each object recycled from this list before allocating any with malloc().
+   ae_shared_pool_entry *volatile recycled_entries;
+// The enumeration pointer, points to the current recycled object.
+   ae_shared_pool_entry *volatile enumeration_counter;
+// The size of the object; used when we call malloc() for new objects.
+   ae_int_t size_of_object;
+// The initializer function; accepts a pointer to the malloc'ed object, initializes its fields.
+   void (*init)(void *dst, bool make_automatic);
+// The copy constructor; accepts a pointer to the malloc'ed object, but not to the initialized object.
+   void (*copy)(void *dst, void *src, bool make_automatic);
+// The destructor function.
+   void (*free)(void *ptr, bool make_automatic);
+// The frame entry; points to the pool object itself.
+   ae_frame frame_entry;
+};
+void ae_shared_pool_init(void *_dst, bool make_automatic);
+void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
+void ae_shared_pool_free(void *_dst, bool make_automatic);
+bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
+void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);
+void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
+void ae_shared_pool_reset(ae_shared_pool *pool);
 
 // Serializer:
 // *	ae_stream_writer is the type expected for pointers to serializer stream-writing functions,
@@ -359,6 +560,7 @@ typedef bool (*ae_stream_writer)(const char *S, ae_int_t Aux);
 //	-	return value true for success, false if any of the conditions above fails,
 //		in w hich case, the contents of S are not used.
 typedef bool (*ae_stream_reader)(ae_int_t Aux, ae_int_t N, char *S);
+
 typedef enum {
    AE_SM_DEFAULT = 0, AE_SM_ALLOC = 1, AE_SM_READY2S = 2,
    AE_SM_TO_STRING = 10, AE_SM_TO_CPPSTRING = 11, AE_SM_TO_STREAM = 12,
@@ -367,37 +569,35 @@ typedef enum {
 
 struct ae_serializer {
    ae_sermode_t mode;
-   ae_int_t entries_needed;
-   ae_int_t entries_saved;
-   ae_int_t bytes_asked;
-   ae_int_t bytes_written;
+   ae_int_t entries_needed, bytes_asked;
+   ae_int_t entries_saved, bytes_written;
 #ifdef AE_USE_CPP_SERIALIZATION
    std::string *out_cppstr;
 #endif
-   char *out_str;       // Pointer to the current position at the output buffer; advanced with each write operation.
-   const char *in_str;  // Pointer to the current position at the input  buffer; advanced with each read  operation.
+// Pointers respectively to the current position at the output/input buffers; advanced with each write/read operation.
+   char *out_str; const char *in_str;
    ae_int_t stream_aux;
    ae_stream_writer stream_writer;
    ae_stream_reader stream_reader;
 };
 
 void ae_serializer_init(ae_serializer *serializer);
+#define NewSerializer(Ser)	alglib_impl::ae_serializer Ser; alglib_impl::ae_serializer_init(&Ser)
 
 void ae_serializer_alloc_start(ae_serializer *serializer);
 void ae_serializer_alloc_entry(ae_serializer *serializer);
-void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes);
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer);
 
 #ifdef AE_USE_CPP_SERIALIZATION
-void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf);
 void ae_serializer_sstart_str(ae_serializer *serializer, std::string *buf);
-void ae_serializer_ustart_stream(ae_serializer *serializer, const std::istream *stream);
+void ae_serializer_ustart_str(ae_serializer *serializer, const std::string *buf);
 void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream);
+void ae_serializer_ustart_stream(ae_serializer *serializer, const std::istream *stream);
 #endif
-void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
 void ae_serializer_sstart_str(ae_serializer *serializer, char *buf);
-void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
+void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
 void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
+void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
 
 bool ae_serializer_unserialize_bool(ae_serializer *serializer);
 void ae_serializer_serialize_bool(ae_serializer *serializer, bool v);
@@ -407,243 +607,14 @@ ae_int64_t ae_serializer_unserialize_int64(ae_serializer *serializer);
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v);
 double ae_serializer_unserialize_double(ae_serializer *serializer);
 void ae_serializer_serialize_double(ae_serializer *serializer, double v);
-void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
-void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
 void ae_serializer_stop(ae_serializer *serializer);
 
-// x-string (zero-terminated):
-//     owner       Determines what to do on realloc().
-//                 false: The vector is owned by the caller, the X-interface will just set ptr to NULL before realloc().
-//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
-//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-//                 contents is either: unchanged, stored at the same location,
-//                 stored at the new location.
-//                 this field is set on return from X.
-//     ptr         pointer to the actual data
-// Members of this structure are ae_int64_t to avoid alignment problems.
-struct x_string {
-   ALIGNED ae_int64_t owner;
-   ALIGNED ae_int64_t last_action;
-   ALIGNED char *ptr;
-};
+void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes);
+void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
+void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes);
 
-// x-vector:
-//     cnt         number of elements
-//     datatype    one of the DT_XXXX values
-//     owner       Determines what to do on realloc().
-//                 false: The vector is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
-//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
-//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-//                 contents is either: unchanged, stored at the same location,
-//                 stored at the new location.
-//                 this field is set on return from X interface and may be
-//                 used by caller as hint when deciding what to do with data
-//                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
-//                 reallocation or copying is required).
-//     x_ptr       pointer to the actual data
-// Members of this structure are ae_int64_t to avoid alignment problems.
-struct x_vector {
-   ae_int64_t cnt;
-   ae_int64_t datatype;
-   ae_int64_t owner;
-   ae_int64_t last_action;
-   union {
-      void *x_ptr;
-      ae_int64_t portable_alignment_enforcer;
-   };
-};
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, bool make_automatic);
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, bool make_automatic);
-void ae_x_set_vector(x_vector *dst, ae_vector *src);
-void ae_x_attach_to_vector(x_vector *dst, ae_vector *src);
-void x_vector_free(x_vector *dst, bool make_automatic);
-
-// x-matrix:
-//     rows        number of rows. may be zero only when cols is zero too.
-//     cols        number of columns. may be zero only when rows is zero too.
-//     stride      stride, i.e. distance between first elements of rows (in bytes)
-//     datatype    one of the DT_XXXX values
-//     owner       Determines what to do on realloc().
-//                 false: The vector is owned by the caller, the X-interface will just set x_ptr to NULL before realloc().
-//                 true: It is owned by X, it will call ae_free/x_free/aligned_free family functions.
-//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-//                 contents is either: unchanged, stored at the same location,
-//                 stored at the new location.
-//                 this field is set on return from X interface and may be
-//                 used by caller as hint when deciding what to do with data
-//                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
-//                 reallocation or copying is required).
-//     x_ptr       pointer to the actual data, stored rowwise
-// Members of this structure are ae_int64_t to avoid alignment problems.
-struct x_matrix {
-   ae_int64_t rows;
-   ae_int64_t cols;
-   ae_int64_t stride;
-   ae_int64_t datatype;
-   ae_int64_t owner;
-   ae_int64_t last_action;
-   union {
-      void *x_ptr;
-      ae_int64_t portable_alignment_enforcer;
-   };
-};
-
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, bool make_automatic);
-void ae_x_set_matrix(x_matrix *dst, ae_matrix *src);
-void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src);
-bool x_is_symmetric(x_matrix *a);
-bool x_is_hermitian(x_matrix *a);
-bool x_force_symmetric(x_matrix *a);
-bool x_force_hermitian(x_matrix *a);
-bool ae_is_symmetric(ae_matrix *a);
-bool ae_is_hermitian(ae_matrix *a);
-bool ae_force_symmetric(ae_matrix *a);
-bool ae_force_hermitian(ae_matrix *a);
-
-struct ae_smart_ptr {
-// pointer to subscriber; all changes in ptr are translated to subscriber
-   void **subscriber;
-// pointer to object
-   void *ptr;
-// whether smart pointer owns ptr
-   bool is_owner;
-// whether object pointed by ptr is dynamic - clearing such object requires BOTH
-// calling destructor function AND calling ae_free for memory occupied by object.
-   bool is_dynamic;
-// destructor function for pointer; clears all dynamically allocated memory
-   void (*free)(void *, bool make_automatic);
-// frame entry; used to ensure automatic deallocation of smart pointer in case of exception/exit
-   ae_dyn_block frame_entry;
-};
-
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic);
-void ae_smart_ptr_free(void *_dst); // Accepts ae_smart_ptr*.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*free)(void *, bool make_automatic));
-void ae_smart_ptr_release(ae_smart_ptr *dst);
-#define NewObj(Type, P)	Type P; memset(&P, 0, sizeof P), Type##_init(&P, true)
-#define RefObj(Type, P)	Type *P; alglib_impl::ae_smart_ptr _##P; memset(&_##P, 0, sizeof _##P), alglib_impl::ae_smart_ptr_init(&_##P, (void **)&P, true)
-#define SetObj(Type, P)	Type##_free(P, true)
-
-// Lock.
-// This structure provides OS-independent non-reentrant lock:
-// * under Windows/Posix systems it uses system-provided locks
-// * under Boost it uses OS-independent lock provided by Boost package
-// * when no OS is defined, it uses "fake lock" (just stub which is not thread-safe):
-//   a) "fake lock" can be in locked or free mode
-//   b) "fake lock" can be used only from one thread - one which created lock
-//   c) when thread acquires free lock, it immediately returns
-//   d) when thread acquires busy lock, program is terminated
-//      (because lock is already acquired and no one else can free it)
-struct ae_lock {
-// Pointer to _lock structure. This pointer has type void* in order to
-// make header file OS-independent (lock declaration depends on OS).
-   void *lock_ptr;
-// For is_static == false this field manages pointer to _lock structure.
-// ae_dyn_block structure is responsible for automatic deletion of
-// the memory allocated for the pointer when its frame is destroyed.
-   ae_dyn_block db;
-// Whether we have eternal lock object (used by thread pool) or
-// transient lock. Eternal locks are allocated without using ae_dyn_block
-// structure and do not allow deallocation.
-   bool is_static;
-};
-
-void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic);
-void ae_acquire_lock(ae_lock *lock);
-void ae_release_lock(ae_lock *lock);
-void ae_free_lock(ae_lock *lock);
-
-// Shared pool: data structure used to provide thread-safe access to pool  of
-// temporary variables.
-struct ae_shared_pool_entry {
-   void *volatile obj;
-   void *volatile next_entry;
-};
-
-struct ae_shared_pool {
-// lock object which protects pool
-   ae_lock pool_lock;
-// seed object (used to create new instances of temporaries)
-   void *volatile seed_object;
-// list of recycled OBJECTS:
-// 1. entries in this list store pointers to recycled objects
-// 2. every time we retrieve object, we retrieve first entry from this list,
-//    move it to recycled_entries and return its obj field to caller/
-   ae_shared_pool_entry *volatile recycled_objects;
-// list of recycled ENTRIES:
-// 1. this list holds entries which are not used to store recycled objects;
-//    every time recycled object is retrieved, its entry is moved to this list.
-// 2. every time object is recycled, we try to fetch entry for him from this list
-//    before allocating it with malloc()
-   ae_shared_pool_entry *volatile recycled_entries;
-// enumeration pointer, points to current recycled object
-   ae_shared_pool_entry *volatile enumeration_counter;
-// size of object; this field is used when we call malloc() for new objects
-   ae_int_t size_of_object;
-// initializer function; accepts pointer to malloc'ed object, initializes its fields
-   void (*init)(void *dst, bool make_automatic);
-// copy constructor; accepts pointer to malloc'ed, but not initialized object
-   void (*copy)(void *dst, void *src, bool make_automatic);
-// destructor function;
-   void (*free)(void *ptr, bool make_automatic);
-// frame entry; contains pointer to the pool object itself
-   ae_dyn_block frame_entry;
-};
-
-void ae_shared_pool_init(void *_dst, bool make_automatic);
-void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic);
-void ae_shared_pool_free(void *dst, bool make_automatic);
-bool ae_shared_pool_is_initialized(ae_shared_pool *dst);
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, bool make_automatic), void (*copy)(void *dst, void *src, bool make_automatic), void (*free)(void *ptr, bool make_automatic));
-void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr);
-void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr);
-void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic);
-void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
-void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr);
-void ae_shared_pool_reset(ae_shared_pool *pool);
-
-// Id values for ae_[sg]et_debug_value().
-typedef enum {
-// set get
-   _ALGLIB_ALLOC_COUNTER = 0, _ALGLIB_TOTAL_ALLOC_SIZE = 1,
-// get
-   _ALGLIB_TOTAL_ALLOC_COUNT = 2,
-// set
-   _ALGLIB_USE_VENDOR_KERNELS = 100, _ALGLIB_VENDOR_MEMSTAT = 101,
-   _ALGLIB_DEBUG_WORKSTEALING = 200, _ALGLIB_WSDBG_NCORES = 201,
-   _ALGLIB_WSDBG_PUSHROOT_OK = 202, _ALGLIB_WSDBG_PUSHROOT_FAILED = 203,
-// get
-   _ALGLIB_CORES_COUNT = 1000,
-// set get
-   _ALGLIB_GLOBAL_THREADING = 1001, _ALGLIB_NWORKERS = 1002,
-#if 0
-// For compatibility:
-// get
-   _ALGLIB_GET_ALLOC_COUNTER = _ALGLIB_ALLOC_COUNTER,
-   _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE = _ALGLIB_TOTAL_ALLOC_SIZE,
-   _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT = _ALGLIB_TOTAL_ALLOC_COUNT,
-   _ALGLIB_GET_CORES_COUNT = _ALGLIB_CORES_COUNT,
-   _ALGLIB_GET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
-   _ALGLIB_GET_NWORKERS = _ALGLIB_NWORKERS,
-// set
-   _ALGLIB_USE_DBG_COUNTERS = _ALGLIB_CUMULATIVE_ALLOC_SIZE,
-   _ALGLIB_SET_GLOBAL_THREADING = _ALGLIB_GLOBAL_THREADING,
-   _ALGLIB_SET_NWORKERS = _ALGLIB_NWORKERS,
-#endif
-} debug_flag_t;
-
-void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
-ae_int64_t ae_get_dbg_value(debug_flag_t id);
-
-void ae_set_global_threading(ae_uint64_t flg_value);
-ae_uint64_t ae_get_global_threading();
-
-// Service functions
-void ae_assert(bool cond, const char *msg);
-
-// Real math functions:
+// Real math functions: IEEE-compliant floating point comparisons and standard functions.
 // * standard functions
 bool isneginf(double x);
 bool isposinf(double x);
@@ -668,127 +639,107 @@ double ae_sqr(double x);
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2);
 double rboundval(double x, double b1, double b2);
 
+// Debug-support.
+#if 0 //(@) Not used anywhere, and not useful for debugging.
+// Flush the console.
+#   define flushconsole(s) fflush(stdout)
+#endif
+
+// Debug-enabled random number functions:
+// TODO:
+// ∙	ae_set_seed():		set the seed of the debug random number generator (NOT thread-safe!!!).
+// ∙	ae_get_seed():		the seed value of the debug random number generator (NOT thread-safe!!!).
+// ∙	ae_debugrng():		a random number generated with a high-quality random number generator.
 double ae_randomreal();
 double ae_randommid();
 ae_int_t ae_randominteger(ae_int_t maxv);
 bool ae_randombool(double p = 0.5);
 
 // Complex math functions:
-// * basic arithmetic operations
-// * standard functions
+// *	basic arithmetic operations
+// *	standard functions
 inline ae_complex ae_complex_from_i(ae_int_t x, ae_int_t y = 0) { ae_complex r; r.x = (double)x, r.y = (double)y; return r; }
 inline ae_complex ae_complex_from_d(double x, double y = 0.0) { ae_complex r; r.x = x, r.y = y; return r; }
 
-ae_complex ae_c_neg(ae_complex lhs);
-bool ae_c_eq(ae_complex lhs, ae_complex rhs);
-bool ae_c_neq(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_add(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs);
-ae_complex ae_c_div(ae_complex lhs, ae_complex rhs);
-bool ae_c_eq_d(ae_complex lhs, double rhs);
-bool ae_c_neq_d(ae_complex lhs, double rhs);
-ae_complex ae_c_add_d(ae_complex lhs, double rhs);
-ae_complex ae_c_mul_d(ae_complex lhs, double rhs);
-ae_complex ae_c_sub_d(ae_complex lhs, double rhs);
-ae_complex ae_c_d_sub(double lhs, ae_complex rhs);
-ae_complex ae_c_div_d(ae_complex lhs, double rhs);
-ae_complex ae_c_d_div(double lhs, ae_complex rhs);
-
-ae_complex ae_c_conj(ae_complex lhs);
-ae_complex ae_c_sqr(ae_complex lhs);
+ae_complex ae_c_neg(ae_complex A);
+ae_complex ae_c_conj(ae_complex A);
+ae_complex ae_c_sqr(ae_complex A);
 double ae_c_abs(ae_complex z);
 
-// Complex BLAS operations
-ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n);
-void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha);
-void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha);
-void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void ae_v_csubd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void ae_v_csubc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha);
-void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha);
-void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex alpha);
+bool ae_c_eq(ae_complex A, ae_complex B);
+bool ae_c_neq(ae_complex A, ae_complex B);
 
-// Real BLAS operations
-double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n);
-void ae_v_move(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void ae_v_moveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void ae_v_moved(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void ae_v_add(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void ae_v_addd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void ae_v_sub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void ae_v_subd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void ae_v_muld(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha);
+ae_complex ae_c_add(ae_complex A, ae_complex B);
+ae_complex ae_c_mul(ae_complex A, ae_complex B);
+ae_complex ae_c_sub(ae_complex A, ae_complex B);
+ae_complex ae_c_div(ae_complex A, ae_complex B);
 
-// Other functions
+bool ae_c_eq_d(ae_complex A, double B);
+bool ae_c_neq_d(ae_complex A, double B);
+
+ae_complex ae_c_add_d(ae_complex A, double B);
+ae_complex ae_c_mul_d(ae_complex A, double B);
+ae_complex ae_c_sub_d(ae_complex A, double B);
+ae_complex ae_c_d_sub(double A, ae_complex B);
+ae_complex ae_c_div_d(ae_complex A, double B);
+ae_complex ae_c_d_div(double A, ae_complex B);
+
+// Complex BLAS operations.
+ae_complex ae_v_cdotproduct(const ae_complex *A, ae_int_t dA, const char *CjA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmove(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmoveneg(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_cmoved(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_cmovec(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
+void ae_v_cadd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_caddd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_caddc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
+void ae_v_csub(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void ae_v_csubd(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void ae_v_csubc(ae_complex *A, ae_int_t dA, const ae_complex *B, ae_int_t dB, const char *CjB, ae_int_t N, ae_complex Alpha);
+void ae_v_cmuld(ae_complex *A, ae_int_t dA, ae_int_t N, double Alpha);
+void ae_v_cmulc(ae_complex *A, ae_int_t dA, ae_int_t N, ae_complex Alpha);
+
+// Real BLAS operations.
+double ae_v_dotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void ae_v_move(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void ae_v_moveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void ae_v_moved(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void ae_v_add(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void ae_v_addd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void ae_v_sub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void ae_v_subd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha);
+
 #if 0
-extern const double ae_machineepsilon, ae_maxrealnumber, ae_minrealnumber, ae_pi;
+extern const double ae_machineepsilon, ae_maxrealnumber, ae_minrealnumber;
+extern const double ae_pi;
+#else
+#   define ae_machineepsilon	5.0E-16
+#   define ae_maxrealnumber	1.0E300
+#   define ae_minrealnumber	1.0E-300
+#   define ae_pi		3.1415926535897932384626433832795
 #endif
-#define ae_machineepsilon 5E-16
-#define ae_maxrealnumber  1E300
-#define ae_minrealnumber  1E-300
-#define ae_pi 3.1415926535897932384626433832795
 
-// Allocation counters, inactive by default.
-// Turned on when needed for debugging purposes.
-//
-// _alloc_counter is incremented by 1 on malloc(), decremented on free().
-// _alloc_counter_total is only incremented by 1.
-extern ae_int_t _alloc_counter;
-extern ae_int_t _alloc_counter_total;
-extern bool _use_alloc_counter;
-
-// Malloc debugging:
-//
-// * _force_malloc_failure - set this flag to true in  order  to  enforce
-//   failure of ALGLIB malloc(). Useful to debug handling of  errors  during
-//   memory allocation. As long as this flag is set, ALGLIB malloc will fail.
-// * _malloc_failure_after - set it to non-zero value in  order  to  enforce
-//   malloc failure as soon as _alloc_counter_total increases above value of
-//   this variable. This value has no effect if  _use_alloc_counter  is  not
-//   set.
-extern bool _force_malloc_failure;
-extern ae_int_t _malloc_failure_after;
-
-// debug functions (must be turned on by preprocessor definitions):
-// * flushconsole(), fluches console
-// * ae_debugrng(), returns random number generated with high-quality random numbers generator
-// * ae_set_seed(), sets seed of the debug RNG (NON-THREAD-SAFE!!!)
-// * ae_get_seed(), returns two seed values of the debug RNG (NON-THREAD-SAFE!!!)
-#define flushconsole(s) fflush(stdout)
-
-// Linear Algebra
+// Optimized shared C/C++ linear algebra code.
 #define ALGLIB_INTERCEPTS_ABLAS
-void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride);
-void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride);
-void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb);
-void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj);
-void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj);
-void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b);
-void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride);
-void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b);
-void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride);
-
-bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc);
 bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
 bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
-bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+void _ialglib_pack_n2(double *col0, double *col1, ae_int_t n, ae_int_t src_stride, double *dst);
+void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode);
+void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride);
 } // end of namespace alglib_impl
 
 namespace alglib {
-typedef alglib_impl::ae_int_t ae_int_t;
+// Declarations for C++-related functionality.
 
 // Exception class and exception handling macros.
 #if !defined AE_NO_EXCEPTIONS
@@ -807,12 +758,12 @@ struct ap_error {
 #else
 // Exception-free code.
 #   define ThrowErrorMsg(X)	set_error_msg(); return X
-#   if AE_THREADING != AE_SERIAL_UNSAFE
-#      error Exception-free mode is thread-unsafe; define AE_THREADING = AE_SERIAL_UNSAFE to prove that you know it
+#   if AE_THREADING != NonTH
+#      error Exception-free mode is thread-unsafe; define AE_THREADING = NonTH to prove that you know it
 #   endif
 #   define BegPoll		{
 #   define EndPoll		}
-// Set the error flag and (optionally) the error message
+// Set the error flag and (optionally) the error message.
 void set_error_msg();
 // Get the error flag and (optionally) the error message (as *MsgP);
 // If the error flag is not set (or MsgP == NULL) *MsgP is not changed.
@@ -832,6 +783,7 @@ void clear_error_flag();
 #define ConstT(T, Val)	(const_cast<alglib_impl::T *>((Val).c_ptr()))
 #define ComplexOf(Val)	(*reinterpret_cast<complex *>(&(Val)))
 
+// Pseudo-templates:
 // The triple-layering -- also present in the distribution version of ALGLIB --
 // is the cost of trying to make a C++ type into a C structure, and to then turn around and wrap it back into a C++ type.
 // It's better to just lose the C code (which is, effectively, what the alglib_impl namespace is and encapsulates)
@@ -885,486 +837,12 @@ Type &Type::operator=(const Type &A) { \
    return *this; \
 }
 
-// Complex number with double precision.
-struct complex {
-   complex(): x(0.0), y(0.0) { }
-   complex(const double &X): x(X), y(0.0) { }
-   complex(const double &X, const double &Y): x(X), y(Y) { }
-   complex(const complex &Z): x(Z.x), y(Z.y) { }
-   complex &operator=(const double &X); complex &operator=(const complex &Z);
-   complex &operator+=(const double &X); complex &operator+=(const complex &Z);
-   complex &operator-=(const double &X); complex &operator-=(const complex &Z);
-   complex &operator*=(const double &X); complex &operator*=(const complex &Z);
-   complex &operator/=(const double &X); complex &operator/=(const complex &Z);
-   alglib_impl::ae_complex *c_ptr() { return (alglib_impl::ae_complex *)this; }
-   const alglib_impl::ae_complex *c_ptr() const { return (const alglib_impl::ae_complex *)this; }
-#if !defined AE_NO_EXCEPTIONS
-   std::string tostring(int dps) const;
-#endif
-   double x, y;
-};
-
-bool operator==(const complex &A, const complex &B);
-bool operator!=(const complex &A, const complex &B);
-const complex operator+(const complex &A);
-const complex operator-(const complex &A);
-const complex operator+(const complex &A, const complex &B);
-const complex operator-(const complex &A, const complex &B);
-const complex operator*(const complex &A, const complex &B);
-const complex operator/(const complex &A, const complex &B);
-const complex operator+(const complex &A, const double &B);
-const complex operator-(const complex &A, const double &B);
-const complex operator*(const complex &A, const double &B);
-const complex operator/(const complex &A, const double &B);
-const complex operator+(const double &A, const complex &B);
-const complex operator-(const double &A, const complex &B);
-const complex operator*(const double &A, const complex &B);
-const complex operator/(const double &A, const complex &B);
-double abscomplex(const complex &A);
-complex conj(const complex &A);
-complex csqr(const complex &A);
-
-// Level 1 BLAS functions
-// NOTES:
-// * destination and source should NOT overlap
-// * stride is assumed to be positive, but it is not
-//   assert'ed within function
-// * conj_src parameter specifies whether complex source is conjugated
-//   before processing or not. Pass string which starts with 'N' or 'n'
-//   ("No conj", for example) to use unmodified parameter. All other
-//   values will result in conjugation of input, but it is recommended
-//   to use "Conj" in such cases.
-double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n);
-double vdotproduct(const double *v1, const double *v2, ae_int_t N);
-
-complex vdotproduct(const complex *v0, ae_int_t stride0, const char *conj0, const complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n);
-complex vdotproduct(const complex *v1, const complex *v2, ae_int_t N);
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void vmove(double *vdst, const double *vsrc, ae_int_t N);
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N);
-
-void vmoveneg(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void vmoveneg(double *vdst, const double *vsrc, ae_int_t N);
-
-void vmoveneg(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void vmoveneg(complex *vdst, const complex *vsrc, ae_int_t N);
-
-void vmove(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void vmove(double *vdst, const double *vsrc, ae_int_t N, double alpha);
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, double alpha);
-
-void vmove(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha);
-void vmove(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha);
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void vadd(double *vdst, const double *vsrc, ae_int_t N);
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N);
-
-void vadd(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void vadd(double *vdst, const double *vsrc, ae_int_t N, double alpha);
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, double alpha);
-
-void vadd(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha);
-void vadd(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha);
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n);
-void vsub(double *vdst, const double *vsrc, ae_int_t N);
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
-void vsub(complex *vdst, const complex *vsrc, ae_int_t N);
-
-void vsub(double *vdst, ae_int_t stride_dst, const double *vsrc, ae_int_t stride_src, ae_int_t n, double alpha);
-void vsub(double *vdst, const double *vsrc, ae_int_t N, double alpha);
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha);
-void vsub(complex *vdst, const complex *vsrc, ae_int_t N, double alpha);
-
-void vsub(complex *vdst, ae_int_t stride_dst, const complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, complex alpha);
-void vsub(complex *vdst, const complex *vsrc, ae_int_t N, complex alpha);
-
-void vmul(double *vdst, ae_int_t stride_dst, ae_int_t n, double alpha);
-void vmul(double *vdst, ae_int_t N, double alpha);
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha);
-void vmul(complex *vdst, ae_int_t N, double alpha);
-
-void vmul(complex *vdst, ae_int_t stride_dst, ae_int_t n, complex alpha);
-void vmul(complex *vdst, ae_int_t N, complex alpha);
-
-// xparams type and several predefined constants
-typedef alglib_impl::ae_uint64_t xparams;
-extern const xparams xdefault, serial, parallel;
-
-// Threading functions
-// nworkers can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
-void setnworkers(ae_int_t nworkers);
-
-// sets global threading settings to serial or parallel
-void setglobalthreading(const xparams settings);
-
-// nworkers can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
-ae_int_t getnworkers();
-
-// internal functions used by TestX.cpp, interfaces for functions present
-// in commercial ALGLIB but lacking in free edition.
-ae_int_t _ae_cores_count();
-void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
-alglib_impl::ae_uint64_t _ae_get_global_threading();
-
-// 1- and 2-dimensional arrays
-struct ae_vector_wrapper {
-// Creates object attached to external ae_vector structure.
-// NOTE: this function also checks that source ae_vector* has
-//       required datatype. An exception is generated otherwise.
-   ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype);
-// Creates zero-size vector of specific datatype
-   ae_vector_wrapper(alglib_impl::ae_datatype datatype);
-// Creates a copy of another vector (can be reference to one of the derived classes)
-// NOTE: this function also checks that source ae_vector* has
-//       required datatype. An exception is generated otherwise.
-   ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype);
-// Well, it is destructor...
-   virtual ~ae_vector_wrapper();
-// For wrapper object allocated with allocate_own() this function
-// changes length, completely dropping previous contents.
-//
-// It does not work (throws exception) for frozen proxy objects.
-   void setlength(ae_int_t iLen);
-// Element count
-   ae_int_t length() const;
-// Access to internal C-structure used by C-core.
-// Not intended for external use.
-   const alglib_impl::ae_vector *c_ptr() const { return This; }
-   alglib_impl::ae_vector *c_ptr() { return This; }
-private:
-   ae_vector_wrapper(const ae_vector_wrapper &rhs);
-protected:
-#if !defined AE_NO_EXCEPTIONS
-// Copies array given by string into current object. Additional
-// parameter DATATYPE contains information about type of the data
-// in S and type of the array to create.
-//
-// NOTE: this function is not supported in exception-free mode.
-   ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype);
-#endif
-// This function attaches wrapper object to external x_vector structure;
-// "frozen proxy" mode is activated (you can read/write, but can not reallocate
-// and do not own memory of the vector).
-// NOTE: initial state of wrapper object is assumed to be initialized;
-//       all previously allocated memory is properly deallocated.
-// NOTE: x_vector structure pointed by new_ptr is used only once; after
-//       we fetch pointer to memory and its size, this structure is ignored
-//       and not referenced anymore. So, you can pass pointers to temporary
-//       x-structures which are deallocated immediately after you call attach_to()
-// NOTE: state structure is used for error reporting purposes (longjmp on errors).
-   void attach_to(alglib_impl::x_vector *new_ptr);
-// Assigns RHS to current object. Returns *this.
-// It has several branches depending on target object status:
-// * in case it is proxy object, data are copied into memory pointed by
-//   proxy. Function checks that source has exactly same size as target
-//   (exception is thrown on failure).
-// * in case it is non-proxy object, data allocated by object are cleared
-//   and a copy of RHS is created in target.
-// NOTE: this function correctly handles assignments of the object to itself.
-   const ae_vector_wrapper &assign(const ae_vector_wrapper &rhs);
-// Pointer to ae_vector structure:
-// * This == &Obj means that wrapper object owns ae_vector structure and
-//   is responsible for proper deallocation of its memory
-// * This != &Obj means that wrapper object works with someone's other
-//   ae_vector record and is not responsible for its memory; in this case
-//   Obj is assumed to be uninitialized.
-   alglib_impl::ae_vector *This;
-// Inner ae_vector record.
-// Ignored for This != &Obj.
-   alglib_impl::ae_vector Obj;
-// Whether this wrapper object is frozen proxy (you may read array, may
-// modify its value, but can not deallocate its memory or resize it) or not.
-//
-// If owner == false and if:
-// * This == &Obj, it means that wrapper works with its own ae_vector
-//   structure, but this structure points to externally allocated memory.
-//   This memory is NOT owned by ae_vector object.
-// * This != &Obj, it means that wrapper works with externally allocated
-//   and managed ae_vector structure. Both memory pointed by ae_vector and
-//   ae_vector structure itself are not owned by wrapper object.
-   bool owner;
-};
-
-struct boolean_1d_array: public ae_vector_wrapper {
-   boolean_1d_array();
-   boolean_1d_array(const boolean_1d_array &rhs);
-   boolean_1d_array(alglib_impl::ae_vector *p);
-   const boolean_1d_array &operator=(const boolean_1d_array &rhs);
-   virtual ~boolean_1d_array();
-   const bool &operator()(ae_int_t i) const;
-   bool &operator()(ae_int_t i);
-   const bool &operator[](ae_int_t i) const;
-   bool &operator[](ae_int_t i);
-// This function allocates array[iLen] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t iLen, const bool *pContent);
-// This function returns pointer to internal memory
-   bool *getcontent();
-   const bool *getcontent() const;
-#if !defined AE_NO_EXCEPTIONS
-   boolean_1d_array(const char *s);
-   std::string tostring() const;
-#endif
-};
-
-struct integer_1d_array: public ae_vector_wrapper {
-   integer_1d_array();
-   integer_1d_array(const integer_1d_array &rhs);
-   integer_1d_array(alglib_impl::ae_vector *p);
-   const integer_1d_array &operator=(const integer_1d_array &rhs);
-   virtual ~integer_1d_array();
-   const ae_int_t &operator()(ae_int_t i) const;
-   ae_int_t &operator()(ae_int_t i);
-   const ae_int_t &operator[](ae_int_t i) const;
-   ae_int_t &operator[](ae_int_t i);
-// This function allocates array[iLen] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t iLen, const ae_int_t *pContent);
-// This function returns pointer to internal memory
-   ae_int_t *getcontent();
-   const ae_int_t *getcontent() const;
-#if !defined AE_NO_EXCEPTIONS
-   integer_1d_array(const char *s);
-   std::string tostring() const;
-#endif
-};
-
-struct real_1d_array: public ae_vector_wrapper {
-   real_1d_array();
-   real_1d_array(const real_1d_array &rhs);
-   real_1d_array(alglib_impl::ae_vector *p);
-   const real_1d_array &operator=(const real_1d_array &rhs);
-   virtual ~real_1d_array();
-   const double &operator()(ae_int_t i) const;
-   double &operator()(ae_int_t i);
-   const double &operator[](ae_int_t i) const;
-   double &operator[](ae_int_t i);
-// This function allocates array[iLen] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t iLen, const double *pContent);
-// This function attaches array to memory pointed by pContent.
-// No own memory is allocated, no copying of data is performed,
-// so pContent pointer should be valid as long as we work with
-// array.
-//
-// After you attach array object to external memory, it becomes
-// "frozen": it is possible to read/write array elements, but
-// it is not allowed to resize it (no setlength() calls).
-   void attach_to_ptr(ae_int_t iLen, double *pContent);
-// This function returns pointer to internal memory
-   double *getcontent();
-   const double *getcontent() const;
-#if !defined AE_NO_EXCEPTIONS
-   real_1d_array(const char *s);
-   std::string tostring(int dps) const;
-#endif
-};
-
-struct complex_1d_array: public ae_vector_wrapper {
-   complex_1d_array();
-   complex_1d_array(const complex_1d_array &rhs);
-   complex_1d_array(alglib_impl::ae_vector *p);
-   const complex_1d_array &operator=(const complex_1d_array &rhs);
-   virtual ~complex_1d_array();
-   const complex &operator()(ae_int_t i) const;
-   complex &operator()(ae_int_t i);
-   const complex &operator[](ae_int_t i) const;
-   complex &operator[](ae_int_t i);
-// This function allocates array[iLen] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t iLen, const complex *pContent);
-   complex *getcontent();
-   const complex *getcontent() const;
-#if !defined AE_NO_EXCEPTIONS
-   complex_1d_array(const char *s);
-   std::string tostring(int dps) const;
-#endif
-};
-
-struct ae_matrix_wrapper {
-// Creates object attached to external ae_vector structure, with additional
-// check for matching datatypes (e_ptr->datatype == datatype is required).
-   ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
-// Creates zero-sized matrix of specified datatype.
-   ae_matrix_wrapper(alglib_impl::ae_datatype datatype);
-// Creates copy of rhs, with additional check for matching datatypes
-// (rhs.datatype == datatype is required).
-   ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype);
-// Destructor
-   virtual ~ae_matrix_wrapper();
-   void setlength(ae_int_t rows, ae_int_t cols);
-   ae_int_t rows() const;
-   ae_int_t cols() const;
-   bool isempty() const;
-   ae_int_t getstride() const;
-   const alglib_impl::ae_matrix *c_ptr() const { return This; }
-   alglib_impl::ae_matrix *c_ptr() { return This; }
-private:
-   ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
-protected:
-#if !defined AE_NO_EXCEPTIONS
-// Copies array given by string into current object. Additional
-// parameter DATATYPE contains information about type of the data
-// in S and type of the array to create.
-//
-// Current object is considered empty (this function should be
-// called from copy constructor).
-   ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype);
-#endif
-// This function attaches wrapper object to external x_vector structure;
-// "frozen proxy" mode is activated (you can read/write, but can not reallocate
-// and do not own memory of the vector).
-// NOTE: initial state of wrapper object is assumed to be initialized;
-//       all previously allocated memory is properly deallocated.
-// NOTE: x_vector structure pointed by new_ptr is used only once; after
-//       we fetch pointer to memory and its size, this structure is ignored
-//       and not referenced anymore. So, you can pass pointers to temporary
-//       x-structures which are deallocated immediately after you call attach_to()
-// NOTE: state structure is used for error-handling (a longjmp is performed
-//       on allocation error). All previously allocated memory is correctly
-//       freed on error.
-   void attach_to(alglib_impl::x_matrix *new_ptr);
-// Assigns RHS to current object.
-// It has several branches depending on target object status:
-// * in case it is proxy object, data are copied into memory pointed by
-//   proxy. Function checks that source has exactly same size as target
-//   (exception is thrown on failure).
-// * in case it is non-proxy object, data allocated by object are cleared
-//   and a copy of RHS is created in target.
-// NOTE: this function correctly handles assignments of the object to itself.
-   const ae_matrix_wrapper &assign(const ae_matrix_wrapper &rhs);
-// Pointer to ae_matrix structure:
-// * This == &Obj means that wrapper object owns ae_matrix structure and
-//   is responsible for proper deallocation of its memory
-// * This != &Obj means that wrapper object works with someone's other
-//   ae_matrix record and is not responsible for its memory; in this case
-//   Obj is assumed to be uninitialized.
-   alglib_impl::ae_matrix *This;
-// Inner ae_matrix record.
-// Ignored for This != &Obj.
-   alglib_impl::ae_matrix Obj;
-// Whether this wrapper object is frozen proxy (you may read array, may
-// modify its value, but can not deallocate its memory or resize it) or not.
-// If owner == false and if:
-// * This == &Obj, it means that wrapper works with its own ae_vector
-//   structure, but this structure points to externally allocated memory.
-//   This memory is NOT owned by ae_vector object.
-// * This != &Obj, it means that wrapper works with externally allocated
-//   and managed ae_vector structure. Both memory pointed by ae_vector and
-//   ae_vector structure itself are not owned by wrapper object.
-   bool owner;
-};
-
-struct boolean_2d_array: public ae_matrix_wrapper {
-   boolean_2d_array();
-   boolean_2d_array(const boolean_2d_array &rhs);
-   boolean_2d_array(alglib_impl::ae_matrix *p);
-   virtual ~boolean_2d_array();
-   const boolean_2d_array &operator=(const boolean_2d_array &rhs);
-   const bool &operator()(ae_int_t i, ae_int_t j) const;
-   bool &operator()(ae_int_t i, ae_int_t j);
-   const bool *operator[](ae_int_t i) const;
-   bool *operator[](ae_int_t i);
-// This function allocates array[irows,icols] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent);
-#if !defined AE_NO_EXCEPTIONS
-   boolean_2d_array(const char *s);
-   std::string tostring() const;
-#endif
-};
-
-struct integer_2d_array: public ae_matrix_wrapper {
-   integer_2d_array();
-   integer_2d_array(const integer_2d_array &rhs);
-   integer_2d_array(alglib_impl::ae_matrix *p);
-   virtual ~integer_2d_array();
-   const integer_2d_array &operator=(const integer_2d_array &rhs);
-   const ae_int_t &operator()(ae_int_t i, ae_int_t j) const;
-   ae_int_t &operator()(ae_int_t i, ae_int_t j);
-   const ae_int_t *operator[](ae_int_t i) const;
-   ae_int_t *operator[](ae_int_t i);
-// This function allocates array[irows,icols] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent);
-#if !defined AE_NO_EXCEPTIONS
-   integer_2d_array(const char *s);
-   std::string tostring() const;
-#endif
-};
-
-struct real_2d_array: public ae_matrix_wrapper {
-   real_2d_array();
-   real_2d_array(const real_2d_array &rhs);
-   real_2d_array(alglib_impl::ae_matrix *p);
-   virtual ~real_2d_array();
-   const real_2d_array &operator=(const real_2d_array &rhs);
-   const double &operator()(ae_int_t i, ae_int_t j) const;
-   double &operator()(ae_int_t i, ae_int_t j);
-   const double *operator[](ae_int_t i) const;
-   double *operator[](ae_int_t i);
-// This function allocates array[irows,icols] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t irows, ae_int_t icols, const double *pContent);
-// This function attaches array to memory pointed by pContent:
-// * only minor amount of own memory is allocated - O(irows) bytes to
-//   store precomputed pointers; but no costly copying of O(rows*cols)
-//   data is performed.
-// * pContent pointer should be valid as long as we work with array
-// After you attach array object to external memory, it becomes
-// "frozen": it is possible to read/write array elements, but
-// it is not allowed to resize it (no setlength() calls).
-   void attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent);
-#if !defined AE_NO_EXCEPTIONS
-   real_2d_array(const char *s);
-   std::string tostring(int dps) const;
-#endif
-};
-
-struct complex_2d_array: public ae_matrix_wrapper {
-   complex_2d_array();
-   complex_2d_array(const complex_2d_array &rhs);
-   complex_2d_array(alglib_impl::ae_matrix *p);
-   virtual ~complex_2d_array();
-   const complex_2d_array &operator=(const complex_2d_array &rhs);
-   const complex &operator()(ae_int_t i, ae_int_t j) const;
-   complex &operator()(ae_int_t i, ae_int_t j);
-   const complex *operator[](ae_int_t i) const;
-   complex *operator[](ae_int_t i);
-// This function allocates array[irows,icols] and copies data
-// pointed by pContent to its memory. Completely independent
-// copy of data is created.
-   void setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent);
-#if !defined AE_NO_EXCEPTIONS
-   complex_2d_array(const char *s);
-   std::string tostring(int dps) const;
-#endif
-};
+typedef alglib_impl::ae_int_t ae_int_t;
 
 #if 0
 // Constants and functions introduced for compatibility with AlgoPascal
 extern const double machineepsilon, maxrealnumber, minrealnumber;
+extern const double pi;
 #endif
 
 bool isneginf(double x);
@@ -1387,50 +865,434 @@ double randommid();
 ae_int_t randominteger(ae_int_t maxv);
 bool randombool(double p = 0.5);
 
-static const int CSV_DEFAULT = 0x0;
-static const int CSV_SKIP_HEADERS = 0x1;
-
-// CSV operations: reading CSV file to real matrix.
-//
-// This function reads CSV  file  and  stores  its  contents  to  double
-// precision 2D array. Format of the data file must conform to RFC  4180
-// specification, with additional notes:
-// * file size should be less than 2GB
-// * ASCI encoding, UTF-8 without BOM (in header names) are supported
-// * any character (comma/tab/space) may be used as field separator,  as
-//   long as it is distinct from one used for decimal point
-// * multiple subsequent field separators (say, two  spaces) are treated
-//   as MULTIPLE separators, not one big separator
-// * both comma and full stop may be used as decimal point. Parser  will
-//   automatically determine specific character being used.  Both  fixed
-//   and exponential number formats are  allowed.   Thousand  separators
-//   are NOT allowed.
-// * line may end with \n (Unix style) or \r\n (Windows  style),  parser
-//   will automatically adapt to chosen convention
-// * escaped fields (ones in double quotes) are not supported
-//
-// Inputs:
-//     filename        relative/absolute path
-//     separator       character used to separate fields.  May  be  ' ',
-//                     ',', '\t'. Other separators are possible too.
-//     flags           several values combined with bitwise OR:
-//                     * CSV_SKIP_HEADERS -  if present, first row
-//                       contains headers  and  will  be  skipped.   Its
-//                       contents is used to determine fields count, and
-//                       that's all.
-//                     If no flags are specified, default value 0x0  (or
-//                     CSV_DEFAULT, which is same) should be used.
-//
-// Outputs:
-//     out             2D matrix, CSV file parsed with atof()
-//
-// HANDLING OF SPECIAL CASES:
-// * file does not exist - ap_error exception is thrown
-// * empty file - empty array is returned (no exception)
-// * skip_first_row=true, only one row in file - empty array is returned
-// * field contents is not recognized by atof() - field value is replaced
-//   by 0.0
+// Complex number with double precision.
+struct complex {
+   complex(): x(0.0), y(0.0) { }
+   complex(const double &X): x(X), y(0.0) { }
+   complex(const double &X, const double &Y): x(X), y(Y) { }
+   complex(const complex &Z): x(Z.x), y(Z.y) { }
+   complex &operator=(const double &v);
+   complex &operator=(const complex &z);
+   complex &operator+=(const double &v);
+   complex &operator+=(const complex &z);
+   complex &operator-=(const double &v);
+   complex &operator-=(const complex &z);
+   complex &operator*=(const double &v);
+   complex &operator*=(const complex &z);
+   complex &operator/=(const double &v);
+   complex &operator/=(const complex &z);
+   alglib_impl::ae_complex *c_ptr() { return (alglib_impl::ae_complex *)this; }
+   const alglib_impl::ae_complex *c_ptr() const { return (const alglib_impl::ae_complex *)this; }
 #if !defined AE_NO_EXCEPTIONS
+   std::string tostring(int _dps) const;
+#endif
+   double x, y;
+};
+
+bool operator==(const complex &A, const complex &B);
+bool operator!=(const complex &A, const complex &B);
+const complex operator+(const complex &A);
+const complex operator-(const complex &A);
+const complex operator+(const complex &A, const complex &B);
+const complex operator+(const complex &A, const double &B);
+const complex operator+(const double &A, const complex &B);
+const complex operator-(const complex &A, const complex &B);
+const complex operator-(const complex &A, const double &B);
+const complex operator-(const double &A, const complex &B);
+const complex operator*(const complex &A, const complex &B);
+const complex operator*(const complex &A, const double &B);
+const complex operator*(const double &A, const complex &B);
+const complex operator/(const complex &A, const complex &B);
+const complex operator/(const complex &A, const double &B);
+const complex operator/(const double &A, const complex &B);
+double abscomplex(const complex &A);
+complex conj(const complex &A);
+complex csqr(const complex &A);
+
+// Multi-threading and multi-core functions.
+// These are mostly stubs from the commercial version of ALGLIB.
+// xparams type and several predefined constants
+typedef alglib_impl::ae_uint64_t xparams;	// enum { NonTH, SerTH, ParTH };
+
+// Set/Get the number cores; can be 1, 2, ...; or 0 for auto; or -1/-2/... for all except for one/two/...
+ae_int_t getnworkers();
+void setnworkers(ae_int_t nworkers);
+
+// Internal functions used by TestX.cpp, interfaces for functions present in commercial version of ALGLIB.
+ae_int_t _ae_cores_count();
+alglib_impl::ae_uint64_t _ae_get_global_threading();
+void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
+
+// Set the global threading mode.
+void setglobalthreading(const xparams settings);
+
+// Level 1 BLAS functions
+// NOTES:
+// *	Segments A and B should NOT overlap.
+// *	Strides dA, dB > 0, but are not assert()'ed within the function.
+// *	CjA, CjB specify whether or not A and B respectively are to be conjugated before processing.
+//	Any string which starts with 'N' or 'n' ("No conj", for example) specifies an unmodified parameter.
+//	All other strings specify conjugation of the input, but "Conj" is recommended for use in such cases.
+double vdotproduct(const double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+double vdotproduct(const double *A, const double *B, ae_int_t N);
+complex vdotproduct(const complex *A, ae_int_t dA, const char *CjA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+complex vdotproduct(const complex *A, const complex *B, ae_int_t N);
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void vmove(double *A, const double *B, ae_int_t N);
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void vmove(complex *A, const complex *B, ae_int_t N);
+
+void vmoveneg(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void vmoveneg(double *A, const double *B, ae_int_t N);
+void vmoveneg(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void vmoveneg(complex *A, const complex *B, ae_int_t N);
+
+void vmove(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void vmove(double *A, const double *B, ae_int_t N, double Alpha);
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void vmove(complex *A, const complex *B, ae_int_t N, double Alpha);
+void vmove(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void vmove(complex *A, const complex *B, ae_int_t N, complex Alpha);
+
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void vadd(double *A, const double *B, ae_int_t N);
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void vadd(complex *A, const complex *B, ae_int_t N);
+void vadd(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void vadd(double *A, const double *B, ae_int_t N, double Alpha);
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void vadd(complex *A, const complex *B, ae_int_t N, double Alpha);
+void vadd(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void vadd(complex *A, const complex *B, ae_int_t N, complex Alpha);
+
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N);
+void vsub(double *A, const double *B, ae_int_t N);
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N);
+void vsub(complex *A, const complex *B, ae_int_t N);
+void vsub(double *A, ae_int_t dA, const double *B, ae_int_t dB, ae_int_t N, double Alpha);
+void vsub(double *A, const double *B, ae_int_t N, double Alpha);
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, double Alpha);
+void vsub(complex *A, const complex *B, ae_int_t N, double Alpha);
+void vsub(complex *A, ae_int_t dA, const complex *B, ae_int_t dB, const char *CjB, ae_int_t N, complex Alpha);
+void vsub(complex *A, const complex *B, ae_int_t N, complex Alpha);
+
+void vmul(double *A, ae_int_t dA, ae_int_t N, double Alpha);
+void vmul(double *A, ae_int_t N, double Alpha);
+void vmul(complex *A, ae_int_t dA, ae_int_t N, double Alpha);
+void vmul(complex *A, ae_int_t N, double Alpha);
+void vmul(complex *A, ae_int_t dA, ae_int_t N, complex Alpha);
+void vmul(complex *A, ae_int_t N, complex Alpha);
+
+// Vectors and Matrices.
+struct ae_vector_wrapper {
+// A new zero-size vector of the given datatype.
+   ae_vector_wrapper(alglib_impl::ae_datatype datatype);
+// A new object attached to an external ae_vector e_ptr.
+// NOTE:
+// *	An exception is thrown if datatype != e_ptr->datatype.
+   ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype);
+// A copy of another vector (can be a reference to one of the derived classes)
+// NOTE:
+// *	An exception is thrown if datatype != rhs.datatype.
+   ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::ae_datatype datatype);
+// The destructor.
+   virtual ~ae_vector_wrapper();
+// If the vector was allocated with its own object, this function changes length, completely dropping the previous contents.
+// It does not work (and throws an exception) for frozen proxy objects.
+   void setlength(ae_int_t iLen);
+// The element count.
+   ae_int_t length() const;
+// Access to the internal C-structure used by the C-core.
+// Not intended for external use.
+   const alglib_impl::ae_vector *c_ptr() const { return This; }
+   alglib_impl::ae_vector *c_ptr() { return This; }
+#if 0 //(@) Not implemented.
+private:
+   ae_vector_wrapper(const ae_vector_wrapper &rhs);
+#endif
+protected:
+// Attach a wrapper object to the external x_vector new_ptr;
+// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not the vector's memory).
+// NOTES:
+// *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
+// *	The x_vector pointed to by new_ptr is used only once;
+//	after we fetch the pointer to memory and its size, this x_vector is ignored and not referenced anymore.
+//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
+// *	The state structure is used for error reporting purposes (longjmp on errors).
+   void attach_to(alglib_impl::x_vector *new_ptr);
+// Assign rhs to the current object and return *this.
+// It has several branches depending on the target object's status:
+// *	For proxy objects, copy the data to the proxy.
+//	Throw an exception if the source and target are not the same size.
+// *	For non-proxy objects, clear the data allocated by the object and copy rhs into the target.
+// NOTE:
+// *	This function correctly handles assignments of the object to itself.
+   const ae_vector_wrapper &assign(const ae_vector_wrapper &rhs);
+#if !defined AE_NO_EXCEPTIONS
+// Copy the vector of the indicated datatype from the string s into the current object.
+// The current object is considered empty (this function should be called from the copy constructor).
+   ae_vector_wrapper(const char *s, alglib_impl::ae_datatype datatype);
+#endif
+// The indicated C-structure used by the C-core and the inner ae_vector:
+// *	This == &Obj:	the object owns the ae_vector and is to handle its deallocation.
+// *	This != &Obj:	someone else owns the ae_vector object and is to handle its deallocation;
+//			while Obj is to be uninitialized and ignored.
+   alglib_impl::ae_vector *This, Obj;
+// True if and only if the vector's object was internally allocated and is owned.
+// *	ae_vector's, directly owned or not, can be read and modified.
+// *	Only internally allocated and owned vector objects can be freed and resized.
+// *	If owner == false:
+//	-	This == &Obj:	the ae_vector contains the object, but it points to externally allocated memory.
+//				This memory is NOT owned by the ae_vector.
+//	-	This != &Obj:	the ae_vector is contained somewhere else.
+//				Neither the memory pointed by the ae_vector nor ae_vector itself are owned by the ae_vector.
+   bool owner;
+};
+
+struct boolean_1d_array: public ae_vector_wrapper {
+   boolean_1d_array();
+   boolean_1d_array(alglib_impl::ae_vector *p);
+   boolean_1d_array(const boolean_1d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   boolean_1d_array(const char *s);
+   std::string tostring() const;
+#endif
+   virtual ~boolean_1d_array();
+   const boolean_1d_array &operator=(const boolean_1d_array &rhs);
+   const bool &operator()(ae_int_t i) const; bool &operator()(ae_int_t i);
+   const bool &operator[](ae_int_t i) const; bool &operator[](ae_int_t i);
+// Allocate an iLen-vector, giving it a completely independent copy of data at pContent.
+   void setcontent(ae_int_t iLen, const bool *pContent);
+// A pointer to internal memory.
+   const bool *getcontent() const; bool *getcontent();
+};
+
+struct integer_1d_array: public ae_vector_wrapper {
+   integer_1d_array();
+   integer_1d_array(alglib_impl::ae_vector *p);
+   integer_1d_array(const integer_1d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   integer_1d_array(const char *s);
+   std::string tostring() const;
+#endif
+   virtual ~integer_1d_array();
+   const integer_1d_array &operator=(const integer_1d_array &rhs);
+   const ae_int_t &operator()(ae_int_t i) const; ae_int_t &operator()(ae_int_t i);
+   const ae_int_t &operator[](ae_int_t i) const; ae_int_t &operator[](ae_int_t i);
+// Allocate an iLen-vector, giving it a completely independent copy of data at pContent.
+   void setcontent(ae_int_t iLen, const ae_int_t *pContent);
+// A pointer to internal memory.
+   const ae_int_t *getcontent() const; ae_int_t *getcontent();
+};
+
+struct real_1d_array: public ae_vector_wrapper {
+   real_1d_array();
+   real_1d_array(alglib_impl::ae_vector *p);
+   real_1d_array(const real_1d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   real_1d_array(const char *s);
+   std::string tostring(int dps) const;
+#endif
+   virtual ~real_1d_array();
+   const real_1d_array &operator=(const real_1d_array &rhs);
+   const double &operator()(ae_int_t i) const; double &operator()(ae_int_t i);
+   const double &operator[](ae_int_t i) const; double &operator[](ae_int_t i);
+// Allocate an iLen-vector, giving it a completely independent copy of data at pContent.
+   void setcontent(ae_int_t iLen, const double *pContent);
+// A pointer to internal memory.
+   const double *getcontent() const; double *getcontent();
+// Attach an array to the vector pointed by pContent.
+// *	No own memory is allocated, no copying of data is performed,
+// *	The pContent pointer should be valid as long as we work with the vector.
+// After attaching the vector to external memory, it is "frozen":
+// it is possible to read/write the vector elements, but not to resize it (no setlength() calls).
+   void attach_to_ptr(ae_int_t iLen, double *pContent);
+};
+
+struct complex_1d_array: public ae_vector_wrapper {
+   complex_1d_array();
+   complex_1d_array(alglib_impl::ae_vector *p);
+   complex_1d_array(const complex_1d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   complex_1d_array(const char *s);
+   std::string tostring(int dps) const;
+#endif
+   virtual ~complex_1d_array();
+   const complex_1d_array &operator=(const complex_1d_array &rhs);
+   const complex &operator()(ae_int_t i) const; complex &operator()(ae_int_t i);
+   const complex &operator[](ae_int_t i) const; complex &operator[](ae_int_t i);
+// Allocate an iLen-vector, giving it a completely independent copy of data at pContent.
+   void setcontent(ae_int_t iLen, const complex *pContent);
+// A pointer to internal memory.
+   const complex *getcontent() const; complex *getcontent();
+};
+
+struct ae_matrix_wrapper {
+// Creates zero-sized matrix of specified datatype.
+   ae_matrix_wrapper(alglib_impl::ae_datatype datatype);
+// Creates object attached to external ae_vector structure, with additional
+// check for matching datatypes (e_ptr->datatype == datatype is required).
+   ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
+// Creates copy of rhs, with additional check for matching datatypes
+// (rhs.datatype == datatype is required).
+   ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype);
+// Destructor
+   virtual ~ae_matrix_wrapper();
+   void setlength(ae_int_t rows, ae_int_t cols);
+   ae_int_t cols() const;
+   ae_int_t rows() const;
+   ae_int_t getstride() const;
+   bool isempty() const;
+   const alglib_impl::ae_matrix *c_ptr() const { return This; }
+   alglib_impl::ae_matrix *c_ptr() { return This; }
+#if 0 //(@) Not implemented.
+private:
+   ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
+#endif
+protected:
+// Attach a wrapper object to the external x_matrix new_ptr;
+// "frozen proxy" mode is activated (you can read/write, but can not reallocate and do not own the matrix's memory).
+// NOTES:
+// *	The wrapper object is assumed to start out already initialized; all previously allocated memory is properly deallocated.
+// *	The x_matrix pointed to by new_ptr is used only once;
+//	after we fetch the pointer to memory and its size, this x_matrix is ignored and not referenced anymore.
+//	So, you can pass pointers to temporary x-structures which are deallocated immediately after you call attach_to().
+// *	The state structure is used for error reporting purposes (longjmp on errors).
+//	All previously allocated memory is correctly freed on error.
+   void attach_to(alglib_impl::x_matrix *new_ptr);
+// Assign rhs to the current object and return *this.
+// It has several branches depending on the target object's status:
+// *	For proxy objects, copy the data to the proxy.
+//	Throw an exception if the source and target are not the same size.
+// *	For non-proxy objects, clear the data allocated by the object and copy rhs into the target.
+// NOTE:
+// *	This function correctly handles assignments of the object to itself.
+   const ae_matrix_wrapper &assign(const ae_matrix_wrapper &rhs);
+#if !defined AE_NO_EXCEPTIONS
+// Copy the matrix of the indicated datatype from the string s into the current object.
+// The current object is considered empty (this function should be called from the copy constructor).
+   ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype);
+#endif
+// The internal C-structure used by the C-core and the inner ae_matrix.
+// *	This == &Obj:	the matrix owns the ae_matrix and is to handle its deallocation.
+// *	This != &Obj:	someone else owns the ae_matrix object and is to handle its deallocation;
+//			while Obj is to be uninitialized and ignored.
+   alglib_impl::ae_matrix *This, Obj;
+// True if and only if the matrix's object was internally allocated and is owned.
+// *	ae_matrix's, directly owned or not, can be read and modified.
+// *	Only internally allocated and owned matrix objects can be freed and resized.
+// *	If owner == false:
+//	-	This == &Obj:	the ae_matrix contains the object, but it points to externally allocated memory.
+//				This memory is NOT owned by the ae_matrix.
+//	-	This != &Obj:	the ae_matrix is contained somewhere else.
+//				Neither the memory pointed by the ae_matrix nor ae_matrix itself are owned by the ae_matrix.
+   bool owner;
+};
+
+struct boolean_2d_array: public ae_matrix_wrapper {
+   boolean_2d_array();
+   boolean_2d_array(alglib_impl::ae_matrix *p);
+   boolean_2d_array(const boolean_2d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   boolean_2d_array(const char *s);
+   std::string tostring() const;
+#endif
+   virtual ~boolean_2d_array();
+   const boolean_2d_array &operator=(const boolean_2d_array &rhs);
+   const bool &operator()(ae_int_t i, ae_int_t j) const; bool &operator()(ae_int_t i, ae_int_t j);
+   const bool *operator[](ae_int_t i) const; bool *operator[](ae_int_t i);
+// A new irows x icols matrix filled with a completely independent copy of the data pointed by pContent.
+   void setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent);
+};
+
+struct integer_2d_array: public ae_matrix_wrapper {
+   integer_2d_array();
+   integer_2d_array(alglib_impl::ae_matrix *p);
+   integer_2d_array(const integer_2d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   integer_2d_array(const char *s);
+   std::string tostring() const;
+#endif
+   virtual ~integer_2d_array();
+   const integer_2d_array &operator=(const integer_2d_array &rhs);
+   const ae_int_t &operator()(ae_int_t i, ae_int_t j) const; ae_int_t &operator()(ae_int_t i, ae_int_t j);
+   const ae_int_t *operator[](ae_int_t i) const; ae_int_t *operator[](ae_int_t i);
+// A new irows x icols matrix filled with a completely independent copy of the data pointed by pContent.
+   void setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent);
+};
+
+struct real_2d_array: public ae_matrix_wrapper {
+   real_2d_array();
+   real_2d_array(alglib_impl::ae_matrix *p);
+   real_2d_array(const real_2d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   real_2d_array(const char *s);
+   std::string tostring(int dps) const;
+#endif
+   virtual ~real_2d_array();
+   const real_2d_array &operator=(const real_2d_array &rhs);
+   const double &operator()(ae_int_t i, ae_int_t j) const; double &operator()(ae_int_t i, ae_int_t j);
+   const double *operator[](ae_int_t i) const; double *operator[](ae_int_t i);
+// A new irows x icols matrix filled with a completely independent copy of the data pointed by pContent.
+   void setcontent(ae_int_t irows, ae_int_t icols, const double *pContent);
+// Attach an array to the matrix pointed by pContent.
+// *	Very little own memory is allocated - O(irows) bytes for the precomputed pointers;
+//	rather than the O(icols irows) copying of data.
+// *	The pContent pointer should be valid as long as we work with the matrix.
+// After attaching the matrix to external memory, it is "frozen":
+// it is possible to read/write the matrix elements, but not to resize it (no setlength() calls).
+   void attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent);
+};
+
+struct complex_2d_array: public ae_matrix_wrapper {
+   complex_2d_array();
+   complex_2d_array(alglib_impl::ae_matrix *p);
+   complex_2d_array(const complex_2d_array &rhs);
+#if !defined AE_NO_EXCEPTIONS
+   complex_2d_array(const char *s);
+   std::string tostring(int dps) const;
+#endif
+   virtual ~complex_2d_array();
+   const complex_2d_array &operator=(const complex_2d_array &rhs);
+   const complex &operator()(ae_int_t i, ae_int_t j) const; complex &operator()(ae_int_t i, ae_int_t j);
+   const complex *operator[](ae_int_t i) const; complex *operator[](ae_int_t i);
+// A new irows x icols matrix filled with a completely independent copy of the data pointed by pContent.
+   void setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent);
+};
+
+#if !defined AE_NO_EXCEPTIONS
+// CSV operations.
+extern const int CSV_DEFAULT, CSV_SKIP_HEADERS;
+
+// Read a CSV file and store its contents to a double precision matrix.
+// The format of the data file must conform to the RFC 4180 specification, with additional notes:
+// *	The file size should be less than 2GB.
+// *	ASCII encoding, UTF-8 without BOM (in header names) are supported
+// *	Any character (comma/tab/space) may be used as a field separator, as long as it is distinct from one used for decimal point.
+// *	Multiple subsequent field separators (say, two spaces) are treated as MULTIPLE separators, not one big separator.
+// *	Either a comma and full stop may be used as a decimal point.
+//	The parser will automatically determine specific character being used.
+//	Both fixed and exponential number formats are allowed.
+//	Thousand separators are NOT allowed.
+// *	A line may end with \n (Unix style) or \r\n (Windows style), the parser will automatically adapt to chosen convention.
+// *	Escaped fields (ones in double quotes) are not supported.
+// Inputs:
+//	filename	The relative/absolute path.
+//	separator	The character used to separate fields.
+//			May be ' ', ',', '\t'.
+//			Other separators are possible too.
+//	flags		Several values combined with bitwise OR:
+//			*	CSV_SKIP_HEADERS - if present, the first row contains headers and will be skipped.
+//				Its contents are used to determine field counts, and that's all.
+//			If no flags are specified, the default value 0x0 (or CSV_DEFAULT, which is same) should be used.
+// Output:
+//	out		The matrix, CSV file parsed with atof()
+// HANDLING OF SPECIAL CASES:
+// *	The file does not exist - an ap_error exception is thrown.
+// *	The file is empty - an empty array is returned (no exception).
+// *	skip_first_row == true, there is only one row in the file - an empty array is returned.
+// *	The field contents are not recognized by atof() - the field value is replaced by 0.0.
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out);
 #endif
 } // end of namespace alglib
