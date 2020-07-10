@@ -63,7 +63,7 @@ TestX$X: ${Objs} TestX$O
 TestY$X: ${ObjY} TestY$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestZ$X: $(Srcs) TestZ.cpp
-	${Cpp} ${CcOpt} $^ ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=AE_SERIAL_UNSAFE -o $@
+	${Cpp} ${CcOpt} $^ ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=NonTH -o $@
 test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestI: API Interface"
 	./TestI$X

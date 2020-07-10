@@ -1161,14 +1161,12 @@ static bool testnearestneighborunit_testkdtreeserialization() {
                {
                // This code passes data structure through serializers
                // (serializes it to string and loads back)
-                  ae_serializer _local_serializer;
-                  ae_int_t _local_ssize;
                   ae_frame _local_frame_block;
                   ae_frame_make(&_local_frame_block);
-                  ae_serializer_init(&_local_serializer);
+                  NewSerializer(_local_serializer);
                   ae_serializer_alloc_start(&_local_serializer);
                   kdtreealloc(&_local_serializer, &tree0);
-                  _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                   NewBlock(_local_dynamic_block, _local_ssize + 1);
                   ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                   kdtreeserialize(&_local_serializer, &tree0);
@@ -2599,8 +2597,7 @@ Local bool testlevel2unsymmetric() {
 // Test linear algebra functions
    for (m = 1; m <= 20; m++) {
       for (n = 1; n <= 20; n++) {
-         testsparseunit_initgenerator(m, n, 0, 0, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(m, n, 0, 0, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Convert SA to desired storage format:
          // * to CRS if M != N
          // * with 50% probability to CRS or SKS, if M=N
@@ -2756,8 +2753,7 @@ Local bool testlevel3unsymmetric() {
 // Test linear algebra functions
    for (m = 1; m <= 20; m++) {
       for (n = 1; n <= 20; n++) {
-         testsparseunit_initgenerator(m, n, 0, 0, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(m, n, 0, 0, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Choose matrix width K
             k = 1 + hqrnduniformi(&rs, 20);
          // Convert SA to desired storage format:
@@ -2893,8 +2889,7 @@ Local bool testlevel2symmetric() {
          if (triangletype > 0) {
             isupper = true;
          }
-         testsparseunit_initgenerator(n, n, 0, triangletype, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(n, n, 0, triangletype, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Convert SA to desired storage format:
          // * S0 stores unmodified copy
          // * S1 stores copy with unmodified triangle corresponding
@@ -3022,8 +3017,7 @@ Local bool testlevel3symmetric() {
          if (triangletype > 0) {
             isupper = true;
          }
-         testsparseunit_initgenerator(n, n, 0, triangletype, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(n, n, 0, triangletype, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Choose matrix width K
             k = 1 + hqrnduniformi(&rs, 20);
          // Convert SA to desired storage format:
@@ -3135,8 +3129,7 @@ Local bool testlevel2triangular() {
          if (triangletype > 0) {
             isupper = true;
          }
-         testsparseunit_initgenerator(n, n, 0, triangletype, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(n, n, 0, triangletype, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Settings (IsUpper was already set, handle the rest)
             isunit = hqrnduniformr(&rs) < 0.5;
             optype = hqrnduniformi(&rs, 2);
@@ -3222,8 +3215,7 @@ Local bool testlevel2triangular() {
          if (triangletype == +1) {
             isupper = true;
          }
-         testsparseunit_initgenerator(n, n, 1, triangletype, &g);
-         while (testsparseunit_generatenext(&g, &a, &sa)) {
+         for (testsparseunit_initgenerator(n, n, 1, triangletype, &g); testsparseunit_generatenext(&g, &a, &sa); ) {
          // Settings (IsUpper was already set, handle the rest)
             isunit = hqrnduniformr(&rs) < 0.5;
             optype = hqrnduniformi(&rs, 2);
@@ -49385,14 +49377,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                mlpalloc(&_local_serializer, &tmp);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                mlpserialize(&_local_serializer, &tmp);
@@ -49418,14 +49408,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                {
                // This code passes data structure through serializers
                // (serializes it to string and loads back)
-                  ae_serializer _local_serializer;
-                  ae_int_t _local_ssize;
                   ae_frame _local_frame_block;
                   ae_frame_make(&_local_frame_block);
-                  ae_serializer_init(&_local_serializer);
+                  NewSerializer(_local_serializer);
                   ae_serializer_alloc_start(&_local_serializer);
                   mlpalloc(&_local_serializer, &tmp);
-                  _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                   NewBlock(_local_dynamic_block, _local_ssize + 1);
                   ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                   mlpserialize(&_local_serializer, &tmp);
@@ -49451,14 +49439,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                   {
                   // This code passes data structure through serializers
                   // (serializes it to string and loads back)
-                     ae_serializer _local_serializer;
-                     ae_int_t _local_ssize;
                      ae_frame _local_frame_block;
                      ae_frame_make(&_local_frame_block);
-                     ae_serializer_init(&_local_serializer);
+                     NewSerializer(_local_serializer);
                      ae_serializer_alloc_start(&_local_serializer);
                      mlpalloc(&_local_serializer, &tmp);
-                     _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                     ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                      NewBlock(_local_dynamic_block, _local_ssize + 1);
                      ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                      mlpserialize(&_local_serializer, &tmp);
@@ -49484,14 +49470,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                      {
                      // This code passes data structure through serializers
                      // (serializes it to string and loads back)
-                        ae_serializer _local_serializer;
-                        ae_int_t _local_ssize;
                         ae_frame _local_frame_block;
                         ae_frame_make(&_local_frame_block);
-                        ae_serializer_init(&_local_serializer);
+                        NewSerializer(_local_serializer);
                         ae_serializer_alloc_start(&_local_serializer);
                         mlpalloc(&_local_serializer, &tmp);
-                        _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                        ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                         NewBlock(_local_dynamic_block, _local_ssize + 1);
                         ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                         mlpserialize(&_local_serializer, &tmp);
@@ -49526,14 +49510,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                mlpalloc(&_local_serializer, &tmp);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                mlpserialize(&_local_serializer, &tmp);
@@ -49559,14 +49541,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                {
                // This code passes data structure through serializers
                // (serializes it to string and loads back)
-                  ae_serializer _local_serializer;
-                  ae_int_t _local_ssize;
                   ae_frame _local_frame_block;
                   ae_frame_make(&_local_frame_block);
-                  ae_serializer_init(&_local_serializer);
+                  NewSerializer(_local_serializer);
                   ae_serializer_alloc_start(&_local_serializer);
                   mlpalloc(&_local_serializer, &tmp);
-                  _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                   NewBlock(_local_dynamic_block, _local_ssize + 1);
                   ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                   mlpserialize(&_local_serializer, &tmp);
@@ -49592,14 +49572,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                   {
                   // This code passes data structure through serializers
                   // (serializes it to string and loads back)
-                     ae_serializer _local_serializer;
-                     ae_int_t _local_ssize;
                      ae_frame _local_frame_block;
                      ae_frame_make(&_local_frame_block);
-                     ae_serializer_init(&_local_serializer);
+                     NewSerializer(_local_serializer);
                      ae_serializer_alloc_start(&_local_serializer);
                      mlpalloc(&_local_serializer, &tmp);
-                     _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                     ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                      NewBlock(_local_dynamic_block, _local_ssize + 1);
                      ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                      mlpserialize(&_local_serializer, &tmp);
@@ -49625,14 +49603,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                      {
                      // This code passes data structure through serializers
                      // (serializes it to string and loads back)
-                        ae_serializer _local_serializer;
-                        ae_int_t _local_ssize;
                         ae_frame _local_frame_block;
                         ae_frame_make(&_local_frame_block);
-                        ae_serializer_init(&_local_serializer);
+                        NewSerializer(_local_serializer);
                         ae_serializer_alloc_start(&_local_serializer);
                         mlpalloc(&_local_serializer, &tmp);
-                        _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                        ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                         NewBlock(_local_dynamic_block, _local_ssize + 1);
                         ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                         mlpserialize(&_local_serializer, &tmp);
@@ -49666,14 +49642,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
          {
          // This code passes data structure through serializers
          // (serializes it to string and loads back)
-            ae_serializer _local_serializer;
-            ae_int_t _local_ssize;
             ae_frame _local_frame_block;
             ae_frame_make(&_local_frame_block);
-            ae_serializer_init(&_local_serializer);
+            NewSerializer(_local_serializer);
             ae_serializer_alloc_start(&_local_serializer);
             mlpalloc(&_local_serializer, &tmp);
-            _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+            ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
             NewBlock(_local_dynamic_block, _local_ssize + 1);
             ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
             mlpserialize(&_local_serializer, &tmp);
@@ -49699,14 +49673,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                mlpalloc(&_local_serializer, &tmp);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                mlpserialize(&_local_serializer, &tmp);
@@ -49732,14 +49704,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                {
                // This code passes data structure through serializers
                // (serializes it to string and loads back)
-                  ae_serializer _local_serializer;
-                  ae_int_t _local_ssize;
                   ae_frame _local_frame_block;
                   ae_frame_make(&_local_frame_block);
-                  ae_serializer_init(&_local_serializer);
+                  NewSerializer(_local_serializer);
                   ae_serializer_alloc_start(&_local_serializer);
                   mlpalloc(&_local_serializer, &tmp);
-                  _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                   NewBlock(_local_dynamic_block, _local_ssize + 1);
                   ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                   mlpserialize(&_local_serializer, &tmp);
@@ -49765,14 +49735,12 @@ static void testmlpbaseunit_createnetwork(multilayerperceptron *network, ae_int_
                   {
                   // This code passes data structure through serializers
                   // (serializes it to string and loads back)
-                     ae_serializer _local_serializer;
-                     ae_int_t _local_ssize;
                      ae_frame _local_frame_block;
                      ae_frame_make(&_local_frame_block);
-                     ae_serializer_init(&_local_serializer);
+                     NewSerializer(_local_serializer);
                      ae_serializer_alloc_start(&_local_serializer);
                      mlpalloc(&_local_serializer, &tmp);
-                     _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                     ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                      NewBlock(_local_dynamic_block, _local_ssize + 1);
                      ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                      mlpserialize(&_local_serializer, &tmp);
@@ -50064,14 +50032,12 @@ static bool testmlpbaseunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_
       {
       // This code passes data structure through serializers
       // (serializes it to string and loads back)
-         ae_serializer _local_serializer;
-         ae_int_t _local_ssize;
          ae_frame _local_frame_block;
          ae_frame_make(&_local_frame_block);
-         ae_serializer_init(&_local_serializer);
+         NewSerializer(_local_serializer);
          ae_serializer_alloc_start(&_local_serializer);
          mlpalloc(&_local_serializer, &network);
-         _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+         ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
          NewBlock(_local_dynamic_block, _local_ssize + 1);
          ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
          mlpserialize(&_local_serializer, &network);
@@ -56235,14 +56201,12 @@ static bool testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                mlpealloc(&_local_serializer, &ensemble);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                mlpeserialize(&_local_serializer, &ensemble);
@@ -56257,14 +56221,12 @@ static bool testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                mlpealloc(&_local_serializer, &ensemble2);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                mlpeserialize(&_local_serializer, &ensemble2);
@@ -56317,14 +56279,12 @@ static bool testmlpeunit_testprocessing(ae_int_t nkind, ae_int_t nin, ae_int_t n
          {
          // This code passes data structure through serializers
          // (serializes it to string and loads back)
-            ae_serializer _local_serializer;
-            ae_int_t _local_ssize;
             ae_frame _local_frame_block;
             ae_frame_make(&_local_frame_block);
-            ae_serializer_init(&_local_serializer);
+            NewSerializer(_local_serializer);
             ae_serializer_alloc_start(&_local_serializer);
             mlpealloc(&_local_serializer, &ensemble);
-            _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+            ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
             NewBlock(_local_dynamic_block, _local_ssize + 1);
             ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
             mlpeserialize(&_local_serializer, &ensemble);
@@ -56919,9 +56879,7 @@ static bool testmlptrainunit_testmlpxorregr() {
             mlpsetdataset(&trainer, &xy, n);
             mlpsetdecay(&trainer, vdecay);
             mlpsetcond(&trainer, traineps, trainits);
-            mlpstarttraining(&trainer, &net, true);
-            while (mlpcontinuetraining(&trainer, &net)) {
-            }
+            for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
          }
       // * sparse matrix.
          if (vtrain == 2) {
@@ -56946,9 +56904,7 @@ static bool testmlptrainunit_testmlpxorregr() {
             mlpsetsparsedataset(&trainer, &sm, n);
             mlpsetdecay(&trainer, vdecay);
             mlpsetcond(&trainer, traineps, trainits);
-            mlpstarttraining(&trainer, &net, true);
-            while (mlpcontinuetraining(&trainer, &net)) {
-            }
+            for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
          }
       // Check that network is trained correctly
          for (i = 0; i < n; i++) {
@@ -57171,9 +57127,7 @@ static bool testmlptrainunit_testmlpxorcls() {
             mlpsetcond(&trainer, traineps, trainits);
             ebest = ae_maxrealnumber;
             for (i = 1; i <= nneedrest; i++) {
-               mlpstarttraining(&trainer, &net, true);
-               while (mlpcontinuetraining(&trainer, &net)) {
-               }
+               for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
                v = ae_v_dotproduct(net.weights.xR, 1, net.weights.xR, 1, wcount);
                e = mlperror(&net, &xy, n) + 0.5 * vdecay * v;
             // Compare with the best answer.
@@ -57210,9 +57164,7 @@ static bool testmlptrainunit_testmlpxorcls() {
             mlpsetcond(&trainer, traineps, trainits);
             ebest = ae_maxrealnumber;
             for (i = 1; i <= nneedrest; i++) {
-               mlpstarttraining(&trainer, &net, true);
-               while (mlpcontinuetraining(&trainer, &net)) {
-               }
+               for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
                v = ae_v_dotproduct(net.weights.xR, 1, net.weights.xR, 1, wcount);
                e = mlperror(&net, &xy, n) + 0.5 * vdecay * v;
             // Compare with the best answer.
@@ -57313,9 +57265,7 @@ static bool testmlptrainunit_testmlpzeroweights() {
       mlpsetcond(&trainer, traineps, trainits);
       c = ae_randominteger(2);
       if (c == 0) {
-         mlpstarttraining(&trainer, &net, true);
-         while (mlpcontinuetraining(&trainer, &net)) {
-         }
+         for (mlpstarttraining(&trainer, &net, true); mlpcontinuetraining(&trainer, &net); ) { }
       }
       if (c == 1) {
          mlptrainnetwork(&trainer, &net, nneedrest, &rep);
@@ -60386,14 +60336,12 @@ static bool testdforestunit_testprocessing() {
       {
       // This code passes data structure through serializers
       // (serializes it to string and loads back)
-         ae_serializer _local_serializer;
-         ae_int_t _local_ssize;
          ae_frame _local_frame_block;
          ae_frame_make(&_local_frame_block);
-         ae_serializer_init(&_local_serializer);
+         NewSerializer(_local_serializer);
          ae_serializer_alloc_start(&_local_serializer);
          dfalloc(&_local_serializer, &df1);
-         _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+         ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
          NewBlock(_local_dynamic_block, _local_ssize + 1);
          ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
          dfserialize(&_local_serializer, &df1);
@@ -62247,14 +62195,12 @@ static bool testknnunit_testknnalgo() {
       {
       // This code passes data structure through serializers
       // (serializes it to string and loads back)
-         ae_serializer _local_serializer;
-         ae_int_t _local_ssize;
          ae_frame _local_frame_block;
          ae_frame_make(&_local_frame_block);
-         ae_serializer_init(&_local_serializer);
+         NewSerializer(_local_serializer);
          ae_serializer_alloc_start(&_local_serializer);
          knnalloc(&_local_serializer, &model1);
-         _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+         ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
          NewBlock(_local_dynamic_block, _local_ssize + 1);
          ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
          knnserialize(&_local_serializer, &model1);
@@ -63474,8 +63420,7 @@ bool testautogk() {
 // Simple test: integral(exp(x),+-1,+-2), no maximum width requirements
    a = (2 * ae_randominteger(2) - 1) * 1.0;
    b = (2 * ae_randominteger(2) - 1) * 2.0;
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       state.f = exp(state.x);
    }
    autogkresults(&state, &v, &rep);
@@ -63489,8 +63434,7 @@ bool testautogk() {
 // Simple test: integral(exp(x),+-1,+-2), XWidth=0.1
    a = (2 * ae_randominteger(2) - 1) * 1.0;
    b = (2 * ae_randominteger(2) - 1) * 2.0;
-   autogksmoothw(a, b, 0.1, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmoothw(a, b, 0.1, &state); autogkiteration(&state); ) {
       state.f = exp(state.x);
    }
    autogkresults(&state, &v, &rep);
@@ -63504,8 +63448,7 @@ bool testautogk() {
 // Simple test: integral(cos(100*x),0,2*pi), no maximum width requirements
    a = 0.0;
    b = 2 * ae_pi;
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       state.f = cos(100 * state.x);
    }
    autogkresults(&state, &v, &rep);
@@ -63519,8 +63462,7 @@ bool testautogk() {
 // Simple test: integral(cos(100*x),0,2*pi), XWidth=0.3
    a = 0.0;
    b = 2 * ae_pi;
-   autogksmoothw(a, b, 0.3, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmoothw(a, b, 0.3, &state); autogkiteration(&state); ) {
       state.f = cos(100 * state.x);
    }
    autogkresults(&state, &v, &rep);
@@ -63563,8 +63505,7 @@ bool testautogk() {
    // 2. use singular integrator for [b,a]
       exact = pow(b - a, alpha + 2) / (alpha + 2) + (1 + a) * pow(b - a, alpha + 1) / (alpha + 1);
       eabs = fabs(exact);
-      autogksingular(a, b, alpha, 0.0, &state);
-      while (autogkiteration(&state)) {
+      for (autogksingular(a, b, alpha, 0.0, &state); autogkiteration(&state); ) {
          if (state.xminusa < 0.01) {
             state.f = pow(state.xminusa, alpha) * (1 + state.x);
          } else {
@@ -63577,8 +63518,7 @@ bool testautogk() {
       } else {
          sngendOk = sngendOk && NearAtR(v, exact, errtol * eabs);
       }
-      autogksingular(b, a, 0.0, alpha, &state);
-      while (autogkiteration(&state)) {
+      for (autogksingular(b, a, 0.0, alpha, &state); autogkiteration(&state); ) {
          if (state.bminusx > -0.01) {
             state.f = pow(-state.bminusx, alpha) * (1 + state.x);
          } else {
@@ -63596,8 +63536,7 @@ bool testautogk() {
    // 2. use singular integrator for [b,a]
       exact = (1 + b) * pow(b - a, alpha + 1) / (alpha + 1) - pow(b - a, alpha + 2) / (alpha + 2);
       eabs = fabs(exact);
-      autogksingular(a, b, 0.0, alpha, &state);
-      while (autogkiteration(&state)) {
+      for (autogksingular(a, b, 0.0, alpha, &state); autogkiteration(&state); ) {
          if (state.bminusx < 0.01) {
             state.f = pow(state.bminusx, alpha) * (1 + state.x);
          } else {
@@ -63610,8 +63549,7 @@ bool testautogk() {
       } else {
          sngendOk = sngendOk && NearAtR(v, exact, errtol * eabs);
       }
-      autogksingular(b, a, alpha, 0.0, &state);
-      while (autogkiteration(&state)) {
+      for (autogksingular(b, a, alpha, 0.0, &state); autogkiteration(&state); ) {
          if (state.xminusa > -0.01) {
             state.f = pow(-state.xminusa, alpha) * (1 + state.x);
          } else {
@@ -64743,14 +64681,12 @@ static bool testidwunit_testcommon() {
                {
                // This code passes data structure through serializers
                // (serializes it to string and loads back)
-                  ae_serializer _local_serializer;
-                  ae_int_t _local_ssize;
                   ae_frame _local_frame_block;
                   ae_frame_make(&_local_frame_block);
-                  ae_serializer_init(&_local_serializer);
+                  NewSerializer(_local_serializer);
                   ae_serializer_alloc_start(&_local_serializer);
                   idwalloc(&_local_serializer, &model1);
-                  _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+                  ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                   NewBlock(_local_dynamic_block, _local_ssize + 1);
                   ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                   idwserialize(&_local_serializer, &model1);
@@ -64889,14 +64825,12 @@ static bool testidwunit_testcommon() {
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                idwalloc(&_local_serializer, &model1);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                idwserialize(&_local_serializer, &model1);
@@ -65110,14 +65044,12 @@ static bool testidwunit_testcommon() {
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                idwalloc(&_local_serializer, &model1);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                idwserialize(&_local_serializer, &model1);
@@ -74954,14 +74886,12 @@ bool testspline2d() {
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                spline2dalloc(&_local_serializer, &c);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                spline2dserialize(&_local_serializer, &c);
@@ -76714,14 +76644,12 @@ static bool testrbfunit_serializationtest() {
          {
          // This code passes data structure through serializers
          // (serializes it to string and loads back)
-            ae_serializer _local_serializer;
-            ae_int_t _local_ssize;
             ae_frame _local_frame_block;
             ae_frame_make(&_local_frame_block);
-            ae_serializer_init(&_local_serializer);
+            NewSerializer(_local_serializer);
             ae_serializer_alloc_start(&_local_serializer);
             rbfalloc(&_local_serializer, &s);
-            _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+            ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
             NewBlock(_local_dynamic_block, _local_ssize + 1);
             ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
             rbfserialize(&_local_serializer, &s);
@@ -76827,14 +76755,12 @@ static bool testrbfunit_serializationtest() {
          {
          // This code passes data structure through serializers
          // (serializes it to string and loads back)
-            ae_serializer _local_serializer;
-            ae_int_t _local_ssize;
             ae_frame _local_frame_block;
             ae_frame_make(&_local_frame_block);
-            ae_serializer_init(&_local_serializer);
+            NewSerializer(_local_serializer);
             ae_serializer_alloc_start(&_local_serializer);
             rbfalloc(&_local_serializer, &s);
-            _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+            ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
             NewBlock(_local_dynamic_block, _local_ssize + 1);
             ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
             rbfserialize(&_local_serializer, &s);
@@ -76936,14 +76862,12 @@ static bool testrbfunit_serializationtest() {
          {
          // This code passes data structure through serializers
          // (serializes it to string and loads back)
-            ae_serializer _local_serializer;
-            ae_int_t _local_ssize;
             ae_frame _local_frame_block;
             ae_frame_make(&_local_frame_block);
-            ae_serializer_init(&_local_serializer);
+            NewSerializer(_local_serializer);
             ae_serializer_alloc_start(&_local_serializer);
             rbfalloc(&_local_serializer, &s);
-            _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+            ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
             NewBlock(_local_dynamic_block, _local_ssize + 1);
             ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
             rbfserialize(&_local_serializer, &s);
@@ -83596,14 +83520,12 @@ static bool testalglibbasicsunit_testserializationfunctions() {
             {
             // This code passes data structure through serializers
             // (serializes it to string and loads back)
-               ae_serializer _local_serializer;
-               ae_int_t _local_ssize;
                ae_frame _local_frame_block;
                ae_frame_make(&_local_frame_block);
-               ae_serializer_init(&_local_serializer);
+               NewSerializer(_local_serializer);
                ae_serializer_alloc_start(&_local_serializer);
                rec4serializationalloc(&_local_serializer, &r0);
-               _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
+               ae_int_t _local_ssize = ae_serializer_get_alloc_size(&_local_serializer);
                NewBlock(_local_dynamic_block, _local_ssize + 1);
                ae_serializer_sstart_str(&_local_serializer, (char *)_local_dynamic_block.ptr);
                rec4serializationserialize(&_local_serializer, &r0);
@@ -84467,7 +84389,7 @@ bool call_unittest(bool (*testfunc)()) {
    TryX {
       return false;
    }
-   if (use_smp) ae_state_set_flags(_ALGLIB_FLG_THREADING_PARALLEL);
+   if (use_smp) ae_state_set_flags(ParTH);
    ae_frame_make(&_frame_block);
    bool Ok = testfunc();
    ae_state_clear();
@@ -84477,7 +84399,7 @@ bool call_unittest(bool (*testfunc)()) {
       ae_frame _frame_block;
       ae_state_init();
       ae_frame_make(&_frame_block);
-      if (use_smp) ae_state_set_flags(_ALGLIB_FLG_THREADING_PARALLEL);
+      if (use_smp) ae_state_set_flags(ParTH);
       bool Ok = testfunc();
       ae_state_clear();
       return Ok;

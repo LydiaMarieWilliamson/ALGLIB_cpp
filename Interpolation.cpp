@@ -1305,14 +1305,12 @@ DefClass(idwreport, AndD DecVal(rmserror) AndD DecVal(avgerror) AndD DecVal(maxe
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void idwserialize(idwmodel &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -1322,10 +1320,9 @@ void idwserialize(idwmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void idwserialize(idwmodel &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::idwalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -1343,20 +1340,18 @@ void idwserialize(idwmodel &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void idwunserialize(const std::string &s_in, idwmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void idwunserialize(const std::istream &s_in, idwmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::idwunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -9234,8 +9229,7 @@ double pspline2arclength(pspline2interpolant *p, double a, double b) {
    ae_frame_make(&_frame_block);
    NewObj(autogkstate, state);
    NewObj(autogkreport, rep);
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       spline1ddiff(&p->x, state.x, &sx, &dsx, &d2sx);
       spline1ddiff(&p->y, state.x, &sy, &dsy, &d2sy);
       state.f = safepythag2(dsx, dsy);
@@ -9275,8 +9269,7 @@ double pspline3arclength(pspline3interpolant *p, double a, double b) {
    ae_frame_make(&_frame_block);
    NewObj(autogkstate, state);
    NewObj(autogkreport, rep);
-   autogksmooth(a, b, &state);
-   while (autogkiteration(&state)) {
+   for (autogksmooth(a, b, &state); autogkiteration(&state); ) {
       spline1ddiff(&p->x, state.x, &sx, &dsx, &d2sx);
       spline1ddiff(&p->y, state.x, &sy, &dsy, &d2sy);
       spline1ddiff(&p->z, state.x, &sz, &dsz, &d2sz);
@@ -27781,14 +27774,12 @@ DefClass(spline2dfitreport, AndD DecVal(rmserror) AndD DecVal(avgerror) AndD Dec
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -27798,10 +27789,9 @@ void spline2dserialize(spline2dinterpolant &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::spline2dalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -27819,20 +27809,18 @@ void spline2dserialize(spline2dinterpolant &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void spline2dunserialize(const std::string &s_in, spline2dinterpolant &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void spline2dunserialize(const std::istream &s_in, spline2dinterpolant &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::spline2dunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -32315,14 +32303,12 @@ DefClass(rbfreport, AndD DecVal(rmserror) AndD DecVal(maxerror) AndD DecVal(arow
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void rbfserialize(rbfmodel &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -32332,10 +32318,9 @@ void rbfserialize(rbfmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::rbfalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -32353,20 +32338,18 @@ void rbfserialize(rbfmodel &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void rbfunserialize(const std::string &s_in, rbfmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void rbfunserialize(const std::istream &s_in, rbfmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::rbfunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);

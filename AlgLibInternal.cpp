@@ -6703,9 +6703,8 @@ Spawn:
       ae_v_move(x->xR, 1, wa->xR, 1, n);
       ae_v_addd(x->xR, 1, s->xR, 1, n, *stp);
    // NEXT
-      *stage = 4; goto Pause; Resume4:
+      *stage = 4; goto Pause; Resume4: ++*nfev;
       *info = 0;
-      ++*nfev;
       v = ae_v_dotproduct(g->xR, 1, s->xR, 1, n);
       state->dg = v;
       state->ftest1 = state->finit + *stp * state->dgtest;
@@ -6871,8 +6870,7 @@ Spawn:
    }
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->PQ = 0; goto Pause; Resume0:
-   state->nfev++;
+   state->PQ = 0; goto Pause; Resume0: state->nfev++;
    if (state->f < state->fcur) {
       state->stplen = v;
       state->fcur = state->f;
@@ -6893,8 +6891,7 @@ Spawn:
          }
          ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
          ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-         state->PQ = 1; goto Pause; Resume1:
-         state->nfev++;
+         state->PQ = 1; goto Pause; Resume1: state->nfev++;
       // make decision
          if (state->f < state->fcur) {
             state->stplen = v;
@@ -6909,8 +6906,7 @@ Spawn:
    v = state->stplen / linmin_armijofactor;
    ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
    ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-   state->PQ = 2; goto Pause; Resume2:
-   state->nfev++;
+   state->PQ = 2; goto Pause; Resume2: state->nfev++;
    if (state->f < state->fcur) {
       state->stplen /= linmin_armijofactor;
       state->fcur = state->f;
@@ -6928,8 +6924,7 @@ Spawn:
          v = state->stplen / linmin_armijofactor;
          ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
          ae_v_addd(state->x.xR, 1, state->s.xR, 1, n, v);
-         state->PQ = 3; goto Pause; Resume3:
-         state->nfev++;
+         state->PQ = 3; goto Pause; Resume3: state->nfev++;
       // make decision
          if (state->f < state->fcur) {
             state->stplen /= linmin_armijofactor;

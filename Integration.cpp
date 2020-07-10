@@ -2237,8 +2237,7 @@ Spawn:
          state->x = x;
          state->xminusa = x - a;
          state->bminusx = b - x;
-         state->PQ = 0; goto Pause; Resume0:
-         state->nfev++;
+         state->PQ = 0; goto Pause; Resume0: state->nfev++;
          state->internalstate.f = state->f;
       }
       state->v = state->internalstate.r;
@@ -2291,13 +2290,12 @@ Spawn:
             state->xminusa = a + t - b;
             state->bminusx = -t;
          }
-         state->PQ = 1; goto Pause; Resume1:
+         state->PQ = 1; goto Pause; Resume1: state->nfev++;
          if (alpha != 0.0) {
             state->internalstate.f = state->f * pow(x, -alpha / (1 + alpha)) / (1 + alpha);
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev++;
       }
       v1 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;
@@ -2318,13 +2316,12 @@ Spawn:
             state->xminusa = -t;
             state->bminusx = a - (b - t);
          }
-         state->PQ = 2; goto Pause; Resume2:
+         state->PQ = 2; goto Pause; Resume2: state->nfev++;
          if (beta != 0.0) {
             state->internalstate.f = state->f * pow(x, -beta / (1 + beta)) / (1 + beta);
          } else {
             state->internalstate.f = state->f;
          }
-         state->nfev++;
       }
       v2 = state->internalstate.r;
       state->nintervals += state->internalstate.heapused;

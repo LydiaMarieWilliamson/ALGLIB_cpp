@@ -1,10 +1,18 @@
-Manual threading event flags:
-∙	Step (generic/default)
-∙	needfgh, needfg, needfij, needfi, needf
-∙ 	needpfgh, needpfg, needpf (⇔ needfgh, needfg, needf)
-∙	needdy
-∙	needprev, needmv, needmtv, needvmv[, needmv2]
-∙	xupdated, lsstart, lsend, algpowerup
+// Manual threading event flags:
+typedef enum {
+// ∙	Exit, Step (generic/default)
+   EV_EXIT, EV_STEP,
+// ∙	needdy
+   EV_NEEDDY = EV_STEP,
+// ∙ 	needpfgh, needpfg, needpf (⇔ needfgh, needfg, needf)
+   EV_NEEDPF = EV_STEP, EV_NEEDPFG, EV_NEEDPFGH,
+// ∙	needfgh, needfg, needfij, needfi, needf
+   EV_NEEDF = EV_STEP, EV_NEEDFG, EV_NEEDFGH, EV_NEEDFI, EV_NEEDFIJ,
+// ∙	needprev, needmv, needmtv, needvmv[, needmv2]
+   EV_NEEDPREV, EV_NEEDMV, EV_NEEDMTV, EV_NEEDVMV,/* EV_NEEDMV2,*/
+// ∙	xupdated, lsstart, lsend, algpowerup
+   EV_XUPDATED, EV_LSSTART, EV_LSEND, EV_ALGPOWERUP
+} ae_event_t;
 
 Manual threading interfaces:
 AlgLibInternal.cpp:
@@ -194,7 +202,7 @@ Solvers.cpp:
 		Q.xupdated:	void (*Rep)(const real_1d_array &X);
 				if (Rep != NULL) Rep(Q.x)
 		Q.needprec:	Q.pv = Prec(Q.x)
-doc_test_complex.cpp:
+TestC.cpp:
 	testsparseunit_generatenext():
 		sparsegenerator Q:
 		(Step):		Anything

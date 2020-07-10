@@ -7041,14 +7041,12 @@ DefClass(multilayerperceptron, EndD)
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -7058,10 +7056,9 @@ void mlpserialize(multilayerperceptron &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void mlpserialize(multilayerperceptron &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -7079,20 +7076,18 @@ void mlpserialize(multilayerperceptron &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void mlpunserialize(const std::string &s_in, multilayerperceptron &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::mlpunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void mlpunserialize(const std::istream &s_in, multilayerperceptron &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::mlpunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -17476,14 +17471,12 @@ DefClass(mlpensemble, EndD)
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void mlpeserialize(mlpensemble &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpealloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -17493,10 +17486,9 @@ void mlpeserialize(mlpensemble &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void mlpeserialize(mlpensemble &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::mlpealloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -17514,20 +17506,18 @@ void mlpeserialize(mlpensemble &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void mlpeunserialize(const std::string &s_in, mlpensemble &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::mlpeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void mlpeunserialize(const std::istream &s_in, mlpensemble &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::mlpeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -27961,14 +27951,12 @@ DefClass(dfreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmser
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void dfserialize(decisionforest &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::dfalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -27978,10 +27966,9 @@ void dfserialize(decisionforest &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void dfserialize(decisionforest &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::dfalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -27999,20 +27986,18 @@ void dfserialize(decisionforest &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void dfunserialize(const std::string &s_in, decisionforest &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::dfunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void dfunserialize(const std::istream &s_in, decisionforest &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::dfunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
@@ -29848,14 +29833,12 @@ DefClass(knnreport, AndD DecVal(relclserror) AndD DecVal(avgce) AndD DecVal(rmse
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void knnserialize(knnmodel &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::knnalloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -29865,10 +29848,9 @@ void knnserialize(knnmodel &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void knnserialize(knnmodel &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::knnalloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -29886,20 +29868,18 @@ void knnserialize(knnmodel &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void knnunserialize(const std::string &s_in, knnmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::knnunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void knnunserialize(const std::istream &s_in, knnmodel &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::knnunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);

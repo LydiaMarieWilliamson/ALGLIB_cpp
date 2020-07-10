@@ -2024,14 +2024,12 @@ DefClass(kdtree, EndD)
 // * these symbols are grouped into words, which are separated by spaces
 //   and Windows-style (CR+LF) newlines
 void kdtreeserialize(kdtree &obj, std::string &s_out) {
-   alglib_impl::ae_serializer serializer;
-   ae_int_t ssize;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr());
-   ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
+   ae_int_t ssize = alglib_impl::ae_serializer_get_alloc_size(&serializer);
    s_out.clear();
    s_out.reserve((size_t)(ssize + 1));
    alglib_impl::ae_serializer_sstart_str(&serializer, &s_out);
@@ -2041,10 +2039,9 @@ void kdtreeserialize(kdtree &obj, std::string &s_out) {
    alglib_impl::ae_state_clear();
 }
 void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_alloc_start(&serializer);
    alglib_impl::kdtreealloc(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_get_alloc_size(&serializer); // not actually needed, but we have to ask
@@ -2062,20 +2059,18 @@ void kdtreeserialize(kdtree &obj, std::ostream &s_out) {
 // * But you should not insert separators into the middle of the "words"
 //   nor you should change case of letters.
 void kdtreeunserialize(const std::string &s_in, kdtree &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_str(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);
    alglib_impl::ae_state_clear();
 }
 void kdtreeunserialize(const std::istream &s_in, kdtree &obj) {
-   alglib_impl::ae_serializer serializer;
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ae_serializer_init(&serializer);
+   NewSerializer(serializer);
    alglib_impl::ae_serializer_ustart_stream(&serializer, &s_in);
    alglib_impl::kdtreeunserialize(&serializer, obj.c_ptr());
    alglib_impl::ae_serializer_stop(&serializer);

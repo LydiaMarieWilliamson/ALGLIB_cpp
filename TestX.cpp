@@ -1738,48 +1738,48 @@ int main() {
                _ae_set_global_threading(default_global_threading);      // restore
             // global serial
                t0 = tickcount();
-               setglobalthreading(serial);
+               setglobalthreading(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global parallel
                t0 = tickcount();
-               setglobalthreading(parallel);
+               setglobalthreading(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global serial, local serial
                t0 = tickcount();
-               setglobalthreading(serial);
-               alglib_impl::ae_state_set_flags(serial);
+               setglobalthreading(SerTH);
+               alglib_impl::ae_state_set_flags(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global serial, local parallel
                t0 = tickcount();
-               setglobalthreading(serial);
-               alglib_impl::ae_state_set_flags(parallel);
+               setglobalthreading(SerTH);
+               alglib_impl::ae_state_set_flags(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_ser_loc_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global parallel, local serial
                t0 = tickcount();
-               setglobalthreading(parallel);
-               alglib_impl::ae_state_set_flags(serial);
+               setglobalthreading(ParTH);
+               alglib_impl::ae_state_set_flags(SerTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_ser += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global parallel, local parallel
                t0 = tickcount();
-               setglobalthreading(parallel);
-               alglib_impl::ae_state_set_flags(parallel);
+               setglobalthreading(ParTH);
+               alglib_impl::ae_state_set_flags(ParTH);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_loc_smp += tickcount() - t0;
                _ae_set_global_threading(default_global_threading);      // restore
             // global parallel, nworkers=1
                t0 = tickcount();
-               setglobalthreading(parallel);
-               alglib_impl::ae_state_set_flags(xdefault);
+               setglobalthreading(ParTH);
+               alglib_impl::ae_state_set_flags(NonTH);
                setnworkers(1);
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, 0, b, 0, 0, 0, 0.0, c, 0, 0);
                time_glob_smp_nw1 += tickcount() - t0;
@@ -2176,9 +2176,9 @@ int main() {
             setnworkers(0);
             t = tickcount();
             for (k = 0; k < nrepeat; k++)
-               alglib_impl::ae_state_set_flags(parallel),
+               alglib_impl::ae_state_set_flags(ParTH),
                rmatrixgemm(n, n, n, 1.0, a, 0, 0, k % 2, b, 0, 0, (k / 2) % 2, 0.0, c, 0, 0),
-               alglib_impl::ae_state_set_flags(xdefault);
+               alglib_impl::ae_state_set_flags(NonTH);
             t = tickcount() - t;
             perf2 = 1.0E-6 * pow((double)n, 3) * 2.0 * nrepeat / (0.001 * t);
             printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2 / perf0));
