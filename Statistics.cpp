@@ -34,6 +34,8 @@ namespace alglib_impl {
 //
 // NOTE: variance is calculated by dividing sum of squares by N-1, not N.
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis);
+// API: void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis);
 void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, double *skewness, double *kurtosis) {
    ae_int_t i;
    double v;
@@ -103,8 +105,9 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Mean' variable.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplemean(const real_1d_array &x, const ae_int_t n);
+// API: double samplemean(const real_1d_array &x);
 double samplemean(RVector *x, ae_int_t n) {
    double mean;
    double tmp0;
@@ -128,8 +131,9 @@ double samplemean(RVector *x, ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Variance' variable.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplevariance(const real_1d_array &x, const ae_int_t n);
+// API: double samplevariance(const real_1d_array &x);
 double samplevariance(RVector *x, ae_int_t n) {
    double variance;
    double tmp0;
@@ -153,8 +157,9 @@ double samplevariance(RVector *x, ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Skewness' variable.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double sampleskewness(const real_1d_array &x, const ae_int_t n);
+// API: double sampleskewness(const real_1d_array &x);
 double sampleskewness(RVector *x, ae_int_t n) {
    double skewness;
    double tmp0;
@@ -178,8 +183,9 @@ double sampleskewness(RVector *x, ae_int_t n) {
 //
 // This function return result  which calculated by 'SampleMoments' function
 // and stored at 'Kurtosis' variable.
-//
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: double samplekurtosis(const real_1d_array &x, const ae_int_t n);
+// API: double samplekurtosis(const real_1d_array &x);
 double samplekurtosis(RVector *x, ae_int_t n) {
    double kurtosis;
    double tmp0;
@@ -202,6 +208,8 @@ double samplekurtosis(RVector *x, ae_int_t n) {
 // Outputs:
 //     ADev-   ADev
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev);
+// API: void sampleadev(const real_1d_array &x, double &adev);
 void sampleadev(RVector *x, ae_int_t n, double *adev) {
    ae_int_t i;
    double mean;
@@ -238,6 +246,8 @@ void sampleadev(RVector *x, ae_int_t n, double *adev) {
 // Outputs:
 //     Median
 // ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
+// API: void samplemedian(const real_1d_array &x, const ae_int_t n, double &median);
+// API: void samplemedian(const real_1d_array &x, double &median);
 void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -247,7 +257,6 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
    ae_int_t midp;
    ae_int_t k;
    double a;
-   double tval;
    ae_frame_make(&_frame_block);
    DupVector(x);
    *median = 0;
@@ -279,30 +288,20 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
       if (ir <= l + 1) {
       // 1 or 2 elements in partition
          if (ir == l + 1 && x->xR[ir] < x->xR[l]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l], &x->xR[ir]);
          }
          break;
       } else {
          midp = (l + ir) / 2;
-         tval = x->xR[midp];
-         x->xR[midp] = x->xR[l + 1];
-         x->xR[l + 1] = tval;
+         swapr(&x->xR[midp], &x->xR[l + 1]);
          if (x->xR[l] > x->xR[ir]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l], &x->xR[ir]);
          }
          if (x->xR[l + 1] > x->xR[ir]) {
-            tval = x->xR[l + 1];
-            x->xR[l + 1] = x->xR[ir];
-            x->xR[ir] = tval;
+            swapr(&x->xR[l + 1], &x->xR[ir]);
          }
          if (x->xR[l] > x->xR[l + 1]) {
-            tval = x->xR[l];
-            x->xR[l] = x->xR[l + 1];
-            x->xR[l + 1] = tval;
+            swapr(&x->xR[l], &x->xR[l + 1]);
          }
          i = l + 1;
          j = ir;
@@ -317,9 +316,7 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
             if (j < i) {
                break;
             }
-            tval = x->xR[i];
-            x->xR[i] = x->xR[j];
-            x->xR[j] = tval;
+            swapr(&x->xR[i], &x->xR[j]);
          }
          x->xR[l + 1] = x->xR[j];
          x->xR[j] = a;
@@ -359,6 +356,8 @@ void samplemedian(RVector *x, ae_int_t n, double *median) {
 // Outputs:
 //     V   -   percentile
 // ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
+// API: void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v);
+// API: void samplepercentile(const real_1d_array &x, const double p, double &v);
 void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    ae_frame _frame_block;
    ae_int_t i1;
@@ -402,6 +401,8 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
 // Result:
 //     covariance (zero for N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+// API: double cov2(const real_1d_array &x, const real_1d_array &y);
 double cov2(RVector *x, RVector *y, ae_int_t n) {
    ae_int_t i;
    double xmean;
@@ -474,6 +475,8 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
 //     Pearson product-moment correlation coefficient
 //     (zero for N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+// API: double pearsoncorr2(const real_1d_array &x, const real_1d_array &y);
 double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    ae_int_t i;
    double xmean;
@@ -547,6 +550,15 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    return result;
 }
 
+// Obsolete function, we recommend to use PearsonCorr2().
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n) {
+   double result;
+   result = pearsoncorr2(x, y, n);
+   return result;
+}
+
 // Spearman's rank correlation coefficient
 //
 // Inputs:
@@ -560,6 +572,8 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
 //     Spearman's rank correlation coefficient
 //     (zero for N=0 or N=1)
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+// API: double spearmancorr2(const real_1d_array &x, const real_1d_array &y);
 double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
    ae_frame _frame_block;
    double result;
@@ -585,6 +599,15 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
    return result;
 }
 
+// Obsolete function, we recommend to use SpearmanCorr2().
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n);
+double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n) {
+   double result;
+   result = spearmancorr2(x, y, n);
+   return result;
+}
+
 // Covariance matrix
 //
 // Inputs:
@@ -601,6 +624,8 @@ double spearmancorr2(RVector *x, RVector *y, ae_int_t n) {
 // Outputs:
 //     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
+// API: void covm(const real_2d_array &x, real_2d_array &c);
 void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -680,6 +705,8 @@ void covm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
+// API: void pearsoncorrm(const real_2d_array &x, real_2d_array &c);
 void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -727,6 +754,8 @@ void pearsoncorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // Outputs:
 //     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c);
+// API: void spearmancorrm(const real_2d_array &x, real_2d_array &c);
 void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -836,6 +865,8 @@ void spearmancorrm(RMatrix *x, ae_int_t n, ae_int_t m, RMatrix *c) {
 // Outputs:
 //     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
+// API: void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -950,6 +981,8 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
+// API: void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1100,6 +1133,8 @@ void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2,
 // Outputs:
 //     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
 // ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+// API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c);
+// API: void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c);
 void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -1334,6 +1369,8 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+// API: void rankdata(real_2d_array &xy);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -1384,6 +1421,8 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //     XY      -   data are replaced by their within-row ranks;
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
+// API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
+// API: void rankdatacentered(real_2d_array &xy);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -1415,41 +1454,9 @@ void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    basestat_rankdatarec(xy, 0, npoints, nfeatures, true, &pool, basecasecost);
    ae_frame_leave();
 }
-
-// Obsolete function, we recommend to use PearsonCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n) {
-   double result;
-   result = pearsoncorr2(x, y, n);
-   return result;
-}
-
-// Obsolete function, we recommend to use SpearmanCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n) {
-   double result;
-   result = spearmancorr2(x, y, n);
-   return result;
-}
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// Outputs:
-//     Mean    -   mean.
-//     Variance-   variance.
-//     Skewness-   skewness (if variance != 0; zero otherwise).
-//     Kurtosis-   kurtosis (if variance != 0; zero otherwise).
-//
-// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1466,20 +1473,6 @@ void samplemoments(const real_1d_array &x, double &mean, double &variance, doubl
 }
 #endif
 
-// Calculation of the mean.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Mean' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplemean(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1498,20 +1491,6 @@ double samplemean(const real_1d_array &x) {
 }
 #endif
 
-// Calculation of the variance.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Variance' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplevariance(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1530,20 +1509,6 @@ double samplevariance(const real_1d_array &x) {
 }
 #endif
 
-// Calculation of the skewness.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Skewness' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double sampleskewness(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1562,20 +1527,6 @@ double sampleskewness(const real_1d_array &x) {
 }
 #endif
 
-// Calculation of the kurtosis.
-//
-// Inputs:
-//     X       -   sample
-//     N       -   N >= 0, sample size:
-//                 * if given, only leading N elements of X are processed
-//                 * if not given, automatically determined from size of X
-//
-// NOTE:
-//
-// This function return result  which calculated by 'SampleMoments' function
-// and stored at 'Kurtosis' variable.
-//
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 double samplekurtosis(const real_1d_array &x, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1594,17 +1545,6 @@ double samplekurtosis(const real_1d_array &x) {
 }
 #endif
 
-// ADev
-//
-// Inputs:
-//     X   -   sample
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Outputs:
-//     ADev-   ADev
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1621,17 +1561,6 @@ void sampleadev(const real_1d_array &x, double &adev) {
 }
 #endif
 
-// Median calculation.
-//
-// Inputs:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//
-// Outputs:
-//     Median
-// ALGLIB: Copyright 06.09.2006 by Sergey Bochkanov
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1648,18 +1577,6 @@ void samplemedian(const real_1d_array &x, double &median) {
 }
 #endif
 
-// Percentile calculation.
-//
-// Inputs:
-//     X   -   sample (array indexes: [0..N-1])
-//     N   -   N >= 0, sample size:
-//             * if given, only leading N elements of X are processed
-//             * if not given, automatically determined from size of X
-//     P   -   percentile (0 <= P <= 1)
-//
-// Outputs:
-//     V   -   percentile
-// ALGLIB: Copyright 01.03.2008 by Sergey Bochkanov
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1676,18 +1593,6 @@ void samplepercentile(const real_1d_array &x, const double p, double &v) {
 }
 #endif
 
-// 2-sample covariance
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     covariance (zero for N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1707,19 +1612,6 @@ double cov2(const real_1d_array &x, const real_1d_array &y) {
 }
 #endif
 
-// Pearson product-moment correlation coefficient
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Pearson product-moment correlation coefficient
-//     (zero for N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1739,19 +1631,14 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y) {
 }
 #endif
 
-// Spearman's rank correlation coefficient
-//
-// Inputs:
-//     X       -   sample 1 (array indexes: [0..N-1])
-//     Y       -   sample 2 (array indexes: [0..N-1])
-//     N       -   N >= 0, sample size:
-//                 * if given, only N leading elements of X/Y are processed
-//                 * if not given, automatically determined from input sizes
-//
-// Result:
-//     Spearman's rank correlation coefficient
-//     (zero for N=0 or N=1)
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1771,22 +1658,14 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y) {
 }
 #endif
 
-// Covariance matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M > 0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
+double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1804,22 +1683,6 @@ void covm(const real_2d_array &x, real_2d_array &c) {
 }
 #endif
 
-// Pearson product-moment correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M > 0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1837,22 +1700,6 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c) {
 }
 #endif
 
-// Spearman's rank correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X are used
-//             * if not given, automatically determined from input size
-//     M   -   M > 0, number of variables:
-//             * if given, only leading M columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1870,28 +1717,6 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c) {
 }
 #endif
 
-// Cross-covariance matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1 > 0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2 > 0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1911,28 +1736,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c) {
 }
 #endif
 
-// Pearson product-moment cross-correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1 > 0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2 > 0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1952,28 +1755,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 }
 #endif
 
-// Spearman's rank cross-correlation matrix
-//
-// Inputs:
-//     X   -   array[N,M1], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     Y   -   array[N,M2], sample matrix:
-//             * J-th column corresponds to J-th variable
-//             * I-th row corresponds to I-th observation
-//     N   -   N >= 0, number of observations:
-//             * if given, only leading N rows of X/Y are used
-//             * if not given, automatically determined from input sizes
-//     M1  -   M1 > 0, number of variables in X:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//     M2  -   M2 > 0, number of variables in Y:
-//             * if given, only leading M1 columns of X are used
-//             * if not given, automatically determined from input size
-//
-// Outputs:
-//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-// ALGLIB: Copyright 28.10.2010 by Sergey Bochkanov
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -1993,22 +1774,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
 }
 #endif
 
-// This function replaces data in XY by their ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * ranking starts from 0, ends at NFeatures-1
-// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -2016,7 +1781,7 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
    alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
-void rankdata(real_2d_array &xy) {
+void rankdata(const real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state_init();
@@ -2026,24 +1791,6 @@ void rankdata(real_2d_array &xy) {
 }
 #endif
 
-// This function replaces data in XY by their CENTERED ranks:
-// * XY is processed row-by-row
-// * rows are processed separately
-// * tied data are correctly handled (tied ranks are calculated)
-// * centered ranks are just usual ranks, but centered in such way  that  sum
-//   of within-row values is equal to 0.0.
-// * centering is performed by subtracting mean from each row, i.e. it changes
-//   mean value, but does NOT change higher moments
-//
-// Inputs:
-//     XY      -   array[NPoints,NFeatures], dataset
-//     NPoints -   number of points
-//     NFeatures-  number of features
-//
-// Outputs:
-//     XY      -   data are replaced by their within-row ranks;
-//                 ranking starts from 0, ends at NFeatures-1
-// ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -2051,7 +1798,7 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
    alglib_impl::ae_state_clear();
 }
 #if !defined AE_NO_EXCEPTIONS
-void rankdatacentered(real_2d_array &xy) {
+void rankdatacentered(const real_2d_array &xy) {
    ae_int_t npoints = xy.rows();
    ae_int_t nfeatures = xy.cols();
    alglib_impl::ae_state_init();
@@ -2060,26 +1807,6 @@ void rankdatacentered(real_2d_array &xy) {
    alglib_impl::ae_state_clear();
 }
 #endif
-
-// Obsolete function, we recommend to use PearsonCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::pearsoncorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-// Obsolete function, we recommend to use SpearmanCorr2().
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::spearmanrankcorrelation(ConstT(ae_vector, x), ConstT(ae_vector, y), n);
-   alglib_impl::ae_state_clear();
-   return D;
-}
 } // end of namespace alglib
 
 // === WSR Package ===
@@ -2087,4506 +1814,512 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 namespace alglib_impl {
 // Tail(S, 5)
 static double wsr_w5(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-3.708099e+00 * s + 7.500000e+00);
-   if (w >= 7) {
-      r = -6.931e-01;
-   }
-   if (w == 6) {
-      r = -9.008e-01;
-   }
-   if (w == 5) {
-      r = -1.163e+00;
-   }
-   if (w == 4) {
-      r = -1.520e+00;
-   }
-   if (w == 3) {
-      r = -1.856e+00;
-   }
-   if (w == 2) {
-      r = -2.367e+00;
-   }
-   if (w == 1) {
-      r = -2.773e+00;
-   }
-   if (w <= 0) {
-      r = -3.466e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -3.466e+00, -2.773e+00, -2.367e+00, -1.856e+00, -1.520e+00, -1.163e+00, -9.008e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-3.708099e+00 * s + 7.500000e+00);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 6)
 static double wsr_w6(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-4.769696e+00 * s + 1.050000e+01);
-   if (w >= 10) {
-      r = -6.931e-01;
-   }
-   if (w == 9) {
-      r = -8.630e-01;
-   }
-   if (w == 8) {
-      r = -1.068e+00;
-   }
-   if (w == 7) {
-      r = -1.269e+00;
-   }
-   if (w == 6) {
-      r = -1.520e+00;
-   }
-   if (w == 5) {
-      r = -1.856e+00;
-   }
-   if (w == 4) {
-      r = -2.213e+00;
-   }
-   if (w == 3) {
-      r = -2.549e+00;
-   }
-   if (w == 2) {
-      r = -3.060e+00;
-   }
-   if (w == 1) {
-      r = -3.466e+00;
-   }
-   if (w <= 0) {
-      r = -4.159e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -4.159e+00, -3.466e+00, -3.060e+00, -2.549e+00, -2.213e+00, -1.856e+00, -1.520e+00, -1.269e+00,
+      -1.068e+00, -8.630e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-4.769696e+00 * s + 1.050000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 7)
 static double wsr_w7(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-5.916080e+00 * s + 1.400000e+01);
-   if (w >= 14) {
-      r = -6.325e-01;
-   }
-   if (w == 13) {
-      r = -7.577e-01;
-   }
-   if (w == 12) {
-      r = -9.008e-01;
-   }
-   if (w == 11) {
-      r = -1.068e+00;
-   }
-   if (w == 10) {
-      r = -1.241e+00;
-   }
-   if (w == 9) {
-      r = -1.451e+00;
-   }
-   if (w == 8) {
-      r = -1.674e+00;
-   }
-   if (w == 7) {
-      r = -1.908e+00;
-   }
-   if (w == 6) {
-      r = -2.213e+00;
-   }
-   if (w == 5) {
-      r = -2.549e+00;
-   }
-   if (w == 4) {
-      r = -2.906e+00;
-   }
-   if (w == 3) {
-      r = -3.243e+00;
-   }
-   if (w == 2) {
-      r = -3.753e+00;
-   }
-   if (w == 1) {
-      r = -4.159e+00;
-   }
-   if (w <= 0) {
-      r = -4.852e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -4.852e+00, -4.159e+00, -3.753e+00, -3.243e+00, -2.906e+00, -2.549e+00, -2.213e+00, -1.908e+00,
+      -1.674e+00, -1.451e+00, -1.241e+00, -1.068e+00, -9.008e-01, -7.577e-01, -6.325e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-5.916080e+00 * s + 1.400000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 8)
 static double wsr_w8(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-7.141428e+00 * s + 1.800000e+01);
-   if (w >= 18) {
-      r = -6.399e-01;
-   }
-   if (w == 17) {
-      r = -7.494e-01;
-   }
-   if (w == 16) {
-      r = -8.630e-01;
-   }
-   if (w == 15) {
-      r = -9.913e-01;
-   }
-   if (w == 14) {
-      r = -1.138e+00;
-   }
-   if (w == 13) {
-      r = -1.297e+00;
-   }
-   if (w == 12) {
-      r = -1.468e+00;
-   }
-   if (w == 11) {
-      r = -1.653e+00;
-   }
-   if (w == 10) {
-      r = -1.856e+00;
-   }
-   if (w == 9) {
-      r = -2.079e+00;
-   }
-   if (w == 8) {
-      r = -2.326e+00;
-   }
-   if (w == 7) {
-      r = -2.601e+00;
-   }
-   if (w == 6) {
-      r = -2.906e+00;
-   }
-   if (w == 5) {
-      r = -3.243e+00;
-   }
-   if (w == 4) {
-      r = -3.599e+00;
-   }
-   if (w == 3) {
-      r = -3.936e+00;
-   }
-   if (w == 2) {
-      r = -4.447e+00;
-   }
-   if (w == 1) {
-      r = -4.852e+00;
-   }
-   if (w <= 0) {
-      r = -5.545e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -5.545e+00, -4.852e+00, -4.447e+00, -3.936e+00, -3.599e+00, -3.243e+00, -2.906e+00, -2.601e+00,
+      -2.326e+00, -2.079e+00, -1.856e+00, -1.653e+00, -1.468e+00, -1.297e+00, -1.138e+00, -9.913e-01,
+      -8.630e-01, -7.494e-01, -6.399e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-7.141428e+00 * s + 1.800000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 9)
 static double wsr_w9(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-8.440972e+00 * s + 2.250000e+01);
-   if (w >= 22) {
-      r = -6.931e-01;
-   }
-   if (w == 21) {
-      r = -7.873e-01;
-   }
-   if (w == 20) {
-      r = -8.912e-01;
-   }
-   if (w == 19) {
-      r = -1.002e+00;
-   }
-   if (w == 18) {
-      r = -1.120e+00;
-   }
-   if (w == 17) {
-      r = -1.255e+00;
-   }
-   if (w == 16) {
-      r = -1.394e+00;
-   }
-   if (w == 15) {
-      r = -1.547e+00;
-   }
-   if (w == 14) {
-      r = -1.717e+00;
-   }
-   if (w == 13) {
-      r = -1.895e+00;
-   }
-   if (w == 12) {
-      r = -2.079e+00;
-   }
-   if (w == 11) {
-      r = -2.287e+00;
-   }
-   if (w == 10) {
-      r = -2.501e+00;
-   }
-   if (w == 9) {
-      r = -2.742e+00;
-   }
-   if (w == 8) {
-      r = -3.019e+00;
-   }
-   if (w == 7) {
-      r = -3.294e+00;
-   }
-   if (w == 6) {
-      r = -3.599e+00;
-   }
-   if (w == 5) {
-      r = -3.936e+00;
-   }
-   if (w == 4) {
-      r = -4.292e+00;
-   }
-   if (w == 3) {
-      r = -4.629e+00;
-   }
-   if (w == 2) {
-      r = -5.140e+00;
-   }
-   if (w == 1) {
-      r = -5.545e+00;
-   }
-   if (w <= 0) {
-      r = -6.238e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -6.238e+00, -5.545e+00, -5.140e+00, -4.629e+00, -4.292e+00, -3.936e+00, -3.599e+00, -3.294e+00,
+      -3.019e+00, -2.742e+00, -2.501e+00, -2.287e+00, -2.079e+00, -1.895e+00, -1.717e+00, -1.547e+00,
+      -1.394e+00, -1.255e+00, -1.120e+00, -1.002e+00, -8.912e-01, -7.873e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-8.440972e+00 * s + 2.250000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 10)
 static double wsr_w10(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-9.810708e+00 * s + 2.750000e+01);
-   if (w >= 27) {
-      r = -6.931e-01;
-   }
-   if (w == 26) {
-      r = -7.745e-01;
-   }
-   if (w == 25) {
-      r = -8.607e-01;
-   }
-   if (w == 24) {
-      r = -9.551e-01;
-   }
-   if (w == 23) {
-      r = -1.057e+00;
-   }
-   if (w == 22) {
-      r = -1.163e+00;
-   }
-   if (w == 21) {
-      r = -1.279e+00;
-   }
-   if (w == 20) {
-      r = -1.402e+00;
-   }
-   if (w == 19) {
-      r = -1.533e+00;
-   }
-   if (w == 18) {
-      r = -1.674e+00;
-   }
-   if (w == 17) {
-      r = -1.826e+00;
-   }
-   if (w == 16) {
-      r = -1.983e+00;
-   }
-   if (w == 15) {
-      r = -2.152e+00;
-   }
-   if (w == 14) {
-      r = -2.336e+00;
-   }
-   if (w == 13) {
-      r = -2.525e+00;
-   }
-   if (w == 12) {
-      r = -2.727e+00;
-   }
-   if (w == 11) {
-      r = -2.942e+00;
-   }
-   if (w == 10) {
-      r = -3.170e+00;
-   }
-   if (w == 9) {
-      r = -3.435e+00;
-   }
-   if (w == 8) {
-      r = -3.713e+00;
-   }
-   if (w == 7) {
-      r = -3.987e+00;
-   }
-   if (w == 6) {
-      r = -4.292e+00;
-   }
-   if (w == 5) {
-      r = -4.629e+00;
-   }
-   if (w == 4) {
-      r = -4.986e+00;
-   }
-   if (w == 3) {
-      r = -5.322e+00;
-   }
-   if (w == 2) {
-      r = -5.833e+00;
-   }
-   if (w == 1) {
-      r = -6.238e+00;
-   }
-   if (w <= 0) {
-      r = -6.931e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -6.931e+00, -6.238e+00, -5.833e+00, -5.322e+00, -4.986e+00, -4.629e+00, -4.292e+00, -3.987e+00,
+      -3.713e+00, -3.435e+00, -3.170e+00, -2.942e+00, -2.727e+00, -2.525e+00, -2.336e+00, -2.152e+00,
+      -1.983e+00, -1.826e+00, -1.674e+00, -1.533e+00, -1.402e+00, -1.279e+00, -1.163e+00, -1.057e+00,
+      -9.551e-01, -8.607e-01, -7.745e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-9.810708e+00 * s + 2.750000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 11)
 static double wsr_w11(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.124722e+01 * s + 3.300000e+01);
-   if (w >= 33) {
-      r = -6.595e-01;
-   }
-   if (w == 32) {
-      r = -7.279e-01;
-   }
-   if (w == 31) {
-      r = -8.002e-01;
-   }
-   if (w == 30) {
-      r = -8.782e-01;
-   }
-   if (w == 29) {
-      r = -9.615e-01;
-   }
-   if (w == 28) {
-      r = -1.050e+00;
-   }
-   if (w == 27) {
-      r = -1.143e+00;
-   }
-   if (w == 26) {
-      r = -1.243e+00;
-   }
-   if (w == 25) {
-      r = -1.348e+00;
-   }
-   if (w == 24) {
-      r = -1.459e+00;
-   }
-   if (w == 23) {
-      r = -1.577e+00;
-   }
-   if (w == 22) {
-      r = -1.700e+00;
-   }
-   if (w == 21) {
-      r = -1.832e+00;
-   }
-   if (w == 20) {
-      r = -1.972e+00;
-   }
-   if (w == 19) {
-      r = -2.119e+00;
-   }
-   if (w == 18) {
-      r = -2.273e+00;
-   }
-   if (w == 17) {
-      r = -2.437e+00;
-   }
-   if (w == 16) {
-      r = -2.607e+00;
-   }
-   if (w == 15) {
-      r = -2.788e+00;
-   }
-   if (w == 14) {
-      r = -2.980e+00;
-   }
-   if (w == 13) {
-      r = -3.182e+00;
-   }
-   if (w == 12) {
-      r = -3.391e+00;
-   }
-   if (w == 11) {
-      r = -3.617e+00;
-   }
-   if (w == 10) {
-      r = -3.863e+00;
-   }
-   if (w == 9) {
-      r = -4.128e+00;
-   }
-   if (w == 8) {
-      r = -4.406e+00;
-   }
-   if (w == 7) {
-      r = -4.680e+00;
-   }
-   if (w == 6) {
-      r = -4.986e+00;
-   }
-   if (w == 5) {
-      r = -5.322e+00;
-   }
-   if (w == 4) {
-      r = -5.679e+00;
-   }
-   if (w == 3) {
-      r = -6.015e+00;
-   }
-   if (w == 2) {
-      r = -6.526e+00;
-   }
-   if (w == 1) {
-      r = -6.931e+00;
-   }
-   if (w <= 0) {
-      r = -7.625e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -7.625e+00, -6.931e+00, -6.526e+00, -6.015e+00, -5.679e+00, -5.322e+00, -4.986e+00, -4.680e+00,
+      -4.406e+00, -4.128e+00, -3.863e+00, -3.617e+00, -3.391e+00, -3.182e+00, -2.980e+00, -2.788e+00,
+      -2.607e+00, -2.437e+00, -2.273e+00, -2.119e+00, -1.972e+00, -1.832e+00, -1.700e+00, -1.577e+00,
+      -1.459e+00, -1.348e+00, -1.243e+00, -1.143e+00, -1.050e+00, -9.615e-01, -8.782e-01, -8.002e-01,
+      -7.279e-01, -6.595e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.124722e+01 * s + 3.300000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 12)
 static double wsr_w12(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.274755e+01 * s + 3.900000e+01);
-   if (w >= 39) {
-      r = -6.633e-01;
-   }
-   if (w == 38) {
-      r = -7.239e-01;
-   }
-   if (w == 37) {
-      r = -7.878e-01;
-   }
-   if (w == 36) {
-      r = -8.556e-01;
-   }
-   if (w == 35) {
-      r = -9.276e-01;
-   }
-   if (w == 34) {
-      r = -1.003e+00;
-   }
-   if (w == 33) {
-      r = -1.083e+00;
-   }
-   if (w == 32) {
-      r = -1.168e+00;
-   }
-   if (w == 31) {
-      r = -1.256e+00;
-   }
-   if (w == 30) {
-      r = -1.350e+00;
-   }
-   if (w == 29) {
-      r = -1.449e+00;
-   }
-   if (w == 28) {
-      r = -1.552e+00;
-   }
-   if (w == 27) {
-      r = -1.660e+00;
-   }
-   if (w == 26) {
-      r = -1.774e+00;
-   }
-   if (w == 25) {
-      r = -1.893e+00;
-   }
-   if (w == 24) {
-      r = -2.017e+00;
-   }
-   if (w == 23) {
-      r = -2.148e+00;
-   }
-   if (w == 22) {
-      r = -2.285e+00;
-   }
-   if (w == 21) {
-      r = -2.429e+00;
-   }
-   if (w == 20) {
-      r = -2.581e+00;
-   }
-   if (w == 19) {
-      r = -2.738e+00;
-   }
-   if (w == 18) {
-      r = -2.902e+00;
-   }
-   if (w == 17) {
-      r = -3.076e+00;
-   }
-   if (w == 16) {
-      r = -3.255e+00;
-   }
-   if (w == 15) {
-      r = -3.443e+00;
-   }
-   if (w == 14) {
-      r = -3.645e+00;
-   }
-   if (w == 13) {
-      r = -3.852e+00;
-   }
-   if (w == 12) {
-      r = -4.069e+00;
-   }
-   if (w == 11) {
-      r = -4.310e+00;
-   }
-   if (w == 10) {
-      r = -4.557e+00;
-   }
-   if (w == 9) {
-      r = -4.821e+00;
-   }
-   if (w == 8) {
-      r = -5.099e+00;
-   }
-   if (w == 7) {
-      r = -5.373e+00;
-   }
-   if (w == 6) {
-      r = -5.679e+00;
-   }
-   if (w == 5) {
-      r = -6.015e+00;
-   }
-   if (w == 4) {
-      r = -6.372e+00;
-   }
-   if (w == 3) {
-      r = -6.708e+00;
-   }
-   if (w == 2) {
-      r = -7.219e+00;
-   }
-   if (w == 1) {
-      r = -7.625e+00;
-   }
-   if (w <= 0) {
-      r = -8.318e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -8.318e+00, -7.625e+00, -7.219e+00, -6.708e+00, -6.372e+00, -6.015e+00, -5.679e+00, -5.373e+00,
+      -5.099e+00, -4.821e+00, -4.557e+00, -4.310e+00, -4.069e+00, -3.852e+00, -3.645e+00, -3.443e+00,
+      -3.255e+00, -3.076e+00, -2.902e+00, -2.738e+00, -2.581e+00, -2.429e+00, -2.285e+00, -2.148e+00,
+      -2.017e+00, -1.893e+00, -1.774e+00, -1.660e+00, -1.552e+00, -1.449e+00, -1.350e+00, -1.256e+00,
+      -1.168e+00, -1.083e+00, -1.003e+00, -9.276e-01, -8.556e-01, -7.878e-01, -7.239e-01, -6.633e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.274755e+01 * s + 3.900000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 13)
 static double wsr_w13(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.430909e+01 * s + 4.550000e+01);
-   if (w >= 45) {
-      r = -6.931e-01;
-   }
-   if (w == 44) {
-      r = -7.486e-01;
-   }
-   if (w == 43) {
-      r = -8.068e-01;
-   }
-   if (w == 42) {
-      r = -8.683e-01;
-   }
-   if (w == 41) {
-      r = -9.328e-01;
-   }
-   if (w == 40) {
-      r = -1.001e+00;
-   }
-   if (w == 39) {
-      r = -1.072e+00;
-   }
-   if (w == 38) {
-      r = -1.146e+00;
-   }
-   if (w == 37) {
-      r = -1.224e+00;
-   }
-   if (w == 36) {
-      r = -1.306e+00;
-   }
-   if (w == 35) {
-      r = -1.392e+00;
-   }
-   if (w == 34) {
-      r = -1.481e+00;
-   }
-   if (w == 33) {
-      r = -1.574e+00;
-   }
-   if (w == 32) {
-      r = -1.672e+00;
-   }
-   if (w == 31) {
-      r = -1.773e+00;
-   }
-   if (w == 30) {
-      r = -1.879e+00;
-   }
-   if (w == 29) {
-      r = -1.990e+00;
-   }
-   if (w == 28) {
-      r = -2.104e+00;
-   }
-   if (w == 27) {
-      r = -2.224e+00;
-   }
-   if (w == 26) {
-      r = -2.349e+00;
-   }
-   if (w == 25) {
-      r = -2.479e+00;
-   }
-   if (w == 24) {
-      r = -2.614e+00;
-   }
-   if (w == 23) {
-      r = -2.755e+00;
-   }
-   if (w == 22) {
-      r = -2.902e+00;
-   }
-   if (w == 21) {
-      r = -3.055e+00;
-   }
-   if (w == 20) {
-      r = -3.215e+00;
-   }
-   if (w == 19) {
-      r = -3.380e+00;
-   }
-   if (w == 18) {
-      r = -3.551e+00;
-   }
-   if (w == 17) {
-      r = -3.733e+00;
-   }
-   if (w == 16) {
-      r = -3.917e+00;
-   }
-   if (w == 15) {
-      r = -4.113e+00;
-   }
-   if (w == 14) {
-      r = -4.320e+00;
-   }
-   if (w == 13) {
-      r = -4.534e+00;
-   }
-   if (w == 12) {
-      r = -4.762e+00;
-   }
-   if (w == 11) {
-      r = -5.004e+00;
-   }
-   if (w == 10) {
-      r = -5.250e+00;
-   }
-   if (w == 9) {
-      r = -5.514e+00;
-   }
-   if (w == 8) {
-      r = -5.792e+00;
-   }
-   if (w == 7) {
-      r = -6.066e+00;
-   }
-   if (w == 6) {
-      r = -6.372e+00;
-   }
-   if (w == 5) {
-      r = -6.708e+00;
-   }
-   if (w == 4) {
-      r = -7.065e+00;
-   }
-   if (w == 3) {
-      r = -7.401e+00;
-   }
-   if (w == 2) {
-      r = -7.912e+00;
-   }
-   if (w == 1) {
-      r = -8.318e+00;
-   }
-   if (w <= 0) {
-      r = -9.011e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -9.011e+00, -8.318e+00, -7.912e+00, -7.401e+00, -7.065e+00, -6.708e+00, -6.372e+00, -6.066e+00,
+      -5.792e+00, -5.514e+00, -5.250e+00, -5.004e+00, -4.762e+00, -4.534e+00, -4.320e+00, -4.113e+00,
+      -3.917e+00, -3.733e+00, -3.551e+00, -3.380e+00, -3.215e+00, -3.055e+00, -2.902e+00, -2.755e+00,
+      -2.614e+00, -2.479e+00, -2.349e+00, -2.224e+00, -2.104e+00, -1.990e+00, -1.879e+00, -1.773e+00,
+      -1.672e+00, -1.574e+00, -1.481e+00, -1.392e+00, -1.306e+00, -1.224e+00, -1.146e+00, -1.072e+00,
+      -1.001e+00, -9.328e-01, -8.683e-01, -8.068e-01, -7.486e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.430909e+01 * s + 4.550000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 14)
 static double wsr_w14(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.592953e+01 * s + 5.250000e+01);
-   if (w >= 52) {
-      r = -6.931e-01;
-   }
-   if (w == 51) {
-      r = -7.428e-01;
-   }
-   if (w == 50) {
-      r = -7.950e-01;
-   }
-   if (w == 49) {
-      r = -8.495e-01;
-   }
-   if (w == 48) {
-      r = -9.067e-01;
-   }
-   if (w == 47) {
-      r = -9.664e-01;
-   }
-   if (w == 46) {
-      r = -1.029e+00;
-   }
-   if (w == 45) {
-      r = -1.094e+00;
-   }
-   if (w == 44) {
-      r = -1.162e+00;
-   }
-   if (w == 43) {
-      r = -1.233e+00;
-   }
-   if (w == 42) {
-      r = -1.306e+00;
-   }
-   if (w == 41) {
-      r = -1.383e+00;
-   }
-   if (w == 40) {
-      r = -1.463e+00;
-   }
-   if (w == 39) {
-      r = -1.546e+00;
-   }
-   if (w == 38) {
-      r = -1.632e+00;
-   }
-   if (w == 37) {
-      r = -1.722e+00;
-   }
-   if (w == 36) {
-      r = -1.815e+00;
-   }
-   if (w == 35) {
-      r = -1.911e+00;
-   }
-   if (w == 34) {
-      r = -2.011e+00;
-   }
-   if (w == 33) {
-      r = -2.115e+00;
-   }
-   if (w == 32) {
-      r = -2.223e+00;
-   }
-   if (w == 31) {
-      r = -2.334e+00;
-   }
-   if (w == 30) {
-      r = -2.450e+00;
-   }
-   if (w == 29) {
-      r = -2.570e+00;
-   }
-   if (w == 28) {
-      r = -2.694e+00;
-   }
-   if (w == 27) {
-      r = -2.823e+00;
-   }
-   if (w == 26) {
-      r = -2.956e+00;
-   }
-   if (w == 25) {
-      r = -3.095e+00;
-   }
-   if (w == 24) {
-      r = -3.238e+00;
-   }
-   if (w == 23) {
-      r = -3.387e+00;
-   }
-   if (w == 22) {
-      r = -3.541e+00;
-   }
-   if (w == 21) {
-      r = -3.700e+00;
-   }
-   if (w == 20) {
-      r = -3.866e+00;
-   }
-   if (w == 19) {
-      r = -4.038e+00;
-   }
-   if (w == 18) {
-      r = -4.215e+00;
-   }
-   if (w == 17) {
-      r = -4.401e+00;
-   }
-   if (w == 16) {
-      r = -4.592e+00;
-   }
-   if (w == 15) {
-      r = -4.791e+00;
-   }
-   if (w == 14) {
-      r = -5.004e+00;
-   }
-   if (w == 13) {
-      r = -5.227e+00;
-   }
-   if (w == 12) {
-      r = -5.456e+00;
-   }
-   if (w == 11) {
-      r = -5.697e+00;
-   }
-   if (w == 10) {
-      r = -5.943e+00;
-   }
-   if (w == 9) {
-      r = -6.208e+00;
-   }
-   if (w == 8) {
-      r = -6.485e+00;
-   }
-   if (w == 7) {
-      r = -6.760e+00;
-   }
-   if (w == 6) {
-      r = -7.065e+00;
-   }
-   if (w == 5) {
-      r = -7.401e+00;
-   }
-   if (w == 4) {
-      r = -7.758e+00;
-   }
-   if (w == 3) {
-      r = -8.095e+00;
-   }
-   if (w == 2) {
-      r = -8.605e+00;
-   }
-   if (w == 1) {
-      r = -9.011e+00;
-   }
-   if (w <= 0) {
-      r = -9.704e+00;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -9.704e+00, -9.011e+00, -8.605e+00, -8.095e+00, -7.758e+00, -7.401e+00, -7.065e+00, -6.760e+00,
+      -6.485e+00, -6.208e+00, -5.943e+00, -5.697e+00, -5.456e+00, -5.227e+00, -5.004e+00, -4.791e+00,
+      -4.592e+00, -4.401e+00, -4.215e+00, -4.038e+00, -3.866e+00, -3.700e+00, -3.541e+00, -3.387e+00,
+      -3.238e+00, -3.095e+00, -2.956e+00, -2.823e+00, -2.694e+00, -2.570e+00, -2.450e+00, -2.334e+00,
+      -2.223e+00, -2.115e+00, -2.011e+00, -1.911e+00, -1.815e+00, -1.722e+00, -1.632e+00, -1.546e+00,
+      -1.463e+00, -1.383e+00, -1.306e+00, -1.233e+00, -1.162e+00, -1.094e+00, -1.029e+00, -9.664e-01,
+      -9.067e-01, -8.495e-01, -7.950e-01, -7.428e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.592953e+01 * s + 5.250000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 15)
 static double wsr_w15(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.760682e+01 * s + 6.000000e+01);
-   if (w >= 60) {
-      r = -6.714e-01;
-   }
-   if (w == 59) {
-      r = -7.154e-01;
-   }
-   if (w == 58) {
-      r = -7.613e-01;
-   }
-   if (w == 57) {
-      r = -8.093e-01;
-   }
-   if (w == 56) {
-      r = -8.593e-01;
-   }
-   if (w == 55) {
-      r = -9.114e-01;
-   }
-   if (w == 54) {
-      r = -9.656e-01;
-   }
-   if (w == 53) {
-      r = -1.022e+00;
-   }
-   if (w == 52) {
-      r = -1.081e+00;
-   }
-   if (w == 51) {
-      r = -1.142e+00;
-   }
-   if (w == 50) {
-      r = -1.205e+00;
-   }
-   if (w == 49) {
-      r = -1.270e+00;
-   }
-   if (w == 48) {
-      r = -1.339e+00;
-   }
-   if (w == 47) {
-      r = -1.409e+00;
-   }
-   if (w == 46) {
-      r = -1.482e+00;
-   }
-   if (w == 45) {
-      r = -1.558e+00;
-   }
-   if (w == 44) {
-      r = -1.636e+00;
-   }
-   if (w == 43) {
-      r = -1.717e+00;
-   }
-   if (w == 42) {
-      r = -1.801e+00;
-   }
-   if (w == 41) {
-      r = -1.888e+00;
-   }
-   if (w == 40) {
-      r = -1.977e+00;
-   }
-   if (w == 39) {
-      r = -2.070e+00;
-   }
-   if (w == 38) {
-      r = -2.166e+00;
-   }
-   if (w == 37) {
-      r = -2.265e+00;
-   }
-   if (w == 36) {
-      r = -2.366e+00;
-   }
-   if (w == 35) {
-      r = -2.472e+00;
-   }
-   if (w == 34) {
-      r = -2.581e+00;
-   }
-   if (w == 33) {
-      r = -2.693e+00;
-   }
-   if (w == 32) {
-      r = -2.809e+00;
-   }
-   if (w == 31) {
-      r = -2.928e+00;
-   }
-   if (w == 30) {
-      r = -3.051e+00;
-   }
-   if (w == 29) {
-      r = -3.179e+00;
-   }
-   if (w == 28) {
-      r = -3.310e+00;
-   }
-   if (w == 27) {
-      r = -3.446e+00;
-   }
-   if (w == 26) {
-      r = -3.587e+00;
-   }
-   if (w == 25) {
-      r = -3.732e+00;
-   }
-   if (w == 24) {
-      r = -3.881e+00;
-   }
-   if (w == 23) {
-      r = -4.036e+00;
-   }
-   if (w == 22) {
-      r = -4.195e+00;
-   }
-   if (w == 21) {
-      r = -4.359e+00;
-   }
-   if (w == 20) {
-      r = -4.531e+00;
-   }
-   if (w == 19) {
-      r = -4.707e+00;
-   }
-   if (w == 18) {
-      r = -4.888e+00;
-   }
-   if (w == 17) {
-      r = -5.079e+00;
-   }
-   if (w == 16) {
-      r = -5.273e+00;
-   }
-   if (w == 15) {
-      r = -5.477e+00;
-   }
-   if (w == 14) {
-      r = -5.697e+00;
-   }
-   if (w == 13) {
-      r = -5.920e+00;
-   }
-   if (w == 12) {
-      r = -6.149e+00;
-   }
-   if (w == 11) {
-      r = -6.390e+00;
-   }
-   if (w == 10) {
-      r = -6.636e+00;
-   }
-   if (w == 9) {
-      r = -6.901e+00;
-   }
-   if (w == 8) {
-      r = -7.178e+00;
-   }
-   if (w == 7) {
-      r = -7.453e+00;
-   }
-   if (w == 6) {
-      r = -7.758e+00;
-   }
-   if (w == 5) {
-      r = -8.095e+00;
-   }
-   if (w == 4) {
-      r = -8.451e+00;
-   }
-   if (w == 3) {
-      r = -8.788e+00;
-   }
-   if (w == 2) {
-      r = -9.299e+00;
-   }
-   if (w == 1) {
-      r = -9.704e+00;
-   }
-   if (w <= 0) {
-      r = -1.040e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.040e+01, -9.704e+00, -9.299e+00, -8.788e+00, -8.451e+00, -8.095e+00, -7.758e+00, -7.453e+00,
+      -7.178e+00, -6.901e+00, -6.636e+00, -6.390e+00, -6.149e+00, -5.920e+00, -5.697e+00, -5.477e+00,
+      -5.273e+00, -5.079e+00, -4.888e+00, -4.707e+00, -4.531e+00, -4.359e+00, -4.195e+00, -4.036e+00,
+      -3.881e+00, -3.732e+00, -3.587e+00, -3.446e+00, -3.310e+00, -3.179e+00, -3.051e+00, -2.928e+00,
+      -2.809e+00, -2.693e+00, -2.581e+00, -2.472e+00, -2.366e+00, -2.265e+00, -2.166e+00, -2.070e+00,
+      -1.977e+00, -1.888e+00, -1.801e+00, -1.717e+00, -1.636e+00, -1.558e+00, -1.482e+00, -1.409e+00,
+      -1.339e+00, -1.270e+00, -1.205e+00, -1.142e+00, -1.081e+00, -1.022e+00, -9.656e-01, -9.114e-01,
+      -8.593e-01, -8.093e-01, -7.613e-01, -7.154e-01, -6.714e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.760682e+01 * s + 6.000000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 16)
 static double wsr_w16(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-1.933908e+01 * s + 6.800000e+01);
-   if (w >= 68) {
-      r = -6.733e-01;
-   }
-   if (w == 67) {
-      r = -7.134e-01;
-   }
-   if (w == 66) {
-      r = -7.551e-01;
-   }
-   if (w == 65) {
-      r = -7.986e-01;
-   }
-   if (w == 64) {
-      r = -8.437e-01;
-   }
-   if (w == 63) {
-      r = -8.905e-01;
-   }
-   if (w == 62) {
-      r = -9.391e-01;
-   }
-   if (w == 61) {
-      r = -9.895e-01;
-   }
-   if (w == 60) {
-      r = -1.042e+00;
-   }
-   if (w == 59) {
-      r = -1.096e+00;
-   }
-   if (w == 58) {
-      r = -1.152e+00;
-   }
-   if (w == 57) {
-      r = -1.210e+00;
-   }
-   if (w == 56) {
-      r = -1.270e+00;
-   }
-   if (w == 55) {
-      r = -1.331e+00;
-   }
-   if (w == 54) {
-      r = -1.395e+00;
-   }
-   if (w == 53) {
-      r = -1.462e+00;
-   }
-   if (w == 52) {
-      r = -1.530e+00;
-   }
-   if (w == 51) {
-      r = -1.600e+00;
-   }
-   if (w == 50) {
-      r = -1.673e+00;
-   }
-   if (w == 49) {
-      r = -1.748e+00;
-   }
-   if (w == 48) {
-      r = -1.825e+00;
-   }
-   if (w == 47) {
-      r = -1.904e+00;
-   }
-   if (w == 46) {
-      r = -1.986e+00;
-   }
-   if (w == 45) {
-      r = -2.071e+00;
-   }
-   if (w == 44) {
-      r = -2.158e+00;
-   }
-   if (w == 43) {
-      r = -2.247e+00;
-   }
-   if (w == 42) {
-      r = -2.339e+00;
-   }
-   if (w == 41) {
-      r = -2.434e+00;
-   }
-   if (w == 40) {
-      r = -2.532e+00;
-   }
-   if (w == 39) {
-      r = -2.632e+00;
-   }
-   if (w == 38) {
-      r = -2.735e+00;
-   }
-   if (w == 37) {
-      r = -2.842e+00;
-   }
-   if (w == 36) {
-      r = -2.951e+00;
-   }
-   if (w == 35) {
-      r = -3.064e+00;
-   }
-   if (w == 34) {
-      r = -3.179e+00;
-   }
-   if (w == 33) {
-      r = -3.298e+00;
-   }
-   if (w == 32) {
-      r = -3.420e+00;
-   }
-   if (w == 31) {
-      r = -3.546e+00;
-   }
-   if (w == 30) {
-      r = -3.676e+00;
-   }
-   if (w == 29) {
-      r = -3.810e+00;
-   }
-   if (w == 28) {
-      r = -3.947e+00;
-   }
-   if (w == 27) {
-      r = -4.088e+00;
-   }
-   if (w == 26) {
-      r = -4.234e+00;
-   }
-   if (w == 25) {
-      r = -4.383e+00;
-   }
-   if (w == 24) {
-      r = -4.538e+00;
-   }
-   if (w == 23) {
-      r = -4.697e+00;
-   }
-   if (w == 22) {
-      r = -4.860e+00;
-   }
-   if (w == 21) {
-      r = -5.029e+00;
-   }
-   if (w == 20) {
-      r = -5.204e+00;
-   }
-   if (w == 19) {
-      r = -5.383e+00;
-   }
-   if (w == 18) {
-      r = -5.569e+00;
-   }
-   if (w == 17) {
-      r = -5.762e+00;
-   }
-   if (w == 16) {
-      r = -5.960e+00;
-   }
-   if (w == 15) {
-      r = -6.170e+00;
-   }
-   if (w == 14) {
-      r = -6.390e+00;
-   }
-   if (w == 13) {
-      r = -6.613e+00;
-   }
-   if (w == 12) {
-      r = -6.842e+00;
-   }
-   if (w == 11) {
-      r = -7.083e+00;
-   }
-   if (w == 10) {
-      r = -7.329e+00;
-   }
-   if (w == 9) {
-      r = -7.594e+00;
-   }
-   if (w == 8) {
-      r = -7.871e+00;
-   }
-   if (w == 7) {
-      r = -8.146e+00;
-   }
-   if (w == 6) {
-      r = -8.451e+00;
-   }
-   if (w == 5) {
-      r = -8.788e+00;
-   }
-   if (w == 4) {
-      r = -9.144e+00;
-   }
-   if (w == 3) {
-      r = -9.481e+00;
-   }
-   if (w == 2) {
-      r = -9.992e+00;
-   }
-   if (w == 1) {
-      r = -1.040e+01;
-   }
-   if (w <= 0) {
-      r = -1.109e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.109e+01, -1.040e+01, -9.992e+00, -9.481e+00, -9.144e+00, -8.788e+00, -8.451e+00, -8.146e+00,
+      -7.871e+00, -7.594e+00, -7.329e+00, -7.083e+00, -6.842e+00, -6.613e+00, -6.390e+00, -6.170e+00,
+      -5.960e+00, -5.762e+00, -5.569e+00, -5.383e+00, -5.204e+00, -5.029e+00, -4.860e+00, -4.697e+00,
+      -4.538e+00, -4.383e+00, -4.234e+00, -4.088e+00, -3.947e+00, -3.810e+00, -3.676e+00, -3.546e+00,
+      -3.420e+00, -3.298e+00, -3.179e+00, -3.064e+00, -2.951e+00, -2.842e+00, -2.735e+00, -2.632e+00,
+      -2.532e+00, -2.434e+00, -2.339e+00, -2.247e+00, -2.158e+00, -2.071e+00, -1.986e+00, -1.904e+00,
+      -1.825e+00, -1.748e+00, -1.673e+00, -1.600e+00, -1.530e+00, -1.462e+00, -1.395e+00, -1.331e+00,
+      -1.270e+00, -1.210e+00, -1.152e+00, -1.096e+00, -1.042e+00, -9.895e-01, -9.391e-01, -8.905e-01,
+      -8.437e-01, -7.986e-01, -7.551e-01, -7.134e-01, -6.733e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-1.933908e+01 * s + 6.800000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 17)
 static double wsr_w17(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-2.112463e+01 * s + 7.650000e+01);
-   if (w >= 76) {
-      r = -6.931e-01;
-   }
-   if (w == 75) {
-      r = -7.306e-01;
-   }
-   if (w == 74) {
-      r = -7.695e-01;
-   }
-   if (w == 73) {
-      r = -8.097e-01;
-   }
-   if (w == 72) {
-      r = -8.514e-01;
-   }
-   if (w == 71) {
-      r = -8.946e-01;
-   }
-   if (w == 70) {
-      r = -9.392e-01;
-   }
-   if (w == 69) {
-      r = -9.853e-01;
-   }
-   if (w == 68) {
-      r = -1.033e+00;
-   }
-   if (w == 67) {
-      r = -1.082e+00;
-   }
-   if (w == 66) {
-      r = -1.133e+00;
-   }
-   if (w == 65) {
-      r = -1.185e+00;
-   }
-   if (w == 64) {
-      r = -1.240e+00;
-   }
-   if (w == 63) {
-      r = -1.295e+00;
-   }
-   if (w == 62) {
-      r = -1.353e+00;
-   }
-   if (w == 61) {
-      r = -1.412e+00;
-   }
-   if (w == 60) {
-      r = -1.473e+00;
-   }
-   if (w == 59) {
-      r = -1.536e+00;
-   }
-   if (w == 58) {
-      r = -1.600e+00;
-   }
-   if (w == 57) {
-      r = -1.666e+00;
-   }
-   if (w == 56) {
-      r = -1.735e+00;
-   }
-   if (w == 55) {
-      r = -1.805e+00;
-   }
-   if (w == 54) {
-      r = -1.877e+00;
-   }
-   if (w == 53) {
-      r = -1.951e+00;
-   }
-   if (w == 52) {
-      r = -2.028e+00;
-   }
-   if (w == 51) {
-      r = -2.106e+00;
-   }
-   if (w == 50) {
-      r = -2.186e+00;
-   }
-   if (w == 49) {
-      r = -2.269e+00;
-   }
-   if (w == 48) {
-      r = -2.353e+00;
-   }
-   if (w == 47) {
-      r = -2.440e+00;
-   }
-   if (w == 46) {
-      r = -2.530e+00;
-   }
-   if (w == 45) {
-      r = -2.621e+00;
-   }
-   if (w == 44) {
-      r = -2.715e+00;
-   }
-   if (w == 43) {
-      r = -2.812e+00;
-   }
-   if (w == 42) {
-      r = -2.911e+00;
-   }
-   if (w == 41) {
-      r = -3.012e+00;
-   }
-   if (w == 40) {
-      r = -3.116e+00;
-   }
-   if (w == 39) {
-      r = -3.223e+00;
-   }
-   if (w == 38) {
-      r = -3.332e+00;
-   }
-   if (w == 37) {
-      r = -3.445e+00;
-   }
-   if (w == 36) {
-      r = -3.560e+00;
-   }
-   if (w == 35) {
-      r = -3.678e+00;
-   }
-   if (w == 34) {
-      r = -3.799e+00;
-   }
-   if (w == 33) {
-      r = -3.924e+00;
-   }
-   if (w == 32) {
-      r = -4.052e+00;
-   }
-   if (w == 31) {
-      r = -4.183e+00;
-   }
-   if (w == 30) {
-      r = -4.317e+00;
-   }
-   if (w == 29) {
-      r = -4.456e+00;
-   }
-   if (w == 28) {
-      r = -4.597e+00;
-   }
-   if (w == 27) {
-      r = -4.743e+00;
-   }
-   if (w == 26) {
-      r = -4.893e+00;
-   }
-   if (w == 25) {
-      r = -5.047e+00;
-   }
-   if (w == 24) {
-      r = -5.204e+00;
-   }
-   if (w == 23) {
-      r = -5.367e+00;
-   }
-   if (w == 22) {
-      r = -5.534e+00;
-   }
-   if (w == 21) {
-      r = -5.706e+00;
-   }
-   if (w == 20) {
-      r = -5.884e+00;
-   }
-   if (w == 19) {
-      r = -6.066e+00;
-   }
-   if (w == 18) {
-      r = -6.254e+00;
-   }
-   if (w == 17) {
-      r = -6.451e+00;
-   }
-   if (w == 16) {
-      r = -6.654e+00;
-   }
-   if (w == 15) {
-      r = -6.864e+00;
-   }
-   if (w == 14) {
-      r = -7.083e+00;
-   }
-   if (w == 13) {
-      r = -7.306e+00;
-   }
-   if (w == 12) {
-      r = -7.535e+00;
-   }
-   if (w == 11) {
-      r = -7.776e+00;
-   }
-   if (w == 10) {
-      r = -8.022e+00;
-   }
-   if (w == 9) {
-      r = -8.287e+00;
-   }
-   if (w == 8) {
-      r = -8.565e+00;
-   }
-   if (w == 7) {
-      r = -8.839e+00;
-   }
-   if (w == 6) {
-      r = -9.144e+00;
-   }
-   if (w == 5) {
-      r = -9.481e+00;
-   }
-   if (w == 4) {
-      r = -9.838e+00;
-   }
-   if (w == 3) {
-      r = -1.017e+01;
-   }
-   if (w == 2) {
-      r = -1.068e+01;
-   }
-   if (w == 1) {
-      r = -1.109e+01;
-   }
-   if (w <= 0) {
-      r = -1.178e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.178e+01, -1.109e+01, -1.068e+01, -1.017e+01, -9.838e+00, -9.481e+00, -9.144e+00, -8.839e+00,
+      -8.565e+00, -8.287e+00, -8.022e+00, -7.776e+00, -7.535e+00, -7.306e+00, -7.083e+00, -6.864e+00,
+      -6.654e+00, -6.451e+00, -6.254e+00, -6.066e+00, -5.884e+00, -5.706e+00, -5.534e+00, -5.367e+00,
+      -5.204e+00, -5.047e+00, -4.893e+00, -4.743e+00, -4.597e+00, -4.456e+00, -4.317e+00, -4.183e+00,
+      -4.052e+00, -3.924e+00, -3.799e+00, -3.678e+00, -3.560e+00, -3.445e+00, -3.332e+00, -3.223e+00,
+      -3.116e+00, -3.012e+00, -2.911e+00, -2.812e+00, -2.715e+00, -2.621e+00, -2.530e+00, -2.440e+00,
+      -2.353e+00, -2.269e+00, -2.186e+00, -2.106e+00, -2.028e+00, -1.951e+00, -1.877e+00, -1.805e+00,
+      -1.735e+00, -1.666e+00, -1.600e+00, -1.536e+00, -1.473e+00, -1.412e+00, -1.353e+00, -1.295e+00,
+      -1.240e+00, -1.185e+00, -1.133e+00, -1.082e+00, -1.033e+00, -9.853e-01, -9.392e-01, -8.946e-01,
+      -8.514e-01, -8.097e-01, -7.695e-01, -7.306e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-2.112463e+01 * s + 7.650000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 18)
 static double wsr_w18(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-2.296193e+01 * s + 8.550000e+01);
-   if (w >= 85) {
-      r = -6.931e-01;
-   }
-   if (w == 84) {
-      r = -7.276e-01;
-   }
-   if (w == 83) {
-      r = -7.633e-01;
-   }
-   if (w == 82) {
-      r = -8.001e-01;
-   }
-   if (w == 81) {
-      r = -8.381e-01;
-   }
-   if (w == 80) {
-      r = -8.774e-01;
-   }
-   if (w == 79) {
-      r = -9.179e-01;
-   }
-   if (w == 78) {
-      r = -9.597e-01;
-   }
-   if (w == 77) {
-      r = -1.003e+00;
-   }
-   if (w == 76) {
-      r = -1.047e+00;
-   }
-   if (w == 75) {
-      r = -1.093e+00;
-   }
-   if (w == 74) {
-      r = -1.140e+00;
-   }
-   if (w == 73) {
-      r = -1.188e+00;
-   }
-   if (w == 72) {
-      r = -1.238e+00;
-   }
-   if (w == 71) {
-      r = -1.289e+00;
-   }
-   if (w == 70) {
-      r = -1.342e+00;
-   }
-   if (w == 69) {
-      r = -1.396e+00;
-   }
-   if (w == 68) {
-      r = -1.452e+00;
-   }
-   if (w == 67) {
-      r = -1.509e+00;
-   }
-   if (w == 66) {
-      r = -1.568e+00;
-   }
-   if (w == 65) {
-      r = -1.628e+00;
-   }
-   if (w == 64) {
-      r = -1.690e+00;
-   }
-   if (w == 63) {
-      r = -1.753e+00;
-   }
-   if (w == 62) {
-      r = -1.818e+00;
-   }
-   if (w == 61) {
-      r = -1.885e+00;
-   }
-   if (w == 60) {
-      r = -1.953e+00;
-   }
-   if (w == 59) {
-      r = -2.023e+00;
-   }
-   if (w == 58) {
-      r = -2.095e+00;
-   }
-   if (w == 57) {
-      r = -2.168e+00;
-   }
-   if (w == 56) {
-      r = -2.244e+00;
-   }
-   if (w == 55) {
-      r = -2.321e+00;
-   }
-   if (w == 54) {
-      r = -2.400e+00;
-   }
-   if (w == 53) {
-      r = -2.481e+00;
-   }
-   if (w == 52) {
-      r = -2.564e+00;
-   }
-   if (w == 51) {
-      r = -2.648e+00;
-   }
-   if (w == 50) {
-      r = -2.735e+00;
-   }
-   if (w == 49) {
-      r = -2.824e+00;
-   }
-   if (w == 48) {
-      r = -2.915e+00;
-   }
-   if (w == 47) {
-      r = -3.008e+00;
-   }
-   if (w == 46) {
-      r = -3.104e+00;
-   }
-   if (w == 45) {
-      r = -3.201e+00;
-   }
-   if (w == 44) {
-      r = -3.301e+00;
-   }
-   if (w == 43) {
-      r = -3.403e+00;
-   }
-   if (w == 42) {
-      r = -3.508e+00;
-   }
-   if (w == 41) {
-      r = -3.615e+00;
-   }
-   if (w == 40) {
-      r = -3.724e+00;
-   }
-   if (w == 39) {
-      r = -3.836e+00;
-   }
-   if (w == 38) {
-      r = -3.950e+00;
-   }
-   if (w == 37) {
-      r = -4.068e+00;
-   }
-   if (w == 36) {
-      r = -4.188e+00;
-   }
-   if (w == 35) {
-      r = -4.311e+00;
-   }
-   if (w == 34) {
-      r = -4.437e+00;
-   }
-   if (w == 33) {
-      r = -4.565e+00;
-   }
-   if (w == 32) {
-      r = -4.698e+00;
-   }
-   if (w == 31) {
-      r = -4.833e+00;
-   }
-   if (w == 30) {
-      r = -4.971e+00;
-   }
-   if (w == 29) {
-      r = -5.113e+00;
-   }
-   if (w == 28) {
-      r = -5.258e+00;
-   }
-   if (w == 27) {
-      r = -5.408e+00;
-   }
-   if (w == 26) {
-      r = -5.561e+00;
-   }
-   if (w == 25) {
-      r = -5.717e+00;
-   }
-   if (w == 24) {
-      r = -5.878e+00;
-   }
-   if (w == 23) {
-      r = -6.044e+00;
-   }
-   if (w == 22) {
-      r = -6.213e+00;
-   }
-   if (w == 21) {
-      r = -6.388e+00;
-   }
-   if (w == 20) {
-      r = -6.569e+00;
-   }
-   if (w == 19) {
-      r = -6.753e+00;
-   }
-   if (w == 18) {
-      r = -6.943e+00;
-   }
-   if (w == 17) {
-      r = -7.144e+00;
-   }
-   if (w == 16) {
-      r = -7.347e+00;
-   }
-   if (w == 15) {
-      r = -7.557e+00;
-   }
-   if (w == 14) {
-      r = -7.776e+00;
-   }
-   if (w == 13) {
-      r = -7.999e+00;
-   }
-   if (w == 12) {
-      r = -8.228e+00;
-   }
-   if (w == 11) {
-      r = -8.469e+00;
-   }
-   if (w == 10) {
-      r = -8.715e+00;
-   }
-   if (w == 9) {
-      r = -8.980e+00;
-   }
-   if (w == 8) {
-      r = -9.258e+00;
-   }
-   if (w == 7) {
-      r = -9.532e+00;
-   }
-   if (w == 6) {
-      r = -9.838e+00;
-   }
-   if (w == 5) {
-      r = -1.017e+01;
-   }
-   if (w == 4) {
-      r = -1.053e+01;
-   }
-   if (w == 3) {
-      r = -1.087e+01;
-   }
-   if (w == 2) {
-      r = -1.138e+01;
-   }
-   if (w == 1) {
-      r = -1.178e+01;
-   }
-   if (w <= 0) {
-      r = -1.248e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.248e+01, -1.178e+01, -1.138e+01, -1.087e+01, -1.053e+01, -1.017e+01, -9.838e+00, -9.532e+00,
+      -9.258e+00, -8.980e+00, -8.715e+00, -8.469e+00, -8.228e+00, -7.999e+00, -7.776e+00, -7.557e+00,
+      -7.347e+00, -7.144e+00, -6.943e+00, -6.753e+00, -6.569e+00, -6.388e+00, -6.213e+00, -6.044e+00,
+      -5.878e+00, -5.717e+00, -5.561e+00, -5.408e+00, -5.258e+00, -5.113e+00, -4.971e+00, -4.833e+00,
+      -4.698e+00, -4.565e+00, -4.437e+00, -4.311e+00, -4.188e+00, -4.068e+00, -3.950e+00, -3.836e+00,
+      -3.724e+00, -3.615e+00, -3.508e+00, -3.403e+00, -3.301e+00, -3.201e+00, -3.104e+00, -3.008e+00,
+      -2.915e+00, -2.824e+00, -2.735e+00, -2.648e+00, -2.564e+00, -2.481e+00, -2.400e+00, -2.321e+00,
+      -2.244e+00, -2.168e+00, -2.095e+00, -2.023e+00, -1.953e+00, -1.885e+00, -1.818e+00, -1.753e+00,
+      -1.690e+00, -1.628e+00, -1.568e+00, -1.509e+00, -1.452e+00, -1.396e+00, -1.342e+00, -1.289e+00,
+      -1.238e+00, -1.188e+00, -1.140e+00, -1.093e+00, -1.047e+00, -1.003e+00, -9.597e-01, -9.179e-01,
+      -8.774e-01, -8.381e-01, -8.001e-01, -7.633e-01, -7.276e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-2.296193e+01 * s + 8.550000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 19)
 static double wsr_w19(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-2.484955e+01 * s + 9.500000e+01);
-   if (w >= 95) {
-      r = -6.776e-01;
-   }
-   if (w == 94) {
-      r = -7.089e-01;
-   }
-   if (w == 93) {
-      r = -7.413e-01;
-   }
-   if (w == 92) {
-      r = -7.747e-01;
-   }
-   if (w == 91) {
-      r = -8.090e-01;
-   }
-   if (w == 90) {
-      r = -8.445e-01;
-   }
-   if (w == 89) {
-      r = -8.809e-01;
-   }
-   if (w == 88) {
-      r = -9.185e-01;
-   }
-   if (w == 87) {
-      r = -9.571e-01;
-   }
-   if (w == 86) {
-      r = -9.968e-01;
-   }
-   if (w == 85) {
-      r = -1.038e+00;
-   }
-   if (w == 84) {
-      r = -1.080e+00;
-   }
-   if (w == 83) {
-      r = -1.123e+00;
-   }
-   if (w == 82) {
-      r = -1.167e+00;
-   }
-   if (w == 81) {
-      r = -1.213e+00;
-   }
-   if (w == 80) {
-      r = -1.259e+00;
-   }
-   if (w == 79) {
-      r = -1.307e+00;
-   }
-   if (w == 78) {
-      r = -1.356e+00;
-   }
-   if (w == 77) {
-      r = -1.407e+00;
-   }
-   if (w == 76) {
-      r = -1.458e+00;
-   }
-   if (w == 75) {
-      r = -1.511e+00;
-   }
-   if (w == 74) {
-      r = -1.565e+00;
-   }
-   if (w == 73) {
-      r = -1.621e+00;
-   }
-   if (w == 72) {
-      r = -1.678e+00;
-   }
-   if (w == 71) {
-      r = -1.736e+00;
-   }
-   if (w == 70) {
-      r = -1.796e+00;
-   }
-   if (w == 69) {
-      r = -1.857e+00;
-   }
-   if (w == 68) {
-      r = -1.919e+00;
-   }
-   if (w == 67) {
-      r = -1.983e+00;
-   }
-   if (w == 66) {
-      r = -2.048e+00;
-   }
-   if (w == 65) {
-      r = -2.115e+00;
-   }
-   if (w == 64) {
-      r = -2.183e+00;
-   }
-   if (w == 63) {
-      r = -2.253e+00;
-   }
-   if (w == 62) {
-      r = -2.325e+00;
-   }
-   if (w == 61) {
-      r = -2.398e+00;
-   }
-   if (w == 60) {
-      r = -2.472e+00;
-   }
-   if (w == 59) {
-      r = -2.548e+00;
-   }
-   if (w == 58) {
-      r = -2.626e+00;
-   }
-   if (w == 57) {
-      r = -2.706e+00;
-   }
-   if (w == 56) {
-      r = -2.787e+00;
-   }
-   if (w == 55) {
-      r = -2.870e+00;
-   }
-   if (w == 54) {
-      r = -2.955e+00;
-   }
-   if (w == 53) {
-      r = -3.042e+00;
-   }
-   if (w == 52) {
-      r = -3.130e+00;
-   }
-   if (w == 51) {
-      r = -3.220e+00;
-   }
-   if (w == 50) {
-      r = -3.313e+00;
-   }
-   if (w == 49) {
-      r = -3.407e+00;
-   }
-   if (w == 48) {
-      r = -3.503e+00;
-   }
-   if (w == 47) {
-      r = -3.601e+00;
-   }
-   if (w == 46) {
-      r = -3.702e+00;
-   }
-   if (w == 45) {
-      r = -3.804e+00;
-   }
-   if (w == 44) {
-      r = -3.909e+00;
-   }
-   if (w == 43) {
-      r = -4.015e+00;
-   }
-   if (w == 42) {
-      r = -4.125e+00;
-   }
-   if (w == 41) {
-      r = -4.236e+00;
-   }
-   if (w == 40) {
-      r = -4.350e+00;
-   }
-   if (w == 39) {
-      r = -4.466e+00;
-   }
-   if (w == 38) {
-      r = -4.585e+00;
-   }
-   if (w == 37) {
-      r = -4.706e+00;
-   }
-   if (w == 36) {
-      r = -4.830e+00;
-   }
-   if (w == 35) {
-      r = -4.957e+00;
-   }
-   if (w == 34) {
-      r = -5.086e+00;
-   }
-   if (w == 33) {
-      r = -5.219e+00;
-   }
-   if (w == 32) {
-      r = -5.355e+00;
-   }
-   if (w == 31) {
-      r = -5.493e+00;
-   }
-   if (w == 30) {
-      r = -5.634e+00;
-   }
-   if (w == 29) {
-      r = -5.780e+00;
-   }
-   if (w == 28) {
-      r = -5.928e+00;
-   }
-   if (w == 27) {
-      r = -6.080e+00;
-   }
-   if (w == 26) {
-      r = -6.235e+00;
-   }
-   if (w == 25) {
-      r = -6.394e+00;
-   }
-   if (w == 24) {
-      r = -6.558e+00;
-   }
-   if (w == 23) {
-      r = -6.726e+00;
-   }
-   if (w == 22) {
-      r = -6.897e+00;
-   }
-   if (w == 21) {
-      r = -7.074e+00;
-   }
-   if (w == 20) {
-      r = -7.256e+00;
-   }
-   if (w == 19) {
-      r = -7.443e+00;
-   }
-   if (w == 18) {
-      r = -7.636e+00;
-   }
-   if (w == 17) {
-      r = -7.837e+00;
-   }
-   if (w == 16) {
-      r = -8.040e+00;
-   }
-   if (w == 15) {
-      r = -8.250e+00;
-   }
-   if (w == 14) {
-      r = -8.469e+00;
-   }
-   if (w == 13) {
-      r = -8.692e+00;
-   }
-   if (w == 12) {
-      r = -8.921e+00;
-   }
-   if (w == 11) {
-      r = -9.162e+00;
-   }
-   if (w == 10) {
-      r = -9.409e+00;
-   }
-   if (w == 9) {
-      r = -9.673e+00;
-   }
-   if (w == 8) {
-      r = -9.951e+00;
-   }
-   if (w == 7) {
-      r = -1.023e+01;
-   }
-   if (w == 6) {
-      r = -1.053e+01;
-   }
-   if (w == 5) {
-      r = -1.087e+01;
-   }
-   if (w == 4) {
-      r = -1.122e+01;
-   }
-   if (w == 3) {
-      r = -1.156e+01;
-   }
-   if (w == 2) {
-      r = -1.207e+01;
-   }
-   if (w == 1) {
-      r = -1.248e+01;
-   }
-   if (w <= 0) {
-      r = -1.317e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.317e+01, -1.248e+01, -1.207e+01, -1.156e+01, -1.122e+01, -1.087e+01, -1.053e+01, -1.023e+01,
+      -9.951e+00, -9.673e+00, -9.409e+00, -9.162e+00, -8.921e+00, -8.692e+00, -8.469e+00, -8.250e+00,
+      -8.040e+00, -7.837e+00, -7.636e+00, -7.443e+00, -7.256e+00, -7.074e+00, -6.897e+00, -6.726e+00,
+      -6.558e+00, -6.394e+00, -6.235e+00, -6.080e+00, -5.928e+00, -5.780e+00, -5.634e+00, -5.493e+00,
+      -5.355e+00, -5.219e+00, -5.086e+00, -4.957e+00, -4.830e+00, -4.706e+00, -4.585e+00, -4.466e+00,
+      -4.350e+00, -4.236e+00, -4.125e+00, -4.015e+00, -3.909e+00, -3.804e+00, -3.702e+00, -3.601e+00,
+      -3.503e+00, -3.407e+00, -3.313e+00, -3.220e+00, -3.130e+00, -3.042e+00, -2.955e+00, -2.870e+00,
+      -2.787e+00, -2.706e+00, -2.626e+00, -2.548e+00, -2.472e+00, -2.398e+00, -2.325e+00, -2.253e+00,
+      -2.183e+00, -2.115e+00, -2.048e+00, -1.983e+00, -1.919e+00, -1.857e+00, -1.796e+00, -1.736e+00,
+      -1.678e+00, -1.621e+00, -1.565e+00, -1.511e+00, -1.458e+00, -1.407e+00, -1.356e+00, -1.307e+00,
+      -1.259e+00, -1.213e+00, -1.167e+00, -1.123e+00, -1.080e+00, -1.038e+00, -9.968e-01, -9.571e-01,
+      -9.185e-01, -8.809e-01, -8.445e-01, -8.090e-01, -7.747e-01, -7.413e-01, -7.089e-01, -6.776e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-2.484955e+01 * s + 9.500000e+01);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 20)
 static double wsr_w20(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-2.678619e+01 * s + 1.050000e+02);
-   if (w >= 105) {
-      r = -6.787e-01;
-   }
-   if (w == 104) {
-      r = -7.078e-01;
-   }
-   if (w == 103) {
-      r = -7.378e-01;
-   }
-   if (w == 102) {
-      r = -7.686e-01;
-   }
-   if (w == 101) {
-      r = -8.004e-01;
-   }
-   if (w == 100) {
-      r = -8.330e-01;
-   }
-   if (w == 99) {
-      r = -8.665e-01;
-   }
-   if (w == 98) {
-      r = -9.010e-01;
-   }
-   if (w == 97) {
-      r = -9.363e-01;
-   }
-   if (w == 96) {
-      r = -9.726e-01;
-   }
-   if (w == 95) {
-      r = -1.010e+00;
-   }
-   if (w == 94) {
-      r = -1.048e+00;
-   }
-   if (w == 93) {
-      r = -1.087e+00;
-   }
-   if (w == 92) {
-      r = -1.128e+00;
-   }
-   if (w == 91) {
-      r = -1.169e+00;
-   }
-   if (w == 90) {
-      r = -1.211e+00;
-   }
-   if (w == 89) {
-      r = -1.254e+00;
-   }
-   if (w == 88) {
-      r = -1.299e+00;
-   }
-   if (w == 87) {
-      r = -1.344e+00;
-   }
-   if (w == 86) {
-      r = -1.390e+00;
-   }
-   if (w == 85) {
-      r = -1.438e+00;
-   }
-   if (w == 84) {
-      r = -1.486e+00;
-   }
-   if (w == 83) {
-      r = -1.536e+00;
-   }
-   if (w == 82) {
-      r = -1.587e+00;
-   }
-   if (w == 81) {
-      r = -1.639e+00;
-   }
-   if (w == 80) {
-      r = -1.692e+00;
-   }
-   if (w == 79) {
-      r = -1.746e+00;
-   }
-   if (w == 78) {
-      r = -1.802e+00;
-   }
-   if (w == 77) {
-      r = -1.859e+00;
-   }
-   if (w == 76) {
-      r = -1.916e+00;
-   }
-   if (w == 75) {
-      r = -1.976e+00;
-   }
-   if (w == 74) {
-      r = -2.036e+00;
-   }
-   if (w == 73) {
-      r = -2.098e+00;
-   }
-   if (w == 72) {
-      r = -2.161e+00;
-   }
-   if (w == 71) {
-      r = -2.225e+00;
-   }
-   if (w == 70) {
-      r = -2.290e+00;
-   }
-   if (w == 69) {
-      r = -2.357e+00;
-   }
-   if (w == 68) {
-      r = -2.426e+00;
-   }
-   if (w == 67) {
-      r = -2.495e+00;
-   }
-   if (w == 66) {
-      r = -2.566e+00;
-   }
-   if (w == 65) {
-      r = -2.639e+00;
-   }
-   if (w == 64) {
-      r = -2.713e+00;
-   }
-   if (w == 63) {
-      r = -2.788e+00;
-   }
-   if (w == 62) {
-      r = -2.865e+00;
-   }
-   if (w == 61) {
-      r = -2.943e+00;
-   }
-   if (w == 60) {
-      r = -3.023e+00;
-   }
-   if (w == 59) {
-      r = -3.104e+00;
-   }
-   if (w == 58) {
-      r = -3.187e+00;
-   }
-   if (w == 57) {
-      r = -3.272e+00;
-   }
-   if (w == 56) {
-      r = -3.358e+00;
-   }
-   if (w == 55) {
-      r = -3.446e+00;
-   }
-   if (w == 54) {
-      r = -3.536e+00;
-   }
-   if (w == 53) {
-      r = -3.627e+00;
-   }
-   if (w == 52) {
-      r = -3.721e+00;
-   }
-   if (w == 51) {
-      r = -3.815e+00;
-   }
-   if (w == 50) {
-      r = -3.912e+00;
-   }
-   if (w == 49) {
-      r = -4.011e+00;
-   }
-   if (w == 48) {
-      r = -4.111e+00;
-   }
-   if (w == 47) {
-      r = -4.214e+00;
-   }
-   if (w == 46) {
-      r = -4.318e+00;
-   }
-   if (w == 45) {
-      r = -4.425e+00;
-   }
-   if (w == 44) {
-      r = -4.534e+00;
-   }
-   if (w == 43) {
-      r = -4.644e+00;
-   }
-   if (w == 42) {
-      r = -4.757e+00;
-   }
-   if (w == 41) {
-      r = -4.872e+00;
-   }
-   if (w == 40) {
-      r = -4.990e+00;
-   }
-   if (w == 39) {
-      r = -5.109e+00;
-   }
-   if (w == 38) {
-      r = -5.232e+00;
-   }
-   if (w == 37) {
-      r = -5.356e+00;
-   }
-   if (w == 36) {
-      r = -5.484e+00;
-   }
-   if (w == 35) {
-      r = -5.614e+00;
-   }
-   if (w == 34) {
-      r = -5.746e+00;
-   }
-   if (w == 33) {
-      r = -5.882e+00;
-   }
-   if (w == 32) {
-      r = -6.020e+00;
-   }
-   if (w == 31) {
-      r = -6.161e+00;
-   }
-   if (w == 30) {
-      r = -6.305e+00;
-   }
-   if (w == 29) {
-      r = -6.453e+00;
-   }
-   if (w == 28) {
-      r = -6.603e+00;
-   }
-   if (w == 27) {
-      r = -6.757e+00;
-   }
-   if (w == 26) {
-      r = -6.915e+00;
-   }
-   if (w == 25) {
-      r = -7.076e+00;
-   }
-   if (w == 24) {
-      r = -7.242e+00;
-   }
-   if (w == 23) {
-      r = -7.411e+00;
-   }
-   if (w == 22) {
-      r = -7.584e+00;
-   }
-   if (w == 21) {
-      r = -7.763e+00;
-   }
-   if (w == 20) {
-      r = -7.947e+00;
-   }
-   if (w == 19) {
-      r = -8.136e+00;
-   }
-   if (w == 18) {
-      r = -8.330e+00;
-   }
-   if (w == 17) {
-      r = -8.530e+00;
-   }
-   if (w == 16) {
-      r = -8.733e+00;
-   }
-   if (w == 15) {
-      r = -8.943e+00;
-   }
-   if (w == 14) {
-      r = -9.162e+00;
-   }
-   if (w == 13) {
-      r = -9.386e+00;
-   }
-   if (w == 12) {
-      r = -9.614e+00;
-   }
-   if (w == 11) {
-      r = -9.856e+00;
-   }
-   if (w == 10) {
-      r = -1.010e+01;
-   }
-   if (w == 9) {
-      r = -1.037e+01;
-   }
-   if (w == 8) {
-      r = -1.064e+01;
-   }
-   if (w == 7) {
-      r = -1.092e+01;
-   }
-   if (w == 6) {
-      r = -1.122e+01;
-   }
-   if (w == 5) {
-      r = -1.156e+01;
-   }
-   if (w == 4) {
-      r = -1.192e+01;
-   }
-   if (w == 3) {
-      r = -1.225e+01;
-   }
-   if (w == 2) {
-      r = -1.276e+01;
-   }
-   if (w == 1) {
-      r = -1.317e+01;
-   }
-   if (w <= 0) {
-      r = -1.386e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.386e+01, -1.317e+01, -1.276e+01, -1.225e+01, -1.192e+01, -1.156e+01, -1.122e+01, -1.092e+01,
+      -1.064e+01, -1.037e+01, -1.010e+01, -9.856e+00, -9.614e+00, -9.386e+00, -9.162e+00, -8.943e+00,
+      -8.733e+00, -8.530e+00, -8.330e+00, -8.136e+00, -7.947e+00, -7.763e+00, -7.584e+00, -7.411e+00,
+      -7.242e+00, -7.076e+00, -6.915e+00, -6.757e+00, -6.603e+00, -6.453e+00, -6.305e+00, -6.161e+00,
+      -6.020e+00, -5.882e+00, -5.746e+00, -5.614e+00, -5.484e+00, -5.356e+00, -5.232e+00, -5.109e+00,
+      -4.990e+00, -4.872e+00, -4.757e+00, -4.644e+00, -4.534e+00, -4.425e+00, -4.318e+00, -4.214e+00,
+      -4.111e+00, -4.011e+00, -3.912e+00, -3.815e+00, -3.721e+00, -3.627e+00, -3.536e+00, -3.446e+00,
+      -3.358e+00, -3.272e+00, -3.187e+00, -3.104e+00, -3.023e+00, -2.943e+00, -2.865e+00, -2.788e+00,
+      -2.713e+00, -2.639e+00, -2.566e+00, -2.495e+00, -2.426e+00, -2.357e+00, -2.290e+00, -2.225e+00,
+      -2.161e+00, -2.098e+00, -2.036e+00, -1.976e+00, -1.916e+00, -1.859e+00, -1.802e+00, -1.746e+00,
+      -1.692e+00, -1.639e+00, -1.587e+00, -1.536e+00, -1.486e+00, -1.438e+00, -1.390e+00, -1.344e+00,
+      -1.299e+00, -1.254e+00, -1.211e+00, -1.169e+00, -1.128e+00, -1.087e+00, -1.048e+00, -1.010e+00,
+      -9.726e-01, -9.363e-01, -9.010e-01, -8.665e-01, -8.330e-01, -8.004e-01, -7.686e-01, -7.378e-01,
+      -7.078e-01, -6.787e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-2.678619e+01 * s + 1.050000e+02);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 21)
 static double wsr_w21(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-2.877064e+01 * s + 1.155000e+02);
-   if (w >= 115) {
-      r = -6.931e-01;
-   }
-   if (w == 114) {
-      r = -7.207e-01;
-   }
-   if (w == 113) {
-      r = -7.489e-01;
-   }
-   if (w == 112) {
-      r = -7.779e-01;
-   }
-   if (w == 111) {
-      r = -8.077e-01;
-   }
-   if (w == 110) {
-      r = -8.383e-01;
-   }
-   if (w == 109) {
-      r = -8.697e-01;
-   }
-   if (w == 108) {
-      r = -9.018e-01;
-   }
-   if (w == 107) {
-      r = -9.348e-01;
-   }
-   if (w == 106) {
-      r = -9.685e-01;
-   }
-   if (w == 105) {
-      r = -1.003e+00;
-   }
-   if (w == 104) {
-      r = -1.039e+00;
-   }
-   if (w == 103) {
-      r = -1.075e+00;
-   }
-   if (w == 102) {
-      r = -1.112e+00;
-   }
-   if (w == 101) {
-      r = -1.150e+00;
-   }
-   if (w == 100) {
-      r = -1.189e+00;
-   }
-   if (w == 99) {
-      r = -1.229e+00;
-   }
-   if (w == 98) {
-      r = -1.269e+00;
-   }
-   if (w == 97) {
-      r = -1.311e+00;
-   }
-   if (w == 96) {
-      r = -1.353e+00;
-   }
-   if (w == 95) {
-      r = -1.397e+00;
-   }
-   if (w == 94) {
-      r = -1.441e+00;
-   }
-   if (w == 93) {
-      r = -1.486e+00;
-   }
-   if (w == 92) {
-      r = -1.533e+00;
-   }
-   if (w == 91) {
-      r = -1.580e+00;
-   }
-   if (w == 90) {
-      r = -1.628e+00;
-   }
-   if (w == 89) {
-      r = -1.677e+00;
-   }
-   if (w == 88) {
-      r = -1.728e+00;
-   }
-   if (w == 87) {
-      r = -1.779e+00;
-   }
-   if (w == 86) {
-      r = -1.831e+00;
-   }
-   if (w == 85) {
-      r = -1.884e+00;
-   }
-   if (w == 84) {
-      r = -1.939e+00;
-   }
-   if (w == 83) {
-      r = -1.994e+00;
-   }
-   if (w == 82) {
-      r = -2.051e+00;
-   }
-   if (w == 81) {
-      r = -2.108e+00;
-   }
-   if (w == 80) {
-      r = -2.167e+00;
-   }
-   if (w == 79) {
-      r = -2.227e+00;
-   }
-   if (w == 78) {
-      r = -2.288e+00;
-   }
-   if (w == 77) {
-      r = -2.350e+00;
-   }
-   if (w == 76) {
-      r = -2.414e+00;
-   }
-   if (w == 75) {
-      r = -2.478e+00;
-   }
-   if (w == 74) {
-      r = -2.544e+00;
-   }
-   if (w == 73) {
-      r = -2.611e+00;
-   }
-   if (w == 72) {
-      r = -2.679e+00;
-   }
-   if (w == 71) {
-      r = -2.748e+00;
-   }
-   if (w == 70) {
-      r = -2.819e+00;
-   }
-   if (w == 69) {
-      r = -2.891e+00;
-   }
-   if (w == 68) {
-      r = -2.964e+00;
-   }
-   if (w == 67) {
-      r = -3.039e+00;
-   }
-   if (w == 66) {
-      r = -3.115e+00;
-   }
-   if (w == 65) {
-      r = -3.192e+00;
-   }
-   if (w == 64) {
-      r = -3.270e+00;
-   }
-   if (w == 63) {
-      r = -3.350e+00;
-   }
-   if (w == 62) {
-      r = -3.432e+00;
-   }
-   if (w == 61) {
-      r = -3.515e+00;
-   }
-   if (w == 60) {
-      r = -3.599e+00;
-   }
-   if (w == 59) {
-      r = -3.685e+00;
-   }
-   if (w == 58) {
-      r = -3.772e+00;
-   }
-   if (w == 57) {
-      r = -3.861e+00;
-   }
-   if (w == 56) {
-      r = -3.952e+00;
-   }
-   if (w == 55) {
-      r = -4.044e+00;
-   }
-   if (w == 54) {
-      r = -4.138e+00;
-   }
-   if (w == 53) {
-      r = -4.233e+00;
-   }
-   if (w == 52) {
-      r = -4.330e+00;
-   }
-   if (w == 51) {
-      r = -4.429e+00;
-   }
-   if (w == 50) {
-      r = -4.530e+00;
-   }
-   if (w == 49) {
-      r = -4.632e+00;
-   }
-   if (w == 48) {
-      r = -4.736e+00;
-   }
-   if (w == 47) {
-      r = -4.842e+00;
-   }
-   if (w == 46) {
-      r = -4.950e+00;
-   }
-   if (w == 45) {
-      r = -5.060e+00;
-   }
-   if (w == 44) {
-      r = -5.172e+00;
-   }
-   if (w == 43) {
-      r = -5.286e+00;
-   }
-   if (w == 42) {
-      r = -5.402e+00;
-   }
-   if (w == 41) {
-      r = -5.520e+00;
-   }
-   if (w == 40) {
-      r = -5.641e+00;
-   }
-   if (w == 39) {
-      r = -5.763e+00;
-   }
-   if (w == 38) {
-      r = -5.889e+00;
-   }
-   if (w == 37) {
-      r = -6.016e+00;
-   }
-   if (w == 36) {
-      r = -6.146e+00;
-   }
-   if (w == 35) {
-      r = -6.278e+00;
-   }
-   if (w == 34) {
-      r = -6.413e+00;
-   }
-   if (w == 33) {
-      r = -6.551e+00;
-   }
-   if (w == 32) {
-      r = -6.692e+00;
-   }
-   if (w == 31) {
-      r = -6.835e+00;
-   }
-   if (w == 30) {
-      r = -6.981e+00;
-   }
-   if (w == 29) {
-      r = -7.131e+00;
-   }
-   if (w == 28) {
-      r = -7.283e+00;
-   }
-   if (w == 27) {
-      r = -7.439e+00;
-   }
-   if (w == 26) {
-      r = -7.599e+00;
-   }
-   if (w == 25) {
-      r = -7.762e+00;
-   }
-   if (w == 24) {
-      r = -7.928e+00;
-   }
-   if (w == 23) {
-      r = -8.099e+00;
-   }
-   if (w == 22) {
-      r = -8.274e+00;
-   }
-   if (w == 21) {
-      r = -8.454e+00;
-   }
-   if (w == 20) {
-      r = -8.640e+00;
-   }
-   if (w == 19) {
-      r = -8.829e+00;
-   }
-   if (w == 18) {
-      r = -9.023e+00;
-   }
-   if (w == 17) {
-      r = -9.223e+00;
-   }
-   if (w == 16) {
-      r = -9.426e+00;
-   }
-   if (w == 15) {
-      r = -9.636e+00;
-   }
-   if (w == 14) {
-      r = -9.856e+00;
-   }
-   if (w == 13) {
-      r = -1.008e+01;
-   }
-   if (w == 12) {
-      r = -1.031e+01;
-   }
-   if (w == 11) {
-      r = -1.055e+01;
-   }
-   if (w == 10) {
-      r = -1.079e+01;
-   }
-   if (w == 9) {
-      r = -1.106e+01;
-   }
-   if (w == 8) {
-      r = -1.134e+01;
-   }
-   if (w == 7) {
-      r = -1.161e+01;
-   }
-   if (w == 6) {
-      r = -1.192e+01;
-   }
-   if (w == 5) {
-      r = -1.225e+01;
-   }
-   if (w == 4) {
-      r = -1.261e+01;
-   }
-   if (w == 3) {
-      r = -1.295e+01;
-   }
-   if (w == 2) {
-      r = -1.346e+01;
-   }
-   if (w == 1) {
-      r = -1.386e+01;
-   }
-   if (w <= 0) {
-      r = -1.456e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.456e+01, -1.386e+01, -1.346e+01, -1.295e+01, -1.261e+01, -1.225e+01, -1.192e+01, -1.161e+01,
+      -1.134e+01, -1.106e+01, -1.079e+01, -1.055e+01, -1.031e+01, -1.008e+01, -9.856e+00, -9.636e+00,
+      -9.426e+00, -9.223e+00, -9.023e+00, -8.829e+00, -8.640e+00, -8.454e+00, -8.274e+00, -8.099e+00,
+      -7.928e+00, -7.762e+00, -7.599e+00, -7.439e+00, -7.283e+00, -7.131e+00, -6.981e+00, -6.835e+00,
+      -6.692e+00, -6.551e+00, -6.413e+00, -6.278e+00, -6.146e+00, -6.016e+00, -5.889e+00, -5.763e+00,
+      -5.641e+00, -5.520e+00, -5.402e+00, -5.286e+00, -5.172e+00, -5.060e+00, -4.950e+00, -4.842e+00,
+      -4.736e+00, -4.632e+00, -4.530e+00, -4.429e+00, -4.330e+00, -4.233e+00, -4.138e+00, -4.044e+00,
+      -3.952e+00, -3.861e+00, -3.772e+00, -3.685e+00, -3.599e+00, -3.515e+00, -3.432e+00, -3.350e+00,
+      -3.270e+00, -3.192e+00, -3.115e+00, -3.039e+00, -2.964e+00, -2.891e+00, -2.819e+00, -2.748e+00,
+      -2.679e+00, -2.611e+00, -2.544e+00, -2.478e+00, -2.414e+00, -2.350e+00, -2.288e+00, -2.227e+00,
+      -2.167e+00, -2.108e+00, -2.051e+00, -1.994e+00, -1.939e+00, -1.884e+00, -1.831e+00, -1.779e+00,
+      -1.728e+00, -1.677e+00, -1.628e+00, -1.580e+00, -1.533e+00, -1.486e+00, -1.441e+00, -1.397e+00,
+      -1.353e+00, -1.311e+00, -1.269e+00, -1.229e+00, -1.189e+00, -1.150e+00, -1.112e+00, -1.075e+00,
+      -1.039e+00, -1.003e+00, -9.685e-01, -9.348e-01, -9.018e-01, -8.697e-01, -8.383e-01, -8.077e-01,
+      -7.779e-01, -7.489e-01, -7.207e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-2.877064e+01 * s + 1.155000e+02);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 22)
 static double wsr_w22(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-3.080179e+01 * s + 1.265000e+02);
-   if (w >= 126) {
-      r = -6.931e-01;
-   }
-   if (w == 125) {
-      r = -7.189e-01;
-   }
-   if (w == 124) {
-      r = -7.452e-01;
-   }
-   if (w == 123) {
-      r = -7.722e-01;
-   }
-   if (w == 122) {
-      r = -7.999e-01;
-   }
-   if (w == 121) {
-      r = -8.283e-01;
-   }
-   if (w == 120) {
-      r = -8.573e-01;
-   }
-   if (w == 119) {
-      r = -8.871e-01;
-   }
-   if (w == 118) {
-      r = -9.175e-01;
-   }
-   if (w == 117) {
-      r = -9.486e-01;
-   }
-   if (w == 116) {
-      r = -9.805e-01;
-   }
-   if (w == 115) {
-      r = -1.013e+00;
-   }
-   if (w == 114) {
-      r = -1.046e+00;
-   }
-   if (w == 113) {
-      r = -1.080e+00;
-   }
-   if (w == 112) {
-      r = -1.115e+00;
-   }
-   if (w == 111) {
-      r = -1.151e+00;
-   }
-   if (w == 110) {
-      r = -1.187e+00;
-   }
-   if (w == 109) {
-      r = -1.224e+00;
-   }
-   if (w == 108) {
-      r = -1.262e+00;
-   }
-   if (w == 107) {
-      r = -1.301e+00;
-   }
-   if (w == 106) {
-      r = -1.340e+00;
-   }
-   if (w == 105) {
-      r = -1.381e+00;
-   }
-   if (w == 104) {
-      r = -1.422e+00;
-   }
-   if (w == 103) {
-      r = -1.464e+00;
-   }
-   if (w == 102) {
-      r = -1.506e+00;
-   }
-   if (w == 101) {
-      r = -1.550e+00;
-   }
-   if (w == 100) {
-      r = -1.594e+00;
-   }
-   if (w == 99) {
-      r = -1.640e+00;
-   }
-   if (w == 98) {
-      r = -1.686e+00;
-   }
-   if (w == 97) {
-      r = -1.733e+00;
-   }
-   if (w == 96) {
-      r = -1.781e+00;
-   }
-   if (w == 95) {
-      r = -1.830e+00;
-   }
-   if (w == 94) {
-      r = -1.880e+00;
-   }
-   if (w == 93) {
-      r = -1.930e+00;
-   }
-   if (w == 92) {
-      r = -1.982e+00;
-   }
-   if (w == 91) {
-      r = -2.034e+00;
-   }
-   if (w == 90) {
-      r = -2.088e+00;
-   }
-   if (w == 89) {
-      r = -2.142e+00;
-   }
-   if (w == 88) {
-      r = -2.198e+00;
-   }
-   if (w == 87) {
-      r = -2.254e+00;
-   }
-   if (w == 86) {
-      r = -2.312e+00;
-   }
-   if (w == 85) {
-      r = -2.370e+00;
-   }
-   if (w == 84) {
-      r = -2.429e+00;
-   }
-   if (w == 83) {
-      r = -2.490e+00;
-   }
-   if (w == 82) {
-      r = -2.551e+00;
-   }
-   if (w == 81) {
-      r = -2.614e+00;
-   }
-   if (w == 80) {
-      r = -2.677e+00;
-   }
-   if (w == 79) {
-      r = -2.742e+00;
-   }
-   if (w == 78) {
-      r = -2.808e+00;
-   }
-   if (w == 77) {
-      r = -2.875e+00;
-   }
-   if (w == 76) {
-      r = -2.943e+00;
-   }
-   if (w == 75) {
-      r = -3.012e+00;
-   }
-   if (w == 74) {
-      r = -3.082e+00;
-   }
-   if (w == 73) {
-      r = -3.153e+00;
-   }
-   if (w == 72) {
-      r = -3.226e+00;
-   }
-   if (w == 71) {
-      r = -3.300e+00;
-   }
-   if (w == 70) {
-      r = -3.375e+00;
-   }
-   if (w == 69) {
-      r = -3.451e+00;
-   }
-   if (w == 68) {
-      r = -3.529e+00;
-   }
-   if (w == 67) {
-      r = -3.607e+00;
-   }
-   if (w == 66) {
-      r = -3.687e+00;
-   }
-   if (w == 65) {
-      r = -3.769e+00;
-   }
-   if (w == 64) {
-      r = -3.851e+00;
-   }
-   if (w == 63) {
-      r = -3.935e+00;
-   }
-   if (w == 62) {
-      r = -4.021e+00;
-   }
-   if (w == 61) {
-      r = -4.108e+00;
-   }
-   if (w == 60) {
-      r = -4.196e+00;
-   }
-   if (w == 59) {
-      r = -4.285e+00;
-   }
-   if (w == 58) {
-      r = -4.376e+00;
-   }
-   if (w == 57) {
-      r = -4.469e+00;
-   }
-   if (w == 56) {
-      r = -4.563e+00;
-   }
-   if (w == 55) {
-      r = -4.659e+00;
-   }
-   if (w == 54) {
-      r = -4.756e+00;
-   }
-   if (w == 53) {
-      r = -4.855e+00;
-   }
-   if (w == 52) {
-      r = -4.955e+00;
-   }
-   if (w == 51) {
-      r = -5.057e+00;
-   }
-   if (w == 50) {
-      r = -5.161e+00;
-   }
-   if (w == 49) {
-      r = -5.266e+00;
-   }
-   if (w == 48) {
-      r = -5.374e+00;
-   }
-   if (w == 47) {
-      r = -5.483e+00;
-   }
-   if (w == 46) {
-      r = -5.594e+00;
-   }
-   if (w == 45) {
-      r = -5.706e+00;
-   }
-   if (w == 44) {
-      r = -5.821e+00;
-   }
-   if (w == 43) {
-      r = -5.938e+00;
-   }
-   if (w == 42) {
-      r = -6.057e+00;
-   }
-   if (w == 41) {
-      r = -6.177e+00;
-   }
-   if (w == 40) {
-      r = -6.300e+00;
-   }
-   if (w == 39) {
-      r = -6.426e+00;
-   }
-   if (w == 38) {
-      r = -6.553e+00;
-   }
-   if (w == 37) {
-      r = -6.683e+00;
-   }
-   if (w == 36) {
-      r = -6.815e+00;
-   }
-   if (w == 35) {
-      r = -6.949e+00;
-   }
-   if (w == 34) {
-      r = -7.086e+00;
-   }
-   if (w == 33) {
-      r = -7.226e+00;
-   }
-   if (w == 32) {
-      r = -7.368e+00;
-   }
-   if (w == 31) {
-      r = -7.513e+00;
-   }
-   if (w == 30) {
-      r = -7.661e+00;
-   }
-   if (w == 29) {
-      r = -7.813e+00;
-   }
-   if (w == 28) {
-      r = -7.966e+00;
-   }
-   if (w == 27) {
-      r = -8.124e+00;
-   }
-   if (w == 26) {
-      r = -8.285e+00;
-   }
-   if (w == 25) {
-      r = -8.449e+00;
-   }
-   if (w == 24) {
-      r = -8.617e+00;
-   }
-   if (w == 23) {
-      r = -8.789e+00;
-   }
-   if (w == 22) {
-      r = -8.965e+00;
-   }
-   if (w == 21) {
-      r = -9.147e+00;
-   }
-   if (w == 20) {
-      r = -9.333e+00;
-   }
-   if (w == 19) {
-      r = -9.522e+00;
-   }
-   if (w == 18) {
-      r = -9.716e+00;
-   }
-   if (w == 17) {
-      r = -9.917e+00;
-   }
-   if (w == 16) {
-      r = -1.012e+01;
-   }
-   if (w == 15) {
-      r = -1.033e+01;
-   }
-   if (w == 14) {
-      r = -1.055e+01;
-   }
-   if (w == 13) {
-      r = -1.077e+01;
-   }
-   if (w == 12) {
-      r = -1.100e+01;
-   }
-   if (w == 11) {
-      r = -1.124e+01;
-   }
-   if (w == 10) {
-      r = -1.149e+01;
-   }
-   if (w == 9) {
-      r = -1.175e+01;
-   }
-   if (w == 8) {
-      r = -1.203e+01;
-   }
-   if (w == 7) {
-      r = -1.230e+01;
-   }
-   if (w == 6) {
-      r = -1.261e+01;
-   }
-   if (w == 5) {
-      r = -1.295e+01;
-   }
-   if (w == 4) {
-      r = -1.330e+01;
-   }
-   if (w == 3) {
-      r = -1.364e+01;
-   }
-   if (w == 2) {
-      r = -1.415e+01;
-   }
-   if (w == 1) {
-      r = -1.456e+01;
-   }
-   if (w <= 0) {
-      r = -1.525e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.525e+01, -1.456e+01, -1.415e+01, -1.364e+01, -1.330e+01, -1.295e+01, -1.261e+01, -1.230e+01,
+      -1.203e+01, -1.175e+01, -1.149e+01, -1.124e+01, -1.100e+01, -1.077e+01, -1.055e+01, -1.033e+01,
+      -1.012e+01, -9.917e+00, -9.716e+00, -9.522e+00, -9.333e+00, -9.147e+00, -8.965e+00, -8.789e+00,
+      -8.617e+00, -8.449e+00, -8.285e+00, -8.124e+00, -7.966e+00, -7.813e+00, -7.661e+00, -7.513e+00,
+      -7.368e+00, -7.226e+00, -7.086e+00, -6.949e+00, -6.815e+00, -6.683e+00, -6.553e+00, -6.426e+00,
+      -6.300e+00, -6.177e+00, -6.057e+00, -5.938e+00, -5.821e+00, -5.706e+00, -5.594e+00, -5.483e+00,
+      -5.374e+00, -5.266e+00, -5.161e+00, -5.057e+00, -4.955e+00, -4.855e+00, -4.756e+00, -4.659e+00,
+      -4.563e+00, -4.469e+00, -4.376e+00, -4.285e+00, -4.196e+00, -4.108e+00, -4.021e+00, -3.935e+00,
+      -3.851e+00, -3.769e+00, -3.687e+00, -3.607e+00, -3.529e+00, -3.451e+00, -3.375e+00, -3.300e+00,
+      -3.226e+00, -3.153e+00, -3.082e+00, -3.012e+00, -2.943e+00, -2.875e+00, -2.808e+00, -2.742e+00,
+      -2.677e+00, -2.614e+00, -2.551e+00, -2.490e+00, -2.429e+00, -2.370e+00, -2.312e+00, -2.254e+00,
+      -2.198e+00, -2.142e+00, -2.088e+00, -2.034e+00, -1.982e+00, -1.930e+00, -1.880e+00, -1.830e+00,
+      -1.781e+00, -1.733e+00, -1.686e+00, -1.640e+00, -1.594e+00, -1.550e+00, -1.506e+00, -1.464e+00,
+      -1.422e+00, -1.381e+00, -1.340e+00, -1.301e+00, -1.262e+00, -1.224e+00, -1.187e+00, -1.151e+00,
+      -1.115e+00, -1.080e+00, -1.046e+00, -1.013e+00, -9.805e-01, -9.486e-01, -9.175e-01, -8.871e-01,
+      -8.573e-01, -8.283e-01, -7.999e-01, -7.722e-01, -7.452e-01, -7.189e-01, -6.931e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-3.080179e+01 * s + 1.265000e+02);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 23)
 static double wsr_w23(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-3.287856e+01 * s + 1.380000e+02);
-   if (w >= 138) {
-      r = -6.813e-01;
-   }
-   if (w == 137) {
-      r = -7.051e-01;
-   }
-   if (w == 136) {
-      r = -7.295e-01;
-   }
-   if (w == 135) {
-      r = -7.544e-01;
-   }
-   if (w == 134) {
-      r = -7.800e-01;
-   }
-   if (w == 133) {
-      r = -8.061e-01;
-   }
-   if (w == 132) {
-      r = -8.328e-01;
-   }
-   if (w == 131) {
-      r = -8.601e-01;
-   }
-   if (w == 130) {
-      r = -8.880e-01;
-   }
-   if (w == 129) {
-      r = -9.166e-01;
-   }
-   if (w == 128) {
-      r = -9.457e-01;
-   }
-   if (w == 127) {
-      r = -9.755e-01;
-   }
-   if (w == 126) {
-      r = -1.006e+00;
-   }
-   if (w == 125) {
-      r = -1.037e+00;
-   }
-   if (w == 124) {
-      r = -1.069e+00;
-   }
-   if (w == 123) {
-      r = -1.101e+00;
-   }
-   if (w == 122) {
-      r = -1.134e+00;
-   }
-   if (w == 121) {
-      r = -1.168e+00;
-   }
-   if (w == 120) {
-      r = -1.202e+00;
-   }
-   if (w == 119) {
-      r = -1.237e+00;
-   }
-   if (w == 118) {
-      r = -1.273e+00;
-   }
-   if (w == 117) {
-      r = -1.309e+00;
-   }
-   if (w == 116) {
-      r = -1.347e+00;
-   }
-   if (w == 115) {
-      r = -1.384e+00;
-   }
-   if (w == 114) {
-      r = -1.423e+00;
-   }
-   if (w == 113) {
-      r = -1.462e+00;
-   }
-   if (w == 112) {
-      r = -1.502e+00;
-   }
-   if (w == 111) {
-      r = -1.543e+00;
-   }
-   if (w == 110) {
-      r = -1.585e+00;
-   }
-   if (w == 109) {
-      r = -1.627e+00;
-   }
-   if (w == 108) {
-      r = -1.670e+00;
-   }
-   if (w == 107) {
-      r = -1.714e+00;
-   }
-   if (w == 106) {
-      r = -1.758e+00;
-   }
-   if (w == 105) {
-      r = -1.804e+00;
-   }
-   if (w == 104) {
-      r = -1.850e+00;
-   }
-   if (w == 103) {
-      r = -1.897e+00;
-   }
-   if (w == 102) {
-      r = -1.944e+00;
-   }
-   if (w == 101) {
-      r = -1.993e+00;
-   }
-   if (w == 100) {
-      r = -2.042e+00;
-   }
-   if (w == 99) {
-      r = -2.093e+00;
-   }
-   if (w == 98) {
-      r = -2.144e+00;
-   }
-   if (w == 97) {
-      r = -2.195e+00;
-   }
-   if (w == 96) {
-      r = -2.248e+00;
-   }
-   if (w == 95) {
-      r = -2.302e+00;
-   }
-   if (w == 94) {
-      r = -2.356e+00;
-   }
-   if (w == 93) {
-      r = -2.412e+00;
-   }
-   if (w == 92) {
-      r = -2.468e+00;
-   }
-   if (w == 91) {
-      r = -2.525e+00;
-   }
-   if (w == 90) {
-      r = -2.583e+00;
-   }
-   if (w == 89) {
-      r = -2.642e+00;
-   }
-   if (w == 88) {
-      r = -2.702e+00;
-   }
-   if (w == 87) {
-      r = -2.763e+00;
-   }
-   if (w == 86) {
-      r = -2.825e+00;
-   }
-   if (w == 85) {
-      r = -2.888e+00;
-   }
-   if (w == 84) {
-      r = -2.951e+00;
-   }
-   if (w == 83) {
-      r = -3.016e+00;
-   }
-   if (w == 82) {
-      r = -3.082e+00;
-   }
-   if (w == 81) {
-      r = -3.149e+00;
-   }
-   if (w == 80) {
-      r = -3.216e+00;
-   }
-   if (w == 79) {
-      r = -3.285e+00;
-   }
-   if (w == 78) {
-      r = -3.355e+00;
-   }
-   if (w == 77) {
-      r = -3.426e+00;
-   }
-   if (w == 76) {
-      r = -3.498e+00;
-   }
-   if (w == 75) {
-      r = -3.571e+00;
-   }
-   if (w == 74) {
-      r = -3.645e+00;
-   }
-   if (w == 73) {
-      r = -3.721e+00;
-   }
-   if (w == 72) {
-      r = -3.797e+00;
-   }
-   if (w == 71) {
-      r = -3.875e+00;
-   }
-   if (w == 70) {
-      r = -3.953e+00;
-   }
-   if (w == 69) {
-      r = -4.033e+00;
-   }
-   if (w == 68) {
-      r = -4.114e+00;
-   }
-   if (w == 67) {
-      r = -4.197e+00;
-   }
-   if (w == 66) {
-      r = -4.280e+00;
-   }
-   if (w == 65) {
-      r = -4.365e+00;
-   }
-   if (w == 64) {
-      r = -4.451e+00;
-   }
-   if (w == 63) {
-      r = -4.539e+00;
-   }
-   if (w == 62) {
-      r = -4.628e+00;
-   }
-   if (w == 61) {
-      r = -4.718e+00;
-   }
-   if (w == 60) {
-      r = -4.809e+00;
-   }
-   if (w == 59) {
-      r = -4.902e+00;
-   }
-   if (w == 58) {
-      r = -4.996e+00;
-   }
-   if (w == 57) {
-      r = -5.092e+00;
-   }
-   if (w == 56) {
-      r = -5.189e+00;
-   }
-   if (w == 55) {
-      r = -5.287e+00;
-   }
-   if (w == 54) {
-      r = -5.388e+00;
-   }
-   if (w == 53) {
-      r = -5.489e+00;
-   }
-   if (w == 52) {
-      r = -5.592e+00;
-   }
-   if (w == 51) {
-      r = -5.697e+00;
-   }
-   if (w == 50) {
-      r = -5.804e+00;
-   }
-   if (w == 49) {
-      r = -5.912e+00;
-   }
-   if (w == 48) {
-      r = -6.022e+00;
-   }
-   if (w == 47) {
-      r = -6.133e+00;
-   }
-   if (w == 46) {
-      r = -6.247e+00;
-   }
-   if (w == 45) {
-      r = -6.362e+00;
-   }
-   if (w == 44) {
-      r = -6.479e+00;
-   }
-   if (w == 43) {
-      r = -6.598e+00;
-   }
-   if (w == 42) {
-      r = -6.719e+00;
-   }
-   if (w == 41) {
-      r = -6.842e+00;
-   }
-   if (w == 40) {
-      r = -6.967e+00;
-   }
-   if (w == 39) {
-      r = -7.094e+00;
-   }
-   if (w == 38) {
-      r = -7.224e+00;
-   }
-   if (w == 37) {
-      r = -7.355e+00;
-   }
-   if (w == 36) {
-      r = -7.489e+00;
-   }
-   if (w == 35) {
-      r = -7.625e+00;
-   }
-   if (w == 34) {
-      r = -7.764e+00;
-   }
-   if (w == 33) {
-      r = -7.905e+00;
-   }
-   if (w == 32) {
-      r = -8.049e+00;
-   }
-   if (w == 31) {
-      r = -8.196e+00;
-   }
-   if (w == 30) {
-      r = -8.345e+00;
-   }
-   if (w == 29) {
-      r = -8.498e+00;
-   }
-   if (w == 28) {
-      r = -8.653e+00;
-   }
-   if (w == 27) {
-      r = -8.811e+00;
-   }
-   if (w == 26) {
-      r = -8.974e+00;
-   }
-   if (w == 25) {
-      r = -9.139e+00;
-   }
-   if (w == 24) {
-      r = -9.308e+00;
-   }
-   if (w == 23) {
-      r = -9.481e+00;
-   }
-   if (w == 22) {
-      r = -9.658e+00;
-   }
-   if (w == 21) {
-      r = -9.840e+00;
-   }
-   if (w == 20) {
-      r = -1.003e+01;
-   }
-   if (w == 19) {
-      r = -1.022e+01;
-   }
-   if (w == 18) {
-      r = -1.041e+01;
-   }
-   if (w == 17) {
-      r = -1.061e+01;
-   }
-   if (w == 16) {
-      r = -1.081e+01;
-   }
-   if (w == 15) {
-      r = -1.102e+01;
-   }
-   if (w == 14) {
-      r = -1.124e+01;
-   }
-   if (w == 13) {
-      r = -1.147e+01;
-   }
-   if (w == 12) {
-      r = -1.169e+01;
-   }
-   if (w == 11) {
-      r = -1.194e+01;
-   }
-   if (w == 10) {
-      r = -1.218e+01;
-   }
-   if (w == 9) {
-      r = -1.245e+01;
-   }
-   if (w == 8) {
-      r = -1.272e+01;
-   }
-   if (w == 7) {
-      r = -1.300e+01;
-   }
-   if (w == 6) {
-      r = -1.330e+01;
-   }
-   if (w == 5) {
-      r = -1.364e+01;
-   }
-   if (w == 4) {
-      r = -1.400e+01;
-   }
-   if (w == 3) {
-      r = -1.433e+01;
-   }
-   if (w == 2) {
-      r = -1.484e+01;
-   }
-   if (w == 1) {
-      r = -1.525e+01;
-   }
-   if (w <= 0) {
-      r = -1.594e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.594e+01, -1.525e+01, -1.484e+01, -1.433e+01, -1.400e+01, -1.364e+01, -1.330e+01, -1.300e+01,
+      -1.272e+01, -1.245e+01, -1.218e+01, -1.194e+01, -1.169e+01, -1.147e+01, -1.124e+01, -1.102e+01,
+      -1.081e+01, -1.061e+01, -1.041e+01, -1.022e+01, -1.003e+01, -9.840e+00, -9.658e+00, -9.481e+00,
+      -9.308e+00, -9.139e+00, -8.974e+00, -8.811e+00, -8.653e+00, -8.498e+00, -8.345e+00, -8.196e+00,
+      -8.049e+00, -7.905e+00, -7.764e+00, -7.625e+00, -7.489e+00, -7.355e+00, -7.224e+00, -7.094e+00,
+      -6.967e+00, -6.842e+00, -6.719e+00, -6.598e+00, -6.479e+00, -6.362e+00, -6.247e+00, -6.133e+00,
+      -6.022e+00, -5.912e+00, -5.804e+00, -5.697e+00, -5.592e+00, -5.489e+00, -5.388e+00, -5.287e+00,
+      -5.189e+00, -5.092e+00, -4.996e+00, -4.902e+00, -4.809e+00, -4.718e+00, -4.628e+00, -4.539e+00,
+      -4.451e+00, -4.365e+00, -4.280e+00, -4.197e+00, -4.114e+00, -4.033e+00, -3.953e+00, -3.875e+00,
+      -3.797e+00, -3.721e+00, -3.645e+00, -3.571e+00, -3.498e+00, -3.426e+00, -3.355e+00, -3.285e+00,
+      -3.216e+00, -3.149e+00, -3.082e+00, -3.016e+00, -2.951e+00, -2.888e+00, -2.825e+00, -2.763e+00,
+      -2.702e+00, -2.642e+00, -2.583e+00, -2.525e+00, -2.468e+00, -2.412e+00, -2.356e+00, -2.302e+00,
+      -2.248e+00, -2.195e+00, -2.144e+00, -2.093e+00, -2.042e+00, -1.993e+00, -1.944e+00, -1.897e+00,
+      -1.850e+00, -1.804e+00, -1.758e+00, -1.714e+00, -1.670e+00, -1.627e+00, -1.585e+00, -1.543e+00,
+      -1.502e+00, -1.462e+00, -1.423e+00, -1.384e+00, -1.347e+00, -1.309e+00, -1.273e+00, -1.237e+00,
+      -1.202e+00, -1.168e+00, -1.134e+00, -1.101e+00, -1.069e+00, -1.037e+00, -1.006e+00, -9.755e-01,
+      -9.457e-01, -9.166e-01, -8.880e-01, -8.601e-01, -8.328e-01, -8.061e-01, -7.800e-01, -7.544e-01,
+      -7.295e-01, -7.051e-01, -6.813e-01
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-3.287856e+01 * s + 1.380000e+02);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
 // Tail(S, 24)
 static double wsr_w24(double s) {
-   ae_int_t w;
-   double r;
-   double result;
-   r = 0.0;
-   w = RoundZ(-3.500000e+01 * s + 1.500000e+02);
-   if (w >= 150) {
-      r = -6.820e-01;
-   }
-   if (w == 149) {
-      r = -7.044e-01;
-   }
-   if (w == 148) {
-      r = -7.273e-01;
-   }
-   if (w == 147) {
-      r = -7.507e-01;
-   }
-   if (w == 146) {
-      r = -7.746e-01;
-   }
-   if (w == 145) {
-      r = -7.990e-01;
-   }
-   if (w == 144) {
-      r = -8.239e-01;
-   }
-   if (w == 143) {
-      r = -8.494e-01;
-   }
-   if (w == 142) {
-      r = -8.754e-01;
-   }
-   if (w == 141) {
-      r = -9.020e-01;
-   }
-   if (w == 140) {
-      r = -9.291e-01;
-   }
-   if (w == 139) {
-      r = -9.567e-01;
-   }
-   if (w == 138) {
-      r = -9.849e-01;
-   }
-   if (w == 137) {
-      r = -1.014e+00;
-   }
-   if (w == 136) {
-      r = -1.043e+00;
-   }
-   if (w == 135) {
-      r = -1.073e+00;
-   }
-   if (w == 134) {
-      r = -1.103e+00;
-   }
-   if (w == 133) {
-      r = -1.135e+00;
-   }
-   if (w == 132) {
-      r = -1.166e+00;
-   }
-   if (w == 131) {
-      r = -1.198e+00;
-   }
-   if (w == 130) {
-      r = -1.231e+00;
-   }
-   if (w == 129) {
-      r = -1.265e+00;
-   }
-   if (w == 128) {
-      r = -1.299e+00;
-   }
-   if (w == 127) {
-      r = -1.334e+00;
-   }
-   if (w == 126) {
-      r = -1.369e+00;
-   }
-   if (w == 125) {
-      r = -1.405e+00;
-   }
-   if (w == 124) {
-      r = -1.441e+00;
-   }
-   if (w == 123) {
-      r = -1.479e+00;
-   }
-   if (w == 122) {
-      r = -1.517e+00;
-   }
-   if (w == 121) {
-      r = -1.555e+00;
-   }
-   if (w == 120) {
-      r = -1.594e+00;
-   }
-   if (w == 119) {
-      r = -1.634e+00;
-   }
-   if (w == 118) {
-      r = -1.675e+00;
-   }
-   if (w == 117) {
-      r = -1.716e+00;
-   }
-   if (w == 116) {
-      r = -1.758e+00;
-   }
-   if (w == 115) {
-      r = -1.800e+00;
-   }
-   if (w == 114) {
-      r = -1.844e+00;
-   }
-   if (w == 113) {
-      r = -1.888e+00;
-   }
-   if (w == 112) {
-      r = -1.932e+00;
-   }
-   if (w == 111) {
-      r = -1.978e+00;
-   }
-   if (w == 110) {
-      r = -2.024e+00;
-   }
-   if (w == 109) {
-      r = -2.070e+00;
-   }
-   if (w == 108) {
-      r = -2.118e+00;
-   }
-   if (w == 107) {
-      r = -2.166e+00;
-   }
-   if (w == 106) {
-      r = -2.215e+00;
-   }
-   if (w == 105) {
-      r = -2.265e+00;
-   }
-   if (w == 104) {
-      r = -2.316e+00;
-   }
-   if (w == 103) {
-      r = -2.367e+00;
-   }
-   if (w == 102) {
-      r = -2.419e+00;
-   }
-   if (w == 101) {
-      r = -2.472e+00;
-   }
-   if (w == 100) {
-      r = -2.526e+00;
-   }
-   if (w == 99) {
-      r = -2.580e+00;
-   }
-   if (w == 98) {
-      r = -2.636e+00;
-   }
-   if (w == 97) {
-      r = -2.692e+00;
-   }
-   if (w == 96) {
-      r = -2.749e+00;
-   }
-   if (w == 95) {
-      r = -2.806e+00;
-   }
-   if (w == 94) {
-      r = -2.865e+00;
-   }
-   if (w == 93) {
-      r = -2.925e+00;
-   }
-   if (w == 92) {
-      r = -2.985e+00;
-   }
-   if (w == 91) {
-      r = -3.046e+00;
-   }
-   if (w == 90) {
-      r = -3.108e+00;
-   }
-   if (w == 89) {
-      r = -3.171e+00;
-   }
-   if (w == 88) {
-      r = -3.235e+00;
-   }
-   if (w == 87) {
-      r = -3.300e+00;
-   }
-   if (w == 86) {
-      r = -3.365e+00;
-   }
-   if (w == 85) {
-      r = -3.432e+00;
-   }
-   if (w == 84) {
-      r = -3.499e+00;
-   }
-   if (w == 83) {
-      r = -3.568e+00;
-   }
-   if (w == 82) {
-      r = -3.637e+00;
-   }
-   if (w == 81) {
-      r = -3.708e+00;
-   }
-   if (w == 80) {
-      r = -3.779e+00;
-   }
-   if (w == 79) {
-      r = -3.852e+00;
-   }
-   if (w == 78) {
-      r = -3.925e+00;
-   }
-   if (w == 77) {
-      r = -4.000e+00;
-   }
-   if (w == 76) {
-      r = -4.075e+00;
-   }
-   if (w == 75) {
-      r = -4.151e+00;
-   }
-   if (w == 74) {
-      r = -4.229e+00;
-   }
-   if (w == 73) {
-      r = -4.308e+00;
-   }
-   if (w == 72) {
-      r = -4.387e+00;
-   }
-   if (w == 71) {
-      r = -4.468e+00;
-   }
-   if (w == 70) {
-      r = -4.550e+00;
-   }
-   if (w == 69) {
-      r = -4.633e+00;
-   }
-   if (w == 68) {
-      r = -4.718e+00;
-   }
-   if (w == 67) {
-      r = -4.803e+00;
-   }
-   if (w == 66) {
-      r = -4.890e+00;
-   }
-   if (w == 65) {
-      r = -4.978e+00;
-   }
-   if (w == 64) {
-      r = -5.067e+00;
-   }
-   if (w == 63) {
-      r = -5.157e+00;
-   }
-   if (w == 62) {
-      r = -5.249e+00;
-   }
-   if (w == 61) {
-      r = -5.342e+00;
-   }
-   if (w == 60) {
-      r = -5.436e+00;
-   }
-   if (w == 59) {
-      r = -5.531e+00;
-   }
-   if (w == 58) {
-      r = -5.628e+00;
-   }
-   if (w == 57) {
-      r = -5.727e+00;
-   }
-   if (w == 56) {
-      r = -5.826e+00;
-   }
-   if (w == 55) {
-      r = -5.927e+00;
-   }
-   if (w == 54) {
-      r = -6.030e+00;
-   }
-   if (w == 53) {
-      r = -6.134e+00;
-   }
-   if (w == 52) {
-      r = -6.240e+00;
-   }
-   if (w == 51) {
-      r = -6.347e+00;
-   }
-   if (w == 50) {
-      r = -6.456e+00;
-   }
-   if (w == 49) {
-      r = -6.566e+00;
-   }
-   if (w == 48) {
-      r = -6.678e+00;
-   }
-   if (w == 47) {
-      r = -6.792e+00;
-   }
-   if (w == 46) {
-      r = -6.907e+00;
-   }
-   if (w == 45) {
-      r = -7.025e+00;
-   }
-   if (w == 44) {
-      r = -7.144e+00;
-   }
-   if (w == 43) {
-      r = -7.265e+00;
-   }
-   if (w == 42) {
-      r = -7.387e+00;
-   }
-   if (w == 41) {
-      r = -7.512e+00;
-   }
-   if (w == 40) {
-      r = -7.639e+00;
-   }
-   if (w == 39) {
-      r = -7.768e+00;
-   }
-   if (w == 38) {
-      r = -7.899e+00;
-   }
-   if (w == 37) {
-      r = -8.032e+00;
-   }
-   if (w == 36) {
-      r = -8.167e+00;
-   }
-   if (w == 35) {
-      r = -8.305e+00;
-   }
-   if (w == 34) {
-      r = -8.445e+00;
-   }
-   if (w == 33) {
-      r = -8.588e+00;
-   }
-   if (w == 32) {
-      r = -8.733e+00;
-   }
-   if (w == 31) {
-      r = -8.881e+00;
-   }
-   if (w == 30) {
-      r = -9.031e+00;
-   }
-   if (w == 29) {
-      r = -9.185e+00;
-   }
-   if (w == 28) {
-      r = -9.341e+00;
-   }
-   if (w == 27) {
-      r = -9.501e+00;
-   }
-   if (w == 26) {
-      r = -9.664e+00;
-   }
-   if (w == 25) {
-      r = -9.830e+00;
-   }
-   if (w == 24) {
-      r = -1.000e+01;
-   }
-   if (w == 23) {
-      r = -1.017e+01;
-   }
-   if (w == 22) {
-      r = -1.035e+01;
-   }
-   if (w == 21) {
-      r = -1.053e+01;
-   }
-   if (w == 20) {
-      r = -1.072e+01;
-   }
-   if (w == 19) {
-      r = -1.091e+01;
-   }
-   if (w == 18) {
-      r = -1.110e+01;
-   }
-   if (w == 17) {
-      r = -1.130e+01;
-   }
-   if (w == 16) {
-      r = -1.151e+01;
-   }
-   if (w == 15) {
-      r = -1.172e+01;
-   }
-   if (w == 14) {
-      r = -1.194e+01;
-   }
-   if (w == 13) {
-      r = -1.216e+01;
-   }
-   if (w == 12) {
-      r = -1.239e+01;
-   }
-   if (w == 11) {
-      r = -1.263e+01;
-   }
-   if (w == 10) {
-      r = -1.287e+01;
-   }
-   if (w == 9) {
-      r = -1.314e+01;
-   }
-   if (w == 8) {
-      r = -1.342e+01;
-   }
-   if (w == 7) {
-      r = -1.369e+01;
-   }
-   if (w == 6) {
-      r = -1.400e+01;
-   }
-   if (w == 5) {
-      r = -1.433e+01;
-   }
-   if (w == 4) {
-      r = -1.469e+01;
-   }
-   if (w == 3) {
-      r = -1.503e+01;
-   }
-   if (w == 2) {
-      r = -1.554e+01;
-   }
-   if (w == 1) {
-      r = -1.594e+01;
-   }
-   if (w <= 0) {
-      r = -1.664e+01;
-   }
-   result = r;
-   return result;
+   static double tab[] = {
+      -1.664e+01, -1.594e+01, -1.554e+01, -1.503e+01, -1.469e+01, -1.433e+01, -1.400e+01, -1.369e+01,
+      -1.342e+01, -1.314e+01, -1.287e+01, -1.263e+01, -1.239e+01, -1.216e+01, -1.194e+01, -1.172e+01,
+      -1.151e+01, -1.130e+01, -1.110e+01, -1.091e+01, -1.072e+01, -1.053e+01, -1.035e+01, -1.017e+01,
+      -1.000e+01, -9.830e+00, -9.664e+00, -9.501e+00, -9.341e+00, -9.185e+00, -9.031e+00, -8.881e+00,
+      -8.733e+00, -8.588e+00, -8.445e+00, -8.305e+00, -8.167e+00, -8.032e+00, -7.899e+00, -7.768e+00,
+      -7.639e+00, -7.512e+00, -7.387e+00, -7.265e+00, -7.144e+00, -7.025e+00, -6.907e+00, -6.792e+00,
+      -6.678e+00, -6.566e+00, -6.456e+00, -6.347e+00, -6.240e+00, -6.134e+00, -6.030e+00, -5.927e+00,
+      -5.826e+00, -5.727e+00, -5.628e+00, -5.531e+00, -5.436e+00, -5.342e+00, -5.249e+00, -5.157e+00,
+      -5.067e+00, -4.978e+00, -4.890e+00, -4.803e+00, -4.718e+00, -4.633e+00, -4.550e+00, -4.468e+00,
+      -4.387e+00, -4.308e+00, -4.229e+00, -4.151e+00, -4.075e+00, -4.000e+00, -3.925e+00, -3.852e+00,
+      -3.779e+00, -3.708e+00, -3.637e+00, -3.568e+00, -3.499e+00, -3.432e+00, -3.365e+00, -3.300e+00,
+      -3.235e+00, -3.171e+00, -3.108e+00, -3.046e+00, -2.985e+00, -2.925e+00, -2.865e+00, -2.806e+00,
+      -2.749e+00, -2.692e+00, -2.636e+00, -2.580e+00, -2.526e+00, -2.472e+00, -2.419e+00, -2.367e+00,
+      -2.316e+00, -2.265e+00, -2.215e+00, -2.166e+00, -2.118e+00, -2.070e+00, -2.024e+00, -1.978e+00,
+      -1.932e+00, -1.888e+00, -1.844e+00, -1.800e+00, -1.758e+00, -1.716e+00, -1.675e+00, -1.634e+00,
+      -1.594e+00, -1.555e+00, -1.517e+00, -1.479e+00, -1.441e+00, -1.405e+00, -1.369e+00, -1.334e+00,
+      -1.299e+00, -1.265e+00, -1.231e+00, -1.198e+00, -1.166e+00, -1.135e+00, -1.103e+00, -1.073e+00,
+      -1.043e+00, -1.014e+00, -9.849e-01, -9.567e-01, -9.291e-01, -9.020e-01, -8.754e-01, -8.494e-01,
+      -8.239e-01, -7.990e-01, -7.746e-01, -7.507e-01, -7.273e-01, -7.044e-01, -6.820e-01,
+   };
+   const size_t n = sizeof tab/sizeof tab[0] - 1;
+   ae_int_t w = RoundZ(-3.500000e+01 * s + 1.500000e+02);
+   return tab[w < 0 ? 0 : w > n ? n : w];
 }
 
-// Sequential Chebyshev interpolation.
-static void wsr_wcheb(double x, double c, double *tj, double *tj1, double *r) {
-   double t;
-   *r += c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
-   *tj = *tj1;
-   *tj1 = t;
-}
-
-// Tail(S, 25)
+// Tail(S, 25).
 static double wsr_w25(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.150509e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.695528e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.437637e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.611906e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -7.625722e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.579892e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.086876e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.906543e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.354881e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 1.007195e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -8.437327e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.150509e+00, c1 = -5.695528e+00, c2 = -1.437637e+00, c3 = -2.611906e-01;
+   const double c4 = -7.625722e-02, c5 = -2.579892e-02, c6 = -1.086876e-02, c7 = -2.906543e-03;
+   const double c8 = -2.354881e-03, c9 = +1.007195e-04, ca = -8.437327e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 26)
+// Tail(S, 26).
 static double wsr_w26(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.117622e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.635159e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.395167e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.382823e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -6.531987e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.060112e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -8.203697e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.516523e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.431364e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 6.384553e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -3.238369e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.117622e+00, c1 = -5.635159e+00, c2 = -1.395167e+00, c3 = -2.382823e-01;
+   const double c4 = -6.531987e-02, c5 = -2.060112e-02, c6 = -8.203697e-03, c7 = -1.516523e-03;
+   const double c8 = -1.431364e-03, c9 = +6.384553e-04, ca = -3.238369e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 27)
+// Tail(S, 27).
 static double wsr_w27(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.089731e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.584248e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.359966e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.203696e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.753344e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.761891e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -7.096897e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.419108e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.581214e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 3.033766e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.901441e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.089731e+00, c1 = -5.584248e+00, c2 = -1.359966e+00, c3 = -2.203696e-01;
+   const double c4 = -5.753344e-02, c5 = -1.761891e-02, c6 = -7.096897e-03, c7 = -1.419108e-03;
+   const double c8 = -1.581214e-03, c9 = +3.033766e-04, ca = -5.901441e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 28)
+// Tail(S, 28).
 static double wsr_w28(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.065046e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.539163e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.328939e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.046376e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.061515e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.469271e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.711578e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -8.389153e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.250575e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 4.047245e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.128555e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.065046e+00, c1 = -5.539163e+00, c2 = -1.328939e+00, c3 = -2.046376e-01;
+   const double c4 = -5.061515e-02, c5 = -1.469271e-02, c6 = -5.711578e-03, c7 = -8.389153e-04;
+   const double c8 = -1.250575e-03, c9 = +4.047245e-04, ca = -5.128555e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 29)
+// Tail(S, 29).
 static double wsr_w29(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.043413e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.499756e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.302137e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.915129e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.516329e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.260064e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.817269e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.478130e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.111668e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 4.093451e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.135860e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.043413e+00, c1 = -5.499756e+00, c2 = -1.302137e+00, c3 = -1.915129e-01;
+   const double c4 = -4.516329e-02, c5 = -1.260064e-02, c6 = -4.817269e-03, c7 = -5.478130e-04;
+   const double c8 = -1.111668e-03, c9 = +4.093451e-04, ca = -5.135860e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 30)
+// Tail(S, 30).
 static double wsr_w30(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -5.024071e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.464515e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.278342e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.800030e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.046294e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.076162e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -3.968677e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.911679e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -8.619185e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, 5.125362e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -3.984370e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -5.024071e+00, c1 = -5.464515e+00, c2 = -1.278342e+00, c3 = -1.800030e-01;
+   const double c4 = -4.046294e-02, c5 = -1.076162e-02, c6 = -3.968677e-03, c7 = -1.911679e-04;
+   const double c8 = -8.619185e-04, c9 = +5.125362e-04, ca = -3.984370e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 40)
+// Tail(S, 40).
 static double wsr_w40(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -4.904809e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.248327e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.136698e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.170982e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.824427e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -3.888648e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.344929e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, 2.790407e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.619858e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, 3.359121e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.883026e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -4.904809e+00, c1 = -5.248327e+00, c2 = -1.136698e+00, c3 = -1.170982e-01;
+   const double c4 = -1.824427e-02, c5 = -3.888648e-03, c6 = -1.344929e-03, c7 = +2.790407e-04;
+   const double c8 = -4.619858e-04, c9 = +3.359121e-04, ca = -2.883026e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 60)
+// Tail(S, 60).
 static double wsr_w60(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -4.809656e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.077191e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.029402e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -7.507931e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, -6.506226e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.391278e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.263635e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, 2.302271e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.384348e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, 1.865587e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.622355e-04, &tj, &tj1, &result);
-   return result;
+   const double c0 = -4.809656e+00, c1 = -5.077191e+00, c2 = -1.029402e+00, c3 = -7.507931e-02;
+   const double c4 = -6.506226e-03, c5 = -1.391278e-03, c6 = -4.263635e-04, c7 = +2.302271e-04;
+   const double c8 = -2.384348e-04, c9 = +1.865587e-04, ca = -1.622355e-04;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 120)
+// Tail(S, 120).
 static double wsr_w120(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -4.729426e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.934426e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -9.433231e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.492504e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, 1.673948e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, -6.077014e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -7.215768e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, 9.086734e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, -8.447980e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, 6.705028e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.828507e-05, &tj, &tj1, &result);
-   return result;
+   const double c0 = -4.729426e+00, c1 = -4.934426e+00, c2 = -9.433231e-01, c3 = -4.492504e-02;
+   const double c4 = +1.673948e-05, c5 = -6.077014e-04, c6 = -7.215768e-05, c7 = +9.086734e-05;
+   const double c8 = -8.447980e-05, c9 = +6.705028e-05, ca = -5.828507e-05;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
-// Tail(S, 200)
+// Tail(S, 200).
 static double wsr_w200(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
-   x = rmin2(2 * (s - 0.000000e+00) / 4.000000e+00 - 1, 1.0);
-   tj = 1.0;
-   tj1 = x;
-   wsr_wcheb(x, -4.700240e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.883080e+00, &tj, &tj1, &result);
-   wsr_wcheb(x, -9.132168e-01, &tj, &tj1, &result);
-   wsr_wcheb(x, -3.512684e-02, &tj, &tj1, &result);
-   wsr_wcheb(x, 1.726342e-03, &tj, &tj1, &result);
-   wsr_wcheb(x, -5.189796e-04, &tj, &tj1, &result);
-   wsr_wcheb(x, -1.628659e-06, &tj, &tj1, &result);
-   wsr_wcheb(x, 4.261786e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, -4.002498e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, 3.146287e-05, &tj, &tj1, &result);
-   wsr_wcheb(x, -2.727576e-05, &tj, &tj1, &result);
-   return result;
+   const double c0 = -4.700240e+00, c1 = -4.883080e+00, c2 = -9.132168e-01, c3 = -3.512684e-02;
+   const double c4 = +1.726342e-03, c5 = -5.189796e-04, c6 = -1.628659e-06, c7 = +4.261786e-05;
+   const double c8 = -4.002498e-05, c9 = +3.146287e-05, ca = -2.727576e-05;
+   double x = rmin2(s / 2.0 - 1.0, 1.0), x2 = 2.0 * x;
+   double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1, t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+   double t6 = x2 * t5 - t4, t7 = x2 * t6 - t5, t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+   return c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
 }
 
 // Tail(S,N), S >= 0
 static double wsr_wsigma(double s, ae_int_t n) {
-   double f0;
-   double f1;
-   double f2;
-   double f3;
-   double f4;
-   double x0;
-   double x1;
-   double x2;
-   double x3;
-   double x4;
-   double x;
-   double result;
-   result = 0.0;
-   if (n == 5) {
-      result = wsr_w5(s);
+   switch (n) {
+      case 5: return wsr_w5(s);
+      case 6: return wsr_w6(s);
+      case 7: return wsr_w7(s);
+      case 8: return wsr_w8(s);
+      case 9: return wsr_w9(s);
+      case 10: return wsr_w10(s);
+      case 11: return wsr_w11(s);
+      case 12: return wsr_w12(s);
+      case 13: return wsr_w13(s);
+      case 14: return wsr_w14(s);
+      case 15: return wsr_w15(s);
+      case 16: return wsr_w16(s);
+      case 17: return wsr_w17(s);
+      case 18: return wsr_w18(s);
+      case 19: return wsr_w19(s);
+      case 20: return wsr_w20(s);
+      case 21: return wsr_w21(s);
+      case 22: return wsr_w22(s);
+      case 23: return wsr_w23(s);
+      case 24: return wsr_w24(s);
+      case 25: return wsr_w25(s);
+      case 26: return wsr_w26(s);
+      case 27: return wsr_w27(s);
+      case 28: return wsr_w28(s);
+      case 29: return wsr_w29(s);
+      case 30: return wsr_w30(s);
+      default:
+         if (n > 30) {
+            double x = 1.0 / n;
+            const double x0 = 1.0 / 30, x1 = 1.0 / 40, x2 = 1.0 / 60, x3 = 1.0 / 120, x4 = 1.0 / 200;
+            double f0 = wsr_w30(s), f1 = wsr_w40(s), f2 = wsr_w60(s), f3 = wsr_w120(s), f4 = wsr_w200(s);
+            f1 = ((x - x0) * f1 - (x - x1) * f0) / (x1 - x0);
+            f2 = ((x - x0) * f2 - (x - x2) * f0) / (x2 - x0);
+            f3 = ((x - x0) * f3 - (x - x3) * f0) / (x3 - x0);
+            f4 = ((x - x0) * f4 - (x - x4) * f0) / (x4 - x0);
+            f2 = ((x - x1) * f2 - (x - x2) * f1) / (x2 - x1);
+            f3 = ((x - x1) * f3 - (x - x3) * f1) / (x3 - x1);
+            f4 = ((x - x1) * f4 - (x - x4) * f1) / (x4 - x1);
+            f3 = ((x - x2) * f3 - (x - x3) * f2) / (x3 - x2);
+            f4 = ((x - x2) * f4 - (x - x4) * f2) / (x4 - x2);
+            f4 = ((x - x3) * f4 - (x - x4) * f3) / (x4 - x3);
+            return f4;
+         }
+      return 0.0;
    }
-   if (n == 6) {
-      result = wsr_w6(s);
-   }
-   if (n == 7) {
-      result = wsr_w7(s);
-   }
-   if (n == 8) {
-      result = wsr_w8(s);
-   }
-   if (n == 9) {
-      result = wsr_w9(s);
-   }
-   if (n == 10) {
-      result = wsr_w10(s);
-   }
-   if (n == 11) {
-      result = wsr_w11(s);
-   }
-   if (n == 12) {
-      result = wsr_w12(s);
-   }
-   if (n == 13) {
-      result = wsr_w13(s);
-   }
-   if (n == 14) {
-      result = wsr_w14(s);
-   }
-   if (n == 15) {
-      result = wsr_w15(s);
-   }
-   if (n == 16) {
-      result = wsr_w16(s);
-   }
-   if (n == 17) {
-      result = wsr_w17(s);
-   }
-   if (n == 18) {
-      result = wsr_w18(s);
-   }
-   if (n == 19) {
-      result = wsr_w19(s);
-   }
-   if (n == 20) {
-      result = wsr_w20(s);
-   }
-   if (n == 21) {
-      result = wsr_w21(s);
-   }
-   if (n == 22) {
-      result = wsr_w22(s);
-   }
-   if (n == 23) {
-      result = wsr_w23(s);
-   }
-   if (n == 24) {
-      result = wsr_w24(s);
-   }
-   if (n == 25) {
-      result = wsr_w25(s);
-   }
-   if (n == 26) {
-      result = wsr_w26(s);
-   }
-   if (n == 27) {
-      result = wsr_w27(s);
-   }
-   if (n == 28) {
-      result = wsr_w28(s);
-   }
-   if (n == 29) {
-      result = wsr_w29(s);
-   }
-   if (n == 30) {
-      result = wsr_w30(s);
-   }
-   if (n > 30) {
-      x = 1.0 / n;
-      x0 = 1.0 / 30;
-      f0 = wsr_w30(s);
-      x1 = 1.0 / 40;
-      f1 = wsr_w40(s);
-      x2 = 1.0 / 60;
-      f2 = wsr_w60(s);
-      x3 = 1.0 / 120;
-      f3 = wsr_w120(s);
-      x4 = 1.0 / 200;
-      f4 = wsr_w200(s);
-      f1 = ((x - x0) * f1 - (x - x1) * f0) / (x1 - x0);
-      f2 = ((x - x0) * f2 - (x - x2) * f0) / (x2 - x0);
-      f3 = ((x - x0) * f3 - (x - x3) * f0) / (x3 - x0);
-      f4 = ((x - x0) * f4 - (x - x4) * f0) / (x4 - x0);
-      f2 = ((x - x1) * f2 - (x - x2) * f1) / (x2 - x1);
-      f3 = ((x - x1) * f3 - (x - x3) * f1) / (x3 - x1);
-      f4 = ((x - x1) * f4 - (x - x4) * f1) / (x4 - x1);
-      f3 = ((x - x2) * f3 - (x - x3) * f2) / (x3 - x2);
-      f4 = ((x - x2) * f4 - (x - x4) * f2) / (x4 - x2);
-      f4 = ((x - x3) * f4 - (x - x4) * f3) / (x4 - x3);
-      result = f4;
-   }
-   return result;
 }
 
 // Wilcoxon signed-rank test
@@ -6634,14 +2367,13 @@ static double wsr_wsigma(double s, ae_int_t n) {
 // There is no approximation outside the [0.0001, 1] interval. Therefore,  if
 // the significance level outlies this interval, the test returns 0.0001.
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail);
 void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    ae_int_t t;
-   double tmp;
-   ae_int_t tmpi;
    ae_int_t ns;
    double w;
    double p;
@@ -6695,12 +2427,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
             if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
-               tmp = r.xR[k - 1];
-               r.xR[k - 1] = r.xR[t - 1];
-               r.xR[t - 1] = tmp;
-               tmpi = c.xZ[k - 1];
-               c.xZ[k - 1] = c.xZ[t - 1];
-               c.xZ[t - 1] = tmpi;
+               swapr(&r.xR[k - 1], &r.xR[t - 1]);
+               swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                t = k;
             }
          }
@@ -6708,12 +2436,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
       } while (i <= ns);
       i = ns - 1;
       do {
-         tmp = r.xR[i];
-         r.xR[i] = r.xR[0];
-         r.xR[0] = tmp;
-         tmpi = c.xZ[i];
-         c.xZ[i] = c.xZ[0];
-         c.xZ[0] = tmpi;
+         swapr(&r.xR[i], &r.xR[0]);
+         swapi(&c.xZ[i], &c.xZ[0]);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -6728,12 +2452,8 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
                if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
-                  tmp = r.xR[k - 1];
-                  r.xR[k - 1] = r.xR[t - 1];
-                  r.xR[t - 1] = tmp;
-                  tmpi = c.xZ[k - 1];
-                  c.xZ[k - 1] = c.xZ[t - 1];
-                  c.xZ[t - 1] = tmpi;
+                  swapr(&r.xR[k - 1], &r.xR[t - 1]);
+                  swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                   t = k;
                }
             }
@@ -6782,51 +2502,6 @@ void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails,
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Wilcoxon signed-rank test
-//
-// This test checks three hypotheses about the median  of  the  given sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis  -  the  median  is  less than or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
-//       the test could not be applied to nominal variables).
-//     * the distribution should be continuous and symmetric relative to  its
-//       median.
-//     * number of distinct values in the X array should be greater than 4
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with two decimal places in interval [0.0001, 1].
-//
-// "Two decimal places" does not sound very impressive, but in  practice  the
-// relative error of less than 1% is enough to make a decision.
-//
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -6874,6 +2549,7 @@ namespace alglib_impl {
 // While   calculating   p-values   high-precision   binomial    distribution
 // approximation is used, so significance levels have about 15 exact digits.
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
 void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    ae_int_t gtcnt;
@@ -6915,42 +2591,6 @@ void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails,
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Sign test
-//
-// This test checks three hypotheses about the median of  the  given  sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the  median  is  less  than  or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// While   calculating   p-values   high-precision   binomial    distribution
-// approximation is used, so significance levels have about 15 exact digits.
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -6995,6 +2635,7 @@ namespace alglib_impl {
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
 void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
@@ -7028,394 +2669,80 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
    *righttail = 1 - p;
 }
 
-// Tail(S, 5)
-static double correlationtests_spearmantail5(double s) {
-   double result;
-   if (s < 0.000e+00) {
-      result = studenttdistribution(3, -s);
-      return result;
-   }
-   if (s >= 3.580e+00) {
-      result = 8.304e-03;
-      return result;
-   }
-   if (s >= 2.322e+00) {
-      result = 4.163e-02;
-      return result;
-   }
-   if (s >= 1.704e+00) {
-      result = 6.641e-02;
-      return result;
-   }
-   if (s >= 1.303e+00) {
-      result = 1.164e-01;
-      return result;
-   }
-   if (s >= 1.003e+00) {
-      result = 1.748e-01;
-      return result;
-   }
-   if (s >= 7.584e-01) {
-      result = 2.249e-01;
-      return result;
-   }
-   if (s >= 5.468e-01) {
-      result = 2.581e-01;
-      return result;
-   }
-   if (s >= 3.555e-01) {
-      result = 3.413e-01;
-      return result;
-   }
-   if (s >= 1.759e-01) {
-      result = 3.911e-01;
-      return result;
-   }
-   if (s >= 1.741e-03) {
-      result = 4.747e-01;
-      return result;
-   }
-   if (s >= 0.000e+00) {
-      result = 5.248e-01;
-      return result;
-   }
-   result = 0.0;
-   return result;
-}
-
-// Tail(S, 6)
-static double correlationtests_spearmantail6(double s) {
-   double result;
-   if (s < 1.001e+00) {
-      result = studenttdistribution(4, -s);
-      return result;
-   }
-   if (s >= 5.663e+00) {
-      result = 1.366e-03;
-      return result;
-   }
-   if (s >= 3.834e+00) {
-      result = 8.350e-03;
-      return result;
-   }
-   if (s >= 2.968e+00) {
-      result = 1.668e-02;
-      return result;
-   }
-   if (s >= 2.430e+00) {
-      result = 2.921e-02;
-      return result;
-   }
-   if (s >= 2.045e+00) {
-      result = 5.144e-02;
-      return result;
-   }
-   if (s >= 1.747e+00) {
-      result = 6.797e-02;
-      return result;
-   }
-   if (s >= 1.502e+00) {
-      result = 8.752e-02;
-      return result;
-   }
-   if (s >= 1.295e+00) {
-      result = 1.210e-01;
-      return result;
-   }
-   if (s >= 1.113e+00) {
-      result = 1.487e-01;
-      return result;
-   }
-   if (s >= 1.001e+00) {
-      result = 1.780e-01;
-      return result;
-   }
-   result = 0.0;
-   return result;
-}
-
-// Tail(S, 7)
-static double correlationtests_spearmantail7(double s) {
-   double result;
-   if (s < 1.001e+00) {
-      result = studenttdistribution(5, -s);
-      return result;
-   }
-   if (s >= 8.159e+00) {
-      result = 2.081e-04;
-      return result;
-   }
-   if (s >= 5.620e+00) {
-      result = 1.393e-03;
-      return result;
-   }
-   if (s >= 4.445e+00) {
-      result = 3.398e-03;
-      return result;
-   }
-   if (s >= 3.728e+00) {
-      result = 6.187e-03;
-      return result;
-   }
-   if (s >= 3.226e+00) {
-      result = 1.200e-02;
-      return result;
-   }
-   if (s >= 2.844e+00) {
-      result = 1.712e-02;
-      return result;
-   }
-   if (s >= 2.539e+00) {
-      result = 2.408e-02;
-      return result;
-   }
-   if (s >= 2.285e+00) {
-      result = 3.320e-02;
-      return result;
-   }
-   if (s >= 2.068e+00) {
-      result = 4.406e-02;
-      return result;
-   }
-   if (s >= 1.879e+00) {
-      result = 5.478e-02;
-      return result;
-   }
-   if (s >= 1.710e+00) {
-      result = 6.946e-02;
-      return result;
-   }
-   if (s >= 1.559e+00) {
-      result = 8.331e-02;
-      return result;
-   }
-   if (s >= 1.420e+00) {
-      result = 1.001e-01;
-      return result;
-   }
-   if (s >= 1.292e+00) {
-      result = 1.180e-01;
-      return result;
-   }
-   if (s >= 1.173e+00) {
-      result = 1.335e-01;
-      return result;
-   }
-   if (s >= 1.062e+00) {
-      result = 1.513e-01;
-      return result;
-   }
-   if (s >= 1.001e+00) {
-      result = 1.770e-01;
-      return result;
-   }
-   result = 0.0;
-   return result;
-}
-
-// Tail(S, 8)
-static double correlationtests_spearmantail8(double s) {
-   double result;
-   if (s < 2.001e+00) {
-      result = studenttdistribution(6, -s);
-      return result;
-   }
-   if (s >= 1.103e+01) {
-      result = 2.194e-05;
-      return result;
-   }
-   if (s >= 7.685e+00) {
-      result = 2.008e-04;
-      return result;
-   }
-   if (s >= 6.143e+00) {
-      result = 5.686e-04;
-      return result;
-   }
-   if (s >= 5.213e+00) {
-      result = 1.138e-03;
-      return result;
-   }
-   if (s >= 4.567e+00) {
-      result = 2.310e-03;
-      return result;
-   }
-   if (s >= 4.081e+00) {
-      result = 3.634e-03;
-      return result;
-   }
-   if (s >= 3.697e+00) {
-      result = 5.369e-03;
-      return result;
-   }
-   if (s >= 3.381e+00) {
-      result = 7.708e-03;
-      return result;
-   }
-   if (s >= 3.114e+00) {
-      result = 1.087e-02;
-      return result;
-   }
-   if (s >= 2.884e+00) {
-      result = 1.397e-02;
-      return result;
-   }
-   if (s >= 2.682e+00) {
-      result = 1.838e-02;
-      return result;
-   }
-   if (s >= 2.502e+00) {
-      result = 2.288e-02;
-      return result;
-   }
-   if (s >= 2.340e+00) {
-      result = 2.883e-02;
-      return result;
-   }
-   if (s >= 2.192e+00) {
-      result = 3.469e-02;
-      return result;
-   }
-   if (s >= 2.057e+00) {
-      result = 4.144e-02;
-      return result;
-   }
-   if (s >= 2.001e+00) {
-      result = 4.804e-02;
-      return result;
-   }
-   result = 0.0;
-   return result;
-}
-
-// Tail(S, 9)
-static double correlationtests_spearmantail9(double s) {
-   double result;
-   if (s < 2.001e+00) {
-      result = studenttdistribution(7, -s);
-      return result;
-   }
-   if (s >= 9.989e+00) {
-      result = 2.306e-05;
-      return result;
-   }
-   if (s >= 8.069e+00) {
-      result = 8.167e-05;
-      return result;
-   }
-   if (s >= 6.890e+00) {
-      result = 1.744e-04;
-      return result;
-   }
-   if (s >= 6.077e+00) {
-      result = 3.625e-04;
-      return result;
-   }
-   if (s >= 5.469e+00) {
-      result = 6.450e-04;
-      return result;
-   }
-   if (s >= 4.991e+00) {
-      result = 1.001e-03;
-      return result;
-   }
-   if (s >= 4.600e+00) {
-      result = 1.514e-03;
-      return result;
-   }
-   if (s >= 4.272e+00) {
-      result = 2.213e-03;
-      return result;
-   }
-   if (s >= 3.991e+00) {
-      result = 2.990e-03;
-      return result;
-   }
-   if (s >= 3.746e+00) {
-      result = 4.101e-03;
-      return result;
-   }
-   if (s >= 3.530e+00) {
-      result = 5.355e-03;
-      return result;
-   }
-   if (s >= 3.336e+00) {
-      result = 6.887e-03;
-      return result;
-   }
-   if (s >= 3.161e+00) {
-      result = 8.598e-03;
-      return result;
-   }
-   if (s >= 3.002e+00) {
-      result = 1.065e-02;
-      return result;
-   }
-   if (s >= 2.855e+00) {
-      result = 1.268e-02;
-      return result;
-   }
-   if (s >= 2.720e+00) {
-      result = 1.552e-02;
-      return result;
-   }
-   if (s >= 2.595e+00) {
-      result = 1.836e-02;
-      return result;
-   }
-   if (s >= 2.477e+00) {
-      result = 2.158e-02;
-      return result;
-   }
-   if (s >= 2.368e+00) {
-      result = 2.512e-02;
-      return result;
-   }
-   if (s >= 2.264e+00) {
-      result = 2.942e-02;
-      return result;
-   }
-   if (s >= 2.166e+00) {
-      result = 3.325e-02;
-      return result;
-   }
-   if (s >= 2.073e+00) {
-      result = 3.800e-02;
-      return result;
-   }
-   if (s >= 2.001e+00) {
-      result = 4.285e-02;
-      return result;
-   }
-   result = 0.0;
-   return result;
-}
-
 // Tail(T,N), accepts T < 0
 static double correlationtests_spearmantail(double t, ae_int_t n) {
-   double result;
-   if (n == 5) {
-      result = correlationtests_spearmantail5(-t);
-      return result;
+   switch (n) {
+      case 5:
+         return
+            t <= -7.584e-01 ? (
+               t <= -1.704e+00 ? (
+                  t <= -3.580e+00 ? 8.304e-03 : t <= -2.322e+00 ? 4.163e-02: 6.641e-02
+               ) : t <= -1.303e+00 ? 1.164e-01 : t <= -1.003e+00 ? 1.748e-01 : 2.249e-01
+            ) : t <= -1.759e-01 ? (
+               t <= -5.468e-01 ? 2.581e-01 : t <= -3.555e-01 ? 3.413e-01 : 3.911e-01
+            ) : t <= -1.741e-03 ? 4.747e-01 : t <= -0.000e+00 ? 5.248e-01 : studenttdistribution(3, t);
+      case 6:
+         return
+            t <= -2.045e+00 ? (
+               t <= -3.834e+00 ? (
+                  t <= -5.663e+00 ? 1.366e-03: 8.350e-03
+               ) : t <= -2.968e+00 ? 1.668e-02 : t <= -2.430e+00 ? 2.921e-02 : 5.144e-02
+            ) : t <= -1.295e+00 ? (
+               t <= -1.747e+00 ? 6.797e-02 : t <= -1.502e+00 ? 8.752e-02 : 1.210e-01
+            ) : t <= -1.113e+00 ? 1.487e-01 : t <= -1.001e+00 ? 1.780e-01 : studenttdistribution(4, t);
+      case 7:
+         return
+            t <= -2.068e+00 ? (
+               t <= -3.728e+00 ? (
+                  t <= -5.620e+00 ? (
+                     t <= -8.159e+00 ? 2.081e-04 : 1.393e-03
+                  ) : t <= -4.445e+00 ? 3.398e-03 : 6.187e-03
+               ) : t <= -2.844e+00 ? (
+                  t <= -3.226e+00 ? 1.200e-02: 1.712e-02
+               ) : t <= -2.539e+00 ? 2.408e-02 : t <= -2.285e+00 ? 3.320e-02 : 4.406e-02
+            ) : t <= -1.420e+00 ? (
+               t <= -1.710e+00 ? (
+                  t <= -1.879e+00 ? 5.478e-02 : 6.946e-02
+               ) : t <= -1.559e+00 ? 8.331e-02 : 1.001e-01
+            ) : t <= -1.173e+00 ? (
+               t <= -1.292e+00 ? 1.180e-01: 1.335e-01
+            ) : t <= -1.062e+00 ? 1.513e-01 : t <= -1.001e+00 ? 1.770e-01 : studenttdistribution(5, t);
+      case 8:
+         return
+            t <= -3.381e+00 ? (
+               t <= -5.213e+00 ? (
+                  t <= -7.685e+00 ? (
+                     t <= -1.103e+01 ? 2.194e-05 : 2.008e-04
+                  ) : t <= -6.143e+00 ? 5.686e-04 : 1.138e-03
+               ) : t <= -4.081e+00 ? (
+                  t <= -4.567e+00 ? 2.310e-03 : 3.634e-03
+               ) : t <= -3.697e+00 ? 5.369e-03 : 7.708e-03
+            ) : t <= -2.502e+00 ? (
+               t <= -2.884e+00 ? (
+                  t <= -3.114e+00 ? 1.087e-02 : 1.397e-02
+               ) : t <= -2.682e+00 ? 1.838e-02 : 2.288e-02
+            ) : t <= -2.192e+00 ? (
+               t <= -2.340e+00 ? 2.883e-02 : 3.469e-02
+            ) : t <= -2.057e+00 ? 4.144e-02 : t <= -2.001e+00 ? 4.804e-02 : studenttdistribution(6, t);
+     case 9:
+         return
+            t <= -3.336e+00 ? (
+               t <= -4.991e+00 ? (
+                  t <= -6.890e+00 ? (
+                     t <= -9.989e+00 ? 2.306e-05 : t <= -8.069e+00 ? 8.167e-05 : 1.744e-04
+                  ) : t <= -6.077e+00 ? 3.625e-04 : t <= -5.469e+00 ? 6.450e-04 : 1.001e-03
+               ) : t <= -3.991e+00 ? (
+                  t <= -4.600e+00 ? 1.514e-03 : t <= -4.272e+00 ? 2.213e-03 : 2.990e-03
+               ) : t <= -3.746e+00 ? 4.101e-03 : t <= -3.530e+00 ? 5.355e-03 : 6.887e-03
+            ) : t <= -2.477e+00 ? (
+               t <= -2.855e+00 ? (
+                  t <= -3.161e+00 ? 8.598e-03 : t <= -3.002e+00 ? 1.065e-02 : 1.268e-02
+               ) : t <= -2.720e+00 ? 1.552e-02 : t <= -2.595e+00 ? 1.836e-02 : 2.158e-02
+            ) : t <= -2.166e+00 ? (
+               t <= -2.368e+00 ? 2.512e-02 : t <= -2.264e+00 ? 2.942e-02 : 3.325e-02
+            ) : t <= -2.073e+00 ? 3.800e-02 : t <= -2.001e+00 ? 4.285e-02 : studenttdistribution(7, t);
+      default: return studenttdistribution(n - 2, t);
    }
-   if (n == 6) {
-      result = correlationtests_spearmantail6(-t);
-      return result;
-   }
-   if (n == 7) {
-      result = correlationtests_spearmantail7(-t);
-      return result;
-   }
-   if (n == 8) {
-      result = correlationtests_spearmantail8(-t);
-      return result;
-   }
-   if (n == 9) {
-      result = correlationtests_spearmantail9(-t);
-      return result;
-   }
-   result = studenttdistribution(n - 2, t);
-   return result;
 }
 
 // Spearman's rank correlation coefficient significance test
@@ -7452,6 +2779,7 @@ static double correlationtests_spearmantail(double t, ae_int_t n) {
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
 void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
    double t;
    double p;
@@ -7490,38 +2818,6 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Pearson's correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5
-//     * normality of distributions of X and Y.
-//
-// Inputs:
-//     R   -   Pearson's correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -7529,40 +2825,6 @@ void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bo
    alglib_impl::ae_state_clear();
 }
 
-// Spearman's rank correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5.
-//
-// The test is non-parametric and doesn't require distributions X and Y to be
-// normal.
-//
-// Inputs:
-//     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -7610,8 +2872,8 @@ namespace alglib_impl {
 //       * when variance of X[] is exactly zero, p-values are set
 //         to 1.0 or 0.0, depending on difference between sample mean and
 //         value of mean being tested.
-//
 // ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
 void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
@@ -7729,6 +2991,7 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
 //       * when both samples has exactly zero variance, p-values are set
 //         to 1.0 or 0.0, depending on difference between means.
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    bool samex;
@@ -7853,6 +3116,7 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
 //       * when only one sample has zero variance, test reduces to 1-sample
 //         version.
 // ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    bool samex;
@@ -7969,44 +3233,6 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
 } // end of namespace alglib_impl
 
 namespace alglib {
-// One-sample t-test
-//
-// This test checks three hypotheses about the mean of the given sample.  The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
-//       value)
-//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the mean is less than or  equal
-//       to the given value).
-//
-// The test is based on the assumption that  a  given  sample  has  a  normal
-// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
-// differs from normal, the test will work incorrectly.
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of sample, N >= 0
-//     Mean    -   assumed value of the mean.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0, all p-values are set to 1.0
-//       * when variance of X[] is exactly zero, p-values are set
-//         to 1.0 or 0.0, depending on difference between sample mean and
-//         value of mean being tested.
-//
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -8014,43 +3240,6 @@ void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, 
    alglib_impl::ae_state_clear();
 }
 
-// Two-sample pooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * dispersions are equal
-//     * samples are independent.
-//
-// Inputs:
-//     X       -   sample 1. Array whose index goes from 0 to N-1.
-//     N       -   size of sample.
-//     Y       -   sample 2. Array whose index goes from 0 to M-1.
-//     M       -   size of sample.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has exactly zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -8058,45 +3247,6 @@ void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array
    alglib_impl::ae_state_clear();
 }
 
-// Two-sample unpooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * samples are independent.
-// Equality of variances is NOT required.
-//
-// Inputs:
-//     X - sample 1. Array whose index goes from 0 to N-1.
-//     N - size of the sample.
-//     Y - sample 2. Array whose index goes from 0 to M-1.
-//     M - size of the sample.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-//       * when only one sample has zero variance, test reduces to 1-sample
-//         version.
-// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -11572,6 +6722,7 @@ static double mannwhitneyu_usigma(double s, ae_int_t n1, ae_int_t n2) {
 //       P's outside of this interval are enforced to these bounds. Say,  you
 //       may quite often get P equal to exactly 0.25 or 0.0001.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_frame _frame_block;
    ae_int_t i;
@@ -11579,7 +6730,6 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    ae_int_t k;
    ae_int_t t;
    double tmp;
-   ae_int_t tmpi;
    ae_int_t ns;
    double u;
    double p;
@@ -11624,12 +6774,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
             if (r.xR[k - 1] >= r.xR[t - 1]) {
                t = 1;
             } else {
-               tmp = r.xR[k - 1];
-               r.xR[k - 1] = r.xR[t - 1];
-               r.xR[t - 1] = tmp;
-               tmpi = c.xZ[k - 1];
-               c.xZ[k - 1] = c.xZ[t - 1];
-               c.xZ[t - 1] = tmpi;
+               swapr(&r.xR[k - 1], &r.xR[t - 1]);
+               swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                t = k;
             }
          }
@@ -11637,12 +6783,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
       } while (i <= ns);
       i = ns - 1;
       do {
-         tmp = r.xR[i];
-         r.xR[i] = r.xR[0];
-         r.xR[0] = tmp;
-         tmpi = c.xZ[i];
-         c.xZ[i] = c.xZ[0];
-         c.xZ[0] = tmpi;
+         swapr(&r.xR[i], &r.xR[0]);
+         swapi(&c.xZ[i], &c.xZ[0]);
          t = 1;
          while (t != 0) {
             k = 2 * t;
@@ -11657,12 +6799,8 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
                if (r.xR[t - 1] >= r.xR[k - 1]) {
                   t = 0;
                } else {
-                  tmp = r.xR[k - 1];
-                  r.xR[k - 1] = r.xR[t - 1];
-                  r.xR[t - 1] = tmp;
-                  tmpi = c.xZ[k - 1];
-                  c.xZ[k - 1] = c.xZ[t - 1];
-                  c.xZ[t - 1] = tmpi;
+                  swapr(&r.xR[k - 1], &r.xR[t - 1]);
+                  swapi(&c.xZ[k - 1], &c.xZ[t - 1]);
                   t = k;
                }
             }
@@ -11720,70 +6858,6 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Mann-Whitney U-test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous distributions of the same shape  and  same  median  or  whether
-// their medians are different.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the medians are equal)
-//     * left-tailed test (null hypothesis - the median of the  first  sample
-//       is greater than or equal to the median of the second sample)
-//     * right-tailed test (null hypothesis - the median of the first  sample
-//       is less than or equal to the median of the second sample).
-//
-// Requirements:
-//     * the samples are independent
-//     * X and Y are continuous distributions (or discrete distributions well-
-//       approximating continuous distributions)
-//     * distributions of X and Y have the  same  shape.  The  only  possible
-//       difference is their position (i.e. the value of the median)
-//     * the number of elements in each sample is not less than 5
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distributions to be normal.
-//
-// Inputs:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   size of the sample. M >= 5
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// To calculate p-values, special approximation is used. This method lets  us
-// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
-// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-// the significance level outlies this interval, the test returns 0.0001.
-//
-// Relative precision of approximation of p-value:
-//
-// N          M          Max.err.   Rms.err.
-// 5..10      N..10      1.4e-02    6.0e-04
-// 5..10      N..100     2.2e-02    5.3e-06
-// 10..15     N..15      1.0e-02    3.2e-04
-// 10..15     N..100     1.0e-02    2.2e-05
-// 15..100    N..100     6.1e-03    2.7e-06
-//
-// For N, M > 100 accuracy checks weren't put into  practice,  but  taking  into
-// account characteristics of asymptotic approximation used, precision should
-// not be sharply different from the values for interval [5, 100].
-//
-// NOTE: P-value approximation was  optimized  for  0.0001 <= p <= 0.2500.  Thus,
-//       P's outside of this interval are enforced to these bounds. Say,  you
-//       may quite often get P equal to exactly 0.25 or 0.0001.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -11795,1846 +6869,861 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 // === JARQUEBERA Package ===
 namespace alglib_impl {
 static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
-   double t;
    *r += c * (*tj);
-   t = 2 * x * (*tj1) - (*tj);
-   *tj = *tj1;
-   *tj1 = t;
+   double t = 2.0 * x * (*tj1) - (*tj);
+   *tj = *tj1, *tj1 = t;
 }
 
 static double jarquebera_jbtbl5(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 0.4000) {
-      x = 2 * (s - 0.000000) / 0.400000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.097885e-20, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.854501e-20, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.756616e-20, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 1.1000) {
-      x = 2 * (s - 0.400000) / 0.700000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.324545e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.075941e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.772272e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.175686e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.576162e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.126861e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.434425e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.790359e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.809178e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.479704e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.717040e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.294170e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.880632e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.023344e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.601531e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.920403e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
-   return result;
-}
-
-static void jarquebera_jarqueberastatistic(RVector *x, ae_int_t n, double *s) {
-   ae_int_t i;
-   double v;
-   double v1;
-   double v2;
-   double stddev;
-   double mean;
-   double variance;
-   double skewness;
-   double kurtosis;
-   *s = 0;
-   mean = 0.0;
-   variance = 0.0;
-   skewness = 0.0;
-   kurtosis = 0.0;
-   stddev = 0.0;
-   ae_assert(n > 1, "Assertion failed");
-// Mean
-   for (i = 0; i < n; i++) {
-      mean += x->xR[i];
-   }
-   mean /= n;
-// Variance (using corrected two-pass algorithm)
-   if (n != 1) {
-      v1 = 0.0;
-      for (i = 0; i < n; i++) {
-         v1 += ae_sqr(x->xR[i] - mean);
-      }
-      v2 = 0.0;
-      for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - mean;
-      }
-      v2 = ae_sqr(v2) / n;
-      variance = (v1 - v2) / (n - 1);
-      if (variance < 0.0) {
-         variance = 0.0;
-      }
-      stddev = sqrt(variance);
-   }
-// Skewness and kurtosis
-   if (stddev != 0.0) {
-      for (i = 0; i < n; i++) {
-         v = (x->xR[i] - mean) / stddev;
-         v2 = ae_sqr(v);
-         skewness += v2 * v;
-         kurtosis += ae_sqr(v2);
-      }
-      skewness /= n;
-      kurtosis = kurtosis / n - 3;
-   }
-// Statistic
-   *s = (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4);
+      double x = 2 * (s - 0.000000) / 0.400000 - 1, x2 = x * x;
+      const double c0 = -1.097885e-20, c1 = -2.854501e-20, c2 = -1.756616e-20;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.1000) {
+      double x = 2 * (s - 0.400000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -1.324545e+00, c1 = -1.075941e+00, c2 = -9.772272e-01, c3 = +3.175686e-01;
+      const double c4 = -1.576162e-01, c5 = +1.126861e-01, c6 = -3.434425e-02, c7 = -2.790359e-01;
+      const double c8 = +2.809178e-02, c9 = -5.479704e-01, ca = +3.717040e-02, cb = -5.294170e-01;
+      const double cc = +2.880632e-02, cd = -3.023344e-01, ce = +1.601531e-02, cf = -7.920403e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
 }
 
 static double jarquebera_jbtbl6(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 0.2500) {
-      x = 2 * (s - 0.000000) / 0.250000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.274707e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.700471e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.425764e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 1.3000) {
-      x = 2 * (s - 0.250000) / 1.050000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.339000e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.011104e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.168177e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.085666e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.738606e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.022876e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.462402e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.908270e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.230772e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.006996e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.410222e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.893768e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.114564e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 1.8500) {
-      x = 2 * (s - 1.300000) / 0.550000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.794311e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.578700e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.394664e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.928290e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.813273e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.076063e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.835380e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.013013e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.058903e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.856915e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.710887e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.770029e+02 * (s - 1.850000e+00) - 1.371015e+01;
-   return result;
+      double x = 2 * (s - 0.000000) / 0.250000 - 1, x2 = x * x;
+      const double c0 = -2.274707e-04, c1 = -5.700471e-04, c2 = -3.425764e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.3000) {
+      double x = 2 * (s - 0.250000) / 1.050000 - 1, x2 = x * x;
+      const double c0 = -1.339000e+00, c1 = -2.011104e+00, c2 = -8.168177e-01, c3 = -1.085666e-01;
+      const double c4 = +7.738606e-02, c5 = +7.022876e-02, c6 = +3.462402e-02, c7 = +6.908270e-03;
+      const double c8 = -8.230772e-03, c9 = -1.006996e-02, ca = -5.410222e-03, cb = -2.893768e-03;
+      const double cc = +8.114564e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.8500) {
+      double x = 2 * (s - 1.300000) / 0.550000 - 1, x2 = x * x;
+      const double c0 = -6.794311e+00, c1 = -3.578700e+00, c2 = -1.394664e+00, c3 = -7.928290e-01;
+      const double c4 = -4.813273e-01, c5 = -3.076063e-01, c6 = -1.835380e-01, c7 = -1.013013e-01;
+      const double c8 = -5.058903e-02, c9 = -1.856915e-02, ca = -6.710887e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.770029e+02 * (s - 1.850000e+00) - 1.371015e+01;
 }
 
 static double jarquebera_jbtbl7(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.4000) {
-      x = 2 * (s - 0.000000) / 1.400000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.093681e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.695911e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.473192e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.203236e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.590379e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.291876e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.132007e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.411147e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.180067e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.487610e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.436561e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 3.0000) {
-      x = 2 * (s - 1.400000) / 1.600000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.947854e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.772675e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.707912e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.691171e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.132795e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.481310e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.867536e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.772327e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.033387e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.378277e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.497964e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.636814e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.581640e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 3.2000) {
-      x = 2 * (s - 3.000000) / 0.200000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -7.511008e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.895025e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.140472e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.933930e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.568561e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.682053e+00, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.824116e+03 * (s - 3.200000e+00) - 1.440330e+01;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.400000 - 1, x2 = x * x;
+      const double c0 = -1.093681e+00, c1 = -1.695911e+00, c2 = -7.473192e-01, c3 = -1.203236e-01;
+      const double c4 = +6.590379e-02, c5 = +6.291876e-02, c6 = +3.132007e-02, c7 = +9.411147e-03;
+      const double c8 = -1.180067e-03, c9 = -3.487610e-03, ca = -2.436561e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.400000) / 1.600000 - 1, x2 = x * x;
+      const double c0 = -5.947854e+00, c1 = -2.772675e+00, c2 = -4.707912e-01, c3 = -1.691171e-01;
+      const double c4 = -4.132795e-02, c5 = -1.481310e-02, c6 = +2.867536e-03, c7 = +8.772327e-04;
+      const double c8 = +5.033387e-03, c9 = -1.378277e-03, ca = -2.497964e-03, cb = -3.636814e-03;
+      const double cc = -9.581640e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.2000) {
+      double x = 2 * (s - 3.000000) / 0.200000 - 1, x2 = x * x;
+      const double c0 = -7.511008e+00, c1 = -8.140472e-01, c2 = +1.682053e+00, c3 = -2.568561e-02;
+      const double c4 = -1.933930e+00, c5 = -8.140472e-01, c6 = -3.895025e+00, c7 = -8.140472e-01;
+      const double c8 = -1.933930e+00, c9 = -2.568561e-02, ca = +1.682053e+00;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.824116e+03 * (s - 3.200000e+00) - 1.440330e+01;
 }
 
 static double jarquebera_jbtbl8(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.3000) {
-      x = 2 * (s - 0.000000) / 1.300000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -7.199015e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.095921e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.736828e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.047438e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.484320e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.937923e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.810470e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.139780e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.708443e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 2.0000) {
-      x = 2 * (s - 1.300000) / 0.700000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.378966e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.802461e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.547593e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.241042e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.203274e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.201990e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.125597e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.584426e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.546069e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 5.0000) {
-      x = 2 * (s - 2.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.828366e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.137533e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.016671e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.745637e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.189801e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.621610e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.741122e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.516368e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.552085e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.787029e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.359774e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -5.087028e+00 * (s - 5.000000e+00) - 1.071300e+01;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
+      const double c0 = -7.199015e-01, c1 = -1.095921e+00, c2 = -4.736828e-01, c3 = -1.047438e-01;
+      const double c4 = -2.484320e-03, c5 = +7.937923e-03, c6 = +4.810470e-03, c7 = +2.139780e-03;
+      const double c8 = +6.708443e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -3.378966e+00, c1 = -7.802461e-01, c2 = +1.547593e-01, c3 = -6.241042e-02;
+      const double c4 = +1.203274e-02, c5 = +5.201990e-03, c6 = -5.125597e-03, c7 = +1.584426e-03;
+      const double c8 = +2.546069e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -6.828366e+00, c1 = -3.137533e+00, c2 = -5.016671e-01, c3 = -1.745637e-01;
+      const double c4 = -5.189801e-02, c5 = -1.621610e-02, c6 = -6.741122e-03, c7 = -4.516368e-03;
+      const double c8 = +3.552085e-04, c9 = +2.787029e-03, ca = +5.359774e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.087028e+00 * (s - 5.000000e+00) - 1.071300e+01;
 }
 
 static double jarquebera_jbtbl9(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.3000) {
-      x = 2 * (s - 0.000000) / 1.300000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.279320e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.277151e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.669339e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.086149e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.333816e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.871249e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.007048e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.482245e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.355615e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 2.0000) {
-      x = 2 * (s - 1.300000) / 0.700000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.981430e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.972248e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.747737e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.808530e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.888305e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.001302e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.378767e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.108510e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.915372e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 7.0000) {
-      x = 2 * (s - 2.000000) / 5.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.387463e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.845231e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.809956e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.543461e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.880397e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.160074e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.356527e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.394428e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.619892e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.758763e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.790977e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.020952e+00 * (s - 7.000000e+00) - 9.516623e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
+      const double c0 = -6.279320e-01, c1 = -9.277151e-01, c2 = -3.669339e-01, c3 = -7.086149e-02;
+      const double c4 = -1.333816e-03, c5 = +3.871249e-03, c6 = +2.007048e-03, c7 = +7.482245e-04;
+      const double c8 = +2.355615e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -2.981430e+00, c1 = -7.972248e-01, c2 = +1.747737e-01, c3 = -3.808530e-02;
+      const double c4 = -7.888305e-03, c5 = +9.001302e-03, c6 = -1.378767e-03, c7 = -1.108510e-03;
+      const double c8 = +5.915372e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 7.0000) {
+      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
+      const double c0 = -6.387463e+00, c1 = -2.845231e+00, c2 = -1.809956e-01, c3 = -7.543461e-02;
+      const double c4 = -4.880397e-03, c5 = -1.160074e-02, c6 = -7.356527e-03, c7 = -4.394428e-03;
+      const double c8 = +9.619892e-04, c9 = -2.758763e-04, ca = +4.790977e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.020952e+00 * (s - 7.000000e+00) - 9.516623e+00;
 }
 
 static double jarquebera_jbtbl10(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.2000) {
-      x = 2 * (s - 0.000000) / 1.200000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.590993e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.562730e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.353934e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.069933e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.849151e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.931406e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.636295e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.178340e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.917749e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 2.0000) {
-      x = 2 * (s - 1.200000) / 0.800000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.537658e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.962401e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.838715e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.055792e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.580316e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.781701e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.770362e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.838983e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.999052e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 7.0000) {
-      x = 2 * (s - 2.000000) / 5.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.337524e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.877029e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.734650e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.249254e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.320250e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.432266e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -8.711035e-01 * (s - 7.000000e+00) - 7.212811e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
+      const double c0 = -4.590993e-01, c1 = -6.562730e-01, c2 = -2.353934e-01, c3 = -4.069933e-02;
+      const double c4 = -1.849151e-03, c5 = +8.931406e-04, c6 = +3.636295e-04, c7 = +1.178340e-05;
+      const double c8 = -8.917749e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.200000) / 0.800000 - 1, x2 = x * x;
+      const double c0 = -2.537658e+00, c1 = -9.962401e-01, c2 = +1.838715e-01, c3 = +1.055792e-02;
+      const double c4 = -2.580316e-02, c5 = +1.781701e-03, c6 = +3.770362e-03, c7 = -4.838983e-04;
+      const double c8 = -6.999052e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 7.0000) {
+      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
+      const double c0 = -5.337524e+00, c1 = -1.877029e+00, c2 = +4.734650e-02, c3 = -4.249254e-02;
+      const double c4 = +3.320250e-03, c5 = -6.432266e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else return -8.711035e-01 * (s - 7.000000e+00) - 7.212811e+00;
 }
 
 static double jarquebera_jbtbl11(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.2000) {
-      x = 2 * (s - 0.000000) / 1.200000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.339517e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.051558e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.000992e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.022547e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.808401e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.592870e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.575081e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.086173e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.089011e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 2.2500) {
-      x = 2 * (s - 1.200000) / 1.050000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.523221e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.068388e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.179661e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.555524e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.238964e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.364320e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.895771e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.762774e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.201340e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 8.0000) {
-      x = 2 * (s - 2.250000) / 5.750000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.212179e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.684579e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.299519e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.606261e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.310869e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.320115e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -5.715445e-01 * (s - 8.000000e+00) - 6.845834e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
+      const double c0 = -4.339517e-01, c1 = -6.051558e-01, c2 = -2.000992e-01, c3 = -3.022547e-02;
+      const double c4 = -9.808401e-04, c5 = +5.592870e-04, c6 = +3.575081e-04, c7 = +2.086173e-04;
+      const double c8 = +6.089011e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.2500) {
+      double x = 2 * (s - 1.200000) / 1.050000 - 1, x2 = x * x;
+      const double c0 = -2.523221e+00, c1 = -1.068388e+00, c2 = +2.179661e-01, c3 = -1.555524e-03;
+      const double c4 = -3.238964e-02, c5 = +7.364320e-03, c6 = +4.895771e-03, c7 = -1.762774e-03;
+      const double c8 = -8.201340e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 8.0000) {
+      double x = 2 * (s - 2.250000) / 5.750000 - 1, x2 = x * x;
+      const double c0 = -5.212179e+00, c1 = -1.684579e+00, c2 = +8.299519e-02, c3 = -3.606261e-02;
+      const double c4 = +7.310869e-03, c5 = -3.320115e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.715445e-01 * (s - 8.000000e+00) - 6.845834e+00;
 }
 
 static double jarquebera_jbtbl12(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.0000) {
-      x = 2 * (s - 0.000000) / 1.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.736742e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.657836e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.047209e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.319599e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.545631e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.280445e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.815679e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.213519e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.256838e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 3.0000) {
-      x = 2 * (s - 1.000000) / 2.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.573947e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.515287e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.611880e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.271311e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.495815e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.141186e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.180886e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.388211e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.890761e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.233175e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.946156e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 12.0000) {
-      x = 2 * (s - 3.000000) / 9.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.947819e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.034157e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.878986e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.078603e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.990977e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.866215e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.897866e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.512252e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.073743e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.022621e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.501343e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.877243e-01 * (s - 1.200000e+01) - 7.936839e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.736742e-01, c1 = -3.657836e-01, c2 = -1.047209e-01, c3 = -1.319599e-02;
+      const double c4 = -5.545631e-04, c5 = +9.280445e-05, c6 = +2.815679e-05, c7 = -2.213519e-05;
+      const double c8 = +1.256838e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.573947e+00, c1 = -1.515287e+00, c2 = +3.611880e-01, c3 = -3.271311e-02;
+      const double c4 = -6.495815e-02, c5 = +4.141186e-02, c6 = +7.180886e-04, c7 = -1.388211e-02;
+      const double c8 = +4.890761e-03, c9 = +3.233175e-03, ca = -2.946156e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 12.0000) {
+      double x = 2 * (s - 3.000000) / 9.000000 - 1, x2 = x * x;
+      const double c0 = -5.947819e+00, c1 = -2.034157e+00, c2 = +6.878986e-02, c3 = -4.078603e-02;
+      const double c4 = +6.990977e-03, c5 = -2.866215e-03, c6 = +3.897866e-03, c7 = +2.512252e-03;
+      const double c8 = +2.073743e-03, c9 = +3.022621e-03, ca = +1.501343e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.877243e-01 * (s - 1.200000e+01) - 7.936839e+00;
 }
 
 static double jarquebera_jbtbl13(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.0000) {
-      x = 2 * (s - 0.000000) / 1.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.713276e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.557541e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.459092e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.044145e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.546132e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.002374e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.349456e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.025669e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.590242e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 3.0000) {
-      x = 2 * (s - 1.000000) / 2.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.454383e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.467539e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.270774e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.075763e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.611647e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.990785e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.109212e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.135031e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.915919e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.522390e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.144701e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 13.0000) {
-      x = 2 * (s - 3.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.736127e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.920809e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.175858e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.002049e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.158966e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.157781e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.762172e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.780347e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.193310e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.442421e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.547756e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.799944e-01 * (s - 1.300000e+01) - 7.566269e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.713276e-01, c1 = -3.557541e-01, c2 = -9.459092e-02, c3 = -1.044145e-02;
+      const double c4 = -2.546132e-04, c5 = +1.002374e-04, c6 = +2.349456e-05, c7 = -7.025669e-05;
+      const double c8 = -1.590242e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.454383e+00, c1 = -1.467539e+00, c2 = +3.270774e-01, c3 = -8.075763e-03;
+      const double c4 = -6.611647e-02, c5 = +2.990785e-02, c6 = +8.109212e-03, c7 = -1.135031e-02;
+      const double c8 = +5.915919e-04, c9 = +3.522390e-03, ca = -1.144701e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 13.0000) {
+      double x = 2 * (s - 3.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.736127e+00, c1 = -1.920809e+00, c2 = +1.175858e-01, c3 = -4.002049e-02;
+      const double c4 = +1.158966e-02, c5 = -3.157781e-03, c6 = +2.762172e-03, c7 = +5.780347e-04;
+      const double c8 = -1.193310e-03, c9 = -2.442421e-05, ca = +2.547756e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.799944e-01 * (s - 1.300000e+01) - 7.566269e+00;
 }
 
 static double jarquebera_jbtbl14(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 1.0000) {
-      x = 2 * (s - 0.000000) / 1.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.698527e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.479081e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.640733e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.466899e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.469485e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.150009e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.965975e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.710210e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.327808e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 3.0000) {
-      x = 2 * (s - 1.000000) / 2.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -2.350359e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.421365e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.960468e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.149167e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.361109e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.976022e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.082700e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.563328e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.453123e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.917559e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.151067e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 3.000000) / 12.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.746892e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.010441e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.566146e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.129690e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.929724e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.524227e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.192933e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.254730e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.620685e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.289618e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.112350e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.590621e-01 * (s - 1.500000e+01) - 7.632238e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.698527e-01, c1 = -3.479081e-01, c2 = -8.640733e-02, c3 = -8.466899e-03;
+      const double c4 = -1.469485e-04, c5 = +2.150009e-05, c6 = +1.965975e-05, c7 = -4.710210e-05;
+      const double c8 = -1.327808e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.350359e+00, c1 = -1.421365e+00, c2 = +2.960468e-01, c3 = +1.149167e-02;
+      const double c4 = -6.361109e-02, c5 = +1.976022e-02, c6 = +1.082700e-02, c7 = -8.563328e-03;
+      const double c8 = -1.453123e-03, c9 = +2.917559e-03, ca = -1.151067e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 3.000000) / 12.000000 - 1, x2 = x * x;
+      const double c0 = -5.746892e+00, c1 = -2.010441e+00, c2 = +1.566146e-01, c3 = -5.129690e-02;
+      const double c4 = +1.929724e-02, c5 = -2.524227e-03, c6 = +3.192933e-03, c7 = -4.254730e-04;
+      const double c8 = +1.620685e-03, c9 = +7.289618e-04, ca = -2.112350e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.590621e-01 * (s - 1.500000e+01) - 7.632238e+00;
 }
 
 static double jarquebera_jbtbl15(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 2.0000) {
-      x = 2 * (s - 0.000000) / 2.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.043660e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.361653e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.009497e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.951784e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.377903e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.003253e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.271309e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 5.0000) {
-      x = 2 * (s - 2.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.582778e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.349578e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.476514e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.717385e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.222591e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.635124e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.815993e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 17.0000) {
-      x = 2 * (s - 5.000000) / 12.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.115476e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.655936e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.404310e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.663794e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.868618e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.381447e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.444801e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.581503e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.468696e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.728509e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.206470e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.927937e-01 * (s - 1.700000e+01) - 7.700983e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -1.043660e+00, c1 = -1.361653e+00, c2 = -3.009497e-01, c3 = +4.951784e-02;
+      const double c4 = +4.377903e-02, c5 = +1.003253e-02, c6 = -1.271309e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.582778e+00, c1 = -8.349578e-01, c2 = +9.476514e-02, c3 = -2.717385e-02;
+      const double c4 = +1.222591e-02, c5 = -6.635124e-03, c6 = +2.815993e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 17.0000) {
+      double x = 2 * (s - 5.000000) / 12.000000 - 1, x2 = x * x;
+      const double c0 = -6.115476e+00, c1 = -1.655936e+00, c2 = +8.404310e-02, c3 = -2.663794e-02;
+      const double c4 = +8.868618e-03, c5 = +1.381447e-03, c6 = +9.444801e-04, c7 = -1.581503e-04;
+      const double c8 = -9.468696e-04, c9 = +1.728509e-03, ca = +1.206470e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.927937e-01 * (s - 1.700000e+01) - 7.700983e+00;
 }
 
 static double jarquebera_jbtbl16(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 2.0000) {
-      x = 2 * (s - 0.000000) / 2.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.002570e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.298141e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.832803e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.877026e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.539436e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.439658e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.756911e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 5.0000) {
-      x = 2 * (s - 2.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.486198e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.242944e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.020002e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.130531e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.512373e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.054876e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.556839e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 20.0000) {
-      x = 2 * (s - 5.000000) / 15.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.241608e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.832655e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.340545e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.361143e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.283219e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.484549e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.805968e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.057243e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.454439e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.177513e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.819209e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.391580e-01 * (s - 2.000000e+01) - 7.963205e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -1.002570e+00, c1 = -1.298141e+00, c2 = -2.832803e-01, c3 = +3.877026e-02;
+      const double c4 = +3.539436e-02, c5 = +8.439658e-03, c6 = -4.756911e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.486198e+00, c1 = -8.242944e-01, c2 = +1.020002e-01, c3 = -3.130531e-02;
+      const double c4 = +1.512373e-02, c5 = -8.054876e-03, c6 = +3.556839e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 5.000000) / 15.000000 - 1, x2 = x * x;
+      const double c0 = -6.241608e+00, c1 = -1.832655e+00, c2 = +1.340545e-01, c3 = -3.361143e-02;
+      const double c4 = +1.283219e-02, c5 = +3.484549e-03, c6 = +1.805968e-03, c7 = -2.057243e-03;
+      const double c8 = -1.454439e-03, c9 = -2.177513e-03, ca = -1.819209e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.391580e-01 * (s - 2.000000e+01) - 7.963205e+00;
 }
 
 static double jarquebera_jbtbl17(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 3.0000) {
-      x = 2 * (s - 0.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.566973e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.810330e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.840039e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.337294e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.383549e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.556515e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.656965e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.404569e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.447867e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 6.0000) {
-      x = 2 * (s - 3.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.905684e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.222920e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.146667e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.809176e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.057028e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.211838e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.099683e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.161105e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.225465e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 24.0000) {
-      x = 2 * (s - 6.000000) / 18.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.594282e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.917838e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.455980e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.999589e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.604263e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.484445e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.819937e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.930390e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.771761e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.232581e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.029083e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.127771e-01 * (s - 2.400000e+01) - 8.400197e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.566973e+00, c1 = -1.810330e+00, c2 = -4.840039e-02, c3 = +2.337294e-01;
+      const double c4 = -5.383549e-04, c5 = -5.556515e-02, c6 = -8.656965e-03, c7 = +1.404569e-02;
+      const double c8 = +6.447867e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.905684e+00, c1 = -6.222920e-01, c2 = +4.146667e-02, c3 = -4.809176e-03;
+      const double c4 = +1.057028e-03, c5 = -1.211838e-04, c6 = -4.099683e-04, c7 = +1.161105e-04;
+      const double c8 = +2.225465e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 24.0000) {
+      double x = 2 * (s - 6.000000) / 18.000000 - 1, x2 = x * x;
+      const double c0 = -6.594282e+00, c1 = -1.917838e+00, c2 = +1.455980e-01, c3 = -2.999589e-02;
+      const double c4 = +5.604263e-03, c5 = -3.484445e-03, c6 = -1.819937e-03, c7 = -2.930390e-03;
+      const double c8 = +2.771761e-04, c9 = -6.232581e-04, ca = -7.029083e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.127771e-01 * (s - 2.400000e+01) - 8.400197e+00;
 }
 
 static double jarquebera_jbtbl18(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 3.0000) {
-      x = 2 * (s - 0.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.526802e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.762373e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.598890e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.189437e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.971721e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.823067e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.064501e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.014932e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.953513e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 6.0000) {
-      x = 2 * (s - 3.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.818669e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.070918e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.277196e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.879817e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.887357e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.638451e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.502800e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.165796e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.034960e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 20.0000) {
-      x = 2 * (s - 6.000000) / 14.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.010656e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.496296e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.002227e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.338250e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.137036e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.586202e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.736384e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.332251e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.877982e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.160963e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.547247e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.684623e-01 * (s - 2.000000e+01) - 7.428883e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.526802e+00, c1 = -1.762373e+00, c2 = -5.598890e-02, c3 = +2.189437e-01;
+      const double c4 = +5.971721e-03, c5 = -4.823067e-02, c6 = -1.064501e-02, c7 = +1.014932e-02;
+      const double c8 = +5.953513e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.818669e+00, c1 = -6.070918e-01, c2 = +4.277196e-02, c3 = -4.879817e-03;
+      const double c4 = +6.887357e-04, c5 = +1.638451e-05, c6 = +1.502800e-04, c7 = -3.165796e-05;
+      const double c8 = +5.034960e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
+      const double c0 = -6.010656e+00, c1 = -1.496296e+00, c2 = +1.002227e-01, c3 = -2.338250e-02;
+      const double c4 = +4.137036e-03, c5 = -2.586202e-03, c6 = -9.736384e-04, c7 = +1.332251e-03;
+      const double c8 = +1.877982e-03, c9 = -1.160963e-05, ca = -2.547247e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.684623e-01 * (s - 2.000000e+01) - 7.428883e+00;
 }
 
 static double jarquebera_jbtbl19(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 3.0000) {
-      x = 2 * (s - 0.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.490213e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.719633e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.459123e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.034878e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.113868e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.030922e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.054022e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.525623e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.277360e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 6.0000) {
-      x = 2 * (s - 3.000000) / 3.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -3.744750e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.977749e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.223716e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.363889e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.711774e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.557257e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.254794e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.034207e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.498107e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 20.0000) {
-      x = 2 * (s - 6.000000) / 14.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.872768e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.430689e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.136575e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.726627e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.421110e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.581510e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.559520e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.838208e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.428839e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.170682e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.006647e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.539373e-01 * (s - 2.000000e+01) - 7.206941e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.490213e+00, c1 = -1.719633e+00, c2 = -6.459123e-02, c3 = +2.034878e-01;
+      const double c4 = +1.113868e-02, c5 = -4.030922e-02, c6 = -1.054022e-02, c7 = +7.525623e-03;
+      const double c8 = +5.277360e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.744750e+00, c1 = -5.977749e-01, c2 = +4.223716e-02, c3 = -5.363889e-03;
+      const double c4 = +5.711774e-04, c5 = -5.557257e-04, c6 = +4.254794e-04, c7 = +9.034207e-05;
+      const double c8 = +5.498107e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
+      const double c0 = -5.872768e+00, c1 = -1.430689e+00, c2 = +1.136575e-01, c3 = -1.726627e-02;
+      const double c4 = +3.421110e-03, c5 = -1.581510e-03, c6 = -5.559520e-04, c7 = -6.838208e-04;
+      const double c8 = +8.428839e-04, c9 = -7.170682e-04, ca = -6.006647e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.539373e-01 * (s - 2.000000e+01) - 7.206941e+00;
 }
 
 static double jarquebera_jbtbl20(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.854794e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.948947e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.632184e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.139397e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.006237e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.810031e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.573620e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.951242e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.274092e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.464196e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.882139e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.575144e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.822804e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.061348e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.908404e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.978353e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.030989e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.327151e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.346404e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.840051e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.578551e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.813886e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.905973e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.358489e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.450795e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.941157e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.432418e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.070537e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.375654e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.367378e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.890859e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.679782e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -7.015854e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.487737e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.244254e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.318007e-01 * (s - 2.500000e+01) - 7.742185e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.854794e+00, c1 = -1.948947e+00, c2 = +1.632184e-01, c3 = +2.139397e-01;
+      const double c4 = -1.006237e-01, c5 = -3.810031e-02, c6 = +3.573620e-02, c7 = +9.951242e-03;
+      const double c8 = -1.274092e-02, c9 = -3.464196e-03, ca = +4.882139e-03, cb = +1.575144e-03;
+      const double cc = -1.822804e-03, cd = -7.061348e-04, ce = +5.908404e-04, cf = +1.978353e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -5.030989e+00, c1 = -1.327151e+00, c2 = +1.346404e-01, c3 = -2.840051e-02;
+      const double c4 = +7.578551e-03, c5 = -9.813886e-04, c6 = +5.905973e-05, c7 = -5.358489e-04;
+      const double c8 = -3.450795e-04, c9 = -6.941157e-04, ca = -7.432418e-04, cb = -2.070537e-04;
+      const double cc = +9.375654e-04, cd = +5.367378e-04, ce = +9.890859e-04, cf = +6.679782e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -7.015854e+00, c1 = -7.487737e-01, c2 = +2.244254e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.318007e-01 * (s - 2.500000e+01) - 7.742185e+00;
 }
 
 static double jarquebera_jbtbl30(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.630822e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.724298e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.872756e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.658268e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.573597e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.994157e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.994825e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.394303e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.785029e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.990264e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.037838e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.755546e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.774473e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.821395e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.392603e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.353313e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.539322e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.197018e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.396848e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.804293e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.867928e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.768758e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.211792e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.925799e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.046235e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.536469e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.489642e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.263462e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.177316e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.590637e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.028212e-01 * (s - 2.500000e+01) - 6.855288e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.630822e+00, c1 = -1.724298e+00, c2 = +7.872756e-02, c3 = +1.658268e-01;
+      const double c4 = -3.573597e-02, c5 = -2.994157e-02, c6 = +5.994825e-03, c7 = +7.394303e-03;
+      const double c8 = -5.785029e-04, c9 = -1.990264e-03, ca = -1.037838e-04, cb = +6.755546e-04;
+      const double cc = +1.774473e-04, cd = -2.821395e-04, ce = -1.392603e-04, cf = +1.353313e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.539322e+00, c1 = -1.197018e+00, c2 = +1.396848e-01, c3 = -2.804293e-02;
+      const double c4 = +6.867928e-03, c5 = -2.768758e-03, c6 = +5.211792e-04, c7 = +4.925799e-04;
+      const double c8 = +5.046235e-04, c9 = -9.536469e-05, ca = -6.489642e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.263462e+00, c1 = -6.177316e-01, c2 = +2.590637e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.028212e-01 * (s - 2.500000e+01) - 6.855288e+00;
 }
 
 static double jarquebera_jbtbl50(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.436279e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.519711e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.148699e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.001204e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.207620e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.034778e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.220322e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.033260e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.588280e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.851653e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.287733e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.234645e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.189127e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.429738e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.058822e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 9.086776e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.445783e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.311671e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.261298e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.496987e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.605249e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.162282e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.921095e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.888603e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.080113e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -9.313116e-02 * (s - 2.500000e+01) - 6.479154e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.436279e+00, c1 = -1.519711e+00, c2 = +1.148699e-02, c3 = +1.001204e-01;
+      const double c4 = -3.207620e-03, c5 = -1.034778e-02, c6 = -1.220322e-03, c7 = +1.033260e-03;
+      const double c8 = +2.588280e-04, c9 = -1.851653e-04, ca = -1.287733e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.234645e+00, c1 = -1.189127e+00, c2 = +1.429738e-01, c3 = -3.058822e-02;
+      const double c4 = +9.086776e-03, c5 = -1.445783e-03, c6 = +1.311671e-03, c7 = -7.261298e-04;
+      const double c8 = +6.496987e-04, c9 = +2.605249e-04, ca = +8.162282e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.921095e+00, c1 = -5.888603e-01, c2 = +3.080113e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -9.313116e-02 * (s - 2.500000e+01) - 6.479154e+00;
 }
 
 static double jarquebera_jbtbl65(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.360024e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.434631e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.514580e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 7.332038e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.158197e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.121233e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.051056e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.148601e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.214233e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.487977e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.424720e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.116715e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.043152e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.718149e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.313701e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.097305e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.181031e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.256975e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.858951e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.895179e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.933237e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -9.443768e-02 * (s - 2.500000e+01) - 6.419137e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.360024e+00, c1 = -1.434631e+00, c2 = -6.514580e-03, c3 = +7.332038e-02;
+      const double c4 = +1.158197e-03, c5 = -5.121233e-03, c6 = -1.051056e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.148601e+00, c1 = -1.214233e+00, c2 = +1.487977e-01, c3 = -3.424720e-02;
+      const double c4 = +1.116715e-02, c5 = -4.043152e-03, c6 = +1.718149e-03, c7 = -1.313701e-03;
+      const double c8 = +3.097305e-04, c9 = +2.181031e-04, ca = +1.256975e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.858951e+00, c1 = -5.895179e-01, c2 = +2.933237e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -9.443768e-02 * (s - 2.500000e+01) - 6.419137e+00;
 }
 
 static double jarquebera_jbtbl100(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.257021e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.313418e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.628931e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.264287e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.518487e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.499826e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.836044e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.056508e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.279690e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.665746e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.290012e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.487632e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.704465e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.211669e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.866099e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.399767e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.498208e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.080097e-01 * (s - 2.500000e+01) - 6.481094e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.257021e+00, c1 = -1.313418e+00, c2 = -1.628931e-02, c3 = +4.264287e-02;
+      const double c4 = +1.518487e-03, c5 = -1.499826e-03, c6 = -4.836044e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.056508e+00, c1 = -1.279690e+00, c2 = +1.665746e-01, c3 = -4.290012e-02;
+      const double c4 = +1.487632e-02, c5 = -5.704465e-03, c6 = +2.211669e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.866099e+00, c1 = -6.399767e-01, c2 = +2.498208e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.080097e-01 * (s - 2.500000e+01) - 6.481094e+00;
 }
 
 static double jarquebera_jbtbl130(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.207999e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.253864e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.618032e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.112729e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.210546e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.732602e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.410527e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.026324e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.331990e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.779129e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.674749e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.669077e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.679136e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 8.833221e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -5.893951e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.475304e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.116734e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.045722e-01 * (s - 2.500000e+01) - 6.510314e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.207999e+00, c1 = -1.253864e+00, c2 = -1.618032e-02, c3 = +3.112729e-02;
+      const double c4 = +1.210546e-03, c5 = -4.732602e-04, c6 = -2.410527e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.026324e+00, c1 = -1.331990e+00, c2 = +1.779129e-01, c3 = -4.674749e-02;
+      const double c4 = +1.669077e-02, c5 = -5.679136e-03, c6 = +8.833221e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.893951e+00, c1 = -6.475304e-01, c2 = +3.116734e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.045722e-01 * (s - 2.500000e+01) - 6.510314e+00;
 }
 
 static double jarquebera_jbtbl200(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.146155e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.177398e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.297970e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.869745e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.717288e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.982108e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.427636e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.034235e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.455006e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.942996e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.973795e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.418812e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.156778e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.896705e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.086071e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.152176e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.725393e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.132404e-01 * (s - 2.500000e+01) - 6.764034e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.146155e+00, c1 = -1.177398e+00, c2 = -1.297970e-02, c3 = +1.869745e-02;
+      const double c4 = +1.717288e-04, c5 = -1.982108e-04, c6 = +6.427636e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.034235e+00, c1 = -1.455006e+00, c2 = +1.942996e-01, c3 = -4.973795e-02;
+      const double c4 = +1.418812e-02, c5 = -3.156778e-03, c6 = +4.896705e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.086071e+00, c1 = -7.152176e-01, c2 = +3.725393e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.132404e-01 * (s - 2.500000e+01) - 6.764034e+00;
 }
 
 static double jarquebera_jbtbl301(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.104290e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.125800e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.595847e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.219666e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.502210e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.414543e-05, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.754115e-05, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.065955e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.582060e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.004472e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -4.709092e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.105779e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.197391e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.386780e-04, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.311384e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.918763e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.626584e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.293626e-01 * (s - 2.500000e+01) - 7.066995e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.104290e+00, c1 = -1.125800e+00, c2 = -9.595847e-03, c3 = +1.219666e-02;
+      const double c4 = +1.502210e-04, c5 = -6.414543e-05, c6 = +6.754115e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.065955e+00, c1 = -1.582060e+00, c2 = +2.004472e-01, c3 = -4.709092e-02;
+      const double c4 = +1.105779e-02, c5 = +1.197391e-03, c6 = -8.386780e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.311384e+00, c1 = -7.918763e-01, c2 = +3.626584e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.293626e-01 * (s - 2.500000e+01) - 7.066995e+00;
 }
 
 static double jarquebera_jbtbl501(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.067426e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.079765e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -5.463005e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 6.875659e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.127574e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.740694e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.044502e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.746714e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 3.810594e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.197111e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.628194e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -8.846221e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.386405e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.418332e-01 * (s - 2.500000e+01) - 7.468952e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.067426e+00, c1 = -1.079765e+00, c2 = -5.463005e-03, c3 = +6.875659e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.127574e+00, c1 = -1.740694e+00, c2 = +2.044502e-01, c3 = -3.746714e-02;
+      const double c4 = +3.810594e-04, c5 = +1.197111e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.628194e+00, c1 = -8.846221e-01, c2 = +4.386405e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.418332e-01 * (s - 2.500000e+01) - 7.468952e+00;
 }
 
 static double jarquebera_jbtbl701(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.050999e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.059769e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -3.922680e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 4.847054e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.192182e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.860007e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.963942e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.838711e-02, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.893112e-04, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.159788e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -6.917851e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -9.817020e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.383727e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -1.532706e-01 * (s - 2.500000e+01) - 7.845715e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.050999e+00, c1 = -1.059769e+00, c2 = -3.922680e-03, c3 = +4.847054e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.192182e+00, c1 = -1.860007e+00, c2 = +1.963942e-01, c3 = -2.838711e-02;
+      const double c4 = -2.893112e-04, c5 = +2.159788e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.917851e+00, c1 = -9.817020e-01, c2 = +5.383727e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.532706e-01 * (s - 2.500000e+01) - 7.845715e+00;
 }
 
 static double jarquebera_jbtbl1401(double s) {
-   double x;
-   double tj;
-   double tj1;
-   double result;
-   result = 0.0;
    if (s <= 4.0000) {
-      x = 2 * (s - 0.000000) / 4.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -1.026266e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.030061e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.259222e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 2.536254e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 15.0000) {
-      x = 2 * (s - 4.000000) / 11.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -4.329849e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -2.095443e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 1.759363e-01, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -7.751359e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -6.124368e-03, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.793114e-03, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   if (s <= 25.0000) {
-      x = 2 * (s - 15.000000) / 10.000000 - 1;
-      tj = 1.0;
-      tj1 = x;
-      jarquebera_jbcheb(x, -7.544330e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, -1.225382e+00, &tj, &tj1, &result);
-      jarquebera_jbcheb(x, 5.392349e-02, &tj, &tj1, &result);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      return result;
-   }
-   result = -2.019375e-01 * (s - 2.500000e+01) - 8.715788e+00;
-   return result;
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.026266e+00, c1 = -1.030061e+00, c2 = -1.259222e-03, c3 = +2.536254e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.329849e+00, c1 = -2.095443e+00, c2 = +1.759363e-01, c3 = -7.751359e-03;
+      const double c4 = -6.124368e-03, c5 = -1.793114e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -7.544330e+00, c1 = -1.225382e+00, c2 = +5.392349e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.019375e-01 * (s - 2.500000e+01) - 8.715788e+00;
 }
 
 static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
    ae_frame _frame_block;
-   double t1;
-   double t2;
-   double t3;
-   double t;
-   double f1;
-   double f2;
-   double f3;
-   double f12;
-   double f23;
-   double x;
-   double result;
+   double x = s;
    ae_frame_make(&_frame_block);
    NewVector(vx, 0, DT_REAL);
    NewVector(vy, 0, DT_REAL);
    NewMatrix(ctbl, 0, 0, DT_REAL);
-   result = 1.0;
-   x = s;
-   if (n < 5) {
-      ae_frame_leave();
-      return result;
-   }
-// N = 5..20 are tabulated
-   if (n >= 5 && n <= 20) {
-      if (n == 5) {
-         result = exp(jarquebera_jbtbl5(x));
-      }
-      if (n == 6) {
-         result = exp(jarquebera_jbtbl6(x));
-      }
-      if (n == 7) {
-         result = exp(jarquebera_jbtbl7(x));
-      }
-      if (n == 8) {
-         result = exp(jarquebera_jbtbl8(x));
-      }
-      if (n == 9) {
-         result = exp(jarquebera_jbtbl9(x));
-      }
-      if (n == 10) {
-         result = exp(jarquebera_jbtbl10(x));
-      }
-      if (n == 11) {
-         result = exp(jarquebera_jbtbl11(x));
-      }
-      if (n == 12) {
-         result = exp(jarquebera_jbtbl12(x));
-      }
-      if (n == 13) {
-         result = exp(jarquebera_jbtbl13(x));
-      }
-      if (n == 14) {
-         result = exp(jarquebera_jbtbl14(x));
-      }
-      if (n == 15) {
-         result = exp(jarquebera_jbtbl15(x));
-      }
-      if (n == 16) {
-         result = exp(jarquebera_jbtbl16(x));
-      }
-      if (n == 17) {
-         result = exp(jarquebera_jbtbl17(x));
-      }
-      if (n == 18) {
-         result = exp(jarquebera_jbtbl18(x));
-      }
-      if (n == 19) {
-         result = exp(jarquebera_jbtbl19(x));
-      }
-      if (n == 20) {
-         result = exp(jarquebera_jbtbl20(x));
-      }
-      ae_frame_leave();
-      return result;
-   }
-// N = 20, 30, 50 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 20 && n <= 50) {
-      t1 = -1.0 / 20.0;
-      t2 = -1.0 / 30.0;
-      t3 = -1.0 / 50.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl20(x);
-      f2 = jarquebera_jbtbl30(x);
-      f3 = jarquebera_jbtbl50(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+   double result;
+// N = 5, 6, ..., 20, 30, 50, 65, 100, 130, 200, 301, 501, 701, 1401 are tabulated.
+// In-between values up to 1400 are interpolated using an interpolating polynomial of the second degree.
+// Anything under 5 or beyond 1400 is tabulated by an asymptotic expansion.
+   if (n <= 20) switch (n) {
+      default: ae_frame_leave(); return 1.0;
+      case 5: result = jarquebera_jbtbl5(x); break;
+      case 6: result = jarquebera_jbtbl6(x); break;
+      case 7: result = jarquebera_jbtbl7(x); break;
+      case 8: result = jarquebera_jbtbl8(x); break;
+      case 9: result = jarquebera_jbtbl9(x); break;
+      case 10: result = jarquebera_jbtbl10(x); break;
+      case 11: result = jarquebera_jbtbl11(x); break;
+      case 12: result = jarquebera_jbtbl12(x); break;
+      case 13: result = jarquebera_jbtbl13(x); break;
+      case 14: result = jarquebera_jbtbl14(x); break;
+      case 15: result = jarquebera_jbtbl15(x); break;
+      case 16: result = jarquebera_jbtbl16(x); break;
+      case 17: result = jarquebera_jbtbl17(x); break;
+      case 18: result = jarquebera_jbtbl18(x); break;
+      case 19: result = jarquebera_jbtbl19(x); break;
+      case 20: result = jarquebera_jbtbl20(x); break;
+   } else if (n > 20 && n <= 50) {
+      double t1 = -1.0 / 20.0, t2 = -1.0 / 30.0, t3 = -1.0 / 50.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl20(x), f2 = jarquebera_jbtbl30(x), f3 = jarquebera_jbtbl50(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 50, 65, 100 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 50 && n <= 100) {
-      t1 = -1.0 / 50.0;
-      t2 = -1.0 / 65.0;
-      t3 = -1.0 / 100.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl50(x);
-      f2 = jarquebera_jbtbl65(x);
-      f3 = jarquebera_jbtbl100(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 50 && n <= 100) {
+      double t1 = -1.0 / 50.0, t2 = -1.0 / 65.0, t3 = -1.0 / 100.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl50(x), f2 = jarquebera_jbtbl65(x), f3 = jarquebera_jbtbl100(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 100, 130, 200 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 100 && n <= 200) {
-      t1 = -1.0 / 100.0;
-      t2 = -1.0 / 130.0;
-      t3 = -1.0 / 200.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl100(x);
-      f2 = jarquebera_jbtbl130(x);
-      f3 = jarquebera_jbtbl200(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 100 && n <= 200) {
+      double t1 = -1.0 / 100.0, t2 = -1.0 / 130.0, t3 = -1.0 / 200.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl100(x), f2 = jarquebera_jbtbl130(x), f3 = jarquebera_jbtbl200(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 200, 301, 501 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 200 && n <= 501) {
-      t1 = -1.0 / 200.0;
-      t2 = -1.0 / 301.0;
-      t3 = -1.0 / 501.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl200(x);
-      f2 = jarquebera_jbtbl301(x);
-      f3 = jarquebera_jbtbl501(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 200 && n <= 501) {
+      double t1 = -1.0 / 200.0, t2 = -1.0 / 301.0, t3 = -1.0 / 501.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl200(x), f2 = jarquebera_jbtbl301(x), f3 = jarquebera_jbtbl501(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// N = 501, 701, 1401 are tabulated.
-// In-between values are interpolated
-// using interpolating polynomial of the second degree.
-   if (n > 501 && n <= 1401) {
-      t1 = -1.0 / 501.0;
-      t2 = -1.0 / 701.0;
-      t3 = -1.0 / 1401.0;
-      t = -1.0 / n;
-      f1 = jarquebera_jbtbl501(x);
-      f2 = jarquebera_jbtbl701(x);
-      f3 = jarquebera_jbtbl1401(x);
-      f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2);
-      f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 501 && n <= 1401) {
+      double t1 = -1.0 / 501.0, t2 = -1.0 / 701.0, t3 = -1.0 / 1401.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl501(x), f2 = jarquebera_jbtbl701(x), f3 = jarquebera_jbtbl1401(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
       result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
-   }
-// Asymptotic expansion
-   if (n > 1401) {
+      if (result > 0.0) result = 0.0;
+   } else {
       result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
-      if (result > 0.0) {
-         result = 0.0;
-      }
-      result = exp(result);
-      ae_frame_leave();
-      return result;
+      if (result > 0.0) result = 0.0;
    }
+   result = exp(result);
    ae_frame_leave();
    return result;
 }
@@ -13665,47 +7754,52 @@ static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
 // For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
 // from table values.
 // ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
 void jarqueberatest(RVector *x, ae_int_t n, double *p) {
-   double s;
    *p = 0;
-// N is too small
+// N is too small.
    if (n < 5) {
       *p = 1.0;
       return;
    }
-// N is large enough
-   jarquebera_jarqueberastatistic(x, n, &s);
-   *p = jarquebera_jarqueberaapprox(n, s);
+// N is large enough.
+   double mean = 0.0;
+   double variance = 0.0;
+   double skewness = 0.0;
+   double kurtosis = 0.0;
+   double stddev = 0.0;
+   ae_assert(n > 1, "Assertion failed");
+// Mean.
+   for (ae_int_t i = 0; i < n; i++) mean += x->xR[i];
+   mean /= n;
+// Variance (using corrected two-pass algorithm).
+   if (n != 1) {
+      double v1 = 0.0;
+      for (ae_int_t i = 0; i < n; i++) v1 += ae_sqr(x->xR[i] - mean);
+      double v2 = 0.0;
+      for (ae_int_t i = 0; i < n; i++) v2 += x->xR[i] - mean;
+      v2 = ae_sqr(v2) / n;
+      variance = (v1 - v2) / (n - 1);
+      if (variance < 0.0) variance = 0.0;
+      stddev = sqrt(variance);
+   }
+// Skewness and kurtosis.
+   if (stddev != 0.0) {
+      for (ae_int_t i = 0; i < n; i++) {
+         double v = (x->xR[i] - mean) / stddev;
+         double v2 = v * v;
+         skewness += v2 * v;
+         kurtosis += v2 * v2;
+      }
+      skewness /= n;
+      kurtosis = kurtosis / n - 3;
+   }
+// Statistic.
+   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4.0));
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Jarque-Bera test
-//
-// This test checks hypotheses about the fact that a  given  sample  X  is  a
-// sample of normal random variable.
-//
-// Requirements:
-//     * the number of elements in the sample is not less than 5.
-//
-// Inputs:
-//     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//
-// Outputs:
-//     P           -   p-value for the test
-//
-// Accuracy of the approximation used (5 <= N <= 1951):
-//
-// p-value          relative error (5 <= N <= 1951)
-// [1, 0.1]            < 1%
-// [0.1, 0.01]         < 2%
-// [0.01, 0.001]       < 6%
-// [0.001, 0]          wasn't measured
-//
-// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
-// from table values.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -13750,6 +7844,7 @@ namespace alglib_impl {
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
@@ -13835,6 +7930,7 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
 // ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail);
 void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
    double xmean;
@@ -13878,38 +7974,6 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Two-sample F-test
-//
-// This test checks three hypotheses about dispersions of the given  samples.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersions are equal)
-//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
-//       sample is greater than or equal to  the  dispersion  of  the  second
-//       sample).
-//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
-//       sample is less than or equal to the dispersion of the second sample)
-//
-// The test is based on the following assumptions:
-//     * the given samples have normal distributions
-//     * the samples are independent.
-//
-// Inputs:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   sample size.
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   sample size.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -13917,36 +7981,6 @@ void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, con
    alglib_impl::ae_state_clear();
 }
 
-// One-sample chi-square test
-//
-// This test checks three hypotheses about the dispersion of the given sample
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersion equals  the  given
-//       number)
-//     * left-tailed test (null hypothesis - the dispersion is  greater  than
-//       or equal to the given number)
-//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
-//       equal to the given number).
-//
-// Test is based on the following assumptions:
-//     * the given sample has a normal distribution.
-//
-// Inputs:
-//     X           -   sample 1. Array whose index goes from 0 to N-1.
-//     N           -   size of the sample.
-//     Variance    -   dispersion value to compare with.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()

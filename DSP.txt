@@ -1,0 +1,205 @@
+DSP Transforms:
+In the following, we adopt the following conventions:
+∙	a^b ≡ exp(b ln(a)) means a to the power b, where a > 0;
+∙	except:
+		1^x ≡ exp(2πix) = cos(2πx) + i sin(2πx),
+	to denote powers of unity.
+∙	0 = {}, 1 = {0}, 2 = {0,1}, 3 = {0,1,2}, ⋯, ω = {0,1,2,3,⋯}, so that n ∈ N ⇔ 0 ≤ n < N, for N = ω.
+∙	δ(x) is the delta function; i.e. the distribution for which ∫ f(x₁) δ(x₀ - x₁) dx₁ = f(x₀)
+∙	δ(n₀,n₁) is the Kroenecker delta; i.e. the *discrete* distribution for which Σ_n₀ f(n₁) δ(n₀,n₁) = f(n₀)
+∙	()* denotes complex conjugate; i.e. (x + iy)* = x - iy, for x, y ∈ ℝ.
+
+Generalized Discrete Fourier Transform (DFT):
+∙	Continuum Form:
+	―	Forward:	∀ ν ∈ ℝ:	F(ν) = ∫ f(t) 1^{-νt} dt
+	―	Backward:	∀ t ∈ ℝ:	f(t) = ∫ F(ν) 1^{+νt} dν
+	―	Kernels:	∀ t₀, t₁ ∈ ℝ:	∫ 1^{ν (t₀ - t₁)} dν = δ(t₀ - t₁)
+				∀ ν₀, ν₁ ∈ ℝ:	∫ 1^{(ν₀ - ν₁) t} dt = δ(ν₀ - ν₁)
+
+∙	Discrete Form:
+	The quantization condition on the interval spacings Δν and Δt determines the size, N, of the DFT and the corresponding FFT.
+	The intervals are evenly spaced so as to be able to fulfill the conditions placed on the kernels.
+	―	Forward:	∀ ν ∈ F:	F(ν) = Σ_{t ∈ T} f(t) 1^{-νt} Δt
+	―	Backward:	∀ t ∈ T:	f(t) = Σ_{ν ∈ F} F(ν) 1^{+νt} Δν
+	―	Kernels:	∀ t₀, t₁ ∈ T:	Σ_{ν ∈ F} 1^{ν (t₀ - t₁)} Δν Δt = δ(t₀, t₁)
+				∀ ν₀, ν₁ ∈ F:	Σ_{t ∈ T} 1^{(ν₀ - ν₁) t} Δν Δt = δ(ν₀, ν₁)
+	―	Domains:	t ∈ T = { t₀ + k Δt: k ∈ N }: N points, equally-spaced by Δt.
+				f ∈ F = { ν₀ + n Δν: n ∈ N }: N points, equally-spaced by Δν.
+	―	Quantization	N ≡ 1/(ΔνΔt) ∈ {1,2,3,⋯} is the "N" of the corresponding DFT.
+		Condition:	The equal-spacing and quantization conditions are required for the kernel conditions.
+	―	Bands		t ∈ T ⇔ [t - ½Δt, t + ½Δt)
+				ν ∈ F ⇔ [ν - ½Δν, ν + ½Δν)
+	―	Bandwidths:	T ⇔ [t₀ - ½Δt, t₀ - ½Δt + 1/Δν)
+				F ⇔ [ν₀ - ½Δν, ν₀ - ½Δν + 1/Δt)
+	―	Defaults:	t₀ = ½ Δt
+				ν₀ = ½ (Δν - 1/Δt) = -½ (N - 1) Δν
+				T = { (k + ½) Δt: k ∈ N } ⇔ [0, 1/Δν)
+				F = { (n + ½ (1 - N)) Δν: n ∈ N } ⇔ [-½ 1/Δt, +½ 1/Δt)
+	―	Periodicity:	f(t + 1/Δν) = 1^{-ν₀/Δν} f(t)
+				F(ν + 1/Δt) = 1^{+t₀/Δt} F(ν)
+		The periodicity is only up to phase when t₀ ≠ 0 or ν₀ ≠ 0.
+
+∙	Algorithm:
+	Parameters:
+	―	N:	the DFT size = 1/(ΔνΔt) ∈ {1,2,3,⋯} (default = 4096 = 0x1000),
+	―	Δt:	the time spacing (default = 1),
+	―	Δν:	the frequency spacing (default = 1/N),
+	―	The parameters N, Δt, Δν are initialized to their defaults, 0x1000, 1, 1/0x1000, respectively.
+	―	Seting N, Δt, Δν alters Δν, Δν, Δt respectively, while keeping Δt, N, N fixed, respectively.
+	―	t₀:	the base time (default = 0),
+	―	ν₀:	the base frequency (default = -1/2Δt = -NΔν/2).
+	―	The parameters t₀ and ν₀ are initialized to their defaults, 0 and -1/2Δt respectively.
+	―	Altering Δt may reset ν₀, if it has not yet been reset from its default.
+	―	λ:	the phase-adjustment; λ ∈ [0,1] recommended, with the cardinal values being λ = 0, λ = ½ or λ = 1.
+	Input/Output:
+	―	f ≡ (f(t₀ + k Δt): k ∈ N):	the time-domain vector,
+	―	F ≡ (F(ν₀ + n Δν): n ∈ N):	the frequency-domain vector.
+	Routines:
+	―	Forward (EnDFT):	1⁺ (enphase):	∀ k ∈ N:	f_k = f(t₀ + k Δt) 1^{-ν₀ (λ t₀ + k Δt)}
+					2⁺ (FFT):	∀ n ∈ N:	F_n = Σ_{k ∈ N} f_k 1^{-nk/N} Δt
+					3⁺ (dephase):	∀ n ∈ N:	F(ν₀ + n Δν) = F_n 1^{-(n Δν + (1 - λ) ν₀) t₀}
+	―	Backward (DeDFT):	3⁻ (enphase):	∀ n ∈ N:	F_n = F(ν₀ + n Δν) 1^{+(n Δν + (1 - λ) ν₀) t₀}
+					2⁻ (IFFT):	∀ k ∈ N:	f_k = Σ_{n ∈ N} F_n 1^{+nk/N} Δν
+					1⁻ (dephase):	∀ k ∈ N:	f(t₀ + k Δt) = f_k 1^{+ν₀ (λ t₀ + k Δt)}
+	Extensions (incorporate FFT-Pack):
+	―	Real / Symmetric
+	―	Sine Transform
+	―	Cosine Transform
+	Tests:
+	―	Cardinal Tests:
+		▪	Pure frequency tone (f) → EnDFT → unit vector (F)
+		▪	Time spike (f) → EnDFT → white noise (F)
+	―	Inverse Tests:
+		▪	f → EnDFT → F → DeDFT → f
+		▪	F → DeDFT → f → EnDFT → F
+	―	Gauss to Gauss:
+		▪	Gauss → EnDFT → Gauss
+		▪	Gauss → DeDFT → Gauss
+	―	Phase Shift
+	―	Convolution - Product Property
+	―	Parseval Formula Invariance
+
+Spectrograph, or Windowed Fourier Transform (WFT generalized):
+∙	For the following, let λ ∈ [0,1] be arbitrarily chosen; the cardinal values being: 
+	―	λ = 0: The phase in F(q,p) reflects the wave form for F_p(q) and yields instantaneous frequency
+	―	λ = 1: The phase in F(q,p) is slowly-varying in q and reflects the wave form for p ↦ F(q,p) and yields impulse timee
+∙	Continuum Form (Time Domain):
+	―	Forward:	∀ q, p ∈ ℝ:	F(q, p) = ∫ f(t) g(t - q)* 1^{-p(t - q)} 1^{-λpq} dt
+	―	Backward:	∀ t ∈ ℝ:	f(t) = ∫ F(q, p) h(t - q) 1^{+p(t - q)} 1^{+λpq} dq dp
+	―	Kernel:		∀ t ∈ ℝ:	∫ g(t - q)* h(t - q) dq = 1
+∙	Continuum Form (Frequency Domain):
+	―	Forward:	∀ q, p ∈ ℝ:	F(q, p) = ∫ F(ν) G(ν - p)* 1^{+(ν - λp)q} dν
+	―	Backward:	∀ ν ∈ ℝ:	F(ν) = ∫ F(q, p) H(ν - p) 1^{-(ν - λp)q} dq dp
+	―	Kernel:		∀ ν ∈ ℝ:	∫ G(ν - p)* H(ν - p) dp = 1
+∙	Windowing Function:
+	―	g(Q) is supported over a compact subset supp(g) = T_Q ⊆ ℝ.
+	―	Default: ∀ Q ∈ T_Q:	g(Q) = cos² Q δp
+∙	Synthesis Function:
+	―	Consistency:	∫ g(t - q)* h(t - q) dq = 1 = ∫ G(ν - p)* H(ν - p) dp
+	―	Defaults:
+		▪	h = g, H = G,
+			∫ |g(Q)|² dQ = 1 = ∫ |G(P)|² dP;
+		▪	h(Q) = 1, H(P) = δ(P),
+			∫ g(Q) dQ = 1 = G(0);
+		▪	h(Q) = δ(Q), H(P) = 1,
+			g(0) = 1 = ∫ G(P) dP.
+∙	Transforms:
+	―	Forward:
+		▪	∀ q,Q ∈ ℝ×T_Q:	f_q(Q) = f(q + Q) g(Q)*
+		▪	∀ q,p ∈ ℝ×ℝ:	F_p(q) = ∫_{T_Q} f_q(Q) 1^{-pQ} dQ
+		▪	∀ q,p ∈ ℝ×ℝ:	F(q,p) = F_p(q) 1^{-λpq}
+	―	Backward:
+		▪	∀ q,p ∈ ℝ×ℝ:	F_q(p) = F(q,p) 1^{+λpq}
+		▪	∀ q,Q ∈ ℝ×T_Q:	f_q(Q) = ∫ F_q(p) 1^{pQ} dp
+		▪	∀ t ∈ ℝ:	f(t) = ∫ f_q(t - q) h(t - q) dq
+	―	f(t) → F(q,p) → f(t) = identity
+	―	F(q,p) → f(t) → F(q,p) = retraction
+
+∙	Discrete Form (Time Domain):
+	―	Forward:	∀ (q, p) ∈ T_q × F_p:	F(q, p) = Σ_{t ∈ T} f(t) g(t - q)* 1^{-p(t - q)} 1^{-λpq} Δt
+	―	Backward:	∀ t ∈ T:		f(t) = Σ_{(q,p) ∈ T_q × F_p} F(q, p) h(t - q) 1^{p(t - q}} 1^{+λpq} Δq Δp
+
+∙	Domains:
+	―	t ∈ T: regularly-spaced with width Δt = sample width,
+	―	q ∈ T_q: regularly-spaced with width Δq = spectrograph time width,
+	―	p ∈ F_p: regularly-spaced with width Δp = spectrograph frequency width.
+	―	Q ∈ T_Q = supp(g): regularly-spaced with width ΔQ = windowing function time width = Δt = sample width,
+∙	Domain Conditions:
+	―	N ≡ 1/(ΔpΔQ) ∈ { 1, 2, 3, ⋯ }
+	―	card|T_Q| = N = card|F_p|
+	―	Δq > Δt
+	―	{ q + Q: (q,Q) ∈ T_q × T_Q } = T
+	―	supp(g) ⊆ T_Q
+∙	Corollaries?
+	―	ΔQ = Δt
+	―	H_q ≡ Δq/Δt ∈ { 2, 3, ⋯ } = Hop size
+	―	K_t ≡ card { (q,Q) ∈ T_q × T_Q: q + Q = t } ∈ { 2, 3, ⋯ } = Overlap factor is independent of t
+∙	Default Windowing Functions:
+	―	Cosine window: g(Q) = 2 Δp cos²(πQΔp) = (1 + cos(2πQΔp)) Δp, Q ∈ T_Q.
+	―	h(Q) = 1/Δq, Q ∈ T_Q
+	―	It is normalized such that
+		∀ t ∈ T:	∑_{q ∈ T_q} g(t - q) ≡ 1
+∙	Transforms:
+	―	Forward:
+		▪	∀ (q,Q) ∈ T_q × T_Q:	f_q(Q) = f(q + Q) g(Q)*
+		▪	∀ (q,p) ∈ T_q × F_p:	F_p(q) = Σ_{Q ∈ T_Q} f_q(Q) 1^{-pQ} Δt
+		▪	∀ (q,p) ∈ T_q × F_p:	F(q,p) = F_p(q) 1^{-λpq}
+	―	Backward:
+		▪	∀ (q,p) ∈ T_q × F_p:	F_q(p) = F(q,p) 1^{+λpq}
+		▪	∀ (q,Q) ∈ T_q × T_Q:	f_q(Q) = Σ_{p ∈ F_p} F_q(p) 1^{pQ} Δp
+		▪	∀ t ∈ T:		f(t) = Σ_{q ∈ T_q} f_q(t - q) h(t - q) Δq
+	―	Compatibility Condition:
+		∀ t ∈ T:	Σ_{q ∈ T_q} g(t - q)* h(t - q) Δq = 1
+
+Scalograph, or Continuous Wavelet Transform (CWT generalized):
+∙	Variables & Functions:
+	―	t:	real-time
+	―	p:	log-frequency = 1/σ
+		σ:	time scale
+	―	q:	scalograph time = τ
+		τ:	base time
+	―	ψ,Ψ:	forward transform wavelet (time & frequency domain forms)
+	―	φ,Φ:	backward transform wavelet (time & frequency domain forms)
+∙	Continuum Form (Time Domain):
+		F(q, p) = ∫ f(t) |p| ψ(p(t - q))* dt
+		f(t) = ∫ F(q, p) φ(p(t - q)) dq dp
+∙	Continuum Form (Frequency Domain):
+		F(q, p) = ∫ F(ν) Ψ(ν/p)* 1^{+νq) dν
+		F(ν) = ∫ F(q, p) Φ(ν/p) 1^{-νq} dq dp/|p|
+∙	Kernels:
+		∫ |p| ψ(p(t' - q))* φ(p(t - q)) dp dq = δ(t - t')
+		∫ Ψ(ν/p)* Φ(ν/p) dp/|p| = 1
+∙	Default:
+		φ = ψ:	Contiuous Wavelet Transform (CWT).
+
+Time-Scale and more General Windowed Transforms:
+∙	Continuum Form (Time Domain):
+		F(q, p) = ∫ f(t) ψ_p(t - q)* dt
+		f(t) = ∫ F(q, p) ψ^p(t - q) dq dp
+∙	Continuum Form (Frequency Domain):
+		F(q, p) = ∫ F(ν) Ψ_p(ν)* 1^{+νq) dν
+		F(ν) = ∫ F(q, p) Ψ^p(ν) 1^{-νq} dq dp
+∙	Kernels:
+		∫ ψ_p(t' - q)* ψ^p(t - q) dp dq = δ(t - t')
+		∫ Ψ_p(ν)* Ψ^p(ν) dp = 1
+∙	Specializations:
+	―	Time-Scale Transforms (CWT generalized):
+		▪	ψ_p(Q) = |p| ψ(pQ), ψ^p(Q) = φ(pQ)
+		▪	Ψ_p(ν) = Ψ(ν/p), Ψ^p(Q) = Φ(ν/p) 1/|p|
+		▪	1 = ∫ Ψ(ν/p)* Φ(ν/p) dp/|p| = ∫ Ψ(γ)* Φ(γ) dγ/|γ|
+		▪	Default:
+				φ = ψ:	Contiuous Wavelet Transform (CWT), with scale σ = 1/p and time offset τ = q.
+	―	Time-Scale Transforms as Time-Frequency with logarithmic frequency:
+		▪	ψ_p(Q) = |p| g(pQ) 1^{pQ}, ψ^p(Q) = h(pQ) 1^{pQ}
+		▪	Ψ^p(ν) = G_p(ν/p - 1), Ψ^p(ν) = H^p(ν/p - 1)/|p|
+		▪	1 = ∫ G_p(ν/p - 1)* H^p(ν/p - 1) dp/|p| = ∫ G_p(γ - 1)* H^p(γ - 1) dγ/|γ|
+		▪	Defaults:
+				h_p(Q) = δ(Q):		Generalized S-transform.
+				g_p(Q) = δ(Q):		Generalized Q transform? (Not sure.)
+	―	Time-Frequency Transforms (WFT generalized):
+		▪	ψ_p(Q) = g_p(Q) 1^{pQ}, ψ^p(Q) = h^p(Q) 1^{pQ}
+		▪	Ψ^p(ν) = G_p(ν - p), Ψ^p(ν) = H^p(ν - p)
+		▪	1 = ∫ G_p(ν - p)* H^p(ν - p) dp
+		▪	Defaults:
+			·	g_p = g, h_p = h:	Windowed Fourier transform (WFT generalized)
+			·	g_p = g = h = h_p:	Windowed Fourier transform

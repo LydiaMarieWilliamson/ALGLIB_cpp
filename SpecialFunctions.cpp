@@ -14,8 +14,11 @@
 #define InAlgLib
 #include "SpecialFunctions.h"
 
+static const double Eul = 0.5772156649015328606065, HalfPi = 1.57079632679489661923, Root2 = 1.41421356237309504880;
+
 // === GAMMAFUNC Package ===
 namespace alglib_impl {
+#if !defined ALGLIB_INTERCEPTS_SPECFUNCS
 static double gammafunc_gammastirf(double x) {
    double y;
    double w;
@@ -39,6 +42,7 @@ static double gammafunc_gammastirf(double x) {
    result = 2.50662827463100050242 * y * w;
    return result;
 }
+#endif
 
 // Gamma function
 //
@@ -58,8 +62,11 @@ static double gammafunc_gammastirf(double x) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
+// API: double gammafunction(const double x);
 double gammafunction(double x) {
-#ifndef ALGLIB_INTERCEPTS_SPECFUNCS
+#if defined ALGLIB_INTERCEPTS_SPECFUNCS
+   return _ialglib_i_gammafunction(x);
+#else
    double p;
    double pp;
    double q;
@@ -98,7 +105,7 @@ double gammafunction(double x) {
    }
    while (x < 0.0) {
       if (x > -0.000000001) {
-         result = z / ((1 + 0.5772156649015329 * x) * x);
+         result = z / ((1.0 + Eul * x) * x);
          return result;
       }
       z /= x;
@@ -106,7 +113,7 @@ double gammafunction(double x) {
    }
    while (x < 2.0) {
       if (x < 0.000000001) {
-         result = z / ((1 + 0.5772156649015329 * x) * x);
+         result = z / ((1.0 + Eul * x) * x);
          return result;
       }
       z /= x;
@@ -134,8 +141,6 @@ double gammafunction(double x) {
    qq = 1.00000000000000000320 + x * qq;
    result = z * pp / qq;
    return result;
-#else
-   return _ialglib_i_gammafunction(x);
 #endif
 }
 
@@ -169,8 +174,11 @@ double gammafunction(double x) {
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
+// API: double lngamma(const double x, double &sgngam);
 double lngamma(double x, double *sgngam) {
-#ifndef ALGLIB_INTERCEPTS_SPECFUNCS
+#if defined ALGLIB_INTERCEPTS_SPECFUNCS
+   return _ialglib_i_lngamma(x, sgngam);
+#else
    double a;
    double b;
    double c;
@@ -268,31 +276,11 @@ double lngamma(double x, double *sgngam) {
    }
    result = q;
    return result;
-#else
-   return _ialglib_i_lngamma(x, sgngam);
 #endif
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Gamma function
-//
-// Inputs:
-//     X   -   argument
-//
-// Domain:
-//     0 < X < 171.6
-//     -170 < X < 0, X is not an integer.
-//
-// Relative error:
-//  arithmetic   domain     # trials      peak         rms
-//     IEEE    -170,-33      20000       2.3e-15     3.3e-16
-//     IEEE     -33,  33     20000       9.4e-16     2.2e-16
-//     IEEE      33, 171.6   20000       2.3e-15     3.2e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
-// Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
 double gammafunction(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -301,36 +289,6 @@ double gammafunction(const double x) {
    return D;
 }
 
-// Natural logarithm of gamma function
-//
-// Inputs:
-//     X       -   argument
-//
-// Result:
-//     logarithm of the absolute value of the Gamma(X).
-//
-// Outputs:
-//     SgnGam  -   sign(Gamma(X))
-//
-// Domain:
-//     0 < X < 2.55e305
-//     -2.55e305 < X < 0, X is not an integer.
-//
-// ACCURACY:
-// arithmetic      domain        # trials     peak         rms
-//    IEEE    0, 3                 28000     5.4e-16     1.1e-16
-//    IEEE    2.718, 2.556e305     40000     3.5e-16     8.3e-17
-// The error criterion was relative when the function magnitude
-// was greater than one but absolute when it was less than one.
-//
-// The following test used the relative error criterion, though
-// at certain points the relative error could be much higher than
-// indicated.
-//    IEEE    -200, -4             10000     4.8e-16     1.3e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
-// Translated to AlgoPascal by Sergey Bochkanov (2005, 2006, 2007).
 double lngamma(const double x, double &sgngam) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -343,6 +301,32 @@ double lngamma(const double x, double &sgngam) {
 // === NORMALDISTR Package ===
 // Depends on: (AlgLibMisc) HQRND
 namespace alglib_impl {
+// Rationally-based approximation of erf(x) over x in (0.0, 0.5).
+static double erfr0(double x) {
+   double xx = x * x;
+   const double p13 = +0.007547728033418631287834, p11 = -0.288805137207594084924010;
+   const double p09 = +14.3383842191748205576712, p07 = +38.0140318123903008244444;
+   const double p05 = +3017.82788536507577809226, p03 = +7404.07142710151470082064, p01 = +80437.3630960840172832162;
+   double p = x * (p01 + xx * (p03 + xx * (p05 + xx * (p07 + xx * (p09 + xx * (p11 + xx * p13))))));
+   const double q8 = 38.0190713951939403753468, q6 = 658.070155459240506326937;
+   const double q4 = 6379.60017324428279487120, q2 = 34216.5257924628539769006, q0 = 80437.3630960840172826266;
+   double q = q0 + xx * (q2 + xx * (q4 + xx * (q6 + xx * (q8 + xx))));
+   return 1.1283791670955125738961589031 * p / q;
+}
+
+// Rationally-based approximation of erfc(x) over x in [0.5, 10.0).
+static double erfr1(double x) {
+   const double p7 = 0.5641877825507397413087057563, p6 = 9.675807882987265400604202961;
+   const double p5 = 77.08161730368428609781633646, p4 = 368.5196154710010637133875746, p3 = 1143.262070703886173606073338;
+   const double p2 = 2320.439590251635247384768711, p1 = 2898.0293292167655611275846, p0 = 1826.3348842295112592168999;
+   double p = p0 + x * (p1 + x * (p2 + x * (p3 + x * (p4 + x * (p5 + x * (p6 + x * p7))))));
+   const double q7 = 17.14980943627607849376131193, q6 = 137.1255960500622202878443578;
+   const double q5 = 661.7361207107653469211984771, q4 = 2094.384367789539593790281779, q3 = 4429.612803883682726711528526;
+   const double q2 = 6089.5424232724435504633068, q1 = 4958.82756472114071495438422, q0 = 1826.3348842295112595576438;
+   double q = q0 + x * (q1 + x * (q2 + x * (q3 + x * (q4 + x * (q5 + x * (q6 + x * (q7 + x)))))));
+   return exp(-(x * x)) * p / q;
+}
+
 // Error function
 //
 // The integral is
@@ -367,39 +351,12 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double errorfunction(const double x);
 double errorfunction(double x) {
-   double xsq;
-   double s;
-   double p;
-   double q;
-   double result;
-   s = (double)(ae_sign(x));
-   x = fabs(x);
-   if (x < 0.5) {
-      xsq = x * x;
-      p = 0.007547728033418631287834;
-      p = -0.288805137207594084924010 + xsq * p;
-      p = 14.3383842191748205576712 + xsq * p;
-      p = 38.0140318123903008244444 + xsq * p;
-      p = 3017.82788536507577809226 + xsq * p;
-      p = 7404.07142710151470082064 + xsq * p;
-      p = 80437.3630960840172832162 + xsq * p;
-      q = 0.0;
-      q = 1.00000000000000000000000 + xsq * q;
-      q = 38.0190713951939403753468 + xsq * q;
-      q = 658.070155459240506326937 + xsq * q;
-      q = 6379.60017324428279487120 + xsq * q;
-      q = 34216.5257924628539769006 + xsq * q;
-      q = 80437.3630960840172826266 + xsq * q;
-      result = s * 1.1283791670955125738961589031 * x * p / q;
-      return result;
-   }
-   if (x >= 10.0) {
-      result = s;
-      return result;
-   }
-   result = s * (1 - errorfunctionc(x));
-   return result;
+   if (x == 0.0) return 0.0;
+   else if (-0.5 < x && x < +0.5) return erfr0(x);
+   else if (-10.0 < x && x < +10.0) return x < 0.0 ? erfr1(-x) - 1.0 : 1.0 - erfr1(x);
+   else return x < 0.0 ? -1.0 : +1.0;
 }
 
 // Complementary error function
@@ -427,49 +384,12 @@ double errorfunction(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double errorfunctionc(const double x);
 double errorfunctionc(double x) {
-   double p;
-   double q;
-   double result;
-   if (x < 0.0) {
-      result = 2 - errorfunctionc(-x);
-      return result;
-   }
-   if (x < 0.5) {
-      result = 1.0 - errorfunction(x);
-      return result;
-   }
-   if (x >= 10.0) {
-      result = 0.0;
-      return result;
-   }
-   p = 0.0;
-   p = 0.5641877825507397413087057563 + x * p;
-   p = 9.675807882987265400604202961 + x * p;
-   p = 77.08161730368428609781633646 + x * p;
-   p = 368.5196154710010637133875746 + x * p;
-   p = 1143.262070703886173606073338 + x * p;
-   p = 2320.439590251635247384768711 + x * p;
-   p = 2898.0293292167655611275846 + x * p;
-   p = 1826.3348842295112592168999 + x * p;
-   q = 1.0;
-   q = 17.14980943627607849376131193 + x * q;
-   q = 137.1255960500622202878443578 + x * q;
-   q = 661.7361207107653469211984771 + x * q;
-   q = 2094.384367789539593790281779 + x * q;
-   q = 4429.612803883682726711528526 + x * q;
-   q = 6089.5424232724435504633068 + x * q;
-   q = 4958.82756472114071495438422 + x * q;
-   q = 1826.3348842295112595576438 + x * q;
-   result = exp(-ae_sqr(x)) * p / q;
-   return result;
-}
-
-// Same as normalcdf(), obsolete name.
-double normaldistribution(double x) {
-   double result;
-   result = 0.5 * (errorfunction(x / 1.41421356237309504880) + 1);
-   return result;
+   if (x == 0.0) return 1.0;
+   else if (-0.5 < x && x < +0.5) return 1.0 - erfr0(x);
+   else if (-10.0 < x && x < +10.0) return x < 0.0 ? 2.0 - erfr1(-x) : erfr1(x);
+   else return x < 0.0 ? 2.0 : 0.0;
 }
 
 // Normal distribution PDF
@@ -482,11 +402,10 @@ double normaldistribution(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double normalpdf(const double x);
 double normalpdf(double x) {
-   double result;
    ae_assert(isfinite(x), "NormalPDF: X is infinite");
-   result = exp(-x * x / 2) / sqrt(2 * ae_pi);
-   return result;
+   return exp(-x * x / 2) / sqrt(2 * ae_pi);
 }
 
 // Normal distribution CDF
@@ -517,27 +436,56 @@ double normalpdf(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double normalcdf(const double x);
 double normalcdf(double x) {
-   double result;
-   result = 0.5 * (errorfunction(x / 1.41421356237309504880) + 1);
-   return result;
+// return 0.5 * (errorfunction(x / Root2) + 1.0);
+   x /= Root2;
+   if (-0.5 < x && x < +0.5) return 0.5 * (erfr0(x) + 1.0);
+   else if (-10.0 < x && x < +10.0) return x < 0.0 ? 0.5 * erfr1(-x) : 1.0 - 0.5 * erfr1(x);
+   else return x < 0.0 ? 0.0 : +1.0;
 }
 
-// Inverse of the error function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-double inverf(double e) {
-   double result;
-   result = invnormaldistribution(0.5 * (e + 1)) / sqrt(2.0);
-   return result;
+// Same as normalcdf(), obsolete name.
+// API: double normaldistribution(const double x);
+double normaldistribution(double x) {
+   return normalcdf(x);
 }
 
-// Same as invnormalcdf(), deprecated name
-double invnormaldistribution(double y0) {
-   double result;
-   result = invnormalcdf(y0);
-   return result;
+double inverfr0(double y) {
+   const double s2pi = 2.50662827463100050242;
+   double yy = y * y;
+   const double p11 = -59.9633501014107895267, p09 = +98.0010754185999661536;
+   const double p07 = -56.6762857469070293439, p05 = +13.9312609387279679503, p03 = -1.23916583867381258016;
+   double p = y * yy * (p03 + yy * (p05 + yy * (p07 + yy * (p09 + yy * p11))));
+   const double q14 = +1.95448858338141759834, q12 = +4.67627912898881538453;
+   const double q10 = +86.3602421390890590575, q08 = -225.462687854119370527, q06 = +200.260212380060660359;
+   const double q04 = -82.0372256168333339912, q02 = +15.9056225126211695515, q00 = -1.18331621121330003142;
+   double q = q00 + yy * (q02 + yy * (q04 + yy * (q06 + yy * (q08 + yy * (q10 + yy * (q12 + yy * (q14 + yy)))))));
+   return (y + p / q) * s2pi;
+}
+
+double inverfr1(double z) {
+   const double p0 = +4.05544892305962419923, p1 = +31.5251094599893866154, p2 = +57.1628192246421288162;
+   const double p3 = +44.0805073893200834700, p4 = +14.6849561928858024014, p5 = +2.18663306850790267539;
+   const double p6 = -1.40256079171354495875 * 0.1, p7 = -3.50424626827848203418 * 0.01, p8 = -8.57456785154685413611 * 0.0001;
+   double p = z * (p8 + z * (p7 + z * (p6 + z * (p5 + z * (p4 + z * (p3 + z * (p2 + z * (p1 + z * p0))))))));
+   const double q2 = +15.7799883256466749731, q3 = +45.3907635128879210584, q4 = +41.3172038254672030440;
+   const double q5 = +15.0425385692907503408, q6 = +2.50464946208309415979, q7 = -1.42182922854787788574 * 0.1;
+   const double q8 = -3.80806407691578277194 * 0.01, q9 = -9.33259480895457427372 * 0.0001;
+   double q = q9 + z * (q8 + z * (q7 + z * (q6 + z * (q5 + z * (q4 + z * (q3 + z * (q2 + z)))))));
+   return p / q;
+}
+
+double inverfr2(double z) {
+   const double p0 = 3.23774891776946035970, p1 = 6.91522889068984211695, p2 = 3.93881025292474443415;
+   const double p3 = 1.33303460815807542389, p4 = 2.01485389549179081538 * 0.1, p5 = 1.23716634817820021358 * 0.01;
+   const double p6 = 3.01581553508235416007 * 0.0001, p7 = 2.65806974686737550832 * 0.000001, p8 = 6.23974539184983293730 * 0.000000001;
+   double p = z * (p8 + z * (p7 + z * (p6 + z * (p5 + z * (p4 + z * (p3 + z * (p2 + z * (p1 + z * p0))))))));
+   const double q2 = 6.02427039364742014255, q3 = 3.67983563856160859403, q4 = 1.37702099489081330271;
+   const double q5 = 2.16236993594496635890 * 0.1, q6 = 1.34204006088543189037 * 0.01, q7 = 3.28014464682127739104 * 0.0001;
+   const double q8 = 2.89247864745380683936 * 0.000001, q9 = 6.79019408009981274425 * 0.000000001;
+   double q = q9 + z * (q8 + z * (q7 + z * (q6 + z * (q5 + z * (q4 + z * (q3 + z * (q2 + z)))))));
+   return p / q;
 }
 
 // Inverse of Normal CDF
@@ -563,111 +511,31 @@ double invnormaldistribution(double y0) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double invnormalcdf(const double y0);
 double invnormalcdf(double y0) {
-   double expm2;
-   double s2pi;
-   double x;
-   double y;
-   double z;
-   double y2;
-   double x0;
-   double x1;
-   ae_int_t code;
-   double p0;
-   double q0;
-   double p1;
-   double q1;
-   double p2;
-   double q2;
-   double result;
-   expm2 = 0.13533528323661269189;
-   s2pi = 2.50662827463100050242;
-   if (y0 <= 0.0) {
-      result = -ae_maxrealnumber;
-      return result;
-   }
-   if (y0 >= 1.0) {
-      result = ae_maxrealnumber;
-      return result;
-   }
-   code = 1;
-   y = y0;
-   if (y > 1.0 - expm2) {
-      y = 1.0 - y;
-      code = 0;
-   }
-   if (y > expm2) {
-      y -= 0.5;
-      y2 = y * y;
-      p0 = -59.9633501014107895267;
-      p0 = 98.0010754185999661536 + y2 * p0;
-      p0 = -56.6762857469070293439 + y2 * p0;
-      p0 = 13.9312609387279679503 + y2 * p0;
-      p0 = -1.23916583867381258016 + y2 * p0;
-      q0 = 1.0;
-      q0 = 1.95448858338141759834 + y2 * q0;
-      q0 = 4.67627912898881538453 + y2 * q0;
-      q0 = 86.3602421390890590575 + y2 * q0;
-      q0 = -225.462687854119370527 + y2 * q0;
-      q0 = 200.260212380060660359 + y2 * q0;
-      q0 = -82.0372256168333339912 + y2 * q0;
-      q0 = 15.9056225126211695515 + y2 * q0;
-      q0 = -1.18331621121330003142 + y2 * q0;
-      x = y + y * y2 * p0 / q0;
-      x *= s2pi;
-      result = x;
-      return result;
-   }
-   x = sqrt(-2.0 * log(y));
-   x0 = x - log(x) / x;
-   z = 1.0 / x;
-   if (x < 8.0) {
-      p1 = 4.05544892305962419923;
-      p1 = 31.5251094599893866154 + z * p1;
-      p1 = 57.1628192246421288162 + z * p1;
-      p1 = 44.0805073893200834700 + z * p1;
-      p1 = 14.6849561928858024014 + z * p1;
-      p1 = 2.18663306850790267539 + z * p1;
-      p1 = -1.40256079171354495875 * 0.1 + z * p1;
-      p1 = -3.50424626827848203418 * 0.01 + z * p1;
-      p1 = -8.57456785154685413611 * 0.0001 + z * p1;
-      q1 = 1.0;
-      q1 = 15.7799883256466749731 + z * q1;
-      q1 = 45.3907635128879210584 + z * q1;
-      q1 = 41.3172038254672030440 + z * q1;
-      q1 = 15.0425385692907503408 + z * q1;
-      q1 = 2.50464946208309415979 + z * q1;
-      q1 = -1.42182922854787788574 * 0.1 + z * q1;
-      q1 = -3.80806407691578277194 * 0.01 + z * q1;
-      q1 = -9.33259480895457427372 * 0.0001 + z * q1;
-      x1 = z * p1 / q1;
-   } else {
-      p2 = 3.23774891776946035970;
-      p2 = 6.91522889068984211695 + z * p2;
-      p2 = 3.93881025292474443415 + z * p2;
-      p2 = 1.33303460815807542389 + z * p2;
-      p2 = 2.01485389549179081538 * 0.1 + z * p2;
-      p2 = 1.23716634817820021358 * 0.01 + z * p2;
-      p2 = 3.01581553508235416007 * 0.0001 + z * p2;
-      p2 = 2.65806974686737550832 * 0.000001 + z * p2;
-      p2 = 6.23974539184983293730 * 0.000000001 + z * p2;
-      q2 = 1.0;
-      q2 = 6.02427039364742014255 + z * q2;
-      q2 = 3.67983563856160859403 + z * q2;
-      q2 = 1.37702099489081330271 + z * q2;
-      q2 = 2.16236993594496635890 * 0.1 + z * q2;
-      q2 = 1.34204006088543189037 * 0.01 + z * q2;
-      q2 = 3.28014464682127739104 * 0.0001 + z * q2;
-      q2 = 2.89247864745380683936 * 0.000001 + z * q2;
-      q2 = 6.79019408009981274425 * 0.000000001 + z * q2;
-      x1 = z * p2 / q2;
-   }
-   x = x0 - x1;
-   if (code != 0) {
-      x = -x;
-   }
-   result = x;
-   return result;
+   const double expm2 = 0.13533528323661269189;
+   if (y0 <= 0.0) return -ae_maxrealnumber;
+   else if (y0 >= 1.0) return +ae_maxrealnumber;
+   ae_int_t sign = y0 <= expm2 ? -1 : y0 > 1.0 - expm2 ? +1 : 0;
+   if (sign == 0) return inverfr0(y0 - 0.5);
+   else if (sign > 0) y0 = 1.0 - y0;
+   double x = sqrt(-2.0 * log(y0));
+   return sign * (x - log(x) / x - (x < 8.0 ? inverfr1(1.0 / x) : inverfr2(1.0 / x)));
+}
+
+// Same as invnormalcdf(), deprecated name
+// API: double invnormaldistribution(const double y0);
+double invnormaldistribution(double y0) {
+   return invnormalcdf(y0);
+}
+
+// Inverse of the error function
+//
+// Cephes Math Library Release 2.8:  June, 2000
+// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
+// API: double inverf(const double e);
+double inverf(double e) {
+   return invnormaldistribution(0.5 * (e + 1)) / Root2;
 }
 
 // Bivariate normal PDF
@@ -684,6 +552,7 @@ double invnormalcdf(double y0) {
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
+// API: double bivariatenormalpdf(const double x, const double y, const double rho);
 double bivariatenormalpdf(double x, double y, double rho) {
    double onerho2;
    double result;
@@ -765,6 +634,7 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 //
 // This function won't fail as long as Rho is in (-1,+1) range.
 // ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
+// API: double bivariatenormalcdf(const double x, const double y, const double rho);
 double bivariatenormalcdf(double x, double y, double rho) {
    double rangea;
    double rangeb;
@@ -856,30 +726,6 @@ double bivariatenormalcdf(double x, double y, double rho) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Error function
-//
-// The integral is
-//
-//                           x
-//                            -
-//                 2         | |          2
-//   erf(x)  =  --------     |    exp( - t  ) dt.
-//              sqrt(pi)   | |
-//                          -
-//                           0
-//
-// For 0 <= |x| < 1, erf(x) = x * P4(x**2)/Q5(x**2); otherwise
-// erf(x) = 1 - erfc(x).
-//
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,1         30000       3.7e-16     1.0e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double errorfunction(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -888,31 +734,6 @@ double errorfunction(const double x) {
    return D;
 }
 
-// Complementary error function
-//
-//  1 - erf(x) =
-//
-//                           inf.
-//                             -
-//                  2         | |          2
-//   erfc(x)  =  --------     |    exp( - t  ) dt
-//               sqrt(pi)   | |
-//                           -
-//                            x
-//
-//
-// For small x, erfc(x) = 1 - erf(x); otherwise rational
-// approximations are computed.
-//
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,26.6417   30000       5.7e-14     1.5e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double errorfunctionc(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -921,25 +742,6 @@ double errorfunctionc(const double x) {
    return D;
 }
 
-// Same as normalcdf(), obsolete name.
-double normaldistribution(const double x) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::normaldistribution(x);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-// Normal distribution PDF
-//
-// Returns Gaussian probability density function:
-//
-//                1
-//    f(x)  = --------- * exp(-x^2/2)
-//            sqrt(2pi)
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double normalpdf(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -948,34 +750,6 @@ double normalpdf(const double x) {
    return D;
 }
 
-// Normal distribution CDF
-//
-// Returns the area under the Gaussian probability density
-// function, integrated from minus infinity to x:
-//
-//                            x
-//                             -
-//                   1        | |          2
-//    ndtr(x)  = ---------    |    exp( - t /2 ) dt
-//               sqrt(2pi)  | |
-//                           -
-//                          -inf.
-//
-//             =  ( 1 + erf(z) ) / 2
-//             =  erfc(z) / 2
-//
-// where z = x/sqrt(2). Computation is via the functions
-// erf and erfc.
-//
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE     -13,0        30000       3.4e-14     6.7e-15
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double normalcdf(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -984,50 +758,14 @@ double normalcdf(const double x) {
    return D;
 }
 
-// Inverse of the error function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
-double inverf(const double e) {
+double normaldistribution(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
-   double D = alglib_impl::inverf(e);
+   double D = alglib_impl::normaldistribution(x);
    alglib_impl::ae_state_clear();
    return D;
 }
 
-// Same as invnormalcdf(), deprecated name
-double invnormaldistribution(const double y0) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::invnormaldistribution(y0);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-// Inverse of Normal CDF
-//
-// Returns the argument, x, for which the area under the
-// Gaussian probability density function (integrated from
-// minus infinity to x) is equal to y.
-//
-//
-// For small arguments 0 < y < exp(-2), the program computes
-// z = sqrt( -2.0 * log(y) );  then the approximation is
-// x = z - log(z)/z  - (1/z) P(1/z) / Q(1/z).
-// There are two rational functions P/Q, one for 0 < y < exp(-32)
-// and the other for y up to exp(-2).  For larger arguments,
-// w = y - 0.5, and  x/sqrt(2pi) = w + w**3 R(w**2)/S(w**2)).
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain        # trials      peak         rms
-//    IEEE     0.125, 1        20000       7.2e-16     1.3e-16
-//    IEEE     3e-308, 0.135   50000       4.6e-16     9.8e-17
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double invnormalcdf(const double y0) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1036,20 +774,22 @@ double invnormalcdf(const double y0) {
    return D;
 }
 
-// Bivariate normal PDF
-//
-// Returns probability density function of the bivariate  Gaussian  with
-// correlation parameter equal to Rho:
-//
-//                          1              (    x^2 - 2*rho*x*y + y^2  )
-//     f(x,y,rho) = ----------------- * exp( - ----------------------- )
-//                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
-//
-//
-// with -1 < rho < +1 and arbitrary x, y.
-//
-// This function won't fail as long as Rho is in (-1,+1) range.
-// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
+double invnormaldistribution(const double y0) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::invnormaldistribution(y0);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+double inverf(const double e) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::inverf(e);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
 double bivariatenormalpdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1058,37 +798,6 @@ double bivariatenormalpdf(const double x, const double y, const double rho) {
    return D;
 }
 
-// Bivariate normal CDF
-//
-// Returns the area under the bivariate Gaussian  PDF  with  correlation
-// parameter equal to Rho, integrated from minus infinity to (x,y):
-//
-//
-//                                           x      y
-//                                           -      -
-//                             1            | |    | |
-//     bvn(x,y,rho) = -------------------   |      |   f(u,v,rho)*du*dv
-//                     2pi*sqrt(1-rho^2)  | |    | |
-//                                         -      -
-//                                        -INF   -INF
-//
-//
-// where
-//
-//                       (    u^2 - 2*rho*u*v + v^2  )
-//     f(u,v,rho)   = exp( - ----------------------- )
-//                       (        2*(1-rho^2)        )
-//
-//
-// with -1 < rho < +1 and arbitrary x, y.
-//
-// This subroutine uses high-precision approximation scheme proposed  by
-// Alan Genz in "Numerical  Computation  of  Rectangular  Bivariate  and
-// Trivariate Normal and  t  probabilities",  which  computes  CDF  with
-// absolute error roughly equal to 1e-14.
-//
-// This function won't fail as long as Rho is in (-1,+1) range.
-// ALGLIB: Copyright 15.11.2019 by Sergey Bochkanov
 double bivariatenormalcdf(const double x, const double y, const double rho) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1128,6 +837,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
+// API: double incompletegamma(const double a, const double x);
 double incompletegamma(double a, double x) {
    double igammaepsilon;
    double ans;
@@ -1194,6 +904,7 @@ double incompletegamma(double a, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
+// API: double incompletegammac(const double a, const double x);
 double incompletegammac(double a, double x) {
    double igammaepsilon;
    double igammabignumber;
@@ -1302,6 +1013,7 @@ double incompletegammac(double a, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double invincompletegammac(const double a, const double y0);
 double invincompletegammac(double a, double y0) {
    double igammaepsilon;
    double iinvgammabignumber;
@@ -1430,33 +1142,6 @@ double invincompletegammac(double a, double y0) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Incomplete gamma integral
-//
-// The function is defined by
-//
-//                           x
-//                            -
-//                   1       | |  -t  a-1
-//  igam(a,x)  =   -----     |   e   t   dt.
-//                  -      | |
-//                 | (a)    -
-//                           0
-//
-//
-// In this implementation both arguments must be positive.
-// The integral is evaluated by either a power series or
-// continued fraction expansion, depending on the relative
-// values of a and x.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,30       200000       3.6e-14     2.9e-15
-//    IEEE      0,100      300000       9.9e-14     1.5e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double incompletegamma(const double a, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1465,37 +1150,6 @@ double incompletegamma(const double a, const double x) {
    return D;
 }
 
-// Complemented incomplete gamma integral
-//
-// The function is defined by
-//
-//
-//  igamc(a,x)   =   1 - igam(a,x)
-//
-//                            inf.
-//                              -
-//                     1       | |  -t  a-1
-//               =   -----     |   e   t   dt.
-//                    -      | |
-//                   | (a)    -
-//                             x
-//
-//
-// In this implementation both arguments must be positive.
-// The integral is evaluated by either a power series or
-// continued fraction expansion, depending on the relative
-// values of a and x.
-//
-// ACCURACY:
-//
-// Tested at random a, x.
-//                a         x                      Relative error:
-// arithmetic   domain   domain     # trials      peak         rms
-//    IEEE     0.5,100   0,100      200000       1.9e-14     1.7e-15
-//    IEEE     0.01,0.5  0,100      200000       1.4e-13     1.6e-15
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double incompletegammac(const double a, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1504,40 +1158,6 @@ double incompletegammac(const double a, const double x) {
    return D;
 }
 
-// Inverse of complemented imcomplete gamma integral
-//
-// Given p, the function finds x such that
-//
-//  igamc( a, x ) = p.
-//
-// Starting with the approximate value
-//
-//         3
-//  x = a t
-//
-//  where
-//
-//  t = 1 - d - ndtri(p) sqrt(d)
-//
-// and
-//
-//  d = 1/9a,
-//
-// the routine performs up to 10 Newton iterations to find the
-// root of igamc(a,x) - p = 0.
-//
-// ACCURACY:
-//
-// Tested at random a, p in the intervals indicated.
-//
-//                a        p                      Relative error:
-// arithmetic   domain   domain     # trials      peak         rms
-//    IEEE     0.5,100   0,0.5       100000       1.0e-14     1.7e-15
-//    IEEE     0.01,0.5  0,0.5       100000       9.0e-14     3.4e-15
-//    IEEE    0.5,10000  0,0.5        20000       2.3e-13     3.8e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invincompletegammac(const double a, const double y0) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -1549,40 +1169,6 @@ double invincompletegammac(const double a, const double y0) {
 
 // === ELLIPTIC Package ===
 namespace alglib_impl {
-// Complete elliptic integral of the first kind
-//
-// Approximates the integral
-//
-//
-//
-//            pi/2
-//             -
-//            | |
-//            |           dt
-// K(m)  =    |    ------------------
-//            |                   2
-//          | |    sqrt( 1 - m sin t )
-//           -
-//            0
-//
-// using the approximation
-//
-//     P(x)  -  log x Q(x).
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0,1        30000       2.5e-16     6.8e-17
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-double ellipticintegralk(double m) {
-   double result;
-   result = ellipticintegralkhighprecision(1.0 - m);
-   return result;
-}
-
 // Complete elliptic integral of the first kind
 //
 // Approximates the integral
@@ -1617,6 +1203,7 @@ double ellipticintegralk(double m) {
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double ellipticintegralkhighprecision(const double m1);
 double ellipticintegralkhighprecision(double m1) {
    double p;
    double q;
@@ -1648,6 +1235,41 @@ double ellipticintegralkhighprecision(double m1) {
       q = q * m1 + 4.99999999999999999821E-1;
       result = p - q * log(m1);
    }
+   return result;
+}
+
+// Complete elliptic integral of the first kind
+//
+// Approximates the integral
+//
+//
+//
+//            pi/2
+//             -
+//            | |
+//            |           dt
+// K(m)  =    |    ------------------
+//            |                   2
+//          | |    sqrt( 1 - m sin t )
+//           -
+//            0
+//
+// using the approximation
+//
+//     P(x)  -  log x Q(x).
+//
+// ACCURACY:
+//
+//                      Relative error:
+// arithmetic   domain     # trials      peak         rms
+//    IEEE       0,1        30000       2.5e-16     6.8e-17
+//
+// Cephes Math Library, Release 2.8:  June, 2000
+// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double ellipticintegralk(const double m);
+double ellipticintegralk(double m) {
+   double result;
+   result = ellipticintegralkhighprecision(1.0 - m);
    return result;
 }
 
@@ -1683,13 +1305,13 @@ double ellipticintegralkhighprecision(double m1) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double incompleteellipticintegralk(const double phi, const double m);
 double incompleteellipticintegralk(double phi, double m) {
    double a;
    double b;
    double c;
    double e;
    double temp;
-   double pio2;
    double t;
    double k;
    ae_int_t d;
@@ -1697,23 +1319,22 @@ double incompleteellipticintegralk(double phi, double m) {
    ae_int_t s;
    ae_int_t npio2;
    double result;
-   pio2 = 1.57079632679489661923;
    if (m == 0.0) {
       result = phi;
       return result;
    }
    a = 1 - m;
    if (a == 0.0) {
-      result = log(tan(0.5 * (pio2 + phi)));
+      result = log(tan(0.5 * (HalfPi + phi)));
       return result;
    }
-   npio2 = FloorZ(phi / pio2);
+   npio2 = FloorZ(phi / HalfPi);
    if (npio2 % 2 != 0) {
       npio2++;
    }
    if (npio2 != 0) {
       k = ellipticintegralk(1 - a);
-      phi -= npio2 * pio2;
+      phi -= npio2 * HalfPi;
    } else {
       k = 0.0;
    }
@@ -1747,7 +1368,7 @@ double incompleteellipticintegralk(double phi, double m) {
    while (!SmallAtR(c / a, ae_machineepsilon)) {
       temp = b / a;
       phi += atan(t * temp) + md * ae_pi;
-      md = TruncZ((phi + pio2) / ae_pi);
+      md = TruncZ((phi + HalfPi) / ae_pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -1788,6 +1409,7 @@ double incompleteellipticintegralk(double phi, double m) {
 //
 // Cephes Math Library, Release 2.8: June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double ellipticintegrale(const double m);
 double ellipticintegrale(double m) {
    double p;
    double q;
@@ -1851,8 +1473,8 @@ double ellipticintegrale(double m) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1993, 2000 by Stephen L. Moshier
+// API: double incompleteellipticintegrale(const double phi, const double m);
 double incompleteellipticintegrale(double phi, double m) {
-   double pio2;
    double a;
    double b;
    double c;
@@ -1866,17 +1488,16 @@ double incompleteellipticintegrale(double phi, double m) {
    ae_int_t npio2;
    ae_int_t s;
    double result;
-   pio2 = 1.57079632679489661923;
    if (m == 0.0) {
       result = phi;
       return result;
    }
    lphi = phi;
-   npio2 = FloorZ(lphi / pio2);
+   npio2 = FloorZ(lphi / HalfPi);
    if (npio2 % 2 != 0) {
       npio2++;
    }
-   lphi -= npio2 * pio2;
+   lphi -= npio2 * HalfPi;
    if (lphi < 0.0) {
       lphi = -lphi;
       s = -1;
@@ -1919,7 +1540,7 @@ double incompleteellipticintegrale(double phi, double m) {
    while (!SmallAtR(c / a, ae_machineepsilon)) {
       temp = b / a;
       lphi += atan(t * temp) + md * ae_pi;
-      md = TruncZ((lphi + pio2) / ae_pi);
+      md = TruncZ((lphi + HalfPi) / ae_pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -1940,76 +1561,6 @@ double incompleteellipticintegrale(double phi, double m) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Complete elliptic integral of the first kind
-//
-// Approximates the integral
-//
-//
-//
-//            pi/2
-//             -
-//            | |
-//            |           dt
-// K(m)  =    |    ------------------
-//            |                   2
-//          | |    sqrt( 1 - m sin t )
-//           -
-//            0
-//
-// using the approximation
-//
-//     P(x)  -  log x Q(x).
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0,1        30000       2.5e-16     6.8e-17
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-double ellipticintegralk(const double m) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::ellipticintegralk(m);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-// Complete elliptic integral of the first kind
-//
-// Approximates the integral
-//
-//
-//
-//            pi/2
-//             -
-//            | |
-//            |           dt
-// K(m)  =    |    ------------------
-//            |                   2
-//          | |    sqrt( 1 - m sin t )
-//           -
-//            0
-//
-// where m = 1 - m1, using the approximation
-//
-//     P(x)  -  log x Q(x).
-//
-// The argument m1 is used rather than m so that the logarithmic
-// singularity at m = 1 will be shifted to the origin; this
-// preserves maximum accuracy.
-//
-// K(0) = pi/2.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0,1        30000       2.5e-16     6.8e-17
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double ellipticintegralkhighprecision(const double m1) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2018,38 +1569,14 @@ double ellipticintegralkhighprecision(const double m1) {
    return D;
 }
 
-// Incomplete elliptic integral of the first kind F(phi|m)
-//
-// Approximates the integral
-//
-//
-//
-//                phi
-//                 -
-//                | |
-//                |           dt
-// F(phi_\m)  =    |    ------------------
-//                |                   2
-//              | |    sqrt( 1 - m sin t )
-//               -
-//                0
-//
-// of amplitude phi and modulus m, using the arithmetic -
-// geometric mean algorithm.
-//
-//
-//
-//
-// ACCURACY:
-//
-// Tested at random points with m in [0, 1] and phi as indicated.
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE     -10,10       200000      7.4e-16     1.0e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
+double ellipticintegralk(const double m) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::ellipticintegralk(m);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
 double incompleteellipticintegralk(const double phi, const double m) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2058,31 +1585,6 @@ double incompleteellipticintegralk(const double phi, const double m) {
    return D;
 }
 
-// Complete elliptic integral of the second kind
-//
-// Approximates the integral
-//
-//
-//            pi/2
-//             -
-//            | |                 2
-// E(m)  =    |    sqrt( 1 - m sin t ) dt
-//          | |
-//           -
-//            0
-//
-// using the approximation
-//
-//      P(x)  -  x log x Q(x).
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0, 1       10000       2.1e-16     7.3e-17
-//
-// Cephes Math Library, Release 2.8: June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double ellipticintegrale(const double m) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2091,34 +1593,6 @@ double ellipticintegrale(const double m) {
    return D;
 }
 
-// Incomplete elliptic integral of the second kind
-//
-// Approximates the integral
-//
-//
-//                phi
-//                 -
-//                | |
-//                |                   2
-// E(phi_\m)  =    |    sqrt( 1 - m sin t ) dt
-//                |
-//              | |
-//               -
-//                0
-//
-// of amplitude phi and modulus m, using the arithmetic -
-// geometric mean algorithm.
-//
-// ACCURACY:
-//
-// Tested at random arguments with phi in [-10, 10] and m in
-// [0, 1].
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE     -10,10      150000       3.3e-15     1.4e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1993, 2000 by Stephen L. Moshier
 double incompleteellipticintegrale(const double phi, const double m) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2138,6 +1612,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Hermite polynomial Hn at x
+// API: double hermitecalculate(const ae_int_t n, const double x);
 double hermitecalculate(ae_int_t n, double x) {
    ae_int_t i;
    double a;
@@ -2176,6 +1651,7 @@ double hermitecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Hermite polynomial at x
+// API: double hermitesum(const real_1d_array &c, const ae_int_t n, const double x);
 double hermitesum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
@@ -2199,6 +1675,7 @@ double hermitesum(RVector *c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
+// API: void hermitecoefficients(const ae_int_t n, real_1d_array &c);
 void hermitecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
@@ -2214,14 +1691,6 @@ void hermitecoefficients(ae_int_t n, RVector *c) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Calculation of the value of the Hermite polynomial.
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Hermite polynomial Hn at x
 double hermitecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2230,17 +1699,6 @@ double hermitecalculate(const ae_int_t n, const double x) {
    return D;
 }
 
-// Summation of Hermite polynomials using Clenshaw's recurrence formula.
-//
-// This routine calculates
-//     c[0]*H0(x) + c[1]*H1(x) + ... + c[N]*HN(x)
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Hermite polynomial at x
 double hermitesum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2249,13 +1707,6 @@ double hermitesum(const real_1d_array &c, const ae_int_t n, const double x) {
    return D;
 }
 
-// Representation of Hn as C[0] + C[1]*X + ... + C[N]*X^N
-//
-// Inputs:
-//     N   -   polynomial degree, n >= 0
-//
-// Outputs:
-//     C   -   coefficients
 void hermitecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -2289,6 +1740,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double dawsonintegral(const double x);
 double dawsonintegral(double x) {
    double x2;
    double y;
@@ -2382,29 +1834,6 @@ double dawsonintegral(double x) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Dawson's Integral
-//
-// Approximates the integral
-//
-//                             x
-//                             -
-//                      2     | |        2
-//  dawsn(x)  =  exp( -x  )   |    exp( t  ) dt
-//                          | |
-//                           -
-//                           0
-//
-// Three different rational approximations are employed, for
-// the intervals 0 to 3.25; 3.25 to 6.25; and 6.25 up.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,10        10000       6.9e-16     1.0e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double dawsonintegral(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -2453,163 +1882,86 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.1:  January, 1989
 // Copyright 1984, 1987, 1989 by Stephen L. Moshier
+// API: void sinecosineintegrals(const double x, double &si, double &ci);
 void sinecosineintegrals(double x, double *si, double *ci) {
-   double z;
-   double c;
-   double s;
-   double f;
-   double g;
-   ae_int_t sg;
-   double sn;
-   double sd;
-   double cn;
-   double cd;
-   double fn;
-   double fd;
-   double gn;
-   double gd;
    *si = 0;
    *ci = 0;
-   if (x < 0.0) {
-      sg = -1;
-      x = -x;
-   } else {
-      sg = 0;
-   }
+   bool neg = x < 0.0;
+   if (neg) x = -x;
    if (x == 0.0) {
       *si = 0.0;
       *ci = -ae_maxrealnumber;
       return;
-   }
-   if (x > 1.0E9) {
-      *si = 1.570796326794896619 - cos(x) / x;
+   } else if (x > 1.0E9) {
+      *si = HalfPi - cos(x) / x;
       *ci = sin(x) / x;
       return;
-   }
-   if (x <= 4.0) {
-      z = x * x;
-      sn = -8.39167827910303881427E-11;
-      sn = sn * z + 4.62591714427012837309E-8;
-      sn = sn * z - 9.75759303843632795789E-6;
-      sn = sn * z + 9.76945438170435310816E-4;
-      sn = sn * z - 4.13470316229406538752E-2;
-      sn = sn * z + 1.00000000000000000302E0;
-      sd = 2.03269266195951942049E-12;
-      sd = sd * z + 1.27997891179943299903E-9;
-      sd = sd * z + 4.41827842801218905784E-7;
-      sd = sd * z + 9.96412122043875552487E-5;
-      sd = sd * z + 1.42085239326149893930E-2;
-      sd = sd * z + 9.99999999999999996984E-1;
-      s = x * sn / sd;
-      cn = 2.02524002389102268789E-11;
-      cn = cn * z - 1.35249504915790756375E-8;
-      cn = cn * z + 3.59325051419993077021E-6;
-      cn = cn * z - 4.74007206873407909465E-4;
-      cn = cn * z + 2.89159652607555242092E-2;
-      cn = cn * z - 1.00000000000000000080E0;
-      cd = 4.07746040061880559506E-12;
-      cd = cd * z + 3.06780997581887812692E-9;
-      cd = cd * z + 1.23210355685883423679E-6;
-      cd = cd * z + 3.17442024775032769882E-4;
-      cd = cd * z + 5.10028056236446052392E-2;
-      cd = cd * z + 4.00000000000000000080E0;
-      c = z * cn / cd;
-      if (sg != 0) {
-         s = -s;
-      }
+   } else if (x <= 4.0) {
+      double xx = x * x;
+      const double sn11 = -8.39167827910303881427E-11, sn09 = +4.62591714427012837309E-8, sn07 = -9.75759303843632795789E-6;
+      const double sn05 = +9.76945438170435310816E-4, sn03 = -4.13470316229406538752E-2, sn01 = +1.00000000000000000302E0;
+      double sn = (((((sn11 * xx + sn09) * xx + sn07) * xx + sn05) * xx + sn03) * xx + sn01) * x;
+      const double sd10 = +2.03269266195951942049E-12, sd08 = +1.27997891179943299903E-9, sd06 = +4.41827842801218905784E-7;
+      const double sd04 = +9.96412122043875552487E-5, sd02 = +1.42085239326149893930E-2, sd00 = +9.99999999999999996984E-1;
+      double sd = ((((sd10 * xx + sd08) * xx + sd06) * xx + sd04) * xx + sd02) * xx + sd00;
+      double s = sn / sd;
+      const double cn12 = +2.02524002389102268789E-11, cn10 = -1.35249504915790756375E-8, cn08 = +3.59325051419993077021E-6;
+      const double cn06 = -4.74007206873407909465E-4, cn04 = +2.89159652607555242092E-2, cn02 = -1.00000000000000000080E0;
+      double cn = (((((cn12 * xx + cn10) * xx + cn08) * xx + cn06) * xx + cn04) * xx + cn02) * xx;
+      const double cd10 = +4.07746040061880559506E-12, cd08 = +3.06780997581887812692E-9, cd06 = +1.23210355685883423679E-6;
+      const double cd04 = +3.17442024775032769882E-4, cd02 = +5.10028056236446052392E-2, cd00 = +4.00000000000000000080E0;
+      double cd = ((((cd10 * xx + cd08) * xx + cd06) * xx + cd04) * xx + cd02) * xx + cd00;
+      double c = cn / cd;
+      if (neg) s = -s;
       *si = s;
-      *ci = 0.57721566490153286061 + log(x) + c;
+      *ci = Eul + log(x) + c;
       return;
    }
-   s = sin(x);
-   c = cos(x);
-   z = 1.0 / (x * x);
+   double s = sin(x), c = cos(x);
+   double w = 1.0 / x, ww = 1.0 / (x * x);
+   double f, g;
    if (x < 8.0) {
-      fn = 4.23612862892216586994E0;
-      fn = fn * z + 5.45937717161812843388E0;
-      fn = fn * z + 1.62083287701538329132E0;
-      fn = fn * z + 1.67006611831323023771E-1;
-      fn = fn * z + 6.81020132472518137426E-3;
-      fn = fn * z + 1.08936580650328664411E-4;
-      fn = fn * z + 5.48900223421373614008E-7;
-      fd = 1.00000000000000000000E0;
-      fd = fd * z + 8.16496634205391016773E0;
-      fd = fd * z + 7.30828822505564552187E0;
-      fd = fd * z + 1.86792257950184183883E0;
-      fd = fd * z + 1.78792052963149907262E-1;
-      fd = fd * z + 7.01710668322789753610E-3;
-      fd = fd * z + 1.10034357153915731354E-4;
-      fd = fd * z + 5.48900252756255700982E-7;
-      f = fn / (x * fd);
-      gn = 8.71001698973114191777E-2;
-      gn = gn * z + 6.11379109952219284151E-1;
-      gn = gn * z + 3.97180296392337498885E-1;
-      gn = gn * z + 7.48527737628469092119E-2;
-      gn = gn * z + 5.38868681462177273157E-3;
-      gn = gn * z + 1.61999794598934024525E-4;
-      gn = gn * z + 1.97963874140963632189E-6;
-      gn = gn * z + 7.82579040744090311069E-9;
-      gd = 1.00000000000000000000E0;
-      gd = gd * z + 1.64402202413355338886E0;
-      gd = gd * z + 6.66296701268987968381E-1;
-      gd = gd * z + 9.88771761277688796203E-2;
-      gd = gd * z + 6.22396345441768420760E-3;
-      gd = gd * z + 1.73221081474177119497E-4;
-      gd = gd * z + 2.02659182086343991969E-6;
-      gd = gd * z + 7.82579218933534490868E-9;
-      g = z * gn / gd;
+      const double fn01 = 4.23612862892216586994E0, fn03 = 5.45937717161812843388E0, fn05 = 1.62083287701538329132E0;
+      const double fn07 = 1.67006611831323023771E-1, fn09 = 6.81020132472518137426E-3;
+      const double fn11 = 1.08936580650328664411E-4, fn13 = 5.48900223421373614008E-7;
+      double fn = ((((((fn01 * ww + fn03) * ww + fn05) * ww + fn07) * ww + fn09) * ww + fn11) * ww + fn13) * w;
+      const double fd00 = 8.16496634205391016773E0, fd02 = 7.30828822505564552187E0, fd04 = 1.86792257950184183883E0;
+      const double fd06 = 1.78792052963149907262E-1, fd08 = 7.01710668322789753610E-3;
+      const double fd10 = 1.10034357153915731354E-4, fd12 = 5.48900252756255700982E-7;
+      double fd = ((((((ww + fd00) * ww + fd02) * ww + fd04) * ww + fd06) * ww + fd08) * ww + fd10) * ww + fd12;
+      f = fn / fd;
+      const double gn00 = 8.71001698973114191777E-2, gn02 = 6.11379109952219284151E-1, gn04 = 3.97180296392337498885E-1;
+      const double gn06 = 7.48527737628469092119E-2, gn08 = 5.38868681462177273157E-3, gn10 = 1.61999794598934024525E-4;
+      const double gn12 = 1.97963874140963632189E-6, gn14 = 7.82579040744090311069E-9, gn16 = 1.00000000000000000000E0;
+      double gn = (((((((gn00 * ww + gn02) * ww + gn04) * ww + gn06) * ww + gn08) * ww + gn10) * ww + gn12) * ww + gn14) * ww;
+      const double gd04 = 1.64402202413355338886E0, gd06 = 6.66296701268987968381E-1, gd08 = 9.88771761277688796203E-2;
+      const double gd10 = 6.22396345441768420760E-3, gd12 = 1.73221081474177119497E-4;
+      const double gd14 = 2.02659182086343991969E-6, gd16 = 7.82579218933534490868E-9;
+      double gd = ((((((ww + gd04) * ww + gd06) * ww + gd08) * ww + gd10) * ww + gd12) * ww + gd14) * ww + gd16;
+      g = gn / gd;
    } else {
-      fn = 4.55880873470465315206E-1;
-      fn = fn * z + 7.13715274100146711374E-1;
-      fn = fn * z + 1.60300158222319456320E-1;
-      fn = fn * z + 1.16064229408124407915E-2;
-      fn = fn * z + 3.49556442447859055605E-4;
-      fn = fn * z + 4.86215430826454749482E-6;
-      fn = fn * z + 3.20092790091004902806E-8;
-      fn = fn * z + 9.41779576128512936592E-11;
-      fn = fn * z + 9.70507110881952024631E-14;
-      fd = 1.00000000000000000000E0;
-      fd = fd * z + 9.17463611873684053703E-1;
-      fd = fd * z + 1.78685545332074536321E-1;
-      fd = fd * z + 1.22253594771971293032E-2;
-      fd = fd * z + 3.58696481881851580297E-4;
-      fd = fd * z + 4.92435064317881464393E-6;
-      fd = fd * z + 3.21956939101046018377E-8;
-      fd = fd * z + 9.43720590350276732376E-11;
-      fd = fd * z + 9.70507110881952025725E-14;
-      f = fn / (x * fd);
-      gn = 6.97359953443276214934E-1;
-      gn = gn * z + 3.30410979305632063225E-1;
-      gn = gn * z + 3.84878767649974295920E-2;
-      gn = gn * z + 1.71718239052347903558E-3;
-      gn = gn * z + 3.48941165502279436777E-5;
-      gn = gn * z + 3.47131167084116673800E-7;
-      gn = gn * z + 1.70404452782044526189E-9;
-      gn = gn * z + 3.85945925430276600453E-12;
-      gn = gn * z + 3.14040098946363334640E-15;
-      gd = 1.00000000000000000000E0;
-      gd = gd * z + 1.68548898811011640017E0;
-      gd = gd * z + 4.87852258695304967486E-1;
-      gd = gd * z + 4.67913194259625806320E-2;
-      gd = gd * z + 1.90284426674399523638E-3;
-      gd = gd * z + 3.68475504442561108162E-5;
-      gd = gd * z + 3.57043223443740838771E-7;
-      gd = gd * z + 1.72693748966316146736E-9;
-      gd = gd * z + 3.87830166023954706752E-12;
-      gd = gd * z + 3.14040098946363335242E-15;
-      g = z * gn / gd;
+      const double fn00 = 4.55880873470465315206E-1, fn02 = 7.13715274100146711374E-1, fn04 = 1.60300158222319456320E-1;
+      const double fn06 = 1.16064229408124407915E-2, fn08 = 3.49556442447859055605E-4, fn10 = 4.86215430826454749482E-6;
+      const double fn12 = 3.20092790091004902806E-8, fn14 = 9.41779576128512936592E-11, fn16 = 9.70507110881952024631E-14;
+      double fn = ((((((((fn00 * ww + fn02) * ww + fn04) * ww + fn06) * ww + fn08) * ww + fn10) * ww + fn12) * ww + fn14) * ww + fn16) * w;
+      const double fd03 = 9.17463611873684053703E-1, fd05 = 1.78685545332074536321E-1, fd07 = 1.22253594771971293032E-2;
+      const double fd09 = 3.58696481881851580297E-4, fd11 = 4.92435064317881464393E-6, fd13 = 3.21956939101046018377E-8;
+      const double fd15 = 9.43720590350276732376E-11, fd17 = 9.70507110881952025725E-14;
+      double fd = (((((((ww + fd03) * ww + fd05) * ww + fd07) * ww + fd09) * ww + fd11) * ww + fd13) * ww + fd15) * ww + fd17;
+      f = fn / fd;
+      const double gn00 = 6.97359953443276214934E-1, gn02 = 3.30410979305632063225E-1, gn04 = 3.84878767649974295920E-2;
+      const double gn06 = 1.71718239052347903558E-3, gn08 = 3.48941165502279436777E-5, gn10 = 3.47131167084116673800E-7;
+      const double gn12 = 1.70404452782044526189E-9, gn14 = 3.85945925430276600453E-12, gn16 = 3.14040098946363334640E-15;
+      double gn = ((((((((gn00 * ww + gn02) * ww + gn04) * ww + gn06) * ww + gn08) * ww + gn10) * ww + gn12) * ww + gn14) * ww + gn16) * ww;
+      const double gd02 = 1.68548898811011640017E0, gd04 = 4.87852258695304967486E-1, gd06 = 4.67913194259625806320E-2;
+      const double gd08 = 1.90284426674399523638E-3, gd10 = 3.68475504442561108162E-5, gd12 = 3.57043223443740838771E-7;
+      const double gd14 = 1.72693748966316146736E-9, gd16 = 3.87830166023954706752E-12, gd18 = 3.14040098946363335242E-15;
+      double gd = ((((((((ww + gd02) * ww + gd04) * ww + gd06) * ww + gd08) * ww + gd10) * ww + gd12) * ww + gd14) * ww + gd16) * ww + gd18;
+      g = gn / gd;
    }
-   *si = 1.570796326794896619 - f * c - g * s;
-   if (sg != 0) {
-      *si = -*si;
-   }
+   *si = HalfPi - f * c - g * s;
+   if (neg) *si = -*si;
    *ci = f * s - g * c;
-}
-
-static void trigintegrals_chebiterationshichi(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
 }
 
 // Hyperbolic sine and cosine integrals
@@ -2650,35 +2002,20 @@ static void trigintegrals_chebiterationshichi(double x, double c, double *b0, do
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi);
 void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
-   double k;
-   double z;
-   double c;
-   double s;
-   double a;
-   ae_int_t sg;
-   double b0;
-   double b1;
-   double b2;
-   *shi = 0;
-   *chi = 0;
-   if (x < 0.0) {
-      sg = -1;
-      x = -x;
-   } else {
-      sg = 0;
-   }
+   ae_int_t neg = x < 0.0;
+   if (neg) x = -x;
    if (x == 0.0) {
       *shi = 0.0;
       *chi = -ae_maxrealnumber;
       return;
    }
+   double s, c;
    if (x < 8.0) {
-      z = x * x;
-      a = 1.0;
+      double z = x * x, k = 2.0, a = 1.0;
       s = 1.0;
       c = 0.0;
-      k = 2.0;
       do {
          a = a * z / k;
          c += a / k;
@@ -2688,171 +2025,89 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
          k++;
       } while (!SmallR(a / s, ae_machineepsilon));
       s *= x;
+      c += Eul + log(x);
+   } else if (x < 18.0) {
+      double k = exp(x) / x, a = (576.0 / x - 52.0) / 10.0;
+      const double s21 = +1.83889230173399459482E-17, s20 = -9.55485532279655569575E-17;
+      const double s19 = +2.04326105980879882648E-16, s18 = +1.09896949074905343022E-15;
+      const double s17 = -1.31313534344092599234E-14, s16 = +5.93976226264314278932E-14, s15 = -3.47197010497749154755E-14;
+      const double s14 = -1.40059764613117131000E-12, s13 = +9.49044626224223543299E-12, s12 = -1.61596181145435454033E-11;
+      const double s11 = -1.77899784436430310321E-10, s10 = +1.35455469767246947469E-9, s09 = -1.03257121792819495123E-9;
+      const double s08 = -3.56699611114982536845E-8, s07 = +1.44818877384267342057E-7, s06 = +7.82018215184051295296E-7;
+      const double s05 = -5.39919118403805073710E-6, s04 = -3.12458202168959833422E-5, s03 = +8.90136741950727517826E-5;
+      const double s02 = +2.02558474743846862168E-3, s01 = +2.96064440855633256972E-2, s00 = +1.11847751047257036625E0;
+      double b0 = s21, b2 = a*b0 + s20, b1 = a*b2 - b0 + s19;
+      b0 = a*b1 - b2 + s18;
+      b2 = a*b0 - b1 + s17, b1 = a*b2 - b0 + s16, b0 = a*b1 - b2 + s15;
+      b2 = a*b0 - b1 + s14, b1 = a*b2 - b0 + s13, b0 = a*b1 - b2 + s12;
+      b2 = a*b0 - b1 + s11, b1 = a*b2 - b0 + s10, b0 = a*b1 - b2 + s09;
+      b2 = a*b0 - b1 + s08, b1 = a*b2 - b0 + s07, b0 = a*b1 - b2 + s06;
+      b2 = a*b0 - b1 + s05, b1 = a*b2 - b0 + s04, b0 = a*b1 - b2 + s03;
+      b2 = a*b0 - b1 + s02, b1 = a*b2 - b0 + s01, b0 = a*b1 - b2 + s00;
+      s = k * 0.5 * (b0 - b2);
+      const double c22 = -8.12435385225864036372E-18, c21 = +2.17586413290339214377E-17;
+      const double c20 = +5.22624394924072204667E-17, c19 = -9.48812110591690559363E-16, c18 = +5.35546311647465209166E-15;
+      const double c17 = -1.21009970113732918701E-14, c16 = -6.00865178553447437951E-14, c15 = +7.16339649156028587775E-13;
+      const double c14 = -2.93496072607599856104E-12, c13 = -1.40359438136491256904E-12, c12 = +8.76302288609054966081E-11;
+      const double c11 = -4.40092476213282340617E-10, c10 = -1.87992075640569295479E-10, c09 = +1.31458150989474594064E-8;
+      const double c08 = -4.75513930924765465590E-8, c07 = -2.21775018801848880741E-7, c06 = +1.94635531373272490962E-6;
+      const double c05 = +4.33505889257316408893E-6, c04 = -6.13387001076494349496E-5, c03 = -3.13085477492997465138E-4;
+      const double c02 = +4.97164789823116062801E-4, c01 = +2.64347496031374526641E-2, c00 = +1.11446150876699213025E0;
+      b1 = c22, b0 = a*b1 + c21;
+      b2 = a*b0 - b1 + c20, b1 = a*b2 - b0 + c19, b0 = a*b1 - b2 + c18;
+      b2 = a*b0 - b1 + c17, b1 = a*b2 - b0 + c16, b0 = a*b1 - b2 + c15;
+      b2 = a*b0 - b1 + c14, b1 = a*b2 - b0 + c13, b0 = a*b1 - b2 + c12;
+      b2 = a*b0 - b1 + c11, b1 = a*b2 - b0 + c10, b0 = a*b1 - b2 + c09;
+      b2 = a*b0 - b1 + c08, b1 = a*b2 - b0 + c07, b0 = a*b1 - b2 + c06;
+      b2 = a*b0 - b1 + c05, b1 = a*b2 - b0 + c04, b0 = a*b1 - b2 + c03;
+      b2 = a*b0 - b1 + c02, b1 = a*b2 - b0 + c01, b0 = a*b1 - b2 + c00;
+      c = Eul + log(x) + k * 0.5 * (b0 - b2);
+   } else if (x <= 88.0) {
+      double k = exp(x) / x, a = (6336.0 / x - 212.0) / 70.0;
+      const double s22 = -1.05311574154850938805E-17, s21 = +2.62446095596355225821E-17;
+      const double s20 = +8.82090135625368160657E-17, s19 = -3.38459811878103047136E-16, s18 = -8.30608026366935789136E-16;
+      const double s17 = +3.93397875437050071776E-15, s16 = +1.01765565969729044505E-14, s15 = -4.21128170307640802703E-14;
+      const double s14 = -1.60818204519802480035E-13, s13 = +3.34714954175994481761E-13, s12 = +2.72600352129153073807E-12;
+      const double s11 = +1.66894954752839083608E-12, s10 = -3.49278141024730899554E-11, s09 = -1.58580661666482709598E-10;
+      const double s08 = -1.79289437183355633342E-10, s07 = +1.76281629144264523277E-9, s06 = +1.69050228879421288846E-8;
+      const double s05 = +1.25391771228487041649E-7, s04 = +1.16229947068677338732E-6, s03 = +1.61038260117376323993E-5;
+      const double s02 = +3.49810375601053973070E-4, s01 = +1.28478065259647610779E-2, s00 = +1.03665722588798326712E0;
+      double b1 = s22, b0 = a*b1 + s21, b2 = a*b0 - b1 + s20;
+      b1 = a*b2 - b0 + s19, b0 = a*b1 - b2 + s18;
+      b2 = a*b0 - b1 + s17, b1 = a*b2 - b0 + s16, b0 = a*b1 - b2 + s15;
+      b2 = a*b0 - b1 + s14, b1 = a*b2 - b0 + s13, b0 = a*b1 - b2 + s12;
+      b2 = a*b0 - b1 + s11, b1 = a*b2 - b0 + s10, b0 = a*b1 - b2 + s09;
+      b2 = a*b0 - b1 + s08, b1 = a*b2 - b0 + s07, b0 = a*b1 - b2 + s06;
+      b2 = a*b0 - b1 + s05, b1 = a*b2 - b0 + s04, b0 = a*b1 - b2 + s03;
+      b2 = a*b0 - b1 + s02, b1 = a*b2 - b0 + s01, b0 = a*b1 - b2 + s00;
+      s = k * 0.5 * (b0 - b2);
+      const double c23 = 8.06913408255155572081E-18, c22 = -2.08074168180148170312E-17, c21 = -5.98111329658272336816E-17;
+      const double c20 = +2.68533951085945765591E-16, c19 = +4.52313941698904694774E-16, c18 = -3.10734917335299464535E-15;
+      const double c17 = -4.42823207332531972288E-15, c16 = +3.49639695410806959872E-14, c15 = +6.63406731718911586609E-14;
+      const double c14 = -3.71902448093119218395E-13, c13 = -1.27135418132338309016E-12, c12 = +2.74851141935315395333E-12;
+      const double c11 = +2.33781843985453438400E-11, c10 = +2.71436006377612442764E-11, c09 = -2.56600180000355990529E-10;
+      const double c08 = -1.61021375163803438552E-9, c07 = -4.72543064876271773512E-9, c06 = -3.00095178028681682282E-9;
+      const double c05 = +7.79387474390914922337E-8, c04 = +1.06942765566401507066E-6, c03 = +1.59503164802313196374E-5;
+      const double c02 = +3.49592575153777996871E-4, c01 = +1.28475387530065247392E-2, c00 = +1.03665693917934275131E0;
+      b2 = c23, b1 = a*b2 + c22, b0 = a*b1 - b0 + c21;
+      b2 = a*b0 - b1 + c20, b1 = a*b2 - b0 + c19, b0 = a*b1 - b2 + c18;
+      b2 = a*b0 - b1 + c17, b1 = a*b2 - b0 + c16, b0 = a*b1 - b2 + c15;
+      b2 = a*b0 - b1 + c14, b1 = a*b2 - b0 + c13, b0 = a*b1 - b2 + c12;
+      b2 = a*b0 - b1 + c11, b1 = a*b2 - b0 + c10, b0 = a*b1 - b2 + c09;
+      b2 = a*b0 - b1 + c08, b1 = a*b2 - b0 + c07, b0 = a*b1 - b2 + c06;
+      b2 = a*b0 - b1 + c05, b1 = a*b2 - b0 + c04, b0 = a*b1 - b2 + c03;
+      b2 = a*b0 - b1 + c02, b1 = a*b2 - b0 + c01, b0 = a*b1 - b2 + c00;
+      c = Eul + log(x) + k * 0.5 * (b0 - b2);
    } else {
-      if (x < 18.0) {
-         a = (576.0 / x - 52.0) / 10.0;
-         k = exp(x) / x;
-         b0 = 1.83889230173399459482E-17;
-         b1 = 0.0;
-         trigintegrals_chebiterationshichi(a, -9.55485532279655569575E-17, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 2.04326105980879882648E-16, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.09896949074905343022E-15, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.31313534344092599234E-14, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 5.93976226264314278932E-14, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -3.47197010497749154755E-14, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.40059764613117131000E-12, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 9.49044626224223543299E-12, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.61596181145435454033E-11, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.77899784436430310321E-10, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.35455469767246947469E-9, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.03257121792819495123E-9, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -3.56699611114982536845E-8, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.44818877384267342057E-7, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 7.82018215184051295296E-7, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -5.39919118403805073710E-6, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -3.12458202168959833422E-5, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 8.90136741950727517826E-5, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 2.02558474743846862168E-3, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 2.96064440855633256972E-2, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.11847751047257036625E0, &b0, &b1, &b2);
-         s = k * 0.5 * (b0 - b2);
-         b0 = -8.12435385225864036372E-18;
-         b1 = 0.0;
-         trigintegrals_chebiterationshichi(a, 2.17586413290339214377E-17, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 5.22624394924072204667E-17, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -9.48812110591690559363E-16, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 5.35546311647465209166E-15, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.21009970113732918701E-14, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -6.00865178553447437951E-14, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 7.16339649156028587775E-13, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -2.93496072607599856104E-12, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.40359438136491256904E-12, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 8.76302288609054966081E-11, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -4.40092476213282340617E-10, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -1.87992075640569295479E-10, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.31458150989474594064E-8, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -4.75513930924765465590E-8, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -2.21775018801848880741E-7, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.94635531373272490962E-6, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 4.33505889257316408893E-6, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -6.13387001076494349496E-5, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, -3.13085477492997465138E-4, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 4.97164789823116062801E-4, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 2.64347496031374526641E-2, &b0, &b1, &b2);
-         trigintegrals_chebiterationshichi(a, 1.11446150876699213025E0, &b0, &b1, &b2);
-         c = k * 0.5 * (b0 - b2);
-      } else {
-         if (x <= 88.0) {
-            a = (6336.0 / x - 212.0) / 70.0;
-            k = exp(x) / x;
-            b0 = -1.05311574154850938805E-17;
-            b1 = 0.0;
-            trigintegrals_chebiterationshichi(a, 2.62446095596355225821E-17, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 8.82090135625368160657E-17, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -3.38459811878103047136E-16, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -8.30608026366935789136E-16, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 3.93397875437050071776E-15, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.01765565969729044505E-14, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -4.21128170307640802703E-14, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -1.60818204519802480035E-13, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 3.34714954175994481761E-13, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 2.72600352129153073807E-12, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.66894954752839083608E-12, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -3.49278141024730899554E-11, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -1.58580661666482709598E-10, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -1.79289437183355633342E-10, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.76281629144264523277E-9, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.69050228879421288846E-8, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.25391771228487041649E-7, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.16229947068677338732E-6, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.61038260117376323993E-5, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 3.49810375601053973070E-4, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.28478065259647610779E-2, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.03665722588798326712E0, &b0, &b1, &b2);
-            s = k * 0.5 * (b0 - b2);
-            b0 = 8.06913408255155572081E-18;
-            b1 = 0.0;
-            trigintegrals_chebiterationshichi(a, -2.08074168180148170312E-17, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -5.98111329658272336816E-17, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 2.68533951085945765591E-16, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 4.52313941698904694774E-16, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -3.10734917335299464535E-15, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -4.42823207332531972288E-15, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 3.49639695410806959872E-14, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 6.63406731718911586609E-14, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -3.71902448093119218395E-13, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -1.27135418132338309016E-12, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 2.74851141935315395333E-12, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 2.33781843985453438400E-11, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 2.71436006377612442764E-11, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -2.56600180000355990529E-10, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -1.61021375163803438552E-9, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -4.72543064876271773512E-9, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, -3.00095178028681682282E-9, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 7.79387474390914922337E-8, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.06942765566401507066E-6, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.59503164802313196374E-5, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 3.49592575153777996871E-4, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.28475387530065247392E-2, &b0, &b1, &b2);
-            trigintegrals_chebiterationshichi(a, 1.03665693917934275131E0, &b0, &b1, &b2);
-            c = k * 0.5 * (b0 - b2);
-         } else {
-            if (sg != 0) {
-               *shi = -ae_maxrealnumber;
-            } else {
-               *shi = ae_maxrealnumber;
-            }
-            *chi = ae_maxrealnumber;
-            return;
-         }
-      }
+      c = s = ae_maxrealnumber;
    }
-   if (sg != 0) {
-      s = -s;
-   }
+   if (neg) s = -s;
    *shi = s;
-   *chi = 0.57721566490153286061 + log(x) + c;
+   *chi = c;
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Sine and cosine integrals
-//
-// Evaluates the integrals
-//
-//                          x
-//                          -
-//                         |  cos t - 1
-//   Ci(x) = eul + ln x +  |  --------- dt,
-//                         |      t
-//                        -
-//                         0
-//             x
-//             -
-//            |  sin t
-//   Si(x) =  |  ----- dt
-//            |    t
-//           -
-//            0
-//
-// where eul = 0.57721566490153286061 is Euler's constant.
-// The integrals are approximated by rational functions.
-// For x > 8 auxiliary functions f(x) and g(x) are employed
-// such that
-//
-// Ci(x) = f(x) sin(x) - g(x) cos(x)
-// Si(x) = pi/2 - f(x) cos(x) - g(x) sin(x)
-//
-//
-// ACCURACY:
-//    Test interval = [0,50].
-// Absolute error, except relative when > 1:
-// arithmetic   function   # trials      peak         rms
-//    IEEE        Si        30000       4.4e-16     7.3e-17
-//    IEEE        Ci        30000       6.9e-16     5.1e-17
-//
-// Cephes Math Library Release 2.1:  January, 1989
-// Copyright 1984, 1987, 1989 by Stephen L. Moshier
 void sinecosineintegrals(const double x, double &si, double &ci) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -2860,44 +2115,6 @@ void sinecosineintegrals(const double x, double &si, double &ci) {
    alglib_impl::ae_state_clear();
 }
 
-// Hyperbolic sine and cosine integrals
-//
-// Approximates the integrals
-//
-//                            x
-//                            -
-//                           | |   cosh t - 1
-//   Chi(x) = eul + ln x +   |    -----------  dt,
-//                         | |          t
-//                          -
-//                          0
-//
-//               x
-//               -
-//              | |  sinh t
-//   Shi(x) =   |    ------  dt
-//            | |       t
-//             -
-//             0
-//
-// where eul = 0.57721566490153286061 is Euler's constant.
-// The integrals are evaluated by power series for x < 8
-// and by Chebyshev expansions for x between 8 and 88.
-// For large x, both functions approach exp(x)/2x.
-// Arguments greater than 88 in magnitude return MAXNUM.
-//
-//
-// ACCURACY:
-//
-// Test interval 0 to 88.
-//                      Relative error:
-// arithmetic   function  # trials      peak         rms
-//    IEEE         Shi      30000       6.9e-16     1.6e-16
-//        Absolute error, except relative when |Chi| > 1:
-//    IEEE         Chi      30000       8.4e-16     1.4e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -2932,6 +2149,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double poissondistribution(const ae_int_t k, const double m);
 double poissondistribution(ae_int_t k, double m) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistribution");
@@ -2963,6 +2181,7 @@ double poissondistribution(ae_int_t k, double m) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double poissoncdistribution(const ae_int_t k, const double m);
 double poissoncdistribution(ae_int_t k, double m) {
    double result;
    ae_assert(k >= 0 && m > 0.0, "Domain error in PoissonDistributionC");
@@ -2987,6 +2206,7 @@ double poissoncdistribution(ae_int_t k, double m) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double invpoissondistribution(const ae_int_t k, const double y);
 double invpoissondistribution(ae_int_t k, double y) {
    double result;
    ae_assert(k >= 0 && y >= 0.0 && y < 1.0, "Domain error in InvPoissonDistribution");
@@ -2996,29 +2216,6 @@ double invpoissondistribution(ae_int_t k, double y) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Poisson distribution
-//
-// Returns the sum of the first k+1 terms of the Poisson
-// distribution:
-//
-//   k         j
-//   --   -m  m
-//   >   e    --
-//   --       j!
-//  j=0
-//
-// The terms are not summed directly; instead the incomplete
-// gamma integral is employed, according to the relation
-//
-// y = pdtr( k, m ) = igamc( k+1, m ).
-//
-// The arguments must both be positive.
-// ACCURACY:
-//
-// See incomplete gamma function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double poissondistribution(const ae_int_t k, const double m) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -3027,30 +2224,6 @@ double poissondistribution(const ae_int_t k, const double m) {
    return D;
 }
 
-// Complemented Poisson distribution
-//
-// Returns the sum of the terms k+1 to infinity of the Poisson
-// distribution:
-//
-//  inf.       j
-//   --   -m  m
-//   >   e    --
-//   --       j!
-//  j=k+1
-//
-// The terms are not summed directly; instead the incomplete
-// gamma integral is employed, according to the formula
-//
-// y = pdtrc( k, m ) = igam( k+1, m ).
-//
-// The arguments must both be positive.
-//
-// ACCURACY:
-//
-// See incomplete gamma function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double poissoncdistribution(const ae_int_t k, const double m) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -3059,23 +2232,6 @@ double poissoncdistribution(const ae_int_t k, const double m) {
    return D;
 }
 
-// Inverse Poisson distribution
-//
-// Finds the Poisson variable x such that the integral
-// from 0 to x of the Poisson density is equal to the
-// given probability y.
-//
-// This is accomplished using the inverse gamma integral
-// function and the relation
-//
-//    m = igami( k+1, y ).
-//
-// ACCURACY:
-//
-// See inverse incomplete gamma function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invpoissondistribution(const ae_int_t k, const double y) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -3087,45 +2243,22 @@ double invpoissondistribution(const ae_int_t k, const double y) {
 
 // === BESSEL Package ===
 namespace alglib_impl {
-static void bessel_besselasympt0(double x, double *pzero, double *qzero) {
-   double xsq;
-   double p2;
-   double q2;
-   double p3;
-   double q3;
-   *pzero = 0;
-   *qzero = 0;
-   xsq = 64.0 / (x * x);
-   p2 = 0.0;
-   p2 = 2485.271928957404011288128951 + xsq * p2;
-   p2 = 153982.6532623911470917825993 + xsq * p2;
-   p2 = 2016135.283049983642487182349 + xsq * p2;
-   p2 = 8413041.456550439208464315611 + xsq * p2;
-   p2 = 12332384.76817638145232406055 + xsq * p2;
-   p2 = 5393485.083869438325262122897 + xsq * p2;
-   q2 = 1.0;
-   q2 = 2615.700736920839685159081813 + xsq * q2;
-   q2 = 156001.7276940030940592769933 + xsq * q2;
-   q2 = 2025066.801570134013891035236 + xsq * q2;
-   q2 = 8426449.050629797331554404810 + xsq * q2;
-   q2 = 12338310.22786324960844856182 + xsq * q2;
-   q2 = 5393485.083869438325560444960 + xsq * q2;
-   p3 = -0.0;
-   p3 = -4.887199395841261531199129300 + xsq * p3;
-   p3 = -226.2630641933704113967255053 + xsq * p3;
-   p3 = -2365.956170779108192723612816 + xsq * p3;
-   p3 = -8239.066313485606568803548860 + xsq * p3;
-   p3 = -10381.41698748464093880530341 + xsq * p3;
-   p3 = -3984.617357595222463506790588 + xsq * p3;
-   q3 = 1.0;
-   q3 = 408.7714673983499223402830260 + xsq * q3;
-   q3 = 15704.89191515395519392882766 + xsq * q3;
-   q3 = 156021.3206679291652539287109 + xsq * q3;
-   q3 = 533291.3634216897168722255057 + xsq * q3;
-   q3 = 666745.4239319826986004038103 + xsq * q3;
-   q3 = 255015.5108860942382983170882 + xsq * q3;
-   *pzero = p2 / q2;
-   *qzero = 8 * p3 / q3 / x;
+static void bessel_besselasympt0(double w, double *pzero, double *qzero) {
+   double ww = w * w;
+   const double pp02 = 2485.271928957404011288128951, pp04 = 153982.6532623911470917825993, pp06 = 2016135.283049983642487182349;
+   const double pp08 = 8413041.456550439208464315611, pp10 = 12332384.76817638145232406055, pp12 = 5393485.083869438325262122897;
+   double pp = pp12 + ww * (pp10 + ww * (pp08 + ww * (pp06 + ww * (pp04 + ww * pp02))));
+   const double pq02 = 2615.700736920839685159081813, pq04 = 156001.7276940030940592769933, pq06 = 2025066.801570134013891035236;
+   const double pq08 = 8426449.050629797331554404810, pq10 = 12338310.22786324960844856182, pq12 = 5393485.083869438325560444960;
+   double pq = pq12 + ww * (pq10 + ww * (pq08 + ww * (pq06 + ww * (pq04 + ww * (pq02 + ww)))));
+   const double qp01 = -4.887199395841261531199129300, qp03 = -226.2630641933704113967255053, qp05 = -2365.956170779108192723612816;
+   const double qp07 = -8239.066313485606568803548860, qp09 = -10381.41698748464093880530341, qp11 = -3984.617357595222463506790588;
+   double qp = w * (qp11 + ww * (qp09 + ww * (qp07 + ww * (qp05 + ww * (qp03 + ww * (qp01))))));
+   const double qq02 = 408.7714673983499223402830260, qq04 = 15704.89191515395519392882766, qq06 = 156021.3206679291652539287109;
+   const double qq08 = 533291.3634216897168722255057, qq10 = 666745.4239319826986004038103, qq12 = 255015.5108860942382983170882;
+   double qq = qq12 + ww * (qq10 + ww * (qq08 + ww * (qq06 + ww * (qq04 + ww * (qq02 + ww)))));
+   *pzero = pp / pq;
+   *qzero = qp / qq;
 }
 
 // Bessel function of order zero
@@ -3156,83 +2289,43 @@ static void bessel_besselasympt0(double x, double *pzero, double *qzero) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double besselj0(const double x);
 double besselj0(double x) {
-   double xsq;
-   double nn;
-   double pzero;
-   double qzero;
-   double p1;
-   double q1;
-   double result;
-   if (x < 0.0) {
-      x = -x;
-   }
+   if (x < 0.0) x = -x;
    if (x > 8.0) {
-      bessel_besselasympt0(x, &pzero, &qzero);
-      nn = x - ae_pi / 4;
-      result = sqrt(2 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
-      return result;
+      double pzero, qzero;
+      bessel_besselasympt0(8.0 / x, &pzero, &qzero);
+      double nn = x - ae_pi / 4.0;
+      return sqrt(2.0 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
    }
-   xsq = ae_sqr(x);
-   p1 = 26857.86856980014981415848441;
-   p1 = -40504123.71833132706360663322 + xsq * p1;
-   p1 = 25071582855.36881945555156435 + xsq * p1;
-   p1 = -8085222034853.793871199468171 + xsq * p1;
-   p1 = 1434354939140344.111664316553 + xsq * p1;
-   p1 = -136762035308817138.6865416609 + xsq * p1;
-   p1 = 6382059341072356562.289432465 + xsq * p1;
-   p1 = -117915762910761053603.8440800 + xsq * p1;
-   p1 = 493378725179413356181.6813446 + xsq * p1;
-   q1 = 1.0;
-   q1 = 1363.063652328970604442810507 + xsq * q1;
-   q1 = 1114636.098462985378182402543 + xsq * q1;
-   q1 = 669998767.2982239671814028660 + xsq * q1;
-   q1 = 312304311494.1213172572469442 + xsq * q1;
-   q1 = 112775673967979.8507056031594 + xsq * q1;
-   q1 = 30246356167094626.98627330784 + xsq * q1;
-   q1 = 5428918384092285160.200195092 + xsq * q1;
-   q1 = 493378725179413356211.3278438 + xsq * q1;
-   result = p1 / q1;
-   return result;
+   double xsq = x * x;
+   const double p16 = +26857.86856980014981415848441, p14 = -40504123.71833132706360663322, p12 = +25071582855.36881945555156435;
+   const double p10 = -8085222034853.793871199468171, p08 = +1434354939140344.111664316553, p06 = -136762035308817138.6865416609;
+   const double p04 = +6382059341072356562.289432465, p02 = -117915762910761053603.8440800, p00 = +493378725179413356181.6813446;
+   double p1 = p00 + xsq * (p02 + xsq * (p04 + xsq * (p06 + xsq * (p08 + xsq * (p10 + xsq * (p12 + xsq * (p14 + xsq * p16)))))));
+   const double q14 = 1363.063652328970604442810507, q12 = 1114636.098462985378182402543;
+   const double q10 = 669998767.2982239671814028660, q08 = 312304311494.1213172572469442, q06 = 112775673967979.8507056031594;
+   const double q04 = 30246356167094626.98627330784, q02 = 5428918384092285160.200195092, q00 = 493378725179413356211.3278438;
+   double q1 = q00 + xsq * (q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq)))))));
+   return p1 / q1;
 }
 
-static void bessel_besselasympt1(double x, double *pzero, double *qzero) {
-   double xsq;
-   double p2;
-   double q2;
-   double p3;
-   double q3;
-   *pzero = 0;
-   *qzero = 0;
-   xsq = 64.0 / (x * x);
-   p2 = -1611.616644324610116477412898;
-   p2 = -109824.0554345934672737413139 + xsq * p2;
-   p2 = -1523529.351181137383255105722 + xsq * p2;
-   p2 = -6603373.248364939109255245434 + xsq * p2;
-   p2 = -9942246.505077641195658377899 + xsq * p2;
-   p2 = -4435757.816794127857114720794 + xsq * p2;
-   q2 = 1.0;
-   q2 = -1455.009440190496182453565068 + xsq * q2;
-   q2 = -107263.8599110382011903063867 + xsq * q2;
-   q2 = -1511809.506634160881644546358 + xsq * q2;
-   q2 = -6585339.479723087072826915069 + xsq * q2;
-   q2 = -9934124.389934585658967556309 + xsq * q2;
-   q2 = -4435757.816794127856828016962 + xsq * q2;
-   p3 = 35.26513384663603218592175580;
-   p3 = 1706.375429020768002061283546 + xsq * p3;
-   p3 = 18494.26287322386679652009819 + xsq * p3;
-   p3 = 66178.83658127083517939992166 + xsq * p3;
-   p3 = 85145.16067533570196555001171 + xsq * p3;
-   p3 = 33220.91340985722351859704442 + xsq * p3;
-   q3 = 1.0;
-   q3 = 863.8367769604990967475517183 + xsq * q3;
-   q3 = 37890.22974577220264142952256 + xsq * q3;
-   q3 = 400294.4358226697511708610813 + xsq * q3;
-   q3 = 1419460.669603720892855755253 + xsq * q3;
-   q3 = 1819458.042243997298924553839 + xsq * q3;
-   q3 = 708712.8194102874357377502472 + xsq * q3;
-   *pzero = p2 / q2;
-   *qzero = 8 * p3 / q3 / x;
+static void bessel_besselasympt1(double w, double *pzero, double *qzero) {
+   double ww = w * w;
+   const double pp02 = -1611.616644324610116477412898, pp04 = -109824.0554345934672737413139, pp06 = -1523529.351181137383255105722;
+   const double pp08 = -6603373.248364939109255245434, pp10 = -9942246.505077641195658377899, pp12 = -4435757.816794127857114720794;
+   double pp = pp12 + ww * (pp10 + ww * (pp08 + ww * (pp06 + ww * (pp04 + ww * pp02))));
+   const double pq02 = -1455.009440190496182453565068, pq04 = -107263.8599110382011903063867, pq06 = -1511809.506634160881644546358;
+   const double pq08 = -6585339.479723087072826915069, pq10 = -9934124.389934585658967556309, pq12 = -4435757.816794127856828016962;
+   double pq = pq12 + ww * (pq10 + ww * (pq08 + ww * (pq06 + ww * (pq04 + ww * (pq02 + ww)))));
+   const double qp01 = 35.26513384663603218592175580, qp03 = 1706.375429020768002061283546, qp05 = 18494.26287322386679652009819;
+   const double qp07 = 66178.83658127083517939992166, qp09 = 85145.16067533570196555001171, qp11 = 33220.91340985722351859704442;
+   double qp = w * (qp11 + ww * (qp09 + ww * (qp07 + ww * (qp05 + ww * (qp03 + ww * qp01)))));
+   const double qq02 = 863.8367769604990967475517183, qq04 = 37890.22974577220264142952256, qq06 = 400294.4358226697511708610813;
+   const double qq08 = 1419460.669603720892855755253, qq10 = 1819458.042243997298924553839, qq12 = 708712.8194102874357377502472;
+   double qq = qq12 + ww * (qq10 + ww * (qq08 + ww * (qq06 + ww * (qq04 + ww * (qq02 + ww)))));
+   *pzero = pp / pq;
+   *qzero = qp / qq;
 }
 
 // Bessel function of order one
@@ -3253,49 +2346,27 @@ static void bessel_besselasympt1(double x, double *pzero, double *qzero) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double besselj1(const double x);
 double besselj1(double x) {
-   double s;
-   double xsq;
-   double nn;
-   double pzero;
-   double qzero;
-   double p1;
-   double q1;
-   double result;
-   s = (double)(ae_sign(x));
-   if (x < 0.0) {
-      x = -x;
-   }
+   bool neg = x < 0.0;
+   if (neg) x = -x;
    if (x > 8.0) {
-      bessel_besselasympt1(x, &pzero, &qzero);
-      nn = x - 3 * ae_pi / 4;
-      result = sqrt(2 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
-      if (s < 0.0) {
-         result = -result;
-      }
-      return result;
+      double pzero, qzero;
+      bessel_besselasympt1(8.0 / x, &pzero, &qzero);
+      double nn = x - 3.0 * ae_pi / 4.0;
+      double result = sqrt(2.0 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
+      return neg ? -result : +result;
    }
-   xsq = ae_sqr(x);
-   p1 = 2701.122710892323414856790990;
-   p1 = -4695753.530642995859767162166 + xsq * p1;
-   p1 = 3413234182.301700539091292655 + xsq * p1;
-   p1 = -1322983480332.126453125473247 + xsq * p1;
-   p1 = 290879526383477.5409737601689 + xsq * p1;
-   p1 = -35888175699101060.50743641413 + xsq * p1;
-   p1 = 2316433580634002297.931815435 + xsq * p1;
-   p1 = -66721065689249162980.20941484 + xsq * p1;
-   p1 = 581199354001606143928.050809 + xsq * p1;
-   q1 = 1.0;
-   q1 = 1606.931573481487801970916749 + xsq * q1;
-   q1 = 1501793.594998585505921097578 + xsq * q1;
-   q1 = 1013863514.358673989967045588 + xsq * q1;
-   q1 = 524371026216.7649715406728642 + xsq * q1;
-   q1 = 208166122130760.7351240184229 + xsq * q1;
-   q1 = 60920613989175217.46105196863 + xsq * q1;
-   q1 = 11857707121903209998.37113348 + xsq * q1;
-   q1 = 1162398708003212287858.529400 + xsq * q1;
-   result = s * x * p1 / q1;
-   return result;
+   double xsq = x * x;
+   const double p17 = +2701.122710892323414856790990, p15 = -4695753.530642995859767162166, p13 = +3413234182.301700539091292655;
+   const double p11 = -1322983480332.126453125473247, p09 = +290879526383477.5409737601689, p07 = -35888175699101060.50743641413;
+   const double p05 = +2316433580634002297.931815435, p03 = -66721065689249162980.20941484, p01 = +581199354001606143928.050809;
+   double p1 = x * (p01 + xsq * (p03 + xsq * (p05 + xsq * (p07 + xsq * (p09 + xsq * (p11 + xsq * (p13 + xsq * (p15 + xsq * p17))))))));
+   const double q14 = 1606.931573481487801970916749, q12 = 1501793.594998585505921097578;
+   const double q10 = 1013863514.358673989967045588, q08 = 524371026216.7649715406728642, q06 = 208166122130760.7351240184229;
+   const double q04 = 60920613989175217.46105196863, q02 = 11857707121903209998.37113348, q00 = 1162398708003212287858.529400;
+   double q1 = q00 + xsq * (q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq)))))));
+   return neg ? -p1 / q1 : +p1 / q1;
 }
 
 // Bessel function of integer order
@@ -3323,56 +2394,25 @@ double besselj1(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double besseljn(const ae_int_t n, const double x);
 double besseljn(ae_int_t n, double x) {
-   double pkm2;
-   double pkm1;
-   double pk;
-   double xk;
-   double r;
-   double ans;
-   ae_int_t k;
    ae_int_t sg;
-   double result;
    if (n < 0) {
       n = -n;
-      if (n % 2 == 0) {
-         sg = 1;
-      } else {
-         sg = -1;
-      }
-   } else {
-      sg = 1;
-   }
+      sg = n % 2 == 0 ? +1 : -1;
+   } else sg = +1;
    if (x < 0.0) {
-      if (n % 2 != 0) {
-         sg = -sg;
-      }
+      if (n % 2 != 0) sg = -sg;
       x = -x;
    }
-   if (n == 0) {
-      result = sg * besselj0(x);
-      return result;
-   }
-   if (n == 1) {
-      result = sg * besselj1(x);
-      return result;
-   }
-   if (n == 2) {
-      if (x == 0.0) {
-         result = 0.0;
-      } else {
-         result = sg * (2.0 * besselj1(x) / x - besselj0(x));
-      }
-      return result;
-   }
-   if (x < ae_machineepsilon) {
-      result = 0.0;
-      return result;
-   }
-   k = 53;
-   pk = (double)(2 * (n + k));
-   ans = pk;
-   xk = x * x;
+   if (n == 0) return sg * besselj0(x);
+   else if (n == 1) return sg * besselj1(x);
+   else if (n == 2) return x == 0.0 ? 0.0 : sg * (2.0 * besselj1(x) / x - besselj0(x));
+   else if (x < ae_machineepsilon) return 0.0;
+   ae_int_t k = 53;
+   double pk = 2.0 * (n + k);
+   double ans = pk;
+   double xk = x * x;
    do {
       pk -= 2.0;
       ans = pk - xk / ans;
@@ -3380,23 +2420,16 @@ double besseljn(ae_int_t n, double x) {
    } while (k != 0);
    ans = x / ans;
    pk = 1.0;
-   pkm1 = 1.0 / ans;
+   double pkm1 = 1.0 / ans;
    k = n - 1;
-   r = (double)(2 * k);
+   double r = 2.0 * k;
    do {
-      pkm2 = (pkm1 * r - pk * x) / x;
+      double pkm2 = (pkm1 * r - pk * x) / x;
       pk = pkm1;
       pkm1 = pkm2;
       r -= 2.0;
-      k--;
-   } while (k != 0);
-   if (fabs(pk) > fabs(pkm1)) {
-      ans = besselj1(x) / pk;
-   } else {
-      ans = besselj0(x) / pkm1;
-   }
-   result = sg * ans;
-   return result;
+   } while (--k > 0);
+   return sg * (fabs(pk) > fabs(pkm1) ? besselj1(x) / pk : besselj0(x) / pkm1);
 }
 
 // Bessel function of the second kind, order zero
@@ -3425,41 +2458,24 @@ double besseljn(ae_int_t n, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double bessely0(const double x);
 double bessely0(double x) {
-   double nn;
-   double xsq;
-   double pzero;
-   double qzero;
-   double p4;
-   double q4;
-   double result;
    if (x > 8.0) {
-      bessel_besselasympt0(x, &pzero, &qzero);
-      nn = x - ae_pi / 4;
-      result = sqrt(2 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
-      return result;
+      double pzero, qzero;
+      bessel_besselasympt0(8.0 / x, &pzero, &qzero);
+      double nn = x - ae_pi / 4.0;
+      return sqrt(2.0 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
    }
-   xsq = ae_sqr(x);
-   p4 = -41370.35497933148554125235152;
-   p4 = 59152134.65686889654273830069 + xsq * p4;
-   p4 = -34363712229.79040378171030138 + xsq * p4;
-   p4 = 10255208596863.94284509167421 + xsq * p4;
-   p4 = -1648605817185729.473122082537 + xsq * p4;
-   p4 = 137562431639934407.8571335453 + xsq * p4;
-   p4 = -5247065581112764941.297350814 + xsq * p4;
-   p4 = 65874732757195549259.99402049 + xsq * p4;
-   p4 = -27502866786291095837.01933175 + xsq * p4;
-   q4 = 1.0;
-   q4 = 1282.452772478993804176329391 + xsq * q4;
-   q4 = 1001702.641288906265666651753 + xsq * q4;
-   q4 = 579512264.0700729537480087915 + xsq * q4;
-   q4 = 261306575504.1081249568482092 + xsq * q4;
-   q4 = 91620380340751.85262489147968 + xsq * q4;
-   q4 = 23928830434997818.57439356652 + xsq * q4;
-   q4 = 4192417043410839973.904769661 + xsq * q4;
-   q4 = 372645883898616588198.9980 + xsq * q4;
-   result = p4 / q4 + 2 / ae_pi * besselj0(x) * log(x);
-   return result;
+   double xsq = ae_sqr(x);
+   const double p16 = -41370.35497933148554125235152, p14 = +59152134.65686889654273830069, p12 = -34363712229.79040378171030138;
+   const double p10 = +10255208596863.94284509167421, p08 = -1648605817185729.473122082537, p06 = +137562431639934407.8571335453;
+   const double p04 = -5247065581112764941.297350814, p02 = +65874732757195549259.99402049, p00 = -27502866786291095837.01933175;
+   double p4 = p00 + xsq * (p02 + xsq * (p04 + xsq * (p06 + xsq * (p08 + xsq * (p10 + xsq * (p12 + xsq * (p14 + xsq * p16)))))));
+   const double q16 = 1282.452772478993804176329391, q14 = 1001702.641288906265666651753;
+   const double q12 = 579512264.0700729537480087915, q10 = 261306575504.1081249568482092, q08 = 91620380340751.85262489147968;
+   const double q06 = 23928830434997818.57439356652, q04 = 4192417043410839973.904769661, q02 = 372645883898616588198.9980;
+   double q4 = q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq * (q16 + xsq)))))));
+   return p4 / q4 + 2.0 / ae_pi * besselj0(x) * log(x);
 }
 
 // Bessel function of second kind of order one
@@ -3481,42 +2497,24 @@ double bessely0(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: double bessely1(const double x);
 double bessely1(double x) {
-   double nn;
-   double xsq;
-   double pzero;
-   double qzero;
-   double p4;
-   double q4;
-   double result;
    if (x > 8.0) {
-      bessel_besselasympt1(x, &pzero, &qzero);
-      nn = x - 3 * ae_pi / 4;
-      result = sqrt(2 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
-      return result;
+      double pzero, qzero;
+      bessel_besselasympt1(8.0 / x, &pzero, &qzero);
+      double nn = x - 3.0 * ae_pi / 4.0;
+      return sqrt(2.0 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
    }
-   xsq = ae_sqr(x);
-   p4 = -2108847.540133123652824139923;
-   p4 = 3639488548.124002058278999428 + xsq * p4;
-   p4 = -2580681702194.450950541426399 + xsq * p4;
-   p4 = 956993023992168.3481121552788 + xsq * p4;
-   p4 = -196588746272214065.8820322248 + xsq * p4;
-   p4 = 21931073399177975921.11427556 + xsq * p4;
-   p4 = -1212297555414509577913.561535 + xsq * p4;
-   p4 = 26554738314348543268942.48968 + xsq * p4;
-   p4 = -99637534243069222259967.44354 + xsq * p4;
-   q4 = 1.0;
-   q4 = 1612.361029677000859332072312 + xsq * q4;
-   q4 = 1563282.754899580604737366452 + xsq * q4;
-   q4 = 1128686837.169442121732366891 + xsq * q4;
-   q4 = 646534088126.5275571961681500 + xsq * q4;
-   q4 = 297663212564727.6729292742282 + xsq * q4;
-   q4 = 108225825940881955.2553850180 + xsq * q4;
-   q4 = 29549879358971486742.90758119 + xsq * q4;
-   q4 = 5435310377188854170800.653097 + xsq * q4;
-   q4 = 508206736694124324531442.4152 + xsq * q4;
-   result = x * p4 / q4 + 2 / ae_pi * (besselj1(x) * log(x) - 1 / x);
-   return result;
+   double xsq = x * x;
+   const double p17 = -2108847.540133123652824139923, p15 = +3639488548.124002058278999428, p13 = -2580681702194.450950541426399;
+   const double p11 = +956993023992168.3481121552788, p09 = -196588746272214065.8820322248, p07 = +21931073399177975921.11427556;
+   const double p05 = -1212297555414509577913.561535, p03 = +26554738314348543268942.48968, p01 = -99637534243069222259967.44354;
+   double p4 = x * (p01 + xsq * (p03 + xsq * (p05 + xsq * (p07 + xsq * (p09 + xsq * (p11 + xsq * (p13 + xsq * (p15 + xsq * p17))))))));
+   const double q16 = 1612.361029677000859332072312, q14 = 1563282.754899580604737366452, q12 = 1128686837.169442121732366891;
+   const double q10 = 646534088126.5275571961681500, q08 = 297663212564727.6729292742282, q06 = 108225825940881955.2553850180;
+   const double q04 = 29549879358971486742.90758119, q02 = 5435310377188854170800.653097, q00 = 508206736694124324531442.4152;
+   double q4 = q00 + xsq * (q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq * (q16 + xsq))))))));
+   return p4 / q4 + 2.0 / ae_pi * (besselj1(x) * log(x) - 1.0 / x);
 }
 
 // Bessel function of second kind of integer order
@@ -3539,57 +2537,22 @@ double bessely1(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double besselyn(const ae_int_t n, const double x);
 double besselyn(ae_int_t n, double x) {
-   ae_int_t i;
-   double a;
-   double b;
-   double tmp;
-   double s;
-   double result;
-   s = 1.0;
+   double s = 1.0;
    if (n < 0) {
       n = -n;
-      if (n % 2 != 0) {
-         s = -1.0;
-      }
+      if (n % 2 != 0) s = -1.0;
    }
-   if (n == 0) {
-      result = bessely0(x);
-      return result;
-   }
-   if (n == 1) {
-      result = s * bessely1(x);
-      return result;
-   }
-   a = bessely0(x);
-   b = bessely1(x);
-   for (i = 1; i < n; i++) {
-      tmp = b;
+   if (n == 0) return bessely0(x);
+   else if (n == 1) return s * bessely1(x);
+   double a = bessely0(x), b = bessely1(x);
+   for (ae_int_t i = 1; i < n; i++) {
+      double tmp = b;
       b = 2 * i / x * b - a;
       a = tmp;
    }
-   result = s * b;
-   return result;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmfirstcheb(double c, double *b0, double *b1, double *b2) {
-   *b0 = c;
-   *b1 = 0.0;
-   *b2 = 0.0;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
+   return s * b;
 }
 
 // Modified Bessel function of order zero
@@ -3611,102 +2574,54 @@ static void bessel_besselmnextcheb(double x, double c, double *b0, double *b1, d
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double besseli0(const double x);
 double besseli0(double x) {
-   double y;
-   double v;
-   double z;
-   double b0;
-   double b1;
-   double b2;
-   double result;
-   if (x < 0.0) {
-      x = -x;
-   }
+   if (x < 0.0) x = -x;
    if (x <= 8.0) {
-      y = x / 2.0 - 2.0;
-      bessel_besselmfirstcheb(-4.41534164647933937950E-18, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 3.33079451882223809783E-17, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -2.43127984654795469359E-16, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.71539128555513303061E-15, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -1.16853328779934516808E-14, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 7.67618549860493561688E-14, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -4.85644678311192946090E-13, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 2.95505266312963983461E-12, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -1.72682629144155570723E-11, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 9.67580903537323691224E-11, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -5.18979560163526290666E-10, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 2.65982372468238665035E-9, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -1.30002500998624804212E-8, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 6.04699502254191894932E-8, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -2.67079385394061173391E-7, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.11738753912010371815E-6, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -4.41673835845875056359E-6, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.64484480707288970893E-5, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -5.75419501008210370398E-5, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.88502885095841655729E-4, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -5.76375574538582365885E-4, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.63947561694133579842E-3, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -4.32430999505057594430E-3, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.05464603945949983183E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -2.37374148058994688156E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 4.93052842396707084878E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -9.49010970480476444210E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.71620901522208775349E-1, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -3.04682672343198398683E-1, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 6.76795274409476084995E-1, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      result = exp(x) * v;
-      return result;
+      double y = x / 2.0 - 2.0;
+      const double b29 = -4.41534164647933937950E-18, b28 = +3.33079451882223809783E-17, b27 = -2.43127984654795469359E-16;
+      const double b26 = +1.71539128555513303061E-15, b25 = -1.16853328779934516808E-14, b24 = +7.67618549860493561688E-14;
+      const double b23 = -4.85644678311192946090E-13, b22 = +2.95505266312963983461E-12, b21 = -1.72682629144155570723E-11;
+      const double b20 = +9.67580903537323691224E-11, b19 = -5.18979560163526290666E-10, b18 = +2.65982372468238665035E-9;
+      const double b17 = -1.30002500998624804212E-8, b16 = +6.04699502254191894932E-8, b15 = -2.67079385394061173391E-7;
+      const double b14 = +1.11738753912010371815E-6, b13 = -4.41673835845875056359E-6, b12 = +1.64484480707288970893E-5;
+      const double b11 = -5.75419501008210370398E-5, b10 = +1.88502885095841655729E-4, b09 = -5.76375574538582365885E-4;
+      const double b08 = +1.63947561694133579842E-3, b07 = -4.32430999505057594430E-3, b06 = +1.05464603945949983183E-2;
+      const double b05 = -2.37374148058994688156E-2, b04 = +4.93052842396707084878E-2, b03 = -9.49010970480476444210E-2;
+      const double b02 = +1.71620901522208775349E-1, b01 = -3.04682672343198398683E-1, b00 = +6.76795274409476084995E-1;
+      double b2 = b29, b1 = y * b2 + b28, b0 = y * b1 - b2 + b27;
+      b2 = y * b0 - b1 + b26, b1 = y * b2 - b0 + b25, b0 = y * b1 - b2 + b24;
+      b2 = y * b0 - b1 + b23, b1 = y * b2 - b0 + b22, b0 = y * b1 - b2 + b21;
+      b2 = y * b0 - b1 + b20, b1 = y * b2 - b0 + b19, b0 = y * b1 - b2 + b18;
+      b2 = y * b0 - b1 + b17, b1 = y * b2 - b0 + b16, b0 = y * b1 - b2 + b15;
+      b2 = y * b0 - b1 + b14, b1 = y * b2 - b0 + b13, b0 = y * b1 - b2 + b12;
+      b2 = y * b0 - b1 + b11, b1 = y * b2 - b0 + b10, b0 = y * b1 - b2 + b09;
+      b2 = y * b0 - b1 + b08, b1 = y * b2 - b0 + b07, b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      return 0.5 * (b0 - b2) * exp(x);
+   } else {
+      double z = 32.0 / x - 2.0;
+      const double b24 = -7.23318048787475395456E-18, b23 = -4.83050448594418207126E-18;
+      const double b22 = +4.46562142029675999901E-17, b21 = +3.46122286769746109310E-17;
+      const double b20 = -2.82762398051658348494E-16, b19 = -3.42548561967721913462E-16, b18 = +1.77256013305652638360E-15;
+      const double b17 = +3.81168066935262242075E-15, b16 = -9.55484669882830764870E-15, b15 = -4.15056934728722208663E-14;
+      const double b14 = +1.54008621752140982691E-14, b13 = +3.85277838274214270114E-13, b12 = +7.18012445138366623367E-13;
+      const double b11 = -1.79417853150680611778E-12, b10 = -1.32158118404477131188E-11, b09 = -3.14991652796324136454E-11;
+      const double b08 = +1.18891471078464383424E-11, b07 = +4.94060238822496958910E-10, b06 = +3.39623202570838634515E-9;
+      const double b05 = +2.26666899049817806459E-8, b04 = +2.04891858946906374183E-7, b03 = +2.89137052083475648297E-6;
+      const double b02 = +6.88975834691682398426E-5, b01 = +3.36911647825569408990E-3, b00 = +8.04490411014108831608E-1;
+      double b0 = b24, b2 = z * b0 + b23, b1 = z * b2 - b0 + b22;
+      b0 = z * b1 - b2 + b21;
+      b2 = z * b0 - b1 + b20, b1 = z * b2 - b0 + b19, b0 = z * b1 - b2 + b18;
+      b2 = z * b0 - b1 + b17, b1 = z * b2 - b0 + b16, b0 = z * b1 - b2 + b15;
+      b2 = z * b0 - b1 + b14, b1 = z * b2 - b0 + b13, b0 = z * b1 - b2 + b12;
+      b2 = z * b0 - b1 + b11, b1 = z * b2 - b0 + b10, b0 = z * b1 - b2 + b09;
+      b2 = z * b0 - b1 + b08, b1 = z * b2 - b0 + b07, b0 = z * b1 - b2 + b06;
+      b2 = z * b0 - b1 + b05, b1 = z * b2 - b0 + b04, b0 = z * b1 - b2 + b03;
+      b2 = z * b0 - b1 + b02, b1 = z * b2 - b0 + b01, b0 = z * b1 - b2 + b00;
+      return 0.5 * (b0 - b2) * exp(x) / sqrt(x);
    }
-   z = 32.0 / x - 2.0;
-   bessel_besselmfirstcheb(-7.23318048787475395456E-18, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -4.83050448594418207126E-18, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 4.46562142029675999901E-17, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 3.46122286769746109310E-17, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -2.82762398051658348494E-16, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -3.42548561967721913462E-16, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 1.77256013305652638360E-15, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 3.81168066935262242075E-15, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -9.55484669882830764870E-15, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -4.15056934728722208663E-14, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 1.54008621752140982691E-14, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 3.85277838274214270114E-13, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 7.18012445138366623367E-13, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -1.79417853150680611778E-12, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -1.32158118404477131188E-11, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, -3.14991652796324136454E-11, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 1.18891471078464383424E-11, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 4.94060238822496958910E-10, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 3.39623202570838634515E-9, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 2.26666899049817806459E-8, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 2.04891858946906374183E-7, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 2.89137052083475648297E-6, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 6.88975834691682398426E-5, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 3.36911647825569408990E-3, &b0, &b1, &b2);
-   bessel_besselmnextcheb(z, 8.04490411014108831608E-1, &b0, &b1, &b2);
-   v = 0.5 * (b0 - b2);
-   result = exp(x) * v / sqrt(x);
-   return result;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1firstcheb(double c, double *b0, double *b1, double *b2) {
-   *b0 = c;
-   *b1 = 0.0;
-   *b2 = 0.0;
-}
-
-// Internal subroutine
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
-static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, double *b2) {
-   *b2 = *b1;
-   *b1 = *b0;
-   *b0 = x * (*b1) - (*b2) + c;
 }
 
 // Modified Bessel function of order one
@@ -3728,83 +2643,55 @@ static void bessel_besselm1nextcheb(double x, double c, double *b0, double *b1, 
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
+// API: double besseli1(const double x);
 double besseli1(double x) {
-   double y;
-   double z;
-   double v;
-   double b0;
-   double b1;
-   double b2;
-   double result;
-   z = fabs(x);
+   double z = fabs(x);
    if (z <= 8.0) {
-      y = z / 2.0 - 2.0;
-      bessel_besselm1firstcheb(2.77791411276104639959E-18, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.11142121435816608115E-17, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.55363195773620046921E-16, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.10559694773538630805E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 7.60068429473540693410E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -5.04218550472791168711E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.22379336594557470981E-13, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.98397439776494371520E-12, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.17361862988909016308E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -6.66348972350202774223E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.62559028155211703701E-10, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.88724975172282928790E-9, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 9.38153738649577178388E-9, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -4.44505912879632808065E-8, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.00329475355213526229E-7, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -8.56872026469545474066E-7, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.47025130813767847674E-6, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.32731636560394358279E-5, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 4.78156510755005422638E-5, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.61760815825896745588E-4, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 5.12285956168575772895E-4, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.51357245063125314899E-3, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 4.15642294431288815669E-3, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.05640848946261981558E-2, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.47264490306265168283E-2, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -5.29459812080949914269E-2, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.02643658689847095384E-1, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.76416518357834055153E-1, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.52587186443633654823E-1, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      z *= v * exp(z);
+      double y = z / 2.0 - 2.0;
+      const double b28 = +2.77791411276104639959E-18, b27 = -2.11142121435816608115E-17;
+      const double b26 = +1.55363195773620046921E-16, b25 = -1.10559694773538630805E-15, b24 = +7.60068429473540693410E-15;
+      const double b23 = -5.04218550472791168711E-14, b22 = +3.22379336594557470981E-13, b21 = -1.98397439776494371520E-12;
+      const double b20 = +1.17361862988909016308E-11, b19 = -6.66348972350202774223E-11, b18 = +3.62559028155211703701E-10;
+      const double b17 = -1.88724975172282928790E-9, b16 = +9.38153738649577178388E-9, b15 = -4.44505912879632808065E-8;
+      const double b14 = +2.00329475355213526229E-7, b13 = -8.56872026469545474066E-7, b12 = +3.47025130813767847674E-6;
+      const double b11 = -1.32731636560394358279E-5, b10 = +4.78156510755005422638E-5, b09 = -1.61760815825896745588E-4;
+      const double b08 = +5.12285956168575772895E-4, b07 = -1.51357245063125314899E-3, b06 = +4.15642294431288815669E-3;
+      const double b05 = -1.05640848946261981558E-2, b04 = +2.47264490306265168283E-2, b03 = -5.29459812080949914269E-2;
+      const double b02 = +1.02643658689847095384E-1, b01 = -1.76416518357834055153E-1, b00 = +2.52587186443633654823E-1;
+      double b1 = b28, b0 = y * b1 + b27, b2 = y * b0 - b1 + b26;
+      b1 = y * b2 - b0 + b25, b0 = y * b1 - b2 + b24;
+      b2 = y * b0 - b1 + b23, b1 = y * b2 - b0 + b22, b0 = y * b1 - b2 + b21;
+      b2 = y * b0 - b1 + b20, b1 = y * b2 - b0 + b19, b0 = y * b1 - b2 + b18;
+      b2 = y * b0 - b1 + b17, b1 = y * b2 - b0 + b16, b0 = y * b1 - b2 + b15;
+      b2 = y * b0 - b1 + b14, b1 = y * b2 - b0 + b13, b0 = y * b1 - b2 + b12;
+      b2 = y * b0 - b1 + b11, b1 = y * b2 - b0 + b10, b0 = y * b1 - b2 + b09;
+      b2 = y * b0 - b1 + b08, b1 = y * b2 - b0 + b07, b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      z *= 0.5 * (b0 - b2) * exp(z);
    } else {
-      y = 32.0 / z - 2.0;
-      bessel_besselm1firstcheb(7.51729631084210481353E-18, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 4.41434832307170791151E-18, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -4.65030536848935832153E-17, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.20952592199342395980E-17, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.96262899764595013876E-16, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.30820231092092828324E-16, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.88035477551078244854E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.81440307243700780478E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.04202769841288027642E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 4.27244001671195135429E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.10154184277266431302E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -4.08355111109219731823E-13, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -7.19855177624590851209E-13, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.03562854414708950722E-12, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.41258074366137813316E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.25260358301548823856E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.89749581235054123450E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -5.58974346219658380687E-10, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.83538038596423702205E-9, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.63146884688951950684E-8, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.51223623787020892529E-7, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.88256480887769039346E-6, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.10588938762623716291E-4, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -9.76109749136146840777E-3, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 7.78576235018280120474E-1, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      z = v * exp(z) / sqrt(z);
+      double y = 32.0 / z - 2.0;
+      const double b24 = +7.51729631084210481353E-18, b23 = +4.41434832307170791151E-18;
+      const double b22 = -4.65030536848935832153E-17, b21 = -3.20952592199342395980E-17;
+      const double b20 = +2.96262899764595013876E-16, b19 = +3.30820231092092828324E-16, b18 = -1.88035477551078244854E-15;
+      const double b17 = -3.81440307243700780478E-15, b16 = +1.04202769841288027642E-14, b15 = +4.27244001671195135429E-14;
+      const double b14 = -2.10154184277266431302E-14, b13 = -4.08355111109219731823E-13, b12 = -7.19855177624590851209E-13;
+      const double b11 = +2.03562854414708950722E-12, b10 = +1.41258074366137813316E-11, b09 = +3.25260358301548823856E-11;
+      const double b08 = -1.89749581235054123450E-11, b07 = -5.58974346219658380687E-10, b06 = -3.83538038596423702205E-9;
+      const double b05 = -2.63146884688951950684E-8, b04 = -2.51223623787020892529E-7, b03 = -3.88256480887769039346E-6;
+      const double b02 = -1.10588938762623716291E-4, b01 = -9.76109749136146840777E-3, b00 = +7.78576235018280120474E-1;
+      double b0 = b24, b2 = y * b0 + b23, b1 = y * b2 - b0 + b22;
+      b0 = y * b1 - b2 + b21;
+      b2 = y * b0 - b1 + b20, b1 = y * b2 - b0 + b19, b0 = y * b1 - b2 + b18;
+      b2 = y * b0 - b1 + b17, b1 = y * b2 - b0 + b16, b0 = y * b1 - b2 + b15;
+      b2 = y * b0 - b1 + b14, b1 = y * b2 - b0 + b13, b0 = y * b1 - b2 + b12;
+      b2 = y * b0 - b1 + b11, b1 = y * b2 - b0 + b10, b0 = y * b1 - b2 + b09;
+      b2 = y * b0 - b1 + b08, b1 = y * b2 - b0 + b07, b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      z = 0.5 * (b0 - b2) * exp(z) / sqrt(z);
    }
-   if (x < 0.0) {
-      z = -z;
-   }
-   result = z;
-   return result;
+   return x < 0.0 ? -z : +z;
 }
 
 // Modified Bessel function, second kind, order zero
@@ -3826,61 +2713,44 @@ double besseli1(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double besselk0(const double x);
 double besselk0(double x) {
-   double y;
-   double z;
    double v;
-   double b0;
-   double b1;
-   double b2;
-   double result;
    ae_assert(x > 0.0, "Domain error in BesselK0: x <= 0");
    if (x <= 2.0) {
-      y = x * x - 2.0;
-      bessel_besselmfirstcheb(1.37446543561352307156E-16, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 4.25981614279661018399E-14, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.03496952576338420167E-11, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.90451637722020886025E-9, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 2.53479107902614945675E-7, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 2.28621210311945178607E-5, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 1.26461541144692592338E-3, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 3.59799365153615016266E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, 3.44289899924628486886E-1, &b0, &b1, &b2);
-      bessel_besselmnextcheb(y, -5.35327393233902768720E-1, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      v -= log(0.5 * x) * besseli0(x);
+      double y = x * x - 2.0;
+      const double b09 = +1.37446543561352307156E-16, b08 = +4.25981614279661018399E-14;
+      const double b07 = +1.03496952576338420167E-11, b06 = +1.90451637722020886025E-9;
+      const double b05 = +2.53479107902614945675E-7, b04 = +2.28621210311945178607E-5, b03 = +1.26461541144692592338E-3;
+      const double b02 = +3.59799365153615016266E-2, b01 = +3.44289899924628486886E-1, b00 = -5.35327393233902768720E-1;
+      double b0 = b09, b2 = y * b0 + b08, b1 = y * b2 - b0 + b07;
+      b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      v = 0.5 * (b0 - b2) - log(0.5 * x) * besseli0(x);
    } else {
-      z = 8.0 / x - 2.0;
-      bessel_besselmfirstcheb(5.30043377268626276149E-18, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.64758043015242134646E-17, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 5.21039150503902756861E-17, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.67823109680541210385E-16, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 5.51205597852431940784E-16, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.84859337734377901440E-15, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 6.34007647740507060557E-15, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -2.22751332699166985548E-14, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 8.03289077536357521100E-14, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -2.98009692317273043925E-13, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 1.14034058820847496303E-12, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -4.51459788337394416547E-12, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 1.85594911495471785253E-11, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -7.95748924447710747776E-11, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 3.57739728140030116597E-10, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.69753450938905987466E-9, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 8.57403401741422608519E-9, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -4.66048989768794782956E-8, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 2.76681363944501510342E-7, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.83175552271911948767E-6, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 1.39498137188764993662E-5, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -1.28495495816278026384E-4, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 1.56988388573005337491E-3, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, -3.14481013119645005427E-2, &b0, &b1, &b2);
-      bessel_besselmnextcheb(z, 2.44030308206595545468E0, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      v = v * exp(-x) / sqrt(x);
+      double z = 8.0 / x - 2.0;
+      const double b24 = +5.30043377268626276149E-18, b23 = -1.64758043015242134646E-17;
+      const double b22 = +5.21039150503902756861E-17, b21 = -1.67823109680541210385E-16;
+      const double b20 = +5.51205597852431940784E-16, b19 = -1.84859337734377901440E-15, b18 = +6.34007647740507060557E-15;
+      const double b17 = -2.22751332699166985548E-14, b16 = +8.03289077536357521100E-14, b15 = -2.98009692317273043925E-13;
+      const double b14 = +1.14034058820847496303E-12, b13 = -4.51459788337394416547E-12, b12 = +1.85594911495471785253E-11;
+      const double b11 = -7.95748924447710747776E-11, b10 = +3.57739728140030116597E-10, b09 = -1.69753450938905987466E-9;
+      const double b08 = +8.57403401741422608519E-9, b07 = -4.66048989768794782956E-8, b06 = +2.76681363944501510342E-7;
+      const double b05 = -1.83175552271911948767E-6, b04 = +1.39498137188764993662E-5, b03 = -1.28495495816278026384E-4;
+      const double b02 = +1.56988388573005337491E-3, b01 = -3.14481013119645005427E-2, b00 = +2.44030308206595545468E0;
+      double b0 = b24, b2 = z * b0 + b23, b1 = z * b2 - b0 + b22;
+      b0 = z * b1 - b2 + b21;
+      b2 = z * b0 - b1 + b20, b1 = z * b2 - b0 + b19, b0 = z * b1 - b2 + b18;
+      b2 = z * b0 - b1 + b17, b1 = z * b2 - b0 + b16, b0 = z * b1 - b2 + b15;
+      b2 = z * b0 - b1 + b14, b1 = z * b2 - b0 + b13, b0 = z * b1 - b2 + b12;
+      b2 = z * b0 - b1 + b11, b1 = z * b2 - b0 + b10, b0 = z * b1 - b2 + b09;
+      b2 = z * b0 - b1 + b08, b1 = z * b2 - b0 + b07, b0 = z * b1 - b2 + b06;
+      b2 = z * b0 - b1 + b05, b1 = z * b2 - b0 + b04, b0 = z * b1 - b2 + b03;
+      b2 = z * b0 - b1 + b02, b1 = z * b2 - b0 + b01, b0 = z * b1 - b2 + b00;
+      v = 0.5 * (b0 - b2) * exp(-x) / sqrt(x);
    }
-   result = v;
-   return result;
+   return v;
 }
 
 // Modified Bessel function, second kind, order one
@@ -3900,62 +2770,43 @@ double besselk0(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double besselk1(const double x);
 double besselk1(double x) {
-   double y;
-   double z;
-   double v;
-   double b0;
-   double b1;
-   double b2;
-   double result;
-   z = 0.5 * x;
+   double z = 0.5 * x;
    ae_assert(z > 0.0, "Domain error in K1");
    if (x <= 2.0) {
-      y = x * x - 2.0;
-      bessel_besselm1firstcheb(-7.02386347938628759343E-18, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.42744985051936593393E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -6.66690169419932900609E-13, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.41148839263352776110E-10, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.21338763073472585583E-8, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.43340614156596823496E-6, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.73028895751305206302E-4, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -6.97572385963986435018E-3, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.22611180822657148235E-1, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.53155960776544875667E-1, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.52530022733894777053E0, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      result = log(z) * besseli1(x) + v / x;
+      double y = x * x - 2.0;
+      const double b10 = -7.02386347938628759343E-18, b09 = -2.42744985051936593393E-15;
+      const double b08 = -6.66690169419932900609E-13, b07 = -1.41148839263352776110E-10, b06 = -2.21338763073472585583E-8;
+      const double b05 = -2.43340614156596823496E-6, b04 = -1.73028895751305206302E-4, b03 = -6.97572385963986435018E-3;
+      const double b02 = -1.22611180822657148235E-1, b01 = -3.53155960776544875667E-1, b00 = +1.52530022733894777053E0;
+      double b1 = b10, b0 = y * b1 + b09, b2 = y * b0 - b1 + b08;
+      b1 = y * b2 - b0 + b07, b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      return log(z) * besseli1(x) + 0.5 * (b0 - b2) / x;
    } else {
-      y = 8.0 / x - 2.0;
-      bessel_besselm1firstcheb(-5.75674448366501715755E-18, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.79405087314755922667E-17, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -5.68946255844285935196E-17, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.83809354436663880070E-16, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -6.05704724837331885336E-16, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.03870316562433424052E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -7.01983709041831346144E-15, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.47715442448130437068E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -8.97670518232499435011E-14, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 3.34841966607842919884E-13, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.28917396095102890680E-12, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 5.13963967348173025100E-12, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.12996783842756842877E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 9.21831518760500529508E-11, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -4.19035475934189648750E-10, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.01504975519703286596E-9, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.03457624656780970260E-8, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 5.74108412545004946722E-8, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -3.50196060308781257119E-7, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.40648494783721712015E-6, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -1.93619797416608296024E-5, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.95215518471351631108E-4, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, -2.85781685962277938680E-3, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 1.03923736576817238437E-1, &b0, &b1, &b2);
-      bessel_besselm1nextcheb(y, 2.72062619048444266945E0, &b0, &b1, &b2);
-      v = 0.5 * (b0 - b2);
-      result = exp(-x) * v / sqrt(x);
+      double y = 8.0 / x - 2.0;
+      const double b24 = -5.75674448366501715755E-18, b23 = +1.79405087314755922667E-17;
+      const double b22 = -5.68946255844285935196E-17, b21 = +1.83809354436663880070E-16;
+      const double b20 = -6.05704724837331885336E-16, b19 = +2.03870316562433424052E-15, b18 = -7.01983709041831346144E-15;
+      const double b17 = +2.47715442448130437068E-14, b16 = -8.97670518232499435011E-14, b15 = +3.34841966607842919884E-13;
+      const double b14 = -1.28917396095102890680E-12, b13 = +5.13963967348173025100E-12, b12 = -2.12996783842756842877E-11;
+      const double b11 = +9.21831518760500529508E-11, b10 = -4.19035475934189648750E-10, b09 = +2.01504975519703286596E-9;
+      const double b08 = -1.03457624656780970260E-8, b07 = +5.74108412545004946722E-8, b06 = -3.50196060308781257119E-7;
+      const double b05 = +2.40648494783721712015E-6, b04 = -1.93619797416608296024E-5, b03 = +1.95215518471351631108E-4;
+      const double b02 = -2.85781685962277938680E-3, b01 = +1.03923736576817238437E-1, b00 = +2.72062619048444266945E0;
+      double b0 = b24, b2 = y * b0 + b23, b1 = y * b2 - b0 + b22;
+      b0 = y * b1 - b2 + b21;
+      b2 = y * b0 - b1 + b20, b1 = y * b2 - b0 + b19, b0 = y * b1 - b2 + b18;
+      b2 = y * b0 - b1 + b17, b1 = y * b2 - b0 + b16, b0 = y * b1 - b2 + b15;
+      b2 = y * b0 - b1 + b14, b1 = y * b2 - b0 + b13, b0 = y * b1 - b2 + b12;
+      b2 = y * b0 - b1 + b11, b1 = y * b2 - b0 + b10, b0 = y * b1 - b2 + b09;
+      b2 = y * b0 - b1 + b08, b1 = y * b2 - b0 + b07, b0 = y * b1 - b2 + b06;
+      b2 = y * b0 - b1 + b05, b1 = y * b2 - b0 + b04, b0 = y * b1 - b2 + b03;
+      b2 = y * b0 - b1 + b02, b1 = y * b2 - b0 + b01, b0 = y * b1 - b2 + b00;
+      return exp(-x) * 0.5 * (b0 - b2) / sqrt(x);
    }
-   return result;
 }
 
 // Modified Bessel function, second kind, integer order
@@ -3978,78 +2829,44 @@ double besselk1(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 2000 by Stephen L. Moshier
+// API: double besselkn(const ae_int_t nn, const double x);
 double besselkn(ae_int_t nn, double x) {
-   double k;
-   double kf;
-   double nk1f;
-   double nkf;
-   double zn;
-   double t;
-   double s;
-   double z0;
-   double z;
-   double ans;
-   double fn;
-   double pn;
-   double pk;
-   double zmn;
-   double tlg;
-   double tox;
-   ae_int_t i;
-   ae_int_t n;
-   double eul;
-   double result;
-   eul = 5.772156649015328606065e-1;
-   if (nn < 0) {
-      n = -nn;
-   } else {
-      n = nn;
-   }
+   ae_int_t n = nn < 0 ? -nn : +nn;
    ae_assert(n <= 31, "Overflow in BesselKN");
    ae_assert(x > 0.0, "Domain error in BesselKN");
    if (x <= 9.55) {
-      ans = 0.0;
-      z0 = 0.25 * x * x;
-      fn = 1.0;
-      pn = 0.0;
-      zmn = 1.0;
-      tox = 2.0 / x;
+      double ans = 0.0, z0 = 0.25 * x * x, tox = 2.0 / x;
+      double fn = 1.0, pn = 0.0, zmn = 1.0;
       if (n > 0) {
-         pn = -eul;
-         k = 1.0;
-         for (i = 1; i < n; i++) {
-            pn += 1.0 / k;
-            k++;
-            fn *= k;
+         pn = -Eul;
+         for (ae_int_t i = 1; i < n; i++) {
+            pn += 1.0 / i;
+            fn *= i;
          }
          zmn = tox;
-         if (n == 1) {
-            ans = 1.0 / x;
-         } else {
-            nk1f = fn / n;
-            kf = 1.0;
-            s = nk1f;
-            z = -z0;
-            zn = 1.0;
-            for (i = 1; i < n; i++) {
+         if (n == 1) ans = 1.0 / x;
+         else {
+            double nk1f = fn / n, kf = 1.0, s = nk1f;
+            double z = -z0, zn = 1.0;
+            for (ae_int_t i = 1; i < n; i++) {
                nk1f /= n - i;
                kf *= i;
                zn *= z;
-               t = nk1f * zn / kf;
+               double t = nk1f * zn / kf;
                s += t;
                ae_assert(ae_maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN");
                ae_assert(!(tox > 1.0 && ae_maxrealnumber / tox < zmn), "Overflow in BesselKN");
                zmn *= tox;
             }
             s *= 0.5;
-            t = fabs(s);
+            double t = fabs(s);
             ae_assert(!(zmn > 1.0 && ae_maxrealnumber / zmn < t), "Overflow in BesselKN");
             ae_assert(!(t > 1.0 && ae_maxrealnumber / t < zmn), "Overflow in BesselKN");
             ans = s * zmn;
          }
       }
-      tlg = 2.0 * log(0.5 * x);
-      pk = -eul;
+      double tlg = 2.0 * log(0.5 * x), pk = -Eul;
+      double t;
       if (n == 0) {
          pn = pk;
          t = 1.0;
@@ -4057,8 +2874,8 @@ double besselkn(ae_int_t nn, double x) {
          pn += 1.0 / n;
          t = 1.0 / fn;
       }
-      s = (pk + pn - tlg) * t;
-      k = 1.0;
+      double s = (pk + pn - tlg) * t;
+      double k = 1.0;
       do {
          t *= z0 / (k * (k + n));
          pk += 1.0 / k;
@@ -4067,73 +2884,29 @@ double besselkn(ae_int_t nn, double x) {
          k++;
       } while (!SmallAtR(t / s, ae_machineepsilon));
       s = 0.5 * s / zmn;
-      if (n % 2 != 0) {
-         s = -s;
-      }
-      ans += s;
-      result = ans;
-      return result;
+      if (n % 2 != 0) s = -s;
+      return ans + s;
    }
-   if (x > log(ae_maxrealnumber)) {
-      result = 0.0;
-      return result;
-   }
-   k = (double)n;
-   pn = 4.0 * k * k;
-   pk = 1.0;
-   z0 = 8.0 * x;
-   fn = 1.0;
-   t = 1.0;
-   s = t;
-   nkf = ae_maxrealnumber;
-   i = 0;
+   if (x > log(ae_maxrealnumber)) return 0.0;
+   double pn = 4.0 * (n * n), pk = 1.0, z0 = 8.0 * x, fn = 1.0, nkf = ae_maxrealnumber;
+   double t = 1.0, s = t;
+   ae_int_t i = 0;
    do {
-      z = pn - pk * pk;
+      double z = pn - pk * pk;
       t = t * z / (fn * z0);
-      nk1f = fabs(t);
-      if (i >= n && nk1f > nkf) {
-         break;
-      }
+      double nk1f = fabs(t);
+      if (i >= n && nk1f > nkf) break;
       nkf = nk1f;
       s += t;
       fn++;
       pk += 2.0;
       i++;
    } while (!SmallAtR(t / s, ae_machineepsilon));
-   result = exp(-x) * sqrt(ae_pi / (2.0 * x)) * s;
-   return result;
+   return exp(-x) * sqrt(ae_pi / (2.0 * x)) * s;
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Bessel function of order zero
-//
-// Returns Bessel function of order zero of the argument.
-//
-// The domain is divided into the intervals [0, 5] and
-// (5, infinity). In the first interval the following rational
-// approximation is used:
-//
-//
-//        2         2
-// (w - r  ) (w - r  ) P (w) / Q (w)
-//       1         2    3       8
-//
-//            2
-// where w = x  and the two r's are zeros of the function.
-//
-// In the second interval, the Hankel asymptotic expansion
-// is employed with two rational functions of degree 6/6
-// and 7/7.
-//
-// ACCURACY:
-//
-//                      Absolute error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       60000       4.2e-16     1.1e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double besselj0(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4142,24 +2915,6 @@ double besselj0(const double x) {
    return D;
 }
 
-// Bessel function of order one
-//
-// Returns Bessel function of order one of the argument.
-//
-// The domain is divided into the intervals [0, 8] and
-// (8, infinity). In the first interval a 24 term Chebyshev
-// expansion is used. In the second, the asymptotic
-// trigonometric representation is employed using two
-// rational functions of degree 5/5.
-//
-// ACCURACY:
-//
-//                      Absolute error:
-// arithmetic   domain      # trials      peak         rms
-//    IEEE      0, 30       30000       2.6e-16     1.1e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double besselj1(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4168,31 +2923,6 @@ double besselj1(const double x) {
    return D;
 }
 
-// Bessel function of integer order
-//
-// Returns Bessel function of order n, where n is a
-// (possibly negative) integer.
-//
-// The ratio of jn(x) to j0(x) is computed by backward
-// recurrence.  First the ratio jn/jn-1 is found by a
-// continued fraction expansion.  Then the recurrence
-// relating successive orders is applied until j0 or j1 is
-// reached.
-//
-// If n = 0 or 1 the routine for j0 or j1 is called
-// directly.
-//
-// ACCURACY:
-//
-//                      Absolute error:
-// arithmetic   range      # trials      peak         rms
-//    IEEE      0, 30        5000       4.4e-16     7.9e-17
-//
-//
-// Not suitable for large n or x. Use jv() (fractional order) instead.
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besseljn(const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4201,32 +2931,6 @@ double besseljn(const ae_int_t n, const double x) {
    return D;
 }
 
-// Bessel function of the second kind, order zero
-//
-// Returns Bessel function of the second kind, of order
-// zero, of the argument.
-//
-// The domain is divided into the intervals [0, 5] and
-// (5, infinity). In the first interval a rational approximation
-// R(x) is employed to compute
-//   y0(x)  = R(x)  +   2 * log(x) * j0(x) / PI.
-// Thus a call to j0() is required.
-//
-// In the second interval, the Hankel asymptotic expansion
-// is employed with two rational functions of degree 6/6
-// and 7/7.
-//
-//
-//
-// ACCURACY:
-//
-//  Absolute error, when y0(x) < 1; else relative error:
-//
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       30000       1.3e-15     1.6e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double bessely0(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4235,25 +2939,6 @@ double bessely0(const double x) {
    return D;
 }
 
-// Bessel function of second kind of order one
-//
-// Returns Bessel function of the second kind of order one
-// of the argument.
-//
-// The domain is divided into the intervals [0, 8] and
-// (8, infinity). In the first interval a 25 term Chebyshev
-// expansion is used, and a call to j1() is required.
-// In the second, the asymptotic trigonometric representation
-// is employed using two rational functions of degree 5/5.
-//
-// ACCURACY:
-//
-//                      Absolute error:
-// arithmetic   domain      # trials      peak         rms
-//    IEEE      0, 30       30000       1.0e-15     1.3e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double bessely1(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4262,26 +2947,6 @@ double bessely1(const double x) {
    return D;
 }
 
-// Bessel function of second kind of integer order
-//
-// Returns Bessel function of order n, where n is a
-// (possibly negative) integer.
-//
-// The function is evaluated by forward recurrence on
-// n, starting with values computed by the routines
-// y0() and y1().
-//
-// If n = 0 or 1 the routine for y0 or y1 is called
-// directly.
-//
-// ACCURACY:
-//                      Absolute error, except relative
-//                      when y > 1:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       30000       3.4e-15     4.3e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselyn(const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4290,25 +2955,6 @@ double besselyn(const ae_int_t n, const double x) {
    return D;
 }
 
-// Modified Bessel function of order zero
-//
-// Returns modified Bessel function of order zero of the
-// argument.
-//
-// The function is defined as i0(x) = j0( ix ).
-//
-// The range is partitioned into the two intervals [0,8] and
-// (8, infinity).  Chebyshev polynomial expansions are employed
-// in each interval.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,30        30000       5.8e-16     1.4e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besseli0(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4317,25 +2963,6 @@ double besseli0(const double x) {
    return D;
 }
 
-// Modified Bessel function of order one
-//
-// Returns modified Bessel function of order one of the
-// argument.
-//
-// The function is defined as i1(x) = -i j1( ix ).
-//
-// The range is partitioned into the two intervals [0,8] and
-// (8, infinity).  Chebyshev polynomial expansions are employed
-// in each interval.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       30000       1.9e-15     2.1e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double besseli1(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4344,25 +2971,6 @@ double besseli1(const double x) {
    return D;
 }
 
-// Modified Bessel function, second kind, order zero
-//
-// Returns modified Bessel function of the second kind
-// of order zero of the argument.
-//
-// The range is partitioned into the two intervals [0,8] and
-// (8, infinity).  Chebyshev polynomial expansions are employed
-// in each interval.
-//
-// ACCURACY:
-//
-// Tested at 2000 random points between 0 and 8.  Peak absolute
-// error (relative when K0 > 1) was 1.46e-14; rms, 4.26e-15.
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       30000       1.2e-15     1.6e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselk0(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4371,23 +2979,6 @@ double besselk0(const double x) {
    return D;
 }
 
-// Modified Bessel function, second kind, order one
-//
-// Computes the modified Bessel function of the second kind
-// of order one of the argument.
-//
-// The range is partitioned into the two intervals [0,2] and
-// (2, infinity).  Chebyshev polynomial expansions are employed
-// in each interval.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       30000       1.2e-15     1.6e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselk1(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4396,26 +2987,6 @@ double besselk1(const double x) {
    return D;
 }
 
-// Modified Bessel function, second kind, integer order
-//
-// Returns modified Bessel function of the second kind
-// of order n of the argument.
-//
-// The range is partitioned into the two intervals [0,9.55] and
-// (9.55, infinity).  An ascending power series is used in the
-// low range, and an asymptotic expansion in the high range.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,30        90000       1.8e-8      3.0e-10
-//
-// Error is high only near the crossover point x = 9.55
-// between the two expansions used.
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1988, 2000 by Stephen L. Moshier
 double besselkn(const ae_int_t nn, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4709,6 +3280,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
 //
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
+// API: double incompletebeta(const double a, const double b, const double x);
 double incompletebeta(double a, double b, double x) {
    double t;
    double xc;
@@ -4831,6 +3403,7 @@ double incompletebeta(double a, double b, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1996, 2000 by Stephen L. Moshier
+// API: double invincompletebeta(const double a, const double b, const double y);
 double invincompletebeta(double a, double b, double y) {
    double aaa;
    double bbb;
@@ -5160,45 +3733,6 @@ double invincompletebeta(double a, double b, double y) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Incomplete beta integral
-//
-// Returns incomplete beta integral of the arguments, evaluated
-// from zero to x.  The function is defined as
-//
-//                  x
-//     -            -
-//    | (a+b)      | |  a-1     b-1
-//  -----------    |   t   (1-t)   dt.
-//   -     -     | |
-//  | (a) | (b)   -
-//                 0
-//
-// The domain of definition is 0 <= x <= 1.  In this
-// implementation a and b are restricted to positive values.
-// The integral from x to 1 may be obtained by the symmetry
-// relation
-//
-//    1 - incbet( a, b, x )  =  incbet( b, a, 1-x ).
-//
-// The integral is evaluated by a continued fraction expansion
-// or, when b*x is small, by a power series.
-//
-// ACCURACY:
-//
-// Tested at uniformly distributed random points (a,b,x) with a and b
-// in "domain" and x between 0 and 1.
-//                                        Relative error
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,5         10000       6.9e-15     4.5e-16
-//    IEEE      0,85       250000       2.2e-13     1.7e-14
-//    IEEE      0,1000      30000       5.3e-12     6.3e-13
-//    IEEE      0,10000    250000       9.3e-11     7.1e-12
-//    IEEE      0,100000    10000       8.7e-10     4.8e-11
-// Outputs smaller than the IEEE gradual underflow threshold
-// were excluded from these statistics.
-//
-// Cephes Math Library, Release 2.8:  June, 2000
-// Copyright 1984, 1995, 2000 by Stephen L. Moshier
 double incompletebeta(const double a, const double b, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -5207,32 +3741,6 @@ double incompletebeta(const double a, const double b, const double x) {
    return D;
 }
 
-// Inverse of imcomplete beta integral
-//
-// Given y, the function finds x such that
-//
-//  incbet( a, b, x ) = y .
-//
-// The routine performs interval halving or Newton iterations to find the
-// root of incbet(a,b,x) - y = 0.
-//
-//
-// ACCURACY:
-//
-//                      Relative error:
-//                x     a,b
-// arithmetic   domain  domain  # trials    peak       rms
-//    IEEE      0,1    .5,10000   50000    5.8e-12   1.3e-13
-//    IEEE      0,1   .25,100    100000    1.8e-13   3.9e-15
-//    IEEE      0,1     0,5       50000    1.1e-12   5.5e-15
-// With a and b constrained to half-integer or integer values:
-//    IEEE      0,1    .5,10000   50000    5.8e-12   1.1e-13
-//    IEEE      0,1    .5,100    100000    1.7e-14   7.9e-16
-// With a = .5, b constrained to half-integer or integer values:
-//    IEEE      0,1    .5,10000   10000    8.3e-11   1.0e-11
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1996, 2000 by Stephen L. Moshier
 double invincompletebeta(const double a, const double b, const double y) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -5275,6 +3783,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double fdistribution(const ae_int_t a, const ae_int_t b, const double x);
 double fdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
@@ -5319,6 +3828,7 @@ double fdistribution(ae_int_t a, ae_int_t b, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double fcdistribution(const ae_int_t a, const ae_int_t b, const double x);
 double fcdistribution(ae_int_t a, ae_int_t b, double x) {
    double w;
    double result;
@@ -5361,6 +3871,7 @@ double fcdistribution(ae_int_t a, ae_int_t b, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double invfdistribution(const ae_int_t a, const ae_int_t b, const double y);
 double invfdistribution(ae_int_t a, ae_int_t b, double y) {
    double w;
    double result;
@@ -5381,36 +3892,6 @@ double invfdistribution(ae_int_t a, ae_int_t b, double y) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// F distribution
-//
-// Returns the area from zero to x under the F density
-// function (also known as Snedcor's density or the
-// variance ratio density).  This is the density
-// of x = (u1/df1)/(u2/df2), where u1 and u2 are random
-// variables having Chi square distributions with df1
-// and df2 degrees of freedom, respectively.
-// The incomplete beta integral is used, according to the
-// formula
-//
-// P(x) = incbet( df1/2, df2/2, (df1*x/(df2 + df1*x) ).
-//
-//
-// The arguments a and b are greater than zero, and x is
-// nonnegative.
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,x).
-//
-//                x     a,b                     Relative error:
-// arithmetic  domain  domain     # trials      peak         rms
-//    IEEE      0,1    0,100       100000      9.8e-15     1.7e-15
-//    IEEE      1,5    0,100       100000      6.5e-15     3.5e-16
-//    IEEE      0,1    1,10000     100000      2.2e-11     3.3e-12
-//    IEEE      1,5    1,10000     100000      1.1e-11     1.7e-13
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double fdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -5419,40 +3900,6 @@ double fdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    return D;
 }
 
-// Complemented F distribution
-//
-// Returns the area from x to infinity under the F density
-// function (also known as Snedcor's density or the
-// variance ratio density).
-//
-//
-//                      inf.
-//                       -
-//              1       | |  a-1      b-1
-// 1-P(x)  =  ------    |   t    (1-t)    dt
-//            B(a,b)  | |
-//                     -
-//                      x
-//
-//
-// The incomplete beta integral is used, according to the
-// formula
-//
-// P(x) = incbet( df2/2, df1/2, (df2/(df2 + df1*x) ).
-//
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,x) in the indicated intervals.
-//                x     a,b                     Relative error:
-// arithmetic  domain  domain     # trials      peak         rms
-//    IEEE      0,1    1,100       100000      3.7e-14     5.9e-16
-//    IEEE      1,5    1,100       100000      8.0e-15     1.6e-15
-//    IEEE      0,1    1,10000     100000      1.8e-11     3.5e-13
-//    IEEE      1,5    1,10000     100000      2.0e-11     3.0e-12
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double fcdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -5461,39 +3908,6 @@ double fcdistribution(const ae_int_t a, const ae_int_t b, const double x) {
    return D;
 }
 
-// Inverse of complemented F distribution
-//
-// Finds the F density argument x such that the integral
-// from x to infinity of the F density is equal to the
-// given probability p.
-//
-// This is accomplished using the inverse beta integral
-// function and the relations
-//
-//      z = incbi( df2/2, df1/2, p )
-//      x = df2 (1-z) / (df1 z).
-//
-// Note: the following relations hold for the inverse of
-// the uncomplemented F distribution:
-//
-//      z = incbi( df1/2, df2/2, p )
-//      x = df2 z / (df1 (1-z)).
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,p).
-//
-//              a,b                     Relative error:
-// arithmetic  domain     # trials      peak         rms
-//  For p between .001 and 1:
-//    IEEE     1,100       100000      8.3e-15     4.7e-16
-//    IEEE     1,10000     100000      2.1e-11     1.4e-13
-//  For p between 10^-6 and 10^-3:
-//    IEEE     1,100        50000      1.3e-12     8.4e-15
-//    IEEE     1,10000      50000      3.0e-12     4.8e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invfdistribution(const ae_int_t a, const ae_int_t b, const double y) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -5545,6 +3959,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: void fresnelintegral(const double x, double &c, double &s);
 void fresnelintegral(double x, double *c, double *s) {
    double xxa;
    double f;
@@ -5562,10 +3977,6 @@ void fresnelintegral(double x, double *c, double *s) {
    double fd;
    double gn;
    double gd;
-   double mpi;
-   double mpio2;
-   mpi = 3.14159265358979323846;
-   mpio2 = 1.57079632679489661923;
    xxa = x;
    x = fabs(xxa);
    x2 = x * x;
@@ -5607,7 +4018,7 @@ void fresnelintegral(double x, double *c, double *s) {
       return;
    }
    x2 = x * x;
-   t = mpi * x2;
+   t = ae_pi * x2;
    u = 1 / (t * t);
    t = 1 / t;
    fn = 4.21543555043677546506E-1;
@@ -5656,10 +4067,10 @@ void fresnelintegral(double x, double *c, double *s) {
    gd = gd * u + 1.86958710162783236342E-22;
    f = 1 - u * fn / fd;
    g = t * gn / gd;
-   t = mpio2 * x2;
+   t = HalfPi * x2;
    cc = cos(t);
    ss = sin(t);
-   t = mpi * x;
+   t = ae_pi * x;
    *c = 0.5 + (f * ss - g * cc) / t;
    *s = 0.5 - (f * cc + g * ss) / t;
    *c *= ae_sign(xxa);
@@ -5668,46 +4079,6 @@ void fresnelintegral(double x, double *c, double *s) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Fresnel integral
-//
-// Evaluates the Fresnel integrals
-//
-//           x
-//           -
-//          | |
-// C(x) =   |   cos(pi/2 t**2) dt,
-//        | |
-//         -
-//          0
-//
-//           x
-//           -
-//          | |
-// S(x) =   |   sin(pi/2 t**2) dt.
-//        | |
-//         -
-//          0
-//
-//
-// The integrals are evaluated by a power series for x < 1.
-// For x >= 1 auxiliary functions f(x) and g(x) are employed
-// such that
-//
-// C(x) = 0.5 + f(x) sin( pi/2 x**2 ) - g(x) cos( pi/2 x**2 )
-// S(x) = 0.5 - f(x) cos( pi/2 x**2 ) - g(x) sin( pi/2 x**2 )
-//
-//
-//
-// ACCURACY:
-//
-//  Relative error.
-//
-// Arithmetic  function   domain     # trials      peak         rms
-//   IEEE       S(x)      0, 10       10000       2.0e-15     3.2e-16
-//   IEEE       C(x)      0, 10       10000       1.8e-15     3.3e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 void fresnelintegral(const double x, double &c, double &s) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -5756,6 +4127,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph);
 void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph) {
    ae_frame _frame_block;
    double ai;
@@ -5792,7 +4164,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
       phi = 1.0 / b;
       twon = b * sinh(u);
       *sn = t + ai * (twon - u) / (b * b);
-      *ph = 2.0 * atan(exp(u)) - 1.57079632679489661923 + ai * (twon - u) / b;
+      *ph = 2.0 * atan(exp(u)) - HalfPi + ai * (twon - u) / b;
       ai *= t * phi;
       *cn = phi - ai * (twon - u);
       *dn = phi + ai * (twon + u);
@@ -5834,44 +4206,6 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Jacobian Elliptic Functions
-//
-// Evaluates the Jacobian elliptic functions sn(u|m), cn(u|m),
-// and dn(u|m) of parameter m between 0 and 1, and real
-// argument u.
-//
-// These functions are periodic, with quarter-period on the
-// real axis equal to the complete elliptic integral
-// ellpk(1.0-m).
-//
-// Relation to incomplete elliptic integral:
-// If u = ellik(phi,m), then sn(u|m) = sin(phi),
-// and cn(u|m) = cos(phi).  Phi is called the amplitude of u.
-//
-// Computation is by means of the arithmetic-geometric mean
-// algorithm, except when m is within 1e-9 of 0 or 1.  In the
-// latter case with m close to 1, the approximation applies
-// only for phi < pi/2.
-//
-// ACCURACY:
-//
-// Tested at random points with u between 0 and 10, m between
-// 0 and 1.
-//
-//            Absolute error (* = relative error):
-// arithmetic   function   # trials      peak         rms
-//    IEEE      phi         10000       9.2e-16*    1.4e-16*
-//    IEEE      sn          50000       4.1e-15     4.6e-16
-//    IEEE      cn          40000       3.6e-15     4.4e-16
-//    IEEE      dn          10000       1.3e-12     1.8e-14
-//
-//  Peak error observed in consistency check using addition
-// theorem for sn(u+v) was 4e-16 (absolute).  Also tested by
-// the above relation to the incomplete elliptic integral.
-// Accuracy deteriorates when u is large.
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -5919,6 +4253,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1992, 2000 by Stephen L. Moshier
+// API: double psi(const double x);
 double psi(double x) {
    double p;
    double q;
@@ -5962,7 +4297,7 @@ double psi(double x) {
          w = (double)i;
          y += 1.0 / w;
       }
-      y -= 0.57721566490153286061;
+      y -= Eul;
    } else {
       s = x;
       w = 0.0;
@@ -5994,43 +4329,6 @@ double psi(double x) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Psi (digamma) function
-//
-//              d      -
-//   psi(x)  =  -- ln | (x)
-//              dx
-//
-// is the logarithmic derivative of the gamma function.
-// For integer x,
-//                   n-1
-//                    -
-// psi(n) = -EUL  +   >  1/k.
-//                    -
-//                   k=1
-//
-// This formula is used for 0 < n <= 10.  If x is negative, it
-// is transformed to a positive argument by the reflection
-// formula  psi(1-x) = psi(x) + pi cot(pi x).
-// For general positive x, the argument is made greater than 10
-// using the recurrence  psi(x+1) = psi(x) + 1/x.
-// Then the following asymptotic expansion is applied:
-//
-//                           inf.   B
-//                            -      2k
-// psi(x) = log(x) - 1/2x -   >   -------
-//                            -        2k
-//                           k=1   2k x
-//
-// where the B2k are Bernoulli numbers.
-//
-// ACCURACY:
-//    Relative error (except absolute when |psi| < 1):
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0,30        30000       1.3e-15     1.4e-16
-//    IEEE      -30,0       40000       1.5e-15     2.2e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1992, 2000 by Stephen L. Moshier
 double psi(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6065,14 +4363,13 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  May, 1999
 // Copyright 1999 by Stephen L. Moshier
+// API: double exponentialintegralei(const double x);
 double exponentialintegralei(double x) {
-   double eul;
    double f;
    double f1;
    double f2;
    double w;
    double result;
-   eul = 0.5772156649015328606065;
    if (x <= 0.0) {
       result = 0.0;
       return result;
@@ -6092,7 +4389,7 @@ double exponentialintegralei(double x) {
       f2 = f2 * x - 729494.9239640527645655;
       f2 = f2 * x + 1592627.163384945429726;
       f = f1 / f2;
-      result = eul + log(x) + x * f;
+      result = Eul + log(x) + x * f;
       return result;
    }
    if (x < 4.0) {
@@ -6261,6 +4558,7 @@ double exponentialintegralei(double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 2000 by Stephen L. Moshier
+// API: double exponentialintegralen(const double x, const ae_int_t n);
 double exponentialintegralen(double x, ae_int_t n) {
    double r;
    double t;
@@ -6277,9 +4575,7 @@ double exponentialintegralen(double x, ae_int_t n) {
    ae_int_t i;
    ae_int_t k;
    double big;
-   double eul;
    double result;
-   eul = 0.57721566490153286060;
    big = 1.44115188075855872 * pow(10.0, 17.0);
    if (n < 0 || x < 0.0 || x > 170.0 || x == 0.0 && n < 2) {
       result = -1.0;
@@ -6304,7 +4600,7 @@ double exponentialintegralen(double x, ae_int_t n) {
       return result;
    }
    if (x <= 1.0) {
-      psi = -eul - log(x);
+      psi = -Eul - log(x);
       for (i = 1; i < n; i++) {
          psi += 1.0 / (double)i;
       }
@@ -6379,29 +4675,6 @@ double exponentialintegralen(double x, ae_int_t n) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Exponential integral Ei(x)
-//
-//               x
-//                -     t
-//               | |   e
-//    Ei(x) =   -|-   ---  dt .
-//             | |     t
-//              -
-//             -inf
-//
-// Not defined for x <= 0.
-// See also expn.c.
-//
-//
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0,100       50000      8.6e-16     1.3e-16
-//
-// Cephes Math Library Release 2.8:  May, 1999
-// Copyright 1999 by Stephen L. Moshier
 double exponentialintegralei(const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6410,35 +4683,6 @@ double exponentialintegralei(const double x) {
    return D;
 }
 
-// Exponential integral En(x)
-//
-// Evaluates the exponential integral
-//
-//                 inf.
-//                   -
-//                  | |   -xt
-//                  |    e
-//      E (x)  =    |    ----  dt.
-//       n          |      n
-//                | |     t
-//                 -
-//                  1
-//
-//
-// Both n and x must be nonnegative.
-//
-// The routine employs either a power series, a continued
-// fraction, or an asymptotic formula depending on the
-// relative values of n and x.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE      0, 30       10000       1.7e-15     3.6e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1985, 2000 by Stephen L. Moshier
 double exponentialintegralen(const double x, const ae_int_t n) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6458,6 +4702,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Laguerre polynomial Ln at x
+// API: double laguerrecalculate(const ae_int_t n, const double x);
 double laguerrecalculate(ae_int_t n, double x) {
    double a;
    double b;
@@ -6489,6 +4734,7 @@ double laguerrecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Laguerre polynomial at x
+// API: double laguerresum(const real_1d_array &c, const ae_int_t n, const double x);
 double laguerresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
@@ -6512,6 +4758,7 @@ double laguerresum(RVector *c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
+// API: void laguerrecoefficients(const ae_int_t n, real_1d_array &c);
 void laguerrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
@@ -6524,14 +4771,6 @@ void laguerrecoefficients(ae_int_t n, RVector *c) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Calculation of the value of the Laguerre polynomial.
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Laguerre polynomial Ln at x
 double laguerrecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6540,16 +4779,6 @@ double laguerrecalculate(const ae_int_t n, const double x) {
    return D;
 }
 
-// Summation of Laguerre polynomials using Clenshaw's recurrence formula.
-//
-// This routine calculates c[0]*L0(x) + c[1]*L1(x) + ... + c[N]*LN(x)
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Laguerre polynomial at x
 double laguerresum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6558,13 +4787,6 @@ double laguerresum(const real_1d_array &c, const ae_int_t n, const double x) {
    return D;
 }
 
-// Representation of Ln as C[0] + C[1]*X + ... + C[N]*X^N
-//
-// Inputs:
-//     N   -   polynomial degree, n >= 0
-//
-// Outputs:
-//     C   -   coefficients
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -6607,6 +4829,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double chisquaredistribution(const double v, const double x);
 double chisquaredistribution(double v, double x) {
    double result;
    ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistribution");
@@ -6643,6 +4866,7 @@ double chisquaredistribution(double v, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double chisquarecdistribution(const double v, const double x);
 double chisquarecdistribution(double v, double x) {
    double result;
    ae_assert(x >= 0.0 && v >= 1.0, "Domain error in ChiSquareDistributionC");
@@ -6668,6 +4892,7 @@ double chisquarecdistribution(double v, double x) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
+// API: double invchisquaredistribution(const double v, const double y);
 double invchisquaredistribution(double v, double y) {
    double result;
    ae_assert(y >= 0.0 && y <= 1.0 && v >= 1.0, "Domain error in InvChiSquareDistribution");
@@ -6677,37 +4902,6 @@ double invchisquaredistribution(double v, double y) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Chi-square distribution
-//
-// Returns the area under the left hand tail (from 0 to x)
-// of the Chi square probability density function with
-// v degrees of freedom.
-//
-//
-//                                   x
-//                                    -
-//                        1          | |  v/2-1  -t/2
-//  P( x | v )   =   -----------     |   t      e     dt
-//                    v/2  -       | |
-//                   2    | (v/2)   -
-//                                   0
-//
-// where x is the Chi-square variable.
-//
-// The incomplete gamma integral is used, according to the
-// formula
-//
-// y = chdtr( v, x ) = igam( v/2.0, x/2.0 ).
-//
-// The arguments must both be positive.
-//
-// ACCURACY:
-//
-// See incomplete gamma function
-//
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double chisquaredistribution(const double v, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6716,35 +4910,6 @@ double chisquaredistribution(const double v, const double x) {
    return D;
 }
 
-// Complemented Chi-square distribution
-//
-// Returns the area under the right hand tail (from x to
-// infinity) of the Chi square probability density function
-// with v degrees of freedom:
-//
-//                                  inf.
-//                                    -
-//                        1          | |  v/2-1  -t/2
-//  P( x | v )   =   -----------     |   t      e     dt
-//                    v/2  -       | |
-//                   2    | (v/2)   -
-//                                   x
-//
-// where x is the Chi-square variable.
-//
-// The incomplete gamma integral is used, according to the
-// formula
-//
-// y = chdtr( v, x ) = igamc( v/2.0, x/2.0 ).
-//
-// The arguments must both be positive.
-//
-// ACCURACY:
-//
-// See incomplete gamma function
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double chisquarecdistribution(const double v, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6753,24 +4918,6 @@ double chisquarecdistribution(const double v, const double x) {
    return D;
 }
 
-// Inverse of complemented Chi-square distribution
-//
-// Finds the Chi-square argument x such that the integral
-// from x to infinity of the Chi-square density is equal
-// to the given cumulative probability y.
-//
-// This is accomplished using the inverse gamma integral
-// function and the relation
-//
-//    x/2 = igami( df/2, y );
-//
-// ACCURACY:
-//
-// See inverse incomplete gamma function
-//
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double invchisquaredistribution(const double v, const double y) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6790,6 +4937,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Legendre polynomial Pn at x
+// API: double legendrecalculate(const ae_int_t n, const double x);
 double legendrecalculate(ae_int_t n, double x) {
    double a;
    double b;
@@ -6825,6 +4973,7 @@ double legendrecalculate(ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Legendre polynomial at x
+// API: double legendresum(const real_1d_array &c, const ae_int_t n, const double x);
 double legendresum(RVector *c, ae_int_t n, double x) {
    double b1;
    double b2;
@@ -6848,6 +4997,7 @@ double legendresum(RVector *c, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
+// API: void legendrecoefficients(const ae_int_t n, real_1d_array &c);
 void legendrecoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
@@ -6866,14 +5016,6 @@ void legendrecoefficients(ae_int_t n, RVector *c) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Calculation of the value of the Legendre polynomial Pn.
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Legendre polynomial Pn at x
 double legendrecalculate(const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6882,17 +5024,6 @@ double legendrecalculate(const ae_int_t n, const double x) {
    return D;
 }
 
-// Summation of Legendre polynomials using Clenshaw's recurrence formula.
-//
-// This routine calculates
-//     c[0]*P0(x) + c[1]*P1(x) + ... + c[N]*PN(x)
-//
-// Parameters:
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Legendre polynomial at x
 double legendresum(const real_1d_array &c, const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -6901,13 +5032,6 @@ double legendresum(const real_1d_array &c, const ae_int_t n, const double x) {
    return D;
 }
 
-// Representation of Pn as C[0] + C[1]*X + ... + C[N]*X^N
-//
-// Inputs:
-//     N   -   polynomial degree, n >= 0
-//
-// Outputs:
-//     C   -   coefficients
 void legendrecoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -6939,6 +5063,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.0:  April, 1987
 // Copyright 1984, 1987 by Stephen L. Moshier
+// API: double beta(const double a, const double b);
 double beta(double a, double b) {
    double y;
    double sg;
@@ -6974,26 +5099,6 @@ double beta(double a, double b) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Beta function
-//
-//
-//                   -     -
-//                  | (a) | (b)
-// beta( a, b )  =  -----------.
-//                     -
-//                    | (a+b)
-//
-// For large arguments the logarithm of the function is
-// evaluated using lgam(), then exponentiated.
-//
-// ACCURACY:
-//
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE       0,30       30000       8.1e-14     1.1e-14
-//
-// Cephes Math Library Release 2.0:  April, 1987
-// Copyright 1984, 1987 by Stephen L. Moshier
 double beta(const double a, const double b) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7015,6 +5120,7 @@ namespace alglib_impl {
 //
 // Result:
 //     the value of the Chebyshev polynomial at x
+// API: double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x);
 double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
    ae_int_t i;
    double a;
@@ -7062,6 +5168,7 @@ double chebyshevcalculate(ae_int_t r, ae_int_t n, double x) {
 //
 // Result:
 //     the value of the Chebyshev polynomial at x
+// API: double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x);
 double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x) {
    double b1;
    double b2;
@@ -7089,6 +5196,7 @@ double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x) {
 //
 // Outputs:
 //     C   -   coefficients
+// API: void chebyshevcoefficients(const ae_int_t n, real_1d_array &c);
 void chebyshevcoefficients(ae_int_t n, RVector *c) {
    ae_int_t i;
    SetVector(c);
@@ -7117,6 +5225,7 @@ void chebyshevcoefficients(ae_int_t n, RVector *c) {
 //
 // Outputs:
 //     B   -   power series coefficients
+// API: void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b);
 void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
    ae_int_t i;
    ae_int_t k;
@@ -7161,16 +5270,6 @@ void fromchebyshev(RVector *a, ae_int_t n, RVector *b) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Calculation of the value of the Chebyshev polynomials of the
-// first and second kinds.
-//
-// Parameters:
-//     r   -   polynomial kind, either 1 or 2.
-//     n   -   degree, n >= 0
-//     x   -   argument, -1 <= x <= 1
-//
-// Result:
-//     the value of the Chebyshev polynomial at x
 double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7179,21 +5278,6 @@ double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x) {
    return D;
 }
 
-// Summation of Chebyshev polynomials using Clenshaw's recurrence formula.
-//
-// This routine calculates
-//     c[0]*T0(x) + c[1]*T1(x) + ... + c[N]*TN(x)
-// or
-//     c[0]*U0(x) + c[1]*U1(x) + ... + c[N]*UN(x)
-// depending on the R.
-//
-// Parameters:
-//     r   -   polynomial kind, either 1 or 2.
-//     n   -   degree, n >= 0
-//     x   -   argument
-//
-// Result:
-//     the value of the Chebyshev polynomial at x
 double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7202,13 +5286,6 @@ double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, 
    return D;
 }
 
-// Representation of Tn as C[0] + C[1]*X + ... + C[N]*X^N
-//
-// Inputs:
-//     N   -   polynomial degree, n >= 0
-//
-// Outputs:
-//     C   -   coefficients
 void chebyshevcoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -7216,17 +5293,6 @@ void chebyshevcoefficients(const ae_int_t n, real_1d_array &c) {
    alglib_impl::ae_state_clear();
 }
 
-// Conversion of a series of Chebyshev polynomials to a power series.
-//
-// Represents A[0]*T0(x) + A[1]*T1(x) + ... + A[N]*Tn(x) as
-// B[0] + B[1]*X + ... + B[N]*X^N.
-//
-// Inputs:
-//     A   -   Chebyshev series coefficients
-//     N   -   degree, N >= 0
-//
-// Outputs:
-//     B   -   power series coefficients
 void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -7277,6 +5343,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double studenttdistribution(const ae_int_t k, const double t);
 double studenttdistribution(ae_int_t k, double t) {
    double x;
    double rk;
@@ -7353,6 +5420,7 @@ double studenttdistribution(ae_int_t k, double t) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double invstudenttdistribution(const ae_int_t k, const double p);
 double invstudenttdistribution(ae_int_t k, double p) {
    double t;
    double rk;
@@ -7392,45 +5460,6 @@ double invstudenttdistribution(ae_int_t k, double p) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Student's t distribution
-//
-// Computes the integral from minus infinity to t of the Student
-// t distribution with integer k > 0 degrees of freedom:
-//
-//                                      t
-//                                      -
-//                                     | |
-//              -                      |         2   -(k+1)/2
-//             | ( (k+1)/2 )           |  (     x   )
-//       ----------------------        |  ( 1 + --- )        dx
-//                     -               |  (      k  )
-//       sqrt( k pi ) | ( k/2 )        |
-//                                   | |
-//                                    -
-//                                   -inf.
-//
-// Relation to incomplete beta integral:
-//
-//        1 - stdtr(k,t) = 0.5 * incbet( k/2, 1/2, z )
-// where
-//        z = k/(k + t**2).
-//
-// For t < -2, this is the method of computation.  For higher t,
-// a direct method is derived from integration by parts.
-// Since the function is symmetric about t=0, the area under the
-// right tail of the density is found by calling the function
-// with -t instead of t.
-//
-// ACCURACY:
-//
-// Tested at random 1 <= k <= 25.  The "domain" refers to t.
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE     -100,-2      50000       5.9e-15     1.4e-15
-//    IEEE     -2,100      500000       2.7e-15     4.9e-17
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double studenttdistribution(const ae_int_t k, const double t) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7439,21 +5468,6 @@ double studenttdistribution(const ae_int_t k, const double t) {
    return D;
 }
 
-// Functional inverse of Student's t distribution
-//
-// Given probability p, finds the argument t such that stdtr(k,t)
-// is equal to p.
-//
-// ACCURACY:
-//
-// Tested at random 1 <= k <= 100.  The "domain" refers to p:
-//                      Relative error:
-// arithmetic   domain     # trials      peak         rms
-//    IEEE    .001,.999     25000       5.7e-15     8.0e-16
-//    IEEE    10^-6,.001    25000       2.0e-12     2.9e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invstudenttdistribution(const ae_int_t k, const double p) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7496,6 +5510,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p);
 double binomialdistribution(ae_int_t k, ae_int_t n, double p) {
    double dk;
    double dn;
@@ -7552,6 +5567,7 @@ double binomialdistribution(ae_int_t k, ae_int_t n, double p) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p);
 double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
    double dk;
    double dn;
@@ -7607,6 +5623,7 @@ double binomialcdistribution(ae_int_t k, ae_int_t n, double p) {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
+// API: double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y);
 double invbinomialdistribution(ae_int_t k, ae_int_t n, double y) {
    double dk;
    double dn;
@@ -7635,35 +5652,6 @@ double invbinomialdistribution(ae_int_t k, ae_int_t n, double y) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Binomial distribution
-//
-// Returns the sum of the terms 0 through k of the Binomial
-// probability density:
-//
-//   k
-//   --  ( n )   j      n-j
-//   >   (   )  p  (1-p)
-//   --  ( j )
-//  j=0
-//
-// The terms are not summed directly; instead the incomplete
-// beta integral is employed, according to the formula
-//
-// y = bdtr( k, n, p ) = incbet( n-k, k+1, 1-p ).
-//
-// The arguments must be positive, with p ranging from 0 to 1.
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,p), with p between 0 and 1.
-//
-//               a,b                     Relative error:
-// arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
-//    IEEE     0,100       100000      4.3e-15     2.6e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7672,37 +5660,6 @@ double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p) 
    return D;
 }
 
-// Complemented binomial distribution
-//
-// Returns the sum of the terms k+1 through n of the Binomial
-// probability density:
-//
-//   n
-//   --  ( n )   j      n-j
-//   >   (   )  p  (1-p)
-//   --  ( j )
-//  j=k+1
-//
-// The terms are not summed directly; instead the incomplete
-// beta integral is employed, according to the formula
-//
-// y = bdtrc( k, n, p ) = incbet( k+1, n-k, p ).
-//
-// The arguments must be positive, with p ranging from 0 to 1.
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,p).
-//
-//               a,b                     Relative error:
-// arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
-//    IEEE     0,100       100000      6.7e-15     8.2e-16
-//  For p between 0 and .001:
-//    IEEE     0,100       100000      1.5e-13     2.7e-15
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7711,32 +5668,6 @@ double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p)
    return D;
 }
 
-// Inverse binomial distribution
-//
-// Finds the event probability p such that the sum of the
-// terms 0 through k of the Binomial probability density
-// is equal to the given cumulative probability y.
-//
-// This is accomplished using the inverse beta integral
-// function and the relation
-//
-// 1 - p = incbi( n-k, k+1, y ).
-//
-// ACCURACY:
-//
-// Tested at random points (a,b,p).
-//
-//               a,b                     Relative error:
-// arithmetic  domain     # trials      peak         rms
-//  For p between 0.001 and 1:
-//    IEEE     0,100       100000      2.3e-14     6.4e-16
-//    IEEE     0,10000     100000      6.6e-12     1.2e-13
-//  For p between 10^-6 and 0.001:
-//    IEEE     0,100       100000      2.0e-12     1.3e-14
-//    IEEE     0,10000     100000      1.5e-12     3.2e-14
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -7778,6 +5709,7 @@ namespace alglib_impl {
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
+// API: void airy(const double x, double &ai, double &aip, double &bi, double &bip);
 void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    double z;
    double zz;
@@ -8068,36 +6000,6 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
 } // end of namespace alglib_impl
 
 namespace alglib {
-// Airy function
-//
-// Solution of the differential equation
-//
-// y"(x) = xy.
-//
-// The function returns the two independent solutions Ai, Bi
-// and their first derivatives Ai'(x), Bi'(x).
-//
-// Evaluation is by power series summation for small x,
-// by rational minimax approximations for large x.
-//
-//
-//
-// ACCURACY:
-// Error criterion is absolute when function <= 1, relative
-// when function > 1, except * denotes relative error criterion.
-// For large negative x, the absolute error increases as x^1.5.
-// For large positive x, the relative error increases as x^1.5.
-//
-// Arithmetic  domain   function  # trials      peak         rms
-// IEEE        -10, 0     Ai        10000       1.6e-15     2.7e-16
-// IEEE          0, 10    Ai        10000       2.3e-14*    1.8e-15*
-// IEEE        -10, 0     Ai'       10000       4.6e-15     7.6e-16
-// IEEE          0, 10    Ai'       10000       1.8e-14*    1.5e-15*
-// IEEE        -10, 10    Bi        30000       4.2e-15     5.3e-16
-// IEEE        -10, 10    Bi'       30000       4.9e-15     7.3e-16
-//
-// Cephes Math Library Release 2.8:  June, 2000
-// Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 void airy(const double x, double &ai, double &aip, double &bi, double &bip) {
    alglib_impl::ae_state_init();
    TryCatch()

@@ -49,6 +49,7 @@ a.nav:hover	{ color: #ff6666; font-weight: bold; text-decoration: none; }
 </head>
 <body>
 <div class=pagecontent>
+<p>
 <h1>ALGLIB++ Supplementary Notes</h1>
 Additional notes on the implementation and revisions of ALGLIB++.
 This is a supplement to the <a href="Manual.htm">ALGLIB++ Reference Manual</a>.
@@ -640,10 +641,14 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 		testdforestunit_basictestrandom()
 	is rewritten to match that used by dfavgce().
 	These tests produce false positives: NAN's may be produced, which pass, because the comparison condition is stated negatively.
+∙	The minqp tests produced sporadic failures (about 4% of the time) in the original version of ALGLIB.
+	They were masked as false positives, which was uncovered in ALGLIB++ after stage 31, and became visible as a result.
+	This issue has been left unresolved.
 ∙	2 C-incompatibilities: ByteOrder and CurCPU are defined at start-up time.
 	In C, it'll have to be replaced by a "startup" routine in Ap.cpp and called in up front main().
 	SSE2 intrinsics are not present in all GCC installations on Intel, so the automatic definition of AE_HAS_SSE2_INTRINSICS has been removed.
 	It must be explicitly #defined, instead (preferrably in Ap.h, where indicated).
+∙	Many more C-incompatibilities are introduced on and after stage 33.
 ∙	The replacement of ae_cpuid() by CurCPU excludes the 1-compiler/loader - heterogeneous-CPU configurations;
 	which is not supported in the GPL version.
 ∙	In ALGLIB _clear should have been _destroy in ~vector_wrapper(), ~matrix_wrapper() (as well as in attach_to()).
@@ -741,7 +746,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Corrections in the comments &amp; printouts; e.g.
 		"launcn" → "launch" "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
 		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
-		"⋯intial⋯" → "⋯initial⋯",
+		"⋯intial⋯" → "⋯initial⋯", lentgh → length,
 		"VIMP⋯" → "VIPM⋯".
 	Normalized all test routines and flags in TestC.cpp to true on success, false on failure.
 	Normalized comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
@@ -753,6 +758,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Normalized boolean comparisons, e.g. A&amp;&amp;B || !A&amp;&amp;!B &rArr; A == B
 	Removed ae_never_call_it(): it's a legacy stub from the Commercial version of ALGLIB.
 	Removed countdown(): it is unused.
+	Removed ivectorappend(): it is unused.
 	Removed maxreal3(); it's a duplicate of rmax3().
 	Removed boundval(): it's a duplicate of rboundval().
 	Normalization of structs and unions to C++ (embedded unions made anonymous; redundant typedefs removed).
@@ -868,7 +874,152 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	―	CSV_DEFAULT, CSV_SKIP_HEADERS definitions in Ap.h moved to Ap.cpp and reduced in Ap.h to declarations.
 	―	Removed ae_check_zeros(); placing, instead, the responsibility for zero-initialization into the constructor wrappers.
 	―	Synthesized the constructor macro NewSerializer().
-36	Second round of normalization of comments &amp; documentation (mostly still forthcoming).
+36	Second round of normalization of comments &amp; documentation: reduced the 4-fold redundancy in header-comments.
+	―	For programmers maintaining/revising the library:
+		header-comments for the high-level iteration routines and DefClass() definitions, for now, are left in the alglib namespace in *.cpp.
+		header-comments are confined, in all other cases, to the implementation routines the alglib_impl namespace in *.cpp.
+	―	For programmers using the API: a copy of the comments is in the manual section.
+	First round of normalization of iteration routines.
+	―	Made logit_{xtol,ftol,gtol,maxfev,stpmin,stpmax}, in DataAnalysis.cpp, local to logit_mnlmcsrch() and removed the logit_ prefix.
+	―	Made linmin_{ftol,xtol,maxfev,defstpmax), in AlgLibInternal.cpp, local to mcsrch() and removed the linmin_ prefix.
+	―	Merged the locals linmin_mcstep() in AlgLibInternal. and logic_mnlmcstep() in DataAnalysis.cpp into a global mcstep() in AlgLibInternal.{cpp,h}
+	For parameter declarations:
+	∙	For iteration and [un]serializer routines, the documented and declared versions match.
+	∙	For the user-supplied functions in the iteration routines and their high-level versions, the documented and declared versions also match.
+	∙	Output parameters X of type T are documented and declared respectively as:
+		―	T &amp;X	⇔	T &amp;X
+	∙	Input parameters X of type T are documented and declared respectively as:
+		―	T X	⇔	const T X	- for scalar types T ∈ { bool, ae_int_t, double, complex },
+		―	T X	⇔	const T &amp;X	― for all other types T.
+	The documentation of the following 1D and 2D array argument parameters in Manual.htm was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
+	∙	a	rmatrixenforcesymmetricity rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
+	∙	b	rmatrix{[gen]copy,transpose}, {r,c}matrix[lu]solve[m]fast, rvectorcopy, {h,s}pdmatrix[cholesky]solve[m]fast
+	∙	c	cmatrixherk, {r,c}matrix{gemm,syrk}
+	∙	tmp	rmatrixsyvmv
+	∙	x	{r,c}matrix{left,right}trsm, rmatrixtrsv, sparsetr{m,s}v
+	∙	xy	rankdata[centered]
+	∙	y	rmatrix[ge,sy]mv, sparsegemv
+	The xy parameters in the reduced forms of rankdata[centered]() were changed to input, to match the declaration of xy in the full form.
+	∙	void rankdata(real_2d_array &amp;xy);	⇒ void rankdata(const real_2d_array &amp;xy);
+	∙	void rankdatacentered(real_2d_array &amp;xy);	⇒ rankdatacentered(const real_2d_array &amp;xy);
+	Other minor changes in the documentation &amp; Comments:
+	∙	sparsesmm(): A is M × K, not N × K.
+	∙	sparsecholeskyskyline(): "matrixm" → "matrix"
+37	Recoding of internal and non-API routines.
+	∙	AlgLibInternal.{cpp,h}: swapb(), swapc() added.
+		―	swap{b,i,r,c}() synthesized in numerous places.
+		―	Non-API routine mcsrch(): Redeclared "double *f" as an input-only parameter "double f".
+		―	Non-API routine tiledsplit(tasksize, tilesize, &amp;task0, &amp;task1)
+			redefined as task0 = tiledsplit(tasksize, tilesize), task1 = tasksize - task0;
+		―	Non-API routine splitlength(tasksize, chunksize, &amp;task0, &amp;task1)
+			redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
+		―	Non-API routine splitlengtheven(tasksize, &amp;task0, &amp;task1)
+			redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
+		―	Non-API routines tagsortmiddleir(), sortmiddlei() redeclared with default offset = 0, and recoded.
+			Declarations changed from *sortmiddlei*(a, b, offset, n) to *sortmiddlei*(a, b, n, offset = 0).
+		―	Non-API routines tagsortfast[ir]() recoded.
+		―	Local routines tsort_tagsortfast[ir]rec() recoded.
+		―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
+			redefined as tsort_tagsortfastirec(a-&gt;xR + i1, b-&gt;xZ + i1, bufa-&gt;xR + i1, bufb-&gt;xZ + i1, i2 - i1 + 1)
+		―	Local routine tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i2)
+			redefined as tsort_tagsortfastrrec(a-&gt;xR + i1, b-&gt;xR + i1, bufa-&gt;xR + i1, bufb-&gt;xR + i1, i2 - i1 + 1)
+		―	Local routine tsort_tagsortfastrec(a, bufa, i1, i2)
+			redefined as tsort_tagsortfastrec(a-&gt;xR + i1, bufa-&gt;xR + i1, i2 - i1 + 1)
+		―	Localized static constant linmin_armijofactor to the routine it is used in,
+			and removed the "linmin_" prefix.
+		―	All of the routines in the FTBASE package were recoded.
+		―	Non-API routine ftapplyplan(&amp;plan, &amp;buf, offset, reps) redeclared with default offset = 0 and reps = 1, and recoded.
+		―	Local routines ftbase_ftpushentry{2,4}() combined with ftbase_ftpushentry() by making defaults eparam1 = -1, eparam2 = 0, eparam3 = 0.
+		―	Local routine(s) ftbase_ftpushentry*(plan, &hellip;) redefined as ftbase_ftpushentry*(&amp;plan-&gt;entries, &hellip;).
+		―	Local routine ftbase_fftirltrec(a, astart, astride, b, bstart, bstride, m, n)
+			redefined as ftbase_fftirltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
+		―	Local routine ftbase_ffticltrec(a, astart, astride, b, bstart, bstride, m, n)
+			redefined as ftbase_ffticltrec(a-&gt;xR + astart, astride, b-&gt;xR + bstart, bstride, m, n).
+		―	Local routine ftbase_internalcomplexlintranspose(a, n, m, astart, buf)
+			redefined as ftbase_internalcomplexlintranspose(a-&gt;xR + astart, n, m, buf).
+		―	Local routine ftbase_ftapplycomplexcodelettwfft(a, offs, args, n, mun)
+			redefined as ftbase_ftapplycomplexcodelettwfft(a-&gt;xR + offs, args, n, mun).
+		―	Local routine ftbase_ffttwcalc(a, aoffset, n1, n2)
+			redefined as ftbase_ffttwcalc(a-&gt;xR + aoffset, n1, n2).
+		―	Local routine ftbase_ftapplycomplexreffft(a, offs, args, n, mun, buf)
+			redefined as ftbase_ftapplycomplexreffft(a-&gt;xR + offs, args, n, buf).
+			The mun == 2 assertion is placed outside and before the call.
+		―	Local routine ftbase_ftapplycomplexcodeletfft(a, offs, args, n, mun)
+			redefined as ftbase_ftapplycomplexcodeletfft(a-&gt;xR + offs, args, n).
+			The mun == 2 assertion is placed outside and before the call.
+		―	Local routine ftbase_ftbluesteinsfft(plan, a, abase, aoffset, ⋯, bufa, bufb, bufc, bufd)
+			redefined as ftbase_ftbluesteinsfft(plan, a-&gt;xR + abase + aoffset, ⋯, bufa, bufc).
+		―	Local routine ftbase_ftradersfft(plan, a, abase, aoffset, ⋯, buf)
+			redefined as ftbase_ftradersfft(plan, a-&gt;xR + abase + aoffset, aoffset, ⋯, buf).
+		―	Local routine ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset, buf, repcnt)
+			redefined as ftbase_ftapplysubplan(plan, subplan, a-&gt;xR + abase + aoffset, aoffset, buf, repcnt).
+		―	Local routine ftbase_ftprecomputebluesteinsfft(n, m, precr, offs)
+			redefined as ftbase_ftprecomputebluesteinsfft(n, m, precr-&gt;xR + offs).
+		―	Local routine ftbase_ftprecomputeradersfft(n, rq, riq, precr, offs)
+			redefined as ftbase_ftprecomputeradersfft(n, rq, riq, precr-&gt;xR + offs).
+	∙	AlgLibMisc.cpp:
+		―	Local routine nearestneighbor_kdtreesplit()
+			redefined with the output-only parameter "ae_int_t *i3" remade a return value.
+		―	Synthesized new API routine hqrndmiduniformr() = 2 hqrnduniformr() - 1.
+	∙	DataAnalysis.cpp:
+		―	Local routine logit_mnlmcsrch(): Redeclared "double *f" as an input-only parameter "double f".
+		―	Local boolean routine ssa_hassomethingtoanalyze(): reversed, renamed ssa_isdegenerate() and recoded.
+	∙	Statistics.{cpp,h}:
+		―	Local routine wsr_wcheb() eliminated and substituted into wsr_w{25,26,...,200}(), wsr_wsigma() recoded.
+		―	wsr_w*() recoded.
+		―	Local routine jarquebera_jarqueberastatistic() eliminated and substituted into jarqueberatest(),
+			and jarqueberatest() recoded.
+		―	Local routine jarquebera_jbcheb() eliminated and substituted into jarquebera_jbtbl*(),
+			and jarquebera_jbtbl*() recoded.
+		―	Local routine jarquebera_jarqueberaapprox() recoded.
+		―	API routine jarqueberatest() recoded.
+		―	Local routines correlationtests_spearmantail{5,6,7,8,9}() eliminated and substituted into correlationtests_spearmantail(),
+			and correlationtests_spearmantail() recoded.
+	∙	SpecialFunctions.{cpp,h}:
+		―	Recoded sinecosineintegrals().
+		―	Local routine trigintegrals_chebiterationshichi() eliminated and substituted into hyperbolicsinecosineintegrals(),
+			hyperbolicsinecosineintegrals() recoded.
+		―	Local routines bessel_besselm{first,next}cheb() eliminated and substituted into besseli0().
+		―	Local routines bessel_besselm1{first,next}cheb() eliminated and substituted into besseli1(), besselk0(), besselk1().
+		―	Local routines bessel_besselasympt{0,1}(x, ⋯) recoded and redefined as bessel_besselasympt{0,1}(8.0/x, ⋯).
+		―	API routines besseli{0,1}(), bessel{j,y,k}{0,1,n}() recoded.
+		―	Synthesized internal constants for the Euler constant, π/2 and √2.
+		―	Synthesized local routines erfr0(), erfr1() and recoded errorfunction[c](), normal{cdf,distribution}() using them to remove recursive calls.
+		―	Synthesized local routines inverfr0(), inverfr1(), inverfr2() and recoded invnormal{cdf,distribution}() and inverf() using them.
+	∙	Optimization.cpp:
+		―	optserv_feasibilityerrorgrad(): remade "double *err" into a return value.
+		―	localized most static constants that are used in only one routine to the routines they are used in,
+			and removed the prefixes (e.g. cqmodels_newtonrefinementits → newtonrefinementits).
+	∙	Solvers.{cpp,h}:
+		―	lincgsetb() added to the API.
+	∙	LinAlg.{cpp,h}:
+		―	rmatrix{transpose,copy}(): removed "const" from "real_2d_array &amp;b" to match "b" in cmatrix{transpose,copy}().
+		―	rmatrixmv(): removed "const" from "real_1d_array &amp;y" to match "y" in cmatrixmv().
+		―	Non-API routine rmatrixqrbasecase() removed from LinAlg.h, made local to LinAlg.cpp, renamed ortfac_rmatrixqrbasecase().
+		―	Non-API routine spdmatrixcholeskyinverserec() removed from LinAlg.h, made local to LinAlg.cpp, renamed matinv_spdmatrixcholeskyinverserec().
+		―	Non-API routine ablascomplexsplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablascomplexsplitlength(a, n), n2 = n - n1;
+		―	Non-API routine ablassplitlength(a, n, &amp;n1, &amp;n2) redefined as n1 = ablassplitlength(a, n), n2 = n - n1;
+		―	Local routine ablas_ablasinternalsplitlength(n, nb, &amp;n1, &amp;n2) redefined as n1 = ablas_ablasinternalsplitlength(n, nb), n2 = n - n1;
+	∙	Manual.htm:
+		―	rmatrix{transpose,copy}(): redeclared b an output parameter, to match the declaration on cmatrix{transpose,copy}().
+		―	rmatrixmv(): redeclared y an output parameter, to match the declaration in cmatrixmv().
+		―	lincgsetb(): added to the API and newly documented.
+		―	hqrndmiduniformr(): added to the API and newly documented.
+		―	ssaforecastsequence() documentation: the Data parameter is array[DataLen], not array[NTicks].
+	∙	Interpolation.cpp:
+		―	Local routine spline1d_diffthreepoint() in-line substituted into spline1dbuildakima() and removed,
+			and spline1dbuildakima() recoded.
+		―	localized most static constants that are used in only one routine to the routines they are used in,
+			and removed the prefixes (e.g. spline1d_lambdareg → lambdareg).
+		―	spline3d_spline3ddiff(): remade "double *fx", "double *fy", "double *fxy" into optional output parameters.
+		―	spline1dconvdiffinternal():
+			remade the non-API routine into static local.
+			remade "RVector *y", "RVector *d1", "RVector *d2" into optional output parameters.
+			eliminated "bool needy", "bool needd1", "bool needd2" respectively in favor of (y != NULL), (d1 != NULL) and (d2 != NULL).
+		―	spline1d_spline1dgriddiffcubicinternal():
+			removed "RVector *dt", it's not used by any of routine's callers,
+			replaced its use inside the routine by d, since it was copied to d after being assigned to.
+		―	rbf_clearreportfields(): removed and inserted inline at its point of use.
 </pre>
 </p>
 <p>
@@ -878,10 +1029,10 @@ The values cited for TestX are for MFLOPS counts for the RGEMM BLAS routine for 
 The times, themselves are meaningful only for comparisons on a single host, rather than across different hosts.
 In the case of TestX, not all tests were done cleanly (i.e. with background processes disabled), so there may be fluctuations.
 <pre class=narration>
-01	1555 1946 1958 1875 1552948070 232
+01	1555 1946 1958 1875 1552948070 (5c901b66) 232
 01	1550 1946 1946 1856
-02	1580 1934 1939 1868 1552948674 248
-02	1577 1931 1946 1839 1552949228 250 // First-restructured version.
+02	1580 1934 1939 1868 1552948674 (5c901dc2) 248
+02	1577 1931 1946 1839 1552949228 (5c901fec) 250 // First-restructured version.
 02	1550 1938 1946 1861
 02	1536 1934 1950 1864
 02	1582 1942 1946 1865
@@ -890,96 +1041,106 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 04	1553 1938 1946 1849
 04	1558 1949 1954 1874
 04	1587 1931 1924 1878
-02	1572 1938 1942 1867 1553095988 245 // Started over
+02	1572 1938 1942 1867 1553095988 (5c925d34) 245 // Started over
 02	1529 1938 1946 1872
 02	1567 1931 1916 1859
-03	1580 1949 1950 1873 1553098036 233
+03	1580 1949 1950 1873 1553098036 (5c926534) 233
 03	1560 1949 1950 1861
 03	1548 1946 1950 1858
-04	1538 1934 1946 1874 1553099012 225
+04	1538 1934 1946 1874 1553099012 (5c926904) 225
 04	1531 1938 1942 1865
 04	1572 1934 1946 1868
-05	1565 1938 1939 1856 1553309815 211
+05	1565 1938 1939 1856 1553309815 (5c95a077) 211
 06	1587 1949 1946 1873
-06	1590 1949 1942 1855 1553329021 204
-07	1590 1946 1942 1846 1553357985 206
+06	1590 1949 1942 1855 1553329021 (5c95eb7d) 204
+07	1590 1946 1942 1846 1553357985 (5c965ca1) 206
 08	1473 1916 1931 1853
 08	1522 1934 1946 1853
 08	1575 1938 1942 1846
 09	1582 1942 1946 1834
-10	1582 1949 1958 1882 1553372412 205
-11	1541 1869 1950 1865 1553382833 208 // Run with the network active.
+10	1582 1949 1958 1882 1553372412 (5c9694fc) 205
+11	1541 1869 1950 1865 1553382833 (5c96bdb1) 208 // Run with the network active.
 11	1560 1942 1942 1855 // Run with the network active.
 12	1590 1931 1954 1855
 13	1558 1938 1958 1881 // TestZ "fails" because the conditions underlying a part of it have changed.
-13	1585 1946 1939 1847 1553450728 203 // Skipped TestZ.
-13	1590 1953 1958 1876 1553454094 200 // Skipped TestZ.
-14	1563 1931 1946 1867 1553457101 197 // TestZ was changed to reflect the new conditions.
-14	1590 1953 1958 1853 1553460998 208
+13	1585 1946 1939 1847 1553450728 (5c97c6e8) 203 // Skipped TestZ.
+13	1590 1953 1958 1876 1553454094 (5c97d40e) 200 // Skipped TestZ.
+14	1563 1931 1946 1867 1553457101 (5c97dfcd) 197 // TestZ was changed to reflect the new conditions.
+14	1590 1953 1958 1853 1553460998 (5c97ef06) 208
 14	1560 1946 1950 1859 // Added the ConstT() and TryX macros.
-15	1590 1949 1954 1876 1553475423 204 // Run with the network active.
-16	1553 1934 1942 1861 1553501003 201 // Added the TryCatch macro.
-17	1575 1934 1946 1844 1553510964 203 // Added the New*, Ref*, Dup* macros.
-18	1572 1931 1946 1867 1553517390 205 // Removed the FP comparison macros.
-18	1543 1942 1950 1868 15535????? 205 // Regularized the layout of the modules.
+15	1590 1949 1954 1876 1553475423 (5c98275f) 204 // Run with the network active.
+16	1553 1934 1942 1861 1553501003 (5c988b4b) 201 // Added the TryCatch macro.
+17	1575 1934 1946 1844 1553510964 (5c98b234) 203 // Added the New*, Ref*, Dup* macros.
+18	1572 1931 1946 1867 1553517390 (5c98cb4e) 205 // Removed the FP comparison macros.
+18	1543 1942 1950 1868 1553550000 (5c994ab0) (15535?????) 205 // Regularized the layout of the modules.
 19	1527 1923 1942 1842 // Reformatted the RCOMM routines and [logit_]mcsrch.
-19	1543 1905 1939 1865 1553672842 200 // 11 TestC tests fail with the revisions.
-19	1541 1942 1950 1867 1553681461 201 // Corrected.
+19	1543 1905 1939 1865 1553672842 (5c9b2a8a) 200 // 11 TestC tests fail with the revisions.
+19	1541 1942 1950 1867 1553681461 (5c9b4c35) 201 // Corrected.
 19	1565 1923 1939 1849
-20	1541 1939 1942 1867 1553708554 200
-21	1575 1942 1913 1866 1553731148 220
+20	1541 1939 1942 1867 1553708554 (5c9bb60a) 200
+21	1575 1942 1913 1866 1553731148 (5c9c0e4c) 220
 22	1595 1916 1954 1879
-22	1548 1942 1946 1895 1553905444 199
+22	1548 1942 1946 1895 1553905444 (5c9eb724) 199
 22	1577 1946 1946 1897 // Minor correction in TestX.cpp.
-23	1585 1949 1946 1890 1553932849 199
+23	1585 1949 1946 1890 1553932849 (5c9f2231) 199
 24	2268 3585 3510 3278 // With -mtune=core2 and -msse2. The machine's cooling fan was activated during the test.
 24	2227 3497 3323 3264 // Dropped -mtune=core2 but kept -msse2.
-24	2208 3472 3461 3238 1554065184 207
-24	2208 3485 3461 3307 1554066501 203 // The bugs in the dforest module and tester were repaired.
-24	2242 3485 3473 3277 1555921305 205
-25	2283 3559 3498 3279 1557611349 203
-25	2283 3534 3510 3235 1580240643 212 // Final fixes in preparation for upgrade to 3.16.
-25	2299 3559 3510 3243 1580249792 204 // Final fixes in preparation for upgrade to 3.16.
-25	2268 3521 3498 3287 1580340998 200 // Final test of Version 3.15.
-30	2257 3534 3486 3279 1581358777 202 // Final test of Version 3.15 with retrofits.
-26	2146 3402 3486 3230 1580248905 220 // Version 3.16.
-26	2294 3449 3522 3247 1580273645 212
-26	2273 3534 3461 2865 1580343048 213
-26	2299 3472 3486 3252 1580940186 225
-27	2257 3509 3449 3262 1581001359 218
-28	2278 3497 3510 3253 1581027835 // 5 TestC tests failed.
-28	2268 3497 3498 3205 1581032293 222 // Corrected.
-28	2294 3485 3498 3271 1581033702 228 // Modifications, following cross-validation against local version.
-29	2268 3460 3461 3193 1581111823 230 // 1 TestC test failed.
-29	2294 3472 3498 3237 1581112921 215 // Corrected.
-29	2268 3559 3498 3248 1581201426 234 // Modifications, following cross-validation against local version.
-30	2268 3472 3498 3235 1581312636 213
-30	2278 3413 3498 3241 1581556573 216
-30	2273 3509 3510 3261 1581634496 220
-30	2299 3437 3486 3262 1581731061 217
-30	2283 3437 3414 3240 1581740396 224 // Modifications, following cross-validation against local version.
-31	2283 3472 3510 3241 1581968963 216
-31	2262 3472 3486 3235 1581983401 209
-32	2268 3485 3498 3208 1582670816 218 // 1 TestC test failed.
-32	2257 3572 3498 3246 1582673449 214 // Corrected.
-32	2252 3413 3473 3200 1582847620 213
-32	2273 3379 3486 3184 1582951824 225 // 1 TestC test "failed" due to a hidden bug in TestC.cpp inherited from ALGLIB. Corrected.
-32	2222 3356 3438 3266 1583163421 226
-32	2242 3356 3473 3238 1583193341 216
-32	2232 3379 3473 3229 1583267567 210
-33	2262 3367 3473 3218 1583609500 220
-33	2288 3460 3510 3217 1583795111 218
-33	2278 3497 3510 3279 1583852957 227
-34	2288 3521 3500 3274 1583869463 // (Ended early to make a last-minute change to the display format of TestC.cpp.)
-34	2262 3413 3510 3248 1583869582 218
-34	2278 3521 3510 3245 1586305481 213 // Resumed from a temporary suspension, bunkering down to await the passing of a worldwide plague.
-35	2278 3402 3449 3266 1589855728 221 // Minor changes, following reconciliation with the main (and internal) branch of ALGLIB++.
-35	2252 3485 3510 3265 1592593244 234
-35	2198 3460 3438 3262 1593720351 223
-35	2262 3413 3426 3282 1593794381 217
-35	2294 3449 3498 3287 1593905439 212
-35	2326 3449 3510 3289 1594326522 226
-35	2315 3460 3498 3282 1594410366 219
+24	2208 3472 3461 3238 1554065184 (5ca12720) 207
+24	2208 3485 3461 3307 1554066501 (5ca12c45) 203 // The bugs in the dforest module and tester were repaired.
+24	2242 3485 3473 3277 1555921305 (5cbd7999) 205
+25	2283 3559 3498 3279 1557611349 (5cd74355) 203
+25	2283 3534 3510 3235 1580240643 (5e308f03) 212 // Final fixes in preparation for upgrade to 3.16.
+25	2299 3559 3510 3243 1580249792 (5e30b2c0) 204 // Final fixes in preparation for upgrade to 3.16.
+25	2268 3521 3498 3287 1580340998 (5e321706) 200 // Final test of Version 3.15.
+30	2257 3534 3486 3279 1581358777 (5e419eb9) 202 // Final test of Version 3.15 with retrofits.
+26	2146 3402 3486 3230 1580248905 (5e30af49) 220 // Version 3.16.
+26	2294 3449 3522 3247 1580273645 (5e310fed) 212
+26	2273 3534 3461 2865 1580343048 (5e321f08) 213
+26	2299 3472 3486 3252 1580940186 (5e3b3b9a) 225
+27	2257 3509 3449 3262 1581001359 (5e3c2a8f) 218
+28	2278 3497 3510 3253 1581027835 (5e3c91fb) // 5 TestC tests failed.
+28	2268 3497 3498 3205 1581032293 (5e3ca365) 222 // Corrected.
+28	2294 3485 3498 3271 1581033702 (5e3ca8e6) 228 // Modifications, following cross-validation against local version.
+29	2268 3460 3461 3193 1581111823 (5e3dda0f) 230 // 1 TestC test failed.
+29	2294 3472 3498 3237 1581112921 (5e3dde59) 215 // Corrected.
+29	2268 3559 3498 3248 1581201426 (5e3f3812) 234 // Modifications, following cross-validation against local version.
+30	2268 3472 3498 3235 1581312636 (5e40ea7c) 213
+30	2278 3413 3498 3241 1581556573 (5e44a35d) 216
+30	2273 3509 3510 3261 1581634496 (5e45d3c0) 220
+30	2299 3437 3486 3262 1581731061 (5e474cf5) 217
+30	2283 3437 3414 3240 1581740396 (5e47716c) 224 // Modifications, following cross-validation against local version.
+31	2283 3472 3510 3241 1581968963 (5e4aee43) 216
+31	2262 3472 3486 3235 1581983401 (5e4b26a9) 209
+32	2268 3485 3498 3208 1582670816 (5e55a3e0) 218 // 1 TestC test failed.
+32	2257 3572 3498 3246 1582673449 (5e55ae29) 214 // Corrected.
+32	2252 3413 3473 3200 1582847620 (5e585684) 213
+32	2273 3379 3486 3184 1582951824 (5e59ed90) 225 // 1 TestC test "failed" due to a hidden bug in TestC.cpp inherited from ALGLIB. Corrected.
+32	2222 3356 3438 3266 1583163421 (5e5d281d) 226
+32	2242 3356 3473 3238 1583193341 (5e5d9cfd) 216
+32	2232 3379 3473 3229 1583267567 (5e5ebeef) 210
+33	2262 3367 3473 3218 1583609500 (5e63f69c) 220
+33	2288 3460 3510 3217 1583795111 (5e66cba7) 218
+33	2278 3497 3510 3279 1583852957 (5e67ad9d) 227
+34	2288 3521 3500 3274 1583869463 (5e67ee17) // Ended early to make a last-minute change to the display format of TestC.cpp.
+34	2262 3413 3510 3248 1583869582 (5e67ee8e) 218
+34	2278 3521 3510 3245 1586305481 (5e8d19c9) 213 // Resumed from a temporary suspension, bunkering down to await the passing of a worldwide plague.
+35	2278 3402 3449 3266 1589855728 (5ec345f0) 221 // Minor changes, following reconciliation with the main (and internal) branch of ALGLIB++.
+35	2252 3485 3510 3265 1592593244 (5eed0b5c) 234
+35	2198 3460 3438 3262 1593720351 (5efe3e1f) 223
+35	2262 3413 3426 3282 1593794381 (5eff5f4d) 217
+35	2294 3449 3498 3287 1593905439 (5f01111f) 212
+36	2326 3449 3510 3289 1594326522 (5f077dfa) 226
+36	2315 3460 3498 3282 1594410366 (5f08c57e) 219
+36	2320 3390 3498 3279 1594701863 (5f0d3827) 214
+36	2288 3437 3486 3297 1594955177 (5f1115a9) 213
+36	2283 3534 3510 3271 1595472599 (5f18fad7) 219
+36	2288 3485 3486 3255 1596334058 (5f261fea) 218
+36	2294 3449 3426 3278 1596496519 (5f289a87) 218
+37	2310 3472 3498 3282 1601204686 (5f7071ce) // 6 TestC tests failed, 4 stalled and 4 crashed, 1 sporadic failure (minqp).
+37	2283 3367 3449 3250 1601325526 (5f7249d6) 229 // Corrected. Sporadic failures in minqp exist, found to have been inherited from ALGLIB.
+37	2315 3509 3498 3276 1601836904 (5f7a1768) 227
+37	2310 3497 3498 3282 1602025944 (5f7cf9d8) 214
+37	2273 3402 3486 3260 1602621006 (5f860e4e) 222
 </pre>
 </p>
 </div>

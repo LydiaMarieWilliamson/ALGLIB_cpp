@@ -135,7 +135,7 @@ void ae_state_init() {
    CurFlags = 0x0, CurBreakAt = NULL, CurMsg = "", TopFr = &BotFr;
 }
 
-// Clear the ALGLIB++ frrame stack environment, freeing all the dynamic data in it that it controls.
+// Clear the ALGLIB++ frame stack environment, freeing all the dynamic data in it that it controls.
 void ae_state_clear() {
    if (TopFr == NULL) return;
    for (; TopFr->ptr != &DynBottom; TopFr = TopFr->p_next)
@@ -437,7 +437,7 @@ void set_memory_pool(void *ptr, size_t size) {
    AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof *sm_page_tbl) + sm_page_size);
    sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof *sm_page_tbl);
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
-   sm_page_tbl = (ae_int_t *) ptr;
+   sm_page_tbl = (ae_int_t *)ptr;
    sm_mem = (unsigned char *)ae_align(sm_page_tbl + sm_page_cnt, sm_page_size);
 // Mark all pages as free.
    memset(sm_page_tbl, 0, sm_page_cnt * sizeof *sm_page_tbl);
@@ -779,8 +779,7 @@ static void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
       dst->xyX = pp_ptr;
       for (ae_int_t i = 0; i < dst->rows; i++, p_base += dst->stride * ae_sizeof(dst->datatype))
          pp_ptr[i] = p_base;
-   } else
-      dst->xyX = NULL;
+   } else dst->xyX = NULL;
 }
 
 // Make dst into a new rows x cols datatype ae_matrix.
@@ -906,7 +905,7 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, bool make_automatic
 // Free the smart pointer _dst so that it contains the NULL reference,
 // The change is propagated to its subscriber, if the _dst was created with a non-NULL subscriber.
 void ae_smart_ptr_free(void *_dst) {
-   ae_smart_ptr *dst = (ae_smart_ptr *) _dst;
+   ae_smart_ptr *dst = (ae_smart_ptr *)_dst;
    if (dst->is_owner && dst->ptr != NULL) {
       dst->free(dst->ptr, false);
       if (dst->is_dynamic) ae_free(dst->ptr);
@@ -1584,7 +1583,7 @@ struct _lock {
    char buf[sizeof(ae_int_t) + AE_LOCK_ALIGNMENT];
 };
 static inline void _ae_init_lock_raw(_lock *p) {
-   p->p_lock = (ae_int_t *) ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
+   p->p_lock = (ae_int_t *)ae_align((void *)&p->buf, AE_LOCK_ALIGNMENT);
    p->p_lock[0] = 0;
 }
 static inline void _ae_acquire_lock_raw(_lock *p) {
@@ -1644,25 +1643,25 @@ void ae_init_lock(ae_lock *lock, bool is_static, bool make_automatic) {
    size_t size = sizeof(_lock);
    ae_db_init(&lock->db, size, make_automatic);
    lock->lock_ptr = !is_static ? lock->db.ptr : size == 0 || _force_malloc_failure ? NULL : malloc(size);
-   _ae_init_lock_raw((_lock *) lock->lock_ptr);
+   _ae_init_lock_raw((_lock *)lock->lock_ptr);
    if (!is_auto) ae_state_clear();
 }
 
 // Acquire a lock.
 // If the lock is busy and ae_yield() is supported, we ae_yield() after retrying several times, with tight spin waits in between.
 void ae_acquire_lock(ae_lock *lock) {
-   _ae_acquire_lock_raw((_lock *) lock->lock_ptr);
+   _ae_acquire_lock_raw((_lock *)lock->lock_ptr);
 }
 
 // Releases a lock.
 void ae_release_lock(ae_lock *lock) {
-   _ae_release_lock_raw((_lock *) lock->lock_ptr);
+   _ae_release_lock_raw((_lock *)lock->lock_ptr);
 }
 
 // Free a lock.
 void ae_free_lock(ae_lock *lock) {
    AE_CRITICAL_ASSERT(!lock->is_static);
-   _lock *p = (_lock *) lock->lock_ptr;
+   _lock *p = (_lock *)lock->lock_ptr;
    if (p != NULL) _ae_free_lock_raw(p);
    ae_db_free(&lock->db);
 }
@@ -1676,7 +1675,7 @@ static void ae_shared_pool_destroy(void *_dst) { ae_shared_pool_free(_dst, false
 // as opposed to being the field of some other object.
 // Upon allocation failure, call ae_break().
 void ae_shared_pool_init(void *_dst, bool make_automatic) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
 //(@) Zero-check removed.
 // Initialize.
    dst->seed_object = NULL;
@@ -1706,7 +1705,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
    }
 // Free the recycled objects.
    for (ae_shared_pool_entry *ptr = dst->recycled_objects; ptr != NULL; ) {
-      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ptr->next_entry;
       dst->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
@@ -1715,7 +1714,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
    dst->recycled_objects = NULL;
 // Free the recycled entries.
    for (ae_shared_pool_entry *ptr = dst->recycled_entries; ptr != NULL;) {
-      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ptr->next_entry;
       ae_free(ptr);
       ptr = tmp;
    }
@@ -1730,8 +1729,8 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst, bool make_automati
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
-   ae_shared_pool *src = (ae_shared_pool *) _src;
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
+   ae_shared_pool *src = (ae_shared_pool *)_src;
    ae_shared_pool_init(dst, make_automatic);
 // Copy the non-pointer fields.
    dst->size_of_object = src->size_of_object;
@@ -1746,9 +1745,9 @@ void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
    }
 // Copy the recycled objects.
    dst->recycled_objects = NULL;
-   for (ae_shared_pool_entry *ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *) ptr->next_entry) {
+   for (ae_shared_pool_entry *ptr = src->recycled_objects; ptr != NULL; ptr = (ae_shared_pool_entry *)ptr->next_entry) {
    // Allocate an entry, immediately add it to the recycled list (we do not want to lose it in case of future malloc failures).
-      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ae_malloc(sizeof *tmp);
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ae_malloc(sizeof *tmp);
       memset(tmp, 0, sizeof *tmp);
       tmp->next_entry = dst->recycled_objects;
       dst->recycled_objects = tmp;
@@ -1771,7 +1770,7 @@ void ae_shared_pool_copy(void *_dst, void *_src, bool make_automatic) {
 // *	This function is NOT thread-safe.
 //	It does NOT try to acquire a pool lock and should NOT be used simultaneously from other threads.
 void ae_shared_pool_free(void *_dst, bool make_automatic) {
-   ae_shared_pool *dst = (ae_shared_pool *) _dst;
+   ae_shared_pool *dst = (ae_shared_pool *)_dst;
 // Clear the seed and lists.
    ae_shared_pool_internalclear(dst, make_automatic);
 // Clear the fields.
@@ -1827,7 +1826,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    if (pool->recycled_objects != NULL) { // Try to reuse recycled objects.
    // Retrieve an entry/object from the list of recycled objects.
       ae_shared_pool_entry *result = pool->recycled_objects;
-      pool->recycled_objects = (ae_shared_pool_entry *) pool->recycled_objects->next_entry;
+      pool->recycled_objects = (ae_shared_pool_entry *)pool->recycled_objects->next_entry;
       void *new_obj = result->obj;
       result->obj = NULL;
    // Recycle the entry.
@@ -1867,13 +1866,13 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
    ae_shared_pool_entry *new_entry;
    if (pool->recycled_entries != NULL) {
       new_entry = pool->recycled_entries;
-      pool->recycled_entries = (ae_shared_pool_entry *) new_entry->next_entry;
+      pool->recycled_entries = (ae_shared_pool_entry *)new_entry->next_entry;
    } else {
    // NOTE:
    // *	Unlock the pool first
    //	so as to prevent the pool from being left in a locked state in case ae_malloc() raises an exception.
       ae_release_lock(&pool->pool_lock);
-      new_entry = (ae_shared_pool_entry *) ae_malloc(sizeof *new_entry);
+      new_entry = (ae_shared_pool_entry *)ae_malloc(sizeof *new_entry);
       ae_acquire_lock(&pool->pool_lock);
    }
 // Recycle the object, the lock object and the source pointer.
@@ -1891,7 +1890,7 @@ void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr) {
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, bool make_automatic) {
 // Clear the recycled objects.
    for (ae_shared_pool_entry *ptr = pool->recycled_objects; ptr != NULL; ) {
-      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *) ptr->next_entry;
+      ae_shared_pool_entry *tmp = (ae_shared_pool_entry *)ptr->next_entry;
       pool->free(ptr->obj, make_automatic);
       ae_free(ptr->obj);
       ae_free(ptr);
@@ -1929,7 +1928,7 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr) {
       return;
    }
 // Modify the internal enumeration counter.
-   pool->enumeration_counter = (ae_shared_pool_entry *) pool->enumeration_counter->next_entry;
+   pool->enumeration_counter = (ae_shared_pool_entry *)pool->enumeration_counter->next_entry;
 // Exit on an empty list.
    if (pool->enumeration_counter == NULL)
       ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
@@ -1971,9 +1970,9 @@ static char ae_sixbits2char(ae_int_t v) {
 #if 0
 // v is correct, process it.
    return
-      v < 10 ? '0' + v : 
-      (v -= 10) < 26 ? 'A' + v : 
-      (v -= 26) < 26 ? 'a' + v : 
+      v < 10 ? '0' + v :
+      (v -= 10) < 26 ? 'A' + v :
+      (v -= 26) < 26 ? 'a' + v :
       (v -= 26) == 0 ? '-' : '_';
 #endif
 }
@@ -2051,8 +2050,8 @@ static ae_int_t GetByteOrder() {
 // allow us to easily distinguish between the upper and lower halves and to detect mixed endian hardware.
    union { double a; ae_int32_t p[2]; } u; u.a = 1.0 / 1983.0;
    return
-      u.p[1] == (ae_int32_t) 0x3f408642 ? AE_LITTLE_ENDIAN : 
-      u.p[0] == (ae_int32_t) 0x3f408642 ? AE_BIG_ENDIAN : 
+      u.p[1] == (ae_int32_t) 0x3f408642 ? AE_LITTLE_ENDIAN :
+      u.p[0] == (ae_int32_t) 0x3f408642 ? AE_BIG_ENDIAN :
       AE_MIXED_ENDIAN; //(@) Originally this prompted an abort().
 }
 
@@ -3226,7 +3225,7 @@ void ae_v_muld(double *A, ae_int_t dA, ae_int_t N, double Alpha) {
 // Global and local constants and variables.
 const double ae_machineepsilon = 5.0E-16, ae_maxrealnumber = 1.0E300, ae_minrealnumber = 1.0E-300;
 const double ae_pi = 3.1415926535897932384626433832795;
-#endif 
+#endif
 
 // Optimized shared C/C++ linear algebra code.
 static const ae_int_t alglib_simd_alignment = 0x10;
@@ -4414,7 +4413,7 @@ static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_
 // Copy a and c, and transformed the task to "a a^T"-form.
 // If beta == 0.0, then zero out c and ignore it.
 // If alpha == 0.0 or k == 0 then ignore a.
-//(@) The SSE2-optimized form of _ialglib_mcopyblock() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+//(@) The SSE2-optimized form of _ialglib_mcopyblock() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
    double _loc_abuf[alglib_r_block * alglib_r_block + alglib_simd_alignment];
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    if (alpha == 0.0)
@@ -4437,7 +4436,7 @@ static bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_
             _ialglib_vzero(i + 1, crow, 1);
    }
 // Update c.
-//(@) The SSE2-optimized form of _ialglib_rmv() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+//(@) The SSE2-optimized form of _ialglib_rmv() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
    double *arow = abuf, *crow = cbuf;
    if (isupper)
       for (ae_int_t i = 0; i < n; i++, arow += alglib_r_block, crow += alglib_r_block)
@@ -4480,7 +4479,7 @@ static bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_comple
             _ialglib_vzero(2 * (i + 1), crow, 1);
    }
 // Update c.
-//(@) The SSE2-optimized form of _ialglib_cmv() has not used here in the original ALGLIB version and hasn't yet been incorporated here.
+//(@) The SSE2-optimized form of _ialglib_cmv() was not used here in the original ALGLIB version and hasn't yet been incorporated here.
    double _loc_tmpbuf[2 * alglib_c_block + alglib_simd_alignment];
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
    double *arow = abuf, *crow = cbuf;
@@ -5074,7 +5073,7 @@ void clear_error_flag() { _alglib_last_error = NULL; }
 // Global and local constants and variables.
 const double machineepsilon = 5.0E-16, maxrealnumber = 1.0E300, minrealnumber = 1.0E-300;
 const double pi = 3.1415926535897932384626433832795;
-#endif 
+#endif
 
 // Standard functions.
 bool isneginf(double x) { return isinf(x) && signbit(x); }

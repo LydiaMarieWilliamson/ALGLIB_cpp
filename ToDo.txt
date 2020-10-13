@@ -1,6 +1,11 @@
-Add in the DSP routines and modified statistics testing routines.
-Add in time-frequency routines onto FastTransforms.
-Add in new multi-threading framework.
-Add further notes on future revisions.
-Add in a scripting language front end
-Implement the other, older, ALGLIB (J.M. Shearer, M.A. Wolfe "ALGLIB, a simple symbol-manipulation package", CACM 28(8) 1985, 820-825) within the scripting language.
+∙	Add in two-way inverse testing routines -
+	for SpecialFunctions, {DiffEquations/Integration}, FastTransforms
+∙	Add in the DSP routines: Windowed Transforms;
+	time-frequency and time-scale routines onto FastTransforms; outlined in a separate file, DSP.txt.
+∙	Add in new multi-threading framework.
+∙	Add in a scripting language front end
+∙	Implement the other, older, ALGLIB
+		J.M. Shearer, M.A. Wolfe
+		"ALGLIB, a simple symbol-manipulation package",
+		CACM 28(8) 1985, 820-825
+	within the scripting language.

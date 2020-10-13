@@ -1460,9 +1460,13 @@ The following packages are included in the ALGLIB++ distribution:
 </tbody></table>
 The examples listed in the following sections match those of <code>TestI.cpp</code>, and include most of the tests described therein.
 For performance reasons, functions may be implemented with slight differences from how they are documented.
-In particular, an input parameter documented as <code>Type Par</code> may be implemented as <code>const Type &amp;Par</code>.
+In particular, while output parameters are documented and declared and implemented as <code>Type &amp;Par</code>,
+input parameters are documented as <code>Type Par</code>, but declared and implemented
+as <code>const Type Par</code> for the scalar types <code>bool</code>, <code>ae_int_t</code>, <code>double</code> and <code>complex</code>,
+and as <code>const Type &amp;Par</code> for all other types.
 This is discussed in greater depth by Stroustrup et al. <a href="https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#Rf-in">in-parameter passing with constant references</a>.
-For user-supplied functions, however, the prototypes actually required are made explicit.
+For user-supplied functions in the iteration routines and their high-level versions, however, the prototypes actually required are made explicit.
+For both these routines as well as for the serializer/unserializer routines, the documented and declared/implemented versions match.
 </p>
 <p>
 <a name=pck_AlgLibInternal class=sheader></a><h3>8.0. AlgLibInternal Package</h3>
@@ -1509,6 +1513,7 @@ Therefore, a short summary is provided here for each of the subpackages.
 <a href=#sub_hqrndcontinuous class=toc>hqrndcontinuous</a> |
 <a href=#sub_hqrnddiscrete class=toc>hqrnddiscrete</a> |
 <a href=#sub_hqrndexponential class=toc>hqrndexponential</a> |
+<a href=#sub_hqrndmiduniformr class=toc>hqrndmiduniformr</a> |
 <a href=#sub_hqrndnormal class=toc>hqrndnormal</a> |
 <a href=#sub_hqrndnormal2 class=toc>hqrndnormal2</a> |
 <a href=#sub_hqrndrandomize class=toc>hqrndrandomize</a> |
@@ -1589,6 +1594,19 @@ ALGLIB: Copyright 11.08.2007 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>double</b> hqrndexponential(hqrndstate state, <b>double</b> lambdav);
+</pre>
+<a name=sub_hqrndmiduniformr></a><h6 class=pageheader>hqrndmiduniformr Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function generates random real number in (-1,+1),
+not including interval boundaries
+
+State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>double</b> hqrndmiduniformr(hqrndstate state);
 </pre>
 <a name=sub_hqrndnormal></a><h6 class=pageheader>hqrndnormal Function</h6>
 <hr width=600 align=left>
@@ -2299,6 +2317,7 @@ ae_int_t kdtreequeryrnnu(kdtree kdt, real_1d_array x, <b>double</b> r);
 <a name=sub_kdtreeserialize></a><h6 class=pageheader>kdtreeserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -2309,6 +2328,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -2714,6 +2734,7 @@ ae_int_t kdtreetsqueryrnnu(kdtree kdt, kdtreerequestbuffer buf, real_1d_array x,
 <a name=sub_kdtreeunserialize></a><h6 class=pageheader>kdtreeunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -2721,6 +2742,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -2864,7 +2886,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugb1not(boolean_1d_array &amp;a);
+<b>void</b> xdebugb1not(boolean_1d_array a);
 </pre>
 <a name=sub_xdebugb1outeven></a><h6 class=pageheader>xdebugb1outeven Function</h6>
 <hr width=600 align=left>
@@ -2896,7 +2918,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugb2not(boolean_2d_array &amp;a);
+<b>void</b> xdebugb2not(boolean_2d_array a);
 </pre>
 <a name=sub_xdebugb2outsin></a><h6 class=pageheader>xdebugb2outsin Function</h6>
 <hr width=600 align=left>
@@ -2940,7 +2962,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugc1neg(complex_1d_array &amp;a);
+<b>void</b> xdebugc1neg(complex_1d_array a);
 </pre>
 <a name=sub_xdebugc1outeven></a><h6 class=pageheader>xdebugc1outeven Function</h6>
 <hr width=600 align=left>
@@ -2974,7 +2996,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugc2neg(complex_2d_array &amp;a);
+<b>void</b> xdebugc2neg(complex_2d_array a);
 </pre>
 <a name=sub_xdebugc2outsincos></a><h6 class=pageheader>xdebugc2outsincos Function</h6>
 <hr width=600 align=left>
@@ -3028,7 +3050,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugi1neg(integer_1d_array &amp;a);
+<b>void</b> xdebugi1neg(integer_1d_array a);
 </pre>
 <a name=sub_xdebugi1outeven></a><h6 class=pageheader>xdebugi1outeven Function</h6>
 <hr width=600 align=left>
@@ -3062,7 +3084,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugi2neg(integer_2d_array &amp;a);
+<b>void</b> xdebugi2neg(integer_2d_array a);
 </pre>
 <a name=sub_xdebugi2outsin></a><h6 class=pageheader>xdebugi2outsin Function</h6>
 <hr width=600 align=left>
@@ -3138,7 +3160,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugr1neg(real_1d_array &amp;a);
+<b>void</b> xdebugr1neg(real_1d_array a);
 </pre>
 <a name=sub_xdebugr1outeven></a><h6 class=pageheader>xdebugr1outeven Function</h6>
 <hr width=600 align=left>
@@ -3172,7 +3194,7 @@ ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> xdebugr2neg(real_2d_array &amp;a);
+<b>void</b> xdebugr2neg(real_2d_array a);
 </pre>
 <a name=sub_xdebugr2outsin></a><h6 class=pageheader>xdebugr2outsin Function</h6>
 <hr width=600 align=left>
@@ -3443,7 +3465,6 @@ ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=narration>
 This structure is a clusterization engine.
-
 You should not try to access its fields directly.
 Use ALGLIB functions in order to work with this object.
 ALGLIB: Copyright 10.07.2012 by Sergey Bochkanov
@@ -4985,7 +5006,7 @@ Inputs:
                     * 0 = baseline dense RDF
 
 Outputs:
-    S           -   decision forest builder, see
+    S           -   decision forest builder
 ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -5007,7 +5028,7 @@ Inputs:
                     * 2 = strong split at the best point of the range (default)
 
 Outputs:
-    S           -   decision forest builder, see
+    S           -   decision forest builder
 ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -5351,6 +5372,7 @@ ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 <a name=sub_dfserialize></a><h6 class=pageheader>dfserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -5361,6 +5383,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -5399,6 +5422,7 @@ ALGLIB: Copyright 16.02.2009 by Sergey Bochkanov
 <a name=sub_dfunserialize></a><h6 class=pageheader>dfunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -5406,6 +5430,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -6336,6 +6361,7 @@ ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 <a name=sub_knnserialize></a><h6 class=pageheader>knnserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -6346,6 +6372,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -6380,6 +6407,7 @@ ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 <a name=sub_knnunserialize></a><h6 class=pageheader>knnunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -6387,6 +6415,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 15.02.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -7222,7 +7251,6 @@ ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=narration>
 This structure is a MCPD (Markov Chains for Population Data) solver.
-
 You should use ALGLIB functions in order to work with this object.
 ALGLIB: Copyright 23.05.2010 by Sergey Bochkanov
 </pre>
@@ -9192,11 +9220,11 @@ ALGLIB: Copyright 04.11.2007 by Sergey Bochkanov
 <pre class=narration>
 Batch Hessian calculation using R-algorithm.
 Internal subroutine.
-ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 Hessian calculation based on R-algorithm described in
      &quot;Fast Exact Multiplication by the Hessian&quot;,
      B. A. Pearlmutter,
      Neural Computation, 1994.
+ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -9207,11 +9235,11 @@ Hessian calculation based on R-algorithm described in
 <pre class=narration>
 Batch Hessian calculation (natural error function) using R-algorithm.
 Internal subroutine.
-ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 Hessian calculation based on R-algorithm described in
      &quot;Fast Exact Multiplication by the Hessian&quot;,
      B. A. Pearlmutter,
      Neural Computation, 1994.
+ALGLIB: Copyright 26.01.2008 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -9466,6 +9494,7 @@ ALGLIB: Copyright 09.08.2012 by Sergey Bochkanov
 <a name=sub_mlpserialize></a><h6 class=pageheader>mlpserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -9476,6 +9505,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -9586,6 +9616,7 @@ ALGLIB: Copyright 25.03.2011 by Sergey Bochkanov
 <a name=sub_mlpunserialize></a><h6 class=pageheader>mlpunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -9593,6 +9624,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -9940,6 +9972,7 @@ ALGLIB: Copyright 17.02.2009 by Sergey Bochkanov
 <a name=sub_mlpeserialize></a><h6 class=pageheader>mlpeserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -9950,6 +9983,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -9959,6 +9993,7 @@ Important properties of s_out:
 <a name=sub_mlpeunserialize></a><h6 class=pageheader>mlpeunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -9966,6 +10001,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -10063,7 +10099,6 @@ NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 <hr width=600 align=left>
 <pre class=narration>
 Trainer object for neural network.
-
 You should not try to access fields of this object directly -  use  ALGLIB
 functions to work with this object.
 </pre>
@@ -11477,7 +11512,6 @@ ALGLIB: Copyright 10.01.2017 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the SSA model.
-
 You should use ALGLIB functions to work with this object.
 </pre>
 <hr width=600 align=left>
@@ -12035,7 +12069,7 @@ Following degenerate cases may happen:
 * no algorithm is specified (no analysis can be done)
 * last sequence is shorter than the WindowWidth   (analysis  can  be done,
   but we can not perform forecasting on the last sequence)
-* window lentgh is 1 (impossible to use for forecasting)
+* window length is 1 (impossible to use for forecasting)
 * SSA analysis algorithm is  configured  to  extract  basis  whose size is
   equal to window length (impossible to use for  forecasting;  only  basis
   whose size is less than window length can be used).
@@ -12118,7 +12152,7 @@ Following degenerate cases may happen:
 * no algorithm is specified (no analysis can be done)
 * data sequence is shorter than the WindowWidth   (analysis  can  be done,
   but we can not perform forecasting on the last sequence)
-* window lentgh is 1 (impossible to use for forecasting)
+* window length is 1 (impossible to use for forecasting)
 * SSA analysis algorithm is  configured  to  extract  basis  whose size is
   equal to window length (impossible to use for  forecasting;  only  basis
   whose size is less than window length can be used).
@@ -12196,7 +12230,7 @@ Following degenerate cases may happen:
 * no algorithm is specified (no analysis can be done)
 * last sequence is shorter than the WindowWidth   (analysis  can  be done,
   but we can not perform forecasting on the last sequence)
-* window lentgh is 1 (impossible to use for forecasting)
+* window length is 1 (impossible to use for forecasting)
 * SSA analysis algorithm is  configured  to  extract  basis  whose size is
   equal to window length (impossible to use for  forecasting;  only  basis
   whose size is less than window length can be used).
@@ -12277,7 +12311,7 @@ Following degenerate cases may happen:
 * no algorithm is specified (no analysis can be done)
 * data sequence is shorter than the WindowWidth   (analysis  can  be done,
   but we can not perform forecasting on the last sequence)
-* window lentgh is 1 (impossible to use for forecasting)
+* window length is 1 (impossible to use for forecasting)
 * SSA analysis algorithm is  configured  to  extract  basis  whose size is
   equal to window length (impossible to use for  forecasting;  only  basis
   whose size is less than window length can be used).
@@ -12835,6 +12869,9 @@ using namespace alglib;
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> odesolverstate {
+   real_1d_array y;
+   real_1d_array dy;
+   double x;
 };
 </pre>
 <a name=sub_odesolverresults></a><h6 class=pageheader>odesolverresults Function</h6>
@@ -13723,6 +13760,10 @@ use. You should use ALGLIB functions to work with this class:
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> autogkstate {
+   double x;
+   double xminusa;
+   double bminusx;
+   double f;
 };
 </pre>
 <a name=sub_autogkintegrate></a><h6 class=pageheader>autogkintegrate Function</h6>
@@ -14574,9 +14615,9 @@ i.e. it is unconstrained nonsmooth optimization problem of finding  &quot;best&q
 central point, with radius R being unambiguously  determined  from  C.  In
 order to move away from non-smoothness we use following reformulation:
 
-        [   ]                   [         ]2
+        [   ]                    [         ]2
     min [ R ] subject to R &ge; 0, [ XY[i]-C ] &le; R^2
-    C,R [   ]                   [         ]
+    C,R [   ]                    [         ]
 
 i.e. it becomes smooth quadratically constrained optimization problem with
 linear target function. Such problem statement is 100% equivalent  to  the
@@ -15164,6 +15205,7 @@ ALGLIB: Copyright 22.10.2018 by Sergey Bochkanov
 <a name=sub_idwserialize></a><h6 class=pageheader>idwserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -15174,6 +15216,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 28.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -15211,6 +15254,7 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <a name=sub_idwunserialize></a><h6 class=pageheader>idwunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -15218,6 +15262,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 28.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -15563,6 +15608,15 @@ Never try to access its fields directly!
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> lsfitstate {
+   bool needf;
+   bool needfg;
+   bool needfgh;
+   bool xupdated;
+   real_1d_array c;
+   double f;
+   real_1d_array g;
+   real_2d_array h;
+   real_1d_array x;
 };
 </pre>
 <a name=struct_polynomialfitreport></a><h6 class=pageheader>polynomialfitreport Class</h6>
@@ -18367,7 +18421,6 @@ using namespace alglib;
 <hr width=600 align=left>
 <pre class=narration>
 Parametric spline inteprolant: 2-dimensional curve.
-
 You should not try to access its members directly - use PSpline2XXXXXXXX()
 functions instead.
 </pre>
@@ -18380,7 +18433,6 @@ functions instead.
 <hr width=600 align=left>
 <pre class=narration>
 Parametric spline inteprolant: 3-dimensional curve.
-
 You should not try to access its members directly - use PSpline3XXXXXXXX()
 functions instead.
 </pre>
@@ -19534,8 +19586,6 @@ Inputs:
 Outputs:
     F   -   barycentric interpolant at T
     DF  -   first derivative
-
-NOTE
 ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20409,6 +20459,7 @@ ALGLIB: Copyright 17.11.2018 by Sergey Bochkanov
 <a name=sub_rbfserialize></a><h6 class=pageheader>rbfserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -20419,6 +20470,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 02.02.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -20980,6 +21032,7 @@ ALGLIB: Copyright 13.12.2011 by Sergey Bochkanov
 <a name=sub_rbfunserialize></a><h6 class=pageheader>rbfunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -20987,6 +21040,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 02.02.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -23094,6 +23148,7 @@ ALGLIB Routine: Copyright 09.07.2007 by Sergey Bochkanov
 <a name=sub_spline2dserialize></a><h6 class=pageheader>spline2dserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: serialization
 These functions serialize a data structure to a C++ string or stream.
 * serialization can be freely moved across 32-bit and 64-bit systems,
   and different byte orders. For example, you can serialize a string
@@ -23104,6 +23159,7 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
+ALGLIB: Copyright 28.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -23171,6 +23227,7 @@ ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 <a name=sub_spline2dunserialize></a><h6 class=pageheader>spline2dunserialize Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
+Serializer: unserialization
 These functions unserialize a data structure from a C++ string or stream.
 Important properties of s_in:
 * any combination of spaces, tabs, Windows or Unix stype newlines can
@@ -23178,6 +23235,7 @@ Important properties of s_in:
   stream or string from text or XML files.
 * But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
+ALGLIB: Copyright 28.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -23879,7 +23937,7 @@ ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, complex_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc);
+<b>void</b> cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, complex_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, complex_2d_array c, ae_int_t ic, ae_int_t jc);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_gemm class=nav>ablas_d_gemm</a> ]</p>
 <a name=sub_cmatrixherk></a><h6 class=pageheader>cmatrixherk Function</h6>
@@ -23918,7 +23976,7 @@ ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixherk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> cmatrixherk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_syrk class=nav>ablas_d_syrk</a> ]</p>
 <a name=sub_cmatrixlefttrsm></a><h6 class=pageheader>cmatrixlefttrsm Function</h6>
@@ -23950,7 +24008,7 @@ ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> cmatrixlefttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array x, ae_int_t i2, ae_int_t j2);
 </pre>
 <a name=sub_cmatrixmv></a><h6 class=pageheader>cmatrixmv Function</h6>
 <hr width=600 align=left>
@@ -24036,7 +24094,7 @@ ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> cmatrixrighttrsm(ae_int_t m, ae_int_t n, complex_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, complex_2d_array x, ae_int_t i2, ae_int_t j2);
 </pre>
 <a name=sub_cmatrixsyrk></a><h6 class=pageheader>cmatrixsyrk Function</h6>
 <hr width=600 align=left>
@@ -24049,7 +24107,7 @@ ALGLIB Routine: Copyright 16.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> cmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, complex_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, complex_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </pre>
 <a name=sub_cmatrixtranspose></a><h6 class=pageheader>cmatrixtranspose Function</h6>
 <hr width=600 align=left>
@@ -24087,7 +24145,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixcopy(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixcopy(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array b, ae_int_t ib, ae_int_t jb);
 </pre>
 <a name=sub_rmatrixenforcesymmetricity></a><h6 class=pageheader>rmatrixenforcesymmetricity Function</h6>
 <hr width=600 align=left>
@@ -24103,7 +24161,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixenforcesymmetricity(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper);
+<b>void</b> rmatrixenforcesymmetricity(real_2d_array a, ae_int_t n, <b>bool</b> isupper);
 </pre>
 <a name=sub_rmatrixgemm></a><h6 class=pageheader>rmatrixgemm Function</h6>
 <hr width=600 align=left>
@@ -24153,13 +24211,15 @@ ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, real_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, <b>double</b> beta, real_2d_array &amp;c, ae_int_t ic, ae_int_t jc);
+<b>void</b> rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, real_2d_array b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, <b>double</b> beta, real_2d_array c, ae_int_t ic, ae_int_t jc);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_gemm class=nav>ablas_d_gemm</a> ]</p>
 <a name=sub_rmatrixgemv></a><h6 class=pageheader>rmatrixgemv Function</h6>
-<pre class=narration></pre>
+<pre class=narration>
+Scaled matrix-vector addition: y += alpha a x.
+</pre>
 <pre class=declaration>
-<b>void</b> rmatrixgemv(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> rmatrixgemv(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </pre>
 <a name=sub_rmatrixgencopy></a><h6 class=pageheader>rmatrixgencopy Function</h6>
 <hr width=600 align=left>
@@ -24184,7 +24244,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixgencopy(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> beta, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixgencopy(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> beta, real_2d_array b, ae_int_t ib, ae_int_t jb);
 </pre>
 <a name=sub_rmatrixger></a><h6 class=pageheader>rmatrixger Function</h6>
 <hr width=600 align=left>
@@ -24212,7 +24272,7 @@ ALGLIB Routine: Copyright 16.10.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixger(ae_int_t m, ae_int_t n, real_2d_array &amp;a, ae_int_t ia, ae_int_t ja, <b>double</b> alpha, real_1d_array u, ae_int_t iu, real_1d_array v, ae_int_t iv);
+<b>void</b> rmatrixger(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>double</b> alpha, real_1d_array u, ae_int_t iu, real_1d_array v, ae_int_t iv);
 </pre>
 <a name=sub_rmatrixlefttrsm></a><h6 class=pageheader>rmatrixlefttrsm Function</h6>
 <hr width=600 align=left>
@@ -24242,7 +24302,7 @@ ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixlefttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> rmatrixlefttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array x, ae_int_t i2, ae_int_t j2);
 </pre>
 <a name=sub_rmatrixmv></a><h6 class=pageheader>rmatrixmv Function</h6>
 <hr width=600 align=left>
@@ -24277,7 +24337,7 @@ ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixmv(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> rmatrixmv(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, real_1d_array y, ae_int_t iy);
 </pre>
 <a name=sub_rmatrixrank1></a><h6 class=pageheader>rmatrixrank1 Function</h6>
 <hr width=600 align=left>
@@ -24330,12 +24390,14 @@ ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixrighttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array &amp;x, ae_int_t i2, ae_int_t j2);
+<b>void</b> rmatrixrighttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array x, ae_int_t i2, ae_int_t j2);
 </pre>
 <a name=sub_rmatrixsymv></a><h6 class=pageheader>rmatrixsymv Function</h6>
-<pre class=narration></pre>
+<pre class=narration>
+Scaled vector-matrix-vector addition: y = alpha a x + beta y.
+</pre>
 <pre class=declaration>
-<b>void</b> rmatrixsymv(ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> rmatrixsymv(ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </pre>
 <a name=sub_rmatrixsyrk></a><h6 class=pageheader>rmatrixsyrk Function</h6>
 <hr width=600 align=left>
@@ -24371,13 +24433,15 @@ ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, real_2d_array &amp;c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
+<b>void</b> rmatrixsyrk(ae_int_t n, ae_int_t k, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, <b>double</b> beta, real_2d_array c, ae_int_t ic, ae_int_t jc, <b>bool</b> isupper);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_syrk class=nav>ablas_d_syrk</a> ]</p>
 <a name=sub_rmatrixsyvmv></a><h6 class=pageheader>rmatrixsyvmv Function</h6>
-<pre class=narration></pre>
+<pre class=narration>
+Vector-matrix-vector multiplication: x^T a x (with tmp = a x).
+</pre>
 <pre class=declaration>
-<b>double</b> rmatrixsyvmv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, real_1d_array &amp;tmp);
+<b>double</b> rmatrixsyvmv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, real_1d_array tmp);
 </pre>
 <a name=sub_rmatrixtranspose></a><h6 class=pageheader>rmatrixtranspose Function</h6>
 <hr width=600 align=left>
@@ -24396,7 +24460,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixtranspose(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixtranspose(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array b, ae_int_t ib, ae_int_t jb);
 </pre>
 <a name=sub_rmatrixtrsv></a><h6 class=pageheader>rmatrixtrsv Function</h6>
 <hr width=600 align=left>
@@ -24435,7 +24499,7 @@ Copyright (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixtrsv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x, ae_int_t ix);
+<b>void</b> rmatrixtrsv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x, ae_int_t ix);
 </pre>
 <a name=sub_rvectorcopy></a><h6 class=pageheader>rvectorcopy Function</h6>
 <hr width=600 align=left>
@@ -24451,7 +24515,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rvectorcopy(ae_int_t n, real_1d_array a, ae_int_t ia, real_1d_array &amp;b, ae_int_t ib);
+<b>void</b> rvectorcopy(ae_int_t n, real_1d_array a, ae_int_t ia, real_1d_array b, ae_int_t ib);
 </pre>
 <a name=example_ablas_d_gemm></a><h6 class=pageheader>ablas_d_gemm Example</h6>
 <pre class=source>
@@ -24700,7 +24764,6 @@ History:
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the subspace iteration algorithm.
-
 You should use ALGLIB functions to work with this object.
 </pre>
 <hr width=600 align=left>
@@ -24713,7 +24776,6 @@ You should use ALGLIB functions to work with this object.
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the subspace iteration algorithm.
-
 You should use ALGLIB functions to work with this object.
 </pre>
 <hr width=600 align=left>
@@ -26721,7 +26783,6 @@ using namespace alglib;
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the iterative norm estimation algorithm.
-
 You should use ALGLIB functions to work with this object.
 </pre>
 <hr width=600 align=left>
@@ -28212,7 +28273,6 @@ to factorization function is enough.
 <hr width=600 align=left>
 <pre class=narration>
 Sparse matrix structure.
-
 You should use ALGLIB functions to work with sparse matrix. Never  try  to
 access its fields directly!
 
@@ -29039,7 +29099,7 @@ ALGLIB Project: Copyright 10.12.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparsegemv(sparsematrix s, <b>double</b> alpha, ae_int_t ops, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array &amp;y, ae_int_t iy);
+<b>void</b> sparsegemv(sparsematrix s, <b>double</b> alpha, ae_int_t ops, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </pre>
 <a name=sub_sparseget></a><h6 class=pageheader>sparseget Function</h6>
 <hr width=600 align=left>
@@ -29605,9 +29665,9 @@ Inputs:
                       empty - these elements are not referenced at all).
                     * if lower triangle is given,  only   S[i,j] for j &le; i
                       are used, and upper triangle is ignored.
-    A           -   array[N][K], input dense matrix. For performance reasons
+    A           -   array[M][K], input dense matrix. For performance reasons
                     we make only quick checks - we check that array size is
-                    at least N, but we do not check for NAN's or INF's.
+                    at least M, but we do not check for NAN's or INF's.
     K           -   number of columns of matrix (A).
     B           -   output buffer, possibly preallocated. In case  buffer
                     size is too small to store  result,  this  buffer  is
@@ -29754,7 +29814,7 @@ ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparsetrmv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x, real_1d_array &amp;y);
+<b>void</b> sparsetrmv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x, real_1d_array &amp;y);
 </pre>
 <a name=sub_sparsetrsv></a><h6 class=pageheader>sparsetrsv Function</h6>
 <hr width=600 align=left>
@@ -29801,7 +29861,7 @@ ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparsetrsv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array &amp;x);
+<b>void</b> sparsetrsv(sparsematrix s, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_1d_array x);
 </pre>
 <a name=sub_sparsevsmv></a><h6 class=pageheader>sparsevsmv Function</h6>
 <hr width=600 align=left>
@@ -30252,7 +30312,7 @@ ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 <a name=sub_sparsecholeskyskyline></a><h6 class=pageheader>sparsecholeskyskyline Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
-Sparse Cholesky decomposition for skyline matrixm using in-place algorithm
+Sparse Cholesky decomposition for skyline matrix using in-place algorithm
 without allocating additional storage.
 
 The algorithm computes Cholesky decomposition  of  a  symmetric  positive-
@@ -30416,7 +30476,7 @@ ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskyupdateadd1(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, real_1d_array u);
+<b>void</b> spdmatrixcholeskyupdateadd1(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array u);
 </pre>
 <a name=sub_spdmatrixcholeskyupdateadd1buf></a><h6 class=pageheader>spdmatrixcholeskyupdateadd1buf Function</h6>
 <hr width=600 align=left>
@@ -30448,7 +30508,7 @@ ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskyupdateadd1buf(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, real_1d_array u, real_1d_array &amp;bufr);
+<b>void</b> spdmatrixcholeskyupdateadd1buf(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array u, real_1d_array &amp;bufr);
 </pre>
 <a name=sub_spdmatrixcholeskyupdatefix></a><h6 class=pageheader>spdmatrixcholeskyupdatefix Function</h6>
 <hr width=600 align=left>
@@ -30509,7 +30569,7 @@ ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskyupdatefix(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix);
+<b>void</b> spdmatrixcholeskyupdatefix(real_2d_array a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix);
 </pre>
 <a name=sub_spdmatrixcholeskyupdatefixbuf></a><h6 class=pageheader>spdmatrixcholeskyupdatefixbuf Function</h6>
 <hr width=600 align=left>
@@ -30541,7 +30601,7 @@ ALGLIB: Copyright 03.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskyupdatefixbuf(real_2d_array &amp;a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix, real_1d_array &amp;bufr);
+<b>void</b> spdmatrixcholeskyupdatefixbuf(real_2d_array a, ae_int_t n, <b>bool</b> isupper, boolean_1d_array fix, real_1d_array &amp;bufr);
 </pre>
 </p>
 <p>
@@ -30639,6 +30699,12 @@ object
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minbcstate {
+   bool needf;
+   bool needfg;
+   bool xupdated;
+   double f;
+   real_1d_array g;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minbccreate></a><h6 class=pageheader>minbccreate Function</h6>
@@ -31666,6 +31732,12 @@ object
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minbleicstate {
+   bool needf;
+   bool needfg;
+   bool xupdated;
+   double f;
+   real_1d_array g;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minbleiccreate></a><h6 class=pageheader>minbleiccreate Function</h6>
@@ -32138,8 +32210,8 @@ ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> minbleicoptimize(minbleicstate &amp;state, <b>void</b> (*grad)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 <b>void</b> minbleicoptimize(minbleicstate &amp;state, <b>void</b> (*func)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
+<b>void</b> minbleicoptimize(minbleicstate &amp;state, <b>void</b> (*grad)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_minbleic_d_1 class=nav>minbleic_d_1</a> | <a href=#example_minbleic_d_2 class=nav>minbleic_d_2</a> | <a href=#example_minbleic_numdiff class=nav>minbleic_numdiff</a> ]</p>
 <a name=sub_minbleicrequesttermination></a><h6 class=pageheader>minbleicrequesttermination Function</h6>
@@ -32832,6 +32904,12 @@ You should use ALGLIB functions to work with this object.
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> mincgstate {
+   bool needf;
+   bool needfg;
+   bool xupdated;
+   double f;
+   real_1d_array g;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_mincgcreate></a><h6 class=pageheader>mincgcreate Function</h6>
@@ -33855,6 +33933,11 @@ using namespace alglib;
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> minasastate {
+   bool needfg;
+   bool xupdated; 
+   double f;
+   real_1d_array g;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minasacreate></a><h6 class=pageheader>minasacreate Function</h6>
@@ -34080,6 +34163,12 @@ Other fields of this structure are not documented and should not be used!
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> minlbfgsstate {
+   bool needf;
+   bool needfg;
+   bool xupdated;
+   double f;
+   real_1d_array g;
+   real_1d_array x; 
 };
 </pre>
 <a name=sub_minlbfgscreate></a><h6 class=pageheader>minlbfgscreate Function</h6>
@@ -34547,8 +34636,8 @@ ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> minlbfgsoptimize(minlbfgsstate &amp;state, <b>void</b> (*grad)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 <b>void</b> minlbfgsoptimize(minlbfgsstate &amp;state, <b>void</b> (*func)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
+<b>void</b> minlbfgsoptimize(minlbfgsstate &amp;state, <b>void</b> (*grad)(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_minlbfgs_d_1 class=nav>minlbfgs_d_1</a> | <a href=#example_minlbfgs_d_2 class=nav>minlbfgs_d_2</a> | <a href=#example_minlbfgs_numdiff class=nav>minlbfgs_numdiff</a> ]</p>
 <a name=sub_minlbfgsrequesttermination></a><h6 class=pageheader>minlbfgsrequesttermination Function</h6>
@@ -35121,6 +35210,17 @@ to work with it.
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minlmstate {
+   bool needf;
+   bool needfgh;
+   bool needfi;
+   bool needfij;
+   bool xupdated;
+   double f;
+   real_1d_array fi;
+   real_1d_array g;
+   real_2d_array h;
+   real_2d_array j;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minlmcreatefgh></a><h6 class=pageheader>minlmcreatefgh Function</h6>
@@ -36852,6 +36952,13 @@ object
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minnlcstate {
+   bool needfi;
+   bool needfij;
+   bool xupdated;
+   double f;
+   real_1d_array fi;
+   real_2d_array j;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minnlccreate></a><h6 class=pageheader>minnlccreate Function</h6>
@@ -37387,8 +37494,8 @@ ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> minnlcoptimize(minnlcstate &amp;state, <b>void</b> (*jac)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 <b>void</b> minnlcoptimize(minnlcstate &amp;state, <b>void</b> (*fvec)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
+<b>void</b> minnlcoptimize(minnlcstate &amp;state, <b>void</b> (*jac)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_minnlc_d_inequality class=nav>minnlc_d_inequality</a> | <a href=#example_minnlc_d_equality class=nav>minnlc_d_equality</a> | <a href=#example_minnlc_d_mixed class=nav>minnlc_d_mixed</a> ]</p>
 <a name=sub_minnlcrequesttermination></a><h6 class=pageheader>minnlcrequesttermination Function</h6>
@@ -38742,6 +38849,13 @@ object
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minnsstate {
+   bool needfi;
+   bool needfij;
+   bool xupdated;
+   double f;
+   real_1d_array fi;
+   real_2d_array j;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minnscreate></a><h6 class=pageheader>minnscreate Function</h6>
@@ -38937,8 +39051,8 @@ ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> minnsoptimize(minnsstate &amp;state, <b>void</b> (*jac)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 <b>void</b> minnsoptimize(minnsstate &amp;state, <b>void</b> (*fvec)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
+<b>void</b> minnsoptimize(minnsstate &amp;state, <b>void</b> (*jac)(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr), <b>void</b> (*rep)(<b>const</b> real_1d_array &amp;x, <b>double</b> func, <b>void</b> *ptr) = NULL, <b>void</b> *ptr = NULL);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_minns_d_unconstrained class=nav>minns_d_unconstrained</a> | <a href=#example_minns_d_diff class=nav>minns_d_diff</a> | <a href=#example_minns_d_bc class=nav>minns_d_bc</a> | <a href=#example_minns_d_nlc class=nav>minns_d_nlc</a> ]</p>
 <a name=sub_minnsrequesttermination></a><h6 class=pageheader>minnsrequesttermination Function</h6>
@@ -40038,9 +40152,9 @@ Inputs:
 
 You should use MinQPResults() function to access results after calls
 to this function.
-ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
      Special thanks to Elvira Illarionova  for  important  suggestions  on
      the linearly constrained QP algorithm.
+ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -41942,8 +42056,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -41975,8 +42089,8 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 
 NOTE: unlike  CMatrixLUSolve(),  this   function   does   NOT   check  for
       near-degeneracy of input matrix. It  checks  for  EXACT  degeneracy,
@@ -41986,7 +42100,7 @@ ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixlusolvefast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> cmatrixlusolvefast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_cmatrixlusolvem></a><h6 class=pageheader>cmatrixlusolvem Function</h6>
 <hr width=600 align=left>
@@ -42035,8 +42149,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42068,13 +42182,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N,M]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixlusolvemfast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> cmatrixlusolvemfast(complex_2d_array lua, integer_1d_array p, ae_int_t n, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_cmatrixmixedsolve></a><h6 class=pageheader>cmatrixmixedsolve Function</h6>
 <hr width=600 align=left>
@@ -42104,8 +42218,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42141,8 +42255,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42192,8 +42306,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42222,13 +42336,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixsolvefast(complex_2d_array a, ae_int_t n, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> cmatrixsolvefast(complex_2d_array a, ae_int_t n, complex_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_cmatrixsolvem></a><h6 class=pageheader>cmatrixsolvem Function</h6>
 <hr width=600 align=left>
@@ -42282,8 +42396,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42315,13 +42429,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N,M]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> cmatrixsolvemfast(complex_2d_array a, ae_int_t n, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> cmatrixsolvemfast(complex_2d_array a, ae_int_t n, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_hpdmatrixcholeskysolve></a><h6 class=pageheader>hpdmatrixcholeskysolve Function</h6>
 <hr width=600 align=left>
@@ -42374,7 +42488,7 @@ Outputs:
                 * rep.rinf  condition number in inf-norm
     X       -   array[N]:
                 * for info &gt; 0  - solution
-                * for info=-3 - filled by zeros
+                * for info = -3 - filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42408,12 +42522,12 @@ Outputs:
                 *  1    task is solved
     B       -   array[N]:
                 * for info &gt; 0  - overwritten by solution
-                * for info=-3 - filled by zeros
+                * for info = -3 - filled by zeros
 ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> hpdmatrixcholeskysolvefast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> hpdmatrixcholeskysolvefast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_hpdmatrixcholeskysolvem></a><h6 class=pageheader>hpdmatrixcholeskysolvem Function</h6>
 <hr width=600 align=left>
@@ -42470,7 +42584,7 @@ Outputs:
                 * rep.rinf  condition number in inf-norm
     X       -   array[N]:
                 * for info &gt; 0 contains solution
-                * for info=-3 filled by zeros
+                * for info = -3 filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42505,12 +42619,12 @@ Outputs:
                 *  1    task was solved
     B       -   array[N]:
                 * for info &gt; 0 overwritten by solution
-                * for info=-3 filled by zeros
+                * for info = -3 filled by zeros
 ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> hpdmatrixcholeskysolvemfast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> hpdmatrixcholeskysolvemfast(complex_2d_array cha, ae_int_t n, <b>bool</b> isupper, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_hpdmatrixsolve></a><h6 class=pageheader>hpdmatrixsolve Function</h6>
 <hr width=600 align=left>
@@ -42594,7 +42708,7 @@ ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> hpdmatrixsolvefast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> hpdmatrixsolvefast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_hpdmatrixsolvem></a><h6 class=pageheader>hpdmatrixsolvem Function</h6>
 <hr width=600 align=left>
@@ -42677,7 +42791,7 @@ ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> hpdmatrixsolvemfast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> hpdmatrixsolvemfast(complex_2d_array a, ae_int_t n, <b>bool</b> isupper, complex_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_rmatrixlusolve></a><h6 class=pageheader>rmatrixlusolve Function</h6>
 <hr width=600 align=left>
@@ -42728,8 +42842,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42764,13 +42878,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixlusolvefast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> rmatrixlusolvefast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_rmatrixlusolvem></a><h6 class=pageheader>rmatrixlusolvem Function</h6>
 <hr width=600 align=left>
@@ -42824,8 +42938,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42861,13 +42975,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N,M]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixlusolvemfast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> rmatrixlusolvemfast(real_2d_array lua, integer_1d_array p, ae_int_t n, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_rmatrixmixedsolve></a><h6 class=pageheader>rmatrixmixedsolve Function</h6>
 <hr width=600 align=left>
@@ -42901,8 +43015,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42941,8 +43055,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -42993,8 +43107,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43030,13 +43144,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task is solved
     B       -   array[N]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 16.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixsolvefast(real_2d_array a, ae_int_t n, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> rmatrixsolvefast(real_2d_array a, ae_int_t n, real_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_rmatrixsolvels></a><h6 class=pageheader>rmatrixsolvels Function</h6>
 <hr width=600 align=left>
@@ -43141,8 +43255,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43185,13 +43299,13 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     B       -   array[N]:
-                * info &gt; 0    &rArr;  overwritten by solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; overwritten by solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixsolvemfast(real_2d_array a, ae_int_t n, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> rmatrixsolvemfast(real_2d_array a, ae_int_t n, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_spdmatrixcholeskysolve></a><h6 class=pageheader>spdmatrixcholeskysolve Function</h6>
 <hr width=600 align=left>
@@ -43244,7 +43358,7 @@ Outputs:
                 * rep.rinf  condition number in inf-norm
     X       -   array[N]:
                 * for info &gt; 0  - solution
-                * for info=-3 - filled by zeros
+                * for info = -3 - filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43278,12 +43392,12 @@ Outputs:
                 *  1    task is solved
     B       -   array[N]:
                 * for info &gt; 0  - overwritten by solution
-                * for info=-3 - filled by zeros
+                * for info = -3 - filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskysolvefast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> spdmatrixcholeskysolvefast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_spdmatrixcholeskysolvem></a><h6 class=pageheader>spdmatrixcholeskysolvem Function</h6>
 <hr width=600 align=left>
@@ -43339,7 +43453,7 @@ Outputs:
                 * rep.rinf  condition number in inf-norm
     X       -   array[N]:
                 * for info &gt; 0 contains solution
-                * for info=-3 filled by zeros
+                * for info = -3 filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43375,12 +43489,12 @@ Outputs:
                 *  1    task was solved
     B       -   array[N]:
                 * for info &gt; 0 overwritten by solution
-                * for info=-3 filled by zeros
+                * for info = -3 filled by zeros
 ALGLIB: Copyright 18.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixcholeskysolvemfast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> spdmatrixcholeskysolvemfast(real_2d_array cha, ae_int_t n, <b>bool</b> isupper, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=sub_spdmatrixsolve></a><h6 class=pageheader>spdmatrixsolve Function</h6>
 <hr width=600 align=left>
@@ -43431,8 +43545,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43463,13 +43577,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task was solved
     B       -   array[N], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixsolvefast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array &amp;b, ae_int_t &amp;info);
+<b>void</b> spdmatrixsolvefast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_1d_array b, ae_int_t &amp;info);
 </pre>
 <a name=sub_spdmatrixsolvem></a><h6 class=pageheader>spdmatrixsolvem Function</h6>
 <hr width=600 align=left>
@@ -43520,8 +43634,8 @@ Outputs:
                 * rep.r1    condition number in 1-norm
                 * rep.rinf  condition number in inf-norm
     X       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -43552,13 +43666,13 @@ Outputs:
                 * -1    N &le; 0 was passed
                 *  1    task was solved
     B       -   array[N,M], it contains:
-                * info &gt; 0    &rArr;  solution
-                * info=-3   &rArr;  filled by zeros
+                * info &gt; 0  &rArr; solution
+                * info = -3 &rArr; filled by zeros
 ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> spdmatrixsolvemfast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_2d_array &amp;b, ae_int_t m, ae_int_t &amp;info);
+<b>void</b> spdmatrixsolvemfast(real_2d_array a, ae_int_t n, <b>bool</b> isupper, real_2d_array b, ae_int_t m, ae_int_t &amp;info);
 </pre>
 <a name=unit_directsparsesolvers></a><h4 class=pageheader>8.9.2. directsparsesolvers Subpackage</h4>
 <div class=pagecontent>
@@ -43769,6 +43883,7 @@ using namespace alglib;
 <h5>Functions</h5><font size=2>[
 <a href=#sub_lincgcreate class=toc>lincgcreate</a> |
 <a href=#sub_lincgresults class=toc>lincgresults</a> |
+<a href=#sub_lincgsetb class=toc>lincgsetb</a> |
 <a href=#sub_lincgsetcond class=toc>lincgsetcond</a> |
 <a href=#sub_lincgsetprecdiag class=toc>lincgsetprecdiag</a> |
 <a href=#sub_lincgsetprecunit class=toc>lincgsetprecunit</a> |
@@ -43797,7 +43912,6 @@ using namespace alglib;
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the linear CG method.
-
 You should use ALGLIB functions to work with this object.
 Never try to access its fields directly!
 </pre>
@@ -43868,6 +43982,22 @@ ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 <b>void</b> lincgresults(lincgstate state, real_1d_array &amp;x, lincgreport &amp;rep);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_lincg_d_1 class=nav>lincg_d_1</a> ]</p>
+<a name=sub_lincgsetb></a><h6 class=pageheader>lincgsetb Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets right part. By default, right part is zero.
+
+Inputs:
+    B       -   right part, array[N].
+
+Outputs:
+    State   -   structure which stores algorithm state
+ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> lincgsetb(lincgstate state, real_1d_array b);
+</pre>
 <a name=sub_lincgsetcond></a><h6 class=pageheader>lincgsetcond Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -43891,6 +44021,8 @@ ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> lincgsetcond(lincgstate state, <b>double</b> epsf, ae_int_t maxits);
 </pre>
+
+
 <a name=sub_lincgsetprecdiag></a><h6 class=pageheader>lincgsetprecdiag Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -44138,7 +44270,6 @@ using namespace alglib;
 <hr width=600 align=left>
 <pre class=narration>
 This object stores state of the LinLSQR method.
-
 You should use ALGLIB functions to work with this object.
 </pre>
 <hr width=600 align=left>
@@ -44488,6 +44619,13 @@ using namespace alglib;
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> nleqstate {
+   bool needf;
+   bool needfij;
+   bool xupdated;
+   double f;
+   real_1d_array fi;
+   real_2d_array j;
+   real_1d_array x;
 };
 </pre>
 <a name=sub_nleqcreatelm></a><h6 class=pageheader>nleqcreatelm Function</h6>
@@ -47342,8 +47480,8 @@ ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rankdata(real_2d_array &amp;xy, ae_int_t npoints, ae_int_t nfeatures);
-<b>void</b> rankdata(real_2d_array &amp;xy);
+<b>void</b> rankdata(real_2d_array xy, ae_int_t npoints, ae_int_t nfeatures);
+<b>void</b> rankdata(real_2d_array xy);
 </pre>
 <a name=sub_rankdatacentered></a><h6 class=pageheader>rankdatacentered Function</h6>
 <hr width=600 align=left>
@@ -47369,8 +47507,8 @@ ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rankdatacentered(real_2d_array &amp;xy, ae_int_t npoints, ae_int_t nfeatures);
-<b>void</b> rankdatacentered(real_2d_array &amp;xy);
+<b>void</b> rankdatacentered(real_2d_array xy, ae_int_t npoints, ae_int_t nfeatures);
+<b>void</b> rankdatacentered(real_2d_array xy);
 </pre>
 <a name=sub_sampleadev></a><h6 class=pageheader>sampleadev Function</h6>
 <hr width=600 align=left>

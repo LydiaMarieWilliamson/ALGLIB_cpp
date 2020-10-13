@@ -4,9 +4,9 @@ typedef enum {
    EV_EXIT, EV_STEP,
 // ∙	needdy
    EV_NEEDDY = EV_STEP,
-// ∙ 	needpfgh, needpfg, needpf (⇔ needfgh, needfg, needf)
+// ∙ 	needpf, needpfg, needpfgh (⇔ needf, needfg, needfgh)
    EV_NEEDPF = EV_STEP, EV_NEEDPFG, EV_NEEDPFGH,
-// ∙	needfgh, needfg, needfij, needfi, needf
+// ∙	needf, needfg, needfgh, needfi, needfij
    EV_NEEDF = EV_STEP, EV_NEEDFG, EV_NEEDFGH, EV_NEEDFI, EV_NEEDFIJ,
 // ∙	needprev, needmv, needmtv, needvmv[, needmv2]
    EV_NEEDPREV, EV_NEEDMV, EV_NEEDMTV, EV_NEEDVMV,/* EV_NEEDMV2,*/
@@ -17,192 +17,253 @@ typedef enum {
 Manual threading interfaces:
 AlgLibInternal.cpp:
 	armijoiteration():
-		armijostate Q;
+		armijostate *Q;
 		(Step: needf):	Anything
 	mcsrch():
 		(Step: Q->diffstep == 0.0? needfg: needf):		Anything
 DataAnalysis.cpp
 │	mlpcontinuetraining():	[Calls mlptrain_mlpcontinuetrainingx() but does not, itself, iterate.]
-│		mlptrainer Q; multilayerperceptron Net;
+│		mlptrainer *Q; multilayerperceptron *Net;
 │		(Step):		Anything
 	static mlptrain_mlpcontinuetrainingx():
-		mlptrainer Q; smlptrnsession SQ;
+		mlptrainer *Q; smlptrnsession *SQ;
 		(Step):		Anything
-	static logit_mnlmcstep():
-		(Step: needfg):	Anything
 DiffEquations.cpp:
 	odesolveriteration():
-		odesolverstate Q;
+		odesolverstate *Q;
 		(Step: needdy):	void (*G)(const real_1d_array &Y, double X, real_1d_array dY, void *P);
-				G(Q.y, Q.x, Q.dy, P);
+				G(Q->y, Q->x, Q->dy, P);
 Integration.cpp:
 	autogkiteration():
-		autogkstate Q;
+		autogkstate *Q;
 		(Step: needf):	void (*F)(double X, double AtoX, double XtoB, double &Y, void *P);
-				F(Q.x, Q.xminusa, Q.bminusx, Q.f, P);
+				F(Q->x, Q->xminusa, Q->bminusx, Q->f, P);
 	static autogk_autogkinternaliteration():
-		autogkinternalstate Q;
+		autogkinternalstate *Q;
 		(Step: needf):	void (*F)(double X, double &Y);
 Interpolation.cpp:
 	lsfititeration():
-		lsfitstate Q;
-		Q.needpf:	void (*F)(const real_1d_array &C, const real_1d_array &X, double &Y, void *P);
-				F(Q.c, Q.x, Q.f, P)
-		Q.needpfg:	void (*dF)(const real_1d_array &C, const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.c, Q.x, Q.f, Q.g, P)
-		Q.needpfgh:	void (*ddF)(const real_1d_array &C, const real_1d_array &X, double &Y, real_1d_array &dY, real_2d_array &ddY, void *P);
-				ddF(Q.c, Q.x, Q.f, Q.g, Q.h, P)
-		Q.xupdated:	void (*Rep)(const real_1d_array &C, double Y, void *P), void *P);
-				if (Rep != NULL) Rep(Q.c, Q.f, P)
+		lsfitstate *Q;
+		Q->needpf:	void (*F)(const real_1d_array &C, const real_1d_array &X, double &Y, void *P);
+				F(Q->c, Q->x, Q->f, P)
+		Q->needpfg:	void (*dF)(const real_1d_array &C, const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->c, Q->x, Q->f, Q->g, P)
+		Q->needpfgh:	void (*ddF)(const real_1d_array &C, const real_1d_array &X, double &Y, real_1d_array &dY, real_2d_array &ddY, void *P);
+				ddF(Q->c, Q->x, Q->f, Q->g, Q->h, P)
+		Q->xupdated:	void (*Rep)(const real_1d_array &C, double Y, void *P), void *P);
+				if (Rep != NULL) Rep(Q->c, Q->f, P)
 LinAlg.cpp:
 	fblscgiteration():
-		fblslincgstate Q;
+		fblslincgstate *Q;
 		(Step):		Anything
 	normestimatoriteration():
-		normestimatorstate Q;
-		Q.needmv:	Q.mv = <A, Q.x>
-		Q.needmtv:	Q.mtv = <A, Q.x>
-	eigsubspaceooccontinue();
+		normestimatorstate *Q;
+		Q->needmv:	Q->mv = <A, Q->x>
+		Q->needmtv:	Q->mtv = <A, Q->x>
+	eigsubspaceooccontinue():
 		(Step):		Anything
-	eigsubspaceiteration();
+	eigsubspaceiteration():
 		(Step):		Anything
 	static rcond_rmatrixestimatenorm():
 		(Step):		Anything
 	static rcond_cmatrixestimatenorm():
 		(Step):		Anything
 Optimization.cpp:
-	smoothnessmonitorcheckgradientatx0(): [needfij Redundant]
-		smoothnessmonitor Q;
-		(needfij)	[minlbfgsiteration(), minbleiciteration(), minnlciteration(), minbciteration(), mincgiteration(), minlmiteration()]
-	mincgiteration(): <smoothnessmonitorcheckgradientatx0()> 
-		mincgstate Q;
-		Q.lsstart:	if (drep) ...
-		Q.lsend:	if (drep) ...
-		Q.algpowerup:	if (drep) ...
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.x, Q.f, Q.g, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
-	minbleiciteration(): <smoothnessmonitorcheckgradientatx0()> 
-		minbleicstate Q;
-		Q.lsstart:	if (drep) ...
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.x, Q.f, Q.g, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
-	minlbfgsiteration(): <smoothnessmonitorcheckgradientatx0()> 
-		minlbfgsstate Q;
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.x, Q.f, Q.g, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+	smoothnessmonitorcheckgradientatx0():
+		smoothnessmonitor *Q;
+		(Step: needfij)	[minlbfgsiteration(), minbleiciteration(), minnlciteration(), minbciteration(), mincgiteration(), minlmiteration()]
+	mincgiteration(): <smoothnessmonitorcheckgradientatx0()>
+		mincgstate *Q;
+		Q->lsstart:	if (drep) ...
+		Q->lsend:	if (drep) ...
+		Q->algpowerup:	if (drep) ...
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->x, Q->f, Q->g, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
+	minbleiciteration(): <smoothnessmonitorcheckgradientatx0()>
+		minbleicstate *Q;
+		Q->lsstart:	if (drep) ...
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->x, Q->f, Q->g, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
+	minlbfgsiteration(): <smoothnessmonitorcheckgradientatx0()>
+		minlbfgsstate *Q;
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->x, Q->f, Q->g, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 	static minlm_minlmstepfinderiteration():
-		minlmstepfinder Q;
-		Q.needfi:	[minlmiteration()]
-		Q.needf:	[minlmiteration()]
-	minlmiteration(): <minlm_minlmstepfinderiteration(), smoothnessmonitorcheckgradientatx0()> 
-		minlmstate Q;
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-		(Never used)	dF(Q.x, Q.f, Q.g, P);
-		Q.needfgh:	void (*ddF)(const real_1d_array &X, double &Y, real_1d_array &dY, real_2d_array &ddY, void *P);
-				ddF(Q.x, Q.f, Q.g, Q.h, P);
-		Q.needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
-				Fv(Q.x, Q.fi, P);
-		Q.needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
-				dFv(Q.x, Q.fi, Q.j, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+		minlmstepfinder *Q;
+		Q->needfi:	[minlmiteration()]
+		Q->needf:	[minlmiteration()]
+	minlmiteration(): <minlm_minlmstepfinderiteration(), smoothnessmonitorcheckgradientatx0()>
+		minlmstate *Q;
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+		(Never used)	dF(Q->x, Q->f, Q->g, P);
+		Q->needfgh:	void (*ddF)(const real_1d_array &X, double &Y, real_1d_array &dY, real_2d_array &ddY, void *P);
+				ddF(Q->x, Q->f, Q->g, Q->h, P);
+		Q->needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
+				Fv(Q->x, Q->fi, P);
+		Q->needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
+				dFv(Q->x, Q->fi, Q->j, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 	minasaiteration():
-		minasastate Q;
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.x, Q.f, Q.g, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+		minasastate *Q;
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->x, Q->f, Q->g, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 	smoothnessmonitorprobe():
-		smoothnessmonitor Q;
+		smoothnessmonitor *Q;
 		(Step)		[nlcsqp_meritphaseiteration(), nlcslp_phase13iteration(), nlcslp_phase2iteration()]
 	static nlcsqp_meritphaseiteration()
-		minsqpstate Q;
-		Q.needfij:	[minsqpiteration()]
-		Q.xupdated:	[minsqpiteration()]
+		minsqpstate *Q;
+		Q->needfij:	[minsqpiteration()]
+		Q->xupdated:	[minsqpiteration()]
 	minsqpiteration(): <nlcsqp_meritphaseiteration()>
-		minsqpstate Q;
-		Q.needfij:	[minnlciteration()]
-		Q.xupdated:	[minnlciteration()]
+		minsqpstate *Q;
+		Q->needfij:	[minnlciteration()]
+		Q->xupdated:	[minnlciteration()]
 	static nlcslp_phase13iteration():
-		Q.xupdated	[minslpiteration()]
+		minslpstate *Q; minslpphase13state *Q13;
+		Q->needfij:	[minnlpiteration()]
+		Q->xupdated	[minslpiteration()]
 	static nlcslp_phase2iteration():
-		minslpstate Q;
-		Q.needfij:	[minslpiteration()]
-		Q.xupdated	[minslpiteration()]
+		minslpstate *Q; minslpphase2state *Q2;
+		Q->needfij:	[minslpiteration()]
+		Q->xupdated	[minslpiteration()]
 	minslpiteration(): <nlcslp_phase13iteration(), nlcslp_phase2iteration()>
-		minslpstate Q;
-		Q.needfij:	[minnlciteration()]
-		Q.xupdated:	[minnlciteration()]
+		minslpstate *Q;
+		Q->needfij:	[minnlciteration()]
+		Q->xupdated:	[minnlciteration()]
 	static minnlc_auliteration():
-		minnlcstate Q;
-		Q.needfij:	[minnlciteration()]
-		Q.xupdated:	[minnlciteration()]
-	minnlciteration(): [minnlc_auliteration()] <minslpiteration(), minsqpiteration(), smoothnessmonitorcheckgradientatx0()> 
-		minnlcstate Q;
-		Q.needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
-				Fv(Q.x, Q.fi, P);
-		Q.needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
-				dFv(Q.x, Q.fi, Q.j, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+		minnlcstate *Q;
+		Q->needfij:	[minnlciteration()]
+		Q->xupdated:	[minnlciteration()]
+	minnlciteration(): [minnlc_auliteration()] <minslpiteration(), minsqpiteration(), smoothnessmonitorcheckgradientatx0()>
+		minnlcstate *Q;
+		Q->needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
+				Fv(Q->x, Q->fi, P);
+		Q->needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
+				dFv(Q->x, Q->fi, Q->j, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 	static minns_agsiteration():
-		minnsstate Q;
-		Q.needfi:	[minnsiteration()]
-		Q.needfij:	[minnsiteration()]
-		Q.xupdated:	[minnsiteration()]
+		minnsstate *Q;
+		Q->needfi:	[minnsiteration()]
+		Q->needfij:	[minnsiteration()]
+		Q->xupdated:	[minnsiteration()]
 	minnsiteration(): <minns_agsiteration()>
-		minnsstate Q;
-		Q.needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
-				Fv(Q.x, Q.fi, P)
-		Q.needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
-				dFv(Q.x, Q.fi, Q.j, P)
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
-	minbciteration(): <smoothnessmonitorcheckgradientatx0()> 
-		minbcstate Q;
-		Q.needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
-				dF(Q.x, Q.f, Q.g, P);
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+		minnsstate *Q;
+		Q->needfi:	void (*Fv)(const real_1d_array &X, real_1d_array &Yv, void *P);
+				Fv(Q->x, Q->fi, P)
+		Q->needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
+				dFv(Q->x, Q->fi, Q->j, P)
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
+	minbciteration(): <smoothnessmonitorcheckgradientatx0()>
+		minbcstate *Q;
+		Q->needfg:	void (*dF)(const real_1d_array &X, double &Y, real_1d_array &dY, void *P);
+				dF(Q->x, Q->f, Q->g, P);
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 Solvers.cpp:
 	linlsqriteration():
-		linlsqrstate Q;
-		Q.needmv:	Q.mv = Mv(A, Q.tmpx, Q.tmpd, Q.x)
-		Q.needmtv:	Q.mtv = Mtv(A, Q.tmpd, Q.x)
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double R2);
-				if (Rep != NULL) Rep(Q.x, Q.r2)
+		linlsqrstate *Q;
+		Q->needmv:	Q->mv = Mv(A, Q->tmpx, Q->tmpd, Q->x)
+		Q->needmtv:	Q->mtv = Mtv(A, Q->tmpd, Q->x)
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double R2);
+				if (Rep != NULL) Rep(Q->x, Q->r2)
 	nleqiteration():
-		nleqstate Q;
-		Q.needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
-				F(Q.x, Q.f, P);
-		Q.needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
-				dFv(Q.x, Q.fi, Q.j, P);
-		Q.xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
-				if (Rep != NULL) Rep(Q.x, Q.f, P);
+		nleqstate *Q;
+		Q->needf:	void (*F)(const real_1d_array &X, double &Y, void *P);
+				F(Q->x, Q->f, P);
+		Q->needfij:	void (*dFv)(const real_1d_array &X, real_1d_array &Yv, real_2d_array &dYv, void *P);
+				dFv(Q->x, Q->fi, Q->j, P);
+		Q->xupdated:	void (*Rep)(const real_1d_array &X, double Y, void *P);
+				if (Rep != NULL) Rep(Q->x, Q->f, P);
 	lincgiteration():
-		lincgstate Q;
-		Q.needmv:	Q.mv = <A, Q.x>
-		Q.needvmv:	Q.vmv = <Q.mv, Q.x>
-		Q.xupdated:	void (*Rep)(const real_1d_array &X);
-				if (Rep != NULL) Rep(Q.x)
-		Q.needprec:	Q.pv = Prec(Q.x)
+		lincgstate *Q;
+		Q->needmv:	Q->mv = <A, Q->x>
+		Q->needvmv:	Q->vmv = <Q->mv, Q->x>
+		Q->xupdated:	void (*Rep)(const real_1d_array &X);
+				if (Rep != NULL) Rep(Q->x)
+		Q->needprec:	Q->pv = Prec(Q->x)
 TestC.cpp:
 	testsparseunit_generatenext():
-		sparsegenerator Q:
+		sparsegenerator *Q;
 		(Step):		Anything
+
+Possible additions to the Manual: API documentation for all the low-level iteration functions; and inclusion of these functions into the API.
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API function autogkintegrate() listed below.
+ALGLIB: Copyright 07.05.2009 by Sergey Bochkanov
+API: bool autogkiteration(const autogkstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions lsfitfit() listed below.
+ALGLIB: Copyright 17.08.2009 by Sergey Bochkanov
+API: bool lsfititeration(const lsfitstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API function minasaoptimize() listed below.
+ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+API: bool minasaiteration(const minasastate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minbcoptimize() listed below.
+ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
+API: bool minbciteration(const minbcstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minbleicoptimize() listed below.
+ALGLIB: Copyright 28.11.2010 by Sergey Bochkanov
+API: bool minbleiciteration(const minbleicstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions mincgoptimize() listed below.
+ALGLIB: Copyright 20.04.2009 by Sergey Bochkanov
+API: bool mincgiteration(const mincgstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minlbfgsoptimize() listed below.
+ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+API: bool minlbfgsiteration(const minlbfgsstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minlmoptimize() listed below.
+ALGLIB: Copyright 10.03.2009 by Sergey Bochkanov
+API: bool minlmiteration(const minlmstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minnlcoptimize() listed below.
+ALGLIB: Copyright 06.06.2014 by Sergey Bochkanov
+API: bool minnlciteration(const minnlcstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API functions minnsoptimize() listed below.
+ALGLIB: Copyright 18.05.2015 by Sergey Bochkanov
+API: bool minnsiteration(const minnsstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API function nleqsolve() listed below.
+ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+API: bool nleqiteration(const nleqstate &state);
+
+This function provides a reverse communication interface, which is not documented or recommended for use.
+Instead, it is recommended that you use the better-documented API function odesolversolve() listed below.
+ALGLIB: Copyright 01.09.2009 by Sergey Bochkanov
+API: bool odesolveriteration(const odesolverstate &state);

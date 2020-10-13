@@ -62,13 +62,13 @@ struct innerrec {
 };
 
 void innerrec_init(void *_p, bool make_automatic) {
-   innerrec *p = (innerrec *) _p;
+   innerrec *p = (innerrec *)_p;
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, make_automatic);
 }
 
 void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
-   innerrec *dst = (innerrec *) _dst;
-   innerrec *src = (innerrec *) _src;
+   innerrec *dst = (innerrec *)_dst;
+   innerrec *src = (innerrec *)_src;
    dst->cval = src->cval;
    dst->rval = src->rval;
    dst->ival = src->ival;
@@ -77,7 +77,7 @@ void innerrec_copy(void *_dst, void *_src, bool make_automatic) {
 }
 
 void innerrec_free(void *_p, bool make_automatic) {
-   innerrec *p = (innerrec *) _p;
+   innerrec *p = (innerrec *)_p;
    alglib_impl::ae_vector_free(&p->i1val, make_automatic);
 }
 
@@ -88,21 +88,21 @@ struct seedrec {
 };
 
 void seedrec_init(void *_p, bool make_automatic) {
-   seedrec *p = (seedrec *) _p;
+   seedrec *p = (seedrec *)_p;
    innerrec_init(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, make_automatic);
 }
 
 void seedrec_copy(void *_dst, void *_src, bool make_automatic) {
-   seedrec *dst = (seedrec *) _dst;
-   seedrec *src = (seedrec *) _src;
+   seedrec *dst = (seedrec *)_dst;
+   seedrec *src = (seedrec *)_src;
    dst->bval = src->bval;
    innerrec_copy(&dst->recval, &src->recval, make_automatic);
    alglib_impl::ae_shared_pool_copy(&dst->pool, &src->pool, make_automatic);
 }
 
 void seedrec_free(void *_p, bool make_automatic) {
-   seedrec *p = (seedrec *) _p;
+   seedrec *p = (seedrec *)_p;
    innerrec_free(&p->recval, make_automatic);
    alglib_impl::ae_shared_pool_free(&p->pool, make_automatic);
 }
@@ -242,7 +242,7 @@ struct async_rbf_record {
 };
 
 ThRet_t async_build_rbf_model(ThArg_t T) {
-   async_rbf_record *p = (async_rbf_record *) T;
+   async_rbf_record *p = (async_rbf_record *)T;
    rbfbuildmodel(*(p->p_model), *(p->p_report));
    p->thread_finished = true;
    return ThNoRet;
@@ -2196,8 +2196,7 @@ int main() {
    if (alglib_impl::_alloc_counter != 0) {
       printf("Failed: alloc_counter is non-zero on end!\n");
       return 1;
-   } else
-      printf("Ok\n");
+   } else printf("Ok\n");
 #endif
 // Return
    return 0;

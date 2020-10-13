@@ -11465,8 +11465,7 @@ int main() {
    if (alglib_impl::_alloc_counter != 0) {
       printf("Failure: _alloc_counter is non-zero on end!\n");
       return 1;
-   } else
-      printf("OK\n");
+   } else printf("OK\n");
 #endif
    return AllOk ? 0 : 1;
 }
