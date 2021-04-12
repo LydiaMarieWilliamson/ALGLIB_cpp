@@ -32,12 +32,13 @@
 #endif
 
 // OS-specific includes.
-#if AE_OS == AE_POSIX
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
 #   include <time.h>
 #   include <unistd.h>
 #   include <pthread.h>
 #   include <sched.h>
-#elif AE_OS == AE_WINDOWS
+#   include <sys/time.h> // For ae_tickcount().
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
 #   ifndef _WIN32_WINNT
 #      define _WIN32_WINNT 0x0501
 #   endif
@@ -338,6 +339,34 @@ void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val) {
       case _ALGLIB_NWORKERS: _alglib_cores_to_use = (ae_int_t) flag_val; break;
    }
 }
+
+// A wrapper around OS-dependent clock routines.
+#if AE_OS == AE_POSIX || defined AE_DEBUG4POSIX
+int ae_tickcount() {
+   struct timeval now;
+   ae_int64_t r, v;
+   gettimeofday(&now, NULL);
+   v = now.tv_sec;
+   r = v * 1000;
+   v = now.tv_usec / 1000;
+   r += v;
+   return r;
+#if 0
+   struct timespec now;
+   if (clock_gettime(CLOCK_MONOTONIC, &now))
+      return 0;
+   return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+#endif
+}
+#elif AE_OS == AE_WINDOWS || defined AE_DEBUG4WINDOWS
+int ae_tickcount() {
+   return (int)GetTickCount();
+}
+#else
+int ae_tickcount() {
+   return 0;
+}
+#endif
 
 ae_int_t ae_misalignment(const void *ptr, size_t alignment) {
    union {
@@ -640,7 +669,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // NOTE:
 // *	These strange dances around block->ptr are necessary in order to correctly handle possible exceptions during memory allocation.
    ae_assert(size >= 0, "ae_db_realloc: negative size");
-   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
+   if (block->ptr != NULL) ((ae_deallocator)block->deallocator)(block->ptr), block->ptr = NULL;
    block->ptr = ae_malloc((size_t)size);
    block->deallocator = ae_free;
 }
@@ -650,7 +679,7 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size) {
 // NOTE:
 // *	Avoid calling it for the special blocks which mark frame boundaries!
 void ae_db_free(ae_dyn_block *block) {
-   if (block->ptr != NULL) ((ae_deallocator) block->deallocator)(block->ptr), block->ptr = NULL;
+   if (block->ptr != NULL) ((ae_deallocator)block->deallocator)(block->ptr), block->ptr = NULL;
    block->deallocator = ae_free;
 }
 
@@ -1202,8 +1231,8 @@ static double x_safepythag2(double x, double y) {
 // ∙	*err:	the maximum componentwise difference between the lower block and the transpose of its upper counterpart.
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err) {
    if (len0 <= x_nb && len1 <= x_nb) { // Reduce to smaller cases.
-      double  *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
-      double  *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
+      double *p1 = (double *)(a->x_ptr) + offset0 * a->stride + offset1;
+      double *p2 = (double *)(a->x_ptr) + offset1 * a->stride + offset0;
       for (ae_int_t i = 0; i < len0; i++) {
          double *pcol = p2 + i;
          double *prow = p1 + i * a->stride;
@@ -3496,7 +3525,7 @@ static void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const dou
       y += 3 * stride;
    }
    for (ae_int_t i = 0; i < mtail; i++) {
-      double row0 = 0;
+      double row0 = 0.0;
       const double *pb = x;
       const double *pa0 = a;
       a += alglib_r_block;

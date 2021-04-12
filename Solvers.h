@@ -323,19 +323,21 @@ void sparsesolverreport_init(void *_p, bool make_automatic);
 void sparsesolverreport_copy(void *_dst, void *_src, bool make_automatic);
 void sparsesolverreport_free(void *_p, bool make_automatic);
 
-void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x);
-void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x);
-void sparsesolve(sparsematrix *a, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep);
-void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *rep);
+void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector *x, sparsesolverreport *rep);
 } // end of namespace alglib_impl
 
 namespace alglib {
 DecClass(sparsesolverreport, ae_int_t &terminationtype;);
 
-void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
-void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
-void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
-void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdcholeskysolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
 } // end of namespace alglib
 
 // === LINCG Package ===

@@ -12,11 +12,14 @@ X=
 #X=.exe
 O=.o
 #O=.obj
-Mods=Ap AlgLibInternal AlgLibMisc DataAnalysis DiffEquations FastTransforms Integration Interpolation LinAlg Optimization Solvers SpecialFunctions Statistics
+Mods=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
 Objs=$(Mods:%=%$O)
-Srcs=$(Mods:%=%.cpp)
-ModsY=Ap AlgLibInternal AlgLibMisc LinAlg
-ObjY=$(ModsY:%=%$O)
+ModX=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics
+ObjX=$(ModX:%=%$O)
+ModY=Ap AlgLibInternal AlgLibMisc LinAlg
+ObjY=$(ModY:%=%$O)
+ModZ=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions
+SrcZ=$(ModZ:%=%.cpp)
 
 all: test
 Ap$O: Ap.cpp
@@ -58,12 +61,12 @@ TestC$X: ${Objs} TestC$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestI$X: ${Objs} TestI$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
-TestX$X: ${Objs} TestX$O
+TestX$X: ${ObjX} TestX$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
 TestY$X: ${ObjY} TestY$O
 	${Cpp} ${CcOpt} $^ ${Libs} -o $@
-TestZ$X: $(Srcs) TestZ.cpp
-	${Cpp} ${CcOpt} $^ ${Libs} -O3 -DAE_OS=AE_LINUX -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=NonTH -o $@
+TestZ$X: ${SrcZ} TestZ.cpp
+	${Cpp} ${CcOpt} $^ ${Libs} -DAE_DEBUG4POSIX -DAE_USE_ALLOC_COUNTER -DAE_NO_EXCEPTIONS -DAE_THREADING=NonTH -o $@
 test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestI: API Interface"
 	./TestI$X
@@ -78,7 +81,7 @@ test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 clean:
 	rm -f Test{I,X,Y,Z,C}$X Test{I,X,Y,Z,C}$O ${Objs}
 
-## Source - Header dependencies
+## Source - Header dependencies:
 Ap.cpp: Ap.h
 AlgLibInternal.cpp: AlgLibInternal.h
 AlgLibMisc.cpp: AlgLibMisc.h
@@ -93,14 +96,18 @@ Solvers.cpp: Solvers.h
 SpecialFunctions.cpp: SpecialFunctions.h
 Statistics.cpp: Statistics.h
 
-## Header - Header dependencies
+## Header - Header dependencies:
 ## Optimization -> Solvers -> LinAlg -> AlgLibMisc -> AlgLibInternal -> Ap
 ## DiffEquations, FastTransforms -> AlgLibInternal
 ## SpecialFunctions -> AlgLibMisc
-## Statistics, Interpolation -> SpecialFunctions, LinAlg
+## Statistics, Integration -> SpecialFunctions, LinAlg
+## DataAnalysis -> Statistics
+## Interpolation -> Integration
 ## DataAnalysis, Interpolation -> Optimization
-## TestC, TestI, TestX, TestZ -> DiffEquations, FastTransforms, DataAnalysis, Interpolation
+## TestC, TestI -> DiffEquations, FastTransforms, DataAnalysis, Interpolation
+## TestX -> DataAnalysis, Interpolation
 ## TestY -> LinAlg
+## TestZ -> Interpolation
 AlgLibInternal.h:	Ap.h
 AlgLibMisc.h DiffEquations.h FastTransforms.h:	AlgLibInternal.h
 LinAlg.h SpecialFunctions.h:	AlgLibMisc.h
@@ -110,5 +117,7 @@ Optimization.h:		Solvers.h
 DataAnalysis.h Interpolation.h:	Optimization.h
 DataAnalysis.h:		Statistics.h
 Interpolation.h:	Integration.h
-TestC.cpp TestI.cpp TestX.cpp TestZ.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
+TestC.cpp TestI.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
+TestX.cpp:	DataAnalysis.h Interpolation.h
 TestY.cpp:	LinAlg.h
+TestZ.cpp:	Interpolation.h

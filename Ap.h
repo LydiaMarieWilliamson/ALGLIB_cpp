@@ -258,6 +258,8 @@ typedef enum {
 ae_int64_t ae_get_dbg_value(debug_flag_t id);
 void ae_set_dbg_value(debug_flag_t flag_id, ae_int64_t flag_val);
 
+int ae_tickcount();
+
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void *ae_align(void *ptr, size_t alignment);
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
@@ -1286,7 +1288,7 @@ extern const int CSV_DEFAULT, CSV_SKIP_HEADERS;
 //			*	CSV_SKIP_HEADERS - if present, the first row contains headers and will be skipped.
 //				Its contents are used to determine field counts, and that's all.
 //			If no flags are specified, the default value 0x0 (or CSV_DEFAULT, which is same) should be used.
-// Output:
+// Outputs:
 //	out		The matrix, CSV file parsed with atof()
 // HANDLING OF SPECIAL CASES:
 // *	The file does not exist - an ap_error exception is thrown.

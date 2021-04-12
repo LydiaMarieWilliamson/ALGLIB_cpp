@@ -384,7 +384,7 @@ void samplepercentile(RVector *x, ae_int_t n, double p, double *v) {
    }
    t = p * (n - 1);
    i1 = FloorZ(t);
-   t = t - FloorZ(t);
+   t -= FloorZ(t);
    *v = x->xR[i1] * (1 - t) + x->xR[i1 + 1] * t;
    ae_frame_leave();
 }
@@ -426,8 +426,7 @@ double cov2(RVector *x, RVector *y, ae_int_t n) {
    }
 // Calculate mean.
 //
-//
-// Additonally we calculate SameX and SameY -
+// Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
 // all X[] (or Y[]) contain exactly same value.
 //
@@ -504,8 +503,7 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    }
 // Calculate mean.
 //
-//
-// Additonally we calculate SameX and SameY -
+// Additionally we calculate SameX and SameY -
 // flag variables which are set to True when
 // all X[] (or Y[]) contain exactly same value.
 //
@@ -1370,7 +1368,7 @@ static void basestat_rankdatarec(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdata(real_2d_array &xy);
+// API: void rankdata(const real_2d_array &xy);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -1422,7 +1420,7 @@ void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
 //                 ranking starts from 0, ends at NFeatures-1
 // ALGLIB: Copyright 18.04.2013 by Sergey Bochkanov
 // API: void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures);
-// API: void rankdatacentered(real_2d_array &xy);
+// API: void rankdatacentered(const real_2d_array &xy);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures) {
    ae_frame _frame_block;
    ae_int_t basecasecost;
@@ -7809,8 +7807,7 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
 } // end of namespace alglib
 
 // === VARIANCETESTS Package ===
-// Depends on: (SpecialFunctions) FDISTR
-// Depends on: (SpecialFunctions) CHISQUAREDISTR
+// Depends on: (SpecialFunctions) FDISTR, CHISQUAREDISTR
 namespace alglib_impl {
 // Two-sample F-test
 //

@@ -660,7 +660,6 @@ namespace alglib_impl {
 //
 //     Mu0 = integral(W(x)dx,a,b)
 //
-//
 // Inputs:
 //     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
 //     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].

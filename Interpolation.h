@@ -1154,7 +1154,7 @@ void rbfrequesttermination(const rbfmodel &s);
 } // end of namespace alglib
 
 // === INTCOMP Package ===
-// Depends on: FITSPHERE SPLINE1D
+// Depends on: FITSPHERE, SPLINE1D
 namespace alglib_impl {
 void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
 void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);

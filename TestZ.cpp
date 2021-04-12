@@ -1,8 +1,5 @@
 #include <sstream>
-#include "DataAnalysis.h"
-#include "DiffEquations.h"
-#include "FastTransforms.h"
-#include "Interpolation.h"
+#include "Interpolation.h" // Only SPLINR1D is tested here.
 
 #if !defined AE_NO_EXCEPTIONS
 #   error "This test should be compiled with AE_NO_EXCEPTIONS defined"

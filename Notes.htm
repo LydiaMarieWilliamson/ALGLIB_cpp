@@ -297,8 +297,8 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>SCODES:</li>
    <li>APSERV:</li>
    <li>TSORT: APSERV</li>
-   <li>ABLASMKL:</li>
    <li>ABLASF:</li>
+   <li>ABLASMKL:</li>
    <li>CREFLECTIONS:</li>
    <li>ROTATIONS:</li>
    <li>TRLINSOLVE:</li>
@@ -316,7 +316,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 </ul></li>
 <li>AlgLibMisc: AlgLibInternal<ul>
    <li>NEARESTNEIGHBOR: (AlgLibInternal) SCODES, TSORT</li>
-   <li>HQRND: (AlgLibInternal) APSERV</li>
+   <li>HQRND: (AlgLibInternal) APSERV, ABLASF</li>
    <li>XDEBUG:</li>
 </ul></li>
 <li>DiffEquations: AlgLibInternal<ul>
@@ -355,15 +355,17 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
 </ul></li>
 <li>LinAlg: AlgLibMisc [AlgLibInternal]<ul>
    <li>SPARSE: (AlgLibInternal) ABLASMKL, TSORT │ (AlgLibMisc) HQRND</li>
-   <li>ABLAS: (AlgLibInternal) APSERV, ABLASMKL, ABLASF</li>
+   <li>ABLAS: (AlgLibInternal) APSERV, ABLASF, ABLASMKL</li>
    <li>DLU: ABLAS</li>
    <li>SPTRF: SPARSE, DLU</li>
+   <li>AMDORDERING: SPARSE, ABLAS</li>
+   <li>SPCHOL: AMDORDERING</li>
    <li>MATGEN: (AlgLibInternal) CREFLECTIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
-   <li>TRFAC: (AlgLibInternal) ROTATIONS │ SPTRF, MATGEN</li>
+   <li>TRFAC: (AlgLibInternal) ROTATIONS │ SPTRF, SPCHOL, MATGEN</li>
    <li>RCOND: (AlgLibInternal) TRLINSOLVE, SAFESOLVE │ TRFAC</li>
    <li>MATINV: RCOND</li>
    <li>ORTFAC: (AlgLibInternal) CREFLECTIONS, HBLAS, SBLAS │ (AlgLibMisc) HQRND │ ABLAS</li>
-   <li>FBLS: ORTFAC</li>
+   <li>FBLS: (AlgLibInternal) ROTATIONS | ORTFAC</li>
    <li>BDSVD: (AlgLibInternal) ROTATIONS │ (AlgLibMisc) HQRND │ ABLAS</li>
    <li>SVD: (AlgLibInternal) BLAS │ ORTFAC, BDSVD</li>
    <li>NORMESTIMATOR: SPARSE, MATGEN</li>
@@ -404,18 +406,19 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>SNNLS: (LinAlg) TRFAC, FBLS</li>
    <li>SACTIVESETS: OPTSERV, SNNLS</li>
    <li>QQPSOLVER: CQMODELS, SACTIVESETS</li>
-   <li>LPQPSERV: (LinAlg) SPARSE</li>
-   <li>VIPMSOLVER: (LinAlg) DIRECTDENSESOLVERS │ CQMODELS, OPTSERV, LPQPSERV</li>
-   <li>NLCSQP: (AlgLibInternal) LINMIN │ VIPMSOLVER</li>
    <li>MINLBFGS: (AlgLibInternal) LINMIN │ (LinAlg) FBLS │ OPTSERV</li>
-   <li>QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS, LINLSQR │ QQPSOLVER, LPQPSERV, MINLBFGS</li>
+   <li>LPQPSERV: (LinAlg) SPARSE</li>
+   <li>VIPMSOLVER: (LinAlg) DIRECTDENSESOLVERS │ CQMODELS, MINLBFGS, LPQPSERV</li>
+   <li>NLCSQP: VIPMSOLVER</li>
+   <li>QPDENSEAULSOLVER: (Solvers) DIRECTDENSESOLVERS, LINLSQR │ QQPSOLVER, MINLBFGS, LPQPSERV</li>
    <li>MINBLEIC: (AlgLibInternal) LINMIN │ CQMODELS, SACTIVESETS</li>
    <li>QPBLEICSOLVER: MINBLEIC</li>
    <li>MINQP: VIPMSOLVER, QPDENSEAULSOLVER, QPBLEICSOLVER</li>
-   <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC</li>
-   <li>MINLP: REVISEDDUALSIMPLEX</li>
+   <li>LPQPPRESOLVE: (LinAlg) SPARSE</li>
+   <li>REVISEDDUALSIMPLEX: (LinAlg) TRFAC | LPQPPRESOLVE</li>
+   <li>MINLP: VIPMSOLVER, REVISEDDUALSIMPLEX</li>
    <li>NLCSLP: (AlgLibInternal) LINMIN │ OPTSERV, REVISEDDUALSIMPLEX</li>
-   <li>MINNLC: NLCSQP, MINLBFGS, MINBLEIC, NLCSLP</li>
+   <li>MINNLC: NLCSQP, MINBLEIC, NLCSLP</li>
    <li>MINBC: (AlgLibInternal) LINMIN │ OPTSERV</li>
    <li>MINNS: MINBLEIC</li>
    <li>MINCOMP: MINLBFGS, MINBLEIC</li>
@@ -436,7 +439,7 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>SPLINE2D: (AlgLibInternal) SCODES │ SPLINE1D</li>
    <li>RBFV1: (AlgLibMisc) NEARESTNEIGHBOR │ LSFIT</li>
    <li>RBF: RBFV2, RBFV1</li>
-   <li>INTCOMP: FITSPHERE SPLINE1D</li>
+   <li>INTCOMP: FITSPHERE, SPLINE1D</li>
 </ul></li>
 <li>DataAnalysis: Statistics Optimization [AlgLibInternal AlgLibMisc SpecialFunctions LinAlg Solvers]<ul>
    <li>PCA: (LinAlg) SVD, EVD │ (Statistics) BASESTAT</li>
@@ -455,8 +458,9 @@ Note that all packages depend on the infrastructure provided in the Ap.{cpp,h} f
    <li>KNN: (AlgLibMisc) HQRND, NEARESTNEIGHBOR │ BDSS</li>
    <li>DATACOMP: CLUSTERING</li>
 </ul></li>
-<li>TestC, TestI, TestX, TestZ: DataAnalysis DiffEquations FastTransforms Interpolation
-</li>
+<li>TestC, TestI: DataAnalysis DiffEquations FastTransforms Interpolation</li>
+<li>TestX: DataAnalysis</li>
+<li>TestZ: Interpolation</li>
 <li>TestY: LinAlg</li>
 </ul>
 </p>
@@ -621,7 +625,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 ∙	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
 	The initial "structural" changes made, before actual recoding included a normalization of the ordering
 	(determined automatically with the aid of the compiler) of the routines and extraction of a dependency list;
-	and various equivalence transforms. 
+	and various equivalence transforms.
 ∙	The God-objects in alglib_impl (ae_state) and RCOMM routines were removed.
 	For the time being, static and global variable are no longer thread-local.
 	Only the commercial version has support for multi-processors or multi-threading;
@@ -731,6 +735,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 25	Separated the subpackages
 26	3.16 upgrade
 	Corrected a long-standing hidden bug testablasunit_testsyrk() in TestC.cpp: cct was initialized with itself, instead of with the transpose of cc.
+        All of the extra infrastructure for internal tracing and timing, added in ALGLIB starting with version 3.16, has been kept out of ALGLIB++.
 27	Normalized the Makefile
 	Minor change in Ap.cpp.
 28	Conversions of assignment expressions to update operators (++X, --X, X++, X--, X op= Y), where applicable.
@@ -740,16 +745,16 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Normalized the RCOMM interface.
 	Synthesized new routines, [ae_]randombool(), [ae_]randommid() and generalized versions of existing routines: ae_complex_from_d().
 31	Synthesized new routines for real and complex approximate comparisons: {Near,Small}[At]{R,CR,C}().
-	Normalized comparisons |A-B|/C &rArr; D to |A-B| &rArr; C&times;D; possibly removing hidden bugs as a result.
+	Normalized comparisons |A-B|/C &ge; D to |A-B| &ge; C&times;D, for C &ge; 0; possibly removing hidden bugs as a result.
 	Normalized most error flags in TestC.cpp to *Ok and *Erred.
 32	Corrected the Manual entry for "autogkintegrate" (it originally listed the entry for "odesolversolve").
 	Corrections in the comments &amp; printouts; e.g.
 		"launcn" → "launch" "traling" → "trailing", "trainig" → "training", "i.e \." → "i.e.", "i.e" → "i.e.",
 		"inself" → "itself", "it's" → "its", "discripancy" → "discrepancy", "strucure" → "structure",
-		"⋯intial⋯" → "⋯initial⋯", lentgh → length,
-		"VIMP⋯" → "VIPM⋯".
+		"⋯intial⋯" → "⋯initial⋯", "lentgh" → "length", "loosing" → "losing", "Additonally" → "Additionally",
+		"VIMP⋯" → "VIPM⋯", "fileds" → "fields", "ouput" → "output", "paremeter" → "parameter".
 	Normalized all test routines and flags in TestC.cpp to true on success, false on failure.
-	Normalized comparisons A-B/C &rarr; D to A-B &rarr; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
+	Normalized comparisons (A-B)/C &ge; D to A-B &ge; C&times;D, for C &ge; 0; removing a hidden bug in the PCA test in TestC.cpp.
 	First round of normalization of comments &amp; documentation.
 33	Further cleanup of unused/stub/legacy code from ALGLIB:
 	Normalized test routines and flags in Test{X,Z}.cpp to *Ok; and true on success, false on error.
@@ -788,7 +793,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	Remade CPU_SSE2 = 1 in Ap.h into an enum typedef ae_cpuid_t.
 	Lifted the return type of ae_cpuid() in Ap.cpp and the type of CurCPU to ae_cpuid_t.
 	Moved i{min,max}2(), imin3(), {i,r}max3(), rmaxabs3(), {i,r}boundval() from AlgLibInternal.{cpp,h} to Ap.{cpp,h}.
-	Removed ae_{min,max}int(): they are duplicates respectively if i{min,max}2().
+	Removed ae_{min,max}int(): they are duplicates respectively of i{min,max}2().
 	Renamed ae_minreal() as rmin2() and ae_maxreal() as rmax2().
 	Removed the unused or redundant types s{boolean,integer,real,complex}[array] from AlgLibInternal.{cpp,h};
 	Converted sinteger ⇒ ae_int_t, sreal ⇒ double, srealarray ⇒ RVector;
@@ -889,7 +894,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	∙	Output parameters X of type T are documented and declared respectively as:
 		―	T &amp;X	⇔	T &amp;X
 	∙	Input parameters X of type T are documented and declared respectively as:
-		―	T X	⇔	const T X	- for scalar types T ∈ { bool, ae_int_t, double, complex },
+		―	T X	⇔	const T X	― for scalar types T ∈ { bool, ae_int_t, double, complex },
 		―	T X	⇔	const T &amp;X	― for all other types T.
 	The documentation of the following 1D and 2D array argument parameters in Manual.htm was changed from output (T &amp;X) to input (T X) to match its declaration (const T &amp;X).
 	∙	a	rmatrixenforcesymmetricity rmatrixger, spdmatrixcholeskyupdate{add1,fix}[buf], xdebug{b{1,2}not,{c,i,r}{1,2}neg}
@@ -915,8 +920,9 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 			redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
 		―	Non-API routine splitlengtheven(tasksize, &amp;task0, &amp;task1)
 			redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
-		―	Non-API routines tagsortmiddleir(), sortmiddlei() redeclared with default offset = 0, and recoded.
-			Declarations changed from *sortmiddlei*(a, b, offset, n) to *sortmiddlei*(a, b, n, offset = 0).
+		―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17].
+		―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
+			Declarations changed from tagsortmiddlei*(a, b, offset, n) to tagsortmiddlei*(a, b, n, offset = 0).
 		―	Non-API routines tagsortfast[ir]() recoded.
 		―	Local routines tsort_tagsortfast[ir]rec() recoded.
 		―	Local routine tsort_tagsortfastirec(a, b, bufa, bufb, i1, i2)
@@ -1020,6 +1026,11 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 			removed "RVector *dt", it's not used by any of routine's callers,
 			replaced its use inside the routine by d, since it was copied to d after being assigned to.
 		―	rbf_clearreportfields(): removed and inserted inline at its point of use.
+38	Integration of version 3.17.
+	Minor corrections in TestC.cpp:
+	∙	Removed duplicate initialization of x in the &quot;Test CG solver&quot; loop of testfbls().
+	∙	Dangling references to &quot;isupper&quot; in sparserealcholeskytest() resolved.
+	∙	Dangling reference to &quot;solvertype&quot; in testminlpunit_singlecalltests() resolved.
 </pre>
 </p>
 <p>
@@ -1141,6 +1152,18 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 37	2315 3509 3498 3276 1601836904 (5f7a1768) 227
 37	2310 3497 3498 3282 1602025944 (5f7cf9d8) 214
 37	2273 3402 3486 3260 1602621006 (5f860e4e) 222
+37	2283 3449 3449 3262 1611556223 (600e657f) 218 // Final test of version 3.16.0 in preparation for update to 3.17.0.
+38	2183 3413 3486 3262 1611557399 (600e6a17) 218 // Updated everything except LinAlg, Solvers, Optimization, TestI, TestC.
+38	2288 3497 3461 3243 1611601185 (600f1521) 217
+38	2315 3449 3498 3237 1611605209 (600f2429) 223 // Updating LinAlg, Solvers, TestI; TestC tests trfac:SPD(Sparse), directsparsesolvers:SPD-CRS(real) failed.
+38	2283 3460 3510 3280 1611695289 (601084b9) 216 // Fixed. Updated LinAlg, Solvers, TestI.
+38	2283 3472 3438 3243 1611721115 (6010e99b) 220 // Updated TestC except the minqp and minlp testing units.
+38	2299 3472 3510 3285 1611721972 (6010ecf4) 206 // Updating Optimization, TestC: minlp:{Basic Tests, Single Call Usage}, minnlc:OptGuard Integrity Monitor failed.
+38	2278 3413 3473 3271 1611802319 (601226cf) // minlp, minnlc failed; Ended early. Further upgrades to TestC pending.
+38	2283 3534 3510 3252 1612840998 (60220026) 235 // Failures corrected. Further updates to 3.17.0 integrated into TestC.
+38	2310 3413 3486 3284 1612909655 (60230c57) 234 // Completed update of TestC.
+38	2273 3425 3461 3257 1613188134 (60274c26) 245 // Final upgrades to code, documentation and comments.
+38	2299 3472 3510 3254 1613195786 (60276a0a) 232 // Corrections made to TestC to fix minor problems inherited from ALGLIB.
 </pre>
 </p>
 </div>

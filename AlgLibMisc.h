@@ -137,7 +137,7 @@ void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r);
 } // end of namespace alglib
 
 // === HQRND Package ===
-// Depends on: (AlgLibInternal) APSERV
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 struct hqrndstate {
    ae_int_t s1;
@@ -155,6 +155,8 @@ double hqrndmiduniformr(hqrndstate *state);
 ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n);
 void hqrndnormal2(hqrndstate *state, double *x1, double *x2);
 double hqrndnormal(hqrndstate *state);
+void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x);
+void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x);
 void hqrndunit2(hqrndstate *state, double *x, double *y);
 double hqrndexponential(hqrndstate *state, double lambdav);
 double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n);
@@ -171,6 +173,8 @@ double hqrndmiduniformr(const hqrndstate &state);
 ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
 void hqrndnormal2(const hqrndstate &state, double &x1, double &x2);
 double hqrndnormal(const hqrndstate &state);
+void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x);
+void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x);
 void hqrndunit2(const hqrndstate &state, double &x, double &y);
 double hqrndexponential(const hqrndstate &state, const double lambdav);
 double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);

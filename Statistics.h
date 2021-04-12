@@ -154,8 +154,7 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
 } // end of namespace alglib
 
 // === VARIANCETESTS Package ===
-// Depends on: (SpecialFunctions) FDISTR
-// Depends on: (SpecialFunctions) CHISQUAREDISTR
+// Depends on: (SpecialFunctions) FDISTR, CHISQUAREDISTR
 namespace alglib_impl {
 void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
 void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail);

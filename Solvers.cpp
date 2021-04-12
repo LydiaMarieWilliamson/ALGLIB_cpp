@@ -2587,7 +2587,6 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int
 //            ! In such cases we strongly recommend you to use faster solver,
 //            ! HPDMatrixCholeskySolveMFast() function.
 //
-//
 // Inputs:
 //     CHA     -   array[N,N], Cholesky decomposition,
 //                 HPDMatrixCholesky result
@@ -4294,12 +4293,10 @@ namespace alglib_impl {
 // conditions. For example, algorithm will converge for any  affine  function
 // F (whether its Jacobian singular or not).
 //
-//
 // REQUIREMENTS:
 // Algorithm will request following information during its operation:
 // * function vector F[] and Jacobian matrix at given point X
 // * value of merit function f(x)=F[0]^2(x)+...+F[M-1]^2(x) at given point X
-//
 //
 // USAGE:
 // 1. User initializes algorithm state with NLEQCreateLM() call
@@ -4314,7 +4311,6 @@ namespace alglib_impl {
 //    function vector. NLEQRestartFrom() allows to reuse already  initialized
 //    structure.
 //
-//
 // Inputs:
 //     N       -   space dimension, N > 1:
 //                 * if provided, only leading N elements of X are used
@@ -4322,10 +4318,8 @@ namespace alglib_impl {
 //     M       -   system size
 //     X       -   starting point
 //
-//
 // Outputs:
 //     State   -   structure which stores algorithm state
-//
 //
 // NOTES:
 // 1. you may tune stopping conditions with NLEQSetCond() function
@@ -4872,31 +4866,32 @@ static void directsparsesolvers_initreport(sparsesolverreport *rep) {
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly
-//     N       -   size of A, N > 0
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
-//     Rep     -   solver report, following fields are set:
-//                 * rep.terminationtype - solver status; > 0 for success,
-//                   set to -3 on failure (degenerate or non-SPD system).
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
+//     Rep     -   solver report, following fields are set:
+//                 * rep.terminationtype - solver status; > 0 for success,
+//                   set to -3 on failure (degenerate or non-SPD system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-// API: void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
-void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x) {
+// API: void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_frame _frame_block;
    ae_int_t i;
+   ae_int_t n;
    ae_frame_make(&_frame_block);
-   SetObj(sparsesolverreport, rep);
    SetVector(x);
+   SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, a2);
-   ae_assert(n > 0, "SparseSolveSKS: N <= 0");
-   ae_assert(sparsegetnrows(a) == n, "SparseSolveSKS: rows(A) != N");
-   ae_assert(sparsegetncols(a) == n, "SparseSolveSKS: cols(A) != N");
-   ae_assert(b->cnt >= n, "SparseSolveSKS: length(B)<N");
-   ae_assert(isfinitevector(b, n), "SparseSolveSKS: B contains infinities or NANs");
+   n = sparsegetnrows(a);
+   ae_assert(n > 0, "SparseSPDSolveSKS: N <= 0");
+   ae_assert(sparsegetnrows(a) == n, "SparseSPDSolveSKS: rows(A) != N");
+   ae_assert(sparsegetncols(a) == n, "SparseSPDSolveSKS: cols(A) != N");
+   ae_assert(b->cnt >= n, "SparseSPDSolveSKS: length(B) < N");
+   ae_assert(isfinitevector(b, n), "SparseSPDSolveSKS: B contains infinities or NANs");
    directsparsesolvers_initreport(rep);
    ae_vector_set_length(x, n);
    sparsecopytosks(a, &a2);
@@ -4922,38 +4917,99 @@ void sparsesolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, spars
    ae_frame_leave();
 }
 
-// Sparse linear solver for A*x=b with N*N real  symmetric  positive definite
-// matrix A given by its Cholesky decomposition, and N*1 vectors x and b.
+// Sparse linear solver for A*x=b with N*N  sparse  real  symmetric  positive
+// definite matrix A, N*1 vectors x and b.
 //
-// IMPORTANT: this solver requires input matrix to be in  the  SKS  (Skyline)
-//            sparse storage format. An exception will be  generated  if  you
-//            pass matrix in some other format (HASH or CRS).
+// This solver  converts  input  matrix  to  CRS  format,  performs  Cholesky
+// factorization using supernodal Cholesky  decomposition  with  permutation-
+// reducing ordering and uses sparse triangular solver to get solution of the
+// original system.
 //
 // Inputs:
-//     A       -   sparse NxN matrix stored in SKS format, must be NxN exactly
-//     N       -   size of A, N > 0
+//     A       -   sparse matrix, must be NxN exactly
 //     IsUpper -   which half of A is provided (another half is ignored)
 //     B       -   array[N], right part
 //
 // Outputs:
+//     X       -   array[N], it contains:
+//                 * rep.terminationtype > 0  =>  solution
+//                 * rep.terminationtype=-3   =>  filled by zeros
 //     Rep     -   solver report, following fields are set:
 //                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate or non-SPD system).
+// ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
+// API: void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t n;
+   ae_frame_make(&_frame_block);
+   SetVector(x);
+   SetObj(sparsesolverreport, rep);
+   NewObj(sparsematrix, a2);
+   NewVector(p, 0, DT_INT);
+   n = sparsegetnrows(a);
+   ae_assert(n > 0, "SparseSPDSolve: N <= 0");
+   ae_assert(sparsegetnrows(a) == n, "SparseSPDSolve: rows(A) != N");
+   ae_assert(sparsegetncols(a) == n, "SparseSPDSolve: cols(A) != N");
+   ae_assert(b->cnt >= n, "SparseSPDSolve: length(B)<N");
+   ae_assert(isfinitevector(b, n), "SparseSPDSolve: B contains infinities or NANs");
+   directsparsesolvers_initreport(rep);
+   sparsecopytocrs(a, &a2);
+   if (!sparsecholeskyp(&a2, isupper, &p)) {
+      rep->terminationtype = -3;
+      rsetallocv(n, 0.0, x);
+      ae_frame_leave();
+      return;
+   }
+   rcopyallocv(n, b, x);
+   for (i = 0; i < n; i++) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
+   if (isupper) {
+      sparsetrsv(&a2, isupper, false, 1, x);
+      sparsetrsv(&a2, isupper, false, 0, x);
+   } else {
+      sparsetrsv(&a2, isupper, false, 0, x);
+      sparsetrsv(&a2, isupper, false, 1, x);
+   }
+   for (i = n - 1; i >= 0; i--) swapr(&x->xR[i], &x->xR[p.xZ[i]]);
+   rep->terminationtype = 1;
+   ae_frame_leave();
+}
+
+// Sparse linear solver for A*x=b with N*N real  symmetric  positive definite
+// matrix A given by its Cholesky decomposition, and N*1 vectors x and b.
+//
+// IMPORTANT: this solver requires input matrix to be in  the  SKS  (Skyline)
+//            or CRS (compressed row storage) format. An  exception  will  be
+//            generated if you pass matrix in some other format.
+//
+// Inputs:
+//     A       -   sparse NxN matrix stored in CRS or SKS format, must be NxN
+//                 exactly
+//     IsUpper -   which half of A is provided (another half is ignored)
+//     B       -   array[N], right part
+//
+// Outputs:
 //     X       -   array[N], it contains:
 //                 * rep.terminationtype > 0    =>  solution
 //                 * rep.terminationtype=-3   =>  filled by zeros
+//     Rep     -   solver report, following fields are set:
+//                 * rep.terminationtype - solver status; > 0 for success,
+//                   set to -3 on failure (degenerate or non-SPD system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-// API: void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x);
-void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *b, sparsesolverreport *rep, RVector *x) {
+// API: void sparsespdcholeskysolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_int_t i;
-   SetObj(sparsesolverreport, rep);
+   ae_int_t n;
    SetVector(x);
-   ae_assert(n > 0, "SparseSolveSKS: N <= 0");
-   ae_assert(sparsegetnrows(a) == n, "SparseSolveSKS: rows(A) != N");
-   ae_assert(sparsegetncols(a) == n, "SparseSolveSKS: cols(A) != N");
-   ae_assert(sparseissks(a), "SparseSolveSKS: A is not an SKS matrix");
-   ae_assert(b->cnt >= n, "SparseSolveSKS: length(B)<N");
-   ae_assert(isfinitevector(b, n), "SparseSolveSKS: B contains infinities or NANs");
+   SetObj(sparsesolverreport, rep);
+   n = sparsegetnrows(a);
+   ae_assert(n > 0, "SparseSPDCholeskySolve: N <= 0");
+   ae_assert(sparsegetnrows(a) == n, "SparseSPDCholeskySolve: rows(A) != N");
+   ae_assert(sparsegetncols(a) == n, "SparseSPDCholeskySolve: cols(A) != N");
+   ae_assert(sparseissks(a) || sparseiscrs(a), "SparseSPDCholeskySolve: A is not an SKS/CRS matrix");
+   ae_assert(b->cnt >= n, "SparseSPDCholeskySolve: length(B)<N");
+   ae_assert(isfinitevector(b, n), "SparseSPDCholeskySolve: B contains infinities or NANs");
    directsparsesolvers_initreport(rep);
    ae_vector_set_length(x, n);
    for (i = 0; i < n; i++) {
@@ -4986,7 +5042,6 @@ void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *
 //
 // Inputs:
 //     A       -   sparse matrix, must be NxN exactly, any storage format
-//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
@@ -4997,16 +5052,18 @@ void sparsecholeskysolvesks(sparsematrix *a, ae_int_t n, bool isupper, RVector *
 //                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-// API: void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
-void sparsesolve(sparsematrix *a, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep) {
+// API: void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_frame _frame_block;
    ae_int_t i;
+   ae_int_t n;
    ae_frame_make(&_frame_block);
    SetVector(x);
    SetObj(sparsesolverreport, rep);
    NewObj(sparsematrix, a2);
    NewVector(pivp, 0, DT_INT);
    NewVector(pivq, 0, DT_INT);
+   n = sparsegetnrows(a);
    ae_assert(n > 0, "SparseSolve: N <= 0");
    ae_assert(sparsegetnrows(a) == n, "SparseSolve: rows(A) != N");
    ae_assert(sparsegetncols(a) == n, "SparseSolve: cols(A) != N");
@@ -5049,7 +5106,6 @@ void sparsesolve(sparsematrix *a, ae_int_t n, RVector *b, RVector *x, sparsesolv
 //     A       -   LU factorization of the sparse matrix, must be NxN exactly
 //                 in CRS storage format
 //     P, Q    -   pivot indexes from LU factorization
-//     N       -   size of A, N > 0
 //     B       -   array[0..N-1], right part
 //
 // Outputs:
@@ -5060,11 +5116,13 @@ void sparsesolve(sparsematrix *a, ae_int_t n, RVector *b, RVector *x, sparsesolv
 //                 * rep.terminationtype - solver status; > 0 for success,
 //                   set to -3 on failure (degenerate system).
 // ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-// API: void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
-void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, ae_int_t n, RVector *b, RVector *x, sparsesolverreport *rep) {
+// API: void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep);
+void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector *x, sparsesolverreport *rep) {
    ae_int_t i;
+   ae_int_t n;
    SetVector(x);
    SetObj(sparsesolverreport, rep);
+   n = sparsegetnrows(a);
    ae_assert(n > 0, "SparseLUSolve: N <= 0");
    ae_assert(sparsegetnrows(a) == n, "SparseLUSolve: rows(A) != N");
    ae_assert(sparsegetncols(a) == n, "SparseLUSolve: cols(A) != N");
@@ -5121,31 +5179,38 @@ namespace alglib {
 // Following fields can be accessed by users:
 DefClass(sparsesolverreport, AndD DecVal(terminationtype))
 
-void sparsesolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x) {
+void sparsespdsolvesks(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sparsesolvesks(ConstT(sparsematrix, a), n, isupper, ConstT(ae_vector, b), ConstT(sparsesolverreport, rep), ConstT(ae_vector, x));
+   alglib_impl::sparsespdsolvesks(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
    alglib_impl::ae_state_clear();
 }
 
-void sparsecholeskysolvesks(const sparsematrix &a, const ae_int_t n, const bool isupper, const real_1d_array &b, sparsesolverreport &rep, real_1d_array &x) {
+void sparsespdsolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sparsecholeskysolvesks(ConstT(sparsematrix, a), n, isupper, ConstT(ae_vector, b), ConstT(sparsesolverreport, rep), ConstT(ae_vector, x));
+   alglib_impl::sparsespdsolve(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
    alglib_impl::ae_state_clear();
 }
 
-void sparsesolve(const sparsematrix &a, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
+void sparsespdcholeskysolve(const sparsematrix &a, const bool isupper, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sparsesolve(ConstT(sparsematrix, a), n, ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
+   alglib_impl::sparsespdcholeskysolve(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
    alglib_impl::ae_state_clear();
 }
 
-void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const ae_int_t n, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
+void sparsesolve(const sparsematrix &a, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::sparselusolve(ConstT(sparsematrix, a), ConstT(ae_vector, p), ConstT(ae_vector, q), n, ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
+   alglib_impl::sparsesolve(ConstT(sparsematrix, a), ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
+   alglib_impl::ae_state_clear();
+}
+
+void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integer_1d_array &q, const real_1d_array &b, real_1d_array &x, sparsesolverreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::sparselusolve(ConstT(sparsematrix, a), ConstT(ae_vector, p), ConstT(ae_vector, q), ConstT(ae_vector, b), ConstT(ae_vector, x), ConstT(sparsesolverreport, rep));
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
@@ -5155,7 +5220,7 @@ void sparselusolve(const sparsematrix &a, const integer_1d_array &p, const integ
 namespace alglib_impl {
 static const double lincg_defaultprecision = 1.0E-6;
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forgot to clear something)
 static void lincg_updateitersdata(lincgstate *state) {
    state->repiterationscount = 0;
    state->repnmv = 0;

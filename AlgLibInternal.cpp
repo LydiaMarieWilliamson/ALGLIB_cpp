@@ -219,7 +219,7 @@ void taskgenint1dcheb2(double a, double b, ae_int_t n, RVector *x, RVector *y) {
 // This function checks that all values from X[] are distinct. It does more
 // than just usual floating point comparison:
 // * first, it calculates max(X) and min(X)
-// * second, it maps X[] from [min,max] to [1,2]
+// * second, it maps X[] from [min,max] to [0,1]
 // * only at this stage actual comparison is done
 //
 // The meaning of such check is to ensure that all values are "distinct enough"
@@ -251,7 +251,7 @@ bool aredistinct(RVector *x, ae_int_t n) {
    }
    ae_assert(!nonsorted, "aredistinct: internal error (not sorted)");
    for (i = 1; i < n; i++) {
-      if ((x->xR[i] - a) / (b - a) + 1 == (x->xR[i - 1] - a) / (b - a) + 1) {
+      if ((x->xR[i] - a) / (b - a) == (x->xR[i - 1] - a) / (b - a)) {
          result = false;
          return result;
       }
@@ -1397,7 +1397,6 @@ ae_int_t chunkscount(ae_int_t tasksize, ae_int_t chunksize) {
 // Returns maximum density for level 2 sparse/dense functions. Density values
 // below one returned by this function are better to handle via sparse Level 2
 // functionality.
-//
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 double sparselevel2density() {
    double result;
@@ -1409,7 +1408,6 @@ double sparselevel2density() {
 //
 // A-tiles are smallest tiles (32x32), suitable for processing by ALGLIB  own
 // implementation of Level 3 linear algebra.
-//
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 ae_int_t matrixtilesizea() {
    ae_int_t result;
@@ -1421,7 +1419,6 @@ ae_int_t matrixtilesizea() {
 //
 // B-tiles are larger  tiles (64x64), suitable for parallel execution or for
 // processing by vendor's implementation of Level 3 linear algebra.
-//
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 ae_int_t matrixtilesizeb() {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -1774,7 +1771,7 @@ void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset/* = 0*/
    }
 }
 
-void sortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset/* = 0*/) {
+void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset/* = 0*/) {
 // Special case.
    if (n <= 1) return;
 // General case, n > 1: sort.
@@ -1875,7 +1872,7 @@ void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf
 //     A       -   unsorted array
 //     N       -   array size
 //
-// OUPUT PARAMETERS:
+// Outputs:
 //     A       -   sorted array
 //     P1, P2  -   permutation tables, array[N]
 //
@@ -2121,484 +2118,731 @@ ae_int_t upperbound(RVector *a, ae_int_t n, double t) {
 }
 } // end of namespace alglib_impl
 
-// === ABLASMKL Package ===
-namespace alglib_impl {
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixgermkl(m, n, a, ia, ja, alpha, u, iu, v, iv);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixgemvmkl(m, n, alpha, a, ia, ja, opa, x, ix, beta, y, iy);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
-bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixtrsvmkl(n, a, ia, ja, isupper, isunit, optype, x, ix);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 01.10.2017 by Sergey Bochkanov
-bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixsymvmkl(n, alpha, a, ia, ja, isupper, x, ix, beta, y, iy);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixsyrkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixherkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
-bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// MKL-based kernel
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE:
-//
-// if function returned False, CholResult is NOT modified. Not ever referenced!
-// if function returned True, CholResult is set to status of Cholesky decomposition
-// (True on succeess).
-//
-// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
-bool spdmatrixcholeskymkl(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool *cholresult) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_spdmatrixcholeskymkl(a, offs, n, isupper, cholresult);
-#endif
-}
-
-// MKL-based kernel.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixplumkl(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixplumkl(a, offs, m, n, pivots);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: this function needs pre-allocated output/temporary arrays.
-//       D and E must be at least max(M,N)-wide.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdmkl(RMatrix *a, ae_int_t m, ae_int_t n, RVector *d, RVector *e, RVector *tauq, RVector *taup) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixbdmkl(a, m, n, d, e, tauq, taup);
-#endif
-}
-
-// MKL-based kernel.
-//
-// If ByQ is True,  TauP is not used (can be empty array).
-// If ByQ is False, TauQ is not used (can be empty array).
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdmultiplybymkl(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool byq, bool fromtheright, bool dotranspose) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixbdmultiplybymkl(qp, m, n, tauq, taup, z, zrows, zcolumns, byq, fromtheright, dotranspose);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Tau must be pre-allocated array with at least N-1 elements.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixhessenbergmkl(a, n, tau);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Q must be pre-allocated N*N array
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixhessenbergunpackqmkl(a, n, tau, q);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Tau, D, E must be pre-allocated arrays;
-//       length(E)=length(Tau)=N-1 (or larger)
-//       length(D)=N (or larger)
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_smatrixtdmkl(a, n, isupper, tau, d, e);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Tau, D, E must be pre-allocated arrays;
-//       length(E)=length(Tau)=N-1 (or larger)
-//       length(D)=N (or larger)
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hmatrixtdmkl(a, n, isupper, tau, d, e);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Q must be pre-allocated N*N array
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_smatrixtdunpackqmkl(a, n, isupper, tau, q);
-#endif
-}
-
-// MKL-based kernel.
-//
-// NOTE: Q must be pre-allocated N*N array
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hmatrixtdunpackqmkl(a, n, isupper, tau, q);
-#endif
-}
-
-// MKL-based kernel.
-//
-// Returns True if MKL was present and handled request (MKL  completion  code
-// is returned as separate output parameter).
-//
-// D and E are pre-allocated arrays with length N (both of them!). On output,
-// D constraints singular values, and E is destroyed.
-//
-// SVDResult is modified if and only if MKL is present.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixbdsvdmkl(RVector *d, RVector *e, ae_int_t n, bool isupper, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, bool *svdresult) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixbdsvdmkl(d, e, n, isupper, u, nru, c, ncc, vt, ncvt, svdresult);
-#endif
-}
-
-// MKL-based DHSEQR kernel.
-//
-// Returns True if MKL was present and handled request.
-//
-// WR and WI are pre-allocated arrays with length N.
-// Z is pre-allocated array[N,N].
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixinternalschurdecompositionmkl(h, n, tneeded, zneeded, wr, wi, z, info);
-#endif
-}
-
-// MKL-based DTREVC kernel.
-//
-// Returns True if MKL was present and handled request.
-//
-// NOTE: this function does NOT support HOWMNY=3!!!!
-//
-// VL and VR are pre-allocated arrays with length N*N, if required. If particalar
-// variables is not required, it can be dummy (empty) array.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_rmatrixinternaltrevcmkl(t, n, side, howmny, vl, vr, m, info);
-#endif
-}
-
-// MKL-based kernel.
-//
-// Returns True if MKL was present and handled request (MKL  completion  code
-// is returned as separate output parameter).
-//
-// D and E are pre-allocated arrays with length N (both of them!). On output,
-// D constraints eigenvalues, and E is destroyed.
-//
-// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
-//
-// EVDResult is modified if and only if MKL is present.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, bool *evdresult) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_smatrixtdevdmkl(d, e, n, zneeded, z, evdresult);
-#endif
-}
-
-// MKL-based kernel.
-//
-// Returns True if MKL was present and handled request (MKL  completion  code
-// is returned as separate output parameter).
-//
-// D and E are pre-allocated arrays with length N (both of them!). On output,
-// D constraints eigenvalues, and E is destroyed.
-//
-// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
-//
-// EVDResult is modified if and only if MKL is present.
-//
-// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
-bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector *vals, ZVector *cidx, ZVector *ridx, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
-#ifndef ALGLIB_INTERCEPTS_MKL
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_sparsegemvcrsmkl(opa, arows, acols, alpha, vals, cidx, ridx, x, ix, beta, y, iy);
-#endif
-}
-} // end of namespace alglib_impl
-
 // === ABLASF Package ===
 namespace alglib_impl {
-// Fast kernel
+// Currently: bcopyv, raddvr, raddvx, rcopymulv, rcopyvx, rsetc are not used anywhere.
+
+// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
 //
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     Y       -   array[N], vector to process
+//
+// Result:
+//     (X,Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotv(ae_int_t n, RVector *x, RVector *y) {
+   double result = 0.0;
+   for (ae_int_t i = 0; i < n; i++) result += x->xR[i] * y->xR[i];
+   return result;
+}
+
+// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index of A
+//
+// Result:
+//     (X,Ai)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
+   double result = 0.0;
+   for (ae_int_t j = 0; j < n; j++) result += x->xR[j] * a->xyR[i][j];
+   return result;
+}
+
+// Computes dot product (A[ia],B[ib]) for rows A[ia,*] and B[ib,*]
+//
+// Inputs:
+//     N       -   vector length
+//     A       -   array[?,N], matrix to process
+//     IA      -   row index of A
+//     B       -   array[?,N], matrix to process
+//     IB      -   row index of B
+//
+// Result:
+//     (A[ia],B[ib])
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotrr(ae_int_t n, RMatrix *a, ae_int_t ia, RMatrix *b, ae_int_t ib) {
+   double result = 0.0;
+   for (ae_int_t j = 0; j < n; j++) result += a->xyR[ia][j] * b->xyR[ib][j];
+   return result;
+}
+
+// Computes dot product (X,X) for elements [0,N) of X[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// Result:
+//     (X,X)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rdotv2(ae_int_t n, RVector *x) {
+   double result = 0.0;
+   for (ae_int_t i = 0; i < n; i++) result += ae_sqr(x->xR[i]);
+   return result;
+}
+
+// Performs in-place addition of Y[] to X[]
+//
+// Inputs:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[N], vector to process
+//     X       -   array[N], vector to process
+//
+// Result:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddv(ae_int_t n, double alpha, RVector *y, RVector *x) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[i] += alpha * y->xR[i];
+}
+
+// Performs in-place addition of Y[] to X[]
+//
+// Inputs:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   source vector
+//     OffsY   -   source offset
+//     X       -   destination vector
+//     OffsX   -   destination offset
+//
+// Result:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddvx(ae_int_t n, double alpha, RVector *y, ae_int_t offsy, RVector *x, ae_int_t offsx) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[offsx + i] += alpha * y->xR[offsy + i];
+}
+
+// Performs in-place addition of vector Y[] to column X[]
+//
+// Inputs:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   target matrix
+//     colidx  -   target column index of X
+//
+// Result:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddvc(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t colidx) {
+   for (ae_int_t i = 0; i < n; i++) x->xyR[i][colidx] += alpha * y->xR[i];
+}
+
+// Performs in-place addition of vector Y[] to row X[]
+//
+// Inputs:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   matrix to add to
+//     RowIdx  -   target row index of X
+//
+// Result:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddvr(ae_int_t n, double alpha, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] += alpha * y->xR[i];
+}
+
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   matrix to multiply into
+//     RowIdx  -   target row index of X
+//
+// Result:
+//     X[RowIdx] := componentwise(X[RowIdx]*Y)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemulvr(ae_int_t n, RVector *y, RMatrix *x, ae_int_t rowidx) {
+   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] *= y->xR[i];
+}
+
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source matrix
+//     RowIdx  -   target row index of X
+//     Y       -   vector to maximize with
+//
+// Result:
+//     X[RowIdx] := componentwise(max(X[RowIdx],Y))
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmergemaxrv(ae_int_t n, RMatrix *x, ae_int_t rowidx, RVector *y) {
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = rmax2(y->xR[i], x->xyR[rowidx][i]);
+}
+
+// Performs in-place addition of Y[RIdx,...] to X[]
+//
+// Inputs:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdx-th row is added
+//     RIdx    -   row index of Y
+//     X       -   array[N], vector to process
+//
+// Result:
+//     X := X + alpha*Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void raddrv(ae_int_t n, double alpha, RMatrix *y, ae_int_t ridx, RVector *x) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[i] += alpha * y->xyR[ridx][i];
+}
+
+// Performs in-place multiplication of X[] by V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], vector to process
+//
+// Outputs:
+//     X       -   elements 0...N-1 multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulv(ae_int_t n, double v, RVector *x) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[i] *= v;
+}
+
+// Performs in-place multiplication of X[] by V
+//
+// Inputs:
+//     N       -   row length
+//     X       -   array[?,N], matrix to process
+//     RowIdx  -   target row index of X
+//     V       -   multiplier
+//
+// Outputs:
+//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx) {
+   for (ae_int_t i = 0; i < n; i++) x->xyR[rowidx][i] *= v;
+}
+
+// Performs in-place multiplication of X[OffsX:OffsX+N-1] by V
+//
+// Inputs:
+//     N       -   subvector length
+//     V       -   multiplier
+//     X       -   vector to process
+//     OffsX   -   target offset
+//
+// Outputs:
+//     X       -   elements OffsX:OffsX+N-1 multiplied by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[offsx + i] *= v;
+}
+
+// Return maximum |X|.
+// Inputs:
+//     N       -   the vector length.
+//     X       -   the n-vector to process.
+// Outputs:
+//     max(|X[i]|)
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+double rmaxabsv(ae_int_t n, RVector *x) {
+   double result = 0.0;
+   for (ae_int_t i = 0; i < n; i++) {
+      double v = fabs(x->xR[i]);
+      if (v > result) result = v;
+   }
+   return result;
+}
+
+// Sets vector X[] to V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetv(ae_int_t n, double v, RVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xR[j] = v;
+}
+
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// Inputs:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//     OffsX   -   target offset
+//
+// Outputs:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx) {
+   for (ae_int_t j = 0; j < n; j++) x->xR[offsx + j] = v;
+}
+
+// Sets vector X[] to V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void isetv(ae_int_t n, ae_int_t v, ZVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xZ[j] = v;
+}
+
+// Sets vector X[] to V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bsetv(ae_int_t n, bool v, BVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xB[j] = v;
+}
+
+// Sets matrix A[] to V
+//
+// Inputs:
+//     M, N    -   rows/cols count
+//     V       -   value to set
+//     A       -   array[M,N]
+//
+// Outputs:
+//     A       -   leading M rows, N cols are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
+   for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = v;
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetallocv(ae_int_t n, double v, RVector *x) {
+   vectorsetlengthatleast(x, n);
+   rsetv(n, v, x);
+}
+
+// Sets vector A[] to V, reallocating A[] if too small.
+//
+// Inputs:
+//     M       -   rows count
+//     N       -   cols count
+//     V       -   value to set
+//     A       -   possibly pre-allocated matrix
+//
+// Outputs:
+//     A       -   leading M rows, N cols are replaced by V; the matrix is
+//                 reallocated if its rows/cols count is less than M/N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetallocm(ae_int_t m, ae_int_t n, double v, RMatrix *a) {
+   matrixsetlengthatleast(a, m, n);
+   rsetm(m, n, v, a);
+}
+
+// Reallocates X[] if its length is less than required value. Does not change
+// its length and contents if it is large enough.
+//
+// Inputs:
+//     N       -   desired vector length
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   length(X) >= N
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rallocv(ae_int_t n, RVector *x) {
+   vectorsetlengthatleast(x, n);
+}
+
+// Reallocates X[] if its length is less than required value. Does not change
+// its length and contents if it is large enough.
+//
+// Inputs:
+//     N       -   desired vector length
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   length(X) >= N
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void ballocv(ae_int_t n, BVector *x) {
+   vectorsetlengthatleast(x, n);
+}
+
+// Reallocates matrix if its rows or cols count is less than  required.  Does
+// not change its size if it is exactly that size or larger.
+//
+// Inputs:
+//     M       -   rows count
+//     N       -   cols count
+//     A       -   possibly pre-allocated matrix
+//
+// Outputs:
+//     A       -   size is at least M*N
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rallocm(ae_int_t m, ae_int_t n, RMatrix *a) {
+   matrixsetlengthatleast(a, m, n);
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void isetallocv(ae_int_t n, ae_int_t v, ZVector *x) {
+   vectorsetlengthatleast(x, n);
+   isetv(n, v, x);
+}
+
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly pre-allocated array
+//
+// Outputs:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bsetallocv(ae_int_t n, bool v, BVector *x) {
+   vectorsetlengthatleast(x, n);
+   bsetv(n, v, x);
+}
+
+// Sets row I of A[,] to V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     I       -   row index
+//
+// Outputs:
+//     A       -   leading N elements of I-th row are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i) {
+   for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = v;
+}
+
+// Sets col J of A[,] to V
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     J       -   col index of A
+//
+// Outputs:
+//     A       -   leading N elements of I-th col are replaced by V
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rsetc(ae_int_t n, double v, RMatrix *a, ae_int_t j) {
+   for (ae_int_t i = 0; i < n; i++) a->xyR[i][j] = v;
+}
+
+// Copies vector X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   pre-allocated array[N]
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyv(ae_int_t n, RVector *x, RVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
+}
+
+// Copies vector X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   pre-allocated array[N]
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bcopyv(ae_int_t n, BVector *x, BVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   pre-allocated array[N]
+//     OffsY   -   destination offset
+//
+// Outputs:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyvx(ae_int_t n, RVector *x, ae_int_t offsx, RVector *y, ae_int_t offsy) {
+   for (ae_int_t j = 0; j < n; j++) y->xR[offsy + j] = x->xR[offsx + j];
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly pre-allocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyallocv(ae_int_t n, RVector *x, RVector *y) {
+   vectorsetlengthatleast(y, n);
+   for (ae_int_t j = 0; j < n; j++) y->xR[j] = x->xR[j];
+}
+
+// Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
+// Y[] are increased - but not decreased.
+//
+// Inputs:
+//     M       -   rows count
+//     N       -   cols count
+//     X       -   array[M,N], source
+//     Y       -   possibly pre-allocated array[M,N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading [M,N] elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyallocm(ae_int_t m, ae_int_t n, RMatrix *x, RMatrix *y) {
+   if (m == 0 || n == 0) return;
+   matrixsetlengthatleast(y, imax2(m, y->rows), imax2(n, y->cols));
+   for (ae_int_t i = 0; i < m; i++) for (ae_int_t j = 0; j < n; j++) y->xyR[i][j] = x->xyR[i][j];
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly pre-allocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyallocv(ae_int_t n, ZVector *x, ZVector *y) {
+   vectorsetlengthatleast(y, n);
+   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
+}
+
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly pre-allocated array[N] (resized if needed)
+//
+// Outputs:
+//     Y       -   leading N elements are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void bcopyallocv(ae_int_t n, BVector *x, BVector *y) {
+   vectorsetlengthatleast(y, n);
+   for (ae_int_t j = 0; j < n; j++) y->xB[j] = x->xB[j];
+}
+
+// Copies vector X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   pre-allocated array[N]
+//
+// Outputs:
+//     Y       -   X copied to Y
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyv(ae_int_t n, ZVector *x, ZVector *y) {
+   for (ae_int_t j = 0; j < n; j++) y->xZ[j] = x->xZ[j];
+}
+
+// Copies vector X[] to Y[], extended version
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   pre-allocated array[N]
+//     OffsY   -   destination offset
+//
+// Outputs:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy) {
+   for (ae_int_t j = 0; j < n; j++) y->xZ[offsy + j] = x->xZ[offsx + j];
+}
+
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) actual size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void igrowv(ae_int_t newn, ZVector *x) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   NewVector(oldx, 0, DT_INT);
+   if (x->cnt >= newn) {
+      ae_frame_leave();
+      return;
+   }
+   ae_int_t oldn = x->cnt;
+   newn = imax2(newn, RoundZ(1.8 * oldn + 1));
+   ae_swap_vectors(x, &oldx);
+   ae_vector_set_length(x, newn);
+   icopyv(oldn, &oldx, x);
+   ae_frame_leave();
+}
+
+// Performs copying with multiplication of V*X[] to Y[]
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   pre-allocated array[N]
+//
+// Outputs:
+//     Y       -   array[N], Y = V*X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulv(ae_int_t n, double v, RVector *x, RVector *y) {
+   for (ae_int_t i = 0; i < n; i++) y->xR[i] = v * x->xR[i];
+}
+
+// Performs copying with multiplication of V*X[] to Y[I,*]
+//
+// Inputs:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   pre-allocated array[?,N]
+//     RIdx    -   destination row index of Y
+//
+// Outputs:
+//     Y       -   Y[RIdx,...] = V*X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopymulvr(ae_int_t n, double v, RVector *x, RMatrix *y, ae_int_t ridx) {
+   for (ae_int_t i = 0; i < n; i++) y->xyR[ridx][i] = v * x->xR[i];
+}
+
+// Copies vector X[] to row I of A[,]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   pre-allocated 2D array large enough to store result
+//     I       -   destination row index
+//
+// Outputs:
+//     A       -   leading N elements of I-th row are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyvr(ae_int_t n, RVector *x, RMatrix *a, ae_int_t i) {
+   for (ae_int_t j = 0; j < n; j++) a->xyR[i][j] = x->xR[j];
+}
+
+// Copies row I of A[,] to vector X[]
+//
+// Inputs:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     X       -   pre-allocated destination
+//
+// Outputs:
+//     X       -   array[N], destination
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyrv(ae_int_t n, RMatrix *a, ae_int_t i, RVector *x) {
+   for (ae_int_t j = 0; j < n; j++) x->xR[j] = a->xyR[i][j];
+}
+
+// Copies row I of A[,] to row K of B[,].
+//
+// A[i,...] and B[k,...] may overlap.
+//
+// Inputs:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     B       -   pre-allocated destination
+//     K       -   destination row index
+//
+// Outputs:
+//     B       -   row K overwritten
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyrr(ae_int_t n, RMatrix *a, ae_int_t i, RMatrix *b, ae_int_t k) {
+   for (ae_int_t j = 0; j < n; j++) b->xyR[k][j] = a->xyR[i][j];
+}
+
+// Copies vector X[] to column J of A[,]
+//
+// Inputs:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   pre-allocated 2D array large enough to store result
+//     J       -   destination col index of A
+//
+// Outputs:
+//     A       -   leading N elements of J-th column are replaced by X
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopyvc(ae_int_t n, RVector *x, RMatrix *a, ae_int_t j) {
+   for (ae_int_t i = 0; i < n; i++) a->xyR[i][j] = x->xR[i];
+}
+
+// Copies column J of A[,] to vector X[]
+//
+// Inputs:
+//     N       -   vector length
+//     A       -   source 2D array
+//     J       -   source col index of A
+//
+// Outputs:
+//     X       -   pre-allocated array[N], destination
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rcopycv(ae_int_t n, RMatrix *a, ae_int_t j, RVector *x) {
+   for (ae_int_t i = 0; i < n; i++) x->xR[i] = a->xyR[i][j];
+}
+
+// Fast kernel
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double ralpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2611,7 +2855,6 @@ bool rmatrixgerf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, d
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2624,7 +2867,6 @@ bool rmatrixrank1f(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja,
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2637,7 +2879,6 @@ bool cmatrixrank1f(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja,
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2650,7 +2891,6 @@ bool rmatrixlefttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2663,7 +2903,6 @@ bool cmatrixlefttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t 
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2676,7 +2915,6 @@ bool rmatrixrighttrsmf(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2689,7 +2927,6 @@ bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2702,7 +2939,6 @@ bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia,
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2715,7 +2951,6 @@ bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia,
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2728,7 +2963,6 @@ bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 }
 
 // Fast kernel
-//
 // ALGLIB Routine: Copyright 19.01.2010 by Sergey Bochkanov
 bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
 #ifndef ALGLIB_INTERCEPTS_ABLAS
@@ -2761,7 +2995,6 @@ bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -2964,7 +3197,6 @@ void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -3166,7 +3398,6 @@ void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -3369,7 +3600,6 @@ void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -3592,7 +3822,6 @@ void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -3686,7 +3915,6 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 //     C       -   PREALLOCATED output matrix
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 27.03.2013 by Sergey Bochkanov
 void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t i;
@@ -3916,6 +4144,449 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
       }
       i += 2;
    }
+}
+} // end of namespace alglib_impl
+
+// === ABLASMKL Package ===
+namespace alglib_impl {
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixgermkl(m, n, a, ia, ja, alpha, u, iu, v, iv);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool rmatrixrank1mkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool cmatrixrank1mkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, CVector *u, ae_int_t iu, CVector *v, ae_int_t iv) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixrank1mkl(m, n, a, ia, ja, u, iu, v, iv);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool rmatrixmvmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool cmatrixmvmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixmvmkl(m, n, a, ia, ja, opa, x, ix, y, iy);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool rmatrixgemvmkl(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixgemvmkl(m, n, alpha, a, ia, ja, opa, x, ix, beta, y, iy);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 12.10.2017 by Sergey Bochkanov
+bool rmatrixtrsvmkl(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixtrsvmkl(n, a, ia, ja, isupper, isunit, optype, x, ix);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 01.10.2017 by Sergey Bochkanov
+bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixsymvmkl(n, alpha, a, ia, ja, isupper, x, ix, beta, y, iy);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
+bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixsyrkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
+bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixherkmkl(n, k, alpha, a, ia, ja, optypea, beta, c, ic, jc, isupper);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 01.10.2013 by Sergey Bochkanov
+bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixgemmmkl(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixlefttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool cmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_cmatrixrighttrsmmkl(m, n, a, i1, j1, isupper, isunit, optype, x, i2, j2);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE:
+//
+// if function returned False, CholResult is NOT modified. Not ever referenced!
+// if function returned True, CholResult is set to status of Cholesky decomposition
+// (True on succeess).
+// ALGLIB Routine: Copyright 16.10.2014 by Sergey Bochkanov
+bool spdmatrixcholeskymkl(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, bool *cholresult) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_spdmatrixcholeskymkl(a, offs, n, isupper, cholresult);
+#endif
+}
+
+// MKL-based kernel.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixplumkl(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixplumkl(a, offs, m, n, pivots);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: this function needs pre-allocated output/temporary arrays.
+//       D and E must be at least max(M,N)-wide.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixbdmkl(RMatrix *a, ae_int_t m, ae_int_t n, RVector *d, RVector *e, RVector *tauq, RVector *taup) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixbdmkl(a, m, n, d, e, tauq, taup);
+#endif
+}
+
+// MKL-based kernel.
+//
+// If ByQ is True,  TauP is not used (can be empty array).
+// If ByQ is False, TauQ is not used (can be empty array).
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixbdmultiplybymkl(RMatrix *qp, ae_int_t m, ae_int_t n, RVector *tauq, RVector *taup, RMatrix *z, ae_int_t zrows, ae_int_t zcolumns, bool byq, bool fromtheright, bool dotranspose) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixbdmultiplybymkl(qp, m, n, tauq, taup, z, zrows, zcolumns, byq, fromtheright, dotranspose);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Tau must be pre-allocated array with at least N-1 elements.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixhessenbergmkl(RMatrix *a, ae_int_t n, RVector *tau) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixhessenbergmkl(a, n, tau);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Q must be pre-allocated N*N array
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixhessenbergunpackqmkl(RMatrix *a, ae_int_t n, RVector *tau, RMatrix *q) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixhessenbergunpackqmkl(a, n, tau, q);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Tau, D, E must be pre-allocated arrays;
+//       length(E)=length(Tau)=N-1 (or larger)
+//       length(D)=N (or larger)
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool smatrixtdmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, RVector *e) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_smatrixtdmkl(a, n, isupper, tau, d, e);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Tau, D, E must be pre-allocated arrays;
+//       length(E)=length(Tau)=N-1 (or larger)
+//       length(D)=N (or larger)
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool hmatrixtdmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, RVector *d, RVector *e) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hmatrixtdmkl(a, n, isupper, tau, d, e);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Q must be pre-allocated N*N array
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool smatrixtdunpackqmkl(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RMatrix *q) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_smatrixtdunpackqmkl(a, n, isupper, tau, q);
+#endif
+}
+
+// MKL-based kernel.
+//
+// NOTE: Q must be pre-allocated N*N array
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool hmatrixtdunpackqmkl(CMatrix *a, ae_int_t n, bool isupper, CVector *tau, CMatrix *q) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hmatrixtdunpackqmkl(a, n, isupper, tau, q);
+#endif
+}
+
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints singular values, and E is destroyed.
+//
+// SVDResult is modified if and only if MKL is present.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixbdsvdmkl(RVector *d, RVector *e, ae_int_t n, bool isupper, RMatrix *u, ae_int_t nru, RMatrix *c, ae_int_t ncc, RMatrix *vt, ae_int_t ncvt, bool *svdresult) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixbdsvdmkl(d, e, n, isupper, u, nru, c, ncc, vt, ncvt, svdresult);
+#endif
+}
+
+// MKL-based DHSEQR kernel.
+//
+// Returns True if MKL was present and handled request.
+//
+// WR and WI are pre-allocated arrays with length N.
+// Z is pre-allocated array[N,N].
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixinternalschurdecompositionmkl(RMatrix *h, ae_int_t n, ae_int_t tneeded, ae_int_t zneeded, RVector *wr, RVector *wi, RMatrix *z, ae_int_t *info) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixinternalschurdecompositionmkl(h, n, tneeded, zneeded, wr, wi, z, info);
+#endif
+}
+
+// MKL-based DTREVC kernel.
+//
+// Returns True if MKL was present and handled request.
+//
+// NOTE: this function does NOT support HOWMNY=3!!!!
+//
+// VL and VR are pre-allocated arrays with length N*N, if required. If particalar
+// variables is not required, it can be dummy (empty) array.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool rmatrixinternaltrevcmkl(RMatrix *t, ae_int_t n, ae_int_t side, ae_int_t howmny, RMatrix *vl, RMatrix *vr, ae_int_t *m, ae_int_t *info) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_rmatrixinternaltrevcmkl(t, n, side, howmny, vl, vr, m, info);
+#endif
+}
+
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints eigenvalues, and E is destroyed.
+//
+// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+//
+// EVDResult is modified if and only if MKL is present.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatrix *z, bool *evdresult) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_smatrixtdevdmkl(d, e, n, zneeded, z, evdresult);
+#endif
+}
+
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints eigenvalues, and E is destroyed.
+//
+// Z is pre-allocated array[N,N] for ZNeeded != 0; ignored for ZNeeded=0.
+//
+// EVDResult is modified if and only if MKL is present.
+// ALGLIB Routine: Copyright 20.10.2014 by Sergey Bochkanov
+bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector *vals, ZVector *cidx, ZVector *ridx, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
+#ifndef ALGLIB_INTERCEPTS_MKL
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_sparsegemvcrsmkl(opa, arows, acols, alpha, vals, cidx, ridx, x, ix, beta, y, iy);
+#endif
 }
 } // end of namespace alglib_impl
 
@@ -4945,7 +5616,6 @@ namespace alglib_impl {
 //     XNorm   -   inf-norm of other components of X (which are already processed)
 //                 it is updated by CBasicSolveAndUpdate.
 //     X       -   solution
-//
 // ALGLIB Routine: Copyright 26.01.2009 by Sergey Bochkanov
 static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, double lnmax, double bnorm, double maxgrowth, double *xnorm, ae_complex *x) {
    double v;
@@ -4977,7 +5647,6 @@ static bool safesolve_cbasicsolveandupdate(ae_complex alpha, ae_complex beta, do
 }
 
 // Real implementation of CMatrixScaledTRSafeSolve
-//
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
 bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
    ae_frame _frame_block;
@@ -5135,7 +5804,6 @@ bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, boo
 // MaxGrowth,  returning  False  if  growth  exceeds MaxGrowth. Degenerate or
 // near-degenerate matrices are handled correctly (False is returned) as long
 // as MaxGrowth is significantly less than MaxRealNumber/norm(b).
-//
 // ALGLIB Routine: Copyright 21.01.2010 by Sergey Bochkanov
 bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth) {
    ae_frame _frame_block;
@@ -6785,7 +7453,6 @@ void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
 // === HPCCORES Package ===
 namespace alglib_impl {
 // Stub function.
-//
 // ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
 static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
@@ -6798,7 +7465,6 @@ static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcoun
 }
 
 // Stub function.
-//
 // ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
 static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad) {
 #ifndef ALGLIB_INTERCEPTS_SSE2
@@ -7227,7 +7893,7 @@ static void ftbase_ftapplycomplexreffft(double *ap, ae_int_t args, ae_int_t n, R
 //     ap   - the vector to be transformed; assumed to be large enough for the result.
 //     args - the operands count (see the description of fasttransformplan).
 //     n    - the operand size (see the description of fasttransformplan).
-// Output:
+// Outputs:
 //     ap   - the transformed vector.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodeletfft(double *ap, ae_int_t args, ae_int_t n) {
@@ -7347,7 +8013,7 @@ static void ftbase_ftapplycomplexcodeletfft(double *ap, ae_int_t args, ae_int_t 
 //     args - the operand count (see the description of fasttransformplan).
 //     n    - the operand size (see the description of fasttransformplan).
 //     mun  - the microvector size; assumed to be at least 1.
-// Output:
+// Outputs:
 //     ap   - the transformed vector.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftapplycomplexcodelettwfft(double *ap, ae_int_t args, ae_int_t n, ae_int_t mun) {
@@ -7910,7 +8576,7 @@ static void ftbase_ftbluesteinsfft(fasttransformplan *plan, double *ap, ae_int_t
 //     riq         -   the inverse of the primitive root modulo n.
 //     precoffs    -   the offset of the precomputed data for the plan.
 //     buf         -   a temporary vector.
-// Output:
+// Outputs:
 //     ap          -   the transformed vector.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov
 static void ftbase_ftradersfft(fasttransformplan *plan, double *ap, ae_int_t aoffset, ae_int_t args, ae_int_t n, ae_int_t subplan, ae_int_t rq, ae_int_t riq, ae_int_t precoffs, RVector *buf) {
@@ -8087,7 +8753,7 @@ void ftapplyplan(fasttransformplan *plan, RVector *a, ae_int_t offsa/* = 0*/, ae
 //     eparam1     -   parameter 1.
 //     eparam2     -   parameter 2.
 //     eparam3     -   parameter 3.
-// Output:
+// Outputs:
 //     *rowptr     -   the updated index.
 //     gridp       -   the updated plan grid.
 // ALGLIB: Copyright 05.04.2013 by Sergey Bochkanov

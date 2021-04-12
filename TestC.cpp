@@ -154,7 +154,7 @@ bool testtsort() {
             for (i = 0; i < n; i++) {
                Ok = Ok && (double)(a4.xZ[i]) == a0.xR[i] && ar2.xR[i] == (double)(p1.xZ[i]);
             }
-            sortmiddlei(&a5, n);
+            tagsortmiddlei(&a5, n);
             for (i = 0; i < n; i++) {
                Ok = Ok && (double)(a5.xZ[i]) == a0.xR[i];
             }
@@ -203,7 +203,7 @@ bool testtsort() {
          for (i = 0; i < n; i++) {
             Ok = Ok && (double)(a4.xZ[i]) == a0.xR[i];
          }
-         sortmiddlei(&a5, n);
+         tagsortmiddlei(&a5, n);
          for (i = 0; i < n; i++) {
             Ok = Ok && (double)(a5.xZ[i]) == a0.xR[i];
          }
@@ -325,7 +325,7 @@ bool testtsort() {
    }
 // The final report.
    if (!Ok || !silent) {
-      printf("Tag Sort Test\n"),
+      printf("Tag Sort Test\n");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    ae_frame_leave();
@@ -1360,7 +1360,7 @@ bool testnearestneighbor() {
 // The final report.
    Ok = kdtOk;
    if (!Ok || !silent) {
-      printf("Nearest Neighbor Search Test\n"),
+      printf("Nearest Neighbor Search Test\n");
       printf("* KD Trees:                               %s\n", kdtOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -1551,8 +1551,8 @@ static void testhqrndunit_calculatemv(RVector *x, ae_int_t n, double *mean, doub
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1);
 }
 
 // Unsets HQRNDState structure
@@ -1570,6 +1570,7 @@ bool testhqrnd() {
    ae_int_t passcount;
    ae_int_t n;
    ae_int_t i;
+   ae_int_t j;
    ae_int_t k;
    ae_int_t pass;
    ae_int_t s1;
@@ -1578,6 +1579,8 @@ bool testhqrnd() {
    ae_int_t i2;
    double r1;
    double r2;
+   ae_int_t am;
+   ae_int_t an;
    double mean;
    double means;
    double stddev;
@@ -1598,11 +1601,13 @@ bool testhqrnd() {
    ae_frame_make(&_frame_block);
    if (!silent) printf("Random Number Generator Test Breakdown\n");
    NewVector(x, 0, DT_REAL);
+   NewVector(dx, 0, DT_REAL);
+   NewMatrix(a, 0, 0, DT_REAL);
    NewVector(bins, 0, DT_INT);
    NewObj(hqrndstate, state);
    Ok = true;
    sigmathreshold = 7.0;
-   samplesize = 100000;
+   samplesize = 100000 + ae_randominteger(100);
    passcount = 50;
    seedOk = true;
    urOk = true;
@@ -1671,7 +1676,7 @@ bool testhqrnd() {
          uiOk = false;
       }
       if (stddevs != 0.0) {
-         uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((ae_sqr((double)n) - 1) / 12)) / stddevs));
+         uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((ae_sqr(n) - 1) / 12)) / stddevs));
       } else {
          uiOk = false;
       }
@@ -1697,7 +1702,7 @@ bool testhqrnd() {
       uiOk = false;
    }
    if (stddevs != 0.0) {
-      uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((ae_sqr((double)n) - 1) / 12)) / stddevs));
+      uisigmaerr = rmax2(uisigmaerr, fabs((stddev - sqrt((ae_sqr(n) - 1) / 12)) / stddevs));
    } else {
       uiOk = false;
    }
@@ -1705,7 +1710,6 @@ bool testhqrnd() {
 // Test normal
    testhqrndunit_unsetstate(&state);
    hqrndrandomize(&state);
-   normsigmaerr = 0.0;
    i = 0;
    while (i < samplesize) {
       hqrndnormal2(&state, &r1, &r2);
@@ -1715,6 +1719,7 @@ bool testhqrnd() {
       }
       i += 2;
    }
+   normsigmaerr = 0.0;
    testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
    if (means != 0.0) {
       normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0) / means));
@@ -1726,6 +1731,51 @@ bool testhqrnd() {
    } else {
       normOk = false;
    }
+   normOk = normOk && normsigmaerr <= sigmathreshold;
+   ae_vector_set_length(&x, 0);
+   hqrndnormalv(&state, samplesize, &x);
+   normOk = normOk && x.cnt == samplesize;
+   normOk = normOk && isfinitevector(&x, samplesize);
+   if (normOk) {
+   // Check mean/sigma of the distribution
+      testhqrndunit_calculatemv(&x, samplesize, &mean, &means, &stddev, &stddevs);
+      normOk = normOk && means != 0.0;
+      normOk = normOk && stddevs != 0.0;
+      normsigmaerr = 0.0;
+      normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+      normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1.0) / coalesce(stddevs, 1.0)));
+      normOk = normOk && normsigmaerr <= sigmathreshold;
+   // Check that subsequent differences are normally distributed too
+      ae_vector_set_length(&dx, samplesize - 1);
+      for (i = 0; i < samplesize - 1; i++) {
+         dx.xR[i] = x.xR[i + 1] - x.xR[i];
+      }
+      testhqrndunit_calculatemv(&dx, samplesize - 1, &mean, &means, &stddev, &stddevs);
+      normOk = normOk && means != 0.0;
+      normOk = normOk && stddevs != 0.0;
+      normsigmaerr = 0.0;
+      normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+      normsigmaerr = rmax2(normsigmaerr, fabs((stddev - sqrt(2.0)) / coalesce(stddevs, 1.0)));
+      normOk = normOk && normsigmaerr <= sigmathreshold;
+   }
+   am = 1 + ae_randominteger(RoundZ(sqrt(samplesize)));
+   an = 1 + samplesize / am;
+   hqrndnormalm(&state, am, an, &a);
+   normOk = normOk && a.rows == am;
+   normOk = normOk && a.cols == an;
+   normOk = normOk && apservisfinitematrix(&a, am, an);
+   ae_vector_set_length(&x, am * an);
+   for (i = 0; i < am; i++) {
+      for (j = 0; j < an; j++) {
+         x.xR[i * an + j] = a.xyR[i][j];
+      }
+   }
+   testhqrndunit_calculatemv(&x, am * an, &mean, &means, &stddev, &stddevs);
+   normOk = normOk && means != 0.0;
+   normOk = normOk && stddevs != 0.0;
+   normsigmaerr = 0.0;
+   normsigmaerr = rmax2(normsigmaerr, fabs((mean - 0.0) / coalesce(means, 1.0)));
+   normsigmaerr = rmax2(normsigmaerr, fabs((stddev - 1.0) / coalesce(stddevs, 1.0)));
    normOk = normOk && normsigmaerr <= sigmathreshold;
 // Test unit2
    testhqrndunit_unsetstate(&state);
@@ -1754,7 +1804,7 @@ bool testhqrnd() {
    testhqrndunit_unsetstate(&state);
    hqrndrandomize(&state);
    expsigmaerr = 0.0;
-   lambdav = 2 + 5 * ae_randomreal();
+   lambdav = 2 + 5.0 * ae_randomreal();
    for (i = 0; i < samplesize; i++) {
       x.xR[i] = hqrndexponential(&state, lambdav);
    }
@@ -1779,7 +1829,7 @@ bool testhqrnd() {
 // The final report.
    Ok = seedOk && urOk && uiOk && normOk && unit2Ok && expOk && discreteOk && continuousOk;
    if (!Ok || !silent) {
-      printf("Random Number Generator Tests\n"),
+      printf("Random Number Generator Tests\n");
       printf("SEED Test:                                %s\n", seedOk? "Ok": "Failed");
       printf("Uniform Continuous:                       %s\n", urOk? "Ok": "Failed");
       printf("Uniform Integer:                          %s\n", uiOk? "Ok": "Failed");
@@ -1924,7 +1974,7 @@ bool testodesolver() {
 // The final report.
    Ok = rkckOk;
    if (!Ok || !silent) {
-      printf("ODE Solver Test\n"),
+      printf("ODE Solver Test\n");
       printf("* Runge-Kutta Cash-Karp:                  %s\n", rkckOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -2070,6 +2120,23 @@ Local bool skstest() {
          for (i = 0; i < n; i++) {
             uppercnt += u.xZ[i];
             lowercnt += d.xZ[i];
+         }
+      // Check correctness of SparseExists()
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (i >= j && i - j > d.xZ[i]) {
+                  Ok = Ok && !sparseexists(&s0, i, j);
+               }
+               if (i >= j && i - j <= d.xZ[i]) {
+                  Ok = Ok && sparseexists(&s0, i, j);
+               }
+               if (i <= j && j - i > u.xZ[j]) {
+                  Ok = Ok && !sparseexists(&s0, i, j);
+               }
+               if (i <= j && j - i <= u.xZ[j]) {
+                  Ok = Ok && sparseexists(&s0, i, j);
+               }
+            }
          }
       // Try to call SparseRewriteExisting() for out-of-band elements, make sure that it returns False.
          for (i = 0; i < n; i++) {
@@ -2235,12 +2302,15 @@ Local bool crstest() {
             } else {
                pnz = 1.0;
             }
-         // Generate random matrix in HASH format, copy it to CRS format, compare with original
+         // Generate random matrix in HASH format (testing SparseExists()
+         // during process), copy it to CRS format, compare with original
             sparsecreate(m, n, RoundZ(nz * hqrnduniformr(&rs)), &s0);
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
+                  Ok = Ok && !sparseexists(&s0, i, j);
                   if (hqrnduniformr(&rs) <= pnz) {
                      sparseset(&s0, i, j, hqrndnormal(&rs));
+                     Ok = Ok && sparseexists(&s0, i, j);
                   }
                }
             }
@@ -2249,6 +2319,8 @@ Local bool crstest() {
             for (i = 0; i < m; i++) {
                for (j = 0; j < n; j++) {
                   Ok = Ok && sparseget(&s0, i, j) == sparseget(&s1, i, j);
+                  Ok = Ok && (!sparseexists(&s0, i, j) || sparseexists(&s1, i, j));
+                  Ok = Ok && (!sparseexists(&s1, i, j) || sparseexists(&s0, i, j));
                }
             }
             if (!Ok) {
@@ -3084,6 +3156,102 @@ Local bool testlevel3symmetric() {
    return Ok;
 }
 
+// Function for testing sparse symmetric permutations
+// ALGLIB Project: Copyright 07.10.2020 by Sergey Bochkanov
+Local bool testsymmetricperm() {
+   ae_frame _frame_block;
+   ae_int_t n;
+   ae_int_t functype;
+   ae_int_t i;
+   ae_int_t j;
+   bool isupper;
+   double eps;
+   double nzprob;
+   bool Ok;
+   ae_frame_make(&_frame_block);
+   NewObj(hqrndstate, rs);
+   NewMatrix(da, 0, 0, DT_REAL);
+   NewMatrix(db, 0, 0, DT_REAL);
+   NewObj(sparsematrix, sa);
+   NewObj(sparsematrix, sb);
+   NewVector(ptbl, 0, DT_INT);
+   NewVector(pprod, 0, DT_INT);
+   eps = 10.0 * ae_machineepsilon;
+   Ok = true;
+   hqrndrandomize(&rs);
+// Try various N and fill factors
+   for (n = 1; n <= 20; n++) {
+      nzprob = 1.0;
+      while (nzprob >= 0.1 / (n * n)) {
+      // Generate matrix with desired fill factor, randomly select one triangle,
+      // generate random permutation (in table and product form)
+         sparsecreate(n, n, 0, &sa);
+         ae_matrix_set_length(&da, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (hqrnduniformr(&rs) < nzprob) {
+                  da.xyR[i][j] = hqrndnormal(&rs);
+                  sparseset(&sa, i, j, da.xyR[i][j]);
+               } else {
+                  da.xyR[i][j] = 0.0;
+               }
+            }
+         }
+         sparseconverttocrs(&sa);
+         isupper = hqrndnormal(&rs) > 0.0;
+         for (i = 0; i < n; i++) {
+            for (j = 0; j <= i; j++) {
+               if (isupper) {
+                  da.xyR[i][j] = da.xyR[j][i];
+               } else {
+                  da.xyR[j][i] = da.xyR[i][j];
+               }
+            }
+         }
+         ae_vector_set_length(&ptbl, n);
+         ae_vector_set_length(&pprod, n);
+         for (i = 0; i < n; i++) {
+            ptbl.xZ[i] = i;
+         }
+         for (i = 0; i < n; i++) {
+            pprod.xZ[i] = i + hqrnduniformi(&rs, n - i);
+            swapi(&ptbl.xZ[i], &ptbl.xZ[pprod.xZ[i]]);
+         }
+         ae_matrix_set_length(&db, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               db.xyR[ptbl.xZ[i]][ptbl.xZ[j]] = da.xyR[i][j];
+            }
+         }
+      // Select function to test, run and test
+         functype = hqrnduniformi(&rs, 2);
+         if (functype == 0) {
+            sparsesymmpermtblbuf(&sa, isupper, &ptbl, &sb);
+         }
+         if (functype == 1) {
+            sparsesymmpermtbl(&sa, isupper, &ptbl, &sb);
+         }
+         Ok = Ok && sparseiscrs(&sb);
+         Ok = Ok && sparsegetnrows(&sb) == n;
+         Ok = Ok && sparsegetncols(&sb) == n;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         if (isupper)
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  Ok = Ok && (j < i? sparseget(&sb, i, j) == 0.0: NearAtR(db.xyR[i][j], sparseget(&sb, i, j), eps));
+               }
+            }
+      // Increase sparsity
+         nzprob *= 0.75;
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // Function for testing Level 2 triangular linear algebra functions.
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 Local bool testlevel2triangular() {
@@ -3322,7 +3490,7 @@ Local bool basicfuncrandomtest() {
       // Checking for Matrix with hash table type
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
-               temp = 2 * ae_randominteger(mfigure) - mfigure;
+               temp = 2.0 * ae_randominteger(mfigure) - mfigure;
                a.xyR[i1][j1] = (double)temp;
                if (ae_randominteger(2) == 0) {
                   sparseset(&s, i1, j1, (double)temp);
@@ -3351,7 +3519,7 @@ Local bool basicfuncrandomtest() {
       // Again initialization of the matrix and check new values
          for (i1 = 0; i1 < i; i1++) {
             for (j1 = 0; j1 < j; j1++) {
-               temp = 2 * ae_randominteger(mfigure) - mfigure;
+               temp = 2.0 * ae_randominteger(mfigure) - mfigure;
                a.xyR[i1][j1] = (double)temp;
                if (ae_randominteger(2) == 0) {
                   sparseset(&s, i1, j1, (double)temp);
@@ -4839,6 +5007,7 @@ bool testsparse() {
    bool level2triangularOk;
    bool level3unsymmetricOk;
    bool level3symmetricOk;
+   bool symmetricpermOk;
    bool linearsOk;
    bool linearmmOk;
    bool linearsmmOk;
@@ -4862,6 +5031,7 @@ bool testsparse() {
    level2triangularOk = testlevel2triangular();
    level3unsymmetricOk = testlevel3unsymmetric();
    level3symmetricOk = testlevel3symmetric();
+   symmetricpermOk = testsymmetricperm();
    linearsOk = linearfunctionsstest();
    linearmmOk = linearfunctionsmmtest();
    linearsmmOk = linearfunctionssmmtest();
@@ -4871,20 +5041,21 @@ bool testsparse() {
    rewriteexistingOk = testsparseunit_rewriteexistingtest();
    getrowOk = getrowOk && testsparseunit_testgetrow();
 // The final report.
-   Ok = sksOk && crsOk && getrowOk && basicOk && linearOk && basicrndOk && level2unsymmetricOk && level2symmetricOk && level2triangularOk && level3unsymmetricOk && level3symmetricOk && linearsOk && linearmmOk && linearsmmOk && copyOk && basiccopyOk && enumerateOk && rewriteexistingOk;
+   Ok = sksOk && crsOk && getrowOk && basicOk && linearOk && basicrndOk && level2unsymmetricOk && level2symmetricOk && level2triangularOk && level3unsymmetricOk && level3symmetricOk && symmetricpermOk && linearsOk && linearmmOk && linearsmmOk && copyOk && basiccopyOk && enumerateOk && rewriteexistingOk;
    if (!Ok || !silent) {
-      printf("Sparse Matrix Tests\n"),
-      printf("* Storage Format Specifics:\n"),
+      printf("Sparse Matrix Tests\n");
+      printf("* Storage Format Specifics:\n");
       printf("* SKS:                                    %s\n", sksOk? "Ok": "Failed");
       printf("* CRS:                                    %s\n", crsOk? "Ok": "Failed");
-      printf("* Operations:\n"),
+      printf("* Operations:\n");
       printf("* GetRow:                                 %s\n", getrowOk? "Ok": "Failed");
-      printf("* BLAS:\n"),
+      printf("* BLAS:\n");
       printf("* Level 2 General:                        %s\n", level2unsymmetricOk? "Ok": "Failed");
       printf("* Level 2 Symmetric:                      %s\n", level2symmetricOk? "Ok": "Failed");
       printf("* Level 2 Triangular:                     %s\n", level2triangularOk? "Ok": "Failed");
       printf("* Level 3 General:                        %s\n", level3unsymmetricOk? "Ok": "Failed");
       printf("* Level 3 Symmetric:                      %s\n", level3symmetricOk? "Ok": "Failed");
+      printf("* Permutations (symmetric):               %s\n", symmetricpermOk? "Ok": "Failed");
       printf("Basic Test:                               %s\n", basicOk? "Ok": "Failed");
       printf("Copy Test:                                %s\n", copyOk? "Ok": "Failed");
       printf("Basic Copy Test:                          %s\n", basiccopyOk? "Ok": "Failed");
@@ -5415,7 +5586,7 @@ static bool testablasunit_testtrsm(ae_int_t minn, ae_int_t maxn) {
    NewMatrix(rxl2, 0, 0, DT_REAL);
    NewMatrix(cxr2, 0, 0, DT_COMPLEX);
    NewMatrix(cxl2, 0, 0, DT_COMPLEX);
-   threshold = ae_sqr((double)maxn) * 100 * ae_machineepsilon;
+   threshold = ae_sqr(maxn) * 100 * ae_machineepsilon;
    Ok = true;
    for (mx = minn; mx <= maxn; mx++) {
    // Select random M/N in [1,MX] such that max(M,N)=MX
@@ -6742,10 +6913,10 @@ static bool testablasunit_spectest() {
       rmatrixgemm(n, n, n, 0.0, &emptyr2, 35345, 23453, ae_randominteger(2), &emptyr2, 74764, 26845, ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0);
       cmatrixgemm(n, n, 0, ae_complex_from_d(1.0), &emptyc2, 35345, 23453, ae_randominteger(3), &emptyc2, 74764, 26845, ae_randominteger(3), ae_complex_from_d(1.0 + ae_randominteger(2)), &outputc2, 0, 0);
       cmatrixgemm(n, n, n, ae_complex_from_d(0.0), &emptyc2, 35345, 23453, ae_randominteger(3), &emptyc2, 74764, 26845, ae_randominteger(3), ae_complex_from_d(1.0 + ae_randominteger(2)), &outputc2, 0, 0);
-      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
-      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
-      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
-      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
+      rmatrixsyrk(n, 0, 1.0, &emptyr2, 54674, 34657, 2.0 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
+      rmatrixsyrk(n, n, 0.0, &emptyr2, 54674, 34657, 2.0 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputr2, 0, 0, ae_randombool());
+      cmatrixherk(n, 0, 1.0, &emptyc2, 54674, 34657, 2.0 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
+      cmatrixherk(n, n, 0.0, &emptyc2, 54674, 34657, 2.0 * ae_randominteger(2), 1.0 + ae_randominteger(2), &outputc2, 0, 0, ae_randombool());
       rmatrixrighttrsm(0, 0, &emptyr2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(2), &outputr2, 0, 0);
       rmatrixlefttrsm(0, 0, &emptyr2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(2), &outputr2, 0, 0);
       cmatrixrighttrsm(0, 0, &emptyc2, 63463, 36345, ae_randombool(), ae_randombool(), ae_randominteger(3), &outputc2, 0, 0);
@@ -7083,12 +7254,12 @@ bool testablas() {
 // The final report.
    Ok = trsmOk && syrkOk && gemmOk && transOk && rank1Ok && gemvOk && symvOk && trsvOk && reflOk && copyOk && specOk;
    if (!Ok || !silent) {
-      printf("ABLAS Tests\n"),
-      printf("Level 3 Functions:\n"),
+      printf("ABLAS Tests\n");
+      printf("Level 3 Functions:\n");
       printf("* TRSM:                                   %s\n", trsmOk? "Ok": "Failed");
       printf("* SYRK:                                   %s\n", syrkOk? "Ok": "Failed");
       printf("* GEMM:                                   %s\n", gemmOk? "Ok": "Failed");
-      printf("Level 2 Functions:\n"),
+      printf("Level 2 Functions:\n");
       printf("* Transpose:                              %s\n", transOk? "Ok": "Failed");
       printf("* Rank 1:                                 %s\n", rank1Ok? "Ok": "Failed");
       printf("* GEMV:                                   %s\n", gemvOk? "Ok": "Failed");
@@ -7261,7 +7432,7 @@ bool testcreflections() {
 // The final report.
    Ok = meg <= threshold && mel <= threshold && mer <= threshold;
    if (!Ok || !silent) {
-      printf("Complex Reflections Tests\n"),
+      printf("Complex Reflections Tests\n");
       printf("Generate Error:                           %5.3e\n", (double)meg);
       printf("Apply(L) Error:                           %5.3e\n", (double)mel);
       printf("Apply(R) Error:                           %5.3e\n", (double)mer);
@@ -7421,9 +7592,9 @@ static bool testmatgenunit_testeult() {
    NewMatrix(a, 0, 0, DT_REAL);
    NewMatrix(b, 0, 0, DT_COMPLEX);
    eps = 2 * ae_machineepsilon;
-   range = 100 * ae_randommid();
+   range = 100.0 * ae_randommid();
    for (n = 1; n <= 15; n++) {
-      c = 900 * ae_randomreal() + 100;
+      c = 900.0 * ae_randomreal() + 100;
    // Generate symmetric matrix and check it
       smatrixrndcond(n, c, &a);
       for (i = 0; i < n; i++) {
@@ -8298,7 +8469,7 @@ bool testmatgen() {
 // The final report.
    Ok = rOk && cOk && sOk && spdOk && hOk && hpdOk && eulOk;
    if (!Ok || !silent) {
-      printf("Matrix Generator Tests\n"),
+      printf("Matrix Generator Tests\n");
       printf("Real Test:                                %s\n", rOk? "Ok": "Failed");
       printf("Complex Test:                             %s\n", cOk? "Ok": "Failed");
       printf("Symmetric Test:                           %s\n", sOk? "Ok": "Failed");
@@ -8313,7 +8484,7 @@ bool testmatgen() {
 }
 
 // === trfac testing unit ===
-// Function for testing sparse real Cholesky.
+// Test sparse real Cholesky.
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 Local bool sparserealcholeskytest() {
    ae_frame _frame_block;
@@ -8329,11 +8500,17 @@ Local bool sparserealcholeskytest() {
    bool isupper;
    double offscale;
    double tol;
-   ae_int_t cfmt;
-   ae_int_t cord;
    ae_int_t maxfmt;
-   ae_int_t maxord;
-   ae_int_t minord;
+   ae_int_t minperm;
+   ae_int_t maxperm;
+   ae_int_t routinetype;
+   ae_int_t permtype;
+   ae_int_t facttype;
+   ae_int_t updatewidth;
+   ae_int_t updaterank;
+   ae_int_t targetwidth;
+   ae_int_t bigsize;
+   ae_int_t bottomsize;
    bool Ok;
    ae_frame_make(&_frame_block);
    NewMatrix(a, 0, 0, DT_REAL);
@@ -8341,22 +8518,25 @@ Local bool sparserealcholeskytest() {
    NewObj(sparsematrix, sa);
    NewObj(sparsematrix, sa1);
    NewObj(sparsematrix, sc);
+   NewObj(sparsematrix, sp);
    NewObj(sparsebuffers, sbuf);
    NewVector(p0, 0, DT_INT);
    NewVector(p1, 0, DT_INT);
+   NewVector(d, 0, DT_REAL);
    NewVector(b1, 0, DT_BOOL);
    NewObj(hqrndstate, rs);
+   NewObj(sparsedecompositionanalysis, analysis);
    Ok = true;
    hqrndrandomize(&rs);
 // Settings
    maxfmt = 2;
-   maxord = 0;
-   minord = -2;
+   minperm = -2;
+   maxperm = 2;
    offscale = 1.0E-3;
    tol = 1.0E-8;
-// SparseCholeskyX test: performed for matrices
-// of all sizes in 1..20 and all sparsity percentages.
-   for (n = 1; n <= 20; n++) {
+// Modern Cholesky (SparseCholesky, SparseCholeskyP, Analyze/Factorize) tests:
+// performed for positive definite matrices of all sizes in 1..20 and all sparsity percentages.
+   for (n = 1; n <= 30; n++) {
       nz = n * n - n;
       while (true) {
       // Generate symmetric N*N matrix where probability of non-diagonal element
@@ -8375,7 +8555,7 @@ Local bool sparserealcholeskytest() {
                   continue;
                }
                if (hqrnduniformr(&rs) <= pnz) {
-                  a.xyR[i][j] = offscale * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
                   a.xyR[j][i] = a.xyR[i][j];
                } else {
                   a.xyR[i][j] = 0.0;
@@ -8383,11 +8563,8 @@ Local bool sparserealcholeskytest() {
                }
             }
          }
-      // Problem statement
+      // Create matrix in hash-based storage format, convert it to random storage format.
          isupper = ae_randombool();
-         cfmt = ae_randominteger(maxfmt + 1);
-         cord = ae_randominteger(maxord + 1 - minord) + minord;
-      // Create matrix is hash-based storage format, convert it to random storage format.
          sparsecreate(n, n, 0, &sa);
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
@@ -8396,74 +8573,187 @@ Local bool sparserealcholeskytest() {
                }
             }
          }
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j < i: j > i) {
+                  if (hqrnduniformr(&rs) <= pnz) {
+                     sparseset(&sa, i, j, hqrndnormal(&rs));
+                  }
+               }
+            }
+         }
          sparseconvertto(&sa, hqrnduniformi(&rs, maxfmt + 1));
-      // Perform sparse Cholesky and make several tests:
-      // * correctness of P0 and P1 (they are correct permutations and one is inverse of another)
-      // * format of SC matches CFmt
-      // * SC has correct size (exactly N*N)
-      // * check that correct triangle is returned
-         if (!sparsecholeskyx(&sa, n, isupper, &p0, &p1, cord, ae_randominteger(3), cfmt, &sbuf, &sc)) {
-            Ok = false;
-            ae_frame_leave();
-            return Ok;
-         }
-         Ok = Ok && p0.cnt >= n;
-         Ok = Ok && p1.cnt >= n;
-         if (!Ok) {
-            ae_frame_leave();
-            return Ok;
-         }
-         ae_vector_set_length(&b1, n);
-         for (i = 0; i < n; i++) {
-            b1.xB[i] = false;
-         }
-         for (i = 0; i < n; i++) {
-            Ok = Ok && p0.xZ[i] >= 0;
-            Ok = Ok && p1.xZ[i] >= 0;
-            Ok = Ok && p0.xZ[i] < n;
-            Ok = Ok && p1.xZ[i] < n;
+      // Try various factorization routines:
+      // * SparseCholesky() without permutation
+      // * SparseCholeskyP()
+      // * Analyze/Factorize family of functions
+         for (routinetype = 0; routinetype <= 2; routinetype++) {
+         // The factorization
+            sparsecopy(&sa, &sc);
+            if (routinetype == 0) {
+            // Positive-definite Cholesky without permutation
+               if (!sparsecholesky(&sc, isupper)) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               ae_vector_set_length(&p0, n);
+               ae_vector_set_length(&d, n);
+               for (i = 0; i < n; i++) {
+                  p0.xZ[i] = i;
+                  d.xR[i] = 1.0;
+               }
+            }
+            if (routinetype == 1) {
+            // Positive-definite Cholesky with permutation
+               if (!sparsecholeskyp(&sc, isupper, &p0)) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               ae_vector_set_length(&d, n);
+               for (i = 0; i < n; i++) {
+                  d.xR[i] = 1.0;
+               }
+            }
+            if (routinetype == 2) {
+            // Positive-definite analyze/factorize with randomly chosen permutation.
+            // We also check that we may analyze one matrix and factorize another one
+            // with same sparsity pattern.
+               sparsecopybuf(&sc, &sp);
+               for (i = 0; i < n; i++) {
+                  for (j = 0; j < n; j++) {
+                     if (sparseexists(&sp, i, j)) {
+                        sparserewriteexisting(&sp, i, j, 1.0);
+                     }
+                  }
+               }
+               permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
+               if (hqrndnormal(&rs) > 0.0) {
+               // Test analyze/factorize sequence
+                  if (!sparsecholeskyanalyze(&sc, isupper, 0, permtype, &analysis)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+                  sparsecreate(1, 1, 0, &sc);
+                  if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+               } else {
+               // Test analyze/reload/factorize sequence
+                  if (!sparsecholeskyanalyze(&sp, isupper, 0, permtype, &analysis)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+                  sparsecholeskyreload(&analysis, &sc, isupper);
+                  sparsecreate(1, 1, 0, &sc);
+                  if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+                     Ok = false;
+                     ae_frame_leave();
+                     return Ok;
+                  }
+               }
+               if (d.cnt != n) {
+                  Ok = false;
+                  ae_frame_leave();
+                  return Ok;
+               }
+               for (i = 0; i < n; i++) {
+                  Ok = Ok && d.xR[i] == 1.0;
+               }
+            }
+         // Check output sizes and formats
+            Ok = Ok && sparseiscrs(&sc) && sparsegetnrows(&sc) == n && sparsegetncols(&sc) == n;
+            Ok = Ok && p0.cnt == n;
+            Ok = Ok && d.cnt == n;
             if (!Ok) {
                ae_frame_leave();
                return Ok;
             }
-            Ok = Ok && !b1.xB[p0.xZ[i]];
-            b1.xB[p0.xZ[i]] = true;
-            Ok = Ok && p1.xZ[p0.xZ[i]] == i;
-         }
-         Ok = Ok && sparsegetmatrixtype(&sc) == cfmt;
-         Ok = Ok && sparsegetncols(&sc) == n;
-         Ok = Ok && sparsegetnrows(&sc) == n;
-         t0 = 0;
-         t1 = 0;
-         while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
-            Ok = Ok && (j >= i || !isupper);
-            Ok = Ok && (j <= i || isupper);
-         }
-      // Now, test correctness of Cholesky decomposition itself.
-      // We calculate U'*U (or L*L') and check at against permutation
-      // of A given by P0.
-      //
-      // NOTE: we expect that only one triangle of SC is filled,
-      //       and another one is exactly zero.
-         if (isupper) {
             for (i = 0; i < n; i++) {
-               for (j = 0; j < n; j++) {
-                  v = 0.0;
-                  for (k = 0; k < n; k++) {
-                     v += sparseget(&sc, k, j) * sparseget(&sc, k, i);
+               Ok = Ok && p0.xZ[i] >= i && p0.xZ[i] < n;
+               Ok = Ok && isfinite(d.xR[i]);
+            }
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            t0 = 0;
+            t1 = 0;
+            while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
+               Ok = Ok && (isupper? j >= i: j <= i);
+            }
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+         // Now, test correctness of Cholesky decomposition itself.
+         // We calculate U'*U (or L*L') and check it against permutation
+         // of A given by P0.
+         //
+         // NOTE: we expect that only one triangle of SC is filled,
+         //       and another one is exactly zero.
+            ae_matrix_set_length(&a1, n, n);
+            if (isupper) {
+               for (i = 0; i < n; i++) {
+                  for (j = 0; j < n; j++) {
+                     v = 0.0;
+                     for (k = 0; k < n; k++) {
+                        v += sparseget(&sc, k, j) * d.xR[k] * sparseget(&sc, k, i);
+                     }
+                     a1.xyR[i][j] = v;
                   }
-                  Ok = Ok && NearAtR(a.xyR[p0.xZ[i]][p0.xZ[j]], v, tol);
+               }
+            } else {
+               for (i = 0; i < n; i++) {
+                  for (j = 0; j < n; j++) {
+                     v = 0.0;
+                     for (k = 0; k < n; k++) {
+                        v += sparseget(&sc, j, k) * d.xR[k] * sparseget(&sc, i, k);
+                     }
+                     a1.xyR[i][j] = v;
+                  }
                }
             }
-         } else {
+            for (i = n - 1; i >= 0; i--) {
+               swaprows(&a1, i, p0.xZ[i], n);
+               swapcols(&a1, i, p0.xZ[i], n);
+            }
             for (i = 0; i < n; i++) {
                for (j = 0; j < n; j++) {
-                  v = 0.0;
-                  for (k = 0; k < n; k++) {
-                     v += sparseget(&sc, j, k) * sparseget(&sc, i, k);
-                  }
-                  Ok = Ok && NearAtR(a.xyR[p0.xZ[i]][p0.xZ[j]], v, tol);
+                  Ok = Ok && NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
                }
+            }
+         }
+      // Check handling of degenerate problems: zeros at main diagonal, negative definite matrices
+         for (routinetype = 0; routinetype <= 1; routinetype++) {
+         // Exact zero at diagonal
+            sparsecopy(&sa, &sc);
+            sparseconverttohash(&sc);
+            k = hqrnduniformi(&rs, n);
+            sparseset(&sc, k, k, 0.0);
+            sparseconvertto(&sc, hqrnduniformi(&rs, maxfmt + 1));
+            if (routinetype == 0) {
+               Ok = Ok && !sparsecholesky(&sc, isupper);
+            }
+            if (routinetype == 1) {
+               Ok = Ok && !sparsecholeskyp(&sc, isupper, &p0);
+            }
+         // Negative definite matrix
+            sparsecopy(&sa, &sc);
+            sparseconverttohash(&sc);
+            k = hqrnduniformi(&rs, n);
+            sparseset(&sc, k, k, -1.0E10);
+            sparseconvertto(&sc, hqrnduniformi(&rs, maxfmt + 1));
+            if (routinetype == 0) {
+               Ok = Ok && !sparsecholesky(&sc, isupper);
+            }
+            if (routinetype == 1) {
+               Ok = Ok && !sparsecholeskyp(&sc, isupper, &p0);
             }
          }
       // Increase problem sparsity and try one more time.
@@ -8472,6 +8762,466 @@ Local bool sparserealcholeskytest() {
             break;
          }
          nz /= 2;
+      }
+   }
+// Negative definite LDLT factorization: performed for matrices with various sparsity factors
+   for (n = 1; n <= 30; n++) {
+      nz = n * n - n;
+      while (true) {
+      // Generate symmetric N*N matrix where probability of non-diagonal element
+      // being non-zero is PNZ. Off-diagonal elements are set to very
+      // small values, so positive definiteness is guaranteed.
+         if (n > 1) {
+            pnz = (double)nz / (double)(n * n - n);
+         } else {
+            pnz = 1.0;
+         }
+         ae_matrix_set_length(&a, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j <= i; j++) {
+               if (i == j) {
+                  a.xyR[i][i] = possign(hqrndnormal(&rs)) * (1.0 + hqrnduniformr(&rs));
+                  continue;
+               }
+               if (hqrnduniformr(&rs) <= pnz) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[j][i] = a.xyR[i][j];
+               } else {
+                  a.xyR[i][j] = 0.0;
+                  a.xyR[j][i] = 0.0;
+               }
+            }
+         }
+      // Create matrix in hash-based storage format, convert it to random storage format.
+         isupper = ae_randombool();
+         sparsecreate(n, n, 0, &sa);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j >= i: j <= i) {
+                  sparseset(&sa, i, j, a.xyR[i][j]);
+               }
+            }
+         }
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j < i: j > i) {
+                  if (hqrnduniformr(&rs) <= pnz) {
+                     sparseset(&sa, i, j, hqrndnormal(&rs));
+                  }
+               }
+            }
+         }
+         sparseconvertto(&sa, hqrnduniformi(&rs, maxfmt + 1));
+      // Try Analyze/Factorize family of functions
+         sparsecopy(&sa, &sc);
+         sparsecopybuf(&sc, &sp);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (sparseexists(&sp, i, j)) {
+                  sparserewriteexisting(&sp, i, j, 1.0);
+               }
+            }
+         }
+         facttype = 1;
+         permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
+         if (hqrndnormal(&rs) > 0.0) {
+         // Test analyze/factorize sequence
+            if (!sparsecholeskyanalyze(&sc, isupper, facttype, permtype, &analysis)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            sparsecreate(1, 1, 0, &sc);
+            if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         } else {
+         // Test analyze/reload/factorize sequence
+            if (!sparsecholeskyanalyze(&sp, isupper, facttype, permtype, &analysis)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            sparsecholeskyreload(&analysis, &sc, isupper);
+            sparsecreate(1, 1, 0, &sc);
+            if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         }
+      // Check output sizes and formats
+         Ok = Ok && sparseiscrs(&sc) && sparsegetnrows(&sc) == n && sparsegetncols(&sc) == n;
+         Ok = Ok && p0.cnt == n;
+         Ok = Ok && d.cnt == n;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (i = 0; i < n; i++) {
+            Ok = Ok && p0.xZ[i] >= i && p0.xZ[i] < n;
+            Ok = Ok && isfinite(d.xR[i]);
+         }
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         t0 = 0;
+         t1 = 0;
+         while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
+            Ok = Ok && (isupper? j >= i: j <= i);
+         }
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+      // Now, test correctness of Cholesky decomposition itself.
+      // We calculate U'*U (or L*L') and check it against permutation
+      // of A given by P0.
+      //
+      // NOTE: we expect that only one triangle of SC is filled,
+      //       and another one is exactly zero.
+         ae_matrix_set_length(&a1, n, n);
+         if (isupper) {
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  v = 0.0;
+                  for (k = 0; k < n; k++) {
+                     v += sparseget(&sc, k, j) * d.xR[k] * sparseget(&sc, k, i);
+                  }
+                  a1.xyR[i][j] = v;
+               }
+            }
+         } else {
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  v = 0.0;
+                  for (k = 0; k < n; k++) {
+                     v += sparseget(&sc, j, k) * d.xR[k] * sparseget(&sc, i, k);
+                  }
+                  a1.xyR[i][j] = v;
+               }
+            }
+         }
+         for (i = n - 1; i >= 0; i--) {
+            swaprows(&a1, i, p0.xZ[i], n);
+            swapcols(&a1, i, p0.xZ[i], n);
+         }
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               Ok = Ok && NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
+            }
+         }
+      // Increase problem sparcity and try one more time.
+      // Stop after testing NZ=0.
+         if (nz == 0) {
+            break;
+         }
+         nz /= 2;
+      }
+   }
+// Basis test of modified Cholesky.
+//
+// We do not perform deep tests here, basically the fact that with diagonal modification
+// we can complete factorization that can't be completed without modification.
+   for (n = 1; n <= 30; n++) {
+      nz = n * n - n;
+      while (true) {
+      // Generate symmetric N*N matrix where probability of non-diagonal element
+      // being non-zero is PNZ. One of diagonal elements is guaranteed to be
+      // negative in order to test modification strategy.
+         if (n > 1) {
+            pnz = (double)nz / (double)(n * n - n);
+         } else {
+            pnz = 1.0;
+         }
+         ae_matrix_set_length(&a, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j <= i; j++) {
+               if (i == j) {
+                  a.xyR[i][i] = hqrndnormal(&rs);
+                  continue;
+               }
+               if (hqrnduniformr(&rs) <= pnz) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[j][i] = a.xyR[i][j];
+               } else {
+                  a.xyR[i][j] = 0.0;
+                  a.xyR[j][i] = 0.0;
+               }
+            }
+         }
+         i = hqrnduniformi(&rs, n);
+         a.xyR[i][i] = -1.0;
+         sparsecreate(n, n, 0, &sa);
+         isupper = ae_randombool(); //(@) Was not present in the original: isupper was left dangling from the previous set of loops.
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j >= i: j <= i) {
+                  sparseset(&sa, i, j, a.xyR[i][j]);
+               }
+            }
+         }
+      // Try Analyze/Factorize family of functions
+         facttype = 0;
+         permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
+         sparsecopy(&sa, &sc);
+         if (!sparsecholeskyanalyze(&sc, isupper, facttype, permtype, &analysis)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsecopy(&sa, &sc);
+         sparsecholeskysetmodtype(&analysis, 1, 1.0, 0.0, 0.0, 0.0);
+         sparsecholeskyreload(&analysis, &sc, isupper);
+         if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+      // Increase problem sparsity and try one more time.
+      // Stop after testing NZ = 0.
+         if (nz == 0) {
+            break;
+         }
+         nz /= 2;
+      }
+   }
+// Basis test of modified Cholesky.
+//
+// We do not perform deep tests here, basically the fact that with diagonal modification
+// we can complete factorization that can't be completed without modification.
+   for (n = 1; n <= 30; n++) {
+      nz = n * n - n;
+      while (true) {
+      // Generate symmetric N*N matrix where probability of non-diagonal element
+      // being non-zero is PNZ. One of diagonal elements is guaranteed to be
+      // negative in order to test modification strategy.
+         if (n > 1) {
+            pnz = (double)nz / (double)(n * n - n);
+         } else {
+            pnz = 1.0;
+         }
+         ae_matrix_set_length(&a, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j <= i; j++) {
+               if (i == j) {
+                  a.xyR[i][i] = hqrndnormal(&rs);
+                  continue;
+               }
+               if (hqrnduniformr(&rs) <= pnz) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+                  a.xyR[j][i] = a.xyR[i][j];
+               } else {
+                  a.xyR[i][j] = 0.0;
+                  a.xyR[j][i] = 0.0;
+               }
+            }
+         }
+         i = hqrnduniformi(&rs, n);
+         a.xyR[i][i] = -1.0;
+         sparsecreate(n, n, 0, &sa);
+         isupper = ae_randombool(); //(@) Was not present in the original: isupper was left dangling from the previous set of loops.
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j >= i: j <= i) {
+                  sparseset(&sa, i, j, a.xyR[i][j]);
+               }
+            }
+         }
+      // Try Analyze/Factorize family of functions
+         facttype = 0;
+         permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
+         sparsecopy(&sa, &sc);
+         if (!sparsecholeskyanalyze(&sc, isupper, facttype, permtype, &analysis)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         if (sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+         sparsecopy(&sa, &sc);
+         sparsecholeskysetmodtype(&analysis, 1, 1.0, 0.0, 0.0, 0.0);
+         sparsecholeskyreload(&analysis, &sc, isupper);
+         if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+            Ok = false;
+            ae_frame_leave();
+            return Ok;
+         }
+      // Increase problem sparsity and try one more time.
+      // Stop after testing NZ=0.
+         if (nz == 0) {
+            break;
+         }
+         nz /= 2;
+      }
+   }
+// Specially designed matrix that allows us to test all internal supernodal update kernels,
+// with all update ranks, update widths, target widths
+   updaterank = 1;
+   updatewidth = 3;
+   targetwidth = updatewidth;
+   for (updaterank = 1; updaterank <= spsymmgetmaxfastkernel(); updaterank++) {
+      for (updatewidth = 1; updatewidth <= spsymmgetmaxfastkernel(); updatewidth++) {
+         for (targetwidth = updatewidth; targetwidth <= spsymmgetmaxfastkernel(); targetwidth++) {
+         // Generate test matrix A:
+         //
+         // [ U                  ]
+         // [ UU                 ]
+         // [ UUU                ]
+         // [ UUUT               ]
+         // [ UUUTT              ]
+         // [ UUUTTT             ]
+         // [    TTTT            ]
+         // [    TTTTR           ]
+         // [    TTTTRR          ]
+         // [    TTTTRRR         ]
+         // [    TTTTRRRR        ]
+         // [    TTTTRRRRR       ]
+         // [        RRRRRR      ]
+         // [        RRRRRRR     ]
+         // [        RRRRRRRR    ]
+         // [        RRRRRRRRR   ]
+         // [ UUUTTTTRRRRRRRRRR  ]
+         // [ UUUTTTTRRRRRRRRRRR ]
+         //
+         // where U is update matrix, T is target matrix, heights of U and T are chosen in
+         // such a way that supernode T will NOT be merged with supernode U, their sizes
+         // are chosen to investigate all possible kinds of update kernels. The residual
+         // R is also chosen in such a way that it is NOT merged with T.
+            bigsize = 10;
+            bottomsize = 2 + hqrnduniformi(&rs, 10);
+            n = updaterank + targetwidth + 2 * bigsize + bottomsize;
+            ae_matrix_set_length(&a, n, n);
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  if (i == j) {
+                     a.xyR[i][j] = 1.0 + hqrnduniformr(&rs);
+                  } else {
+                     a.xyR[i][j] = 0.0;
+                  }
+               }
+            }
+            for (j = 0; j < updaterank; j++) {
+               for (i = j + 1; i < updaterank + updatewidth; i++) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+               }
+               for (i = n - bottomsize; i < n; i++) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+               }
+            }
+            for (j = updaterank; j < updaterank + targetwidth; j++) {
+               for (i = j + 1; i < updaterank + targetwidth + bigsize; i++) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+               }
+               for (i = n - bottomsize; i < n; i++) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+               }
+            }
+            for (j = updaterank + targetwidth; j < n; j++) {
+               for (i = j + 1; i < n; i++) {
+                  a.xyR[i][j] = 0.5 / n * (hqrnduniformr(&rs) - 0.5);
+               }
+            }
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < i; j++) {
+                  a.xyR[j][i] = a.xyR[i][j];
+               }
+            }
+         // Create matrix in hash-based storage format
+            isupper = false;
+            sparsecreate(n, n, 0, &sa);
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  sparseset(&sa, i, j, a.xyR[i][j]);
+               }
+            }
+         // Try analysis with random permutation and factorization
+            facttype = hqrnduniformi(&rs, 2);
+            permtype = minperm + hqrnduniformi(&rs, maxperm - minperm + 1);
+            if (!sparsecholeskyanalyze(&sa, isupper, facttype, permtype, &analysis)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+            if (!sparsecholeskyfactorize(&analysis, isupper, &sc, &d, &p0)) {
+               Ok = false;
+               ae_frame_leave();
+               return Ok;
+            }
+         // Check output sizes and formats
+            Ok = Ok && sparseiscrs(&sc) && sparsegetnrows(&sc) == n && sparsegetncols(&sc) == n;
+            Ok = Ok && p0.cnt == n;
+            Ok = Ok && d.cnt == n;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            for (i = 0; i < n; i++) {
+               Ok = Ok && p0.xZ[i] >= i && p0.xZ[i] < n;
+               Ok = Ok && isfinite(d.xR[i]);
+            }
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+            t0 = 0;
+            t1 = 0;
+            while (sparseenumerate(&sc, &t0, &t1, &i, &j, &v)) {
+               Ok = Ok && (isupper? j >= i: j <= i);
+            }
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
+         // Now, test correctness of Cholesky decomposition itself.
+         // We calculate U'*U (or L*L') and check it against permutation
+         // of A given by P0.
+         //
+         // NOTE: we expect that only one triangle of SC is filled,
+         //       and another one is exactly zero.
+            ae_matrix_set_length(&a1, n, n);
+            if (isupper) {
+               for (i = 0; i < n; i++) {
+                  for (j = 0; j < n; j++) {
+                     v = 0.0;
+                     for (k = 0; k < n; k++) {
+                        v += sparseget(&sc, k, j) * d.xR[k] * sparseget(&sc, k, i);
+                     }
+                     a1.xyR[i][j] = v;
+                  }
+               }
+            } else {
+               for (i = 0; i < n; i++) {
+                  for (j = 0; j < n; j++) {
+                     v = 0.0;
+                     for (k = 0; k < n; k++) {
+                        v += sparseget(&sc, j, k) * d.xR[k] * sparseget(&sc, i, k);
+                     }
+                     a1.xyR[i][j] = v;
+                  }
+               }
+            }
+            for (i = n - 1; i >= 0; i--) {
+               swaprows(&a1, i, p0.xZ[i], n);
+               swapcols(&a1, i, p0.xZ[i], n);
+            }
+            for (i = 0; i < n; i++) {
+               for (j = 0; j < n; j++) {
+                  Ok = Ok && NearAtR(a.xyR[i][j], a1.xyR[i][j], tol);
+               }
+            }
+         }
       }
    }
 // SparseCholeskySkyline test: performed for matrices
@@ -8560,8 +9310,7 @@ Local bool sparserealcholeskytest() {
          t0 = 0;
          t1 = 0;
          while (sparseenumerate(&sa, &t0, &t1, &i, &j, &v)) {
-            Ok = Ok && (j >= i || !isupper);
-            Ok = Ok && (j <= i || isupper);
+            Ok = Ok && (isupper? j >= i: j <= i);
          }
          if (isupper) {
             for (i = 0; i < n; i++) {
@@ -8600,9 +9349,9 @@ Local bool sparserealcholeskytest() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (isupper? j >= i: j <= i) {
-                  Ok = Ok && NearAtR(sparseget(&sa1, i, j), sparseget(&sa, i, j), 10 * ae_machineepsilon);
+                  Ok = Ok && NearAtR(sparseget(&sa1, i, j), sparseget(&sa, i, j), 10.0 * ae_machineepsilon);
                } else {
-                  Ok = Ok && NearAtR(sparseget(&sa1, i, j), a1.xyR[i][j], 10 * ae_machineepsilon);
+                  Ok = Ok && NearAtR(sparseget(&sa1, i, j), a1.xyR[i][j], 10.0 * ae_machineepsilon);
                }
             }
          }
@@ -9187,7 +9936,7 @@ bool testtrfac() {
    largemn = 256;
    threshold = 1000 * ae_machineepsilon * maxmn;
 // Sparse Cholesky
-   sspdOk = sparserealcholeskytest();
+   sspdOk = sspdOk && sparserealcholeskytest();
 // Sparse LU
    srOk = srOk && sparsereallutest();
 // Cholesky updates
@@ -9226,8 +9975,8 @@ bool testtrfac() {
          }
       }
       for (i = 0; i < imin2(m, n); i++) {
-         ra.xyR[i][i] = 1 + 10 * ae_randomreal();
-         ca.xyC[i][i] = ae_complex_from_d(1 + 10 * ae_randomreal());
+         ra.xyR[i][i] = 1 + 10.0 * ae_randomreal();
+         ca.xyC[i][i] = ae_complex_from_d(1 + 10.0 * ae_randomreal());
       }
       cmatrixrndorthogonalfromtheleft(&ca, m, n);
       cmatrixrndorthogonalfromtheright(&ca, m, n);
@@ -9249,8 +9998,8 @@ bool testtrfac() {
          }
       }
       for (i = 0; i < imin2(m, n); i++) {
-         ra.xyR[i][i] = 1 + 10 * ae_randomreal();
-         ca.xyC[i][i] = ae_complex_from_d(1 + 10 * ae_randomreal());
+         ra.xyR[i][i] = 1 + 10.0 * ae_randomreal();
+         ca.xyC[i][i] = ae_complex_from_d(1 + 10.0 * ae_randomreal());
       }
       cmatrixrndorthogonalfromtheleft(&ca, m, n);
       cmatrixrndorthogonalfromtheright(&ca, m, n);
@@ -9263,7 +10012,7 @@ bool testtrfac() {
    for (n = 1; n <= maxmn; n++) {
    // Load CA (HPD matrix with low condition number),
    //      CAL and CAU - its lower and upper triangles
-      hpdmatrixrndcond(n, 1 + 50 * ae_randomreal(), &ca);
+      hpdmatrixrndcond(n, 1 + 50.0 * ae_randomreal(), &ca);
       ae_matrix_set_length(&cal, n, n);
       ae_matrix_set_length(&cau, n, n);
       for (i = 0; i < n; i++) {
@@ -9283,7 +10032,7 @@ bool testtrfac() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j > i) {
-                  hpdOk = hpdOk && !ae_c_neq_d(cal.xyC[i][j], (double)i);
+                  hpdOk = hpdOk && !ae_c_neq_d(cal.xyC[i][j], i);
                } else {
                   vc = ae_v_cdotproduct(cal.xyC[i], 1, "N", cal.xyC[j], 1, "Conj", j + 1);
                   hpdOk = hpdOk && NearAtC(ca.xyC[i][j], vc, threshold);
@@ -9297,7 +10046,7 @@ bool testtrfac() {
          for (i = 0; i < n; i++) {
             for (j = 0; j < n; j++) {
                if (j < i) {
-                  hpdOk = hpdOk && !ae_c_neq_d(cau.xyC[i][j], (double)j);
+                  hpdOk = hpdOk && !ae_c_neq_d(cau.xyC[i][j], j);
                } else {
                   vc = ae_v_cdotproduct(&cau.xyC[0][i], cau.stride, "Conj", &cau.xyC[0][j], cau.stride, "N", i + 1);
                   hpdOk = hpdOk && NearAtC(ca.xyC[i][j], vc, threshold);
@@ -9317,7 +10066,7 @@ bool testtrfac() {
    // After testing SPDMatrixCholesky() we compare results
    // returned by SparseCholeskyX() against ones returned
    // by SPDMatrixCholesky().
-      spdmatrixrndcond(n, 1 + 50 * ae_randomreal(), &ra);
+      spdmatrixrndcond(n, 1 + 50.0 * ae_randomreal(), &ra);
       ae_matrix_set_length(&ral, n, n);
       ae_matrix_set_length(&rau, n, n);
       for (i = 0; i < n; i++) {
@@ -9379,7 +10128,7 @@ bool testtrfac() {
    Ok = rOk && srOk && dspdOk && sspdOk && cOk && hpdOk && propOk && dspdupdOk;
    if (!Ok || !silent) {
       printf("Factorization Tests\n");
-      printf("* Triangular Factorization Tests\n"),
+      printf("* Triangular Factorization Tests\n");
       printf("* Real (Dense):                           %s\n", rOk? "Ok": "Failed");
       printf("* Real (Sparse):                          %s\n", srOk? "Ok": "Failed");
       printf("* SPD (Dense):                            %s\n", dspdOk? "Ok": "Failed");
@@ -9387,7 +10136,7 @@ bool testtrfac() {
       printf("* Complex:                                %s\n", cOk? "Ok": "Failed");
       printf("* HPD:                                    %s\n", hpdOk? "Ok": "Failed");
       printf("* Other Properties:                       %s\n", propOk? "Ok": "Failed");
-      printf("* Updated Factorization Test\n"),
+      printf("* Updated Factorization Test\n");
       printf("* SPD (Dense):                            %s\n", dspdupdOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -9516,7 +10265,7 @@ bool testtrlinsolve() {
    }
 // The final report.
    if (!Ok || !silent) {
-      printf("Real Matrix Safe TR Solver Test\n"),
+      printf("Real Matrix Safe TR Solver Test\n");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    ae_frame_leave();
@@ -9765,7 +10514,7 @@ bool testsafesolve() {
 // The final report.
    Ok = rOk && cOk;
    if (!Ok || !silent) {
-      printf("Safe TR Solver Tests\n"),
+      printf("Safe TR Solver Tests\n");
       printf("Real:                                     %s\n", rOk? "Ok": "Failed");
       printf("Complex:                                  %s\n", cOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -11005,7 +11754,7 @@ bool testrcond() {
 // The final report.
    Ok = rtrOk && ctrOk && rOk && cOk && spdOk && hpdOk;
    if (!Ok || !silent) {
-      printf("RCond Tests\n"),
+      printf("RCond Tests\n");
       printf("Real Triangular:                          %s\n", rtrOk? "Ok": "Failed");
       printf("Complex Triangular:                       %s\n", ctrOk? "Ok": "Failed");
       printf("Real:                                     %s\n", rOk? "Ok": "Failed");
@@ -11980,7 +12729,7 @@ bool testmatinv() {
 // The final report.
    Ok = rtrOk && ctrOk && rOk && cOk && spdOk && hpdOk;
    if (!Ok || !silent) {
-      printf("Matrix Inverse Tests\n"),
+      printf("Matrix Inverse Tests\n");
       printf("* Real Triangular:                        %s\n", rtrOk? "Ok": "Failed");
       printf("* Complex Triangular:                     %s\n", ctrOk? "Ok": "Failed");
       printf("* Real:                                   %s\n", rOk? "Ok": "Failed");
@@ -12083,7 +12832,7 @@ bool testhblas() {
 // The final report.
    Ok = mverr <= threshold;
    if (!Ok || !silent) {
-      printf("Hermitian BLAS Test\n"),
+      printf("Hermitian BLAS Test\n");
       printf("MV Error:                                 %5.3e\n", (double)mverr);
       printf("Threshold:                                %5.3e\n", (double)threshold);
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -12183,7 +12932,7 @@ bool testsblas() {
 // The final report.
    Ok = mverr <= threshold;
    if (!Ok || !silent) {
-      printf("Symmetric BLAS Tests\n"),
+      printf("Symmetric BLAS Tests\n");
       printf("MV Error:                                 %5.3e\n", (double)mverr);
       printf("Threshold:                                %5.3e\n", (double)threshold);
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -13255,7 +14004,7 @@ bool testortfac() {
 // The final report.
    Ok = rqrOk && rlqOk && cqrOk && clqOk && rbdOk && rhessOk && rtdOk && ctdOk;
    if (!Ok || !silent) {
-      printf("OrtFac Unit Tests\n"),
+      printf("OrtFac Unit Tests\n");
       printf("RQR Errors:                               %s\n", rqrOk? "Ok": "Failed");
       printf("RLQ Errors:                               %s\n", rlqOk? "Ok": "Failed");
       printf("CQR Errors:                               %s\n", cqrOk? "Ok": "Failed");
@@ -13271,6 +14020,129 @@ bool testortfac() {
 }
 
 // === fbls testing unit ===
+// Testing GMRES.
+static bool testfblsunit_testgmres() {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t n;
+   ae_int_t rk;
+   ae_int_t itscnt;
+   double e;
+   double eprev;
+   double v;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewMatrix(a, 0, 0, DT_REAL);
+   NewMatrix(c, 0, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
+   NewVector(r, 0, DT_REAL);
+   NewVector(xe, 0, DT_REAL);
+   NewObj(hqrndstate, rs);
+   NewObj(fblsgmresstate, state);
+   hqrndrandomize(&rs);
+// Test following properties:
+// * increasing iterations count results in decreased residual
+// * residual with ItsCnt=N is nearly zero
+// * State.Qi are orthonormal
+   for (n = 1; n <= 5; n++) {
+   // Create problem
+      hqrndnormalv(&rs, n, &b);
+      hqrndnormalm(&rs, n, n, &a);
+   // Test sequence of iteration counts
+      eprev = ae_maxrealnumber;
+      for (itscnt = 1; itscnt <= n; itscnt++) {
+      // Solve
+         fblsgmrescreate(&b, n, itscnt, &state);
+         while (fblsgmresiteration(&state)) {
+            rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
+         }
+      // Check orthonormality of Qi
+         Ok = Ok && state.qi.rows >= itscnt;
+         Ok = Ok && state.qi.cols >= n;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (i = 0; i < itscnt; i++) {
+            for (j = 0; j < itscnt; j++) {
+               v = rdotrr(n, &state.qi, i, &state.qi, j);
+               if (i == j) {
+                  v--;
+               }
+               Ok = Ok && SmallAtR(v, 100.0 * ae_machineepsilon);
+            }
+         }
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+      // Compute residual
+         rallocv(n, &r);
+         rmatrixmv(n, n, &a, 0, 0, 0, &state.xs, 0, &r, 0);
+         raddv(n, -1.0, &b, &r);
+         e = sqrt(rdotv2(n, &r));
+      // Test condition
+         Ok = Ok && e < eprev;
+         if (itscnt == n) {
+            Ok = Ok && e <= 10000.0 * ae_machineepsilon;
+         }
+         eprev = e;
+      }
+   }
+// Test that solving A*x=b with rank-k A (k<N) returns exact solution for ItsCnt >= k
+   for (n = 2; n <= 10; n++) {
+      for (rk = 1; rk < n; rk++) {
+      // Create problem
+         hqrndnormalm(&rs, n, rk, &c);
+         ae_matrix_set_length(&a, n, n);
+         rmatrixgemm(n, n, rk, 1.0, &c, 0, 0, 0, &c, 0, 0, 1, 0.0, &a, 0, 0);
+         hqrndnormalv(&rs, n, &xe);
+         ae_vector_set_length(&b, n);
+         rmatrixmv(n, n, &a, 0, 0, 0, &xe, 0, &b, 0);
+      // Try various iteration counts
+         for (itscnt = rk; itscnt <= n; itscnt++) {
+         // Solve
+            fblsgmrescreate(&b, n, itscnt, &state);
+            while (fblsgmresiteration(&state)) {
+               rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
+            }
+         // Compute residual
+            rallocv(n, &r);
+            rmatrixmv(n, n, &a, 0, 0, 0, &state.xs, 0, &r, 0);
+            raddv(n, -1.0, &b, &r);
+            e = sqrt(rdotv2(n, &r));
+         // Test condition
+            Ok = Ok && e <= 1.0E6 * ae_machineepsilon;
+         }
+      }
+   }
+// Test with zero matrix
+   for (n = 1; n <= 10; n++) {
+      for (itscnt = 1; itscnt <= n; itscnt++) {
+      // Create problem
+         ae_matrix_set_length(&a, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               a.xyR[i][j] = 0.0;
+            }
+         }
+         hqrndnormalv(&rs, n, &b);
+      // Try to solve
+         fblsgmrescreate(&b, n, itscnt, &state);
+         while (fblsgmresiteration(&state)) {
+            rmatrixmv(n, n, &a, 0, 0, 0, &state.x, 0, &state.ax, 0);
+         }
+      // Test solution
+         for (i = 0; i < n; i++) {
+            Ok = Ok && state.xs.xR[i] == 0.0;
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
 // Testing
 bool testfbls() {
    ae_frame _frame_block;
@@ -13283,6 +14155,7 @@ bool testfbls() {
    bool cgOk;
    bool lsOk;
    bool cholOk;
+   bool gmresOk;
    double eps;
    double v;
    double v1;
@@ -13308,6 +14181,7 @@ bool testfbls() {
    cgOk = true;
    lsOk = true;
    cholOk = true;
+   gmresOk = testfblsunit_testgmres();
 // Test CG solver:
 // * generate problem (A, B, Alpha, XE - exact solution) and initial approximation X
 // * E1 = ||A'A*x-b||
@@ -13378,8 +14252,8 @@ bool testfbls() {
          ae_v_sub(tmp2.xR, 1, b.xR, 1, n);
          v = ae_v_dotproduct(tmp2.xR, 1, tmp2.xR, 1, n);
          e2 = sqrt(v);
-         cgOk = cgOk && NearAtR(e1, cgstate.e1, 100 * ae_machineepsilon * e1);
-         cgOk = cgOk && NearAtR(e2, cgstate.e2, 100 * ae_machineepsilon * e1);
+         cgOk = cgOk && NearAtR(e1, cgstate.e1, 100.0 * ae_machineepsilon * e1);
+         cgOk = cgOk && NearAtR(e2, cgstate.e2, 100.0 * ae_machineepsilon * e1);
          cgOk = cgOk && e2 <= 0.001 * e1;
       }
    }
@@ -13439,7 +14313,7 @@ bool testfbls() {
          a.xyR[i][i] = 1 + ae_randomreal();
          xe.xR[i] = ae_randomreal() - 0.5;
       }
-      scalea = pow(10.0, ae_randomreal() * 4 - 2);
+      scalea = pow(10.0, 2.0 * ae_randommid());
       uppera = ae_randombool();
       for (i = 0; i < n; i++) {
          if (uppera) {
@@ -13473,12 +14347,13 @@ bool testfbls() {
       }
    }
 // The final report.
-   Ok = cgOk && lsOk && cholOk;
+   Ok = cgOk && lsOk && cholOk && gmresOk;
    if (!Ok || !silent) {
-      printf("MinCG Optimization Tests\n"),
+      printf("MinCG Optimization Tests\n");
       printf("CG Errors:                                %s\n", cgOk? "Ok": "Failed");
       printf("LS Errors:                                %s\n", lsOk? "Ok": "Failed");
-      printf("CHOL Errors:                              %s\n", cholOk? "Ok": "Failed");
+      printf("Chol Errors:                              %s\n", cholOk? "Ok": "Failed");
+      printf("GmRes Errors:                             %s\n", gmresOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    ae_frame_leave();
@@ -13730,7 +14605,7 @@ bool testcqmodels() {
          // Set non-zero D
             tau = 1.0 + ae_randomreal();
             for (i = 0; i < n; i++) {
-               d.xR[i] = 2 * ae_randomreal() + 1;
+               d.xR[i] = 2.0 * ae_randomreal() + 1;
             }
             cqmsetd(&s, &d, tau);
          } else {
@@ -13746,7 +14621,7 @@ bool testcqmodels() {
                      }
                   }
                   for (i = 0; i < n; i++) {
-                     a.xyR[i][i] = 4 + 2 * ae_randomreal();
+                     a.xyR[i][i] = 4 + 2.0 * ae_randomreal();
                   }
                   cqmseta(&s, &a, ae_randombool(), alpha);
                }
@@ -13766,7 +14641,7 @@ bool testcqmodels() {
                      }
                   }
                   for (i = 0; i < n; i++) {
-                     a.xyR[i][i] = 4 + 2 * ae_randomreal();
+                     a.xyR[i][i] = 4 + 2.0 * ae_randomreal();
                   }
                   cqmseta(&s, &a, ae_randombool(), alpha);
                } else {
@@ -13776,7 +14651,7 @@ bool testcqmodels() {
                      if (tau == 0.0) {
                         tau = 1.0 + ae_randomreal();
                         for (i = 0; i < n; i++) {
-                           d.xR[i] = 2 * ae_randomreal() + 1;
+                           d.xR[i] = 2.0 * ae_randomreal() + 1;
                         }
                         cqmsetd(&s, &d, tau);
                      }
@@ -14071,7 +14946,7 @@ bool testcqmodels() {
    Ok = Ok && newton2Ok;
 // The final report.
    if (!Ok || !silent) {
-      printf("Convex Quadratic Models Tests\n"),
+      printf("Convex Quadratic Models Tests\n");
       printf("Eval0 Test:                               %s\n", eval0Ok? "Ok": "Failed");
       printf("Eval1 Test:                               %s\n", eval1Ok? "Ok": "Failed");
       printf("Eval2 Test:                               %s\n", eval2Ok? "Ok": "Failed");
@@ -14475,7 +15350,7 @@ bool testbdsvd() {
 // The final report.
    Ok = convOk && materr <= threshold && orterr <= threshold && sortOk;
    if (!Ok || !silent) {
-      printf("Bi-Diagonal Singular Value Decomposition Decomposition Tests\n"),
+      printf("Bi-Diagonal Singular Value Decomposition Decomposition Tests\n");
       printf("SVD Decomposition Error:                  %5.3e\n", (double)materr);
       printf("SVD Orthogonality Error:                  %5.3e\n", (double)orterr);
       printf("Singular Values Order:                    %s\n", sortOk? "Ok": "Failed");
@@ -14843,7 +15718,7 @@ bool testblas() {
 // The final report.
    Ok = n2Ok && amaxOk && hsnOk && mvOk && itOk && ctOk && mmOk;
    if (!Ok || !silent) {
-      printf("BLAS Tests\n"),
+      printf("BLAS Tests\n");
       printf("Vector Norm 2:                            %s\n", n2Ok? "Ok": "Failed");
       printf("AbsMax (vector/row/column):               %s\n", amaxOk? "Ok": "Failed");
       printf("Upper Hessenberg 1 Norm:                  %s\n", hsnOk? "Ok": "Failed");
@@ -15086,7 +15961,7 @@ bool testsvd() {
 // The final report.
    Ok = convOk && materr <= threshold && orterr <= threshold && othererr <= threshold && sortOk;
    if (!Ok || !silent) {
-      printf("Singular Value Decomposition Tests\n"),
+      printf("Singular Value Decomposition Tests\n");
       printf("SVD Decomposition Error:                  %5.3e\n", (double)materr);
       printf("SVD Orthogonality Error:                  %5.3e\n", (double)orterr);
       printf("SVD With Different Parameters Error:      %5.3e\n", (double)othererr);
@@ -15376,7 +16251,7 @@ bool testoptserv() {
 // The final report.
    Ok = precOk;
    if (!Ok || !silent) {
-      printf("OptServ Test\n"),
+      printf("OptServ Test\n");
       printf("* Preconditioners:                        %s\n", precOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -15721,7 +16596,7 @@ bool testsnnls() {
 // The final report.
    Ok = test0Ok && test1Ok && test2Ok && testnewtonOk;
    if (!Ok || !silent) {
-      printf("Special NNLS Solver Tests\n"),
+      printf("Special NNLS Solver Tests\n");
       printf("Test 0:                                   %s\n", test0Ok? "Ok": "Failed");
       printf("Test 1:                                   %s\n", test1Ok? "Ok": "Failed");
       printf("Test 2:                                   %s\n", test2Ok? "Ok": "Failed");
@@ -15915,7 +16790,7 @@ bool testsactivesets() {
 // The final report.
    Ok = specOk;
    if (!Ok || !silent) {
-      printf("Active Sets Test\n"),
+      printf("Active Sets Test\n");
       printf("* Special Properties:                     %s\n", specOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -16089,7 +16964,7 @@ bool testxblas() {
 // The final report.
    Ok = approxOk && exactnessOk;
    if (!Ok || !silent) {
-      printf("XBLAS Tests\n"),
+      printf("XBLAS Tests\n");
       printf("Approximation Tests:                      %s\n", approxOk? "Ok": "Failed");
       printf("Exact Tests:                              %s\n", exactnessOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -17849,7 +18724,7 @@ bool testlinmin() {
 // The final report.
    Ok = true;
    if (!Ok || !silent) {
-      printf("LinMin Test\n"),
+      printf("LinMin Test\n");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    return Ok;
@@ -17928,9 +18803,9 @@ static void testminlbfgsunit_calciip2(minlbfgsstate *state, ae_int_t n) {
    if (state->needf || state->needfg) {
       state->f = 0.0;
       for (i = 0; i < n; i++) {
-         state->f += ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.xR[i]);
+         state->f += ae_sqr(i * i + 1) * ae_sqr(state->x.xR[i]);
          if (state->needfg) {
-            state->g.xR[i] = ae_sqr((double)(i * i + 1)) * 2 * state->x.xR[i];
+            state->g.xR[i] = ae_sqr(i * i + 1) * 2 * state->x.xR[i];
          }
       }
    }
@@ -18052,7 +18927,7 @@ static bool testminlbfgsunit_testpreconditioning() {
    // Test it with perturbed diagonal preconditioner
       ae_vector_set_length(&diagh, n);
       for (i = 0; i < n; i++) {
-         diagh.xR[i] = 2 * ae_sqr((double)(i * i + 1)) * (0.8 + 0.4 * ae_randomreal());
+         diagh.xR[i] = 2 * ae_sqr(i * i + 1) * (0.8 + 0.4 * ae_randomreal());
       }
       minlbfgssetprecdiag(&state, &diagh);
       cntg2 = 0;
@@ -18260,7 +19135,7 @@ static bool testminlbfgsunit_testother() {
    ae_vector_set_length(&x, 1);
    ae_vector_set_length(&s, 1);
    diffstep = ae_randomreal() * 1.0E-6;
-   s.xR[0] = exp(ae_randomreal() * 4 - 2);
+   s.xR[0] = exp(2.0*ae_randommid());
    x.xR[0] = 0.0;
    minlbfgscreatef(1, 1, &x, diffstep, &state);
    minlbfgssetcond(&state, 1.0E-6, 0.0, 0.0, 0);
@@ -19322,9 +20197,9 @@ bool testminlbfgs() {
       ae_vector_set_length(&x, 3);
       n = 3;
       m = 2;
-      x.xR[0] = 10 + 10 * ae_randomreal();
-      x.xR[1] = 10 + 10 * ae_randomreal();
-      x.xR[2] = 10 + 10 * ae_randomreal();
+      x.xR[0] = 10 + 10.0 * ae_randomreal();
+      x.xR[1] = 10 + 10.0 * ae_randomreal();
+      x.xR[2] = 10 + 10.0 * ae_randomreal();
       if (dkind == 0) {
          minlbfgscreate(n, m, &x, &state);
       }
@@ -19336,17 +20211,17 @@ bool testminlbfgs() {
       for (i = 0; i <= 10 && minlbfgsiteration(&state); i++) {
          testminlbfgsunit_testfunc2(&state);
       }
-      x.xR[0] = 10 + 10 * ae_randomreal();
-      x.xR[1] = 10 + 10 * ae_randomreal();
-      x.xR[2] = 10 + 10 * ae_randomreal();
+      x.xR[0] = 10 + 10.0 * ae_randomreal();
+      x.xR[1] = 10 + 10.0 * ae_randomreal();
+      x.xR[2] = 10 + 10.0 * ae_randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
          testminlbfgsunit_testfunc2(&state);
       }
       minlbfgsresults(&state, &x, &rep);
       restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
-      x.xR[0] = 10 + 10 * ae_randomreal();
-      x.xR[1] = 10 + 10 * ae_randomreal();
-      x.xR[2] = 10 + 10 * ae_randomreal();
+      x.xR[0] = 10 + 10.0 * ae_randomreal();
+      x.xR[1] = 10 + 10.0 * ae_randomreal();
+      x.xR[2] = 10 + 10.0 * ae_randomreal();
       for (minlbfgsrestartfrom(&state, &x); minlbfgsiteration(&state); ) {
          testminlbfgsunit_testfunc2(&state);
       }
@@ -19507,7 +20382,7 @@ bool testminlbfgs() {
 // The final report.
    Ok = refOk && nonconvOk && eqOk && convOk && crashtestOk && otherOk && restartsOk && precOk && optguardOk;
    if (!Ok || !silent) {
-      printf("L-BFGS Optimization Tests\n"),
+      printf("L-BFGS Optimization Tests\n");
       printf("Reference Problem:                        %s\n", refOk? "Ok": "Failed");
       printf("Non-Convex Problem:                       %s\n", nonconvOk? "Ok": "Failed");
       printf("Linear Equations:                         %s\n", eqOk? "Ok": "Failed");
@@ -19660,7 +20535,7 @@ bool testnormestimator() {
    Ok = Ok && (double)nbetter >= 0.5 * passcount + sigma * sqrt(0.25 * passcount);
 // The final report.
    if (!Ok || !silent) {
-      printf("Norm Estimator Test\n"),
+      printf("Norm Estimator Test\n");
       printf("Test:                                     %s\n", Ok? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -21125,7 +22000,7 @@ bool testlinlsqr() {
 // The final report.
    Ok = svdtestOk && mwcranksvdOk && mwicranksvdOk && bidiagonalOk && zeromatrixOk && reportcorrectnessOk && stoppingcriteriaOk && analytictestOk && prectestOk && termreqOk;
    if (!Ok || !silent) {
-      printf("LinLSQR Tests\n"),
+      printf("LinLSQR Tests\n");
       printf("Different Matrix Types:\n");
       printf("* General M x N:                          %s\n", svdtestOk? "Ok": "Failed");
       printf("* Well-Conditioned M x N:                 %s\n", mwcranksvdOk? "Ok": "Failed");
@@ -21455,7 +22330,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
                      x.xR[i] = ae_randomreal();
-                     x0.xR[i] = 3 * ae_randomreal() - 1;
+                     x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -21537,7 +22412,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                         bu.xR[i] = bl.xR[i];
                      }
                      x.xR[i] = ae_randomreal();
-                     x0.xR[i] = 3 * ae_randomreal() - 1;
+                     x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -21612,7 +22487,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                ae_vector_set_length(&ct, 2 * n);
                for (i = 0; i < n; i++) {
                   x.xR[i] = ae_randomreal();
-                  x0.xR[i] = 3 * ae_randomreal() - 1;
+                  x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                   for (j = 0; j <= n; j++) {
                      c.xyR[2 * i][j] = 0.0;
                      c.xyR[2 * i + 1][j] = 0.0;
@@ -21694,8 +22569,8 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   ae_vector_set_length(&bl, n);
                   ae_vector_set_length(&bu, n);
                   for (i = 0; i < n; i++) {
-                     x0.xR[i] = 3 * ae_randomreal() - 1;
-                     xs.xR[i] = 3 * ae_randomreal() - 1;
+                     x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
+                     xs.xR[i] = 3.0 * ae_randomreal() - 1.0;
                      xc.xR[i] = 0.1 + 0.8 * ae_randomreal();
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
@@ -21781,7 +22656,7 @@ static bool testminbleicunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   bl.xR[i] = 0.0;
                   bu.xR[i] = 1.0;
                   x.xR[i] = ae_randomreal();
-                  x0.xR[i] = 3 * ae_randomreal() - 1;
+                  x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                }
                i = ae_randominteger(n);
                bl.xR[i] = 1.0;
@@ -22107,7 +22982,7 @@ static bool testminbleicunit_testother() {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
       diffstep = ae_randomreal() * 1.0E-6;
-      s.xR[0] = exp(ae_randomreal() * 4 - 2);
+      s.xR[0] = exp(2.0*ae_randommid());
       x.xR[0] = 0.0;
       minbleiccreatef(1, &x, diffstep, &state);
       minbleicsetcond(&state, 1.0E-6, 0.0, epsx, 0);
@@ -22154,7 +23029,7 @@ static bool testminbleicunit_testother() {
       ae_vector_set_length(&x, n);
       ae_vector_set_length(&bl, n);
       ae_vector_set_length(&bu, n);
-      bl.xR[0] = 4 * ae_randomreal() + 1;
+      bl.xR[0] = 4.0 * ae_randomreal() + 1;
       bu.xR[0] = bl.xR[0] + 1;
       x.xR[0] = 0.5 * (bl.xR[0] + bu.xR[0]);
       minbleiccreate(n, &x, &state);
@@ -24383,7 +25258,7 @@ bool testminbleic() {
 // The final report.
    Ok = feasibilityOk && otherOk && convOk && intOk && precOk && optguardOk && bugsOk;
    if (!Ok || !silent) {
-      printf("BLEIC Optimization Tests\n"),
+      printf("BLEIC Optimization Tests\n");
       printf("Feasibility Properties:                   %s\n", feasibilityOk? "Ok": "Failed");
       printf("Preconditioning:                          %s\n", precOk? "Ok": "Failed");
       printf("Other Properties:                         %s\n", otherOk? "Ok": "Failed");
@@ -26869,7 +27744,7 @@ static bool testminqpunit_bcqptest() {
          }
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
-         Ok = Ok && rep.terminationtype == -4;
+         Ok = Ok && (rep.terminationtype == -4 || rep.terminationtype == -2);
          minqpsetbc(&state, &bndl, &bndu);
          minqpoptimize(&state);
          minqpresults(&state, &x1, &rep);
@@ -27027,7 +27902,7 @@ static bool testminqpunit_ecqptest() {
       for (k = 1; k < n; k++) {
       // Generate problem: A, b, CMatrix *, x0, XStart
          rmatrixrndorthogonal(n, &q);
-         spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&x0, n);
          ae_vector_set_length(&x1, n);
@@ -27110,10 +27985,10 @@ static bool testminqpunit_ecqptest() {
    eps = 5.0E-2;
    theta = 1.0E+4;
    aulits = 300;
-   for (n = 2; n <= 6; n++) {
-      for (k = 1; k < n; k++) {
+   for (n = 4; n <= 6; n++) {
+      for (k = 1; k < n - 2; k++) {
       // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart
-         spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -27247,7 +28122,7 @@ static bool testminqpunit_ecqptest() {
       // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart.
       // Additionally, we compute modified b: b2 = b-xorigin'*A
          rmatrixrndorthogonal(n, &q);
-         spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&b2, n);
          ae_vector_set_length(&bndl, n);
@@ -27332,7 +28207,7 @@ static bool testminqpunit_ecqptest() {
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart
       k = 2 * n;
-      spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+      spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&bndl, n);
       ae_vector_set_length(&bndu, n);
@@ -27368,9 +28243,11 @@ static bool testminqpunit_ecqptest() {
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
       minqpoptimize(&state);
+      ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
    // Check feasibility properties of the solution
-      if (rep.terminationtype <= 0) {
+   // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
+      if (xend.cnt != n) {
          Ok = false;
          continue;
       }
@@ -27384,7 +28261,7 @@ static bool testminqpunit_ecqptest() {
 // * random N from [1..6], random K from [1..2*N]
 // * N*N SPD A with moderate condtion number (up to 100)
 // * boundary constraints 0 <= x[i] <= 1
-// * K<2*N random linear equality constraints C*x = C*x0,
+// * K < N random linear equality constraints C*x = C*x0,
 //   where x0 is some random vector from the inner area of the
 //   feasible hypercube (0.1 <= x0[i] <= 0.9)
 // * optimization problem has form 0.5*x'*A*x+b*x,
@@ -27400,8 +28277,8 @@ static bool testminqpunit_ecqptest() {
    for (pass = 1; pass <= 50; pass++) {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix *, x0, x1, XStart.
       n = ae_randominteger(5) + 2;
-      k = ae_randominteger(2 * n) + 1;
-      spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+      k = ae_randominteger(n - 1) + 1;
+      spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&b2, n);
       ae_vector_set_length(&bndl, n);
@@ -27617,7 +28494,7 @@ static bool testminqpunit_icqptest() {
    for (n = 2; n <= 6; n++) {
       for (pass = 0; pass <= 4; pass++) {
       // Generate problem: A, b, CMatrix *, x0, XStart
-         spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&x1, n);
          ae_vector_set_length(&xstart, n);
@@ -27707,7 +28584,7 @@ static bool testminqpunit_icqptest() {
       // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart.
       // Additionally, we compute modified b: b2 = b-xorigin'*A
          rmatrixrndorthogonal(n, &q);
-         spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&b2, n);
          ae_vector_set_length(&bndl, n);
@@ -27812,7 +28689,7 @@ static bool testminqpunit_icqptest() {
    eps = 1.0E-3;
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, x0, XStart, C, CT
-      spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+      spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x1, n);
       ae_vector_set_length(&xstart, n);
@@ -27822,7 +28699,7 @@ static bool testminqpunit_icqptest() {
       ae_vector_set_length(&bndu, n);
       for (i = 0; i < n; i++) {
          x1.xR[i] = ae_randommid();
-         xstart.xR[i] = 3 * ae_randomreal() - 1;
+         xstart.xR[i] = 3.0 * ae_randomreal() - 1.0;
          bndl.xR[i] = -(0.1 + 0.9 * ae_randomreal());
          bndu.xR[i] = 0.1 + 0.9 * ae_randomreal();
          for (j = 0; j < n; j++) {
@@ -27894,7 +28771,7 @@ static bool testminqpunit_icqptest() {
       ae_vector_set_length(&ct, 2 * n);
       for (i = 0; i < n; i++) {
          xstart.xR[i] = ae_randomreal();
-         x0.xR[i] = 3 * ae_randomreal() - 1;
+         x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
          b.xR[i] = -x0.xR[i];
          for (j = 0; j <= n; j++) {
             c.xyR[2 * i][j] = 0.0;
@@ -27952,7 +28829,7 @@ static bool testminqpunit_icqptest() {
    for (n = 1; n <= 6; n++) {
    // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart
       k = 2 * n;
-      spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+      spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&bndl, n);
       ae_vector_set_length(&bndu, n);
@@ -27996,9 +28873,11 @@ static bool testminqpunit_icqptest() {
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
       minqpoptimize(&state);
+      ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
    // Check feasibility properties of the solution
-      if (rep.terminationtype <= 0) {
+   // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
+      if (xend.cnt != n) {
          Ok = false;
          continue;
       }
@@ -28032,7 +28911,7 @@ static bool testminqpunit_icqptest() {
    // Generate problem
       ae_vector_set_length(&da, n);
       ae_matrix_set_length(&a, n, n);
-      rmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &t2);
+      rmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &t2);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       ae_vector_set_length(&xstart, n);
@@ -28142,7 +29021,7 @@ static bool testminqpunit_icqptest() {
    // Generate problem: N, K, A, b, BndL, BndU, CMatrix *, x0, x1, XStart.
       n = ae_randominteger(5) + 2;
       k = ae_randominteger(2 * n) + 1;
-      spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+      spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&b2, n);
       ae_vector_set_length(&bndl, n);
@@ -28161,12 +29040,17 @@ static bool testminqpunit_icqptest() {
          xstart2.xR[i] = 2.0 * ae_randommid();
       }
       for (i = 0; i < k; i++) {
+      // Generate I-th row of C
+      // Avoid excessive (more than N/2) equality constraints.
          for (j = 0; j < n; j++) {
             c.xyR[i][j] = ae_randommid();
          }
          v = ae_v_dotproduct(c.xyR[i], 1, x0.xR, 1, n);
          c.xyR[i][n] = v;
          ct.xZ[i] = ae_randominteger(3) - 1;
+         if (i >= 0.5 * n && ct.xZ[i] == 0) {
+            ct.xZ[i] = 1;
+         }
          if (ct.xZ[i] < 0) {
             c.xyR[i][n] += 0.1;
          }
@@ -28175,6 +29059,8 @@ static bool testminqpunit_icqptest() {
          }
       }
    // Solve with XStart
+   //
+   // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
       minqpcreate(n, &state);
       testminqpunit_setrandomalgoconvexlc(&state);
       minqpsetlinearterm(&state, &b);
@@ -28183,16 +29069,18 @@ static bool testminqpunit_icqptest() {
       minqpsetbc(&state, &bndl, &bndu);
       minqpsetlc(&state, &c, &ct, k);
       minqpoptimize(&state);
+      ae_vector_set_length(&xend, 0);
       minqpresults(&state, &xend, &rep);
-      if (rep.terminationtype <= 0) {
+      if (xend.cnt != n || !isfinitevector(&xend, n)) {
          Ok = false;
          continue;
       }
    // Solve with XStart2
       minqpsetstartingpoint(&state, &xstart2);
       minqpoptimize(&state);
+      ae_vector_set_length(&xend2, 0);
       minqpresults(&state, &xend2, &rep);
-      if (rep.terminationtype <= 0) {
+      if (xend2.cnt != n || !isfinitevector(&xend2, n)) {
          Ok = false;
          continue;
       }
@@ -28559,7 +29447,11 @@ static bool testminqpunit_icqptest() {
             }
             vv = ae_v_dotproduct(g.xR, 1, g.xR, 1, n);
             vv = sqrt(vv);
-            Ok = Ok && vv <= 1.0E-3;
+            if (akind == 3 || akind == 4) {
+               Ok = Ok && vv <= 1.0E-2;
+            } else {
+               Ok = Ok && vv <= 1.0E-3;
+            }
          }
       }
    }
@@ -28865,6 +29757,8 @@ static bool testminqpunit_generallcqptest() {
    double aulrho;
    ae_int_t aulits;
    double ipmeps;
+   double minushuge;
+   double plushuge;
    bool Ok = true;
    ae_frame_make(&_frame_block);
    NewObj(hqrndstate, rs);
@@ -28942,7 +29836,7 @@ static bool testminqpunit_generallcqptest() {
    // as dense, sparse or mixed ones.
       for (n = 1; n <= 10; n++) {
       // Generate random A, b and xs
-         spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &rawa);
+         spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &rawa);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&xs, n);
          for (i = 0; i < n; i++) {
@@ -29152,7 +30046,7 @@ static bool testminqpunit_generallcqptest() {
       for (n = 2; n <= 6; n++) {
          for (pass = 0; pass <= 4; pass++) {
          // Generate problem: A, b, CMatrix *, x0, XStart
-            spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+            spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&xs, n);
             ae_vector_set_length(&xstart, n);
@@ -29251,7 +30145,7 @@ static bool testminqpunit_generallcqptest() {
       xtol = 1.0E-5;
       for (n = 1; n <= 6; n++) {
       // Generate problem: A, b, x0, XStart, C, CT
-         spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&x1, n);
          ae_vector_set_length(&xstart, n);
@@ -29261,7 +30155,7 @@ static bool testminqpunit_generallcqptest() {
          ae_vector_set_length(&bndu, n);
          for (i = 0; i < n; i++) {
             x1.xR[i] = ae_randommid();
-            xstart.xR[i] = 3 * ae_randomreal() - 1;
+            xstart.xR[i] = 3.0 * ae_randomreal() - 1.0;
             bndl.xR[i] = -(0.1 + 0.9 * ae_randomreal());
             bndu.xR[i] = 0.1 + 0.9 * ae_randomreal();
             for (j = 0; j < n; j++) {
@@ -29618,7 +30512,7 @@ static bool testminqpunit_generallcqptest() {
          // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart.
          // Additionally, we compute modified b: b2 = b-xorigin'*A
             rmatrixrndorthogonal(n, &q);
-            spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+            spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&b2, n);
             ae_vector_set_length(&bndl, n);
@@ -29764,7 +30658,7 @@ static bool testminqpunit_generallcqptest() {
          // Solve it immediately.
          //
          // NOTE: we make sure that there exists at least one feasible point X0.
-            spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
+            spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
             ae_vector_set_length(&b, n);
             ae_vector_set_length(&bndl, n);
             ae_vector_set_length(&bndu, n);
@@ -29940,7 +30834,7 @@ static bool testminqpunit_generallcqptest() {
       // Generate problem
          ae_vector_set_length(&da, n);
          ae_matrix_set_length(&a, n, n);
-         rmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &t2);
+         rmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &t2);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&x0, n);
          ae_vector_set_length(&xstart, n);
@@ -30071,7 +30965,7 @@ static bool testminqpunit_generallcqptest() {
          }
       // Generate problem: A, b, BndL, BndU, CMatrix *, x0, x1, XStart
          k = 2 * n;
-         spdmatrixrndcond(n, pow(10.0, 3 * ae_randomreal()), &a);
+         spdmatrixrndcond(n, pow(10.0, 3.0 * ae_randomreal()), &a);
          ae_vector_set_length(&b, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -30131,9 +31025,11 @@ static bool testminqpunit_generallcqptest() {
          minqpsetbc(&state, &bndl, &bndu);
          testminqpunit_randomlysplitandsetlclegacy(&rawc, &rawct, k, n, &state, &rs);
          minqpoptimize(&state);
+         ae_vector_set_length(&x1, 0);
          minqpresults(&state, &x1, &rep);
       // Check feasibility properties of the solution
-         if (rep.terminationtype <= 0) {
+      // NOTE: we do not check termination type because some solvers (IPM) may return feasible X even with negative code
+         if (x1.cnt != n) {
             Ok = false;
             continue;
          }
@@ -30180,7 +31076,7 @@ static bool testminqpunit_generallcqptest() {
          k = 2 * n;
          for (i = 0; i < n; i++) {
             xstart.xR[i] = ae_randomreal();
-            x0.xR[i] = 3 * ae_randomreal() - 1;
+            x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
             b.xR[i] = -x0.xR[i];
             for (j = 0; j <= n; j++) {
                rawc.xyR[2 * i][j] = 0.0;
@@ -30363,6 +31259,7 @@ static bool testminqpunit_generallcqptest() {
    // * f = 0.5*x'*A*x+b'*x
    // * several kinds of A are tried: zero, well conditioned SPD, low rank
    // * initial point x0 = [0 0 ... 0 0]
+   // * absent bounds can be set to +-INF or to some huge number (randomly)
    // * first, we generate set of linear constraints (without bounds),
    //   solution point X and Lagrange multipliers for linear and box constraints
    // * then we determine bounds on variables and linear constraints which
@@ -30371,6 +31268,21 @@ static bool testminqpunit_generallcqptest() {
    //   multipliers we determine linear term B which makes KKT conditions true
       for (n = 1; n <= 8; n++) {
          for (akind = 0; akind <= 2; akind++) {
+         // Select number used for absent bounds:
+         // * +- INF
+         // * 1e9
+         // * 1e11
+            i = hqrnduniformi(&rs, 3);
+            minushuge = -INFINITY;
+            plushuge = +INFINITY;
+            if (i == 1) {
+               minushuge = -1.0E9;
+               plushuge = +1.0E9;
+            }
+            if (i == 2) {
+               minushuge = -1.0E11;
+               plushuge = +1.0E11;
+            }
          // Generate quadratic term A, origin and scale
             ae_matrix_set_length(&a, n, n);
             for (i = 0; i < n; i++) {
@@ -30474,8 +31386,8 @@ static bool testminqpunit_generallcqptest() {
             ae_vector_set_length(&bndl, n);
             ae_vector_set_length(&bndu, n);
             for (j = 0; j < n; j++) {
-               bndl.xR[j] = -INFINITY;
-               bndu.xR[j] = +INFINITY;
+               bndl.xR[j] = minushuge;
+               bndu.xR[j] = plushuge;
                if (hqrndnormal(&rs) > 0.0 || issemidefinite) {
                   bndl.xR[j] = xf.xR[j] - pow(2.0, hqrndnormal(&rs));
                }
@@ -30503,8 +31415,8 @@ static bool testminqpunit_generallcqptest() {
                for (j = 0; j < n; j++) {
                   v += rawc.xyR[i][j] * xf.xR[j];
                }
-               rawcl.xR[i] = -INFINITY;
-               rawcu.xR[i] = +INFINITY;
+               rawcl.xR[i] = minushuge;
+               rawcu.xR[i] = plushuge;
                if (hqrndnormal(&rs) > 0.0) {
                   rawcl.xR[i] = v - pow(2.0, hqrndnormal(&rs));
                }
@@ -30526,7 +31438,7 @@ static bool testminqpunit_generallcqptest() {
                      }
                   }
                }
-               if (!isfinite(rawcl.xR[i]) && !isfinite(rawcu.xR[i])) {
+               if ((!isfinite(rawcl.xR[i]) || rawcl.xR[i] == minushuge) && (!isfinite(rawcu.xR[i]) || rawcu.xR[i] == plushuge)) {
                // At least one bound must be present for linear constraint
                   if (hqrndnormal(&rs) > 0.0) {
                      rawcl.xR[i] = v - 10;
@@ -30638,8 +31550,8 @@ static bool testminqpunit_generallcqptest() {
             ae_assert(false, "unexpected solver type");
          }
       }
-      spdmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &a);
-      rmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &t2);
+      spdmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &a);
+      rmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &t2);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       ae_vector_set_length(&xstart, n);
@@ -30733,7 +31645,7 @@ static bool testminqpunit_generallcqptest() {
       }
       ae_vector_set_length(&da, n);
       ae_matrix_set_length(&a, n, n);
-      rmatrixrndcond(n, pow(10.0, 2 * ae_randomreal()), &t2);
+      rmatrixrndcond(n, pow(10.0, 2.0 * ae_randomreal()), &t2);
       ae_vector_set_length(&b, n);
       ae_vector_set_length(&x0, n);
       ae_vector_set_length(&xstart, n);
@@ -31895,7 +32807,7 @@ static bool testminqpunit_ipmtests() {
             vipmsetquadraticlinear(&vsolver, &fulla, &dummysparse, 0, hqrndnormal(&rs) > 0.0, &b);
             vipmsetconstraints(&vsolver, &bndl, &bndu, &sparsec, sparseccnt, &densec, denseccnt, &rawcl, &rawcu);
             vipmsetcond(&vsolver, epsx, epsx, epsx);
-            vipmoptimize(&vsolver, &x1, &replagbc, &replaglc, &repterminationtype);
+            vipmoptimize(&vsolver, false, &x1, &replagbc, &replaglc, &repterminationtype);
             Ok = Ok && repterminationtype > 0;
             Ok = Ok && x1.cnt >= n;
             Ok = Ok && replagbc.cnt >= n;
@@ -32104,12 +33016,12 @@ bool testminqp() {
 // The final report.
    bool Ok = simpleOk && func1Ok && func2Ok && bcqpOk && linOk && quickqpOk && bleicOk && denseaulOk && ipmOk && specOk;
    if (!Ok || !silent) {
-      printf("MinQP Optimization Tests\n"),
-      printf("Basic Tests:\n"),
+      printf("MinQP Optimization Tests\n");
+      printf("Basic Tests:\n");
       printf("* Simple Test:                            %s\n", simpleOk? "Ok": "Failed");
       printf("* Func1 Test:                             %s\n", func1Ok? "Ok": "Failed");
       printf("* Func2 Test:                             %s\n", func2Ok? "Ok": "Failed");
-      printf("Generic QP Tests:\n"),
+      printf("Generic QP Tests:\n");
       printf("* Box Constrained:                        %s\n", bcqpOk? "Ok": "Failed");
       printf("* Linearly Constrained:                   %s\n", linOk? "Ok": "Failed");
       if (!linOk) {
@@ -32117,7 +33029,7 @@ bool testminqp() {
          printf("* - IC:                                   %s\n", icqpOk? "Ok": "Failed");
          printf("* - LC:                                   %s\n", lcqpOk? "Ok": "Failed");
       }
-      printf("Solver-Specific Tests:\n"),
+      printf("Solver-Specific Tests:\n");
       printf("* QuickQP Solver Tests:                   %s\n", quickqpOk? "Ok": "Failed");
       printf("* BLEIC Solver Tests:                     %s\n", bleicOk? "Ok": "Failed");
       printf("* Dense-AUL Solver Tests:                 %s\n", denseaulOk? "Ok": "Failed");
@@ -32129,22 +33041,32 @@ bool testminqp() {
 }
 
 // === minlp testing unit ===
+static const ae_int_t testminlpunit_solverscount = 2;
+
 // This function validates solution returned by LP solver. It returns  primal
 // and dual feasibility errors for this solution.
-static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, RMatrix *a, RVector *al, RVector *au, ae_int_t m, RVector *xcand, minlpreport *rep, double *errprim, double *errdual) {
+//
+// SolverType:
+// * 0 for dual simplex solver; additional test relying on explicit information
+//   about constraint statuses is performed
+// * 1 for interior point method; only straightforward dual  feasibility is
+//   tested
+//
+static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *bndu, ae_int_t n, RMatrix *a, RVector *al, RVector *au, ae_int_t m, RVector *xcand, minlpreport *rep, ae_int_t solvertype, double *errprim, double *errdual, double *errslack) {
    ae_frame _frame_block;
-   ae_int_t nx;
    ae_int_t i;
    ae_int_t j;
    double v;
-   double ynrm;
+   bool checkstats;
    ae_frame_make(&_frame_block);
    *errprim = 0;
    *errdual = 0;
+   *errslack = 0;
    NewVector(d, 0, DT_REAL);
-   nx = n + m;
+   checkstats = solvertype == 0;
    *errprim = 0.0;
    *errdual = 0.0;
+   *errslack = 0.0;
 // Test primal feasibility
    for (i = 0; i < n; i++) {
       if (isfinite(bndl->xR[i])) {
@@ -32155,7 +33077,7 @@ static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *b
       }
    }
    for (i = 0; i < m; i++) {
-      v = ae_v_dotproduct(a->xyR[i], 1, xcand->xR, 1, n);
+      v = rdotvr(n, xcand, a, i);
       if (isfinite(al->xR[i])) {
          *errprim = rmax2(*errprim, al->xR[i] - v);
       }
@@ -32163,55 +33085,77 @@ static void testminlpunit_validatesolution(RVector *c, RVector *bndl, RVector *b
          *errprim = rmax2(*errprim, v - au->xR[i]);
       }
    }
-// Compute reduced costs.
-// Test dual feasibility.
-   ae_vector_set_length(&d, nx);
+// Test dual feasibility using Lagrange multipliers
+   ae_vector_set_length(&d, n);
    for (i = 0; i < n; i++) {
       d.xR[i] = c->xR[i];
    }
-   for (i = n; i < nx; i++) {
-      d.xR[i] = 0.0;
-   }
    for (i = 0; i < m; i++) {
       for (j = 0; j < n; j++) {
-         d.xR[j] -= rep->y.xR[i] * a->xyR[i][j];
+         d.xR[j] += rep->laglc.xR[i] * a->xyR[i][j];
       }
-      d.xR[n + i] += rep->y.xR[i];
    }
    for (i = 0; i < n; i++) {
-      if (isfinite(bndl->xR[i]) && isfinite(bndu->xR[i]) && bndl->xR[i] == bndu->xR[i]) {
-         continue;
+      d.xR[i] += rep->lagbc.xR[i];
+   }
+   *errdual = rmax2(*errdual, rmaxabsv(n, &d));
+// Test complementary slackness
+   for (i = 0; i < n; i++) {
+      if (isfinite(bndl->xR[i])) {
+         *errslack = rmax2(*errslack, rmax2(xcand->xR[i] - bndl->xR[i], 0.0) * rmax2(-rep->lagbc.xR[i], 0.0));
       }
-      if (isfinite(bndl->xR[i]) && xcand->xR[i] == bndl->xR[i]) {
-         *errdual = rmax2(*errdual, -d.xR[i]);
-         continue;
+      if (isfinite(bndu->xR[i])) {
+         *errslack = rmax2(*errslack, rmax2(bndu->xR[i] - xcand->xR[i], 0.0) * rmax2(rep->lagbc.xR[i], 0.0));
       }
-      if (isfinite(bndu->xR[i]) && xcand->xR[i] == bndu->xR[i]) {
-         *errdual = rmax2(*errdual, d.xR[i]);
-         continue;
-      }
-      *errdual = rmax2(*errdual, fabs(d.xR[i]));
    }
    for (i = 0; i < m; i++) {
-      if (isfinite(al->xR[i]) && isfinite(au->xR[i]) && al->xR[i] == au->xR[i]) {
-         continue;
+      v = rdotvr(n, xcand, a, i);
+      if (isfinite(al->xR[i])) {
+         *errslack = rmax2(*errslack, rmax2(v - al->xR[i], 0.0) * rmax2(-rep->laglc.xR[i], 0.0));
       }
-      if (isfinite(al->xR[i]) && rep->stats.xZ[n + i] < 0) {
-         *errdual = rmax2(*errdual, -d.xR[n + i]);
-         continue;
+      if (isfinite(au->xR[i])) {
+         *errslack = rmax2(*errslack, rmax2(au->xR[i] - v, 0.0) * rmax2(rep->laglc.xR[i], 0.0));
       }
-      if (isfinite(au->xR[i]) && rep->stats.xZ[n + i] > 0) {
-         *errdual = rmax2(*errdual, d.xR[n + i]);
-         continue;
-      }
-      *errdual = rmax2(*errdual, fabs(d.xR[n + i]));
    }
-   ynrm = 0.0;
-   for (i = 0; i < m; i++) {
-      ynrm = rmax2(ynrm, fabs(rep->y.xR[i]));
+// Test dual feasibility using Stats[] array
+   if (checkstats) {
    }
-   *errdual /= rmax2(ynrm, 1.0);
    ae_frame_leave();
+}
+
+// This function selects random LP solver
+static void testminlpunit_selectrandomsolver(minlpstate *state) {
+   ae_int_t k;
+   k = ae_randominteger(2);
+   if (k == 0) {
+      minlpsetalgodss(state, 0.0);
+   }
+   if (k == 1) {
+      minlpsetalgoipm(state, 0.0);
+   }
+}
+
+// This function selects specific LP solver.
+//
+// Reg parameter is used to regularize IPM algo, ignore for DSS
+static void testminlpunit_selectsolver(minlpstate *state, ae_int_t st) {
+   if (st == 0) {
+      minlpsetalgodss(state, 0.0);
+      return;
+   }
+   if (st == 1) {
+      minlpsetalgoipm(state, 0.0);
+      return;
+   }
+   ae_assert(false, "SelectSolver: unexpected solver");
+}
+
+// Shifts nonzero elements of C[] away from zero
+static void testminlpunit_shiftfromzero(RVector *c, ae_int_t n, double s) {
+   ae_int_t i;
+   for (i = 0; i < n; i++) {
+      c->xR[i] += ae_sign(c->xR[i]) * s;
+   }
 }
 
 // Basic tests.
@@ -32225,9 +33169,12 @@ static bool testminlpunit_basictests() {
    ae_int_t pass;
    double v0;
    double v1;
+   double errslack;
    double primtol;
    double dualtol;
    bool Ok = true;
+   double slacktol;
+   ae_int_t solvertype;
    ae_frame_make(&_frame_block);
    NewObj(minlpstate, state);
    NewObj(minlpreport, rep);
@@ -32241,13 +33188,15 @@ static bool testminlpunit_basictests() {
    NewVector(au, 0, DT_REAL);
    NewMatrix(a, 0, 0, DT_REAL);
    NewObj(hqrndstate, rs);
-   primtol = 1.0E-6;
-   dualtol = 1.0E-6;
+   primtol = 1.0E-4;
+   dualtol = 1.0E-4;
+   slacktol = 1.0E-4;
    hqrndrandomize(&rs);
 // Test default state of the solver
    for (pass = 1; pass <= 5; pass++) {
       n = 1 + hqrnduniformi(&rs, 10);
       minlpcreate(n, &state);
+      testminlpunit_selectrandomsolver(&state);
       minlpoptimize(&state);
       minlpresults(&state, &x, &rep);
       Ok = Ok && rep.terminationtype > 0;
@@ -32263,6 +33212,7 @@ static bool testminlpunit_basictests() {
 // Test box constrained problems without linear constraints
    for (n = 1; n <= 10; n++) {
       for (pass = 1; pass <= 20; pass++) {
+         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
          ae_vector_set_length(&c, n);
          ae_vector_set_length(&bndl, n);
          ae_vector_set_length(&bndu, n);
@@ -32272,7 +33222,9 @@ static bool testminlpunit_basictests() {
             bndl.xR[i] = hqrndnormal(&rs);
             bndu.xR[i] = bndl.xR[i] + hqrnduniformi(&rs, 3);
          }
+         testminlpunit_shiftfromzero(&c, n, 0.01);
          minlpcreate(n, &state);
+         testminlpunit_selectsolver(&state, solvertype);
          minlpsetcost(&state, &c);
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
@@ -32284,8 +33236,10 @@ static bool testminlpunit_basictests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+            Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+            Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
          }
          for (i = 0; i < n; i++) {
             c.xR[i] = hqrndnormal(&rs);
@@ -32300,7 +33254,9 @@ static bool testminlpunit_basictests() {
                bndl.xR[i] = -INFINITY;
             }
          }
+         testminlpunit_shiftfromzero(&c, n, 0.01);
          minlpcreate(n, &state);
+         testminlpunit_selectsolver(&state, solvertype);
          minlpsetcost(&state, &c);
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
@@ -32312,8 +33268,10 @@ static bool testminlpunit_basictests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+            Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+            Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
          }
       // Feasible bounded problems with zeros in cost vector
          for (i = 0; i < n; i++) {
@@ -32321,11 +33279,13 @@ static bool testminlpunit_basictests() {
             bndl.xR[i] = hqrndnormal(&rs);
             bndu.xR[i] = bndl.xR[i] + hqrnduniformi(&rs, 3);
          }
+         testminlpunit_shiftfromzero(&c, n, 0.01);
          k = hqrnduniformi(&rs, n);
          c.xR[k] = 0.0;
          bndl.xR[k] = -INFINITY;
          bndu.xR[k] = +INFINITY;
          minlpcreate(n, &state);
+         testminlpunit_selectsolver(&state, solvertype);
          minlpsetcost(&state, &c);
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
@@ -32337,8 +33297,10 @@ static bool testminlpunit_basictests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+            Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+            Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
          }
          Ok = Ok && x.xR[k] == 0.0;
          bndl.xR[k] = hqrndnormal(&rs);
@@ -32353,10 +33315,13 @@ static bool testminlpunit_basictests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+            Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+            Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
          }
-         Ok = Ok && x.xR[k] == bndl.xR[k];
+         Ok = Ok && x.xR[k] >= bndl.xR[k];
+         Ok = Ok && (solvertype != 0 || x.xR[k] == bndl.xR[k]);
          bndl.xR[k] = -INFINITY;
          bndu.xR[k] = hqrndnormal(&rs);
          minlpsetbc(&state, &bndl, &bndu);
@@ -32369,11 +33334,15 @@ static bool testminlpunit_basictests() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+            Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+            Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+            Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+            Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
          }
-         Ok = Ok && x.xR[k] == bndu.xR[k];
+         Ok = Ok && x.xR[k] <= bndu.xR[k];
+         Ok = Ok && (solvertype != 0 || x.xR[k] == bndu.xR[k]);
       // Infeasible problems
+         ae_vector_set_length(&x, 0);
          for (i = 0; i < n; i++) {
             c.xR[i] = hqrndnormal(&rs);
             bndl.xR[i] = hqrndnormal(&rs);
@@ -32382,6 +33351,7 @@ static bool testminlpunit_basictests() {
          k = hqrnduniformi(&rs, n);
          bndu.xR[k] = bndl.xR[k] - 1;
          minlpcreate(n, &state);
+         testminlpunit_selectsolver(&state, solvertype);
          minlpsetcost(&state, &c);
          minlpsetbc(&state, &bndl, &bndu);
          minlpoptimize(&state);
@@ -32392,36 +33362,36 @@ static bool testminlpunit_basictests() {
             ae_frame_leave();
             return Ok;
          }
-         for (i = 0; i < n; i++) {
-            Ok = Ok && x.xR[i] == 0.0;
-         }
       // Unbounded problems
-         for (i = 0; i < n; i++) {
-            do {
-               c.xR[i] = hqrndnormal(&rs);
-            } while (c.xR[i] == 0.0);
-            bndl.xR[i] = hqrndnormal(&rs);
-            bndu.xR[i] = bndl.xR[i] + hqrnduniformi(&rs, 3);
-         }
-         k = hqrnduniformi(&rs, n);
-         if (c.xR[k] > 0.0) {
-            bndl.xR[k] = -INFINITY;
-         } else {
-            bndu.xR[k] = +INFINITY;
-         }
-         minlpcreate(n, &state);
-         minlpsetcost(&state, &c);
-         minlpsetbc(&state, &bndl, &bndu);
-         minlpoptimize(&state);
-         minlpresults(&state, &x, &rep);
-         Ok = Ok && rep.terminationtype == -4;
-         Ok = Ok && x.cnt >= n;
-         if (!Ok) {
-            ae_frame_leave();
-            return Ok;
-         }
-         for (i = 0; i < n; i++) {
-            Ok = Ok && x.xR[i] == 0.0;
+      //
+      // NOTE: we solve it without regularization, because with regularizer any LP problem is bounded
+         if (solvertype != 1) {
+            ae_vector_set_length(&x, 0);
+            for (i = 0; i < n; i++) {
+               do {
+                  c.xR[i] = hqrndnormal(&rs);
+               } while (c.xR[i] == 0.0);
+               bndl.xR[i] = hqrndnormal(&rs);
+               bndu.xR[i] = bndl.xR[i] + hqrnduniformi(&rs, 3);
+            }
+            k = hqrnduniformi(&rs, n);
+            if (c.xR[k] > 0.0) {
+               bndl.xR[k] = -INFINITY;
+            } else {
+               bndu.xR[k] = +INFINITY;
+            }
+            minlpcreate(n, &state);
+            testminlpunit_selectsolver(&state, solvertype);
+            minlpsetcost(&state, &c);
+            minlpsetbc(&state, &bndl, &bndu);
+            minlpoptimize(&state);
+            minlpresults(&state, &x, &rep);
+            Ok = Ok && rep.terminationtype == -4;
+            Ok = Ok && x.cnt >= n;
+            if (!Ok) {
+               ae_frame_leave();
+               return Ok;
+            }
          }
       }
    }
@@ -32429,6 +33399,7 @@ static bool testminlpunit_basictests() {
 // and with all linear constraints being inequality ones satisfied in the
 // box internals.
    for (n = 1; n <= 10; n++) {
+      solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
       ccnt = 1 + hqrnduniformi(&rs, 10);
       ae_vector_set_length(&c, n);
       ae_vector_set_length(&bndl, n);
@@ -32441,6 +33412,7 @@ static bool testminlpunit_basictests() {
          bndl.xR[i] = -0.5 - 0.5 * hqrnduniformr(&rs);
          bndu.xR[i] = +0.5 + 0.5 * hqrnduniformr(&rs);
       }
+      testminlpunit_shiftfromzero(&c, n, 0.01);
       for (i = 0; i < ccnt; i++) {
          for (j = 0; j < n; j++) {
             a.xyR[i][j] = hqrndmiduniformr(&rs);
@@ -32449,6 +33421,7 @@ static bool testminlpunit_basictests() {
          au.xR[i] = (double)(+2 * n);
       }
       minlpcreate(n, &state);
+      testminlpunit_selectsolver(&state, solvertype);
       minlpsetcost(&state, &c);
       minlpsetbc(&state, &bndl, &bndu);
       minlpsetlc2dense(&state, &a, &al, &au, ccnt);
@@ -32461,14 +33434,17 @@ static bool testminlpunit_basictests() {
          return Ok;
       }
       for (i = 0; i < n; i++) {
-         Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] == bndl.xR[i]);
-         Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] == bndu.xR[i]);
+         Ok = Ok && (c.xR[i] <= 0.0 || x.xR[i] >= bndl.xR[i] && x.xR[i] <= bndl.xR[i] + primtol);
+         Ok = Ok && (c.xR[i] >= 0.0 || x.xR[i] <= bndu.xR[i] && x.xR[i] >= bndu.xR[i] - primtol);
+         Ok = Ok && (c.xR[i] <= 0.0 || solvertype != 0 || x.xR[i] == bndl.xR[i]);
+         Ok = Ok && (c.xR[i] >= 0.0 || solvertype != 0 || x.xR[i] == bndu.xR[i]);
       }
    }
 // Test linearly constrained problems with all variables being boxed ones
 // and with random linear constraints, with at least one feasible point
 // in the box internals.
    for (n = 1; n <= 10; n++) {
+      solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
       ccnt = 1 + hqrnduniformi(&rs, 10);
       ae_vector_set_length(&c, n);
       ae_vector_set_length(&x0, n);
@@ -32493,6 +33469,7 @@ static bool testminlpunit_basictests() {
          au.xR[i] = v0 + 0.25 * hqrnduniformr(&rs);
       }
       minlpcreate(n, &state);
+      testminlpunit_selectsolver(&state, solvertype);
       minlpsetcost(&state, &c);
       minlpsetbc(&state, &bndl, &bndu);
       minlpsetlc2dense(&state, &a, &al, &au, ccnt);
@@ -32506,9 +33483,10 @@ static bool testminlpunit_basictests() {
          ae_frame_leave();
          return Ok;
       }
-      testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, ccnt, &x, &rep, &v0, &v1);
+      testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, ccnt, &x, &rep, solvertype, &v0, &v1, &errslack);
       Ok = Ok && SmallAtR(v0, primtol);
       Ok = Ok && SmallAtR(v1, dualtol);
+      Ok = Ok && SmallAtR(errslack, slacktol);
    }
    ae_frame_leave();
    return Ok;
@@ -32636,6 +33614,7 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
             }
             rvectorresize(&ai, nz);
             ivectorresize(&idxi, nz);
+         // Already existing elements are split in two
             nadd = 0;
             if (nz != 0) {
                nadd = hqrnduniformi(rs, 2) * hqrnduniformi(rs, 4);
@@ -32649,7 +33628,13 @@ static void testminlpunit_modifyandsendconstraintsto(ae_int_t n, RMatrix *a, RVe
                   ai.xR[k] -= v;
                }
             }
+         // Possibly nonexistent elements are added as +V and -V
+         // Do not performed for NZ=0 rows because it may introduce slightly nonzero coefficients
+         // to exactly zero row (constraint normalization goes crazy).
             ndup = hqrnduniformi(rs, 2) * hqrnduniformi(rs, 4);
+            if (nz == 0) {
+               ndup = 0;
+            }
             rvectorresize(&ai, nz + nadd + 2 * ndup);
             ivectorresize(&idxi, nz + nadd + 2 * ndup);
             for (j = 0; j < ndup; j++) {
@@ -32690,6 +33675,7 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    ae_int_t j;
    ae_int_t k;
    double v;
+   double mincoeff;
    ae_frame_make(&_frame_block);
    SetVector(c);
    SetMatrix(a);
@@ -32699,39 +33685,9 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    NewVector(y, 0, DT_REAL);
    NewVector(cx, 0, DT_REAL);
    NewMatrix(ax, 0, 0, DT_REAL);
-   NewMatrix(bt, 0, 0, DT_REAL);
    NewVector(pivots, 0, DT_INT);
-// ae_vector_set_length(xx, n); //(@) Superseded by the next call of this function on xx.
-   ae_vector_set_length(c, n);
-   ae_matrix_set_length(a, m, n);
-   ae_vector_set_length(xx, n + m);
-   ae_vector_set_length(&cx, n + m);
-   for (i = 0; i < n; i++) {
-      xx->xR[i] = hqrndnormal(rs);
-      cx.xR[i] = hqrndnormal(rs);
-      c->xR[i] = cx.xR[i];
-   }
-   for (i = n; i < n + m; i++) {
-      xx->xR[i] = 0.0;
-      cx.xR[i] = 0.0;
-   }
-   ae_matrix_set_length(&ax, m, n + m);
-   for (i = 0; i < m; i++) {
-      v = 0.0;
-      for (j = 0; j < n; j++) {
-         ax.xyR[i][j] = hqrndnormal(rs);
-         a->xyR[i][j] = ax.xyR[i][j];
-         v += xx->xR[j] * ax.xyR[i][j];
-      }
-      xx->xR[n + i] = v;
-      for (j = 0; j < m; j++) {
-         ax.xyR[i][n + j] = 0.0;
-      }
-      ax.xyR[i][n + i] = -1.0;
-   }
-// Randomly select M basic variables, compute Y and D
-   ae_matrix_set_length(&bt, m, m);
-   ae_vector_set_length(&y, m);
+   mincoeff = 0.001;
+// Randomly partition columns into basic and nonbasic ones
    ae_vector_set_length(basicnonbasic, n + m);
    for (i = 0; i < n + m; i++) {
       basicnonbasic->xZ[i] = i;
@@ -32739,24 +33695,63 @@ static void testminlpunit_generatecabxd(hqrndstate *rs, ae_int_t n, ae_int_t m, 
    for (i = 0; i < m; i++) {
       k = i + hqrnduniformi(rs, n + m - i);
       swapi(&basicnonbasic->xZ[i], &basicnonbasic->xZ[k]);
-      for (j = 0; j < m; j++) {
-         bt.xyR[i][j] = ax.xyR[j][basicnonbasic->xZ[i]];
-      }
-      y.xR[i] = cx.xR[basicnonbasic->xZ[i]];
    }
-   rmatrixlu(&bt, m, m, &pivots);
+// Generate constraint matrix A
+   ae_matrix_set_length(a, m, n);
+   ae_matrix_set_length(&ax, m, n + m);
    for (i = 0; i < m; i++) {
-      if (pivots.xZ[i] != i) {
-         swapr(&y.xR[i], &y.xR[pivots.xZ[i]]);
+      for (j = 0; j < n; j++) {
+         ax.xyR[i][j] = hqrndnormal(rs);
+         ax.xyR[i][j] += ae_sign(ax.xyR[i][j]) * mincoeff;
+         a->xyR[i][j] = ax.xyR[i][j];
+      }
+      for (j = 0; j < m; j++) {
+         ax.xyR[i][n + j] = 0.0;
+      }
+      ax.xyR[i][n + i] = -1.0;
+   }
+// Generate feasible point
+   ae_vector_set_length(xx, n + m);
+   for (i = 0; i < n; i++) {
+      xx->xR[i] = hqrndnormal(rs);
+   }
+   for (i = n; i < n + m; i++) {
+      xx->xR[i] = 0.0;
+   }
+   for (i = 0; i < m; i++) {
+      v = 0.0;
+      for (j = 0; j < n; j++) {
+         v += xx->xR[j] * ax.xyR[i][j];
+      }
+      xx->xR[n + i] = v;
+   }
+// Generate random Y.
+// Entries corresponding to basic constraints must be zero.
+   ae_vector_set_length(&y, m);
+   for (i = 0; i < m; i++) {
+      y.xR[i] = hqrndnormal(rs);
+   }
+   for (i = 0; i < m; i++) {
+      if (basicnonbasic->xZ[i] >= n) {
+         y.xR[basicnonbasic->xZ[i] - n] = 0.0;
       }
    }
-   rmatrixtrsv(m, &bt, 0, 0, false, true, 0, &y, 0);
-   rmatrixtrsv(m, &bt, 0, 0, true, false, 0, &y, 0);
+// Generate D and C
    ae_vector_set_length(d, n + m);
-   for (i = 0; i < n + m; i++) {
-      d->xR[i] = cx.xR[i];
+   rmatrixgemv(n + m, m, -1.0, &ax, 0, 0, 1, &y, 0, 0.0, d, 0);
+   ae_vector_set_length(&cx, n + m);
+   for (i = 0; i < n; i++) {
+      cx.xR[i] = hqrndnormal(rs);
    }
-   rmatrixgemv(n + m, m, -1.0, &ax, 0, 0, 1, &y, 0, 1.0, d, 0);
+   for (i = n; i < n + m; i++) {
+      cx.xR[i] = 0.0;
+   }
+   for (i = 0; i < m; i++) {
+      cx.xR[basicnonbasic->xZ[i]] = -d->xR[basicnonbasic->xZ[i]];
+   }
+   raddv(n + m, 1.0, &cx, d);
+   ae_vector_set_length(c, n);
+   rcopyv(n, &cx, c);
    ae_frame_leave();
 }
 
@@ -32829,6 +33824,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
    double v;
    double q;
    double big;
+   double mincoeff;
    ae_int_t nprimal;
    ae_int_t ndual;
    ae_frame_make(&_frame_block);
@@ -32850,6 +33846,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
 // Choose problem type
    pcount = 4;
    ptype = hqrnduniformi(rs, pcount);
+   mincoeff = 0.001;
 // A linearly constrained LP problem with all variables/linear constraints
 // being boxed (easy start).
    if (ptype == 0) {
@@ -32869,6 +33866,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->xyR[i][j] = hqrndnormal(rs) * hqrnduniformi(rs, 2);
+            a->xyR[i][j] += ae_sign(a->xyR[i][j]) * mincoeff;
             v += a->xyR[i][j] * x0.xR[j];
          }
          al->xR[i] = v - pow(q, hqrndnormal(rs));
@@ -32902,6 +33900,7 @@ static void testminlpunit_generatelpproblem(hqrndstate *rs, ae_int_t n, RVector 
          v = 0.0;
          for (j = 0; j < n; j++) {
             a->xyR[i][j] = hqrndnormal(rs);
+            a->xyR[i][j] += ae_sign(a->xyR[i][j]) * mincoeff;
             v += a->xyR[i][j] * x0.xR[j];
          }
          al->xR[i] = v - pow(q, hqrndnormal(rs));
@@ -33035,6 +34034,7 @@ static void testminlpunit_generateunboundedlpproblem(hqrndstate *rs, ae_int_t n,
       do {
          c->xR[i] = hqrndnormal(rs);
       } while (c->xR[i] == 0.0);
+      c->xR[i] += 0.1 * ae_sign(c->xR[i]);
       v = pow(q, hqrndnormal(rs)) - pow(q, hqrndnormal(rs));
       if (c->xR[i] < 0.0) {
          bndl->xR[i] = v;
@@ -33096,6 +34096,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
    ae_int_t pcount;
    double v;
    double q;
+   double minerr;
    ae_frame_make(&_frame_block);
    SetVector(c);
    SetVector(bndl);
@@ -33148,6 +34149,7 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
 // Linearly constrained problem with infeasible linear constraints
    if (ptype == 2) {
       q = 5.0;
+      minerr = 0.01;
       *m = 1 + hqrnduniformi(rs, 2 * n);
       testminlpunit_generatecabxd(rs, n, *m, c, a, &xx, &d, &tmpi);
       testminlpunit_generatebounds(rs, n, *m, &xx, &d, &tmpi, bndl, bndu, al, au);
@@ -33157,23 +34159,21 @@ static void testminlpunit_generateinfeasiblelpproblem(hqrndstate *rs, ae_int_t n
       for (i = 0; i < n; i++) {
          a->xyR[*m][i] = a->xyR[*m - 1][i];
       }
+      v = minerr + pow(q, hqrndnormal(rs));
+      v *= rmax2(1.0, sqrt(rdotrr(n, a, *m, a, *m)));
       if (isfinite(al->xR[*m - 1]) && isfinite(au->xR[*m - 1])) {
-         v = pow(q, hqrndnormal(rs));
          al->xR[*m] = au->xR[*m - 1] + v;
          au->xR[*m] = al->xR[*m] + pow(q, hqrndnormal(rs));
       }
       if (isfinite(al->xR[*m - 1]) && !isfinite(au->xR[*m - 1])) {
-         v = pow(q, hqrndnormal(rs));
          au->xR[*m] = al->xR[*m - 1] - v;
          al->xR[*m] = au->xR[*m] - pow(q, hqrndnormal(rs));
       }
       if (!isfinite(al->xR[*m - 1]) && isfinite(au->xR[*m - 1])) {
-         v = pow(q, hqrndnormal(rs));
          al->xR[*m] = au->xR[*m - 1] + v;
          au->xR[*m] = al->xR[*m] + pow(q, hqrndnormal(rs));
       }
       if (!isfinite(al->xR[*m - 1]) && !isfinite(au->xR[*m - 1])) {
-         v = pow(q, hqrndnormal(rs));
          al->xR[*m] = v;
          au->xR[*m] = v - pow(q, hqrndnormal(rs));
       }
@@ -33193,15 +34193,21 @@ static bool testminlpunit_singlecalltests() {
    ae_int_t i;
    ae_int_t j;
    ae_int_t m;
+   ae_int_t n0;
    double v0;
    double v1;
    double primtol;
    double dualtol;
+   double slacktol;
+   double etol;
    double ftol;
    double f;
    double f1;
    double errp;
    double errd;
+   double errs;
+   double alpha;
+   ae_int_t solvertype;
    bool Ok = true;
    ae_frame_make(&_frame_block);
    NewObj(minlpstate, state0);
@@ -33222,30 +34228,38 @@ static bool testminlpunit_singlecalltests() {
    NewVector(x0, 0, DT_REAL);
    NewVector(x1, 0, DT_REAL);
    NewObj(hqrndstate, rs);
-   primtol = 1.0E-6;
-   dualtol = 1.0E-6;
-   ftol = 1.0E-5;
+   primtol = 1.0E-3;
+   dualtol = 1.0E-3;
+   slacktol = 1.0E-3;
+   etol = 1.0E-8;
+   ftol = 1.0E-3;
    hqrndrandomize(&rs);
-// Try different values of N
+// Try different feasible problems
    for (n = 1; n <= 50; n++) {
       for (pass = 1; pass <= 30; pass++) {
-      // Generate random feasible problem and solve it
+         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
+      // Generate random feasible problem and solve it using basic MinLPSetLC2Dense() API
          testminlpunit_generatelpproblem(&rs, n, &c, &bndl, &bndu, &a, &al, &au, &m);
          minlpcreate(n, &state0);
+         testminlpunit_selectsolver(&state0, solvertype);
          minlpsetcost(&state0, &c);
          minlpsetbc(&state0, &bndl, &bndu);
          minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
          Ok = Ok && rep0.terminationtype > 0;
-         Ok = Ok && x0.cnt == n;
+         Ok = Ok && x0.cnt == n && isfinitevector(&x0, n);
          if (!Ok) {
             ae_frame_leave();
             return Ok;
          }
-         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, &errp, &errd);
+         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
          Ok = Ok && SmallAtR(errp, primtol);
          Ok = Ok && SmallAtR(errd, dualtol);
+         Ok = Ok && SmallAtR(errs, slacktol);
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       // Apply random modification to the problem (and to the way
       // we pass constraints to the solver), try solving one more time
       // and compare with the original solution.
@@ -33255,6 +34269,7 @@ static bool testminlpunit_singlecalltests() {
       //       compared.
          ae_vector_set_length(&x1, 0);
          minlpcreate(n, &state1);
+         testminlpunit_selectsolver(&state1, solvertype);
          minlpsetcost(&state1, &c);
          minlpsetbc(&state1, &bndl, &bndu);
          testminlpunit_modifyandsendconstraintsto(n, &a, &al, &au, m, &rs, &state1);
@@ -33296,6 +34311,7 @@ static bool testminlpunit_singlecalltests() {
             }
          }
          minlpcreate(n, &state1);
+         testminlpunit_selectsolver(&state1, solvertype);
          minlpsetscale(&state1, &s);
          minlpsetcost(&state1, &cs);
          minlpsetbc(&state1, &bndls, &bndus);
@@ -33311,42 +34327,140 @@ static bool testminlpunit_singlecalltests() {
          for (i = 0; i < n; i++) {
             Ok = Ok && NearAtR(x0.xR[i], x1.xR[i] / s.xR[i], 1000 * ae_machineepsilon);
          }
+      }
+   }
+// Test infeasible/unbounded problems
+   for (n = 1; n <= 50; n++) {
+      for (pass = 1; pass <= 30; pass++) {
+         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
       // Generate random primal unbounded
+      //
+      // NOTE: because we use constraint validation code, we can not
+      //       use ModifyAndSendConstraintsTo() function - it permutes
+      //       constraints order and prevents correct validation.
          ae_vector_set_length(&x0, 0);
          testminlpunit_generateunboundedlpproblem(&rs, n, &c, &bndl, &bndu, &a, &al, &au, &m);
          minlpcreate(n, &state0);
+         testminlpunit_selectsolver(&state0, solvertype);
          minlpsetcost(&state0, &c);
          minlpsetbc(&state0, &bndl, &bndu);
-         testminlpunit_modifyandsendconstraintsto(n, &a, &al, &au, m, &rs, &state0);
+         minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         Ok = Ok && rep0.terminationtype == -4;
-         Ok = Ok && x0.cnt == n;
+         Ok = Ok && (rep0.terminationtype == -4 || rep0.terminationtype == -2);
+         Ok = Ok && x0.cnt == n && isfinitevector(&x0, n);
          if (!Ok) {
             ae_frame_leave();
             return Ok;
          }
-         for (i = 0; i < n; i++) {
-            Ok = Ok && x0.xR[i] == 0.0;
-         }
+         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       // Generate random primal infeasible
+      //
+      // NOTE: because we use constraint validation code, we can not
+      //       use ModifyAndSendConstraintsTo() function - it permutes
+      //       constraints order and prevents correct validation.
          ae_vector_set_length(&x0, 0);
          testminlpunit_generateinfeasiblelpproblem(&rs, n, &c, &bndl, &bndu, &a, &al, &au, &m);
          minlpcreate(n, &state0);
+         testminlpunit_selectsolver(&state0, solvertype);
          minlpsetcost(&state0, &c);
          minlpsetbc(&state0, &bndl, &bndu);
-         testminlpunit_modifyandsendconstraintsto(n, &a, &al, &au, m, &rs, &state0);
+         minlpsetlc2dense(&state0, &a, &al, &au, m);
          minlpoptimize(&state0);
          minlpresults(&state0, &x0, &rep0);
-         Ok = Ok && rep0.terminationtype == -3;
-         Ok = Ok && x0.cnt == n;
+         Ok = Ok && (rep0.terminationtype == -3 || rep0.terminationtype == -2);
+         Ok = Ok && x0.cnt == n && isfinitevector(&x0, n);
          if (!Ok) {
             ae_frame_leave();
             return Ok;
          }
+         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(rep0.primalerror, 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(rep0.dualerror, 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
+      }
+   }
+   for (n = 2; n <= 50; n++) {
+      for (pass = 1; pass <= 30; pass++) {
+         solvertype = hqrnduniformi(&rs, testminlpunit_solverscount); //(@) Was not present in the original: solvertype was left dangling from the previous set of loops.
+      // Special test for simplex solver.
+      //
+      // Generate carefully crafted primal infeasible - the problem is ALMOST feasible.
+      // So, we expect simplex solver to stop at the best point possible. We also test
+      // that X and Y are correctly unscaled on return.
+         ae_assert(n >= 2, "LPTEST: integrity check failed");
+         n0 = n / 2;
+         ae_assert(n0 < n, "LPTEST: integrity check failed");
+         alpha = 0.0001;
+         ae_vector_set_length(&x0, 0);
+         ae_vector_set_length(&c, n);
+         ae_vector_set_length(&s, n);
+         ae_vector_set_length(&bndl, n);
+         ae_vector_set_length(&bndu, n);
          for (i = 0; i < n; i++) {
-            Ok = Ok && x0.xR[i] == 0.0;
+            if (i < n0) {
+               c.xR[i] = -pow(2.0, 2.0 * hqrndmiduniformr(&rs));
+            } else {
+               c.xR[i] = hqrnduniformr(&rs) - 0.5;
+            }
+            bndl.xR[i] = -pow(2.0, hqrndnormal(&rs));
+            bndu.xR[i] = 1.0;
+            s.xR[i] = pow(2.0, hqrndmiduniformr(&rs));
          }
+         m = 1 + hqrnduniformi(&rs, n);
+         ae_matrix_set_length(&a, m, n);
+         ae_vector_set_length(&al, m);
+         ae_vector_set_length(&au, m);
+         for (i = 0; i < m - 1; i++) {
+            for (j = 0; j < n0; j++) {
+               a.xyR[i][j] = 0.0;
+            }
+            v0 = 0.0;
+            for (j = n0; j < n; j++) {
+               a.xyR[i][j] = hqrndnormal(&rs);
+               v0 += 0.5 * a.xyR[i][j];
+            }
+            al.xR[i] = v0 - pow(2.0, hqrndnormal(&rs));
+            au.xR[i] = v0 + pow(2.0, hqrndnormal(&rs));
+         }
+         v0 = 0.0;
+         for (i = 0; i < n; i++) {
+            if (i < n0) {
+               a.xyR[m - 1][i] = pow(2.0, hqrndnormal(&rs));
+            } else {
+               a.xyR[m - 1][i] = 0.0;
+            }
+            v0 += a.xyR[m - 1][i];
+         }
+         al.xR[m - 1] = v0 + alpha;
+         au.xR[m - 1] = al.xR[m - 1];
+         minlpcreate(n, &state0);
+         minlpsetalgodss(&state0, 0.0);
+         minlpsetcost(&state0, &c);
+         if (hqrndnormal(&rs) > 0.0) {
+            minlpsetscale(&state0, &s);
+         }
+         minlpsetbc(&state0, &bndl, &bndu);
+         minlpsetlc2dense(&state0, &a, &al, &au, m);
+         minlpoptimize(&state0);
+         minlpresults(&state0, &x0, &rep0);
+         Ok = Ok && (rep0.terminationtype == -3 || rep0.terminationtype == -2);
+         Ok = Ok && x0.cnt == n && isfinitevector(&x0, n);
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (i = 0; i < n0; i++) {
+            Ok = Ok && x0.xR[i] >= 1.0;
+         }
+         testminlpunit_validatesolution(&c, &bndl, &bndu, n, &a, &al, &au, m, &x0, &rep0, solvertype, &errp, &errd, &errs);
+         Ok = Ok && SmallAtR(errd, 0.001);
+         Ok = Ok && NearAtR(errp, rep0.primalerror, etol * rmax2(errp, 1.0));
+         Ok = Ok && NearAtR(errd, rep0.dualerror, etol * rmax2(errd, 1.0));
+         Ok = Ok && NearAtR(errs, rep0.slackerror, etol * rmax2(errs, 1.0));
       }
    }
 // Check SetBCAll() and SetBCi()
@@ -33364,6 +34478,7 @@ static bool testminlpunit_singlecalltests() {
 // via setbc() and to the second one via sequential setbci().
 // Both solutions are compared.
    for (n = 1; n <= 30; n++) {
+      solvertype = hqrnduniformi(&rs, testminlpunit_solverscount);
       v0 = -pow(2.0, hqrndnormal(&rs));
       v1 = pow(2.0, hqrndnormal(&rs));
       m = hqrnduniformi(&rs, 2 * n);
@@ -33389,6 +34504,7 @@ static bool testminlpunit_singlecalltests() {
       ae_vector_set_length(&x0, hqrnduniformi(&rs, 2 * n));
       ae_vector_set_length(&x1, hqrnduniformi(&rs, 2 * n));
       minlpcreate(n, &state0);
+      testminlpunit_selectsolver(&state0, solvertype);
       minlpsetcost(&state0, &c);
       minlpsetbc(&state0, &bndl, &bndu);
       minlpsetlc2dense(&state0, &a, &al, &au, m);
@@ -33401,6 +34517,7 @@ static bool testminlpunit_singlecalltests() {
          return Ok;
       }
       minlpcreate(n, &state1);
+      testminlpunit_selectsolver(&state1, solvertype);
       minlpsetcost(&state1, &c);
       minlpsetbcall(&state1, v0, v1);
       minlpsetlc2dense(&state1, &a, &al, &au, m);
@@ -33459,9 +34576,9 @@ bool testminlp() {
 // The final report.
    Ok = basicOk && singlecallOk;
    if (!Ok || !silent) {
-      printf("MinLP Optimization Tests\n"),
+      printf("MinLP Optimization Tests\n");
       printf("Basic Tests:                              %s\n", basicOk? "Ok": "Failed");
-      printf("Common Tests:\n"),
+      printf("Common Tests:\n");
       printf("* Single Call Usage:                      %s\n", singlecallOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -33796,6 +34913,7 @@ static bool testminnlcunit_testlc() {
    ae_int_t shiftkind;
    ae_int_t prectype;
    ae_int_t solvertype;
+   double gnrm2;
    bool Ok = true;
    ae_frame_make(&_frame_block);
    NewMatrix(q, 0, 0, DT_REAL);
@@ -34238,7 +35356,7 @@ static bool testminnlcunit_testlc() {
          ae_vector_set_length(&bndu, n);
          for (i = 0; i < n; i++) {
             xm.xR[i] = ae_randommid();
-            x0.xR[i] = 3 * ae_randomreal() - 1;
+            x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
             bndl.xR[i] = -(0.1 + 0.9 * ae_randomreal());
             bndu.xR[i] = 0.1 + 0.9 * ae_randomreal();
             for (j = 0; j < n; j++) {
@@ -34489,7 +35607,7 @@ static bool testminnlcunit_testlc() {
          for (i = n / 2; i < k; i++) {
             v = 0.0;
             for (j = 0; j < n; j++) {
-               c.xyR[i][j] = hqrndnormal(&rs) / sqrt((double)n);
+               c.xyR[i][j] = hqrndnormal(&rs) / sqrt(n);
                v += c.xyR[i][j] * xm.xR[j];
             }
             c.xyR[i][n] = v;
@@ -34832,9 +35950,11 @@ static bool testminnlcunit_testlc() {
             }
          // Evaluate gradient at solution and test
             vv = 0.0;
+            gnrm2 = 0.0;
             for (i = 0; i < n; i++) {
                v = ae_v_dotproduct(a.xyR[i], 1, xs0.xR, 1, n);
                v += b.xR[i];
+               gnrm2 += v * v;
                if (xs0.xR[i] <= bl.xR[i] + tolconstr && v > 0.0) {
                   v = 0.0;
                }
@@ -34843,8 +35963,8 @@ static bool testminnlcunit_testlc() {
                }
                vv += ae_sqr(v);
             }
-            vv = sqrt(vv);
-            Ok = Ok && vv <= 1.0E-3;
+            vv = sqrt(vv / (gnrm2 + 1.0));
+            Ok = Ok && vv <= 1.0E-2;
          }
       }
    // Linear/convex optimization problem with combination of
@@ -36044,7 +37164,7 @@ static bool testminnlcunit_testother() {
             return Ok;
          }
          for (i = 0; i < n; i++) {
-            Ok = Ok && NearAtR(x1.xR[i], x2.xR[i], 1.0E-4);
+            Ok = Ok && NearAtR(x1.xR[i], x2.xR[i], 1.0E-3);
          }
       }
    // Test integrity checks for NAN/INF:
@@ -36821,8 +37941,6 @@ static bool testminnlcunit_testoptguardc1test0reportfortask0(optguardnonc1test0r
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   double v;
-   double vv;
    double va;
    double vb;
    bool hasc1discontinuities;
@@ -36882,8 +38000,6 @@ static bool testminnlcunit_testoptguardc1test1reportfortask0(optguardnonc1test1r
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   double v;
-   double vv;
    double va;
    double vb;
    bool tooclose;
@@ -37543,7 +38659,7 @@ static bool testminnlcunit_testoptguard() {
                      v += state.x.xR[i] * xu.xR[i];
                   }
                   if (v < vbnd) {
-                     state.fi.xR[0] += (vshift + vpower * (vbnd - v));
+                     state.fi.xR[0] += vshift + vpower * (vbnd - v);
                      for (i = 0; i < n; i++) {
                         state.j.xyR[0][i] -= vpower * xu.xR[i];
                      }
@@ -38255,7 +39371,7 @@ bool testminnlc() {
 // The final report.
    Ok = bcOk && lcOk && nlcOk && otherOk && bugsOk && optguardOk;
    if (!Ok || !silent) {
-      printf("MinNLC Optimization Tests\n"),
+      printf("MinNLC Optimization Tests\n");
       printf("* Box Constrained:                        %s\n", bcOk? "Ok": "Failed");
       printf("* Linearly Constrained:                   %s\n", lcOk? "Ok": "Failed");
       printf("* Non-Linearly Constrained:               %s\n", nlcOk? "Ok": "Failed");
@@ -38377,7 +39493,7 @@ static bool testminbcunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                      bl.xR[i] = 0.0;
                      bu.xR[i] = 1.0;
                      x.xR[i] = ae_randomreal();
-                     x0.xR[i] = 3 * ae_randomreal() - 1;
+                     x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -38459,7 +39575,7 @@ static bool testminbcunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                         bu.xR[i] = bl.xR[i];
                      }
                      x.xR[i] = ae_randomreal();
-                     x0.xR[i] = 3 * ae_randomreal() - 1;
+                     x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                   }
                // Create and optimize
                   if (dkind == 0) {
@@ -38532,7 +39648,7 @@ static bool testminbcunit_testfeasibility(bool *ConvOkP, bool *IntOkP) {
                   bl.xR[i] = 0.0;
                   bu.xR[i] = 1.0;
                   x.xR[i] = ae_randomreal();
-                  x0.xR[i] = 3 * ae_randomreal() - 1;
+                  x0.xR[i] = 3.0 * ae_randomreal() - 1.0;
                }
                i = ae_randominteger(n);
                bl.xR[i] = 1.0;
@@ -38766,7 +39882,7 @@ static bool testminbcunit_testother() {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
       diffstep = ae_randomreal() * 1.0E-6;
-      s.xR[0] = exp(ae_randomreal() * 4 - 2);
+      s.xR[0] = exp(2.0*ae_randommid());
       x.xR[0] = 0.0;
       minbccreatef(1, &x, diffstep, &state);
       minbcsetcond(&state, 1.0E-6, 0.0, epsx, 0);
@@ -38813,7 +39929,7 @@ static bool testminbcunit_testother() {
       ae_vector_set_length(&x, n);
       ae_vector_set_length(&bl, n);
       ae_vector_set_length(&bu, n);
-      bl.xR[0] = 4 * ae_randomreal() + 1;
+      bl.xR[0] = 4.0 * ae_randomreal() + 1;
       bu.xR[0] = bl.xR[0] + 1;
       x.xR[0] = 0.5 * (bl.xR[0] + bu.xR[0]);
       minbccreate(n, &x, &state);
@@ -40030,7 +41146,7 @@ bool testminbc() {
 // The final report.
    Ok = feasibilityOk && otherOk && convOk && intOk && precOk && optguardOk;
    if (!Ok || !silent) {
-      printf("MinBC Optimization Tests\n"),
+      printf("MinBC Optimization Tests\n");
       printf("Feasibility Properties:                   %s\n", feasibilityOk? "Ok": "Failed");
       printf("Preconditioning:                          %s\n", precOk? "Ok": "Failed");
       printf("Other Properties:                         %s\n", otherOk? "Ok": "Failed");
@@ -40547,10 +41663,10 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          ae_vector_set_length(&xrfirst, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * ae_randommid();
+            x0.xR[i] = 10.0 * ae_randommid();
             xc.xR[i] = ae_randommid();
-            d.xR[i] = pow(10.0, 2 * ae_randommid());
-            s.xR[i] = pow(10.0, 2 * ae_randommid());
+            d.xR[i] = pow(10.0, 2.0 * ae_randommid());
+            s.xR[i] = pow(10.0, 2.0 * ae_randommid());
          }
          requirexrep = ae_randombool();
          epsrad = 0.01 * pow(10.0, -2 * ae_randomreal());
@@ -40608,10 +41724,10 @@ static bool testminnsunit_testuc(bool *OtherOkP) {
          ae_vector_set_length(&s, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * ae_randommid();
+            x0.xR[i] = 10.0 * ae_randommid();
             xc.xR[i] = ae_randommid();
-            d.xR[i] = pow(10.0, 2 * ae_randommid());
-            s.xR[i] = pow(10.0, 2 * ae_randommid());
+            d.xR[i] = pow(10.0, 2.0 * ae_randommid());
+            s.xR[i] = pow(10.0, 2.0 * ae_randommid());
          }
          epsrad = 0.01 * pow(10.0, -2 * ae_randomreal());
          xtol = 15.0 * epsrad;
@@ -40779,10 +41895,10 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          ae_vector_set_length(&xrfirst, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * ae_randommid();
+            x0.xR[i] = 10.0 * ae_randommid();
             xc.xR[i] = ae_randommid();
-            d.xR[i] = pow(10.0, 2 * ae_randommid());
-            s.xR[i] = pow(10.0, 2 * ae_randommid());
+            d.xR[i] = pow(10.0, 2.0 * ae_randommid());
+            s.xR[i] = pow(10.0, 2.0 * ae_randommid());
             bndl.xR[i] = -INFINITY;
             bndu.xR[i] = +INFINITY;
             k = ae_randominteger(5);
@@ -40986,10 +42102,10 @@ static bool testminnsunit_testbc(bool *OtherOkP) {
          ae_vector_set_length(&s, n);
          ae_vector_set_length(&xrlast, n);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * ae_randommid();
+            x0.xR[i] = 10.0 * ae_randommid();
             xc.xR[i] = ae_randommid();
-            d.xR[i] = pow(10.0, 2 * ae_randommid());
-            s.xR[i] = pow(10.0, 2 * ae_randommid());
+            d.xR[i] = pow(10.0, 2.0 * ae_randommid());
+            s.xR[i] = pow(10.0, 2.0 * ae_randommid());
             bndl.xR[i] = -INFINITY;
             bndu.xR[i] = +INFINITY;
             k = ae_randominteger(5);
@@ -41208,7 +42324,7 @@ static bool testminnsunit_testlc(bool *OtherOkP) {
          ae_vector_set_length(&d, n);
          ae_vector_set_length(&s, n);
          for (i = 0; i < n; i++) {
-            x0.xR[i] = 10 * ae_randommid();
+            x0.xR[i] = 10.0 * ae_randommid();
             xc.xR[i] = ae_randommid();
             d.xR[i] = 1 + ae_randomreal();
             s.xR[i] = 1 + ae_randomreal();
@@ -41825,7 +42941,7 @@ bool testminns() {
 // The final report.
    Ok = ucOk && bcOk && lcOk && nlcOk && otherOk;
    if (!Ok || !silent) {
-      printf("MinNS Optimization Tests\n"),
+      printf("MinNS Optimization Tests\n");
       printf("* Unconstrained:                          %s\n", ucOk? "Ok": "Failed");
       printf("* Bound Constrained:                      %s\n", bcOk? "Ok": "Failed");
       printf("* Linearly Constrained:                   %s\n", lcOk? "Ok": "Failed");
@@ -41974,7 +43090,7 @@ Local bool testother() {
       ae_vector_set_length(&x, 1);
       ae_vector_set_length(&s, 1);
       diffstep = ae_randomreal() * 1.0E-6;
-      s.xR[0] = exp(ae_randomreal() * 4 - 2);
+      s.xR[0] = exp(2.0*ae_randommid());
       x.xR[0] = 0.0;
       mincgcreatef(1, &x, diffstep, &state);
       mincgsetcond(&state, 1.0E-6, 0.0, 0.0, 0);
@@ -42337,9 +43453,9 @@ static void testmincgunit_calciip2(mincgstate *state, ae_int_t n) {
    if (state->needf || state->needfg) {
       state->f = 0.0;
       for (i = 0; i < n; i++) {
-         state->f += ae_sqr((double)(i * i + 1)) * ae_sqr(state->x.xR[i]);
+         state->f += ae_sqr(i * i + 1) * ae_sqr(state->x.xR[i]);
          if (state->needfg) {
-            state->g.xR[i] = ae_sqr((double)(i * i + 1)) * 2 * state->x.xR[i];
+            state->g.xR[i] = ae_sqr(i * i + 1) * 2 * state->x.xR[i];
          }
       }
    }
@@ -42436,7 +43552,7 @@ static bool testmincgunit_testpreconditioning() {
       // Test it with perturbed diagonal preconditioner
          ae_vector_set_length(&diagh, n);
          for (i = 0; i < n; i++) {
-            diagh.xR[i] = 2 * ae_sqr((double)(i * i + 1)) * (0.8 + 0.4 * ae_randomreal());
+            diagh.xR[i] = 2 * ae_sqr(i * i + 1) * (0.8 + 0.4 * ae_randomreal());
          }
          mincgsetprecdiag(&state, &diagh);
          cntg1 = 0;
@@ -43295,9 +44411,9 @@ bool testmincg() {
          ae_vector_set_length(&x, 3);
          n = 3;
          diffstep = 1.0E-6;
-         x.xR[0] = 10 + 10 * ae_randomreal();
-         x.xR[1] = 10 + 10 * ae_randomreal();
-         x.xR[2] = 10 + 10 * ae_randomreal();
+         x.xR[0] = 10 + 10.0 * ae_randomreal();
+         x.xR[1] = 10 + 10.0 * ae_randomreal();
+         x.xR[2] = 10 + 10.0 * ae_randomreal();
          if (difftype == 0) {
             mincgcreate(n, &x, &state);
          }
@@ -43310,17 +44426,17 @@ bool testmincg() {
          for (i = 0; i <= 10 && mincgiteration(&state); i++) {
             testmincgunit_testfunc2(&state);
          }
-         x.xR[0] = 10 + 10 * ae_randomreal();
-         x.xR[1] = 10 + 10 * ae_randomreal();
-         x.xR[2] = 10 + 10 * ae_randomreal();
+         x.xR[0] = 10 + 10.0 * ae_randomreal();
+         x.xR[1] = 10 + 10.0 * ae_randomreal();
+         x.xR[2] = 10 + 10.0 * ae_randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
             testmincgunit_testfunc2(&state);
          }
          mincgresults(&state, &x, &rep);
          restartsOk = restartsOk && rep.terminationtype > 0 && NearAtR(x.xR[0], log(2.0), 0.01) && SmallAtR(x.xR[1], 0.01) && NearAtR(x.xR[2], log(2.0), 0.01);
-         x.xR[0] = 10 + 10 * ae_randomreal();
-         x.xR[1] = 10 + 10 * ae_randomreal();
-         x.xR[2] = 10 + 10 * ae_randomreal();
+         x.xR[0] = 10 + 10.0 * ae_randomreal();
+         x.xR[1] = 10 + 10.0 * ae_randomreal();
+         x.xR[2] = 10 + 10.0 * ae_randomreal();
          for (mincgrestartfrom(&state, &x); mincgiteration(&state); ) {
             testmincgunit_testfunc2(&state);
          }
@@ -43505,7 +44621,7 @@ bool testmincg() {
 // The final report.
    Ok = refOk && eqOk && lin1Ok && lin2Ok && convOk && otherOk && restartsOk && precOk && optguardOk;
    if (!Ok || !silent) {
-      printf("ConjGrad Tests\n"),
+      printf("ConjGrad Tests\n");
       printf("Reference Problem:                        %s\n", refOk? "Ok": "Failed");
       printf("Lin-1 Problem:                            %s\n", lin1Ok? "Ok": "Failed");
       printf("Lin-2 Problem:                            %s\n", lin2Ok? "Ok": "Failed");
@@ -44088,7 +45204,7 @@ static bool testminlmunit_testbc() {
          for (i = 0; i < n; i++) {
             bl.xR[i] = 0.0;
             bu.xR[i] = 1.0;
-            xe.xR[i] = 3 * ae_randomreal() - 1;
+            xe.xR[i] = 3.0 * ae_randomreal() - 1.0;
             x.xR[i] = ae_randomreal();
          }
          if (tmpkind == 0) {
@@ -45238,8 +46354,8 @@ bool testminlm() {
 // The final report.
    Ok = uOk && bcOk && lcOk && scOk && otherOk && optguardOk;
    if (!Ok || !silent) {
-      printf("Testing Levenberg-Marquardt Optimization\n"),
-      printf("Problem Types:\n"),
+      printf("Testing Levenberg-Marquardt Optimization\n");
+      printf("Problem Types:\n");
       printf("* Unconstrained:                          %s\n", uOk? "Ok": "Failed");
       printf("* Box Constrained:                        %s\n", bcOk? "Ok": "Failed");
       printf("* Linearly Constrained:                   %s\n", lcOk? "Ok": "Failed");
@@ -47334,8 +48450,8 @@ bool testevd() {
 // The final report.
    Ok = nsOk && sOk && hOk && tdOk && sbiOk && hbiOk && tdbiOk && wOk && sisymmOk;
    if (!Ok || !silent) {
-      printf("EVD Unit Tests\n"),
-      printf("Dense Direct Solvers:\n"),
+      printf("EVD Unit Tests\n");
+      printf("Dense Direct Solvers:\n");
       printf("* NS:                                     %s\n", nsOk? "Ok": "Failed");
       printf("* S:                                      %s\n", sOk? "Ok": "Failed");
       printf("* H:                                      %s\n", hOk? "Ok": "Failed");
@@ -47344,7 +48460,7 @@ bool testevd() {
       printf("* HBI:                                    %s\n", hbiOk? "Ok": "Failed");
       printf("* TDBI:                                   %s\n", tdbiOk? "Ok": "Failed");
       printf("* Failure Threshold:                      %s\n", wOk? "Ok": "Failed");
-      printf("Iterative Solvers:\n"),
+      printf("Iterative Solvers:\n");
       printf("* Subspace Iteration (S):                 %s\n", sisymmOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -47581,7 +48697,7 @@ bool testbasestat() {
    n = 10;
    ae_vector_set_length(&x, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = ae_sqr((double)i);
+      x.xR[i] = ae_sqr(i);
    }
    samplemoments(&x, n, &mean, &variance, &skewness, &kurtosis);
    s1Ok = s1Ok && NearAtR(mean, 28.5, 0.001);
@@ -47614,7 +48730,7 @@ bool testbasestat() {
    ae_vector_set_length(&x, n);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
-      x.xR[i] = ae_sqr((double)i);
+      x.xR[i] = ae_sqr(i);
       y.xR[i] = (double)i;
    }
    covcorrOk = covcorrOk && NearAtR(pearsoncorr2(&x, &y, n), 0.9627, 0.0001);
@@ -47750,7 +48866,7 @@ bool testbasestat() {
 // The final report.
    Ok = s1Ok && covcorrOk && rankOk;
    if (!Ok || !silent) {
-      printf("Descriptive Statistics Tests\n"),
+      printf("Descriptive Statistics Tests\n");
       printf("Total Results:                            %s\n", Ok? "Ok": "Failed");
       printf("* 1-Sample Functionality:                 %s\n", s1Ok? "Ok": "Failed");
       printf("* Correlation/Covariation:                %s\n", covcorrOk? "Ok": "Failed");
@@ -47803,8 +48919,8 @@ static void testpcaunit_calculatemv(RVector *x, ae_int_t n, double *mean, double
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1);
 }
 
 bool testpca() {
@@ -48203,13 +49319,13 @@ bool testpca() {
 // The final report.
    Ok = pcaconvOk && pcaortOk && pcavarOk && pcaoptOk && pcadensesubspaceOk && pcasparsesubspaceOk;
    if (!Ok || !silent) {
-      printf("PCA Tests\n"),
-      printf("Complete PCA:\n"),
+      printf("PCA Tests\n");
+      printf("Complete PCA:\n");
       printf("* Convergence:                            %s\n", pcaconvOk? "Ok": "Failed");
       printf("* Ortogonality:                           %s\n", pcaortOk? "Ok": "Failed");
       printf("* Variance Report:                        %s\n", pcavarOk? "Ok": "Failed");
       printf("* Optimality:                             %s\n", pcaoptOk? "Ok": "Failed");
-      printf("Subspace PCA:\n"),
+      printf("Subspace PCA:\n");
       printf("* Dense Subspace PCA:                     %s\n", pcadensesubspaceOk? "Ok": "Failed");
       printf("* Sparse Subspace PCA:                    %s\n", pcasparsesubspaceOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -48764,7 +49880,7 @@ bool testbdss() {
       //
       // First NC-1 ties have C0 entries, remaining NC-th tie
       // have C1 entries.
-         nc = RoundZ(sqrt((double)n));
+         nc = RoundZ(sqrt(n));
          c0 = n / nc;
          c1 = n - c0 * (nc - 1);
          for (i = 0; i < nc - 1; i++) {
@@ -48888,7 +50004,7 @@ bool testbdss() {
 // The final report.
    Ok = tiesOk && split2Ok && optimalsplitkOk && splitkOk;
    if (!Ok || !silent) {
-      printf("Basic Dataset Subroutines Tests\n"),
+      printf("Basic Dataset Subroutines Tests\n");
       printf("Ties:                                     %s\n", tiesOk? "Ok": "Failed");
       printf("Split-2:                                  %s\n", split2Ok? "Ok": "Failed");
       printf("Optimal Split-K:                          %s\n", optimalsplitkOk? "Ok": "Failed");
@@ -50918,7 +52034,7 @@ bool testmlpbase() {
 // The final report.
    Ok = infOk && procOk && gradOk && hessOk && errOk;
    if (!Ok || !silent) {
-      printf("MLP Tests\n"),
+      printf("MLP Tests\n");
       printf("Informational Functions:                  %s\n", infOk? "Ok": "Failed");
       printf("Basic Processing:                         %s\n", procOk? "Ok": "Failed");
       printf("Gradient Calculation:                     %s\n", gradOk? "Ok": "Failed");
@@ -51246,7 +52362,7 @@ bool testlda() {
 // The final report.
    Ok = ldanOk && lda1Ok;
    if (!Ok || !silent) {
-      printf("LDA Tests\n"),
+      printf("LDA Tests\n");
       printf("Fisher LDA-N:                             %s\n", ldanOk? "Ok": "Failed");
       printf("Fisher LDA-1:                             %s\n", lda1Ok? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -51340,7 +52456,7 @@ static bool testssaunit_testgeneral() {
          if (algotype == 1) {
             ae_matrix_set_length(&b, windowwidth, 1);
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
+               b.xyR[i][0] = 1 / sqrt(windowwidth);
             }
             ssasetalgoprecomputed(&state, &b, windowwidth, 1);
          } else {
@@ -51485,7 +52601,7 @@ static bool testssaunit_testgeneral() {
             ae_matrix_set_length(&b, windowwidth, 2);
             v = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
+               b.xyR[i][0] = 1 / sqrt(windowwidth);
                b.xyR[i][1] = (double)i;
                v += (double)i / (double)windowwidth;
             }
@@ -51649,7 +52765,7 @@ static bool testssaunit_testgeneral() {
             ae_matrix_set_length(&b, windowwidth, 2);
             v = 0.0;
             for (i = 0; i < windowwidth; i++) {
-               b.xyR[i][0] = 1 / sqrt((double)windowwidth);
+               b.xyR[i][0] = 1 / sqrt(windowwidth);
                b.xyR[i][1] = (double)i;
                v += (double)i / (double)windowwidth;
             }
@@ -53334,7 +54450,7 @@ bool testssa() {
 // The final report.
    Ok = specOk && genOk;
    if (!Ok || !silent) {
-      printf("SSA Test\n"),
+      printf("SSA Test\n");
       printf("* General Test Suite:                     %s\n", genOk? "Ok": "Failed");
       printf("* Special Cases:                          %s\n", specOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -53364,7 +54480,7 @@ bool testgammafunc() {
 // The final report.
    Ok = gammaOk && lngammaOk;
    if (!Ok || !silent) {
-      printf("Gamma Function Tests\n"),
+      printf("Gamma Function Tests\n");
       printf("Gamma:                                    %s\n", gammaOk? "Ok": "Failed");
       printf("LN Gamma:                                 %s\n", lngammaOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -53539,7 +54655,7 @@ bool testnormaldistr() {
 // The final report.
    Ok = bvnOk && nrmOk;
    if (!Ok || !silent) {
-      printf("Normal Distribution Tests\n"),
+      printf("Normal Distribution Tests\n");
       printf("Normal Distribution:                      %s\n", nrmOk? "Ok": "Failed");
       printf("Bi-Variate Normals:                       %s\n", bvnOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -53651,8 +54767,8 @@ static void testlinregunit_calculatemv(RVector *x, ae_int_t n, double *mean, dou
       *stddev = sqrt(variance);
    }
 // Errors
-   *means = *stddev / sqrt((double)n);
-   *stddevs = *stddev * sqrt(2.0) / sqrt((double)(n - 1));
+   *means = *stddev / sqrt(n);
+   *stddevs = *stddev * sqrt(2.0) / sqrt(n - 1);
 }
 
 // Unsets LR
@@ -53814,7 +54930,7 @@ bool testlinreg() {
       // Test S variant against non-S variant
          ea = ae_randommid();
          eb = ae_randommid();
-         testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), ae_randombool(), 1.0, 1.0, n, &xy, &s);
+         testlinregunit_generatetask(ea, eb, -5.0 * ae_randomreal(), +5.0 * ae_randomreal(), ae_randombool(), 1.0, 1.0, n, &xy, &s);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p);
          lrline(&xy, n, &info2, &a2, &b2);
          if (info != 1 || info2 != 1) {
@@ -53828,7 +54944,7 @@ bool testlinreg() {
       // then make non-zero s[i]
          ea = ae_randommid();
          eb = ae_randommid();
-         testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), n > 4, 0.0, 0.0, n, &xy, &s);
+         testlinregunit_generatetask(ea, eb, -5.0 * ae_randomreal(), +5.0 * ae_randomreal(), n > 4, 0.0, 0.0, n, &xy, &s);
          for (i = 0; i < n; i++) {
             s.xR[i] = 1 + ae_randomreal();
          }
@@ -53844,7 +54960,7 @@ bool testlinreg() {
          }
          ea = ae_randommid();
          eb = ae_randommid();
-         testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), n > 4, 1.0, 2.0, n, &xy, &s);
+         testlinregunit_generatetask(ea, eb, -5.0 * ae_randomreal(), +5.0 * ae_randomreal(), n > 4, 1.0, 2.0, n, &xy, &s);
          lrlines(&xy, &s, n, &info, &a, &b, &vara, &varb, &covab, &corrab, &p);
          if (info != 1) {
             slcOk = false;
@@ -53885,7 +55001,7 @@ bool testlinreg() {
          }
       // Additional tests for P: correlation with fit quality
          if (n > 2) {
-            testlinregunit_generatetask(ea, eb, -5 * ae_randomreal(), 5 * ae_randomreal(), false, 0.0, 0.0, n, &xy, &s);
+            testlinregunit_generatetask(ea, eb, -5.0 * ae_randomreal(), +5.0 * ae_randomreal(), false, 0.0, 0.0, n, &xy, &s);
             for (i = 0; i < n; i++) {
                s.xR[i] = 1 + ae_randomreal();
             }
@@ -53895,7 +55011,7 @@ bool testlinreg() {
                continue;
             }
             slOk = slOk && p >= 0.999;
-            testlinregunit_generatetask(0.0, 0.0, -5 * ae_randomreal(), 5 * ae_randomreal(), false, 1.0, 1.0, n, &xy, &s);
+            testlinregunit_generatetask(0.0, 0.0, -5.0 * ae_randomreal(), +5.0 * ae_randomreal(), false, 1.0, 1.0, n, &xy, &s);
             for (i = 0; i < n; i++) {
                if (i % 2 == 0) {
                   xy.xyR[i][1] = 5.0;
@@ -54338,7 +55454,7 @@ bool testlinreg() {
 // The final report.
    Ok = slOk && slcOk && groptOk && grcovOk && grestOk && grotherOk && grconvOk;
    if (!Ok || !silent) {
-      printf("Regression Tests\n"),
+      printf("Regression Tests\n");
       printf("* Straight Line Regression:               %s\n", slOk? "Ok": "Failed");
       printf("* Straight Line Regression Convergence:   %s\n", slcOk? "Ok": "Failed");
       printf("* General Linear Regression:\n");
@@ -54355,7 +55471,6 @@ bool testlinreg() {
 
 // === filters testing unit ===
 // This function tests SMA(k) filter.
-// Additional IsSilent parameter controls detailed error reporting.
 Local bool testsma() {
    ae_frame _frame_block;
    bool precomputedOk;
@@ -54454,7 +55569,6 @@ Local bool testsma() {
 }
 
 // This function tests EMA(alpha) filter.
-// Additional IsSilent parameter controls detailed error reporting.
 Local bool testema() {
    ae_frame _frame_block;
    bool precomputedOk;
@@ -54491,7 +55605,6 @@ Local bool testema() {
 }
 
 // This function tests LRMA(k) filter.
-// Additional IsSilent parameter controls detailed error reporting.
 Local bool testlrma() {
    ae_frame _frame_block;
    bool precomputedOk;
@@ -54567,7 +55680,7 @@ bool testfilters() {
 // The final report.
    Ok = smaOk && emaOk && lrmaOk;
    if (!Ok || !silent) {
-      printf("Filter Tests\n"),
+      printf("Filter Tests\n");
       printf("* SMA:                                    %s\n", smaOk? "Ok": "Failed");
       printf("* EMA:                                    %s\n", emaOk? "Ok": "Failed");
       printf("* LRMA:                                   %s\n", lrmaOk? "Ok": "Failed");
@@ -54770,7 +55883,7 @@ static bool testmcpdunit_testsimple() {
             xy.xyR[0][j] = 0.0;
          }
       // "main" element
-         v0 = 9 * ae_randomreal() + 1;
+         v0 = 9.0 * ae_randomreal() + 1;
          xy.xyR[0][i] = v0 * (1.0 - 2 * offdiagonal);
          for (j = 0; j < n; j++) {
             xy.xyR[1][j] = v0 * (1.0 - 2 * offdiagonal) * pexact.xyR[j][i];
@@ -55634,7 +56747,7 @@ bool testmcpd() {
 // The final report.
    Ok = otherOk && simpleOk && entryexitOk && ecOk && bcOk && lcOk;
    if (!Ok || !silent) {
-      printf("MCPD Tests\n"),
+      printf("MCPD Tests\n");
       printf("* Simple:                                 %s\n", simpleOk? "Ok": "Failed");
       printf("* Entry/Exit:                             %s\n", entryexitOk? "Ok": "Failed");
       printf("* Equality Constraints:                   %s\n", ecOk? "Ok": "Failed");
@@ -56202,7 +57315,7 @@ bool testmlpe() {
 // The final report.
    Ok = infOk && procOk && errOk;
    if (!Ok || !silent) {
-      printf("MLP Ensemble Tests\n"),
+      printf("MLP Ensemble Tests\n");
       printf("Informational Functions:                  %s\n", infOk? "Ok": "Failed");
       printf("Basic Processing:                         %s\n", procOk? "Ok": "Failed");
       printf("Error Functions:                          %s\n", errOk? "Ok": "Failed");
@@ -56604,7 +57717,7 @@ static bool testmlptrainunit_testmlptrainclass() {
             mlpprocess(&net, &x, &y);
          // Negative number has to be negative and
          // positive number has to be positive.
-            if (x.xR[0] < 0.0 && y.xR[0] < 0.95 && y.xR[1] > 0.05 || x.xR[0] >= 0.0 && y.xR[0] > 0.05 && y.xR[1] < 0.95) {
+            if (x.xR[0] < 0.0? y.xR[0] < 0.95 && y.xR[1] > 0.05: y.xR[0] > 0.05 && y.xR[1] < 0.95) {
                Ok = false;
                ae_frame_leave();
                return Ok;
@@ -56614,7 +57727,7 @@ static bool testmlptrainunit_testmlptrainclass() {
          for (i = 0; i < n; i++) {
             x.xR[0] = pow(-1.0, (double)(ae_randominteger(2))) * ((mxc - mnc) * ae_randomreal() + mnc);
             mlpprocess(&net, &x, &y);
-            if (x.xR[0] < 0.0 && y.xR[0] < 0.95 && y.xR[1] > 0.05 || x.xR[0] >= 0.0 && y.xR[0] > 0.05 && y.xR[1] < 0.95) {
+            if (x.xR[0] < 0.0? y.xR[0] < 0.95 && y.xR[1] > 0.05: y.xR[0] > 0.05 && y.xR[1] < 0.95) {
                Ok = false;
                ae_frame_leave();
                return Ok;
@@ -56759,7 +57872,7 @@ static bool testmlptrainunit_testmlpxorcls() {
             x.xR[0] = xy.xyR[i][0];
             x.xR[1] = xy.xyR[i][1];
             mlpprocess(&net, &x, &y);
-            if (x.xR[0] == x.xR[1] && y.xR[0] < 0.95 && y.xR[1] > 0.05 || x.xR[0] != x.xR[1] && y.xR[0] > 0.05 && y.xR[1] < 0.95) {
+            if (x.xR[0] == x.xR[1]? y.xR[0] < 0.95 && y.xR[1] > 0.05: y.xR[0] > 0.05 && y.xR[1] < 0.95) {
                Ok = false;
                ae_frame_leave();
                return Ok;
@@ -56926,7 +58039,7 @@ static bool testmlptrainunit_testmlprestarts() {
    ae_vector_set_length(&x, 1);
    sparsecreate(n, 2, n * 2, &sm);
    mean = numxp / 2.0;
-   numsigma = 5.0 * sqrt((double)numxp) / 2.0;
+   numsigma = 5.0 * sqrt(numxp) / 2.0;
    for (vtrain = 0; vtrain <= 2; vtrain++) {
       avval = 0.0;
       for (xp = 1; xp <= numxp; xp++) {
@@ -57072,7 +58185,7 @@ static bool testmlptrainunit_testmlpcverror() {
       isregr = false;
    }
    mean = nxp / 2.0;
-   numsigma = 5.0 * sqrt((double)nxp) / 2.0;
+   numsigma = 5.0 * sqrt(nxp) / 2.0;
    diffms = mean - numsigma;
    issparse = ae_randominteger(2);
    if (isregr) {
@@ -57107,7 +58220,7 @@ static bool testmlptrainunit_testmlpcverror() {
          if (isregr) {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  trainingset.xyR[i][j] = 2 * ae_randomreal() + 1;
+                  trainingset.xyR[i][j] = 2.0 * ae_randomreal() + 1;
                }
             }
          } else {
@@ -57131,7 +58244,7 @@ static bool testmlptrainunit_testmlpcverror() {
          if (isregr) {
             for (i = 0; i < npoints; i++) {
                for (j = nin; j < rowsz; j++) {
-                  sparseset(&sptrainingset, i, j, 2 * ae_randomreal() + 1);
+                  sparseset(&sptrainingset, i, j, 2.0 * ae_randomreal() + 1);
                }
             }
          } else {
@@ -57154,7 +58267,7 @@ static bool testmlptrainunit_testmlpcverror() {
       if (isregr) {
          for (i = 0; i < ntstpoints; i++) {
             for (j = nin; j < rowsz; j++) {
-               testset.xyR[i][j] = 2 * ae_randomreal() + 1;
+               testset.xyR[i][j] = 2.0 * ae_randomreal() + 1;
             }
          }
       } else {
@@ -57704,7 +58817,7 @@ bool testmlptrain() {
 // The final report.
    Ok = trnOk && mlptrainregrOk && mlptrainclassOk && mlprestartsOk && mlpxorregrOk && mlpxorclsOk && mlpcverrorOk && mlptrainensOk;
    if (!Ok || !silent) {
-      printf("MLP Tests\n"),
+      printf("MLP Tests\n");
       printf("Cross-Validation Errors:                  %s\n", mlpcverrorOk? "Ok": "Failed");
       printf("Training:                                 %s\n", trnOk? "Ok": "Failed");
       printf("Train -LM -LBFGS For Regression:          %s\n", mlptrainregrOk? "Ok": "Failed");
@@ -59695,7 +60808,7 @@ bool testclustering() {
 // The final report.
    Ok = ahcOk && kmeansOk;
    if (!Ok || !silent) {
-      printf("Clustering Tests\n"),
+      printf("Clustering Tests\n");
       printf("* AHC:                                    %s\n", ahcOk? "Ok": "Failed");
       if (!ahcOk) {
          printf("* - Basic Tests:                          %s\n", basicahcOk? "Ok": "Failed");
@@ -60647,7 +61760,7 @@ static bool testdforestunit_basictestrandom() {
                   refavg += fabs(v);
                   if ((double)j == xy.xyR[i][nvars]) {
                      refavgrel += fabs(v);
-                  // refavgce = refavgce - log(v); //(@) Removed
+                  // refavgce -= log(v); //(@) Removed
                   }
                }
             }
@@ -60798,7 +61911,7 @@ static bool testdforestunit_basictestallsame() {
                refavg += fabs(v);
                if ((double)j == xy.xyR[i][nvars]) {
                   refavgrel += fabs(v);
-               // refavgce = refavgce - log(v); //(@) Removed
+               // refavgce -= log(v); //(@) Removed
                }
             }
          }
@@ -60831,11 +61944,8 @@ static bool testdforestunit_testcompression() {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   double s;
-   ae_int_t info;
    ae_int_t nvars;
    ae_int_t nclasses;
-   ae_int_t passcount;
    double tol16;
    double tol8;
    bool Ok = true;
@@ -62118,7 +63228,7 @@ bool testknn() {
 // The final report.
    Ok = knnOk;
    if (!Ok || !silent) {
-      printf("KNN Classifier/Regression Tests\n"),
+      printf("KNN Classifier/Regression Tests\n");
       printf("* KNN (AKNN) Algorithm:                   %s\n", knnOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -62383,7 +63493,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
    r = 0.0;
    for (i = 0; i < (n + 1) / 2; i++) {
       if (i == 0) {
-         r = sqrt((double)(2 * n + 1)) - 1.85575 * pow((double)(2 * n + 1), -1.0 / 6.0);
+         r = sqrt(2 * n + 1) - 1.85575 * pow((double)(2 * n + 1), -1.0 / 6.0);
       } else {
          if (i == 1) {
             r -= 1.14 * pow((double)n, 0.426) / r;
@@ -62407,7 +63517,7 @@ static void testgqunit_buildgausshermitequadrature(ae_int_t n, RVector *x, RVect
             p2 = p3;
             p3 = p2 * r * sqrt(2.0 / (double)(j + 1)) - p1 * sqrt((double)j / (double)(j + 1));
          }
-         dp3 = sqrt((double)(2 * j)) * p2;
+         dp3 = sqrt(2 * j) * p2;
          r1 = r;
          r -= p3 / dp3;
       } while (!NearR(r, r1, ae_machineepsilon * (1 + fabs(r)) * 100));
@@ -62483,7 +63593,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    for (i = 1; i <= 4; i++) {
       alpha.xR[i] = 0.0;
-      beta.xR[i] = ae_sqr((double)i) / (4 * ae_sqr((double)i) - 1);
+      beta.xR[i] = ae_sqr(i) / (4 * ae_sqr(i) - 1);
    }
    gqgeneraterec(&alpha, &beta, 2.0, 5, &info, &x, &w);
    if (info > 0) {
@@ -62643,7 +63753,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
    for (i = 0; i <= 2; i++) {
-      beta.xR[i] = ae_sqr((double)i) / (4 * ae_sqr((double)i) - 1);
+      beta.xR[i] = ae_sqr(i) / (4 * ae_sqr(i) - 1);
    }
    gqgenerategaussradaurec(&alpha, &beta, 2.0, -1.0, 3, &info, &x, &w);
    if (info > 0) {
@@ -62664,7 +63774,7 @@ bool testgq() {
    alpha.xR[0] = 0.0;
    alpha.xR[1] = 0.0;
    for (i = 0; i <= 2; i++) {
-      beta.xR[i] = ae_sqr((double)i) / (4 * ae_sqr((double)i) - 1);
+      beta.xR[i] = ae_sqr(i) / (4 * ae_sqr(i) - 1);
    }
    gqgenerategaussradaurec(&alpha, &beta, 2.0, 1.0, 3, &info, &x, &w);
    if (info > 0) {
@@ -62764,7 +63874,7 @@ bool testgq() {
 // The final report.
    Ok = recOk && specOk;
    if (!Ok || !silent) {
-      printf("Gauss Quadrature Tests\n"),
+      printf("Gauss Quadrature Tests\n");
       printf("* Special Cases (Legendre/Jacobi/..):     %s\n", specOk? "Ok": "Failed");
       printf("* Recurrence-Based:                       %s\n", recOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -62933,7 +64043,7 @@ bool testgkq() {
 // The final report.
    Ok = intblOk && vstblOk && genOk;
    if (!Ok || !silent) {
-      printf("Gauss-Kronrod Quadrature Tests\n"),
+      printf("Gauss-Kronrod Quadrature Tests\n");
       printf("* Pre-Calculated Table:                   %s\n", intblOk? "Ok": "Failed");
       printf("* Calculated Against The Table:           %s\n", vstblOk? "Ok": "Failed");
       printf("* General Properties:                     %s\n", genOk? "Ok": "Failed");
@@ -63114,7 +64224,7 @@ bool testautogk() {
 // The final report.
    Ok = simpleOk && sngendOk;
    if (!Ok || !silent) {
-      printf("Auto GK Tests\n"),
+      printf("Auto GK Tests\n");
       printf("Integration With Given Accuracy:\n");
       printf("* Simple Problems:                        %s\n", simpleOk? "Ok": "Failed");
       printf("* Singular Problems (Ends Of Interval):   %s\n", sngendOk? "Ok": "Failed");
@@ -63489,7 +64599,7 @@ bool testfft() {
 // The final report.
    Ok = bidiOk && bidirOk && refOk && refrOk && reintOk;
    if (!Ok || !silent) {
-      printf("FFT Tests\n"),
+      printf("FFT Tests\n");
       printf("* Bi-Directional Complex Test:            %s\n", bidiOk? "Ok": "Failed");
       printf("* Against Reference Complex FFT:          %s\n", refOk? "Ok": "Failed");
       printf("* Bi-Directional Real Test:               %s\n", bidirOk? "Ok": "Failed");
@@ -63610,7 +64720,7 @@ bool testfht() {
 // The final report.
    Ok = bidiOk && refOk;
    if (!Ok || !silent) {
-      printf("FHT Tests\n"),
+      printf("FHT Tests\n");
       printf("* Bi-Directional Test:                    %s\n", bidiOk? "Ok": "Failed");
       printf("* Against Reference FHT:                  %s\n", refOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -63893,7 +65003,7 @@ bool testconv() {
 // The final report.
    Ok = refOk && refrOk && invOk && invrOk;
    if (!Ok || !silent) {
-      printf("Convolution Tests\n"),
+      printf("Convolution Tests\n");
       printf("* Against Reference Complex Conv:         %s\n", refOk? "Ok": "Failed");
       printf("* Against Reference Real Conv:            %s\n", refrOk? "Ok": "Failed");
       printf("* Complex Inverse:                        %s\n", invOk? "Ok": "Failed");
@@ -64088,7 +65198,7 @@ bool testcorr() {
 // The final report.
    Ok = refOk && refrOk;
    if (!Ok || !silent) {
-      printf("Correlation Tests\n"),
+      printf("Correlation Tests\n");
       printf("* Against Reference Complex Corr:         %s\n", refOk? "Ok": "Failed");
       printf("* Against Reference Real Corr:            %s\n", refrOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -64858,7 +65968,7 @@ bool testidw() {
 // The final report.
    Ok = commonOk && mstabOk;
    if (!Ok || !silent) {
-      printf("Inverse Distance Weighting Tests\n"),
+      printf("Inverse Distance Weighting Tests\n");
       printf("* Common Properties:                      %s\n", commonOk? "Ok": "Failed");
       printf("* MSTAB-Specific Tests:                   %s\n", mstabOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -65190,8 +66300,8 @@ bool testratint() {
    // D=1, non-equidistant nodes
       for (pass = 1; pass <= passcount; pass++) {
       // Initialize X, Y, W
-         a = -1 - 1 * ae_randomreal();
-         b = 1 + 1 * ae_randomreal();
+         a = -1.0 - ae_randomreal();
+         b = +1.0 + ae_randomreal();
          for (i = 0; i < n; i++) {
             x.xR[i] = atan((b - a) * i / (n - 1) + a);
          }
@@ -65229,8 +66339,8 @@ bool testratint() {
                continue;
             }
          // Initialize X, Y, W
-            a = -1 - 1 * ae_randomreal();
-            b = 1 + 1 * ae_randomreal();
+            a = -1.0 - ae_randomreal();
+            b = +1.0 + ae_randomreal();
             for (i = 0; i < n; i++) {
                x.xR[i] = (b - a) * i / (n - 1) + a;
             }
@@ -65287,7 +66397,7 @@ bool testratint() {
 // The final report.
    Ok = bcOk && npOk;
    if (!Ok || !silent) {
-      printf("Rational Interpolation Tests\n"),
+      printf("Rational Interpolation Tests\n");
       printf("Basic Barycentric Functions:              %s\n", bcOk? "Ok": "Failed");
       printf("Floater-Hormann:                          %s\n", npOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -65750,7 +66860,7 @@ bool testfitsphere() {
 // The final report.
    Ok = nsOk && lsOk;
    if (!Ok || !silent) {
-      printf("Testing FitSphere\n"),
+      printf("Testing FitSphere\n");
       printf("* Least Squares Circle Fitting:           %s\n", lsOk? "Ok": "Failed");
       printf("* Non-Smooth Fitting (MC, MI, MZ):        %s\n", nsOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -66043,7 +67153,7 @@ static bool testspline1dunit_testmonotonespline() {
          ae_frame_leave();
          return Ok;
       }
-      if (x.xR[i] == 3.0 && !NearAtR(dv, 1.0, eps) || x.xR[i] != 3.0 && dv != 0.0) {
+      if (x.xR[i] == 3.0? !NearAtR(dv, 1.0, eps): dv != 0.0) {
          Ok = false;
          ae_frame_leave();
          return Ok;
@@ -66192,8 +67302,6 @@ static bool testspline1dunit_testsplinefitting() {
    ae_int_t i;
    ae_int_t k;
    ae_int_t pass;
-   ae_int_t info;
-   ae_int_t info2;
    double s;
    double v;
    double v1;
@@ -66299,7 +67407,7 @@ static bool testspline1dunit_testsplinefitting() {
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
       Ok = Ok && v / (u + lipschitzeps) <= 1.2;
       Ok = Ok && v1 / (u1 + lipschitzeps * m) <= 1.2;
-      Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr((double)m)) <= 1.2;
+      Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr(m)) <= 1.2;
    }
    for (n = 2; n <= 20; n++) {
       m = 5 * n;
@@ -66327,7 +67435,7 @@ static bool testspline1dunit_testsplinefitting() {
       testspline1dunit_lconst(0.0, 1.0, &c, s / 2, &v, &v1, &v2);
       Ok = Ok && v / (u + lipschitzeps) <= 1.2;
       Ok = Ok && v1 / (u1 + lipschitzeps * m) <= 1.2;
-      Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr((double)m)) <= 1.2;
+      Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr(m)) <= 1.2;
    }
 // Test smoothing properties: a sequence of problems with increasing Rho
 // results in residuals monotonically increasing and nonlinearity penalty
@@ -66368,7 +67476,7 @@ static bool testspline1dunit_testsplinefitting() {
          testspline1dunit_lconst(a, b, &c, s / 2, &v, &v1, &v2);
          Ok = Ok && v / (u + lipschitzeps) <= 1.2;
          Ok = Ok && v1 / (u1 + lipschitzeps * m) <= 1.2;
-         Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr((double)m)) <= 1.2;
+         Ok = Ok && v2 / (u2 + lipschitzeps * ae_sqr(m)) <= 1.2;
       // Compute residuals and penalty
          residuals = 0.0;
          for (i = 0; i < n; i++) {
@@ -67139,7 +68247,7 @@ bool testspline1d() {
 // The final report.
    bool Ok = interpOk && fitOk && dsOk && cpOk && upOk && ltOk && iOk;
    if (!Ok || !silent) {
-      printf("Spline 1D Tests\n"),
+      printf("Spline 1D Tests\n");
    // Normal tests.
       printf("* Interpolation Tests:                    %s\n", interpOk? "Ok": "Failed");
       if (!interpOk) {
@@ -67813,7 +68921,7 @@ bool testparametric() {
 // The final report.
    Ok = p2Ok && p3Ok && rdpOk;
    if (!Ok || !silent) {
-      printf("Parametric Spline Interpolation Tests\n"),
+      printf("Parametric Spline Interpolation Tests\n");
    // Normal tests
       printf("2D Splines:                               %s\n", p2Ok? "Ok": "Failed");
       printf("3D Splines:                               %s\n", p3Ok? "Ok": "Failed");
@@ -68380,7 +69488,7 @@ bool testspline3d() {
 // The final report.
    Ok = basicOk && unpackOk && lintransfOk && trilinresOk;
    if (!Ok || !silent) {
-      printf("3D Spline Tests\n"),
+      printf("3D Spline Tests\n");
       printf("Basic Test:                               %s\n", basicOk? "Ok": "Failed");
       printf("Unpack Test:                              %s\n", unpackOk? "Ok": "Failed");
       printf("Linear Transform Test:                    %s\n", lintransfOk? "Ok": "Failed");
@@ -68729,7 +69837,7 @@ bool testpolint() {
 // The final report.
    Ok = intOk;
    if (!Ok || !silent) {
-      printf("Polynomial Interpolation Test\n"),
+      printf("Polynomial Interpolation Test\n");
    // Normal tests
       printf("Interpolation Test:                       %s\n", intOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
@@ -69947,9 +71055,7 @@ static bool testlsfitunit_testbcnls() {
    }
 // Fit
 //
-//
 //    f(X|C)= c_0
-//
 //
 // subject to random box constraints on c_0, where X is N-dimensional vector
 // (f does not depend on X, and it is not an error! we just test that sizes
@@ -70043,9 +71149,7 @@ static bool testlsfitunit_testbcnls() {
    }
 // Fit
 //
-//
 //    f(X|C)= c_0 + c_1*x0 + c_2*x0^2 + ...
-//
 //
 // subject to random box constraints on c.
    epsx = 1.0E-9;
@@ -70420,9 +71524,7 @@ static bool testlsfitunit_testlcnls() {
    }
 // Fit
 //
-//
 //    f(X|C)= c_0
-//
 //
 // subject to single general linear equality constraint on c_0.
 //
@@ -70481,9 +71583,7 @@ static bool testlsfitunit_testlcnls() {
    }
 // Fit
 //
-//
 //    f(X|C)= c_0 + c_1*x0 + c_2*x0^2 + ...
-//
 //
 // subject to single general linear equality constraint on c.
 //
@@ -71016,7 +72116,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
 //     C(true) = 2.
    n = 100;
    ae_vector_set_length(&c, 1);
-   c.xR[0] = 1 + 2 * ae_randomreal();
+   c.xR[0] = 1.0 + 2.0 * ae_randomreal();
    ae_matrix_set_length(&a, n, 1);
    ae_vector_set_length(&y, n);
    for (i = 0; i < n; i++) {
@@ -71048,7 +72148,7 @@ static void testlsfitunit_testgeneralfitting(bool *LlsOkP, bool *NlsOkP) {
       v2 = ae_randomreal();
       v = 1 + ae_randomreal();
       ae_vector_set_length(&c, 1);
-      c.xR[0] = 1 + 2 * ae_randomreal();
+      c.xR[0] = 1.0 + 2.0 * ae_randomreal();
       ae_matrix_set_length(&a, 4, 1);
       ae_vector_set_length(&y, 4);
       a.xyR[0][0] = 1.0;
@@ -72186,7 +73286,7 @@ static bool testlsfitunit_testgradientcheck() {
          c.xR[i] = spp * ae_randommid();
       }
       for (i = 0; i < m; i++) {
-         x0.xR[i] = 10 * ae_randommid();
+         x0.xR[i] = 10.0 * ae_randommid();
       }
    // Prepare boundary parameters
       for (i = 0; i < k; i++) {
@@ -72274,7 +73374,7 @@ bool testlsfit() {
 // The final report.
    Ok = llsOk && nlsOk && polfitOk && ratfitOk && splfitOk && gradOk && logisticOk && rdpOk;
    if (!Ok || !silent) {
-      printf("Least Squares Fit Tests\n"),
+      printf("Least Squares Fit Tests\n");
       printf("Polynomial Least Squares:                 %s\n", polfitOk? "Ok": "Failed");
       printf("Rational Least Squares:                   %s\n", ratfitOk? "Ok": "Failed");
       printf("Spline Least Squares:                     %s\n", splfitOk? "Ok": "Failed");
@@ -74446,9 +75546,9 @@ bool testspline2d() {
 // The final report.
    Ok = blOk && bcOk && dsOk && cpOk && serOk && upOk && ltOk && syOk && rlOk && rcOk && vfOk && fitpriorOk && fitpenaltyOk && fitblocksolverOk && fitfastddmsolverOk;
    if (!Ok || !silent) {
-      printf("2D Spline Tests\n"),
+      printf("2D Spline Tests\n");
    // Normal tests
-      printf("Interpolation:\n"),
+      printf("Interpolation:\n");
       printf("* Bi-Linear:                              %s\n", blOk? "Ok": "Failed");
       printf("* Bi-Cubic:                               %s\n", bcOk? "Ok": "Failed");
       printf("* Differentiation:                        %s\n", dsOk? "Ok": "Failed");
@@ -74458,12 +75558,12 @@ bool testspline2d() {
       printf("* Linear Transform:                       %s\n", ltOk? "Ok": "Failed");
       printf("* Special Symmetry Props:                 %s\n", syOk? "Ok": "Failed");
       printf("* Vector Spline:                          %s\n", vfOk? "Ok": "Failed");
-      printf("Fitting Tests:\n"),
+      printf("Fitting Tests:\n");
       printf("* Linear Prior Term:                      %s\n", fitpriorOk? "Ok": "Failed");
       printf("* Non-Linearity Penalty Term:             %s\n", fitpenaltyOk? "Ok": "Failed");
       printf("* Block Solver:                           %s\n", fitblocksolverOk? "Ok": "Failed");
       printf("* Fast DDM Solver:                        %s\n", fitfastddmsolverOk? "Ok": "Failed");
-      printf("Resampling Tests:\n"),
+      printf("Resampling Tests:\n");
       printf("* Bi-Linear:                              %s\n", rlOk? "Ok": "Failed");
       printf("* Bi-Cubic:                               %s\n", rcOk? "Ok": "Failed");
    // Summary
@@ -75106,7 +76206,7 @@ static bool testrbfunit_specialtest() {
 // Radii filtering should place a bound on the radius of outlier.
    for (nx = 2; nx <= 3; nx++) {
       for (ny = 1; ny <= 3; ny++) {
-         sx = exp(-5 + 10 * ae_randomreal());
+         sx = exp(-5.0 + 10.0 * ae_randomreal());
          rbfcreate(nx, ny, &s);
          ae_matrix_set_length(&xy, 20, nx + ny);
          for (i = 0; i < xy.rows; i++) {
@@ -75121,7 +76221,7 @@ static bool testrbfunit_specialtest() {
          xy.xyR[xy.rows - 1][0] = -1000 * sx;
          rbfsetpoints(&s, &xy, xy.rows);
       // Try random Z from [1,5]
-         z = 1 + ae_randomreal() * 4;
+         z = 1.0 + ae_randomreal() * 4.0;
          rbfsetalgoqnn(&s, 1.0, z);
          rbfbuildmodel(&s, &rep);
          if (rep.terminationtype <= 0) {
@@ -77771,7 +78871,7 @@ static bool testrbfunit_spechrbftest() {
    vdiff = 0.0;
    for (i = 0; i < n - 1; i++) {
       for (j = 0; j < n - 1; j++) {
-         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / ae_sqr((double)(n - 1));
+         vdiff += fabs(rbfcalc2(&s0, 0.5 + i, 0.5 + j) - rbfcalc2(&s1, 0.5 + i, 0.5 + j)) / ae_sqr(n - 1);
       }
    }
    Ok = Ok && vdiff <= 0.00200 && vdiff >= 0.00001;
@@ -78303,16 +79403,16 @@ bool testrbf() {
 // The final report.
    Ok = specialOk && basicrbfOk && irregularrbfOk && linearitymodelrbfOk && sqrdegmatrixrbfOk && serOk && multilayerrbf1dOk && multilayerrbfOk && gridcalc23Ok && hrbfOk;
    if (!Ok || !silent) {
-      printf("RBF Tests\n"),
-      printf("General Tests:\n"),
+      printf("RBF Tests\n");
+      printf("General Tests:\n");
       printf("* Serialization Test:                     %s\n", serOk? "Ok": "Failed");
       printf("* Special Properties:                     %s\n", specialOk? "Ok": "Failed");
-      printf("RBF-V2:\n"),
+      printf("RBF-V2:\n");
       printf("* Basic HRBF Test:                        %s\n", hrbfbasicOk? "Ok": "Failed");
       printf("* Scale-Related Tests:                    %s\n", hrbfscaleOk? "Ok": "Failed");
       printf("* Grid Calculation Tests:                 %s\n", hrbfgridOk? "Ok": "Failed");
       printf("* Special Properties:                     %s\n", hrbfspecOk? "Ok": "Failed");
-      printf("RBF-V1:\n"),
+      printf("RBF-V1:\n");
       printf("* Basic RBF Test:                         %s\n", basicrbfOk? "Ok": "Failed");
       printf("* Irregular RBF Test:                     %s\n", irregularrbfOk? "Ok": "Failed");
       printf("* Linearity Test:                         %s\n", linearitymodelrbfOk? "Ok": "Failed");
@@ -78418,7 +79518,7 @@ bool testhermite() {
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold;
    if (!Ok || !silent) {
-      printf("Calculation of the Hermite Polynomials Tests\n"),
+      printf("Calculation of the Hermite Polynomials Tests\n");
       printf("Max Error:                                %5.2e\n", (double)err);
       printf("Summation Error:                          %5.2e\n", (double)sumerr);
       printf("Coefficients Error:                       %5.2e\n", (double)cerr);
@@ -78527,7 +79627,7 @@ bool testlaguerre() {
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold;
    if (!Ok || !silent) {
-      printf("Calculation of the LaGuerre Polynomials Tests\n"),
+      printf("Calculation of the LaGuerre Polynomials Tests\n");
       printf("Max Error:                                %5.2e\n", (double)err);
       printf("Summation Error:                          %5.2e\n", (double)sumerr);
       printf("Coefficients Error:                       %5.2e\n", (double)cerr);
@@ -78621,7 +79721,7 @@ bool testlegendre() {
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold;
    if (!Ok || !silent) {
-      printf("Calculation of the Legendre Polynomials Tests\n"),
+      printf("Calculation of the Legendre Polynomials Tests\n");
       printf("Max Error:                                %5.2e\n", (double)err);
       printf("Summation Error:                          %5.2e\n", (double)sumerr);
       printf("Coefficients Error:                       %5.2e\n", (double)cerr);
@@ -78784,7 +79884,7 @@ bool testchebyshev() {
 // The final report.
    Ok = err <= threshold && sumerr <= threshold && cerr <= threshold && ferr <= threshold;
    if (!Ok || !silent) {
-      printf("Calculation of the Chebyshev Polynomials Tests\n"),
+      printf("Calculation of the Chebyshev Polynomials Tests\n");
       printf("Max Error Against Table:                  %5.2e\n", (double)err);
       printf("Summation Error:                          %5.2e\n", (double)sumerr);
       printf("Coefficients Error:                       %5.2e\n", (double)cerr);
@@ -79191,7 +80291,7 @@ bool teststudentttests() {
    unequalvariancettest(&xa, n, &ya, n, &tailb, &taill, &tailr);
 // The final report.
    if (!Ok || !silent) {
-      printf("Student T-Test Calculation Test\n"),
+      printf("Student T-Test Calculation Test\n");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    ae_frame_leave();
@@ -79473,7 +80573,7 @@ bool testschur() {
 // The final report.
    Ok = materr <= threshold && orterr <= threshold && structOk && convOk;
    if (!Ok || !silent) {
-      printf("Schur Decomposition Tests\n"),
+      printf("Schur Decomposition Tests\n");
       printf("Schur Decomposition Error:                %5.3e\n", (double)materr);
       printf("Schur Orthogonality Error:                %5.3e\n", (double)orterr);
       printf("T Matrix Structure:                       %s\n", structOk? "Ok": "Failed");
@@ -79640,7 +80740,7 @@ bool testspdgevd() {
 // The final report.
    Ok = valerr <= threshold && convOk && sortOk;
    if (!Ok || !silent) {
-      printf("Symmetric GEVD Tests\n"),
+      printf("Symmetric GEVD Tests\n");
       printf("Average LambdaV Error (Generalized):      %5.3e\n", (double)valerr);
       printf("Eigenvalues Order:                        %s\n", sortOk? "Ok": "Failed");
       printf("Always converged:                         %s\n", convOk? "Yes": "No");
@@ -80123,7 +81223,7 @@ bool testinverseupdate() {
    }
 // The final report.
    if (!Ok || !silent) {
-      printf("Inverse Update (Real) Test\n"),
+      printf("Inverse Update (Real) Test\n");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
    ae_frame_leave();
@@ -80498,8 +81598,8 @@ bool testnleq() {
 // Test ability to set limit on algorithm steps
    ae_vector_set_length(&x, 2);
    ae_vector_set_length(&xlast, 2);
-   x.xR[0] = 20 * ae_randomreal() + 20;
-   x.xR[1] = 20 * ae_randomreal() + 20;
+   x.xR[0] = 20.0 * ae_randomreal() + 20;
+   x.xR[1] = 20.0 * ae_randomreal() + 20;
    xlast.xR[0] = x.xR[0];
    xlast.xR[1] = x.xR[1];
    stpmax = 0.1 + 0.1 * ae_randomreal();
@@ -80523,7 +81623,7 @@ bool testnleq() {
 // The final report.
    Ok = basicsOk && convOk && otherOk;
    if (!Ok || !silent) {
-      printf("NL-EQ Solver Tests\n"),
+      printf("NL-EQ Solver Tests\n");
       printf("Basic Functionality:                      %s\n", basicsOk? "Ok": "Failed");
       printf("Convergence:                              %s\n", convOk? "Ok": "Failed");
       printf("Other Properties:                         %s\n", otherOk? "Ok": "Failed");
@@ -80604,9 +81704,10 @@ static bool testdirectsparsesolversunit_testsks() {
          }
          ae_vector_set_length(&b, n);
          rmatrixgemv(n, n, 1.0, &a, 0, 0, 0, &xe, 0, 0.0, &b, 0);
-      // Test solver #1
+      // Test SKS solver
          ae_vector_set_length(&xs, 0);
-         sparsesolvesks(&sa, n, isupper, &b, &rep, &xs);
+         sparsecopytosks(&sa, &sa2);
+         sparsespdsolvesks(&sa2, isupper, &b, &xs, &rep);
          Ok = Ok && rep.terminationtype > 0;
          Ok = Ok && xs.cnt == n;
          if (!Ok) {
@@ -80624,7 +81725,96 @@ static bool testdirectsparsesolversunit_testsks() {
             return Ok;
          }
          ae_vector_set_length(&xs, 0);
-         sparsecholeskysolvesks(&sa2, n, isupper, &b, &rep, &xs);
+         sparsespdcholeskysolve(&sa2, isupper, &b, &xs, &rep);
+         Ok = Ok && rep.terminationtype > 0;
+         Ok = Ok && xs.cnt == n;
+         if (!Ok) {
+            ae_frame_leave();
+            return Ok;
+         }
+         for (i = 0; i < n; i++) {
+            Ok = Ok && NearAtR(xe.xR[i], xs.xR[i], threshold);
+         }
+      }
+   }
+   ae_frame_leave();
+   return Ok;
+}
+
+// SPD SKS test
+static bool testdirectsparsesolversunit_testcholesky() {
+   ae_frame _frame_block;
+   ae_int_t pass;
+   ae_int_t passcount;
+   ae_int_t maxn;
+   double threshold;
+   ae_int_t bw;
+   bool isupper;
+   ae_int_t n;
+   ae_int_t i;
+   ae_int_t j;
+   bool Ok = true;
+   ae_frame_make(&_frame_block);
+   NewMatrix(a, 0, 0, DT_REAL);
+   NewVector(xe, 0, DT_REAL);
+   NewVector(b, 0, DT_REAL);
+   NewVector(xs, 0, DT_REAL);
+   NewObj(sparsematrix, sa);
+   NewObj(sparsematrix, sa2);
+   NewObj(sparsesolverreport, rep);
+   NewObj(hqrndstate, rs);
+   passcount = 10;
+   maxn = 30;
+   threshold = 1.0E-6;
+   hqrndrandomize(&rs);
+// Well conditioned SPD problems solved with Cholesky solver
+   for (n = 1; n <= maxn; n++) {
+      for (pass = 1; pass <= passcount; pass++) {
+      // 1. generate random well conditioned matrix A.
+      // 2. generate random solution vector xe
+      // 3. generate right part b=A*xe
+         isupper = hqrndnormal(&rs) > 0.5;
+         bw = hqrnduniformi(&rs, n + 1);
+         ae_matrix_set_length(&a, n, n);
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               a.xyR[i][j] = 0.0;
+            }
+         }
+         sparsecreate(n, n, 0, &sa);
+         for (i = 0; i < n; i++) {
+            a.xyR[i][i] = 1 + hqrnduniformr(&rs);
+            sparseset(&sa, i, i, a.xyR[i][i]);
+            for (j = i + 1; j <= i + bw && j < n; j++) {
+               a.xyR[i][j] = (hqrnduniformr(&rs) - 0.5) / n;
+               a.xyR[j][i] = a.xyR[i][j];
+               if (isupper) {
+                  sparseset(&sa, i, j, a.xyR[i][j]);
+               } else {
+                  sparseset(&sa, j, i, a.xyR[i][j]);
+               }
+            }
+         }
+         for (i = 0; i < n; i++) {
+            for (j = 0; j < n; j++) {
+               if (isupper? j < i: j > i) {
+                  if (hqrnduniformr(&rs) < 0.25) {
+                     sparseset(&sa, i, j, hqrndnormal(&rs));
+                  }
+               }
+            }
+         }
+         sparseconvertto(&sa, hqrnduniformi(&rs, 3));
+         ae_vector_set_length(&xe, n);
+         for (i = 0; i < n; i++) {
+            xe.xR[i] = hqrndnormal(&rs);
+         }
+         ae_vector_set_length(&b, n);
+         rmatrixgemv(n, n, 1.0, &a, 0, 0, 0, &xe, 0, 0.0, &b, 0);
+      // Test CRS/AMD solver
+         ae_vector_set_length(&xs, 0);
+         sparsecopy(&sa, &sa2);
+         sparsespdsolve(&sa2, isupper, &b, &xs, &rep);
          Ok = Ok && rep.terminationtype > 0;
          Ok = Ok && xs.cnt == n;
          if (!Ok) {
@@ -80715,7 +81905,7 @@ static bool testdirectsparsesolversunit_testgen() {
             rmatrixgemv(n, n, 1.0, &a, 0, 0, 0, &xe, 0, 0.0, &b, 0);
          // Test solver #1
             ae_vector_set_length(&xs, 0);
-            sparsesolve(&sa, n, &b, &xs, &rep);
+            sparsesolve(&sa, &b, &xs, &rep);
             Ok = Ok && rep.terminationtype > 0;
             Ok = Ok && xs.cnt == n;
             if (!Ok) {
@@ -80729,7 +81919,7 @@ static bool testdirectsparsesolversunit_testgen() {
             ae_vector_set_length(&xs, 0);
             sparsecopytocrs(&sa, &sa2);
             sparselu(&sa2, 0, &pivp, &pivq);
-            sparselusolve(&sa2, &pivp, &pivq, n, &b, &xs2, &rep);
+            sparselusolve(&sa2, &pivp, &pivq, &b, &xs2, &rep);
             Ok = Ok && rep.terminationtype > 0;
             Ok = Ok && xs2.cnt == n;
             if (!Ok) {
@@ -80751,20 +81941,23 @@ static bool testdirectsparsesolversunit_testgen() {
    return Ok;
 }
 
-// Test
 bool testdirectsparsesolvers() {
    bool rsksOk;
+   bool rcholOk;
    bool rgenOk;
    bool Ok;
    rsksOk = true;
+   rcholOk = true;
    rgenOk = true;
    rsksOk = rsksOk && testdirectsparsesolversunit_testsks();
+   rcholOk = rcholOk && testdirectsparsesolversunit_testcholesky();
    rgenOk = rgenOk && testdirectsparsesolversunit_testgen();
 // The final report.
-   Ok = rsksOk && rgenOk;
+   Ok = rsksOk && rcholOk && rgenOk;
    if (!Ok || !silent) {
-      printf("Direct Sparse Solvers Test\n"),
-      printf("* SKS (Real):                             %s\n", rsksOk? "Ok": "Failed");
+      printf("Direct Sparse Solvers Test\n");
+      printf("* SPD-SKS (Real):                         %s\n", rsksOk? "Ok": "Failed");
+      printf("* SPD-CRS (Real):                         %s\n", rcholOk? "Ok": "Failed");
       printf("* General (Real):                         %s\n", rgenOk? "Ok": "Failed");
       printf("Test %s\n", Ok? "Passed": "Failed");
    }
@@ -80820,7 +82013,7 @@ static bool testlincgunit_complextest() {
    // * random A with norm NA (equal to 1.0),
    // * random right part B whose elements are uniformly distributed in [-MX,+MX]
    // * random starting point X0 whose elements are uniformly distributed in [-MX,+MX]
-      c = 15 + 15 * ae_randomreal();
+      c = 15.0 + 15.0 * ae_randomreal();
       spdmatrixrndcond(sz, c, &a);
       na = 1.0;
       ae_vector_set_length(&b, sz);
@@ -82213,7 +83406,7 @@ bool testlincg() {
 // The final report.
    Ok = basictestxOk && complexresOk && complexOk && rcorrectnessOk && basictestitersOk && krylovsubspaceOk && sparseOk && precondOk;
    if (!Ok || !silent) {
-      printf("LinCG Tests\n"),
+      printf("LinCG Tests\n");
       printf("Basic Test X:                             %s\n", basictestxOk? "Ok": "Failed");
       printf("Basic Test Iters:                         %s\n", basictestitersOk? "Ok": "Failed");
       printf("Complex Res Test:                         %s\n", complexresOk? "Ok": "Failed");

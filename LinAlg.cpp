@@ -77,7 +77,6 @@ static const ae_int_t sparse_linalgswitch = 16;
 // This function completely  overwrites S with new sparse matrix. Previously
 // allocated storage is NOT reused. If you  want  to reuse already allocated
 // memory, call SparseCreateBuf function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsecreate(const ae_int_t m, const ae_int_t n, const ae_int_t k, sparsematrix &s);
 // API: void sparsecreate(const ae_int_t m, const ae_int_t n, sparsematrix &s);
@@ -108,7 +107,6 @@ void sparsecreate(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s) {
 //                     All elements of the matrix are zero.
 //                     Previously allocated storage is reused, if  its  size
 //                     is compatible with expected number of non-zeros K.
-//
 // ALGLIB Project: Copyright 14.01.2014 by Sergey Bochkanov
 // API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const ae_int_t k, const sparsematrix &s);
 // API: void sparsecreatebuf(const ae_int_t m, const ae_int_t n, const sparsematrix &s);
@@ -168,7 +166,6 @@ void sparsecreatebuf(ae_int_t m, ae_int_t n, ae_int_t k, sparsematrix *s) {
 // NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call SparseCreateCRSBuf function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsecreatecrs(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, sparsematrix &s);
 void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
@@ -211,7 +208,6 @@ void sparsecreatecrs(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
 //     S           -   sparse M*N matrix in CRS representation.
 //                     You have to fill ALL non-zero elements by calling
 //                     SparseSet() BEFORE you try to use this matrix.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsecreatecrsbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &ner, const sparsematrix &s);
 void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
@@ -263,7 +259,6 @@ void sparsecreatecrsbuf(ae_int_t m, ae_int_t n, ZVector *ner, sparsematrix *s) {
 // NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call SparseCreateSKSBuf function.
-//
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 // API: void sparsecreatesks(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, sparsematrix &s);
 void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s) {
@@ -308,7 +303,6 @@ void sparsecreatesks(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematri
 //     S           -   sparse M*N matrix in SKS representation.
 //                     All elements are filled by zeros.
 //                     You may use sparseset() to change their values.
-//
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 // API: void sparsecreatesksbuf(const ae_int_t m, const ae_int_t n, const integer_1d_array &d, const integer_1d_array &u, const sparsematrix &s);
 void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsematrix *s) {
@@ -385,7 +379,6 @@ void sparsecreatesksbuf(ae_int_t m, ae_int_t n, ZVector *d, ZVector *u, sparsema
 // NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
 //       Previously allocated storage is NOT reused. If you  want  to  reuse
 //       already allocated memory, call sparsecreatesksbandbuf function.
-//
 // ALGLIB Project: Copyright 25.12.2017 by Sergey Bochkanov
 // API: void sparsecreatesksband(const ae_int_t m, const ae_int_t n, const ae_int_t bw, sparsematrix &s);
 void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s) {
@@ -415,7 +408,6 @@ void sparsecreatesksband(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s) {
 //     S           -   sparse M*N matrix in SKS representation.
 //                     All elements are filled by zeros.
 //                     You may use sparseset() to change their values.
-//
 // ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 // API: void sparsecreatesksbandbuf(const ae_int_t m, const ae_int_t n, const ae_int_t bw, const sparsematrix &s);
 void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s) {
@@ -470,7 +462,6 @@ void sparsecreatesksbandbuf(ae_int_t m, ae_int_t n, ae_int_t bw, sparsematrix *s
 //
 // NOTE:  this  function  does  not verify its arguments, it just copies all
 // fields of the structure.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsecopy(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopy(sparsematrix *s0, sparsematrix *s1) {
@@ -483,7 +474,6 @@ void sparsecopy(sparsematrix *s0, sparsematrix *s1) {
 //
 // NOTE:  this  function  does  not verify its arguments, it just copies all
 // fields of the structure.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsecopybuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopybuf(sparsematrix *s0, sparsematrix *s1) {
@@ -525,7 +515,6 @@ void sparsecopybuf(sparsematrix *s0, sparsematrix *s1) {
 }
 
 // This function efficiently swaps contents of S0 and S1.
-//
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparseswap(const sparsematrix &s0, const sparsematrix &s1);
 void sparseswap(sparsematrix *s0, sparsematrix *s1) {
@@ -543,7 +532,6 @@ void sparseswap(sparsematrix *s0, sparsematrix *s1) {
 }
 
 // This is hash function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize) {
    ae_frame _frame_block;
@@ -575,7 +563,6 @@ static ae_int_t sparse_hash(ae_int_t i, ae_int_t j, ae_int_t tabsize) {
 //
 // NOTE 1:  when  S[i,j]  is exactly zero after modification, it is  deleted
 // from the table.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
@@ -661,7 +648,6 @@ void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 //
 // Outputs:
 //     S           -   modified matrix
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
@@ -745,14 +731,12 @@ void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 // non-zero elements in a row.
 //
 // Inputs:
-//     S           -   sparse M*N matrix in Hash-Table representation.
-//                     Exception will be thrown for CRS matrix.
+//     S           -   sparse M*N matrix
 //     I           -   row index of the element to modify, 0 <= I < M
 //     J           -   column index of the element to modify, 0 <= J < N
 //
 // Result:
 //     value of S[I,J] or zero (in case no element with such index is found)
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
@@ -831,6 +815,95 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
    return result;
 }
 
+// This function checks whether S[i,j] is present in the sparse  matrix.  It
+// returns True even for elements  that  are  numerically  zero  (but  still
+// have place allocated for them).
+//
+// The matrix  can be in any mode (Hash-Table, CRS, SKS), but this  function
+// is less efficient for CRS matrices. Hash-Table and SKS matrices can  find
+// element in O(1) time, while  CRS  matrices need O(log(RS)) time, where RS
+// is an number of non-zero elements in a row.
+//
+// Inputs:
+//     S           -   sparse M*N matrix
+//     I           -   row index of the element to modify, 0 <= I < M
+//     J           -   column index of the element to modify, 0 <= J < N
+//
+// Result:
+//     whether S[I,J] is present in the data structure or not
+// ALGLIB Project: Copyright 14.10.2020 by Sergey Bochkanov
+// API: bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
+bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j) {
+   ae_int_t hashcode;
+   ae_int_t k;
+   ae_int_t k0;
+   ae_int_t k1;
+   bool result;
+   ae_assert(i >= 0, "SparseExists: I<0");
+   ae_assert(i < s->m, "SparseExists: I >= M");
+   ae_assert(j >= 0, "SparseExists: J<0");
+   ae_assert(j < s->n, "SparseExists: J >= N");
+   result = false;
+   if (s->matrixtype == 0) {
+   // Hash-based storage
+      k = s->tablesize;
+      hashcode = sparse_hash(i, j, k);
+      while (true) {
+         if (s->idx.xZ[2 * hashcode] == -1) {
+            return result;
+         }
+         if (s->idx.xZ[2 * hashcode] == i && s->idx.xZ[2 * hashcode + 1] == j) {
+            result = true;
+            return result;
+         }
+         hashcode = (hashcode + 1) % k;
+      }
+   }
+   if (s->matrixtype == 1) {
+   // CRS
+      ae_assert(s->ninitialized == s->ridx.xZ[s->m], "SparseExists: some rows/elements of the CRS matrix were not initialized (you must initialize everything you promised to SparseCreateCRS)");
+      k0 = s->ridx.xZ[i];
+      k1 = s->ridx.xZ[i + 1] - 1;
+      while (k0 <= k1) {
+         k = (k0 + k1) / 2;
+         if (s->idx.xZ[k] == j) {
+            result = true;
+            return result;
+         }
+         if (s->idx.xZ[k] < j) {
+            k0 = k + 1;
+         } else {
+            k1 = k - 1;
+         }
+      }
+      return result;
+   }
+   if (s->matrixtype == 2) {
+   // SKS
+      ae_assert(s->m == s->n, "SparseExists: non-square SKS matrix not supported");
+      if (i == j) {
+      // Return diagonal element
+         result = true;
+         return result;
+      }
+      if (j < i) {
+      // Return subdiagonal element at I-th "skyline block"
+         if (i - j <= s->didx.xZ[i]) {
+            result = true;
+         }
+      } else {
+      // Return superdiagonal element at J-th "skyline block"
+         if (j - i <= s->uidx.xZ[j]) {
+            result = true;
+         }
+         return result;
+      }
+      return result;
+   }
+   ae_assert(false, "SparseExists: unexpected matrix type");
+   return result;
+}
+
 // This function returns I-th diagonal element of the sparse matrix.
 //
 // Matrix can be in any mode (Hash-Table or CRS storage), but this  function
@@ -845,7 +918,6 @@ double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j) {
 //
 // Result:
 //     value of S[I,I] or zero (in case no element with such index is found)
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i);
 double sparsegetdiagonal(sparsematrix *s, ae_int_t i) {
@@ -891,7 +963,6 @@ double sparsegetdiagonal(sparsematrix *s, ae_int_t i) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 void sparsemv(sparsematrix *s, RVector *x, RVector *y) {
@@ -984,7 +1055,6 @@ void sparsemv(sparsematrix *s, RVector *x, RVector *y) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
@@ -1106,7 +1176,6 @@ void sparsemtv(sparsematrix *s, RVector *x, RVector *y) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 10.12.2019 by Sergey Bochkanov
 // API: void sparsegemv(const sparsematrix &s, const double alpha, const ae_int_t ops, const real_1d_array &x, const ae_int_t ix, const double beta, const real_1d_array &y, const ae_int_t iy);
 void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy) {
@@ -1290,7 +1359,6 @@ void sparsegemv(sparsematrix *s, double alpha, ae_int_t ops, RVector *x, ae_int_
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemv2(const sparsematrix &s, const real_1d_array &x, real_1d_array &y0, real_1d_array &y1);
 void sparsemv2(sparsematrix *s, RVector *x, RVector *y0, RVector *y1) {
@@ -1406,7 +1474,6 @@ void sparsemv2(sparsematrix *s, RVector *x, RVector *y0, RVector *y1) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsesmv(const sparsematrix &s, const bool isupper, const real_1d_array &x, real_1d_array &y);
 void sparsesmv(sparsematrix *s, bool isupper, RVector *x, RVector *y) {
@@ -1526,7 +1593,6 @@ void sparsesmv(sparsematrix *s, bool isupper, RVector *x, RVector *y) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 27.01.2014 by Sergey Bochkanov
 // API: double sparsevsmv(const sparsematrix &s, const bool isupper, const real_1d_array &x);
 double sparsevsmv(sparsematrix *s, bool isupper, RVector *x) {
@@ -1634,7 +1700,6 @@ double sparsevsmv(sparsematrix *s, bool isupper, RVector *x) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
@@ -1766,7 +1831,6 @@ void sparsemm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemtm(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
@@ -1902,7 +1966,6 @@ void sparsemtm(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b) {
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, real_2d_array &b0, real_2d_array &b1);
 void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1) {
@@ -2050,7 +2113,6 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b) {
@@ -2072,7 +2134,7 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
    ae_int_t d;
    ae_int_t u;
    ae_assert(s->matrixtype == 1 || s->matrixtype == 2, "SparseSMM: incorrect matrix type (convert your matrix to CRS/SKS)");
-   ae_assert(a->rows >= s->n, "SparseSMM: Rows(X)<N");
+   ae_assert(a->rows >= s->n, "SparseSMM: Rows(X) < M");
    ae_assert(s->m == s->n, "SparseSMM: matrix is non-square");
    n = s->n;
    k1 = k - 1;
@@ -2238,7 +2300,6 @@ void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b
 // NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 // You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 // this function.
-//
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 // API: void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y);
 void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x, RVector *y) {
@@ -2390,7 +2451,6 @@ void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
 //
 // NOTE: no assertion or tests are done during algorithm  operation.   It  is
 //       your responsibility to provide invertible matrix to algorithm.
-//
 // ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 // API: void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x);
 void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x) {
@@ -2608,10 +2668,183 @@ void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVe
    ae_assert(false, "SparseTRSV: internal error");
 }
 
+// This function applies permutation given by permutation table P (as opposed
+// to product form of permutation) to sparse symmetric  matrix  A,  given  by
+// either upper or lower triangle: B := P*A*P'.
+//
+// This function allocates completely new instance of B. Use buffered version
+// SparseSymmPermTblBuf() if you want to reuse already allocated structure.
+//
+// Inputs:
+//     A           -   sparse square matrix in CRS format.
+//     IsUpper     -   whether upper or lower triangle of A is used:
+//                     * if upper triangle is given,  only   A[i,j] for  j >= i
+//                       are used, and lower triangle is  ignored (it can  be
+//                       empty - these elements are not referenced at all).
+//                     * if lower triangle is given,  only   A[i,j] for  j <= i
+//                       are used, and upper triangle is ignored.
+//     P           -   array[N] which stores permutation table;  P[I]=J means
+//                     that I-th row/column of matrix  A  is  moved  to  J-th
+//                     position. For performance reasons we do NOT check that
+//                     P[] is  a   correct   permutation  (that there  is  no
+//                     repetitions, just that all its elements  are  in [0,N)
+//                     range.
+//
+// Outputs:
+//     B           -   permuted matrix.  Permutation  is  applied  to A  from
+//                     the both sides, only upper or lower triangle (depending
+//                     on IsUpper) is stored.
+//
+// NOTE: this function throws exception when called for non-CRS  matrix.  You
+//       must convert your matrix with SparseConvertToCRS() before using this
+//       function.
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+// API: void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b);
+void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b) {
+   SetObj(sparsematrix, b);
+   sparsesymmpermtblbuf(a, isupper, p, b);
+}
+
+// This function is a buffered version  of  SparseSymmPermTbl()  that  reuses
+// previously allocated storage in B as much as possible.
+//
+// This function applies permutation given by permutation table P (as opposed
+// to product form of permutation) to sparse symmetric  matrix  A,  given  by
+// either upper or lower triangle: B := P*A*P'.
+//
+// Inputs:
+//     A           -   sparse square matrix in CRS format.
+//     IsUpper     -   whether upper or lower triangle of A is used:
+//                     * if upper triangle is given,  only   A[i,j] for  j >= i
+//                       are used, and lower triangle is  ignored (it can  be
+//                       empty - these elements are not referenced at all).
+//                     * if lower triangle is given,  only   A[i,j] for  j <= i
+//                       are used, and upper triangle is ignored.
+//     P           -   array[N] which stores permutation table;  P[I]=J means
+//                     that I-th row/column of matrix  A  is  moved  to  J-th
+//                     position. For performance reasons we do NOT check that
+//                     P[] is  a   correct   permutation  (that there  is  no
+//                     repetitions, just that all its elements  are  in [0,N)
+//                     range.
+//     B           -   sparse matrix object that will hold output.
+//                     Previously allocated memory will be reused as much  as
+//                     possible.
+//
+// Outputs:
+//     B           -   permuted matrix.  Permutation  is  applied  to A  from
+//                     the both sides, only upper or lower triangle (depending
+//                     on IsUpper) is stored.
+//
+// NOTE: this function throws exception when called for non-CRS  matrix.  You
+//       must convert your matrix with SparseConvertToCRS() before using this
+//       function.
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+// API: void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b);
+void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t jj;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t k0;
+   ae_int_t k1;
+   ae_int_t n;
+   ae_int_t dst;
+   bool bflag;
+   ae_assert(a->matrixtype == 1, "SparseSymmPermTblBuf: incorrect matrix type (convert your matrix to CRS)");
+   ae_assert(p->cnt >= a->n, "SparseSymmPermTblBuf: Length(P)<N");
+   ae_assert(a->m == a->n, "SparseSymmPermTblBuf: matrix is non-square");
+   bflag = true;
+   for (i = 0; i < a->n; i++) {
+      bflag = (bflag && p->xZ[i] >= 0) && p->xZ[i] < a->n;
+   }
+   ae_assert(bflag, "SparseSymmPermTblBuf: P[] contains values outside of [0,N) range");
+   n = a->n;
+// Prepare output
+   ae_assert(a->ninitialized == a->ridx.xZ[n], "SparseSymmPermTblBuf: integrity check failed");
+   b->matrixtype = 1;
+   b->n = n;
+   b->m = n;
+   vectorsetlengthatleast(&b->didx, n);
+   vectorsetlengthatleast(&b->uidx, n);
+// Determine row sizes (temporary stored in DIdx) and ranges
+   isetv(n, 0, &b->didx);
+   for (i = 0; i < n; i++) {
+      if (isupper) {
+         j0 = a->didx.xZ[i];
+         j1 = a->ridx.xZ[i + 1] - 1;
+         k0 = p->xZ[i];
+         for (jj = j0; jj <= j1; jj++) {
+            k1 = p->xZ[a->idx.xZ[jj]];
+            if (k1 < k0) {
+               b->didx.xZ[k1]++;
+            } else {
+               b->didx.xZ[k0]++;
+            }
+         }
+      } else {
+         j0 = a->ridx.xZ[i];
+         j1 = a->uidx.xZ[i] - 1;
+         k0 = p->xZ[i];
+         for (jj = j0; jj <= j1; jj++) {
+            k1 = p->xZ[a->idx.xZ[jj]];
+            if (k1 > k0) {
+               b->didx.xZ[k1]++;
+            } else {
+               b->didx.xZ[k0]++;
+            }
+         }
+      }
+   }
+   vectorsetlengthatleast(&b->ridx, n + 1);
+   b->ridx.xZ[0] = 0;
+   for (i = 0; i < n; i++) {
+      b->ridx.xZ[i + 1] = b->ridx.xZ[i] + b->didx.xZ[i];
+   }
+   b->ninitialized = b->ridx.xZ[n];
+   vectorsetlengthatleast(&b->idx, b->ninitialized);
+   vectorsetlengthatleast(&b->vals, b->ninitialized);
+// Process matrix
+   for (i = 0; i < n; i++) {
+      b->uidx.xZ[i] = b->ridx.xZ[i];
+   }
+   for (i = 0; i < n; i++) {
+      if (isupper) {
+         j0 = a->didx.xZ[i];
+         j1 = a->ridx.xZ[i + 1] - 1;
+         for (jj = j0; jj <= j1; jj++) {
+            j = a->idx.xZ[jj];
+            k0 = p->xZ[i];
+            k1 = p->xZ[j];
+            if (k1 < k0) swapi(&k0, &k1);
+            dst = b->uidx.xZ[k0]++;
+            b->idx.xZ[dst] = k1;
+            b->vals.xR[dst] = a->vals.xR[jj];
+         }
+      } else {
+         j0 = a->ridx.xZ[i];
+         j1 = a->uidx.xZ[i] - 1;
+         for (jj = j0; jj <= j1; jj++) {
+            j = a->idx.xZ[jj];
+            k0 = p->xZ[i];
+            k1 = p->xZ[j];
+            if (k1 > k0) swapi(&k0, &k1);
+            dst = b->uidx.xZ[k0]++;
+            b->idx.xZ[dst] = k1;
+            b->vals.xR[dst] = a->vals.xR[jj];
+         }
+      }
+   }
+// Finalize matrix
+   for (i = 0; i < n; i++) {
+      tagsortmiddleir(&b->idx, &b->vals, b->ridx.xZ[i + 1] - b->ridx.xZ[i], b->ridx.xZ[i]);
+   }
+   sparseinitduidx(b);
+}
+
 // This procedure resizes Hash-Table matrix. It can be called when you  have
 // deleted too many elements from the matrix, and you want to  free unneeded
 // memory.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseresizematrix(const sparsematrix &s);
 void sparseresizematrix(sparsematrix *s) {
@@ -2651,8 +2884,6 @@ void sparseresizematrix(sparsematrix *s) {
 }
 
 // Procedure for initialization 'S.DIdx' and 'S.UIdx'
-//
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 void sparseinitduidx(sparsematrix *s) {
    ae_int_t i;
@@ -2689,7 +2920,6 @@ void sparseinitduidx(sparsematrix *s) {
 }
 
 // This function return average length of chain at hash-table.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 double sparsegetaveragelengthofchain(sparsematrix *s) {
    ae_int_t nchains;
@@ -2766,7 +2996,6 @@ double sparsegetaveragelengthofchain(sparsematrix *s) {
 // NOTE: you may call SparseRewriteExisting() during enumeration, but it  is
 //       THE  ONLY  matrix  modification  function  you  can  call!!!  Other
 //       matrix modification functions should not be called during enumeration!
-//
 // ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
 // API: bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v);
 bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, ae_int_t *j, double *v) {
@@ -2874,10 +3103,10 @@ bool sparseenumerate(sparsematrix *s, ae_int_t *t0, ae_int_t *t1, ae_int_t *i, a
 //
 // Outputs:
 //     S           -   modified matrix
+//
 // Result:
 //     True in case when element exists
 //     False in case when element doesn't exist or it is zero
-//
 // ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
 // API: bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
@@ -2977,7 +3206,6 @@ bool sparserewriteexisting(sparsematrix *s, ae_int_t i, ae_int_t j, double v) {
 //
 // NOTE: when  incorrect  I  (outside  of  [0,M-1]) or  matrix (non  CRS/SKS)
 //       is passed, this function throws exception.
-//
 // ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
 // API: void sparsegetrow(const sparsematrix &s, const ae_int_t i, real_1d_array &irow);
 void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow) {
@@ -3055,7 +3283,6 @@ void sparsegetrow(sparsematrix *s, ae_int_t i, RVector *irow) {
 //       some "extra"-space, than performing two passes over matrix  -  first
 //       time to calculate exact space required for data, second  time  -  to
 //       store data itself.
-//
 // ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
 // API: void sparsegetcompressedrow(const sparsematrix &s, const ae_int_t i, integer_1d_array &colidx, real_1d_array &vals, ae_int_t &nzcnt);
 void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVector *vals, ae_int_t *nzcnt) {
@@ -3122,7 +3349,6 @@ void sparsegetcompressedrow(sparsematrix *s, ae_int_t i, ZVector *colidx, RVecto
 //
 // Outputs:
 //     S           -   sparse matrix, transposed.
-//
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparsetransposesks(const sparsematrix &s);
 void sparsetransposesks(sparsematrix *s) {
@@ -3240,7 +3466,6 @@ void sparsetransposesks(sparsematrix *s) {
 //
 // NOTE: internal  temporary  copy  is  allocated   for   the   purposes   of
 //       transposition. It is deallocated after transposition.
-//
 // ALGLIB Project: Copyright 30.01.2018 by Sergey Bochkanov
 // API: void sparsetransposecrs(const sparsematrix &s);
 void sparsetransposecrs(sparsematrix *s) {
@@ -3322,11 +3547,9 @@ void sparsetransposecrs(sparsematrix *s) {
 // Outputs:
 //     S1      -   sparse matrix, transposed; previously allocated memory  is
 //                 reused if possible.
-//
 // ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
 // API: void sparsecopytransposecrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1) {
-   ae_frame _frame_block;
    ae_int_t oldn;
    ae_int_t oldm;
    ae_int_t newn;
@@ -3334,9 +3557,9 @@ void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
-   ae_int_t nonne;
-   ae_frame_make(&_frame_block);
-   NewVector(counts, 0, DT_INT);
+   ae_int_t kk;
+   ae_int_t j0;
+   ae_int_t j1;
    ae_assert(s0->matrixtype == 1, "SparseCopyTransposeCRSBuf: only CRS matrices are supported");
    oldn = s0->n;
    oldm = s0->m;
@@ -3351,16 +3574,13 @@ void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1) {
 //
 // Convert RIdx from row sizes to row offsets.
 // Set NInitialized
-   nonne = 0;
-   vectorsetlengthatleast(&s1->ridx, newm + 1);
-   for (i = 0; i <= newm; i++) {
-      s1->ridx.xZ[i] = 0;
-   }
+   isetallocv(newm + 1, 0, &s1->ridx);
    for (i = 0; i < oldm; i++) {
-      for (j = s0->ridx.xZ[i]; j < s0->ridx.xZ[i + 1]; j++) {
+      j0 = s0->ridx.xZ[i];
+      j1 = s0->ridx.xZ[i + 1] - 1;
+      for (j = j0; j <= j1; j++) {
          k = s0->idx.xZ[j] + 1;
          s1->ridx.xZ[k]++;
-         nonne++;
       }
    }
    for (i = 0; i < newm; i++) {
@@ -3368,25 +3588,25 @@ void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1) {
    }
    s1->ninitialized = s1->ridx.xZ[newm];
 // Allocate memory and move elements to Vals/Idx.
-   ae_vector_set_length(&counts, newm);
+   vectorsetlengthatleast(&s1->didx, newm);
    for (i = 0; i < newm; i++) {
-      counts.xZ[i] = 0;
+      s1->didx.xZ[i] = s1->ridx.xZ[i];
    }
-   vectorsetlengthatleast(&s1->vals, nonne);
-   vectorsetlengthatleast(&s1->idx, nonne);
+   vectorsetlengthatleast(&s1->vals, s1->ninitialized);
+   vectorsetlengthatleast(&s1->idx, s1->ninitialized);
    for (i = 0; i < oldm; i++) {
-      for (j = s0->ridx.xZ[i]; j < s0->ridx.xZ[i + 1]; j++) {
-         k = s0->idx.xZ[j];
-         k = s1->ridx.xZ[k] + counts.xZ[k];
+      j0 = s0->ridx.xZ[i];
+      j1 = s0->ridx.xZ[i + 1] - 1;
+      for (j = j0; j <= j1; j++) {
+         kk = s0->idx.xZ[j];
+         k = s1->didx.xZ[kk];
          s1->idx.xZ[k] = i;
          s1->vals.xR[k] = s0->vals.xR[j];
-         k = s0->idx.xZ[j];
-         counts.xZ[k]++;
+         s1->didx.xZ[kk] = k + 1;
       }
    }
 // Initialization 'S.UIdx' and 'S.DIdx'
    sparseinitduidx(s1);
-   ae_frame_leave();
 }
 
 // This function performs copying with transposition of CRS matrix.
@@ -3396,7 +3616,6 @@ void sparsecopytransposecrsbuf(sparsematrix *s0, sparsematrix *s1) {
 //
 // Outputs:
 //     S1      -   sparse matrix, transposed
-//
 // ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
 // API: void sparsecopytransposecrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1) {
@@ -3422,7 +3641,6 @@ void sparsecopytransposecrs(sparsematrix *s0, sparsematrix *s1) {
 //       temporaries.  If  you  perform  a  lot  of  repeated conversions, we
 //       recommend to use out-of-place buffered  conversion  functions,  like
 //       SparseCopyToBuf(), which can reuse already allocated memory.
-//
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparseconvertto(const sparsematrix &s0, const ae_int_t fmt);
 void sparseconvertto(sparsematrix *s0, ae_int_t fmt) {
@@ -3456,7 +3674,6 @@ void sparseconvertto(sparsematrix *s0, ae_int_t fmt) {
 //
 // Outputs:
 //     S1          -   sparse matrix in requested format.
-//
 // ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 // API: void sparsecopytobuf(const sparsematrix &s0, const ae_int_t fmt, const sparsematrix &s1);
 void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1) {
@@ -3491,7 +3708,6 @@ void sparsecopytobuf(sparsematrix *s0, ae_int_t fmt, sparsematrix *s1) {
 //       perform a lot of repeated in- place  conversions,  it  may  lead  to
 //       memory fragmentation. Consider using out-of-place SparseCopyToHashBuf()
 //       function in this case.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparseconverttohash(const sparsematrix &s);
 void sparseconverttohash(sparsematrix *s) {
@@ -3578,7 +3794,6 @@ void sparseconverttohash(sparsematrix *s) {
 //       lead to memory fragmentation. In this case we recommend you  to  use
 //       SparseCopyToHashBuf() function which re-uses memory in S1 as much as
 //       possible.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytohash(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
@@ -3598,7 +3813,6 @@ void sparsecopytohash(sparsematrix *s0, sparsematrix *s1) {
 //     S1          -   sparse matrix in Hash table format.
 //
 // NOTE: if S0 is stored as Hash-table, it is just copied without conversion.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytohashbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1) {
@@ -3654,7 +3868,6 @@ void sparsecopytohashbuf(sparsematrix *s0, sparsematrix *s1) {
 //       matrix. If you perform a lot of repeated conversions, we  recommend
 //       you  to  use  SparseCopyToCRSBuf()  function,   which   can   reuse
 //       previously allocated memory.
-//
 // ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 // API: void sparseconverttocrs(const sparsematrix &s);
 void sparseconverttocrs(sparsematrix *s) {
@@ -3815,7 +4028,6 @@ void sparseconverttocrs(sparsematrix *s) {
 //       lead to memory fragmentation. In this case we recommend you  to  use
 //       SparseCopyToCRSBuf() function which re-uses memory in S1 as much  as
 //       possible.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytocrs(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1) {
@@ -3837,7 +4049,6 @@ void sparsecopytocrs(sparsematrix *s0, sparsematrix *s1) {
 //     S1          -   sparse matrix in CRS format.
 //
 // NOTE: if S0 is stored as CRS, it is just copied without conversion.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytocrsbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
@@ -3989,7 +4200,6 @@ void sparsecopytocrsbuf(sparsematrix *s0, sparsematrix *s1) {
 //       perform a lot of repeated in- place  conversions,  it  may  lead  to
 //       memory fragmentation. Consider using out-of-place SparseCopyToSKSBuf()
 //       function in this case.
-//
 // ALGLIB Project: Copyright 15.01.2014 by Sergey Bochkanov
 // API: void sparseconverttosks(const sparsematrix &s);
 void sparseconverttosks(sparsematrix *s) {
@@ -4081,7 +4291,6 @@ void sparseconverttosks(sparsematrix *s) {
 //       lead to memory fragmentation. In this case we recommend you  to  use
 //       SparseCopyToSKSBuf() function which re-uses memory in S1 as much  as
 //       possible.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytosks(const sparsematrix &s0, sparsematrix &s1);
 void sparsecopytosks(sparsematrix *s0, sparsematrix *s1) {
@@ -4101,7 +4310,6 @@ void sparsecopytosks(sparsematrix *s0, sparsematrix *s1) {
 //     S1          -   sparse matrix in SKS format.
 //
 // NOTE: if S0 is stored as SKS, it is just copied without conversion.
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: void sparsecopytosksbuf(const sparsematrix &s0, const sparsematrix &s1);
 void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1) {
@@ -4187,7 +4395,6 @@ void sparsecopytosksbuf(sparsematrix *s0, sparsematrix *s1) {
 //
 // Outputs:
 //     S   -   sparse matrix in CRS format.
-//
 // ALGLIB Project: Copyright 20.08.2016 by Sergey Bochkanov
 void sparsecreatecrsinplace(sparsematrix *s) {
    ae_int_t m;
@@ -4253,13 +4460,11 @@ void sparsecreatecrsinplace(sparsematrix *s) {
 //
 // NOTE: future  versions  of  ALGLIB  may  include additional sparse storage
 //       formats.
-//
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: ae_int_t sparsegetmatrixtype(const sparsematrix &s);
 ae_int_t sparsegetmatrixtype(sparsematrix *s) {
    ae_int_t result;
-   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseGetMatrixType: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseGetMatrixType: invalid matrix type");
    result = s->matrixtype;
    return result;
 }
@@ -4273,12 +4478,11 @@ ae_int_t sparsegetmatrixtype(sparsematrix *s) {
 // Result:
 //     True if matrix type is Hash table
 //     False if matrix type is not Hash table
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: bool sparseishash(const sparsematrix &s);
 bool sparseishash(sparsematrix *s) {
    bool result;
-   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseIsHash: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsHash: invalid matrix type");
    result = s->matrixtype == 0;
    return result;
 }
@@ -4292,12 +4496,11 @@ bool sparseishash(sparsematrix *s) {
 // Result:
 //     True if matrix type is CRS
 //     False if matrix type is not CRS
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: bool sparseiscrs(const sparsematrix &s);
 bool sparseiscrs(sparsematrix *s) {
    bool result;
-   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseIsCRS: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsCRS: invalid matrix type");
    result = s->matrixtype == 1;
    return result;
 }
@@ -4311,12 +4514,11 @@ bool sparseiscrs(sparsematrix *s) {
 // Result:
 //     True if matrix type is SKS
 //     False if matrix type is not SKS
-//
 // ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 // API: bool sparseissks(const sparsematrix &s);
 bool sparseissks(sparsematrix *s) {
    bool result;
-   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2, "SparseIsSKS: invalid matrix type");
+   ae_assert(s->matrixtype == 0 || s->matrixtype == 1 || s->matrixtype == 2 || s->matrixtype == -10081 || s->matrixtype == -10082, "SparseIsSKS: invalid matrix type");
    result = s->matrixtype == 2;
    return result;
 }
@@ -4326,7 +4528,6 @@ bool sparseissks(sparsematrix *s) {
 //
 // Outputs:
 //     S   -   sparse matrix to delete
-//
 // ALGLIB Project: Copyright 24.07.2012 by Sergey Bochkanov
 // API: void sparsefree(sparsematrix &s);
 void sparsefree(sparsematrix *s) {
@@ -4342,7 +4543,6 @@ void sparsefree(sparsematrix *s) {
 // The function returns number of columns of a sparse matrix.
 //
 // Result: number of columns of a sparse matrix.
-//
 // ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
 // API: ae_int_t sparsegetncols(const sparsematrix &s);
 ae_int_t sparsegetncols(sparsematrix *s) {
@@ -4354,7 +4554,6 @@ ae_int_t sparsegetncols(sparsematrix *s) {
 // The function returns number of rows of a sparse matrix.
 //
 // Result: number of rows of a sparse matrix.
-//
 // ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
 // API: ae_int_t sparsegetnrows(const sparsematrix &s);
 ae_int_t sparsegetnrows(sparsematrix *s) {
@@ -4374,7 +4573,6 @@ ae_int_t sparsegetnrows(sparsematrix *s) {
 // * for CRS and SKS matrix types cost of counting is O(N) (N - matrix size).
 //
 // Result: number of non-zero elements strictly above main diagonal
-//
 // ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
 // API: ae_int_t sparsegetuppercount(const sparsematrix &s);
 ae_int_t sparsegetuppercount(sparsematrix *s) {
@@ -4430,7 +4628,6 @@ ae_int_t sparsegetuppercount(sparsematrix *s) {
 // * for CRS and SKS matrix types cost of counting is O(N) (N - matrix size).
 //
 // Result: number of non-zero elements strictly below main diagonal
-//
 // ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
 // API: ae_int_t sparsegetlowercount(const sparsematrix &s);
 ae_int_t sparsegetlowercount(sparsematrix *s) {
@@ -4560,6 +4757,7 @@ namespace alglib {
 //     OPERATIONS WITH MATRIX      HASH        CRS         SKS
 //     creation                    +           +           +
 //     SparseGet                   +           +           +
+//     SparseExists                +           +           +
 //     SparseRewriteExisting       +           +           +
 //     SparseSet                   +           +           +
 //     SparseAdd                   +
@@ -4693,6 +4891,14 @@ double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j) {
    return D;
 }
 
+bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::sparseexists(ConstT(sparsematrix, s), i, j);
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
 double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
@@ -4783,6 +4989,20 @@ void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, co
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::sparsetrsv(ConstT(sparsematrix, s), isupper, isunit, optype, ConstT(ae_vector, x));
+   alglib_impl::ae_state_clear();
+}
+
+void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::sparsesymmpermtbl(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p), ConstT(sparsematrix, b));
+   alglib_impl::ae_state_clear();
+}
+
+void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::sparsesymmpermtblbuf(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p), ConstT(sparsematrix, b));
    alglib_impl::ae_state_clear();
 }
 
@@ -5001,12 +5221,10 @@ ae_int_t sparsegetlowercount(const sparsematrix &s) {
 } // end of namespace alglib
 
 // === ABLAS Package ===
-// Depends on: (AlgLibInternal) APSERV, ABLASMKL, ABLASF
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 static const ae_int_t ablas_blas2minvendorkernelsize = 8;
 
-// Complex ABLASSplitLength
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
    if (n <= nb) ; // Block size: no further splitting.
@@ -5027,25 +5245,22 @@ static ae_int_t ablas_ablasinternalsplitlength(ae_int_t n, ae_int_t nb) {
 //             matrix itself is not changed.
 //     N   -   length, N > 0
 //
-// Output:
+// Outputs:
 //     N1  -   length of the left half
 //
 // N1 >= N/2, N1 may be N
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablassplitlength(RMatrix *a, ae_int_t n) {
    return ablas_ablasinternalsplitlength(n, n > ablasblocksize(a) ? ablasblocksize(a) : ablasmicroblocksize());
 }
 
 // Complex ABLASSplitLength
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n) {
    return ablas_ablasinternalsplitlength(n, n > ablascomplexblocksize(a) ? ablascomplexblocksize(a) : ablasmicroblocksize());
 }
 
 // Returns switch point for parallelism.
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t gemmparallelsize() {
    ae_int_t result;
@@ -5060,7 +5275,6 @@ ae_int_t gemmparallelsize() {
 //     A   -   real matrix, is passed to ensure that we didn't split
 //             complex matrix using real splitting subroutine.
 //             matrix itself is not changed.
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablasblocksize(RMatrix *a) {
    ae_int_t result;
@@ -5069,7 +5283,6 @@ ae_int_t ablasblocksize(RMatrix *a) {
 }
 
 // Block size for complex subroutines.
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablascomplexblocksize(CMatrix *a) {
    ae_int_t result;
@@ -5078,7 +5291,6 @@ ae_int_t ablascomplexblocksize(CMatrix *a) {
 }
 
 // Microblock size
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 ae_int_t ablasmicroblocksize() {
    ae_int_t result;
@@ -5492,8 +5704,6 @@ void rmatrixgencopy(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t i
 //     IU  -   subvector offset
 //     V   -   vector #2
 //     IV  -   subvector offset
-//
-//
 // ALGLIB Routine: Copyright 16.10.2017 by Sergey Bochkanov
 // API: void rmatrixger(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const double alpha, const real_1d_array &u, const ae_int_t iu, const real_1d_array &v, const ae_int_t iv);
 void rmatrixger(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv) {
@@ -5690,8 +5900,6 @@ void rmatrixgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, 
 //
 // if M=0, then subroutine does nothing.
 // if N=0, Y is filled by zeros.
-//
-//
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 // API: void rmatrixmv(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const real_1d_array &x, const ae_int_t ix, real_1d_array &y, const ae_int_t iy);
 void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, RVector *y, ae_int_t iy) {
@@ -5760,8 +5968,6 @@ void rmatrixmv(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_
 //
 // if M=0, then subroutine does nothing.
 // if N=0, Y is filled by zeros.
-//
-//
 // ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 // API: void cmatrixmv(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t opa, const complex_1d_array &x, const ae_int_t ix, complex_1d_array &y, const ae_int_t iy);
 void cmatrixmv(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, CVector *x, ae_int_t ix, CVector *y, ae_int_t iy) {
@@ -5940,7 +6146,6 @@ double rmatrixsyvmv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupp
 //
 // Outputs:
 //     X       -   solution replaces elements X[IX:IX+N-1]
-//
 // ALGLIB Routine: Copyright (c) 2017 by Sergey Bochkanov - converted to ALGLIB, remastered from LAPACK's DTRSV.
 // Copyright (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
 //      Reference BLAS is a software package provided by Univ. of Tennessee,
@@ -6024,7 +6229,6 @@ void rmatrixtrsv(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper,
 }
 
 // Level 2 subroutine
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 static void ablas_rmatrixrighttrsm2(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
    ae_int_t i;
@@ -6263,7 +6467,6 @@ static void ablas_cmatrixrighttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t
 //     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
-//
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 // API: void rmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6371,7 +6574,6 @@ void rmatrixrighttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t 
 //     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
-//
 // ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
 // API: void cmatrixrighttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void cmatrixrighttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6678,7 +6880,6 @@ static void ablas_cmatrixlefttrsm2(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t 
 //     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
-//
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 // API: void rmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const real_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2) {
@@ -6779,7 +6980,6 @@ void rmatrixlefttrsm(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j
 //     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
 //     I2  -   submatrix offset
 //     J2  -   submatrix offset
-//
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 // API: void cmatrixlefttrsm(const ae_int_t m, const ae_int_t n, const complex_2d_array &a, const ae_int_t i1, const ae_int_t j1, const bool isupper, const bool isunit, const ae_int_t optype, const complex_2d_array &x, const ae_int_t i2, const ae_int_t j2);
 void cmatrixlefttrsm(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2) {
@@ -7039,7 +7239,6 @@ static void ablas_cmatrixherk2(ae_int_t n, ae_int_t k, double alpha, CMatrix *a,
 //     IC      -   submatrix offset (row index)
 //     JC      -   submatrix offset (column index)
 //     IsUpper -   whether C is upper triangular or lower triangular
-//
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 // API: void rmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -7132,7 +7331,6 @@ void rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, 
 //     IsUpper -   whether upper or lower triangle of C is updated;
 //                 this function updates only one half of C, leaving
 //                 other half unchanged (not referenced at all).
-//
 // ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 // API: void cmatrixherk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -7200,7 +7398,6 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
 // This subroutine is an older version of CMatrixHERK(), one with wrong  name
 // (it is HErmitian update, not SYmmetric). It  is  left  here  for  backward
 // compatibility.
-//
 // ALGLIB Routine: Copyright 16.12.2009 by Sergey Bochkanov
 // API: void cmatrixsyrk(const ae_int_t n, const ae_int_t k, const double alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const double beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc, const bool isupper);
 void cmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
@@ -7211,7 +7408,6 @@ void cmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
 // perform some integrity checks performed in the  driver  function,  and  it
 // does not activate multithreading  framework  (driver  decides  whether  to
 // activate workers or not).
-//
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t mnk = imax3(m, n, k);
@@ -7246,7 +7442,6 @@ static void ablas_rmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, double alph
 // perform some integrity checks performed in the  driver  function,  and  it
 // does not activate multithreading  framework  (driver  decides  whether  to
 // activate workers or not).
-//
 // ALGLIB Routine: Copyright 10.01.2019 by Sergey Bochkanov
 static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
    ae_int_t mnk = imax3(m, n, k);
@@ -7318,7 +7513,6 @@ static void ablas_cmatrixgemmrec(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex 
 //     C       -   PREALLOCATED output matrix, large enough to store result
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 // API: void rmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const double alpha, const real_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const real_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const double beta, const real_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc) {
@@ -7377,7 +7571,6 @@ void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, a
 //     C       -   matrix (PREALLOCATED, large enough to store result)
 //     IC      -   submatrix offset
 //     JC      -   submatrix offset
-//
 // ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 // API: void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const complex alpha, const complex_2d_array &a, const ae_int_t ia, const ae_int_t ja, const ae_int_t optypea, const complex_2d_array &b, const ae_int_t ib, const ae_int_t jb, const ae_int_t optypeb, const complex beta, const complex_2d_array &c, const ae_int_t ic, const ae_int_t jc);
 void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc) {
@@ -7392,6 +7585,36 @@ void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *
 // Parallelism was activated if: (m >= 2 * ts || n >= 2 * ts) && 8.0 * m * n * k >= smpactivationlevel()
 // Start actual work
    ablas_cmatrixgemmrec(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc);
+}
+
+// Performs one step  of stable Gram-Schmidt  process  on  vector  X[]  using
+// set of orthonormal rows Q[].
+//
+// Inputs:
+//     Q       -   array[M,N], matrix with orthonormal rows
+//     M, N    -   rows/cols
+//     X       -   array[N], vector to process
+//     NeedQX  -   whether we need QX or not
+//
+// Outputs:
+//     X       -   stores X - Q'*(Q*X)
+//     QX      -   if NeedQX is True, array[M] filled with elements  of  Q*X,
+//                 reallocated if length is less than M.
+//                 Ignored otherwise.
+// ALGLIB: Copyright 20.01.2020 by Sergey Bochkanov
+void rowwisegramschmidt(RMatrix *q, ae_int_t m, ae_int_t n, RVector *x, RVector *qx, bool needqx) {
+   ae_int_t i;
+   double v;
+   if (needqx) {
+      vectorsetlengthatleast(qx, m);
+   }
+   for (i = 0; i < m; i++) {
+      v = rdotvr(n, x, q, i);
+      raddrv(n, -v, q, i, x);
+      if (needqx) {
+         qx->xR[i] = v;
+      }
+   }
 }
 } // end of namespace alglib_impl
 
@@ -7577,7 +7800,6 @@ void cmatrixgemm(const ae_int_t m, const ae_int_t n, const ae_int_t k, const com
 // Depends on: ABLAS
 namespace alglib_impl {
 // Real LUP kernel
-//
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp) {
    ae_int_t i;
@@ -7613,7 +7835,6 @@ static void dlu_rmatrixlup2(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
 }
 
 // Complex LUP kernel
-//
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp) {
    ae_int_t i;
@@ -7650,7 +7871,6 @@ static void dlu_cmatrixlup2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
 
 // Recurrent real LU subroutine.
 // Never call it directly.
-//
 // ALGLIB Routine: Copyright 04.01.2010 by Sergey Bochkanov
 void rmatrixluprec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp) {
    ae_int_t i;
@@ -7697,7 +7917,6 @@ void rmatrixluprec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
 
 // Recurrent complex LU subroutine.
 // Never call it directly.
-//
 // ALGLIB Routine: Copyright 04.01.2010 by Sergey Bochkanov
 void cmatrixluprec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp) {
    ae_int_t i;
@@ -7824,7 +8043,6 @@ static void dlu_cmatrixplu2(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, Z
 
 // Recurrent real LU subroutine.
 // Never call it directly.
-//
 // ALGLIB Routine: Copyright 04.01.2010 by Sergey Bochkanov
 void rmatrixplurec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, RVector *tmp) {
    ae_int_t i;
@@ -7883,7 +8101,6 @@ void rmatrixplurec(RMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *p
 
 // Recurrent complex LU subroutine.
 // Never call it directly.
-//
 // ALGLIB Routine: Copyright 04.01.2010 by Sergey Bochkanov
 void cmatrixplurec(CMatrix *a, ae_int_t offs, ae_int_t m, ae_int_t n, ZVector *pivots, CVector *tmp) {
    ae_int_t i;
@@ -7943,7 +8160,6 @@ static const double sptrf_densebnd = 0.10;
 static const ae_int_t sptrf_slswidth = 8;
 
 // This function drops sequence #I from the structure
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1dropsequence(sluv2list1matrix *a, ae_int_t i) {
    a->idxfirst.xZ[i] = -1;
@@ -7951,7 +8167,6 @@ static void sptrf_sluv2list1dropsequence(sluv2list1matrix *a, ae_int_t i) {
 
 // This function appends column with id=ID to the dense trail (column IDs are
 // integer numbers in [0,N) which can be used to track column permutations).
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_densetrailappendcolumn(sluv2densetrail *d, RVector *x, ae_int_t id) {
    ae_int_t n;
@@ -7981,7 +8196,6 @@ static void sptrf_densetrailappendcolumn(sluv2densetrail *d, RVector *x, ae_int_
 //                     of the columns (densified columns are removed)
 //     DTrail      -   dense trail, receives densified columns from sparse
 //                     trail and BUpper
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list1matrix *bupper, sluv2densetrail *dtrail) {
    ae_int_t n;
@@ -8051,7 +8265,6 @@ static void sptrf_sparsetraildensify(sluv2sparsetrail *a, ae_int_t i1, sluv2list
 //     DTrail      -   dense trail, receives densified columns from sparse
 //                     trail and BUpper
 //     DensificationSupported- if False, no densification is performed
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *v0r, ae_int_t nz0, ZVector *v1i, RVector *v1r, ae_int_t nz1, sluv2list1matrix *bupper, sluv2densetrail *dtrail, bool densificationsupported) {
    ae_int_t n;
@@ -8168,7 +8381,6 @@ static void sptrf_sparsetrailupdate(sluv2sparsetrail *a, ZVector *v0i, RVector *
 //
 // After initialization this structure stores  matrix[N,0],  which contains N
 // rows (sequences), stored as single-linked lists.
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a) {
    ae_int_t i;
@@ -8186,7 +8398,6 @@ static void sptrf_sluv2list1init(ae_int_t n, sluv2list1matrix *a) {
 }
 
 // This function swaps sequences #I and #J stored by the structure
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1swap(sluv2list1matrix *a, ae_int_t i, ae_int_t j) {
    swapi(&a->idxfirst.xZ[i], &a->idxfirst.xZ[j]);
@@ -8212,8 +8423,6 @@ static void sptrf_sluv2list1swap(sluv2list1matrix *a, ae_int_t i, ae_int_t j) {
 //                     matrix.
 //     S           -   destination matrix in CRS format, partially initialized
 //     Dst         -   destination row index
-//
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1appendsequencetomatrix(sluv2list1matrix *a, ae_int_t src, bool hasdiagonal, double d, ae_int_t nzmax, sparsematrix *s, ae_int_t dst) {
    ae_int_t i;
@@ -8250,7 +8459,6 @@ static void sptrf_sluv2list1appendsequencetomatrix(sluv2list1matrix *a, ae_int_t
 
 // This function appends sparse column to the  matrix,  increasing  its  size
 // from [N,K] to [N,K+1]
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sluv2list1pushsparsevector(sluv2list1matrix *a, ZVector *si, RVector *sv, ae_int_t nz) {
    ae_int_t idx;
@@ -8281,7 +8489,6 @@ static void sptrf_sluv2list1pushsparsevector(sluv2list1matrix *a, ZVector *si, R
 }
 
 // This function initializes dense trail, by default it is matrix[N,0]
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n) {
    ae_int_t excessivesize;
@@ -8302,7 +8509,6 @@ static void sptrf_densetrailinit(sluv2densetrail *d, ae_int_t n) {
 // This function initializes sparse trail from the sparse matrix. By default,
 // sparse trail spans columns and rows in [0,N)  range.  Subsequent  pivoting
 // out of rows/columns changes its range to [K,N), [K+1,N) and so on.
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a) {
    ae_int_t i;
@@ -8389,7 +8595,6 @@ static void sptrf_sparsetrailinit(sparsematrix *s, sluv2sparsetrail *a) {
 // PivotType=2 means that both column and row pivoting are supported
 //
 // If all columns were densified, False is returned.
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, ae_int_t *ipiv, ae_int_t *jpiv) {
    ae_int_t n;
@@ -8513,7 +8718,6 @@ static bool sptrf_sparsetrailfindpivot(sluv2sparsetrail *a, ae_int_t pivottype, 
 //   V0I is array[NZ0] which stores row indexes in [K+1,N) range, V0R  stores
 //   values.
 // * V1I, V1R, NZ1 - sparse row pivoted out to the top.
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int_t jpiv, double *uu, ZVector *v0i, RVector *v0r, ae_int_t *nz0, ZVector *v1i, RVector *v1r, ae_int_t *nz1) {
    ae_int_t n;
@@ -8747,7 +8951,6 @@ static void sptrf_sparsetrailpivotout(sluv2sparsetrail *a, ae_int_t ipiv, ae_int
 //   non-degenerate
 // * function returns FALSE if the matrix was factorized but U has strictly
 //   zero elements at the diagonal (the factorization is returned anyway).
-//
 // ALGLIB Routine: Copyright 15.01.2019 by Sergey Bochkanov
 bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv2buffer *buf) {
    ae_int_t n;
@@ -9166,6 +9369,3815 @@ void sluv2buffer_free(void *_p, bool make_automatic) {
 }
 } // end of namespace alglib_impl
 
+// === AMDORDERING Package ===
+// Depends on: SPARSE, ABLAS
+namespace alglib_impl {
+static const ae_int_t amdordering_knsheadersize = 2;
+static const ae_int_t amdordering_llmentrysize = 6;
+
+// Initializes n-set by empty structure.
+//
+// IMPORTANT: this function need O(N) time for initialization. It is recommended
+//            to reduce its usage as much as possible, and use nsClear()
+//            where possible.
+//
+// Inputs:
+//     N           -   possible set size
+//
+// Outputs:
+//     SA          -   empty N-set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nsinitemptyslow(ae_int_t n, amdnset *sa) {
+   sa->n = n;
+   sa->nstored = 0;
+   isetallocv(n, -999999999, &sa->locationof);
+   isetallocv(n, -999999999, &sa->items);
+}
+
+// Clears set
+//
+// Inputs:
+//     SA          -   set to be cleared
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nsclear(amdnset *sa) {
+   ae_int_t i;
+   ae_int_t ns;
+   ns = sa->nstored;
+   for (i = 0; i < ns; i++) {
+      sa->locationof.xZ[sa->items.xZ[i]] = -1;
+   }
+   sa->nstored = 0;
+}
+
+// Copies n-set to properly initialized target set. The target set has to  be
+// properly initialized, and it can be non-empty. If  it  is  non-empty,  its
+// contents is quickly erased before copying.
+//
+// The cost of this function is O(max(SrcSize,DstSize))
+//
+// Inputs:
+//     SSrc        -   source N-set
+//     SDst        -   destination N-set (has same size as SSrc)
+//
+// Outputs:
+//     SDst        -   copy of SSrc
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nscopy(amdnset *ssrc, amdnset *sdst) {
+   ae_int_t ns;
+   ae_int_t i;
+   ae_int_t k;
+   amdordering_nsclear(sdst);
+   ns = ssrc->nstored;
+   for (i = 0; i < ns; i++) {
+      k = ssrc->items.xZ[i];
+      sdst->items.xZ[i] = k;
+      sdst->locationof.xZ[k] = i;
+   }
+   sdst->nstored = ns;
+}
+
+// Add K-th element to the set. The element may already exist in the set.
+//
+// Inputs:
+//     SA          -   set
+//     K           -   element to add, 0 <= K<N.
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nsaddelement(amdnset *sa, ae_int_t k) {
+   ae_int_t ns;
+   if (sa->locationof.xZ[k] >= 0) {
+      return;
+   }
+   ns = sa->nstored;
+   sa->locationof.xZ[k] = ns;
+   sa->items.xZ[ns] = k;
+   sa->nstored = ns + 1;
+}
+
+// Add K-th set from the source kn-set
+//
+// Inputs:
+//     SA          -   set
+//     Src, K      -   source kn-set and set index K
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nsaddkth(amdnset *sa, amdknset *src, ae_int_t k) {
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t j;
+   ae_int_t ns;
+   idxbegin = src->vbegin.xZ[k];
+   idxend = idxbegin + src->vcnt.xZ[k];
+   ns = sa->nstored;
+   while (idxbegin < idxend) {
+      j = src->data.xZ[idxbegin];
+      if (sa->locationof.xZ[j] < 0) {
+         sa->locationof.xZ[j] = ns;
+         sa->items.xZ[ns] = j;
+         ns++;
+      }
+      idxbegin++;
+   }
+   sa->nstored = ns;
+}
+
+// Subtracts K-th set from the source structure
+//
+// Inputs:
+//     SA          -   set
+//     Src, K      -   source kn-set and set index K
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nssubtractkth(amdnset *sa, amdknset *src, ae_int_t k) {
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t j;
+   ae_int_t loc;
+   ae_int_t ns;
+   ae_int_t item;
+   idxbegin = src->vbegin.xZ[k];
+   idxend = idxbegin + src->vcnt.xZ[k];
+   ns = sa->nstored;
+   while (idxbegin < idxend) {
+      j = src->data.xZ[idxbegin];
+      loc = sa->locationof.xZ[j];
+      if (loc >= 0) {
+         item = sa->items.xZ[ns - 1];
+         sa->items.xZ[loc] = item;
+         sa->locationof.xZ[item] = loc;
+         sa->locationof.xZ[j] = -1;
+         ns--;
+      }
+      idxbegin++;
+   }
+   sa->nstored = ns;
+}
+
+// Counts set elements
+//
+// Inputs:
+//     SA          -   set
+//
+// Result:
+//     number of elements in SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_nscount(amdnset *sa) {
+   ae_int_t result;
+   result = sa->nstored;
+   return result;
+}
+
+// Counts set elements not present in the K-th set of the source structure
+//
+// Inputs:
+//     SA          -   set
+//     Src, K      -   source kn-set and set index K
+//
+// Result:
+//     number of elements in SA not present in Src[K]
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_nscountnotkth(amdnset *sa, amdknset *src, ae_int_t k) {
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t intersectcnt;
+   ae_int_t result;
+   idxbegin = src->vbegin.xZ[k];
+   idxend = idxbegin + src->vcnt.xZ[k];
+   intersectcnt = 0;
+   while (idxbegin < idxend) {
+      if (sa->locationof.xZ[src->data.xZ[idxbegin]] >= 0) {
+         intersectcnt++;
+      }
+      idxbegin++;
+   }
+   result = sa->nstored - intersectcnt;
+   return result;
+}
+
+#if 0
+// Counts set elements also present in the K-th set of the source structure
+//
+// Inputs:
+//     SA          -   set
+//     Src, K      -   source kn-set and set index K
+//
+// Result:
+//     number of elements in SA also present in Src[K]
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_nscountandkth(amdnset *sa, amdknset *src, ae_int_t k) {
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t result;
+   idxbegin = src->vbegin.xZ[k];
+   idxend = idxbegin + src->vcnt.xZ[k];
+   result = 0;
+   while (idxbegin < idxend) {
+      if (sa->locationof.xZ[src->data.xZ[idxbegin]] >= 0) {
+         result++;
+      }
+      idxbegin++;
+   }
+   return result;
+}
+#endif
+
+// Compare two sets, returns True for equal sets
+//
+// Inputs:
+//     S0          -   set 0
+//     S1          -   set 1, must have same parameter N as set 0
+//
+// Result:
+//     True, if sets are equal
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static bool amdordering_nsequal(amdnset *s0, amdnset *s1) {
+   ae_int_t i;
+   ae_int_t ns0;
+   ae_int_t ns1;
+   bool result;
+   result = false;
+   if (s0->n != s1->n) {
+      return result;
+   }
+   if (s0->nstored != s1->nstored) {
+      return result;
+   }
+   ns0 = s0->nstored;
+   ns1 = s1->nstored;
+   for (i = 0; i < ns0; i++) {
+      if (s1->locationof.xZ[s0->items.xZ[i]] < 0) {
+         return result;
+      }
+   }
+   for (i = 0; i < ns1; i++) {
+      if (s0->locationof.xZ[s1->items.xZ[i]] < 0) {
+         return result;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Prepares iteration over set
+//
+// Inputs:
+//     SA          -   set
+//
+// Outputs:
+//     SA          -   SA ready for repeated calls of nsEnumerate()
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_nsstartenumeration(amdnset *sa) {
+   sa->iteridx = 0;
+}
+
+// Iterates over the set. Subsequent calls return True and set J to  new  set
+// item until iteration stops and False is returned.
+//
+// Inputs:
+//     SA          -   n-set
+//
+// Outputs:
+//     J           -   if:
+//                     * Result=True - index of element in the set
+//                     * Result=False - not set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static bool amdordering_nsenumerate(amdnset *sa, ae_int_t *i) {
+   ae_int_t k;
+   bool result;
+   *i = 0;
+   k = sa->iteridx;
+   if (k >= sa->nstored) {
+      result = false;
+      return result;
+   }
+   *i = sa->items.xZ[k];
+   sa->iteridx = k + 1;
+   result = true;
+   return result;
+}
+
+// Compresses internal storage, reclaiming previously dropped blocks. To be
+// used internally by kn-set modification functions.
+//
+// Inputs:
+//     SA          -   kn-set to compress
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knscompressstorage(amdknset *sa) {
+   ae_int_t i;
+   ae_int_t blocklen;
+   ae_int_t setidx;
+   ae_int_t srcoffs;
+   ae_int_t dstoffs;
+   srcoffs = 0;
+   dstoffs = 0;
+   while (srcoffs < sa->dataused) {
+      blocklen = sa->data.xZ[srcoffs];
+      setidx = sa->data.xZ[srcoffs + 1];
+      ae_assert(blocklen >= amdordering_knsheadersize, "knsCompressStorage: integrity check 6385 failed");
+      if (setidx < 0) {
+         srcoffs += blocklen;
+         continue;
+      }
+      if (srcoffs != dstoffs) {
+         for (i = 0; i < blocklen; i++) {
+            sa->data.xZ[dstoffs + i] = sa->data.xZ[srcoffs + i];
+         }
+         sa->vbegin.xZ[setidx] = dstoffs + amdordering_knsheadersize;
+      }
+      dstoffs += blocklen;
+      srcoffs += blocklen;
+   }
+   ae_assert(srcoffs == sa->dataused, "knsCompressStorage: integrity check 9464 failed");
+   sa->dataused = dstoffs;
+}
+
+// Reallocates internal storage for set #SetIdx, increasing its  capacity  to
+// NewAllocated exactly. This function may invalidate internal  pointers  for
+// ALL   sets  in  the  kn-set  structure  because  it  may  perform  storage
+// compression in order to reclaim previously freed space.
+//
+// Inputs:
+//     SA          -   kn-set structure
+//     SetIdx      -   set to reallocate
+//     NewAllocated -  new size for the set, must be at least equal to already
+//                     allocated
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsreallocate(amdknset *sa, ae_int_t setidx, ae_int_t newallocated) {
+   ae_int_t oldbegin;
+   ae_int_t oldcnt;
+   ae_int_t newbegin;
+   ae_int_t j;
+   if (sa->data.cnt < sa->dataused + amdordering_knsheadersize + newallocated) {
+      amdordering_knscompressstorage(sa);
+      if (sa->data.cnt < sa->dataused + amdordering_knsheadersize + newallocated) {
+         ivectorgrowto(&sa->data, sa->dataused + amdordering_knsheadersize + newallocated);
+      }
+   }
+   oldbegin = sa->vbegin.xZ[setidx];
+   oldcnt = sa->vcnt.xZ[setidx];
+   newbegin = sa->dataused + amdordering_knsheadersize;
+   sa->vbegin.xZ[setidx] = newbegin;
+   sa->vallocated.xZ[setidx] = newallocated;
+   sa->data.xZ[oldbegin - 1] = -1;
+   sa->data.xZ[newbegin - 2] = amdordering_knsheadersize + newallocated;
+   sa->data.xZ[newbegin - 1] = setidx;
+   sa->dataused += sa->data.xZ[newbegin - 2];
+   for (j = 0; j < oldcnt; j++) {
+      sa->data.xZ[newbegin + j] = sa->data.xZ[oldbegin + j];
+   }
+}
+
+// Initialize kn-set
+//
+// Inputs:
+//     K           -   sets count
+//     N           -   set size
+//     kPrealloc   -   preallocate place per set (can be zero)
+//
+// Outputs:
+//     SA          -   K sets of N elements, initially empty
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsinit(ae_int_t k, ae_int_t n, ae_int_t kprealloc, amdknset *sa) {
+   ae_int_t i;
+   sa->k = n;
+   sa->n = n;
+   isetallocv(n, -1, &sa->flagarray);
+   isetallocv(n, kprealloc, &sa->vallocated);
+   vectorsetlengthatleast(&sa->vbegin, n);
+   sa->vbegin.xZ[0] = amdordering_knsheadersize;
+   for (i = 1; i < n; i++) {
+      sa->vbegin.xZ[i] = sa->vbegin.xZ[i - 1] + sa->vallocated.xZ[i - 1] + amdordering_knsheadersize;
+   }
+   sa->dataused = sa->vbegin.xZ[n - 1] + sa->vallocated.xZ[n - 1];
+   vectorsetlengthatleast(&sa->data, sa->dataused);
+   for (i = 0; i < n; i++) {
+      sa->data.xZ[sa->vbegin.xZ[i] - 2] = amdordering_knsheadersize + sa->vallocated.xZ[i];
+      sa->data.xZ[sa->vbegin.xZ[i] - 1] = i;
+   }
+   isetallocv(n, 0, &sa->vcnt);
+}
+
+// Initialize kn-set from lower triangle of symmetric A
+//
+// Inputs:
+//     A           -   lower triangular sparse matrix in CRS format
+//     N           -   problem size
+//
+// Outputs:
+//     SA          -   N sets of N elements, reproducing both lower and upper
+//                     triangles of A
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsinitfroma(sparsematrix *a, ae_int_t n, amdknset *sa) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t jj;
+   ae_int_t j0;
+   ae_int_t j1;
+   sa->k = n;
+   sa->n = n;
+   isetallocv(n, -1, &sa->flagarray);
+   vectorsetlengthatleast(&sa->vallocated, n);
+   for (i = 0; i < n; i++) {
+      ae_assert(a->didx.xZ[i] < a->uidx.xZ[i], "knsInitFromA: integrity check for diagonal of A failed");
+      j0 = a->ridx.xZ[i];
+      j1 = a->didx.xZ[i] - 1;
+      sa->vallocated.xZ[i] = 1 + (j1 - j0 + 1);
+      for (jj = j0; jj <= j1; jj++) {
+         j = a->idx.xZ[jj];
+         sa->vallocated.xZ[j]++;
+      }
+   }
+   vectorsetlengthatleast(&sa->vbegin, n);
+   sa->vbegin.xZ[0] = amdordering_knsheadersize;
+   for (i = 1; i < n; i++) {
+      sa->vbegin.xZ[i] = sa->vbegin.xZ[i - 1] + sa->vallocated.xZ[i - 1] + amdordering_knsheadersize;
+   }
+   sa->dataused = sa->vbegin.xZ[n - 1] + sa->vallocated.xZ[n - 1];
+   vectorsetlengthatleast(&sa->data, sa->dataused);
+   for (i = 0; i < n; i++) {
+      sa->data.xZ[sa->vbegin.xZ[i] - 2] = amdordering_knsheadersize + sa->vallocated.xZ[i];
+      sa->data.xZ[sa->vbegin.xZ[i] - 1] = i;
+   }
+   isetallocv(n, 0, &sa->vcnt);
+   for (i = 0; i < n; i++) {
+      sa->data.xZ[sa->vbegin.xZ[i] + sa->vcnt.xZ[i]] = i;
+      sa->vcnt.xZ[i]++;
+      j0 = a->ridx.xZ[i];
+      j1 = a->didx.xZ[i] - 1;
+      for (jj = j0; jj <= j1; jj++) {
+         j = a->idx.xZ[jj];
+         sa->data.xZ[sa->vbegin.xZ[i] + sa->vcnt.xZ[i]] = j;
+         sa->data.xZ[sa->vbegin.xZ[j] + sa->vcnt.xZ[j]] = i;
+         sa->vcnt.xZ[i]++;
+         sa->vcnt.xZ[j]++;
+      }
+   }
+}
+
+// Prepares iteration over I-th set
+//
+// Inputs:
+//     SA          -   kn-set
+//     I           -   set index
+//
+// Outputs:
+//     SA          -   SA ready for repeated calls of knsEnumerate()
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsstartenumeration(amdknset *sa, ae_int_t i) {
+   sa->iterrow = i;
+   sa->iteridx = 0;
+}
+
+// Iterates over I-th set (as specified during recent knsStartEnumeration call).
+// Subsequent calls return True and set J to new set item until iteration
+// stops and False is returned.
+//
+// Inputs:
+//     SA          -   kn-set
+//
+// Outputs:
+//     J           -   if:
+//                     * Result=True - index of element in the set
+//                     * Result=False - not set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static bool amdordering_knsenumerate(amdknset *sa, ae_int_t *i) {
+   bool result;
+   *i = 0;
+   if (sa->iteridx < sa->vcnt.xZ[sa->iterrow]) {
+      *i = sa->data.xZ[sa->vbegin.xZ[sa->iterrow] + sa->iteridx];
+      sa->iteridx++;
+      result = true;
+   } else {
+      result = false;
+   }
+   return result;
+}
+
+// Allows direct access to internal storage  of  kn-set  structure  - returns
+// range of elements SA.Data[idxBegin...idxEnd-1] used to store K-th set
+//
+// Inputs:
+//     SA          -   kn-set
+//     K           -   set index
+//
+// Outputs:
+//     idxBegin,
+//     idxEnd      -   half-range [idxBegin,idxEnd) of SA.Data that stores
+//                     K-th set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsdirectaccess(amdknset *sa, ae_int_t k, ae_int_t *idxbegin, ae_int_t *idxend) {
+   *idxbegin = 0;
+   *idxend = 0;
+   *idxbegin = sa->vbegin.xZ[k];
+   *idxend = *idxbegin + sa->vcnt.xZ[k];
+}
+
+// Add K-th element to I-th set. The caller guarantees that  the  element  is
+// not present in the target set.
+//
+// Inputs:
+//     SA          -   kn-set
+//     I           -   set index
+//     K           -   element to add
+//
+// Outputs:
+//     SA          -   modified SA
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsaddnewelement(amdknset *sa, ae_int_t i, ae_int_t k) {
+   ae_int_t cnt;
+   cnt = sa->vcnt.xZ[i];
+   if (cnt == sa->vallocated.xZ[i]) {
+      amdordering_knsreallocate(sa, i, 2 * sa->vallocated.xZ[i] + 1);
+   }
+   sa->data.xZ[sa->vbegin.xZ[i] + cnt] = k;
+   sa->vcnt.xZ[i] = cnt + 1;
+}
+
+// Subtracts source n-set from the I-th set of the destination kn-set.
+//
+// Inputs:
+//     SA          -   destination kn-set structure
+//     I           -   set index in the structure
+//     Src         -   source n-set
+//
+// Outputs:
+//     SA          -   I-th set except for elements in Src
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knssubtract1(amdknset *sa, ae_int_t i, amdnset *src) {
+   ae_int_t j;
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t cnt;
+   cnt = sa->vcnt.xZ[i];
+   idxbegin = sa->vbegin.xZ[i];
+   idxend = idxbegin + cnt;
+   while (idxbegin < idxend) {
+      j = sa->data.xZ[idxbegin];
+      if (src->locationof.xZ[j] >= 0) {
+         sa->data.xZ[idxbegin] = sa->data.xZ[idxend - 1];
+         idxend--;
+         cnt--;
+      } else {
+         idxbegin++;
+      }
+   }
+   sa->vcnt.xZ[i] = cnt;
+}
+
+// Adds Kth set of the source kn-set to the I-th destination set. The  caller
+// guarantees that SA[I] and Src[J] do NOT intersect, i.e. do not have shared
+// elements - it allows to use faster algorithms.
+//
+// Inputs:
+//     SA          -   destination kn-set structure
+//     I           -   set index in the structure
+//     Src         -   source kn-set
+//     K           -   set index
+//
+// Outputs:
+//     SA          -   I-th set plus for elements in K-th set of Src
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsaddkthdistinct(amdknset *sa, ae_int_t i, amdknset *src, ae_int_t k) {
+   ae_int_t idxdst;
+   ae_int_t idxsrcbegin;
+   ae_int_t cnt;
+   ae_int_t srccnt;
+   ae_int_t j;
+   cnt = sa->vcnt.xZ[i];
+   srccnt = src->vcnt.xZ[k];
+   if (cnt + srccnt > sa->vallocated.xZ[i]) {
+      amdordering_knsreallocate(sa, i, 2 * (cnt + srccnt) + 1);
+   }
+   idxsrcbegin = src->vbegin.xZ[k];
+   idxdst = sa->vbegin.xZ[i] + cnt;
+   for (j = 0; j < srccnt; j++) {
+      sa->data.xZ[idxdst] = src->data.xZ[idxsrcbegin + j];
+      idxdst++;
+   }
+   sa->vcnt.xZ[i] = cnt + srccnt;
+}
+
+// Counts elements of K-th set of S0
+//
+// Inputs:
+//     S0          -   kn-set structure
+//     K           -   set index in the structure S0
+//
+// Result:
+//     K-th set element count
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_knscountkth(amdknset *s0, ae_int_t k) {
+   ae_int_t result;
+   result = s0->vcnt.xZ[k];
+   return result;
+}
+
+#if 0
+// Counts elements of I-th set of S0 not present in K-th set of S1
+//
+// Inputs:
+//     S0          -   kn-set structure
+//     I           -   set index in the structure S0
+//     S1          -   kn-set to compare against
+//     K           -   set index in the structure S1
+//
+// Result:
+//     count
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_knscountnotkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k) {
+   ae_int_t idxbegin0;
+   ae_int_t idxbegin1;
+   ae_int_t cnt0;
+   ae_int_t cnt1;
+   ae_int_t j;
+   ae_int_t result;
+   cnt0 = s0->vcnt.xZ[i];
+   cnt1 = s1->vcnt.xZ[k];
+   idxbegin0 = s0->vbegin.xZ[i];
+   idxbegin1 = s1->vbegin.xZ[k];
+   for (j = 0; j < cnt1; j++) {
+      s0->flagarray.xZ[s1->data.xZ[idxbegin1 + j]] = 1;
+   }
+   result = 0;
+   for (j = 0; j < cnt0; j++) {
+      if (s0->flagarray.xZ[s0->data.xZ[idxbegin0 + j]] < 0) {
+         result++;
+      }
+   }
+   for (j = 0; j < cnt1; j++) {
+      s0->flagarray.xZ[s1->data.xZ[idxbegin1 + j]] = -1;
+   }
+   return result;
+}
+
+// Counts elements of I-th set of S0 that are also present in K-th set of S1
+//
+// Inputs:
+//     S0          -   kn-set structure
+//     I           -   set index in the structure S0
+//     S1          -   kn-set to compare against
+//     K           -   set index in the structure S1
+//
+// Result:
+//     count
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_knscountandkth(amdknset *s0, ae_int_t i, amdknset *s1, ae_int_t k) {
+   ae_int_t idxbegin0;
+   ae_int_t idxbegin1;
+   ae_int_t cnt0;
+   ae_int_t cnt1;
+   ae_int_t j;
+   ae_int_t result;
+   cnt0 = s0->vcnt.xZ[i];
+   cnt1 = s1->vcnt.xZ[k];
+   idxbegin0 = s0->vbegin.xZ[i];
+   idxbegin1 = s1->vbegin.xZ[k];
+   for (j = 0; j < cnt1; j++) {
+      s0->flagarray.xZ[s1->data.xZ[idxbegin1 + j]] = 1;
+   }
+   result = 0;
+   for (j = 0; j < cnt0; j++) {
+      if (s0->flagarray.xZ[s0->data.xZ[idxbegin0 + j]] > 0) {
+         result++;
+      }
+   }
+   for (j = 0; j < cnt1; j++) {
+      s0->flagarray.xZ[s1->data.xZ[idxbegin1 + j]] = -1;
+   }
+   return result;
+}
+#endif
+
+// Sums elements in I-th set of S0, returns sum.
+//
+// Inputs:
+//     S0          -   kn-set structure
+//     I           -   set index in the structure S0
+//
+// Result:
+//     sum
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_knssumkth(amdknset *s0, ae_int_t i) {
+   ae_int_t idxbegin0;
+   ae_int_t cnt0;
+   ae_int_t j;
+   ae_int_t result;
+   cnt0 = s0->vcnt.xZ[i];
+   idxbegin0 = s0->vbegin.xZ[i];
+   result = 0;
+   for (j = 0; j < cnt0; j++) {
+      result += s0->data.xZ[idxbegin0 + j];
+   }
+   return result;
+}
+
+// Clear k-th kn-set in collection.
+//
+// Freed memory is NOT reclaimed for future garbage collection.
+//
+// Inputs:
+//     SA          -   kn-set structure
+//     K           -   set index
+//
+// Outputs:
+//     SA          -   K-th set was cleared
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsclearkthnoreclaim(amdknset *sa, ae_int_t k) {
+   sa->vcnt.xZ[k] = 0;
+}
+
+// Clear k-th kn-set in collection.
+//
+// Freed memory is reclaimed for future garbage collection. This function  is
+// NOT recommended if you intend to add elements to this set in some  future,
+// because every addition will result in  reallocation  of  previously  freed
+// memory. Use knsClearKthNoReclaim().
+//
+// Inputs:
+//     SA          -   kn-set structure
+//     K           -   set index
+//
+// Outputs:
+//     SA          -   K-th set was cleared
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_knsclearkthreclaim(amdknset *sa, ae_int_t k) {
+   ae_int_t idxbegin;
+   ae_int_t allocated;
+   idxbegin = sa->vbegin.xZ[k];
+   allocated = sa->vallocated.xZ[k];
+   sa->vcnt.xZ[k] = 0;
+   if (allocated >= amdordering_knsheadersize) {
+      sa->data.xZ[idxbegin - 2] = 2;
+      sa->data.xZ[idxbegin] = allocated;
+      sa->data.xZ[idxbegin + 1] = -1;
+      sa->vallocated.xZ[k] = 0;
+   }
+}
+
+// Initialize linked list matrix
+//
+// Inputs:
+//     N           -   matrix size
+//
+// Outputs:
+//     A           -   NxN linked list matrix
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxinit(ae_int_t n, amdllmatrix *a) {
+   a->n = n;
+   isetallocv(2 * n + 1, -1, &a->vbegin);
+   isetallocv(n, 0, &a->vcolcnt);
+   a->entriesinitialized = 0;
+}
+
+// Adds column from matrix to n-set
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     J           -   column index to add
+//     S           -   target n-set
+//
+// Outputs:
+//     S           -   elements from J-th column are added to S
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxaddcolumnto(amdllmatrix *a, ae_int_t j, amdnset *s) {
+   ae_int_t n;
+   ae_int_t eidx;
+   n = a->n;
+   eidx = a->vbegin.xZ[n + j];
+   while (eidx >= 0) {
+      amdordering_nsaddelement(s, a->entries.xZ[eidx * amdordering_llmentrysize + 4]);
+      eidx = a->entries.xZ[eidx * amdordering_llmentrysize + 3];
+   }
+}
+
+// Inserts new element into column J, row I. The caller guarantees  that  the
+// element being inserted is NOT already present in the matrix.
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     I           -   row index
+//     J           -   column index
+//
+// Outputs:
+//     A           -   element (I,J) added to the list.
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxinsertnewelement(amdllmatrix *a, ae_int_t i, ae_int_t j) {
+   ae_int_t n;
+   ae_int_t k;
+   ae_int_t newsize;
+   ae_int_t eidx;
+   ae_int_t offs;
+   n = a->n;
+   if (a->vbegin.xZ[2 * n] < 0) {
+      newsize = 2 * a->entriesinitialized + 1;
+      ivectorresize(&a->entries, newsize * amdordering_llmentrysize);
+      for (k = a->entriesinitialized; k < newsize - 1; k++) {
+         a->entries.xZ[k * amdordering_llmentrysize] = k + 1;
+      }
+      a->entries.xZ[(newsize - 1) * amdordering_llmentrysize] = a->vbegin.xZ[2 * n];
+      a->vbegin.xZ[2 * n] = a->entriesinitialized;
+      a->entriesinitialized = newsize;
+   }
+   eidx = a->vbegin.xZ[2 * n];
+   offs = eidx * amdordering_llmentrysize;
+   a->vbegin.xZ[2 * n] = a->entries.xZ[offs];
+   a->entries.xZ[offs] = -1;
+   a->entries.xZ[offs + 1] = a->vbegin.xZ[i];
+   if (a->vbegin.xZ[i] >= 0) {
+      a->entries.xZ[a->vbegin.xZ[i] * amdordering_llmentrysize] = eidx;
+   }
+   a->entries.xZ[offs + 2] = -1;
+   a->entries.xZ[offs + 3] = a->vbegin.xZ[j + n];
+   if (a->vbegin.xZ[j + n] >= 0) {
+      a->entries.xZ[a->vbegin.xZ[j + n] * amdordering_llmentrysize + 2] = eidx;
+   }
+   a->entries.xZ[offs + 4] = i;
+   a->entries.xZ[offs + 5] = j;
+   a->vbegin.xZ[i] = eidx;
+   a->vbegin.xZ[j + n] = eidx;
+   a->vcolcnt.xZ[j]++;
+}
+
+// Counts elements in J-th column
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     J           -   column index
+//
+// Result:
+//     element count
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_mtxcountcolumn(amdllmatrix *a, ae_int_t j) {
+   ae_int_t result;
+   result = a->vcolcnt.xZ[j];
+   return result;
+}
+
+// Clears K-th column or row
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     K           -   column/row index to clear
+//     IsCol       -   whether we want to clear row or column
+//
+// Outputs:
+//     A           -   K-th column or row is empty
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxclearx(amdllmatrix *a, ae_int_t k, bool iscol) {
+   ae_int_t n;
+   ae_int_t eidx;
+   ae_int_t enext;
+   ae_int_t idxprev;
+   ae_int_t idxnext;
+   ae_int_t idxr;
+   ae_int_t idxc;
+   n = a->n;
+   if (iscol) {
+      eidx = a->vbegin.xZ[n + k];
+   } else {
+      eidx = a->vbegin.xZ[k];
+   }
+   while (eidx >= 0) {
+      idxr = a->entries.xZ[eidx * amdordering_llmentrysize + 4];
+      idxc = a->entries.xZ[eidx * amdordering_llmentrysize + 5];
+      if (iscol) {
+         enext = a->entries.xZ[eidx * amdordering_llmentrysize + 3];
+      } else {
+         enext = a->entries.xZ[eidx * amdordering_llmentrysize + 1];
+      }
+      idxprev = a->entries.xZ[eidx * amdordering_llmentrysize];
+      idxnext = a->entries.xZ[eidx * amdordering_llmentrysize + 1];
+      if (idxprev >= 0) {
+         a->entries.xZ[idxprev * amdordering_llmentrysize + 1] = idxnext;
+      } else {
+         a->vbegin.xZ[idxr] = idxnext;
+      }
+      if (idxnext >= 0) {
+         a->entries.xZ[idxnext * amdordering_llmentrysize] = idxprev;
+      }
+      idxprev = a->entries.xZ[eidx * amdordering_llmentrysize + 2];
+      idxnext = a->entries.xZ[eidx * amdordering_llmentrysize + 3];
+      if (idxprev >= 0) {
+         a->entries.xZ[idxprev * amdordering_llmentrysize + 3] = idxnext;
+      } else {
+         a->vbegin.xZ[idxc + n] = idxnext;
+      }
+      if (idxnext >= 0) {
+         a->entries.xZ[idxnext * amdordering_llmentrysize + 2] = idxprev;
+      }
+      a->entries.xZ[eidx * amdordering_llmentrysize] = a->vbegin.xZ[2 * n];
+      a->vbegin.xZ[2 * n] = eidx;
+      eidx = enext;
+      if (!iscol) {
+         a->vcolcnt.xZ[idxc]--;
+      }
+   }
+   if (iscol) {
+      a->vcolcnt.xZ[k] = 0;
+   }
+}
+
+// Clears J-th column
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     J           -   column index to clear
+//
+// Outputs:
+//     A           -   J-th column is empty
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxclearcolumn(amdllmatrix *a, ae_int_t j) {
+   amdordering_mtxclearx(a, j, true);
+}
+
+// Clears J-th row
+//
+// Inputs:
+//     A           -   NxN linked list matrix
+//     J           -   row index to clear
+//
+// Outputs:
+//     A           -   J-th row is empty
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_mtxclearrow(amdllmatrix *a, ae_int_t j) {
+   amdordering_mtxclearx(a, j, false);
+}
+
+// Initialize vertex storage using A to estimate initial degrees
+//
+// Inputs:
+//     A           -   NxN lower triangular sparse CRS matrix
+//     N           -   problem size
+//     CheckExactDegrees-
+//                     whether we want to maintain additional exact degress
+//                     (the search is still done using approximate ones)
+//
+// Outputs:
+//     S           -   vertex set
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_vtxinit(sparsematrix *a, ae_int_t n, bool checkexactdegrees, amdvertexset *s) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t jj;
+   ae_int_t j0;
+   ae_int_t j1;
+   SetObj(amdvertexset, s);
+   s->n = n;
+   s->checkexactdegrees = checkexactdegrees;
+   s->smallestdegree = 0;
+   bsetallocv(n, true, &s->isvertex);
+   isetallocv(n, 0, &s->approxd);
+   for (i = 0; i < n; i++) {
+      j0 = a->ridx.xZ[i];
+      j1 = a->didx.xZ[i] - 1;
+      s->approxd.xZ[i] = j1 - j0 + 1;
+      for (jj = j0; jj <= j1; jj++) {
+         j = a->idx.xZ[jj];
+         s->approxd.xZ[j]++;
+      }
+   }
+   if (checkexactdegrees) {
+      icopyallocv(n, &s->approxd, &s->optionalexactd);
+   }
+   isetallocv(n, -1, &s->vbegin);
+   isetallocv(n, -1, &s->vprev);
+   isetallocv(n, -1, &s->vnext);
+   for (i = 0; i < n; i++) {
+      j = s->approxd.xZ[i];
+      j0 = s->vbegin.xZ[j];
+      s->vbegin.xZ[j] = i;
+      s->vnext.xZ[i] = j0;
+      s->vprev.xZ[i] = -1;
+      if (j0 >= 0) {
+         s->vprev.xZ[j0] = i;
+      }
+   }
+}
+
+// Removes vertex from the storage
+//
+// Inputs:
+//     S           -   vertex set
+//     P           -   vertex to be removed
+//
+// Outputs:
+//     S           -   modified
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_vtxremovevertex(amdvertexset *s, ae_int_t p) {
+   ae_int_t d;
+   ae_int_t idxprev;
+   ae_int_t idxnext;
+   d = s->approxd.xZ[p];
+   idxprev = s->vprev.xZ[p];
+   idxnext = s->vnext.xZ[p];
+   if (idxprev >= 0) {
+      s->vnext.xZ[idxprev] = idxnext;
+   } else {
+      s->vbegin.xZ[d] = idxnext;
+   }
+   if (idxnext >= 0) {
+      s->vprev.xZ[idxnext] = idxprev;
+   }
+   s->isvertex.xB[p] = false;
+   s->approxd.xZ[p] = -9999999;
+   if (s->checkexactdegrees) {
+      s->optionalexactd.xZ[p] = -9999999;
+   }
+}
+
+// Get approximate degree. Result is undefined for removed vertexes.
+//
+// Inputs:
+//     S           -   vertex set
+//     P           -   vertex index
+//
+// Result:
+//     vertex degree
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_vtxgetapprox(amdvertexset *s, ae_int_t p) {
+   ae_int_t result;
+   result = s->approxd.xZ[p];
+   return result;
+}
+
+// Get exact degree (or 0, if not supported).  Result is undefined for
+// removed vertexes.
+//
+// Inputs:
+//     S           -   vertex set
+//     P           -   vertex index
+//
+// Result:
+//     vertex degree
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_vtxgetexact(amdvertexset *s, ae_int_t p) {
+   ae_int_t result;
+   if (s->checkexactdegrees) {
+      result = s->optionalexactd.xZ[p];
+   } else {
+      result = 0;
+   }
+   return result;
+}
+
+// Returns index of vertex with minimum approximate degree, or -1 when there
+// is no vertex.
+//
+// Inputs:
+//     S           -   vertex set
+//
+// Result:
+//     vertex index, or -1
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static ae_int_t amdordering_vtxgetapproxmindegree(amdvertexset *s) {
+   ae_int_t i;
+   ae_int_t n;
+   ae_int_t result;
+   n = s->n;
+   result = -1;
+   for (i = s->smallestdegree; i < n; i++) {
+      if (s->vbegin.xZ[i] >= 0) {
+         s->smallestdegree = i;
+         result = s->vbegin.xZ[i];
+         return result;
+      }
+   }
+   return result;
+}
+
+// Update approximate degree
+//
+// Inputs:
+//     S           -   vertex set
+//     P           -   vertex to be updated
+//     DNew        -   new degree
+//
+// Outputs:
+//     S           -   modified
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_vtxupdateapproximatedegree(amdvertexset *s, ae_int_t p, ae_int_t dnew) {
+   ae_int_t dold;
+   ae_int_t idxprev;
+   ae_int_t idxnext;
+   ae_int_t oldbegin;
+   dold = s->approxd.xZ[p];
+   if (dold == dnew) {
+      return;
+   }
+   idxprev = s->vprev.xZ[p];
+   idxnext = s->vnext.xZ[p];
+   if (idxprev >= 0) {
+      s->vnext.xZ[idxprev] = idxnext;
+   } else {
+      s->vbegin.xZ[dold] = idxnext;
+   }
+   if (idxnext >= 0) {
+      s->vprev.xZ[idxnext] = idxprev;
+   }
+   oldbegin = s->vbegin.xZ[dnew];
+   s->vbegin.xZ[dnew] = p;
+   s->vnext.xZ[p] = oldbegin;
+   s->vprev.xZ[p] = -1;
+   if (oldbegin >= 0) {
+      s->vprev.xZ[oldbegin] = p;
+   }
+   s->approxd.xZ[p] = dnew;
+   if (dnew < s->smallestdegree) {
+      s->smallestdegree = dnew;
+   }
+}
+
+// Update optional exact degree. Silently returns if vertex set does not store
+// exact degrees.
+//
+// Inputs:
+//     S           -   vertex set
+//     P           -   vertex to be updated
+//     D           -   new degree
+//
+// Outputs:
+//     S           -   modified
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_vtxupdateexactdegree(amdvertexset *s, ae_int_t p, ae_int_t d) {
+   if (!s->checkexactdegrees) {
+      return;
+   }
+   s->optionalexactd.xZ[p] = d;
+}
+
+// This function selects K-th  pivot  with  minimum  approximate  degree  and
+// generates permutation that reorders variable to the K-th position  in  the
+// matrix.
+//
+// Due to supernodal structure of the matrix more than one pivot variable can
+// be selected and moved to the beginning. The actual count of pivots selected
+// is returned in NodeSize.
+//
+// Inputs:
+//     Buf         -   properly initialized buffer object
+//     K           -   pivot index
+//
+// Outputs:
+//     Buf.Perm    -   entries [K,K+NodeSize) are initialized by permutation
+//     Buf.InvPerm -   entries [K,K+NodeSize) are initialized by permutation
+//     Buf.ColumnSwaps-entries [K,K+NodeSize) are initialized by permutation
+//     P           -   pivot supervariable
+//     NodeSize    -   supernode size
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_amdselectpivotelement(amdbuffer *buf, ae_int_t k, ae_int_t *p, ae_int_t *nodesize) {
+   ae_int_t i;
+   ae_int_t j;
+   *p = 0;
+   *nodesize = 0;
+   *p = amdordering_vtxgetapproxmindegree(&buf->vertexdegrees);
+   ae_assert(*p >= 0, "GenerateAMDPermutation: integrity check 3634 failed");
+   ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, *p) >= 0, "integrity check RDFD2 failed");
+   *nodesize = 0;
+   amdordering_knsstartenumeration(&buf->setsuper, *p);
+   while (amdordering_knsenumerate(&buf->setsuper, &j)) {
+      i = buf->perm.xZ[j];
+      buf->columnswaps.xZ[k + (*nodesize)] = i;
+      buf->invperm.xZ[i] = buf->invperm.xZ[k + (*nodesize)];
+      buf->invperm.xZ[k + (*nodesize)] = j;
+      buf->perm.xZ[buf->invperm.xZ[i]] = i;
+      buf->perm.xZ[buf->invperm.xZ[k + (*nodesize)]] = k + (*nodesize);
+      ++*nodesize;
+   }
+   ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, *p) >= 0 && (!buf->checkexactdegrees || amdordering_vtxgetexact(&buf->vertexdegrees, *p) >= 0), "AMD: integrity check RDFD failed");
+}
+
+// This function computes nonzero pattern of Lp, the column that is added  to
+// the lower triangular Cholesky factor.
+//
+// Inputs:
+//     Buf         -   properly initialized buffer object
+//     P           -   pivot column
+//
+// Outputs:
+//     Buf.Lp      -   initialized with Lp
+//     Buf.PLp     -   initialized with setSuper[P]+Lp
+//     Buf.Ep      -   initialized with setE[P]
+//     Buf.mtxL    -   L := L+Lp
+//     Buf.Ls      -   first Buf.LSCnt elements contain subset of Lp elements
+//                     that are principal nodes in supervariables.
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_amdcomputelp(amdbuffer *buf, ae_int_t p) {
+   ae_int_t i;
+   amdordering_nsclear(&buf->lp);
+   amdordering_nsaddkth(&buf->lp, &buf->seta, p);
+   amdordering_knsstartenumeration(&buf->sete, p);
+   while (amdordering_knsenumerate(&buf->sete, &i)) {
+      amdordering_mtxaddcolumnto(&buf->mtxl, i, &buf->lp);
+   }
+   amdordering_nssubtractkth(&buf->lp, &buf->setsuper, p);
+   buf->lscnt = 0;
+   amdordering_nsstartenumeration(&buf->lp);
+   while (amdordering_nsenumerate(&buf->lp, &i)) {
+      ae_assert(!buf->iseliminated.xB[i], "AMD: integrity check 0740 failed");
+      amdordering_mtxinsertnewelement(&buf->mtxl, i, p);
+      if (buf->issupernode.xB[i]) {
+         buf->ls.xZ[buf->lscnt] = i;
+         buf->lscnt++;
+      }
+   }
+   amdordering_nscopy(&buf->lp, &buf->plp);
+   amdordering_nsaddkth(&buf->plp, &buf->setsuper, p);
+   amdordering_nsclear(&buf->ep);
+   amdordering_nsaddkth(&buf->ep, &buf->sete, p);
+}
+
+// Having output of AMDComputeLp() in the Buf object, this function  performs
+// mass elimination in the quotient graph.
+//
+// Inputs:
+//     Buf         -   properly initialized buffer object
+//     P           -   pivot column
+//     K           -   number of already eliminated columns (P-th is not counted)
+//
+// Outputs:
+//     Buf.setA    -   Lp is eliminated from setA
+//     Buf.setE    -   Ep is eliminated from setE, P is added
+//     approxD     -   updated
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_amdmasselimination(amdbuffer *buf, ae_int_t p, ae_int_t k) {
+   ae_int_t n;
+   ae_int_t lidx;
+   ae_int_t lpi;
+   ae_int_t cntsuperi;
+   ae_int_t cntainoti;
+   ae_int_t cntlpnoti;
+   ae_int_t cc;
+   ae_int_t j;
+   ae_int_t e;
+   ae_int_t we;
+   ae_int_t cnttoclean;
+   ae_int_t idxbegin;
+   ae_int_t idxend;
+   ae_int_t jj;
+   n = buf->n;
+   vectorsetlengthatleast(&buf->tmp0, n);
+   cnttoclean = 0;
+   for (lidx = 0; lidx < buf->lscnt; lidx++) {
+      lpi = buf->ls.xZ[lidx];
+      cntsuperi = amdordering_knscountkth(&buf->setsuper, lpi);
+      amdordering_knsdirectaccess(&buf->sete, lpi, &idxbegin, &idxend);
+      for (jj = idxbegin; jj < idxend; jj++) {
+         e = buf->sete.data.xZ[jj];
+         we = buf->arrwe.xZ[e];
+         if (we < 0) {
+            we = amdordering_mtxcountcolumn(&buf->mtxl, e);
+            buf->tmp0.xZ[cnttoclean] = e;
+            cnttoclean++;
+         }
+         buf->arrwe.xZ[e] = we - cntsuperi;
+      }
+   }
+   for (lidx = 0; lidx < buf->lscnt; lidx++) {
+      lpi = buf->ls.xZ[lidx];
+      amdordering_knssubtract1(&buf->seta, lpi, &buf->plp);
+      amdordering_knssubtract1(&buf->sete, lpi, &buf->ep);
+      amdordering_knsaddnewelement(&buf->sete, lpi, p);
+      cntainoti = amdordering_knscountkth(&buf->seta, lpi);
+      cntlpnoti = amdordering_nscount(&buf->lp) - amdordering_knscountkth(&buf->setsuper, lpi);
+      cc = 0;
+      amdordering_knsdirectaccess(&buf->sete, lpi, &idxbegin, &idxend);
+      for (jj = idxbegin; jj < idxend; jj++) {
+         j = buf->sete.data.xZ[jj];
+         if (j == p) {
+            continue;
+         }
+         e = buf->arrwe.xZ[j];
+         if (e < 0) {
+            e = amdordering_mtxcountcolumn(&buf->mtxl, j);
+         }
+         cc += e;
+      }
+      amdordering_vtxupdateapproximatedegree(&buf->vertexdegrees, lpi, imin3(n - k, amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) + cntlpnoti, cntainoti + cntlpnoti + cc));
+      if (buf->checkexactdegrees) {
+         amdordering_nsclear(&buf->exactdegreetmp0);
+         amdordering_knsstartenumeration(&buf->sete, lpi);
+         while (amdordering_knsenumerate(&buf->sete, &j)) {
+            amdordering_mtxaddcolumnto(&buf->mtxl, j, &buf->exactdegreetmp0);
+         }
+         amdordering_vtxupdateexactdegree(&buf->vertexdegrees, lpi, cntainoti + amdordering_nscountnotkth(&buf->exactdegreetmp0, &buf->setsuper, lpi));
+         ae_assert(amdordering_knscountkth(&buf->sete, lpi) > 2 || amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) == amdordering_vtxgetexact(&buf->vertexdegrees, lpi), "AMD: integrity check 7206 failed");
+         ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) >= amdordering_vtxgetexact(&buf->vertexdegrees, lpi), "AMD: integrity check 8206 failed");
+      }
+   }
+   for (j = 0; j < cnttoclean; j++) {
+      buf->arrwe.xZ[buf->tmp0.xZ[j]] = -1;
+   }
+}
+
+// After mass elimination, but before removal of vertex  P,  we  may  perform
+// supernode detection. Only variables/supernodes in  Lp  (P  itself  is  NOT
+// included) can be merged into larger supernodes.
+//
+// Inputs:
+//     Buf         -   properly initialized buffer object
+//
+// Outputs:
+//     Buf         -   following fields of Buf may be modified:
+//                     * Buf.setSuper
+//                     * Buf.setA
+//                     * Buf.setE
+//                     * Buf.IsSupernode
+//                     * ApproxD and ExactD
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void amdordering_amddetectsupernodes(amdbuffer *buf) {
+   ae_int_t n;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t cnt;
+   ae_int_t lpi;
+   ae_int_t lpj;
+   ae_int_t nj;
+   ae_int_t hashi;
+   n = buf->n;
+   vectorsetlengthatleast(&buf->sncandidates, n);
+   if (buf->lscnt < 2) {
+      return;
+   }
+   for (i = 0; i < buf->lscnt; i++) {
+      lpi = buf->ls.xZ[i];
+      hashi = (amdordering_knssumkth(&buf->seta, lpi) + amdordering_knssumkth(&buf->sete, lpi)) % n;
+      amdordering_nsaddelement(&buf->nonemptybuckets, hashi);
+      amdordering_knsaddnewelement(&buf->hashbuckets, hashi, lpi);
+   }
+   amdordering_nsstartenumeration(&buf->nonemptybuckets);
+   while (amdordering_nsenumerate(&buf->nonemptybuckets, &hashi)) {
+      if (amdordering_knscountkth(&buf->hashbuckets, hashi) >= 2) {
+         cnt = 0;
+         amdordering_knsstartenumeration(&buf->hashbuckets, hashi);
+         while (amdordering_knsenumerate(&buf->hashbuckets, &i)) {
+            buf->sncandidates.xZ[cnt] = i;
+            cnt++;
+         }
+         for (i = cnt - 1; i >= 0; i--) {
+            for (j = cnt - 1; j >= i + 1; j--) {
+               if (buf->issupernode.xB[buf->sncandidates.xZ[i]] && buf->issupernode.xB[buf->sncandidates.xZ[j]]) {
+                  lpi = buf->sncandidates.xZ[i];
+                  lpj = buf->sncandidates.xZ[j];
+                  amdordering_nsclear(&buf->adji);
+                  amdordering_nsclear(&buf->adjj);
+                  amdordering_nsaddkth(&buf->adji, &buf->seta, lpi);
+                  amdordering_nsaddkth(&buf->adjj, &buf->seta, lpj);
+                  amdordering_nsaddkth(&buf->adji, &buf->sete, lpi);
+                  amdordering_nsaddkth(&buf->adjj, &buf->sete, lpj);
+                  amdordering_nsaddelement(&buf->adji, lpi);
+                  amdordering_nsaddelement(&buf->adji, lpj);
+                  amdordering_nsaddelement(&buf->adjj, lpi);
+                  amdordering_nsaddelement(&buf->adjj, lpj);
+                  if (!amdordering_nsequal(&buf->adji, &buf->adjj)) {
+                     continue;
+                  }
+                  nj = amdordering_knscountkth(&buf->setsuper, lpj);
+                  amdordering_knsaddkthdistinct(&buf->setsuper, lpi, &buf->setsuper, lpj);
+                  amdordering_knsclearkthreclaim(&buf->setsuper, lpj);
+                  amdordering_knsclearkthreclaim(&buf->seta, lpj);
+                  amdordering_knsclearkthreclaim(&buf->sete, lpj);
+                  buf->issupernode.xB[lpj] = false;
+                  amdordering_vtxremovevertex(&buf->vertexdegrees, lpj);
+                  amdordering_vtxupdateapproximatedegree(&buf->vertexdegrees, lpi, amdordering_vtxgetapprox(&buf->vertexdegrees, lpi) - nj);
+                  if (buf->checkexactdegrees) {
+                     amdordering_vtxupdateexactdegree(&buf->vertexdegrees, lpi, amdordering_vtxgetexact(&buf->vertexdegrees, lpi) - nj);
+                  }
+               }
+            }
+         }
+      }
+      amdordering_knsclearkthnoreclaim(&buf->hashbuckets, hashi);
+   }
+   amdordering_nsclear(&buf->nonemptybuckets);
+}
+
+// This function generates approximate minimum degree ordering
+//
+// Inputs:
+//     A           -   lower triangular sparse matrix in CRS format
+//     N           -   problem size
+//     Buf         -   reusable buffer object, does not need special initialization
+//
+// Outputs:
+//     Perm        -   array[N], maps original indexes I to permuted indexes
+//     InvPerm     -   array[N], maps permuted indexes I to original indexes
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t p;
+   ae_int_t setprealloc;
+   ae_int_t inithashbucketsize;
+   ae_int_t nodesize;
+   ae_int_t cnt0;
+   ae_int_t cnt1;
+   setprealloc = 3;
+   inithashbucketsize = 16;
+   buf->n = n;
+   buf->checkexactdegrees = false;
+   amdordering_mtxinit(n, &buf->mtxl);
+   amdordering_knsinitfroma(a, n, &buf->seta);
+   amdordering_knsinit(n, n, setprealloc, &buf->setsuper);
+   for (i = 0; i < n; i++) {
+      amdordering_knsaddnewelement(&buf->setsuper, i, i);
+   }
+   amdordering_knsinit(n, n, setprealloc, &buf->sete);
+   amdordering_knsinit(n, n, inithashbucketsize, &buf->hashbuckets);
+   amdordering_nsinitemptyslow(n, &buf->nonemptybuckets);
+   vectorsetlengthatleast(&buf->perm, n);
+   vectorsetlengthatleast(&buf->invperm, n);
+   vectorsetlengthatleast(&buf->columnswaps, n);
+   for (i = 0; i < n; i++) {
+      buf->perm.xZ[i] = i;
+      buf->invperm.xZ[i] = i;
+   }
+   amdordering_vtxinit(a, n, buf->checkexactdegrees, &buf->vertexdegrees);
+   bsetallocv(n, true, &buf->issupernode);
+   bsetallocv(n, false, &buf->iseliminated);
+   isetallocv(n, -1, &buf->arrwe);
+   vectorsetlengthatleast(&buf->ls, n);
+   amdordering_nsinitemptyslow(n, &buf->lp);
+   amdordering_nsinitemptyslow(n, &buf->plp);
+   amdordering_nsinitemptyslow(n, &buf->ep);
+   amdordering_nsinitemptyslow(n, &buf->exactdegreetmp0);
+   amdordering_nsinitemptyslow(n, &buf->adji);
+   amdordering_nsinitemptyslow(n, &buf->adjj);
+   k = 0;
+   while (k < n) {
+      amdordering_amdselectpivotelement(buf, k, &p, &nodesize);
+      amdordering_amdcomputelp(buf, p);
+      amdordering_amdmasselimination(buf, p, k);
+      amdordering_amddetectsupernodes(buf);
+      ae_assert(amdordering_vtxgetapprox(&buf->vertexdegrees, p) >= amdordering_nscount(&buf->lp), "AMD: integrity check 7956 failed");
+      ae_assert(amdordering_knscountkth(&buf->sete, p) > 2 || amdordering_vtxgetapprox(&buf->vertexdegrees, p) == amdordering_nscount(&buf->lp), "AMD: integrity check 7295 failed");
+      amdordering_knsstartenumeration(&buf->sete, p);
+      while (amdordering_knsenumerate(&buf->sete, &j)) {
+         amdordering_mtxclearcolumn(&buf->mtxl, j);
+      }
+      amdordering_knsstartenumeration(&buf->setsuper, p);
+      while (amdordering_knsenumerate(&buf->setsuper, &j)) {
+         buf->iseliminated.xB[j] = true;
+         amdordering_mtxclearrow(&buf->mtxl, j);
+      }
+      amdordering_knsclearkthreclaim(&buf->seta, p);
+      amdordering_knsclearkthreclaim(&buf->sete, p);
+      buf->issupernode.xB[p] = false;
+      amdordering_vtxremovevertex(&buf->vertexdegrees, p);
+      k += nodesize;
+   }
+   vectorsetlengthatleast(perm, n);
+   vectorsetlengthatleast(invperm, n);
+   for (i = 0; i < n; i++) {
+      perm->xZ[i] = buf->perm.xZ[i];
+      invperm->xZ[i] = buf->invperm.xZ[i];
+   }
+}
+
+void amdnset_init(void *_p, bool make_automatic) {
+   amdnset *p = (amdnset *)_p;
+   ae_vector_init(&p->items, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->locationof, 0, DT_INT, make_automatic);
+}
+
+void amdnset_copy(void *_dst, void *_src, bool make_automatic) {
+   amdnset *dst = (amdnset *)_dst;
+   amdnset *src = (amdnset *)_src;
+   dst->n = src->n;
+   dst->nstored = src->nstored;
+   ae_vector_copy(&dst->items, &src->items, make_automatic);
+   ae_vector_copy(&dst->locationof, &src->locationof, make_automatic);
+   dst->iteridx = src->iteridx;
+}
+
+void amdnset_free(void *_p, bool make_automatic) {
+   amdnset *p = (amdnset *)_p;
+   ae_vector_free(&p->items, make_automatic);
+   ae_vector_free(&p->locationof, make_automatic);
+}
+
+void amdknset_init(void *_p, bool make_automatic) {
+   amdknset *p = (amdknset *)_p;
+   ae_vector_init(&p->flagarray, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vbegin, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vallocated, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vcnt, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->data, 0, DT_INT, make_automatic);
+}
+
+void amdknset_copy(void *_dst, void *_src, bool make_automatic) {
+   amdknset *dst = (amdknset *)_dst;
+   amdknset *src = (amdknset *)_src;
+   dst->k = src->k;
+   dst->n = src->n;
+   ae_vector_copy(&dst->flagarray, &src->flagarray, make_automatic);
+   ae_vector_copy(&dst->vbegin, &src->vbegin, make_automatic);
+   ae_vector_copy(&dst->vallocated, &src->vallocated, make_automatic);
+   ae_vector_copy(&dst->vcnt, &src->vcnt, make_automatic);
+   ae_vector_copy(&dst->data, &src->data, make_automatic);
+   dst->dataused = src->dataused;
+   dst->iterrow = src->iterrow;
+   dst->iteridx = src->iteridx;
+}
+
+void amdknset_free(void *_p, bool make_automatic) {
+   amdknset *p = (amdknset *)_p;
+   ae_vector_free(&p->flagarray, make_automatic);
+   ae_vector_free(&p->vbegin, make_automatic);
+   ae_vector_free(&p->vallocated, make_automatic);
+   ae_vector_free(&p->vcnt, make_automatic);
+   ae_vector_free(&p->data, make_automatic);
+}
+
+void amdvertexset_init(void *_p, bool make_automatic) {
+   amdvertexset *p = (amdvertexset *)_p;
+   ae_vector_init(&p->approxd, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->optionalexactd, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->isvertex, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->vbegin, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vprev, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vnext, 0, DT_INT, make_automatic);
+}
+
+void amdvertexset_copy(void *_dst, void *_src, bool make_automatic) {
+   amdvertexset *dst = (amdvertexset *)_dst;
+   amdvertexset *src = (amdvertexset *)_src;
+   dst->n = src->n;
+   dst->checkexactdegrees = src->checkexactdegrees;
+   dst->smallestdegree = src->smallestdegree;
+   ae_vector_copy(&dst->approxd, &src->approxd, make_automatic);
+   ae_vector_copy(&dst->optionalexactd, &src->optionalexactd, make_automatic);
+   ae_vector_copy(&dst->isvertex, &src->isvertex, make_automatic);
+   ae_vector_copy(&dst->vbegin, &src->vbegin, make_automatic);
+   ae_vector_copy(&dst->vprev, &src->vprev, make_automatic);
+   ae_vector_copy(&dst->vnext, &src->vnext, make_automatic);
+}
+
+void amdvertexset_free(void *_p, bool make_automatic) {
+   amdvertexset *p = (amdvertexset *)_p;
+   ae_vector_free(&p->approxd, make_automatic);
+   ae_vector_free(&p->optionalexactd, make_automatic);
+   ae_vector_free(&p->isvertex, make_automatic);
+   ae_vector_free(&p->vbegin, make_automatic);
+   ae_vector_free(&p->vprev, make_automatic);
+   ae_vector_free(&p->vnext, make_automatic);
+}
+
+void amdllmatrix_init(void *_p, bool make_automatic) {
+   amdllmatrix *p = (amdllmatrix *)_p;
+   ae_vector_init(&p->vbegin, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->vcolcnt, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->entries, 0, DT_INT, make_automatic);
+}
+
+void amdllmatrix_copy(void *_dst, void *_src, bool make_automatic) {
+   amdllmatrix *dst = (amdllmatrix *)_dst;
+   amdllmatrix *src = (amdllmatrix *)_src;
+   dst->n = src->n;
+   ae_vector_copy(&dst->vbegin, &src->vbegin, make_automatic);
+   ae_vector_copy(&dst->vcolcnt, &src->vcolcnt, make_automatic);
+   ae_vector_copy(&dst->entries, &src->entries, make_automatic);
+   dst->entriesinitialized = src->entriesinitialized;
+}
+
+void amdllmatrix_free(void *_p, bool make_automatic) {
+   amdllmatrix *p = (amdllmatrix *)_p;
+   ae_vector_free(&p->vbegin, make_automatic);
+   ae_vector_free(&p->vcolcnt, make_automatic);
+   ae_vector_free(&p->entries, make_automatic);
+}
+
+void amdbuffer_init(void *_p, bool make_automatic) {
+   amdbuffer *p = (amdbuffer *)_p;
+   ae_vector_init(&p->iseliminated, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->issupernode, 0, DT_BOOL, make_automatic);
+   amdknset_init(&p->setsuper, make_automatic);
+   amdknset_init(&p->seta, make_automatic);
+   amdknset_init(&p->sete, make_automatic);
+   amdllmatrix_init(&p->mtxl, make_automatic);
+   amdvertexset_init(&p->vertexdegrees, make_automatic);
+   ae_vector_init(&p->perm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->invperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->columnswaps, 0, DT_INT, make_automatic);
+   amdnset_init(&p->lp, make_automatic);
+   amdnset_init(&p->plp, make_automatic);
+   amdnset_init(&p->ep, make_automatic);
+   amdnset_init(&p->adji, make_automatic);
+   amdnset_init(&p->adjj, make_automatic);
+   ae_vector_init(&p->ls, 0, DT_INT, make_automatic);
+   amdnset_init(&p->exactdegreetmp0, make_automatic);
+   amdknset_init(&p->hashbuckets, make_automatic);
+   amdnset_init(&p->nonemptybuckets, make_automatic);
+   ae_vector_init(&p->sncandidates, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->tmp0, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->arrwe, 0, DT_INT, make_automatic);
+   ae_matrix_init(&p->dbga, 0, 0, DT_REAL, make_automatic);
+}
+
+void amdbuffer_copy(void *_dst, void *_src, bool make_automatic) {
+   amdbuffer *dst = (amdbuffer *)_dst;
+   amdbuffer *src = (amdbuffer *)_src;
+   dst->n = src->n;
+   dst->checkexactdegrees = src->checkexactdegrees;
+   ae_vector_copy(&dst->iseliminated, &src->iseliminated, make_automatic);
+   ae_vector_copy(&dst->issupernode, &src->issupernode, make_automatic);
+   amdknset_copy(&dst->setsuper, &src->setsuper, make_automatic);
+   amdknset_copy(&dst->seta, &src->seta, make_automatic);
+   amdknset_copy(&dst->sete, &src->sete, make_automatic);
+   amdllmatrix_copy(&dst->mtxl, &src->mtxl, make_automatic);
+   amdvertexset_copy(&dst->vertexdegrees, &src->vertexdegrees, make_automatic);
+   ae_vector_copy(&dst->perm, &src->perm, make_automatic);
+   ae_vector_copy(&dst->invperm, &src->invperm, make_automatic);
+   ae_vector_copy(&dst->columnswaps, &src->columnswaps, make_automatic);
+   amdnset_copy(&dst->lp, &src->lp, make_automatic);
+   amdnset_copy(&dst->plp, &src->plp, make_automatic);
+   amdnset_copy(&dst->ep, &src->ep, make_automatic);
+   amdnset_copy(&dst->adji, &src->adji, make_automatic);
+   amdnset_copy(&dst->adjj, &src->adjj, make_automatic);
+   ae_vector_copy(&dst->ls, &src->ls, make_automatic);
+   dst->lscnt = src->lscnt;
+   amdnset_copy(&dst->exactdegreetmp0, &src->exactdegreetmp0, make_automatic);
+   amdknset_copy(&dst->hashbuckets, &src->hashbuckets, make_automatic);
+   amdnset_copy(&dst->nonemptybuckets, &src->nonemptybuckets, make_automatic);
+   ae_vector_copy(&dst->sncandidates, &src->sncandidates, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
+   ae_vector_copy(&dst->arrwe, &src->arrwe, make_automatic);
+   ae_matrix_copy(&dst->dbga, &src->dbga, make_automatic);
+}
+
+void amdbuffer_free(void *_p, bool make_automatic) {
+   amdbuffer *p = (amdbuffer *)_p;
+   ae_vector_free(&p->iseliminated, make_automatic);
+   ae_vector_free(&p->issupernode, make_automatic);
+   amdknset_free(&p->setsuper, make_automatic);
+   amdknset_free(&p->seta, make_automatic);
+   amdknset_free(&p->sete, make_automatic);
+   amdllmatrix_free(&p->mtxl, make_automatic);
+   amdvertexset_free(&p->vertexdegrees, make_automatic);
+   ae_vector_free(&p->perm, make_automatic);
+   ae_vector_free(&p->invperm, make_automatic);
+   ae_vector_free(&p->columnswaps, make_automatic);
+   amdnset_free(&p->lp, make_automatic);
+   amdnset_free(&p->plp, make_automatic);
+   amdnset_free(&p->ep, make_automatic);
+   amdnset_free(&p->adji, make_automatic);
+   amdnset_free(&p->adjj, make_automatic);
+   ae_vector_free(&p->ls, make_automatic);
+   amdnset_free(&p->exactdegreetmp0, make_automatic);
+   amdknset_free(&p->hashbuckets, make_automatic);
+   amdnset_free(&p->nonemptybuckets, make_automatic);
+   ae_vector_free(&p->sncandidates, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->arrwe, make_automatic);
+   ae_matrix_free(&p->dbga, make_automatic);
+}
+} // end of namespace alglib_impl
+
+// === SPCHOL Package ===
+// Depends on: AMDORDERING
+namespace alglib_impl {
+// Informational function, useful for debugging
+ae_int_t spsymmgetmaxfastkernel() {
+   const ae_int_t maxfastkernel = 4;
+   ae_int_t result;
+   result = maxfastkernel;
+   return result;
+}
+
+// This function generates test reodering used for debug purposes only
+//
+// Inputs:
+//     A           -   lower triangular sparse matrix in CRS format
+//     N           -   problem size
+//
+// Outputs:
+//     Perm        -   array[N], maps original indexes I to permuted indexes
+//     InvPerm     -   array[N], maps permuted indexes I to original indexes
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_generatedbgpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm) {
+   ae_int_t i;
+   vectorsetlengthatleast(perm, n);
+   vectorsetlengthatleast(invperm, n);
+   for (i = 0; i < n; i++) {
+      perm->xZ[i] = n - 1 - i;
+      invperm->xZ[i] = n - 1 - i;
+   }
+}
+
+// This function builds elimination tree and reorders  it  according  to  the
+// topological post-ordering.
+//
+// Inputs:
+//     A           -   lower triangular sparse matrix in CRS format
+//     N           -   problem size
+//
+//     tRawParentOfRawNode,
+//     tRawParentOfReorderedNode,
+//     tTmp,
+//     tFlagArray  -   preallocated temporary arrays, length at least N+1, no
+//                     meaningful output is provided in these variables
+//
+// Outputs:
+//     Parent      -   array[N], Parent[I] contains index of parent of I-th
+//                     column (after topological reordering). -1 is used to
+//                     denote column with no parents.
+//     SupernodalPermutation
+//                 -   array[N], maps original indexes I to permuted indexes
+//     InvSupernodalPermutation
+//                 -   array[N], maps permuted indexes I to original indexes
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_buildetree(sparsematrix *a, ae_int_t n, ZVector *parent, ZVector *supernodalpermutation, ZVector *invsupernodalpermutation, ZVector *trawparentofrawnode, ZVector *trawparentofreorderednode, ZVector *ttmp, BVector *tflagarray) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t sidx;
+   ae_int_t parentk;
+   ae_int_t unprocessedchildrencnt;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t jj;
+   ae_assert(trawparentofrawnode->cnt >= n + 1, "BuildETree: input buffer tRawParentOfRawNode is too short");
+   ae_assert(ttmp->cnt >= n + 1, "BuildETree: input buffer tTmp is too short");
+   ae_assert(trawparentofreorderednode->cnt >= n + 1, "BuildETree: input buffer tRawParentOfReorderedNode is too short");
+   ae_assert(tflagarray->cnt >= n + 1, "BuildETree: input buffer tFlagArray is too short");
+// Avoid spurious compiler warnings
+   unprocessedchildrencnt = 0;
+// Build elimination tree with original column order using path compression:
+// tTmp[] array stores indexes of some ancestor of the vertex.
+   for (i = 0; i < n; i++) {
+      trawparentofrawnode->xZ[i] = -1;
+      ttmp->xZ[i] = i;
+      j0 = a->ridx.xZ[i];
+      j1 = a->didx.xZ[i] - 1;
+      for (jj = j0; jj <= j1; jj++) {
+         j = a->idx.xZ[jj];
+         k = ttmp->xZ[j];
+         ttmp->xZ[j] = i;
+         parentk = trawparentofrawnode->xZ[k];
+         while (parentk >= 0) {
+            ttmp->xZ[k] = i;
+            k = parentk;
+            parentk = trawparentofrawnode->xZ[k];
+         }
+         if (k != i) {
+            trawparentofrawnode->xZ[k] = i;
+         }
+      }
+   }
+// Compute topological ordering of the elimination tree, produce:
+// * direct and inverse permutations
+// * reordered etree stored in Parent[]
+   isetallocv(n, -1, invsupernodalpermutation);
+   isetallocv(n, -1, supernodalpermutation);
+   isetallocv(n, -1, parent);
+   isetv(n, -1, trawparentofreorderednode);
+   isetv(n, 0, ttmp);
+   for (i = 0; i < n; i++) {
+      k = trawparentofrawnode->xZ[i];
+      if (k >= 0) {
+         ttmp->xZ[k]++;
+      }
+   }
+   bsetv(n, true, tflagarray);
+   sidx = 0;
+   for (i = 0; i < n; i++) {
+      if (tflagarray->xB[i]) {
+      // Move column I to position SIdx, decrease unprocessed children count
+         supernodalpermutation->xZ[i] = sidx;
+         invsupernodalpermutation->xZ[sidx] = i;
+         tflagarray->xB[i] = false;
+         k = trawparentofrawnode->xZ[i];
+         trawparentofreorderednode->xZ[sidx] = k;
+         if (k >= 0) {
+            unprocessedchildrencnt = ttmp->xZ[k] - 1;
+            ttmp->xZ[k] = unprocessedchildrencnt;
+         }
+         sidx++;
+      // Add parents (as long as parent has no unprocessed children)
+         while (k >= 0 && unprocessedchildrencnt == 0) {
+            supernodalpermutation->xZ[k] = sidx;
+            invsupernodalpermutation->xZ[sidx] = k;
+            tflagarray->xB[k] = false;
+            k = trawparentofrawnode->xZ[k];
+            trawparentofreorderednode->xZ[sidx] = k;
+            if (k >= 0) {
+               unprocessedchildrencnt = ttmp->xZ[k] - 1;
+               ttmp->xZ[k] = unprocessedchildrencnt;
+            }
+            sidx++;
+         }
+      }
+   }
+   for (i = 0; i < n; i++) {
+      k = trawparentofreorderednode->xZ[i];
+      if (k >= 0) {
+         parent->xZ[i] = supernodalpermutation->xZ[k];
+      }
+   }
+}
+
+// Determine nonzero pattern of the column.
+//
+// This function takes as input:
+// * A^T - transpose of original input matrix
+// * index of column of L being computed
+// * SuperRowRIdx[] and SuperRowIdx[] - arrays that store row structure of
+//   supernodes, and NSuper - supernodes count
+// * ChildrenNodesR[], ChildrenNodesI[] - arrays that store children nodes
+//   for each node
+// * Node2Supernode[] - array that maps node indexes to supernodes
+// * TrueArray[] - array[N] that has all of its elements set to True (this
+//   invariant is preserved on output)
+// * Tmp0[] - array[N], temporary array
+//
+// As output, it constructs nonzero pattern (diagonal element  not  included)
+// of  the  column #ColumnIdx on top  of  SuperRowIdx[]  array,  starting  at
+// location    SuperRowIdx[SuperRowRIdx[NSuper]]     and    till     location
+// SuperRowIdx[Result-1], where Result is a function result.
+//
+// The SuperRowIdx[] array is automatically resized as needed.
+//
+// It is important that this function computes nonzero pattern, but  it  does
+// NOT change other supernodal structures. The caller still has  to  finalize
+// the column (setup supernode ranges, mappings, etc).
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static ae_int_t spchol_computenonzeropattern(sparsematrix *wrkat, ae_int_t columnidx, ae_int_t n, ZVector *superrowridx, ZVector *superrowidx, ae_int_t nsuper, ZVector *childrennodesr, ZVector *childrennodesi, ZVector *node2supernode, BVector *truearray, ZVector *tmp0) {
+   ae_int_t i;
+   ae_int_t ii;
+   ae_int_t jj;
+   ae_int_t i0;
+   ae_int_t i1;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t cidx;
+   ae_int_t rfirst;
+   ae_int_t rlast;
+   ae_int_t tfirst;
+   ae_int_t tlast;
+   ae_int_t supernodalchildrencount;
+   ae_int_t result;
+   ae_assert(truearray->cnt >= n, "ComputeNonzeroPattern: input temporary is too short");
+   ae_assert(tmp0->cnt >= n, "ComputeNonzeroPattern: input temporary is too short");
+// Determine supernodal children in Tmp0
+   supernodalchildrencount = 0;
+   i0 = childrennodesr->xZ[columnidx];
+   i1 = childrennodesr->xZ[columnidx + 1] - 1;
+   for (ii = i0; ii <= i1; ii++) {
+      i = node2supernode->xZ[childrennodesi->xZ[ii]];
+      if (truearray->xB[i]) {
+         tmp0->xZ[supernodalchildrencount] = i;
+         truearray->xB[i] = false;
+         supernodalchildrencount++;
+      }
+   }
+   for (i = 0; i < supernodalchildrencount; i++) {
+      truearray->xB[tmp0->xZ[i]] = true;
+   }
+// Initialized column by nonzero pattern from A
+   rfirst = superrowridx->xZ[nsuper];
+   tfirst = rfirst + n;
+   igrowv(rfirst + 2 * n, superrowidx);
+   i0 = wrkat->ridx.xZ[columnidx] + 1;
+   i1 = wrkat->ridx.xZ[columnidx + 1];
+   icopyvx(i1 - i0, &wrkat->idx, i0, superrowidx, rfirst);
+   rlast = rfirst + (i1 - i0);
+// For column with small number of children use ordered merge algorithm.
+// For column with many children it is better to perform unsorted merge,
+// and then sort the sequence.
+   if (supernodalchildrencount <= 4) {
+   // Ordered merge. The best approach for small number of children,
+   // but may have O(N^2) running time when O(N) children are present.
+      for (cidx = 0; cidx < supernodalchildrencount; cidx++) {
+      // Skip initial elements that do not contribute to subdiagonal nonzero pattern
+         i0 = superrowridx->xZ[tmp0->xZ[cidx]];
+         i1 = superrowridx->xZ[tmp0->xZ[cidx] + 1] - 1;
+         while (i0 <= i1 && superrowidx->xZ[i0] <= columnidx) {
+            i0++;
+         }
+         j0 = rfirst;
+         j1 = rlast - 1;
+      // Handle degenerate cases: empty merge target or empty merge source.
+         if (j1 < j0) {
+            icopyvx(i1 - i0 + 1, superrowidx, i0, superrowidx, rlast);
+            rlast += i1 - i0 + 1;
+            continue;
+         }
+         if (i1 < i0) {
+            continue;
+         }
+      // General case: two non-empty sorted sequences given by [I0,I1] and [J0,J1],
+      // have to be merged and stored into [RFirst,RLast).
+         ii = superrowidx->xZ[i0];
+         jj = superrowidx->xZ[j0];
+         tlast = tfirst;
+         while (true) {
+            if (ii < jj) {
+               superrowidx->xZ[tlast] = ii;
+               tlast++;
+               i0++;
+               if (i0 > i1) {
+                  break;
+               }
+               ii = superrowidx->xZ[i0];
+            }
+            if (jj < ii) {
+               superrowidx->xZ[tlast] = jj;
+               tlast++;
+               j0++;
+               if (j0 > j1) {
+                  break;
+               }
+               jj = superrowidx->xZ[j0];
+            }
+            if (jj == ii) {
+               superrowidx->xZ[tlast] = ii;
+               tlast++;
+               i0++;
+               j0++;
+               if (i0 > i1) {
+                  break;
+               }
+               if (j0 > j1) {
+                  break;
+               }
+               ii = superrowidx->xZ[i0];
+               jj = superrowidx->xZ[j0];
+            }
+         }
+         for (ii = i0; ii <= i1; ii++) {
+            superrowidx->xZ[tlast] = superrowidx->xZ[ii];
+            tlast++;
+         }
+         for (jj = j0; jj <= j1; jj++) {
+            superrowidx->xZ[tlast] = superrowidx->xZ[jj];
+            tlast++;
+         }
+         icopyvx(tlast - tfirst, superrowidx, tfirst, superrowidx, rfirst);
+         rlast = rfirst + (tlast - tfirst);
+      }
+      result = rlast;
+   } else {
+   // Unordered merge followed by sort. Guaranteed N*logN worst case.
+      for (ii = rfirst; ii < rlast; ii++) {
+         truearray->xB[superrowidx->xZ[ii]] = false;
+      }
+      for (cidx = 0; cidx < supernodalchildrencount; cidx++) {
+      // Skip initial elements that do not contribute to subdiagonal nonzero pattern
+         i0 = superrowridx->xZ[tmp0->xZ[cidx]];
+         i1 = superrowridx->xZ[tmp0->xZ[cidx] + 1] - 1;
+         while (i0 <= i1 && superrowidx->xZ[i0] <= columnidx) {
+            i0++;
+         }
+      // Append elements not present in the sequence
+         for (ii = i0; ii <= i1; ii++) {
+            i = superrowidx->xZ[ii];
+            if (truearray->xB[i]) {
+               superrowidx->xZ[rlast] = i;
+               rlast++;
+               truearray->xB[i] = false;
+            }
+         }
+      }
+      for (ii = rfirst; ii < rlast; ii++) {
+         truearray->xB[superrowidx->xZ[ii]] = true;
+      }
+      tagsortmiddlei(superrowidx, rlast - rfirst, rfirst);
+      result = rlast;
+   }
+   return result;
+}
+
+// This function returns recommended stride for given row size
+// ALGLIB Routine: Copyright 20.10.2020 by Sergey Bochkanov
+static ae_int_t spchol_recommendedstridefor(ae_int_t rowsize) {
+   ae_int_t result;
+   result = rowsize;
+   if (rowsize == 3) {
+      result = 4;
+   }
+   return result;
+}
+
+// This function aligns position in array in order to  better  accommodate to
+// SIMD specifics.
+//
+// NOTE: this function aligns position measured in double precision  numbers,
+//       not in bits or bytes. If you want to have 256-bit aligned  position,
+//       round Offs to nearest multiple of 4 that is not less than Offs.
+// ALGLIB Routine: Copyright 20.10.2020 by Sergey Bochkanov
+static ae_int_t spchol_alignpositioninarray(ae_int_t offs) {
+   ae_int_t result;
+   result = offs;
+   if (offs % 4 != 0) {
+      result += 4 - offs % 4;
+   }
+   return result;
+}
+
+// This function analyzes postordered elimination tree and creates supernodal
+// structure in Analysis object.
+//
+// Inputs:
+//     AT          -   upper triangular CRS matrix, transpose and  reordering
+//                     of the original input matrix A
+//     Parent      -   array[N], supernodal etree
+//     N           -   problem size
+//
+//     tChildrenR,
+//     tChildrenI,
+//     tParentNodeOfSupernode,
+//     tNode2Supernode,
+//     tTmp0,
+//     tFlagArray  -   temporary arrays, length at least N+1, simply provide
+//                     preallocated place.
+//
+// Outputs:
+//     Analysis    -   following fields are initialized:
+//                     * Analysis.NSuper
+//                     * Analysis.SuperColRange
+//                     * Analysis.SuperRowRIdx
+//                     * Analysis.SuperRowIdx
+//                     * Analysis.ParentSupernode
+//                     * Analysis.OutRowCounts
+//                     other fields are ignored and not changed.
+//     Node2Supernode- array[N] that maps node indexes to supernode indexes
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_createsupernodalstructure(sparsematrix *at, ZVector *parent, ae_int_t n, spcholanalysis *analysis, ZVector *node2supernode, ZVector *tchildrenr, ZVector *tchildreni, ZVector *tparentnodeofsupernode, ZVector *tfakenonzeros, ZVector *ttmp0, BVector *tflagarray) {
+   const ae_int_t maxsupernode = 4;
+   const bool relaxedsupernodes = true;
+   const ae_int_t smallfakestolerance = 2;
+   const double maxmergeinefficiency = 0.25;
+   ae_int_t nsuper;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t sidx;
+   ae_int_t i0;
+   ae_int_t ii;
+   ae_int_t columnidx;
+   ae_int_t nodeidx;
+   ae_int_t rfirst;
+   ae_int_t rlast;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   ae_int_t blocksize;
+   bool createsupernode;
+   ae_int_t colcount;
+   ae_int_t offdiagcnt;
+   ae_int_t childcolcount;
+   ae_int_t childoffdiagcnt;
+   ae_int_t fakezerosinnewsupernode;
+   double mergeinefficiency;
+   bool hastheonlychild;
+   ae_assert(ttmp0->cnt >= n + 1, "CreateSupernodalStructure: input buffer tTmp0 is too short");
+   ae_assert(tchildrenr->cnt >= n + 1, "CreateSupernodalStructure: input buffer ChildrenR is too short");
+   ae_assert(tchildreni->cnt >= n + 1, "CreateSupernodalStructure: input buffer ChildrenI is too short");
+   ae_assert(tparentnodeofsupernode->cnt >= n + 1, "CreateSupernodalStructure: input buffer tParentNodeOfSupernode is too short");
+   ae_assert(tfakenonzeros->cnt >= n + 1, "CreateSupernodalStructure: input buffer tFakeNonzeros is too short");
+   ae_assert(tflagarray->cnt >= n + 1, "CreateSupernodalStructure: input buffer tFlagArray is too short");
+// Convert etree from per-column parent array to per-column children list
+   isetv(n, 0, ttmp0);
+   for (i = 0; i < n; i++) {
+      nodeidx = parent->xZ[i];
+      if (nodeidx >= 0) {
+         ttmp0->xZ[nodeidx]++;
+      }
+   }
+   tchildrenr->xZ[0] = 0;
+   for (i = 0; i < n; i++) {
+      tchildrenr->xZ[i + 1] = tchildrenr->xZ[i] + ttmp0->xZ[i];
+   }
+   isetv(n, 0, ttmp0);
+   for (i = 0; i < n; i++) {
+      k = parent->xZ[i];
+      if (k >= 0) {
+         tchildreni->xZ[tchildrenr->xZ[k] + ttmp0->xZ[k]] = i;
+         ttmp0->xZ[k]++;
+      }
+   }
+// Analyze supernodal structure:
+// * determine children count for each node
+// * combine chains of children into supernodes
+// * generate direct and inverse supernodal (topological) permutations
+// * generate column structure of supernodes (after supernodal permutation)
+   isetallocv(n, -1, node2supernode);
+   vectorsetlengthatleast(&analysis->supercolrange, n + 1);
+   vectorsetlengthatleast(&analysis->superrowridx, n + 1);
+   isetv(n, n + 1, tparentnodeofsupernode);
+   bsetv(n, true, tflagarray);
+   nsuper = 0;
+   analysis->supercolrange.xZ[0] = 0;
+   analysis->superrowridx.xZ[0] = 0;
+   while (analysis->supercolrange.xZ[nsuper] < n) {
+      columnidx = analysis->supercolrange.xZ[nsuper];
+   // Compute nonzero pattern of the column, create temporary standalone node
+   // for possible supernodal merge. Newly created node has just one column
+   // and no fake nonzeros.
+      rfirst = analysis->superrowridx.xZ[nsuper];
+      rlast = spchol_computenonzeropattern(at, columnidx, n, &analysis->superrowridx, &analysis->superrowidx, nsuper, tchildrenr, tchildreni, node2supernode, tflagarray, ttmp0);
+      analysis->supercolrange.xZ[nsuper + 1] = columnidx + 1;
+      analysis->superrowridx.xZ[nsuper + 1] = rlast;
+      node2supernode->xZ[columnidx] = nsuper;
+      tparentnodeofsupernode->xZ[nsuper] = parent->xZ[columnidx];
+      tfakenonzeros->xZ[nsuper] = 0;
+      offdiagcnt = rlast - rfirst;
+      colcount = 1;
+      nsuper++;
+   // Decide whether to merge column with previous supernode or not
+      childcolcount = 0;
+      childoffdiagcnt = 0;
+      mergeinefficiency = 0.0;
+      fakezerosinnewsupernode = 0;
+      createsupernode = false;
+      hastheonlychild = false;
+      if (nsuper >= 2 && tparentnodeofsupernode->xZ[nsuper - 2] == columnidx) {
+         childcolcount = analysis->supercolrange.xZ[nsuper - 1] - analysis->supercolrange.xZ[nsuper - 2];
+         childoffdiagcnt = analysis->superrowridx.xZ[nsuper - 1] - analysis->superrowridx.xZ[nsuper - 2];
+         hastheonlychild = tchildrenr->xZ[columnidx + 1] - tchildrenr->xZ[columnidx] == 1;
+         if ((hastheonlychild || relaxedsupernodes) && colcount + childcolcount <= maxsupernode) {
+            i = colcount + childcolcount;
+            k = i * (i + 1) / 2 + offdiagcnt * i;
+            fakezerosinnewsupernode = tfakenonzeros->xZ[nsuper - 2] + tfakenonzeros->xZ[nsuper - 1] + (offdiagcnt - (childoffdiagcnt - 1)) * childcolcount;
+            mergeinefficiency = (double)fakezerosinnewsupernode / (double)k;
+            if (colcount + childcolcount == 2 && fakezerosinnewsupernode <= smallfakestolerance) {
+               createsupernode = true;
+            }
+            if (mergeinefficiency <= maxmergeinefficiency) {
+               createsupernode = true;
+            }
+         }
+      }
+   // Create supernode if needed
+      if (createsupernode) {
+      // Create supernode from nodes NSuper-2 and NSuper-1.
+      // Because these nodes are in the child-parent relation, we can simply
+      // copy nonzero pattern from NSuper-1.
+         ae_assert(tparentnodeofsupernode->xZ[nsuper - 2] == columnidx, "CreateSupernodalStructure: integrity check 9472 failed");
+         i0 = analysis->superrowridx.xZ[nsuper - 1];
+         ii = analysis->superrowridx.xZ[nsuper] - analysis->superrowridx.xZ[nsuper - 1];
+         rfirst = analysis->superrowridx.xZ[nsuper - 2];
+         rlast = rfirst + ii;
+         for (i = 0; i < ii; i++) {
+            analysis->superrowidx.xZ[rfirst + i] = analysis->superrowidx.xZ[i0 + i];
+         }
+         analysis->supercolrange.xZ[nsuper - 1] = columnidx + 1;
+         analysis->superrowridx.xZ[nsuper - 1] = rlast;
+         node2supernode->xZ[columnidx] = nsuper - 2;
+         tfakenonzeros->xZ[nsuper - 2] = fakezerosinnewsupernode;
+         tparentnodeofsupernode->xZ[nsuper - 2] = parent->xZ[columnidx];
+         nsuper--;
+      }
+   }
+   analysis->nsuper = nsuper;
+   ae_assert(analysis->nsuper >= 1, "SPSymmAnalyze: integrity check failed (95mgd)");
+   ae_assert(analysis->supercolrange.xZ[0] == 0, "SPCholFactorize: integrity check failed (f446s)");
+   ae_assert(analysis->supercolrange.xZ[nsuper] == n, "SPSymmAnalyze: integrity check failed (04ut4)");
+   isetallocv(nsuper, -1, &analysis->parentsupernode);
+   for (sidx = 0; sidx < nsuper; sidx++) {
+      nodeidx = tparentnodeofsupernode->xZ[sidx];
+      if (nodeidx >= 0) {
+         nodeidx = node2supernode->xZ[nodeidx];
+         analysis->parentsupernode.xZ[sidx] = nodeidx;
+      }
+   }
+// Allocate supernodal storage
+   vectorsetlengthatleast(&analysis->rowoffsets, analysis->nsuper + 1);
+   vectorsetlengthatleast(&analysis->rowstrides, analysis->nsuper);
+   analysis->rowoffsets.xZ[0] = 0;
+   for (i = 0; i < analysis->nsuper; i++) {
+      blocksize = analysis->supercolrange.xZ[i + 1] - analysis->supercolrange.xZ[i];
+      analysis->rowstrides.xZ[i] = spchol_recommendedstridefor(blocksize);
+      analysis->rowoffsets.xZ[i + 1] = analysis->rowoffsets.xZ[i];
+      analysis->rowoffsets.xZ[i + 1] += analysis->rowstrides.xZ[i] * blocksize;
+      analysis->rowoffsets.xZ[i + 1] += analysis->rowstrides.xZ[i] * (analysis->superrowridx.xZ[i + 1] - analysis->superrowridx.xZ[i]);
+      analysis->rowoffsets.xZ[i + 1] = spchol_alignpositioninarray(analysis->rowoffsets.xZ[i + 1]);
+   }
+// Analyze output structure
+   isetallocv(n, 0, &analysis->outrowcounts);
+   for (sidx = 0; sidx < nsuper; sidx++) {
+      cols0 = analysis->supercolrange.xZ[sidx];
+      cols1 = analysis->supercolrange.xZ[sidx + 1];
+      rfirst = analysis->superrowridx.xZ[sidx];
+      rlast = analysis->superrowridx.xZ[sidx + 1];
+      blocksize = cols1 - cols0;
+      for (j = cols0; j < cols1; j++) {
+         analysis->outrowcounts.xZ[j] += j - cols0 + 1;
+      }
+      for (ii = rfirst; ii < rlast; ii++) {
+         i0 = analysis->superrowidx.xZ[ii];
+         analysis->outrowcounts.xZ[i0] += blocksize;
+      }
+   }
+}
+
+// This function analyzes supernodal  structure  and  precomputes  dependency
+// matrix LAdj+
+//
+// Inputs:
+//     Analysis    -   analysis object with completely initialized supernodal
+//                     structure
+//     RawA        -   original (before reordering) input matrix
+//     Node2Supernode- mapping from node to supernode indexes
+//     N           -   problem size
+//
+//     tTmp0,
+//     tTmp1,
+//     tFlagArray  -   temporary arrays, length at least N+1, simply provide
+//                     preallocated place.
+//
+// Outputs:
+//     Analysis    -   following fields are initialized:
+//                     * Analysis.LAdjPlus
+//                     * Analysis.LAdjPlusR
+//     Node2Supernode- array[N] that maps node indexes to supernode indexes
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_analyzesupernodaldependencies(spcholanalysis *analysis, sparsematrix *rawa, ZVector *node2supernode, ae_int_t n, ZVector *ttmp0, ZVector *ttmp1, BVector *tflagarray) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t rowidx;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t jj;
+   ae_int_t rfirst;
+   ae_int_t rlast;
+   ae_int_t sidx;
+   ae_assert(ttmp0->cnt >= n + 1, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
+   ae_assert(ttmp1->cnt >= n + 1, "AnalyzeSupernodalDependencies: input buffer tTmp1 is too short");
+   ae_assert(tflagarray->cnt >= n + 1, "AnalyzeSupernodalDependencies: input buffer tTmp0 is too short");
+   ae_assert(sparseiscrs(rawa), "AnalyzeSupernodalDependencies: RawA must be CRS matrix");
+// Determine LAdjPlus - supernodes feeding updates to the SIdx-th one.
+//
+// Without supernodes we have: K-th row of L (also denoted as ladj+(K))
+// includes original nonzeros from A (also denoted as ladj(K)) as well
+// as all elements on paths in elimination tree from ladj(K) to K.
+//
+// With supernodes: same principle applied.
+   isetallocv(analysis->nsuper + 1, 0, &analysis->ladjplusr);
+   bsetv(n, true, tflagarray);
+   analysis->ladjplusr.xZ[0] = 0;
+   for (sidx = 0; sidx < analysis->nsuper; sidx++) {
+   // Generate list of nodes feeding updates to SIdx-th one
+      ivectorgrowto(&analysis->ladjplus, analysis->ladjplusr.xZ[sidx] + analysis->nsuper);
+      rfirst = analysis->ladjplusr.xZ[sidx];
+      rlast = rfirst;
+      for (rowidx = analysis->supercolrange.xZ[sidx]; rowidx < analysis->supercolrange.xZ[sidx + 1]; rowidx++) {
+         i = analysis->invsuperperm.xZ[rowidx];
+         j0 = rawa->ridx.xZ[i];
+         j1 = rawa->uidx.xZ[i] - 1;
+         for (jj = j0; jj <= j1; jj++) {
+            j = node2supernode->xZ[analysis->superperm.xZ[rawa->idx.xZ[jj]]];
+            if (j < sidx && tflagarray->xB[j]) {
+               analysis->ladjplus.xZ[rlast] = j;
+               tflagarray->xB[j] = false;
+               rlast++;
+               j = analysis->parentsupernode.xZ[j];
+               while (j >= 0 && j < sidx && tflagarray->xB[j]) {
+                  analysis->ladjplus.xZ[rlast] = j;
+                  tflagarray->xB[j] = false;
+                  rlast++;
+                  j = analysis->parentsupernode.xZ[j];
+               }
+            }
+         }
+      }
+      for (i = rfirst; i < rlast; i++) {
+         tflagarray->xB[analysis->ladjplus.xZ[i]] = true;
+      }
+      analysis->ladjplusr.xZ[sidx + 1] = rlast;
+   }
+}
+
+// This function is a specialized version of SparseSymmPermTbl()  that  takes
+// into   account specifics of topological reorderings (improves performance)
+// and additionally transposes its output.
+//
+// Inputs:
+//     A           -   sparse lower triangular matrix in CRS format.
+//     P           -   array[N] which stores permutation table;  P[I]=J means
+//                     that I-th row/column of matrix  A  is  moved  to  J-th
+//                     position. For performance reasons we do NOT check that
+//                     P[] is  a   correct   permutation  (that there  is  no
+//                     repetitions, just that all its elements  are  in [0,N)
+//                     range.
+//     B           -   sparse matrix object that will hold output.
+//                     Previously allocated memory will be reused as much  as
+//                     possible.
+//
+// Outputs:
+//     B           -   permuted and transposed upper triangular matrix in the
+//                     special internal CRS-like matrix format (MatrixType=-10082).
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_topologicalpermutation(sparsematrix *a, ZVector *p, sparsematrix *b) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t jj;
+   ae_int_t j0;
+   ae_int_t j1;
+   ae_int_t k;
+   ae_int_t k0;
+   ae_int_t n;
+   bool bflag;
+   ae_assert(a->matrixtype == 1, "TopologicalPermutation: incorrect matrix type (convert your matrix to CRS)");
+   ae_assert(p->cnt >= a->n, "TopologicalPermutation: Length(P) < N");
+   ae_assert(a->m == a->n, "TopologicalPermutation: matrix is non-square");
+   ae_assert(a->ninitialized == a->ridx.xZ[a->n], "TopologicalPermutation: integrity check failed");
+   bflag = true;
+   n = a->n;
+   for (i = 0; i < n; i++) {
+      j = p->xZ[i];
+      bflag = bflag && j >= 0 && j < n;
+   }
+   ae_assert(bflag, "TopologicalPermutation: P[] contains values outside of [0,N) range");
+// Prepare output
+   b->matrixtype = -10082;
+   b->n = n;
+   b->m = n;
+   vectorsetlengthatleast(&b->didx, n);
+   vectorsetlengthatleast(&b->uidx, n);
+// Determine row sizes (temporary stored in DIdx) and ranges
+   isetv(n, 0, &b->uidx);
+   for (i = 0; i < n; i++) {
+      j0 = a->ridx.xZ[i];
+      j1 = a->uidx.xZ[i] - 1;
+      for (jj = j0; jj <= j1; jj++) {
+         j = a->idx.xZ[jj];
+         b->uidx.xZ[j]++;
+      }
+   }
+   for (i = 0; i < n; i++) {
+      b->didx.xZ[p->xZ[i]] = b->uidx.xZ[i];
+   }
+   vectorsetlengthatleast(&b->ridx, n + 1);
+   b->ridx.xZ[0] = 0;
+   for (i = 0; i < n; i++) {
+      b->ridx.xZ[i + 1] = b->ridx.xZ[i] + b->didx.xZ[i];
+      b->uidx.xZ[i] = b->ridx.xZ[i];
+   }
+   b->ninitialized = b->ridx.xZ[n];
+   vectorsetlengthatleast(&b->idx, b->ninitialized);
+   vectorsetlengthatleast(&b->vals, b->ninitialized);
+// Process matrix
+   for (i = 0; i < n; i++) {
+      j0 = a->ridx.xZ[i];
+      j1 = a->uidx.xZ[i] - 1;
+      k = p->xZ[i];
+      for (jj = j0; jj <= j1; jj++) {
+         j = p->xZ[a->idx.xZ[jj]];
+         k0 = b->uidx.xZ[j];
+         b->idx.xZ[k0] = k;
+         b->vals.xR[k0] = a->vals.xR[jj];
+         b->uidx.xZ[j] = k0 + 1;
+      }
+   }
+}
+
+// Symbolic phase of Cholesky decomposition.
+//
+// Performs preliminary analysis of Cholesky/LDLT factorization.  The  latter
+// is computed with strictly diagonal D (no Bunch-Kauffman pivoting).
+//
+// The analysis object produced by this function will be used later to  guide
+// actual decomposition.
+//
+// Depending on settings specified during factorization, may produce  vanilla
+// Cholesky or L*D*LT  decomposition  (with  strictly  diagonal  D),  without
+// permutation or with permutation P (being either  topological  ordering  or
+// sparsity preserving ordering).
+//
+// Thus, A is represented as either L*LT or L*D*LT or P*L*LT*PT or P*L*D*LT*PT.
+//
+// NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+//       matrices. However, numerical stability is guaranteed ONLY for a class
+//       of quasi-definite matrices.
+//
+// Inputs:
+//     A           -   sparse square matrix in CRS format, with LOWER triangle
+//                     being used to store the matrix.
+//     FactType    -   factorization type:
+//                     * 0 for traditional Cholesky
+//                     * 1 for LDLT decomposition with strictly diagonal D
+//     PermType    -   permutation type:
+//                     *-2 for column count ordering (NOT RECOMMENDED!)
+//                     *-1 for absence of permutation
+//                     * 0 for best permutation available
+//                     * 1 for supernodal ordering (improves locality and
+//                       performance, but does NOT change fill-in pattern)
+//                     * 2 for supernodal AMD ordering (improves fill-in)
+//     Analysis    -   can be uninitialized instance, or previous analysis
+//                     results. Previously allocated memory is reused as much
+//                     as possible.
+//     Buf         -   buffer; may be completely uninitialized, or one remained
+//                     from previous calls (including ones with completely
+//                     different matrices). Previously allocated temporary
+//                     space will be reused as much as possible.
+//
+// Outputs:
+//     Analysis    -   symbolic analysis of the matrix structure  which  will
+//                     be used later to guide  numerical  factorization.  The
+//                     numerical values are stored internally in the structure,
+//                     but you have to  run  factorization  phase  explicitly
+//                     with SPSymmAnalyze().  You  can  also  reload  another
+//                     matrix with same sparsity pattern with SPSymmReload().
+//
+// This function fails if and only if the matrix A is symbolically degenerate
+// i.e. has diagonal element which is exactly zero. In  such  case  False  is
+// returned.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis) {
+   ae_int_t n;
+   ae_int_t i;
+   bool permready;
+   bool result;
+   ae_assert(sparseiscrs(a), "SPSymmAnalyze: A is not stored in CRS format");
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SPSymmAnalyze: non-square A");
+   ae_assert(facttype == 0 || facttype == 1, "SPSymmAnalyze: unexpected FactType");
+   ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == -1 || permtype == -2, "SPSymmAnalyze: unexpected PermType");
+   if (permtype == 0) {
+      permtype = 2;
+   }
+   result = true;
+   n = sparsegetnrows(a);
+   analysis->tasktype = 0;
+   analysis->n = n;
+   analysis->unitd = facttype == 0;
+   analysis->permtype = permtype;
+   analysis->istopologicalordering = permtype == -1 || permtype == 1;
+   analysis->applypermutationtooutput = permtype == -1;
+   analysis->modtype = 0;
+   analysis->modparam0 = 0.0;
+   analysis->modparam1 = 0.0;
+   analysis->modparam2 = 0.0;
+   analysis->modparam3 = 0.0;
+// Initial integrity check - diagonal MUST be symbolically nonzero
+   for (i = 0; i < n; i++) {
+      if (a->didx.xZ[i] == a->uidx.xZ[i]) {
+         result = false;
+         return result;
+      }
+   }
+// Allocate temporaries
+   vectorsetlengthatleast(&analysis->tmp0, n + 1);
+   vectorsetlengthatleast(&analysis->tmp1, n + 1);
+   vectorsetlengthatleast(&analysis->tmp2, n + 1);
+   vectorsetlengthatleast(&analysis->tmp3, n + 1);
+   vectorsetlengthatleast(&analysis->tmp4, n + 1);
+   vectorsetlengthatleast(&analysis->flagarray, n + 1);
+// What type of permutation do we have?
+   if (analysis->istopologicalordering) {
+      ae_assert(permtype == -1 || permtype == 1, "SPSymmAnalyze: integrity check failed (ihebd)");
+   // Build topologically ordered elimination tree
+      spchol_buildetree(a, n, &analysis->tmpparent, &analysis->superperm, &analysis->invsuperperm, &analysis->tmp0, &analysis->tmp1, &analysis->tmp2, &analysis->flagarray);
+      vectorsetlengthatleast(&analysis->fillinperm, n);
+      vectorsetlengthatleast(&analysis->invfillinperm, n);
+      vectorsetlengthatleast(&analysis->effectiveperm, n);
+      vectorsetlengthatleast(&analysis->inveffectiveperm, n);
+      for (i = 0; i < n; i++) {
+         analysis->fillinperm.xZ[i] = i;
+         analysis->invfillinperm.xZ[i] = i;
+         analysis->effectiveperm.xZ[i] = analysis->superperm.xZ[i];
+         analysis->inveffectiveperm.xZ[i] = analysis->invsuperperm.xZ[i];
+      }
+   // Reorder input matrix
+      spchol_topologicalpermutation(a, &analysis->superperm, &analysis->wrkat);
+   // Analyze etree, build supernodal structure
+      spchol_createsupernodalstructure(&analysis->wrkat, &analysis->tmpparent, n, analysis, &analysis->node2supernode, &analysis->tmp0, &analysis->tmp1, &analysis->tmp2, &analysis->tmp3, &analysis->tmp4, &analysis->flagarray);
+   // Having fully initialized supernodal structure, analyze dependencies
+      spchol_analyzesupernodaldependencies(analysis, a, &analysis->node2supernode, n, &analysis->tmp0, &analysis->tmp1, &analysis->flagarray);
+   } else {
+   // Generate fill-in reducing permutation
+      permready = false;
+      if (permtype == -2) {
+         spchol_generatedbgpermutation(a, n, &analysis->fillinperm, &analysis->invfillinperm);
+         permready = true;
+      }
+      if (permtype == 2) {
+         generateamdpermutation(a, n, &analysis->fillinperm, &analysis->invfillinperm, &analysis->amdtmp);
+         permready = true;
+      }
+      ae_assert(permready, "SPSymmAnalyze: integrity check failed (pp4td)");
+   // Apply permutation to the matrix, perform analysis on the initially reordered matrix
+   // (we may need one more reordering, now topological one, due to supernodal analysis).
+   // Build topologically ordered elimination tree
+      sparsesymmpermtblbuf(a, false, &analysis->fillinperm, &analysis->tmpa);
+      spchol_buildetree(&analysis->tmpa, n, &analysis->tmpparent, &analysis->superperm, &analysis->invsuperperm, &analysis->tmp0, &analysis->tmp1, &analysis->tmp2, &analysis->flagarray);
+      vectorsetlengthatleast(&analysis->effectiveperm, n);
+      vectorsetlengthatleast(&analysis->inveffectiveperm, n);
+      for (i = 0; i < n; i++) {
+         analysis->effectiveperm.xZ[i] = analysis->superperm.xZ[analysis->fillinperm.xZ[i]];
+         analysis->inveffectiveperm.xZ[analysis->effectiveperm.xZ[i]] = i;
+      }
+   // Reorder input matrix
+      spchol_topologicalpermutation(&analysis->tmpa, &analysis->superperm, &analysis->wrkat);
+   // Analyze etree, build supernodal structure
+      spchol_createsupernodalstructure(&analysis->wrkat, &analysis->tmpparent, n, analysis, &analysis->node2supernode, &analysis->tmp0, &analysis->tmp1, &analysis->tmp2, &analysis->tmp3, &analysis->tmp4, &analysis->flagarray);
+   // Having fully initialized supernodal structure, analyze dependencies
+      spchol_analyzesupernodaldependencies(analysis, &analysis->tmpa, &analysis->node2supernode, n, &analysis->tmp0, &analysis->tmp1, &analysis->flagarray);
+   }
+   return result;
+}
+
+// Sets modified Cholesky type
+//
+// Inputs:
+//     Analysis    -   symbolic analysis of the matrix structure
+//     ModStrategy -   modification type:
+//                     * 0 for traditional Cholesky/LDLT (Cholesky fails when
+//                       encounters nonpositive pivot, LDLT fails  when  zero
+//                       pivot   is  encountered,  no  stability  checks  for
+//                       overflows/underflows)
+//                     * 1 for modified Cholesky with additional checks:
+//                       * pivots less than ModParam0 are increased; (similar
+//                         procedure with proper generalization is applied to
+//                         LDLT)
+//                       * if,  at  some  moment,  sum  of absolute values of
+//                         elements in column  J  will  become  greater  than
+//                         ModParam1, Cholesky/LDLT will treat it as  failure
+//                         and will stop immediately
+//                       * if ModParam0 is zero, no pivot modification is applied
+//                       * if ModParam1 is zero, no overflow check is performed
+//     P0, P1, P2,P3 - modification parameters #0 #1, #2 and #3.
+//                     Params #2 and #3 are ignored in current version.
+//
+// Outputs:
+//     Analysis    -   symbolic analysis of the matrix structure, new strategy
+//                     (results will be seen with next SPSymmFactorize() call)
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3) {
+   ae_assert(modstrategy == 0 || modstrategy == 1, "SPSymmSetModificationStrategy: unexpected ModStrategy");
+   ae_assert(isfinite(p0) && p0 >= 0.0, "SPSymmSetModificationStrategy: bad P0");
+   ae_assert(isfinite(p1), "SPSymmSetModificationStrategy: bad P1");
+   ae_assert(isfinite(p2), "SPSymmSetModificationStrategy: bad P2");
+   ae_assert(isfinite(p3), "SPSymmSetModificationStrategy: bad P3");
+   analysis->modtype = modstrategy;
+   analysis->modparam0 = p0;
+   analysis->modparam1 = p1;
+   analysis->modparam2 = p2;
+   analysis->modparam3 = p3;
+}
+
+// Updates symmetric  matrix  internally  stored  in  previously  initialized
+// Analysis object.
+//
+// You can use this function to perform  multiple  factorizations  with  same
+// sparsity patterns: perform symbolic analysis  once  with  SPSymmAnalyze(),
+// then update internal matrix with SPSymmReload() and call SPSymmFactorize().
+//
+// Inputs:
+//     Analysis    -   symbolic analysis of the matrix structure
+//     A           -   sparse square matrix in CRS format with LOWER triangle
+//                     being used to store the matrix. The matrix  MUST  have
+//                     sparsity   pattern   exactly   same  as  one  used  to
+//                     initialize the Analysis object.
+//                     The algorithm will fail in  an  unpredictable  way  if
+//                     something different was passed.
+//
+// Outputs:
+//     Analysis    -   symbolic analysis of the matrix structure  which  will
+//                     be used later to guide  numerical  factorization.  The
+//                     numerical values are stored internally in the structure,
+//                     but you have to  run  factorization  phase  explicitly
+//                     with SPSymmAnalyze().  You  can  also  reload  another
+//                     matrix with same sparsity pattern with SPSymmReload().
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+void spsymmreload(spcholanalysis *analysis, sparsematrix *a) {
+   ae_assert(sparseiscrs(a), "SPSymmReload: A is not stored in CRS format");
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SPSymmReload: non-square A");
+   if (analysis->istopologicalordering) {
+   // Topological (fill-in preserving) ordering is used, we can copy
+   // A directly into WrkAT using joint permute+transpose
+      spchol_topologicalpermutation(a, &analysis->effectiveperm, &analysis->wrkat);
+   } else {
+   // Non-topological permutation; first we perform generic symmetric
+   // permutation, then transpose result
+      sparsesymmpermtblbuf(a, false, &analysis->effectiveperm, &analysis->tmpa);
+      sparsecopytransposecrsbuf(&analysis->tmpa, &analysis->wrkat);
+   }
+}
+
+// This function extracts computed matrix from the supernodal storage.
+// Depending on settings, a supernodal permutation can be applied to the matrix.
+//
+// Inputs:
+//     Analysis    -   analysis object with completely initialized supernodal
+//                     structure
+//     Offsets     -   offsets for supernodal storage
+//     Strides     -   row strides for supernodal storage
+//     RowStorage  -   supernodal storage
+//     DiagD       -   diagonal factor
+//     N           -   problem size
+//
+//     TmpP        -   preallocated temporary array[N+1]
+//
+// Outputs:
+//     A           -   sparse matrix in CRS format:
+//                     * for PermType=0, sparse matrix in the original ordering
+//                       (i.e. the matrix is reordered prior to output that
+//                       may require considerable amount of operations due to
+//                       permutation being applied)
+//                     * for PermType=1, sparse matrix in the topological
+//                       ordering. The least overhead for output.
+//     D           -   array[N], diagonal
+//     P           -   output permutation in product form
+// ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+static void spchol_extractmatrix(spcholanalysis *analysis, ZVector *offsets, ZVector *strides, RVector *rowstorage, RVector *diagd, ae_int_t n, sparsematrix *a, RVector *d, ZVector *p, ZVector *tmpp) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t sidx;
+   ae_int_t i0;
+   ae_int_t ii;
+   ae_int_t rfirst;
+   ae_int_t rlast;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   ae_int_t blocksize;
+   ae_int_t rowstride;
+   ae_int_t offdiagsize;
+   ae_int_t offssdiag;
+   ae_assert(tmpp->cnt >= n + 1, "ExtractMatrix: preallocated temporary TmpP is too short");
+// Basic initialization
+   a->matrixtype = 1;
+   a->n = n;
+   a->m = n;
+// Various permutation types
+   if (analysis->applypermutationtooutput) {
+      ae_assert(analysis->istopologicalordering, "ExtractMatrix: critical integrity check failed (attempt to merge in nontopological permutation)");
+   // Output matrix is topologically permuted, so we return A=L*L' instead of A=P*L*L'*P'.
+   // Somewhat inefficient because we have to apply permutation to L returned by supernodal code.
+      vectorsetlengthatleast(&a->ridx, n + 1);
+      vectorsetlengthatleast(&a->didx, n);
+      a->ridx.xZ[0] = 0;
+      for (i = 0; i < n; i++) {
+         a->ridx.xZ[i + 1] = a->ridx.xZ[i] + analysis->outrowcounts.xZ[analysis->effectiveperm.xZ[i]];
+      }
+      for (i = 0; i < n; i++) {
+         a->didx.xZ[i] = a->ridx.xZ[i];
+      }
+      a->ninitialized = a->ridx.xZ[n];
+      vectorsetlengthatleast(&a->vals, a->ninitialized);
+      vectorsetlengthatleast(&a->idx, a->ninitialized);
+      for (sidx = 0; sidx < analysis->nsuper; sidx++) {
+         cols0 = analysis->supercolrange.xZ[sidx];
+         cols1 = analysis->supercolrange.xZ[sidx + 1];
+         rfirst = analysis->superrowridx.xZ[sidx];
+         rlast = analysis->superrowridx.xZ[sidx + 1];
+         blocksize = cols1 - cols0;
+         offdiagsize = rlast - rfirst;
+         rowstride = strides->xZ[sidx];
+         offssdiag = offsets->xZ[sidx];
+         for (i = 0; i < blocksize; i++) {
+            i0 = analysis->inveffectiveperm.xZ[cols0 + i];
+            ii = a->didx.xZ[i0];
+            for (j = 0; j <= i; j++) {
+               a->idx.xZ[ii] = analysis->inveffectiveperm.xZ[cols0 + j];
+               a->vals.xR[ii] = rowstorage->xR[offssdiag + i * rowstride + j];
+               ii++;
+            }
+            a->didx.xZ[i0] = ii;
+         }
+         for (k = 0; k < offdiagsize; k++) {
+            i0 = analysis->inveffectiveperm.xZ[analysis->superrowidx.xZ[k + rfirst]];
+            ii = a->didx.xZ[i0];
+            for (j = 0; j < blocksize; j++) {
+               a->idx.xZ[ii] = analysis->inveffectiveperm.xZ[cols0 + j];
+               a->vals.xR[ii] = rowstorage->xR[offssdiag + (blocksize + k) * rowstride + j];
+               ii++;
+            }
+            a->didx.xZ[i0] = ii;
+         }
+      }
+      for (i = 0; i < n; i++) {
+         ae_assert(a->didx.xZ[i] == a->ridx.xZ[i + 1], "ExtractMatrix: integrity check failed (9473t)");
+         tagsortmiddleir(&a->idx, &a->vals, a->ridx.xZ[i + 1] - a->ridx.xZ[i], a->ridx.xZ[i]);
+         ae_assert(a->idx.xZ[a->ridx.xZ[i + 1] - 1] == i, "ExtractMatrix: integrity check failed (e4tfd)");
+      }
+      sparseinitduidx(a);
+   // Prepare D[] and P[]
+      vectorsetlengthatleast(d, n);
+      vectorsetlengthatleast(p, n);
+      for (i = 0; i < n; i++) {
+         d->xR[i] = diagd->xR[analysis->effectiveperm.xZ[i]];
+         p->xZ[i] = i;
+      }
+   } else {
+   // The permutation is NOT applied to L prior to extraction,
+   // we return both L and P: A=P*L*L'*P'.
+      vectorsetlengthatleast(&a->ridx, n + 1);
+      vectorsetlengthatleast(&a->didx, n);
+      a->ridx.xZ[0] = 0;
+      for (i = 0; i < n; i++) {
+         a->ridx.xZ[i + 1] = a->ridx.xZ[i] + analysis->outrowcounts.xZ[i];
+      }
+      for (i = 0; i < n; i++) {
+         a->didx.xZ[i] = a->ridx.xZ[i];
+      }
+      a->ninitialized = a->ridx.xZ[n];
+      vectorsetlengthatleast(&a->vals, a->ninitialized);
+      vectorsetlengthatleast(&a->idx, a->ninitialized);
+      for (sidx = 0; sidx < analysis->nsuper; sidx++) {
+         cols0 = analysis->supercolrange.xZ[sidx];
+         cols1 = analysis->supercolrange.xZ[sidx + 1];
+         rfirst = analysis->superrowridx.xZ[sidx];
+         rlast = analysis->superrowridx.xZ[sidx + 1];
+         blocksize = cols1 - cols0;
+         offdiagsize = rlast - rfirst;
+         rowstride = strides->xZ[sidx];
+         offssdiag = offsets->xZ[sidx];
+         for (i = 0; i < blocksize; i++) {
+            i0 = cols0 + i;
+            ii = a->didx.xZ[i0];
+            for (j = 0; j <= i; j++) {
+               a->idx.xZ[ii] = cols0 + j;
+               a->vals.xR[ii] = rowstorage->xR[offssdiag + i * rowstride + j];
+               ii++;
+            }
+            a->didx.xZ[i0] = ii;
+         }
+         for (k = 0; k < offdiagsize; k++) {
+            i0 = analysis->superrowidx.xZ[k + rfirst];
+            ii = a->didx.xZ[i0];
+            for (j = 0; j < blocksize; j++) {
+               a->idx.xZ[ii] = cols0 + j;
+               a->vals.xR[ii] = rowstorage->xR[offssdiag + (blocksize + k) * rowstride + j];
+               ii++;
+            }
+            a->didx.xZ[i0] = ii;
+         }
+      }
+      for (i = 0; i < n; i++) {
+         ae_assert(a->didx.xZ[i] == a->ridx.xZ[i + 1], "ExtractMatrix: integrity check failed (34e43)");
+         ae_assert(a->idx.xZ[a->ridx.xZ[i + 1] - 1] == i, "ExtractMatrix: integrity check failed (k4df5)");
+      }
+      sparseinitduidx(a);
+   // Extract diagonal
+      vectorsetlengthatleast(d, n);
+      for (i = 0; i < n; i++) {
+         d->xR[i] = diagd->xR[i];
+      }
+   // Convert permutation table into product form
+      vectorsetlengthatleast(p, n);
+      for (i = 0; i < n; i++) {
+         p->xZ[i] = i;
+         tmpp->xZ[i] = i;
+      }
+      for (i = 0; i < n; i++) {
+      // We need to move element K to position I.
+      // J is where K actually stored
+         k = analysis->inveffectiveperm.xZ[i];
+         j = tmpp->xZ[k];
+      // Swap elements of P[I:N-1] that is used to store current locations of elements in different way
+         swapi(&p->xZ[i], &p->xZ[j]);
+      // record pivoting of positions I and J
+         tmpp->xZ[p->xZ[j]] = j;
+         p->xZ[i] = j;
+      }
+   }
+}
+
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs 4x4x4x4 update, i.e.:
+// * S is a tHeight*4 matrix
+// * U is a uHeight*4 matrix
+// * Uc' is a 4*4 matrix
+// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
+//   densely packed).
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+   ae_int_t k;
+   ae_int_t targetrow;
+   ae_int_t offsk;
+   double d0;
+   double d1;
+   double d2;
+   double d3;
+   double u00;
+   double u01;
+   double u02;
+   double u03;
+   double u10;
+   double u11;
+   double u12;
+   double u13;
+   double u20;
+   double u21;
+   double u22;
+   double u23;
+   double u30;
+   double u31;
+   double u32;
+   double u33;
+   double uk0;
+   double uk1;
+   double uk2;
+   double uk3;
+   bool result;
+   d0 = diagd->xR[offsd];
+   d1 = diagd->xR[offsd + 1];
+   d2 = diagd->xR[offsd + 2];
+   d3 = diagd->xR[offsd + 3];
+   u00 = d0 * rowstorage->xR[offsu];
+   u01 = d1 * rowstorage->xR[offsu + 1];
+   u02 = d2 * rowstorage->xR[offsu + 2];
+   u03 = d3 * rowstorage->xR[offsu + 3];
+   u10 = d0 * rowstorage->xR[offsu + 4];
+   u11 = d1 * rowstorage->xR[offsu + 5];
+   u12 = d2 * rowstorage->xR[offsu + 6];
+   u13 = d3 * rowstorage->xR[offsu + 7];
+   u20 = d0 * rowstorage->xR[offsu + 8];
+   u21 = d1 * rowstorage->xR[offsu + 9];
+   u22 = d2 * rowstorage->xR[offsu + 10];
+   u23 = d3 * rowstorage->xR[offsu + 11];
+   u30 = d0 * rowstorage->xR[offsu + 12];
+   u31 = d1 * rowstorage->xR[offsu + 13];
+   u32 = d2 * rowstorage->xR[offsu + 14];
+   u33 = d3 * rowstorage->xR[offsu + 15];
+   for (k = 0; k < uheight; k++) {
+      targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+      offsk = offsu + k * 4;
+      uk0 = rowstorage->xR[offsk];
+      uk1 = rowstorage->xR[offsk + 1];
+      uk2 = rowstorage->xR[offsk + 2];
+      uk3 = rowstorage->xR[offsk + 3];
+      rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+      rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+      rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+      rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+   }
+   result = true;
+   return result;
+}
+
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs AxBxCx4 update, i.e.:
+// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
+//   it has 3 or 4 columns)
+// * U is a uHeight*B matrix
+// * Uc' is a B*C matrix, with C <= A
+// * scatter() scatters rows and columns of U*Uc'
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update (quick exit for unsupported
+//   combinations of input sizes)
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+   ae_int_t k;
+   ae_int_t targetrow;
+   ae_int_t targetcol;
+   ae_int_t offsk;
+   double d0;
+   double d1;
+   double d2;
+   double d3;
+   double u00;
+   double u01;
+   double u02;
+   double u03;
+   double u10;
+   double u11;
+   double u12;
+   double u13;
+   double u20;
+   double u21;
+   double u22;
+   double u23;
+   double u30;
+   double u31;
+   double u32;
+   double u33;
+   double uk0;
+   double uk1;
+   double uk2;
+   double uk3;
+   ae_int_t srccol0;
+   ae_int_t srccol1;
+   ae_int_t srccol2;
+   ae_int_t srccol3;
+   bool result;
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+   result = false;
+   if (twidth < 3 || twidth > 4) {
+      return result;
+   }
+   if (uwidth < 3 || uwidth > 4) {
+      return result;
+   }
+   if (urank > 4) {
+      return result;
+   }
+// Determine source columns for target columns, -1 if target column
+// is not updated.
+   srccol0 = -1;
+   srccol1 = -1;
+   srccol2 = -1;
+   srccol3 = -1;
+   for (k = 0; k < uwidth; k++) {
+      targetcol = raw2smap->xZ[superrowidx->xZ[urbase + k]];
+      if (targetcol == 0) {
+         srccol0 = k;
+      }
+      if (targetcol == 1) {
+         srccol1 = k;
+      }
+      if (targetcol == 2) {
+         srccol2 = k;
+      }
+      if (targetcol == 3) {
+         srccol3 = k;
+      }
+   }
+// Load update matrix into aligned/rearranged 4x4 storage
+   d0 = 0.0;
+   d1 = 0.0;
+   d2 = 0.0;
+   d3 = 0.0;
+   u00 = 0.0;
+   u01 = 0.0;
+   u02 = 0.0;
+   u03 = 0.0;
+   u10 = 0.0;
+   u11 = 0.0;
+   u12 = 0.0;
+   u13 = 0.0;
+   u20 = 0.0;
+   u21 = 0.0;
+   u22 = 0.0;
+   u23 = 0.0;
+   u30 = 0.0;
+   u31 = 0.0;
+   u32 = 0.0;
+   u33 = 0.0;
+   if (urank >= 1) {
+      d0 = diagd->xR[offsd];
+   }
+   if (urank >= 2) {
+      d1 = diagd->xR[offsd + 1];
+   }
+   if (urank >= 3) {
+      d2 = diagd->xR[offsd + 2];
+   }
+   if (urank >= 4) {
+      d3 = diagd->xR[offsd + 3];
+   }
+   if (srccol0 >= 0) {
+      if (urank >= 1) {
+         u00 = d0 * rowstorage->xR[offsu + srccol0 * urowstride];
+      }
+      if (urank >= 2) {
+         u01 = d1 * rowstorage->xR[offsu + srccol0 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u02 = d2 * rowstorage->xR[offsu + srccol0 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u03 = d3 * rowstorage->xR[offsu + srccol0 * urowstride + 3];
+      }
+   }
+   if (srccol1 >= 0) {
+      if (urank >= 1) {
+         u10 = d0 * rowstorage->xR[offsu + srccol1 * urowstride];
+      }
+      if (urank >= 2) {
+         u11 = d1 * rowstorage->xR[offsu + srccol1 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u12 = d2 * rowstorage->xR[offsu + srccol1 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u13 = d3 * rowstorage->xR[offsu + srccol1 * urowstride + 3];
+      }
+   }
+   if (srccol2 >= 0) {
+      if (urank >= 1) {
+         u20 = d0 * rowstorage->xR[offsu + srccol2 * urowstride];
+      }
+      if (urank >= 2) {
+         u21 = d1 * rowstorage->xR[offsu + srccol2 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u22 = d2 * rowstorage->xR[offsu + srccol2 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u23 = d3 * rowstorage->xR[offsu + srccol2 * urowstride + 3];
+      }
+   }
+   if (srccol3 >= 0) {
+      if (urank >= 1) {
+         u30 = d0 * rowstorage->xR[offsu + srccol3 * urowstride];
+      }
+      if (urank >= 2) {
+         u31 = d1 * rowstorage->xR[offsu + srccol3 * urowstride + 1];
+      }
+      if (urank >= 3) {
+         u32 = d2 * rowstorage->xR[offsu + srccol3 * urowstride + 2];
+      }
+      if (urank >= 4) {
+         u33 = d3 * rowstorage->xR[offsu + srccol3 * urowstride + 3];
+      }
+   }
+// Run update
+   if (urank == 1) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->xR[offsk];
+         rowstorage->xR[targetrow] -= u00 * uk0;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0;
+      }
+   }
+   if (urank == 2) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1;
+      }
+   }
+   if (urank == 3) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2;
+      }
+   }
+   if (urank == 4) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * 4;
+         offsk = offsu + k * urowstride;
+         uk0 = rowstorage->xR[offsk];
+         uk1 = rowstorage->xR[offsk + 1];
+         uk2 = rowstorage->xR[offsk + 2];
+         uk3 = rowstorage->xR[offsk + 3];
+         rowstorage->xR[targetrow] -= u00 * uk0 + u01 * uk1 + u02 * uk2 + u03 * uk3;
+         rowstorage->xR[targetrow + 1] -= u10 * uk0 + u11 * uk1 + u12 * uk2 + u13 * uk3;
+         rowstorage->xR[targetrow + 2] -= u20 * uk0 + u21 * uk1 + u22 * uk2 + u23 * uk3;
+         rowstorage->xR[targetrow + 3] -= u30 * uk0 + u31 * uk1 + u32 * uk2 + u33 * uk3;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Fast kernels for small supernodal updates: special rank-1 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs rank-1 update, i.e.:
+// * S is a tHeight*A matrix, with A <= 4
+// * U is a uHeight*1 matrix with unit stride
+// * Uc' is a 1*B matrix, with B <= A
+// * scatter() scatters rows and columns of U*Uc'
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update (quick exit for unsupported
+//   combinations of input sizes)
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static bool spchol_updatekernelrank1(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+   ae_int_t k;
+   ae_int_t targetrow;
+   double d0;
+   double u00;
+   double u10;
+   double u20;
+   double u30;
+   double uk;
+   ae_int_t col0;
+   ae_int_t col1;
+   ae_int_t col2;
+   ae_int_t col3;
+   bool result;
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+   result = false;
+   if (twidth > 4) {
+      return result;
+   }
+   if (uwidth > 4) {
+      return result;
+   }
+// Determine target columns, load update matrix
+   d0 = diagd->xR[offsd];
+   col0 = 0;
+   col1 = 0;
+   col2 = 0;
+   col3 = 0;
+   u00 = 0.0;
+   u10 = 0.0;
+   u20 = 0.0;
+   u30 = 0.0;
+   if (uwidth >= 1) {
+      col0 = raw2smap->xZ[superrowidx->xZ[urbase]];
+      u00 = d0 * rowstorage->xR[offsu];
+   }
+   if (uwidth >= 2) {
+      col1 = raw2smap->xZ[superrowidx->xZ[urbase + 1]];
+      u10 = d0 * rowstorage->xR[offsu + 1];
+   }
+   if (uwidth >= 3) {
+      col2 = raw2smap->xZ[superrowidx->xZ[urbase + 2]];
+      u20 = d0 * rowstorage->xR[offsu + 2];
+   }
+   if (uwidth >= 4) {
+      col3 = raw2smap->xZ[superrowidx->xZ[urbase + 3]];
+      u30 = d0 * rowstorage->xR[offsu + 3];
+   }
+// Run update
+   if (uwidth == 1) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk = rowstorage->xR[offsu + k];
+         rowstorage->xR[targetrow + col0] -= u00 * uk;
+      }
+   }
+   if (uwidth == 2) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk = rowstorage->xR[offsu + k];
+         rowstorage->xR[targetrow + col0] -= u00 * uk;
+         rowstorage->xR[targetrow + col1] -= u10 * uk;
+      }
+   }
+   if (uwidth == 3) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk = rowstorage->xR[offsu + k];
+         rowstorage->xR[targetrow + col0] -= u00 * uk;
+         rowstorage->xR[targetrow + col1] -= u10 * uk;
+         rowstorage->xR[targetrow + col2] -= u20 * uk;
+      }
+   }
+   if (uwidth == 4) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk = rowstorage->xR[offsu + k];
+         rowstorage->xR[targetrow + col0] -= u00 * uk;
+         rowstorage->xR[targetrow + col1] -= u10 * uk;
+         rowstorage->xR[targetrow + col2] -= u20 * uk;
+         rowstorage->xR[targetrow + col3] -= u30 * uk;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Fast kernels for small supernodal updates: special rank-2 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs rank-2 update, i.e.:
+// * S is a tHeight*A matrix, with A <= 4
+// * U is a uHeight*2 matrix with row stride equal to 2
+// * Uc' is a 2*B matrix, with B <= A
+// * scatter() scatters rows and columns of U*Uc
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update (quick exit for unsupported
+//   combinations of input sizes)
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static bool spchol_updatekernelrank2(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t trowstride, ae_int_t offsu, ae_int_t uheight, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase) {
+   ae_int_t k;
+   ae_int_t targetrow;
+   double d0;
+   double d1;
+   double u00;
+   double u10;
+   double u20;
+   double u30;
+   double u01;
+   double u11;
+   double u21;
+   double u31;
+   double uk0;
+   double uk1;
+   ae_int_t col0;
+   ae_int_t col1;
+   ae_int_t col2;
+   ae_int_t col3;
+   bool result;
+// Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
+   result = false;
+   if (twidth > 4) {
+      return result;
+   }
+   if (uwidth > 4) {
+      return result;
+   }
+// Determine target columns, load update matrix
+   d0 = diagd->xR[offsd];
+   d1 = diagd->xR[offsd + 1];
+   col0 = 0;
+   col1 = 0;
+   col2 = 0;
+   col3 = 0;
+   u00 = 0.0;
+   u01 = 0.0;
+   u10 = 0.0;
+   u11 = 0.0;
+   u20 = 0.0;
+   u21 = 0.0;
+   u30 = 0.0;
+   u31 = 0.0;
+   if (uwidth >= 1) {
+      col0 = raw2smap->xZ[superrowidx->xZ[urbase]];
+      u00 = d0 * rowstorage->xR[offsu];
+      u01 = d1 * rowstorage->xR[offsu + 1];
+   }
+   if (uwidth >= 2) {
+      col1 = raw2smap->xZ[superrowidx->xZ[urbase + 1]];
+      u10 = d0 * rowstorage->xR[offsu + 1 * 2];
+      u11 = d1 * rowstorage->xR[offsu + 1 * 2 + 1];
+   }
+   if (uwidth >= 3) {
+      col2 = raw2smap->xZ[superrowidx->xZ[urbase + 2]];
+      u20 = d0 * rowstorage->xR[offsu + 2 * 2];
+      u21 = d1 * rowstorage->xR[offsu + 2 * 2 + 1];
+   }
+   if (uwidth >= 4) {
+      col3 = raw2smap->xZ[superrowidx->xZ[urbase + 3]];
+      u30 = d0 * rowstorage->xR[offsu + 3 * 2];
+      u31 = d1 * rowstorage->xR[offsu + 3 * 2 + 1];
+   }
+// Run update
+   if (uwidth == 1) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk0 = rowstorage->xR[offsu + 2 * k];
+         uk1 = rowstorage->xR[offsu + 2 * k + 1];
+         rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
+      }
+   }
+   if (uwidth == 2) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk0 = rowstorage->xR[offsu + 2 * k];
+         uk1 = rowstorage->xR[offsu + 2 * k + 1];
+         rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
+      }
+   }
+   if (uwidth == 3) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk0 = rowstorage->xR[offsu + 2 * k];
+         uk1 = rowstorage->xR[offsu + 2 * k + 1];
+         rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
+         rowstorage->xR[targetrow + col2] -= u20 * uk0 + u21 * uk1;
+      }
+   }
+   if (uwidth == 4) {
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + raw2smap->xZ[superrowidx->xZ[urbase + k]] * trowstride;
+         uk0 = rowstorage->xR[offsu + 2 * k];
+         uk1 = rowstorage->xR[offsu + 2 * k + 1];
+         rowstorage->xR[targetrow + col0] -= u00 * uk0 + u01 * uk1;
+         rowstorage->xR[targetrow + col1] -= u10 * uk0 + u11 * uk1;
+         rowstorage->xR[targetrow + col2] -= u20 * uk0 + u21 * uk1;
+         rowstorage->xR[targetrow + col3] -= u30 * uk0 + u31 * uk1;
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Update target supernode with data from one of its children. This operation
+// is a supernodal equivalent  of  the  column  update  in  the  left-looking
+// Cholesky.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// where
+// * S is an tHeight*tWidth rectangular target matrix that is:
+//   * stored with tStride >= tWidth in RowStorage[OffsS:OffsS+tHeight*tStride-1]
+//   * lower trapezoidal i.e. its leading tWidth*tWidth  submatrix  is  lower
+//     triangular. One may update either entire  tWidth*tWidth  submatrix  or
+//     just its lower part, because upper triangle is not referenced anyway.
+//   * the height of S is not given because it is not actually needed
+// * U is an uHeight*uRank rectangular update matrix tht is:
+//   * stored with row stride uStride >= uRank in RowStorage[OffsU:OffsU+uHeight*uStride-1].
+// * Uc is the leading uWidth*uRank submatrix of U
+// * D is uRank*uRank diagonal matrix that is:
+//   * stored in DiagD[OffsD:OffsD+uRank-1]
+//   * unit, when Analysis.UnitD=True. In this case it can be ignored, although
+//     DiagD still contains 1's in all of its entries
+// * uHeight <= tHeight, uWidth <= tWidth, so scatter operation is needed to update
+//   S with smaller update.
+// * scatter() is an operation  that  extends  smaller  uHeight*uWidth update
+//   matrix U*Uc' into larger tHeight*tWidth target matrix by adding zero rows
+//   and columns into U*Uc':
+//   * I-th row of update modifies Raw2SMap[SuperRowIdx[URBase+I]]-th row  of
+//     the matrix S
+//   * J-th column of update modifies Raw2SMap[SuperRowIdx[URBase+J]]-th  col
+//     of the matrix S
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static ae_int_t spchol_updatesupernode(spcholanalysis *analysis, ae_int_t sidx, ae_int_t cols0, ae_int_t cols1, ae_int_t offss, ZVector *raw2smap, ae_int_t uidx, ae_int_t wrkrow, RVector *diagd, ae_int_t offsd) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t colu0;
+   ae_int_t colu1;
+   ae_int_t urbase;
+   ae_int_t urlast;
+   ae_int_t urank;
+   ae_int_t uwidth;
+   ae_int_t uheight;
+   ae_int_t urowstride;
+   ae_int_t twidth;
+   ae_int_t trowstride;
+   ae_int_t targetrow;
+   ae_int_t targetcol;
+   ae_int_t offsu;
+   ae_int_t offdiagrow;
+   ae_int_t lastrow;
+   ae_int_t offs0;
+   ae_int_t offsj;
+   ae_int_t offsk;
+   double v;
+   ae_int_t result;
+   twidth = cols1 - cols0;
+   offsu = analysis->rowoffsets.xZ[uidx];
+   colu0 = analysis->supercolrange.xZ[uidx];
+   colu1 = analysis->supercolrange.xZ[uidx + 1];
+   urbase = analysis->superrowridx.xZ[uidx];
+   urlast = analysis->superrowridx.xZ[uidx + 1];
+   urank = colu1 - colu0;
+   trowstride = analysis->rowstrides.xZ[sidx];
+   urowstride = analysis->rowstrides.xZ[uidx];
+// Skip leading uRank+WrkRow rows of U because they are not used.
+   offsu += (colu1 - colu0 + wrkrow) * urowstride;
+// Analyze range of rows in supernode LAdjPlus[II] and determine two subranges:
+// * one with indexes stored at SuperRowIdx[WrkRow:OffdiagRow);
+//   these indexes are the ones that intersect with range of rows/columns [ColS0,ColS1)
+//   occupied by diagonal block of the supernode SIdx
+// * one with indexes stored at SuperRowIdx[OffdiagRow:LastRow);
+//   these indexes are ones that intersect with range of rows occupied by
+//   offdiagonal block of the supernode SIdx
+   offdiagrow = wrkrow;
+   lastrow = urlast - urbase;
+   while (offdiagrow < lastrow && analysis->superrowidx.xZ[offdiagrow + urbase] < cols1) {
+      offdiagrow++;
+   }
+   uwidth = offdiagrow - wrkrow;
+   uheight = lastrow - wrkrow;
+   result = offdiagrow;
+// Handle special cases
+   if (trowstride == 4) {
+   // Target is stride-4 column, try several kernels that may work with tWidth=3 and tWidth=4
+      if (uwidth == 4 && twidth == 4 && urank == 4 && urowstride == 4) {
+         if (spchol_updatekernel4444(&analysis->rowstorage, offss, offsu, uheight, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+            return result;
+         }
+      }
+      if (spchol_updatekernelabc4(&analysis->rowstorage, offss, twidth, offsu, uheight, urank, urowstride, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+         return result;
+      }
+   }
+   if (urank == 1 && urowstride == 1) {
+      if (spchol_updatekernelrank1(&analysis->rowstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+         return result;
+      }
+   }
+   if (urank == 2 && urowstride == 2) {
+      if (spchol_updatekernelrank2(&analysis->rowstorage, offss, twidth, trowstride, offsu, uheight, uwidth, &analysis->diagd, colu0, raw2smap, &analysis->superrowidx, urbase + wrkrow)) {
+         return result;
+      }
+   }
+// Handle general update, rerefence code
+   vectorsetlengthatleast(&analysis->u2smap, uheight);
+   for (i = 0; i < uheight; i++) {
+      analysis->u2smap.xZ[i] = raw2smap->xZ[analysis->superrowidx.xZ[urbase + wrkrow + i]];
+   }
+   if (analysis->unitd) {
+   // Unit D, vanilla Cholesky
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + analysis->u2smap.xZ[k] * trowstride;
+         for (j = 0; j < uwidth; j++) {
+            targetcol = analysis->u2smap.xZ[j];
+            offsj = offsu + j * urowstride;
+            offsk = offsu + k * urowstride;
+            offs0 = targetrow + targetcol;
+            v = analysis->rowstorage.xR[offs0];
+            for (i = 0; i < urank; i++) {
+               v -= analysis->rowstorage.xR[offsj + i] * analysis->rowstorage.xR[offsk + i];
+            }
+            analysis->rowstorage.xR[offs0] = v;
+         }
+      }
+   } else {
+   // Non-unit D, LDLT decomposition
+      for (k = 0; k < uheight; k++) {
+         targetrow = offss + analysis->u2smap.xZ[k] * trowstride;
+         for (j = 0; j < uwidth; j++) {
+            targetcol = analysis->u2smap.xZ[j];
+            offsj = offsu + j * urowstride;
+            offsk = offsu + k * urowstride;
+            offs0 = targetrow + targetcol;
+            v = analysis->rowstorage.xR[offs0];
+            for (i = 0; i < urank; i++) {
+               v -= analysis->rowstorage.xR[offsj + i] * diagd->xR[offsd + i] * analysis->rowstorage.xR[offsk + i];
+            }
+            analysis->rowstorage.xR[offs0] = v;
+         }
+      }
+   }
+   return result;
+}
+
+// Factorizes target supernode, returns True on success, False on failure.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+static bool spchol_factorizesupernode(spcholanalysis *analysis, ae_int_t sidx) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   ae_int_t offss;
+   ae_int_t blocksize;
+   ae_int_t offdiagsize;
+   ae_int_t sstride;
+   double v;
+   double vs;
+   double possignvraw;
+   bool controlpivot;
+   bool controloverflow;
+   bool result;
+   cols0 = analysis->supercolrange.xZ[sidx];
+   cols1 = analysis->supercolrange.xZ[sidx + 1];
+   offss = analysis->rowoffsets.xZ[sidx];
+   blocksize = cols1 - cols0;
+   offdiagsize = analysis->superrowridx.xZ[sidx + 1] - analysis->superrowridx.xZ[sidx];
+   sstride = analysis->rowstrides.xZ[sidx];
+   controlpivot = analysis->modtype == 1 && analysis->modparam0 > 0.0;
+   controloverflow = analysis->modtype == 1 && analysis->modparam1 > 0.0;
+   if (analysis->unitd) {
+   // Classic Cholesky
+      for (j = 0; j < blocksize; j++) {
+      // Compute J-th column
+         vs = 0.0;
+         for (k = j; k < blocksize + offdiagsize; k++) {
+            v = analysis->rowstorage.xR[offss + k * sstride + j];
+            for (i = 0; i < j; i++) {
+               v -= analysis->rowstorage.xR[offss + k * sstride + i] * analysis->rowstorage.xR[offss + j * sstride + i];
+            }
+            analysis->rowstorage.xR[offss + k * sstride + j] = v;
+            vs += fabs(v);
+         }
+         if (controloverflow && vs > analysis->modparam1) {
+         // Possible failure due to accumulation of numerical errors
+            result = false;
+            return result;
+         }
+      // Handle pivot element
+         v = analysis->rowstorage.xR[offss + j * sstride + j];
+         if (controlpivot && v <= analysis->modparam0) {
+         // Basic modified Cholesky
+            v = sqrt(analysis->modparam0);
+            analysis->diagd.xR[cols0 + j] = 1.0;
+            analysis->rowstorage.xR[offss + j * sstride + j] = v;
+            v = 1 / v;
+            for (k = j + 1; k < blocksize + offdiagsize; k++) {
+               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+            }
+         } else {
+         // Default case
+            if (v <= 0.0) {
+               result = false;
+               return result;
+            }
+            analysis->diagd.xR[cols0 + j] = 1.0;
+            v = 1 / sqrt(v);
+            for (k = j; k < blocksize + offdiagsize; k++) {
+               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+            }
+         }
+      }
+   } else {
+   // LDLT with diagonal D
+      for (j = 0; j < blocksize; j++) {
+      // Compute J-th column
+         vs = 0.0;
+         for (k = j; k < blocksize + offdiagsize; k++) {
+            v = analysis->rowstorage.xR[offss + k * sstride + j];
+            for (i = 0; i < j; i++) {
+               v -= analysis->rowstorage.xR[offss + k * sstride + i] * analysis->diagd.xR[cols0 + i] * analysis->rowstorage.xR[offss + j * sstride + i];
+            }
+            analysis->rowstorage.xR[offss + k * sstride + j] = v;
+            vs += fabs(v);
+         }
+         if (controloverflow && vs > analysis->modparam1) {
+         // Possible failure due to accumulation of numerical errors
+            result = false;
+            return result;
+         }
+      // Handle pivot element
+         ae_assert(analysis->wrkat.idx.xZ[analysis->wrkat.ridx.xZ[cols0 + j]] == cols0 + j, "FactorizeSupernode: integrity check failed");
+         possignvraw = possign(analysis->wrkat.vals.xR[analysis->wrkat.ridx.xZ[cols0 + j]]);
+         v = analysis->rowstorage.xR[offss + j * sstride + j];
+         if (controlpivot && v / possignvraw <= analysis->modparam0) {
+         // Basic modified LDLT
+            v = possignvraw * analysis->modparam0;
+            analysis->diagd.xR[cols0 + j] = v;
+            analysis->rowstorage.xR[offss + j * sstride + j] = 1.0;
+            v = 1 / v;
+            for (k = j + 1; k < blocksize + offdiagsize; k++) {
+               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+            }
+         } else {
+         // Unmodified LDLT
+            if (v == 0.0) {
+               result = false;
+               return result;
+            }
+            analysis->diagd.xR[cols0 + j] = v;
+            v = 1 / v;
+            for (k = j; k < blocksize + offdiagsize; k++) {
+               analysis->rowstorage.xR[offss + k * sstride + j] *= v;
+            }
+         }
+      }
+   }
+   result = true;
+   return result;
+}
+
+// Sparse Cholesky factorization of SPD matrix stored in  CRS  format,  using
+// precomputed analysis of sparsity pattern stored  in  Analysis  object  and
+// the matrix that is presently loaded into A.
+//
+// Depending on settings specified during factorization, may produce  vanilla
+// Cholesky or L*D*LT  decomposition  (with  strictly  diagonal  D),  without
+// permutation or with permutation P (being either  topological  ordering  or
+// sparsity preserving ordering).
+//
+// Thus, A is represented as either L*LT or L*D*LT or P*L*LT*PT or P*L*D*LT*PT.
+//
+// NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+//       matrices. However, numerical stability is guaranteed ONLY for a class
+//       of quasi-definite matrices.
+//
+// Inputs:
+//     Analysis    -   prior  analysis  performed on some sparse matrix, with
+//                     matrix  being  stored  in  Analysis.  This  matrix  is
+//                     destroyed during factorization.
+//     D, P        -   possibly preallocated buffers
+//
+// Outputs:
+//     A           -   Cholesky decomposition  of  A  stored  in  CRS  format
+//                     in LOWER triangle.
+//     D           -   array[N], diagonal factor. If no diagonal  factor  was
+//                     required during analysis  phase,  still  returned  but
+//                     filled with units.
+//     P           -   array[N], pivots. Permutation matrix P is a product of
+//                     P(0)*P(1)*...*P(N-1), where P(i) is a  permutation  of
+//                     row/col I and P[I] (with P[I] >= I).
+//                     If no permutation was requested during analysis phase,
+//                     still returned but filled with unit elements.
+//
+// The function returns True  when  factorization  resulted  in nondegenerate
+// matrix. False is returned when factorization fails (Cholesky factorization
+// of indefinite matrix) or LDLT factorization has exactly zero  elements  at
+// the diagonal.
+//
+// In the latter case contents of A, D and P is undefined.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVector *p) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t ii;
+   ae_int_t i0;
+   ae_int_t i1;
+   ae_int_t n;
+   ae_int_t cols0;
+   ae_int_t cols1;
+   ae_int_t offss;
+   ae_int_t sstride;
+   ae_int_t blocksize;
+   ae_int_t sidx;
+   ae_int_t uidx;
+   bool result;
+   ae_assert(analysis->tasktype == 0, "SPCholFactorize: Analysis type does not match current task");
+   result = true;
+   n = analysis->n;
+// Prepare structures:
+// * WrkRows[] store pointers to beginnings of the offdiagonal supernode row ranges;
+//   at the beginning of the work WrkRows[]=0, but as we advance from the column
+//   range [0,A) to [A,B), to [B,C) and so on, we advance WrkRows[] in order to
+//   quickly skip parts that are less than A, less than B, less than C and so on.
+   vectorsetlengthatleast(&analysis->raw2smap, n);
+   vectorsetlengthatleast(&analysis->tmp0, n + 1);
+   bsetallocv(n, false, &analysis->flagarray);
+   isetallocv(analysis->nsuper, 0, &analysis->wrkrows);
+   rsetallocv(n, 0.0, &analysis->diagd);
+   rsetallocv(analysis->rowoffsets.xZ[analysis->nsuper], 0.0, &analysis->rowstorage);
+// Now we can run actual supernodal Cholesky
+   for (sidx = 0; sidx < analysis->nsuper; sidx++) {
+      cols0 = analysis->supercolrange.xZ[sidx];
+      cols1 = analysis->supercolrange.xZ[sidx + 1];
+      blocksize = cols1 - cols0;
+      offss = analysis->rowoffsets.xZ[sidx];
+      sstride = analysis->rowstrides.xZ[sidx];
+   // Prepare mapping of raw (range 0...N-1) indexes into internal (range 0...BlockSize+OffdiagSize-1) ones
+      for (i = cols0; i < cols1; i++) {
+         analysis->raw2smap.xZ[i] = i - cols0;
+      }
+      for (k = analysis->superrowridx.xZ[sidx]; k < analysis->superrowridx.xZ[sidx + 1]; k++) {
+         analysis->raw2smap.xZ[analysis->superrowidx.xZ[k]] = blocksize + (k - analysis->superrowridx.xZ[sidx]);
+      }
+   // Load supernode #SIdx using Raw2SMap to perform quick transformation between global and local indexing.
+      for (j = cols0; j < cols1; j++) {
+         i0 = analysis->wrkat.ridx.xZ[j];
+         i1 = analysis->wrkat.ridx.xZ[j + 1] - 1;
+         for (ii = i0; ii <= i1; ii++) {
+            analysis->rowstorage.xR[offss + analysis->raw2smap.xZ[analysis->wrkat.idx.xZ[ii]] * sstride + (j - cols0)] = analysis->wrkat.vals.xR[ii];
+         }
+      }
+   // Update current supernode with nonzeros from the current row
+      for (ii = analysis->ladjplusr.xZ[sidx]; ii < analysis->ladjplusr.xZ[sidx + 1]; ii++) {
+         uidx = analysis->ladjplus.xZ[ii];
+         analysis->wrkrows.xZ[uidx] = spchol_updatesupernode(analysis, sidx, cols0, cols1, offss, &analysis->raw2smap, uidx, analysis->wrkrows.xZ[uidx], &analysis->diagd, analysis->supercolrange.xZ[uidx]);
+      }
+   // Factorize current supernode
+      if (!spchol_factorizesupernode(analysis, sidx)) {
+         result = false;
+         return result;
+      }
+   }
+// Convert from supernodal storage to SparseMatrix format
+   spchol_extractmatrix(analysis, &analysis->rowoffsets, &analysis->rowstrides, &analysis->rowstorage, &analysis->diagd, n, a, d, p, &analysis->tmp0);
+   return result;
+}
+
+void spcholanalysis_init(void *_p, bool make_automatic) {
+   spcholanalysis *p = (spcholanalysis *)_p;
+   ae_vector_init(&p->parentsupernode, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->supercolrange, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->superrowridx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->superrowidx, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->fillinperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->invfillinperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->superperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->invsuperperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->effectiveperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->inveffectiveperm, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->ladjplusr, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->ladjplus, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->outrowcounts, 0, DT_INT, make_automatic);
+   sparsematrix_init(&p->wrkat, make_automatic);
+   ae_vector_init(&p->rowstorage, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->rowstrides, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->rowoffsets, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->diagd, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->wrkrows, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->flagarray, 0, DT_BOOL, make_automatic);
+   ae_vector_init(&p->tmpparent, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->node2supernode, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->u2smap, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->raw2smap, 0, DT_INT, make_automatic);
+   amdbuffer_init(&p->amdtmp, make_automatic);
+   ae_vector_init(&p->tmp0, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->tmp1, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->tmp2, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->tmp3, 0, DT_INT, make_automatic);
+   ae_vector_init(&p->tmp4, 0, DT_INT, make_automatic);
+   sparsematrix_init(&p->tmpa, make_automatic);
+}
+
+void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic) {
+   spcholanalysis *dst = (spcholanalysis *)_dst;
+   spcholanalysis *src = (spcholanalysis *)_src;
+   dst->tasktype = src->tasktype;
+   dst->n = src->n;
+   dst->permtype = src->permtype;
+   dst->unitd = src->unitd;
+   dst->modtype = src->modtype;
+   dst->modparam0 = src->modparam0;
+   dst->modparam1 = src->modparam1;
+   dst->modparam2 = src->modparam2;
+   dst->modparam3 = src->modparam3;
+   dst->nsuper = src->nsuper;
+   ae_vector_copy(&dst->parentsupernode, &src->parentsupernode, make_automatic);
+   ae_vector_copy(&dst->supercolrange, &src->supercolrange, make_automatic);
+   ae_vector_copy(&dst->superrowridx, &src->superrowridx, make_automatic);
+   ae_vector_copy(&dst->superrowidx, &src->superrowidx, make_automatic);
+   ae_vector_copy(&dst->fillinperm, &src->fillinperm, make_automatic);
+   ae_vector_copy(&dst->invfillinperm, &src->invfillinperm, make_automatic);
+   ae_vector_copy(&dst->superperm, &src->superperm, make_automatic);
+   ae_vector_copy(&dst->invsuperperm, &src->invsuperperm, make_automatic);
+   ae_vector_copy(&dst->effectiveperm, &src->effectiveperm, make_automatic);
+   ae_vector_copy(&dst->inveffectiveperm, &src->inveffectiveperm, make_automatic);
+   dst->istopologicalordering = src->istopologicalordering;
+   dst->applypermutationtooutput = src->applypermutationtooutput;
+   ae_vector_copy(&dst->ladjplusr, &src->ladjplusr, make_automatic);
+   ae_vector_copy(&dst->ladjplus, &src->ladjplus, make_automatic);
+   ae_vector_copy(&dst->outrowcounts, &src->outrowcounts, make_automatic);
+   sparsematrix_copy(&dst->wrkat, &src->wrkat, make_automatic);
+   ae_vector_copy(&dst->rowstorage, &src->rowstorage, make_automatic);
+   ae_vector_copy(&dst->rowstrides, &src->rowstrides, make_automatic);
+   ae_vector_copy(&dst->rowoffsets, &src->rowoffsets, make_automatic);
+   ae_vector_copy(&dst->diagd, &src->diagd, make_automatic);
+   ae_vector_copy(&dst->wrkrows, &src->wrkrows, make_automatic);
+   ae_vector_copy(&dst->flagarray, &src->flagarray, make_automatic);
+   ae_vector_copy(&dst->tmpparent, &src->tmpparent, make_automatic);
+   ae_vector_copy(&dst->node2supernode, &src->node2supernode, make_automatic);
+   ae_vector_copy(&dst->u2smap, &src->u2smap, make_automatic);
+   ae_vector_copy(&dst->raw2smap, &src->raw2smap, make_automatic);
+   amdbuffer_copy(&dst->amdtmp, &src->amdtmp, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, make_automatic);
+   ae_vector_copy(&dst->tmp2, &src->tmp2, make_automatic);
+   ae_vector_copy(&dst->tmp3, &src->tmp3, make_automatic);
+   ae_vector_copy(&dst->tmp4, &src->tmp4, make_automatic);
+   sparsematrix_copy(&dst->tmpa, &src->tmpa, make_automatic);
+}
+
+void spcholanalysis_free(void *_p, bool make_automatic) {
+   spcholanalysis *p = (spcholanalysis *)_p;
+   ae_vector_free(&p->parentsupernode, make_automatic);
+   ae_vector_free(&p->supercolrange, make_automatic);
+   ae_vector_free(&p->superrowridx, make_automatic);
+   ae_vector_free(&p->superrowidx, make_automatic);
+   ae_vector_free(&p->fillinperm, make_automatic);
+   ae_vector_free(&p->invfillinperm, make_automatic);
+   ae_vector_free(&p->superperm, make_automatic);
+   ae_vector_free(&p->invsuperperm, make_automatic);
+   ae_vector_free(&p->effectiveperm, make_automatic);
+   ae_vector_free(&p->inveffectiveperm, make_automatic);
+   ae_vector_free(&p->ladjplusr, make_automatic);
+   ae_vector_free(&p->ladjplus, make_automatic);
+   ae_vector_free(&p->outrowcounts, make_automatic);
+   sparsematrix_free(&p->wrkat, make_automatic);
+   ae_vector_free(&p->rowstorage, make_automatic);
+   ae_vector_free(&p->rowstrides, make_automatic);
+   ae_vector_free(&p->rowoffsets, make_automatic);
+   ae_vector_free(&p->diagd, make_automatic);
+   ae_vector_free(&p->wrkrows, make_automatic);
+   ae_vector_free(&p->flagarray, make_automatic);
+   ae_vector_free(&p->tmpparent, make_automatic);
+   ae_vector_free(&p->node2supernode, make_automatic);
+   ae_vector_free(&p->u2smap, make_automatic);
+   ae_vector_free(&p->raw2smap, make_automatic);
+   amdbuffer_free(&p->amdtmp, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
+   ae_vector_free(&p->tmp2, make_automatic);
+   ae_vector_free(&p->tmp3, make_automatic);
+   ae_vector_free(&p->tmp4, make_automatic);
+   sparsematrix_free(&p->tmpa, make_automatic);
+}
+} // end of namespace alglib_impl
+
 // === MATGEN Package ===
 // Depends on: (AlgLibInternal) CREFLECTIONS
 // Depends on: (AlgLibMisc) HQRND
@@ -9189,7 +13201,6 @@ namespace alglib_impl {
 //       * constructs a Householder reflection from the vector, then applies
 //         it to the smaller matrix (embedded in the larger size with a 1 at
 //         the bottom right corner).
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndorthogonal(const ae_int_t n, real_2d_array &a);
 void rmatrixrndorthogonal(ae_int_t n, RMatrix *a) {
@@ -9218,7 +13229,6 @@ void rmatrixrndorthogonal(ae_int_t n, RMatrix *a) {
 //
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -9274,7 +13284,6 @@ void rmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 //       * constructs a Householder reflection from the vector, then applies
 //         it to the smaller matrix (embedded in the larger size with a 1 at
 //         the bottom right corner).
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndorthogonal(const ae_int_t n, complex_2d_array &a);
 void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
@@ -9304,7 +13313,6 @@ void cmatrixrndorthogonal(ae_int_t n, CMatrix *a) {
 //
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -9354,7 +13362,6 @@ void cmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 //
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void smatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -9402,7 +13409,6 @@ void smatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 //
 // Outputs:
 //     A   -   random SPD matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void spdmatrixrndcond(const ae_int_t n, const double c, real_2d_array &a);
 void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
@@ -9453,7 +13459,6 @@ void spdmatrixrndcond(ae_int_t n, double c, RMatrix *a) {
 //
 // Outputs:
 //     A   -   random matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -9505,7 +13510,6 @@ void hmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 //
 // Outputs:
 //     A   -   random HPD matrix with norm2(A)=1 and cond(A)=C
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hpdmatrixrndcond(const ae_int_t n, const double c, complex_2d_array &a);
 void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
@@ -9559,7 +13563,6 @@ void hpdmatrixrndcond(ae_int_t n, double c, CMatrix *a) {
 //
 // Outputs:
 //     A   -   A*Q, where Q is random NxN orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndorthogonalfromtheright(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
@@ -9624,7 +13627,6 @@ void rmatrixrndorthogonalfromtheright(RMatrix *a, ae_int_t m, ae_int_t n) {
 //
 // Outputs:
 //     A   -   Q*A, where Q is random MxM orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void rmatrixrndorthogonalfromtheleft(real_2d_array &a, const ae_int_t m, const ae_int_t n);
 void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
@@ -9691,7 +13693,6 @@ void rmatrixrndorthogonalfromtheleft(RMatrix *a, ae_int_t m, ae_int_t n) {
 //
 // Outputs:
 //     A   -   A*Q, where Q is random NxN orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndorthogonalfromtheright(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
@@ -9751,7 +13752,6 @@ void cmatrixrndorthogonalfromtheright(CMatrix *a, ae_int_t m, ae_int_t n) {
 //
 // Outputs:
 //     A   -   Q*A, where Q is random MxM orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void cmatrixrndorthogonalfromtheleft(complex_2d_array &a, const ae_int_t m, const ae_int_t n);
 void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
@@ -9812,7 +13812,6 @@ void cmatrixrndorthogonalfromtheleft(CMatrix *a, ae_int_t m, ae_int_t n) {
 //
 // Outputs:
 //     A   -   Q'*A*Q, where Q is random NxN orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void smatrixrndmultiply(real_2d_array &a, const ae_int_t n);
 void smatrixrndmultiply(RMatrix *a, ae_int_t n) {
@@ -9873,7 +13872,6 @@ void smatrixrndmultiply(RMatrix *a, ae_int_t n) {
 //
 // Outputs:
 //     A   -   Q^H*A*Q, where Q is random NxN orthogonal matrix
-//
 // ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 // API: void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
 void hmatrixrndmultiply(CMatrix *a, ae_int_t n) {
@@ -10028,7 +14026,7 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n) {
 
 // === TRFAC Package ===
 // Depends on: (AlgLibInternal) ROTATIONS
-// Depends on: SPTRF, MATGEN
+// Depends on: SPTRF, SPCHOL, MATGEN
 namespace alglib_impl {
 // LU decomposition of a general real matrix with row pivoting
 //
@@ -10043,14 +14041,12 @@ namespace alglib_impl {
 //     M       -   number of rows in matrix A.
 //     N       -   number of columns in matrix A.
 //
-//
 // Outputs:
 //     A       -   matrices L and U in compact form:
 //                 * L is stored under main diagonal
 //                 * U is stored on and above main diagonal
 //     Pivots  -   permutation matrix in compact form.
 //                 array[0..Min(M-1,N-1)].
-//
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 // API: void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
@@ -10073,14 +14069,12 @@ void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
 //     M       -   number of rows in matrix A.
 //     N       -   number of columns in matrix A.
 //
-//
 // Outputs:
 //     A       -   matrices L and U in compact form:
 //                 * L is stored under main diagonal
 //                 * U is stored on and above main diagonal
 //     Pivots  -   permutation matrix in compact form.
 //                 array[0..Min(M-1,N-1)].
-//
 // ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 // API: void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
@@ -10170,7 +14164,6 @@ static bool trfac_hpdmatrixcholesky2(CMatrix *aaa, ae_int_t offs, ae_int_t n, bo
 }
 
 // Recursive computational subroutine for HPDMatrixCholesky
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp) {
    ae_int_t n1;
@@ -10258,7 +14251,6 @@ static bool trfac_hpdmatrixcholeskyrec(CMatrix *a, ae_int_t offs, ae_int_t n, bo
 //     If  the  matrix  is  positive-definite,  the  function  returns  True.
 //     Otherwise, the function returns False. Contents of A is not determined
 //     in such case.
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 // API: bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper) {
@@ -10299,7 +14291,6 @@ bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper) {
 //     If  the  matrix  is  positive-definite,  the  function  returns  True.
 //     Otherwise, the function returns False. Contents of A is not determined
 //     in such case.
-//
 // ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 // API: bool hpdmatrixcholesky(complex_2d_array &a, const ae_int_t n, const bool isupper);
 bool hpdmatrixcholesky(CMatrix *a, ae_int_t n, bool isupper) {
@@ -10748,8 +14739,6 @@ void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector
 //   non-degenerate
 // * function returns FALSE, if the matrix was factorized but U has strictly
 //   zero elements at the diagonal (the factorization is returned anyway).
-//
-//
 // ALGLIB Routine: Copyright 03.09.2018 by Sergey Bochkanov
 // API: bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
@@ -10774,11 +14763,10 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
 // definite sparse matrix. The result of an algorithm is a representation  of
 // A as A=U^T*U or A=L*L^T
 //
-// This  function  is  a  more  efficient alternative to general, but  slower
-// SparseCholeskyX(), because it does not  create  temporary  copies  of  the
-// target. It performs factorization in-place, which gives  best  performance
-// on low-profile matrices. Its drawback, however, is that it can not perform
-// profile-reducing permutation of input matrix.
+// This function allows to perform very efficient decomposition of low-profile
+// matrices (average bandwidth is ~5-10 elements). For larger matrices it  is
+// recommended to use supernodal Cholesky decomposition: SparseCholeskyP() or
+// SparseCholeskyAnalyze()/SparseCholeskyFactorize().
 //
 // Inputs:
 //     A       -   sparse matrix in skyline storage (SKS) format.
@@ -10786,7 +14774,6 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
 //     IsUpper -   if IsUpper=True, then factorization is performed on  upper
 //                 triangle. Another triangle is ignored (it may contant some
 //                 data, but it is not changed).
-//
 //
 // Outputs:
 //     A       -   the result of factorization, stored in SKS. If IsUpper=True,
@@ -10805,7 +14792,6 @@ bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q) {
 // NOTE: for  performance  reasons  this  function  does NOT check that input
 //       matrix  includes  only  finite  values. It is your responsibility to
 //       make sure that there are no infinite or NAN values in the matrix.
-//
 // ALGLIB Routine: Copyright 16.01.2014 by Sergey Bochkanov
 // API: bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper);
 bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
@@ -10934,282 +14920,493 @@ bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper) {
    return result;
 }
 
-// Sparse Cholesky decomposition: "expert" function.
+// Sparse Cholesky decomposition for a matrix  stored  in  any sparse storage,
+// without rows/cols permutation.
 //
-// The algorithm computes Cholesky decomposition  of  a  symmetric  positive-
-// definite sparse matrix. The result is representation of A  as  A=U^T*U  or
-// A=L*L^T
+// This function is the most convenient (less parameters to specify), although
+// less efficient, version of sparse Cholesky.
 //
-// Triangular factor L or U is written to separate SparseMatrix structure. If
-// output buffer already contrains enough memory to store L/U, this memory is
-// reused.
+// Internally it:
+// * calls SparseCholeskyAnalyze()  function  to  perform  symbolic  analysis
+//   phase with no permutation being configured.
+// * calls SparseCholeskyFactorize() function to perform numerical  phase  of
+//   the factorization
+//
+// Following alternatives may result in better performance:
+// * using SparseCholeskyP(), which selects best  pivoting  available,  which
+//   almost always results in improved sparsity and cache locality
+// * using  SparseCholeskyAnalyze() and SparseCholeskyFactorize()   functions
+//   directly,  which  may  improve  performance of repetitive factorizations
+//   with same sparsity patterns.
+//
+// The latter also allows one to perform  LDLT  factorization  of  indefinite
+// matrix (one with strictly diagonal D, which is known  to  be  stable  only
+// in few special cases, like quasi-definite matrices).
 //
 // Inputs:
-//     A       -   upper or lower triangle of sparse matrix.
-//                 Matrix can be in any sparse storage format.
-//     N       -   size of matrix A (can be smaller than actual size of A)
-//     IsUpper -   if IsUpper=True, then A contains an upper triangle of
-//                 a symmetric matrix, otherwise A contains a lower one.
-//                 Another triangle is ignored.
-//     P0, P1  -   integer arrays:
-//                 * for Ordering=-3  -  user-supplied permutation  of  rows/
-//                   columns, which complies  to  requirements stated  in the
-//                   "Outputs:" section.  Both  P0 and  P1  must  be
-//                   initialized by user.
-//                 * for other values of  Ordering  -  possibly  preallocated
-//                   buffer,  which   is   filled   by  internally  generated
-//                   permutation. Automatically resized if its  size  is  too
-//                   small to store data.
-//     Ordering-   sparse matrix reordering algorithm which is used to reduce
-//                 fill-in amount:
-//                 * -3    use ordering supplied by user in P0/P1
-//                 * -2    use random ordering
-//                 * -1    use original order
-//                 * 0     use best algorithm implemented so far
-//                 If input matrix is  given  in  SKS  format,  factorization
-//                 function ignores Ordering and uses original order  of  the
-//                 columns. The idea is that if you already store  matrix  in
-//                 SKS format, it is better not to perform costly reordering.
-//     Algo    -   type of algorithm which is used during factorization:
-//                 * 0     use best  algorithm  (for  SKS  input  or   output
-//                         matrices Algo=2 is used; otherwise Algo=1 is used)
-//                 * 1     use CRS-based algorithm
-//                 * 2     use skyline-based factorization algorithm.
-//                         This algorithm is a  fastest  one  for low-profile
-//                         matrices,  but  requires  too  much of memory  for
-//                         matrices with large bandwidth.
-//     Fmt     -   desired storage format  of  the  output,  as  returned  by
-//                 SparseGetMatrixType() function:
-//                 * 0 for hash-based storage
-//                 * 1 for CRS
-//                 * 2 for SKS
-//                 If you do not know what format to choose, use 1 (CRS).
-//     Buf     -   SparseBuffers structure which is used to store temporaries.
-//                 This function may reuse previously allocated  storage,  so
-//                 if you perform repeated factorizations it is beneficial to
-//                 reuse Buf.
-//     C       -   SparseMatrix structure  which  can  be  just  some  random
-//                 garbage. In  case  in  contains  enough  memory  to  store
-//                 triangular factors, this memory will be reused. Othwerwise,
-//                 algorithm will automatically allocate enough memory.
-//
+//     A       -   a square NxN sparse matrix, stored in any storage format.
+//     IsUpper -   if IsUpper=True, then factorization is performed on  upper
+//                 triangle.  Another triangle is ignored on  input,  dropped
+//                 on output. Similarly, if IsUpper=False, the lower triangle
+//                 is processed.
 //
 // Outputs:
-//     C       -   the result of factorization, stored in desired format.  If
-//                 IsUpper=True, then the upper triangle  contains  matrix U,
-//                 such  that  (P'*A*P) = U^T*U,  where  P  is  a permutation
-//                 matrix (see below). The elements below the  main  diagonal
-//                 are zero.
-//                 Similarly, if IsUpper = False. In this case L is returned,
-//                 and we have (P'*A*P) = L*(L^T).
-//     P0      -   permutation  (according   to   Ordering  parameter)  which
-//                 minimizes amount of fill-in:
-//                 * P0 is array[N]
-//                 * permutation is applied to A before  factorization  takes
-//                   place, i.e. we have U'*U = L*L' = P'*A*P
-//                 * P0[k]=j means that column/row j of A  is  moved  to k-th
-//                   position before starting factorization.
-//     P1      -   permutation P in another format, array[N]:
-//                 * P1[k]=j means that k-th column/row of A is moved to j-th
-//                   position
+//     A       -   the result of factorization, stored in CRS format:
+//                 * if IsUpper=True, then the upper triangle contains matrix
+//                   U such  that  A = U^T*U and the lower triangle is empty.
+//                 * similarly, if IsUpper=False, then lower triangular L  is
+//                   returned and we have A = L*(L^T).
+//                 Note that THIS function does not  perform  permutation  of
+//                 the rows to reduce fill-in.
 //
 // Result:
 //     If  the  matrix  is  positive-definite,  the  function  returns  True.
-//     Otherwise, the function returns False. Contents of C is not determined
+//     Otherwise, the function returns False.  Contents  of  A  is  undefined
 //     in such case.
 //
 // NOTE: for  performance  reasons  this  function  does NOT check that input
 //       matrix  includes  only  finite  values. It is your responsibility to
 //       make sure that there are no infinite or NAN values in the matrix.
-//
-// ALGLIB Routine: Copyright 16.01.2014 by Sergey Bochkanov
-bool sparsecholeskyx(sparsematrix *a, ae_int_t n, bool isupper, ZVector *p0, ZVector *p1, ae_int_t ordering, ae_int_t algo, ae_int_t fmt, sparsebuffers *buf, sparsematrix *c) {
+// ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
+// API: bool sparsecholesky(const sparsematrix &a, const bool isupper);
+bool sparsecholesky(sparsematrix *a, bool isupper) {
    ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   ae_int_t t0;
-   ae_int_t t1;
-   double v;
+   ae_int_t facttype;
+   ae_int_t permtype;
    bool result;
    ae_frame_make(&_frame_block);
-   NewObj(hqrndstate, rs);
-   ae_assert(n >= 0, "SparseMatrixCholeskyBuf: N<0");
-   ae_assert(sparsegetnrows(a) >= n, "SparseMatrixCholeskyBuf: rows(A)<N");
-   ae_assert(sparsegetncols(a) >= n, "SparseMatrixCholeskyBuf: cols(A)<N");
-   ae_assert(ordering >= -3 && ordering <= 0, "SparseMatrixCholeskyBuf: invalid Ordering parameter");
-   ae_assert(algo >= 0 && algo <= 2, "SparseMatrixCholeskyBuf: invalid Algo parameter");
-   hqrndrandomize(&rs);
-// Perform some quick checks.
-// Because sparse matrices are expensive data structures, these
-// checks are better to perform during early stages of the factorization.
-   result = false;
-   if (n < 1) {
+   NewObj(sparsedecompositionanalysis, analysis);
+   NewVector(dummyd, 0, DT_REAL);
+   NewVector(dummyp, 0, DT_INT);
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholesky: A is not square");
+// Quick exit
+   if (sparsegetnrows(a) == 0) {
+      result = true;
       ae_frame_leave();
       return result;
    }
-   for (i = 0; i < n; i++) {
-      if (sparsegetdiagonal(a, i) <= 0.0) {
+// Choose factorization and permutation: vanilla Cholesky and no permutation
+   facttype = 0;
+   permtype = -1;
+// Easy case - CRS matrix in lower triangle, no conversion or transposition is needed
+   if (sparseiscrs(a) && !isupper) {
+      result = spsymmanalyze(a, facttype, permtype, &analysis.analysis);
+      if (!result) {
          ae_frame_leave();
          return result;
       }
-   }
-// First, determine appropriate ordering:
-// * for SKS inputs, Ordering=-1 is automatically chosen (overrides user settings)
-   if (ordering == 0) {
-      ordering = -1;
-   }
-   if (sparseissks(a)) {
-      ordering = -1;
-   }
-   if (ordering == -3) {
-   // User-supplied ordering.
-   // Check its correctness.
-      ae_assert(p0->cnt >= n, "SparseCholeskyX: user-supplied permutation is too short");
-      ae_assert(p1->cnt >= n, "SparseCholeskyX: user-supplied permutation is too short");
-      for (i = 0; i < n; i++) {
-         ae_assert(p0->xZ[i] >= 0 && p0->xZ[i] < n, "SparseCholeskyX: user-supplied permutation includes values outside of [0,N)");
-         ae_assert(p1->xZ[i] >= 0 && p1->xZ[i] < n, "SparseCholeskyX: user-supplied permutation includes values outside of [0,N)");
-         ae_assert(p1->xZ[p0->xZ[i]] == i, "SparseCholeskyX: user-supplied permutation is inconsistent - P1 is not inverse of P0");
-      }
-   }
-   if (ordering == -2) {
-   // Use random ordering
-      vectorsetlengthatleast(p0, n);
-      vectorsetlengthatleast(p1, n);
-      for (i = 0; i < n; i++) {
-         p0->xZ[i] = i;
-      }
-      for (i = 0; i < n; i++) {
-         j = i + hqrnduniformi(&rs, n - i);
-         if (j != i) {
-            swapi(&p0->xZ[i], &p0->xZ[j]);
-         }
-      }
-      for (i = 0; i < n; i++) {
-         p1->xZ[p0->xZ[i]] = i;
-      }
-   }
-   if (ordering == -1) {
-   // Use initial ordering
-      vectorsetlengthatleast(p0, n);
-      vectorsetlengthatleast(p1, n);
-      for (i = 0; i < n; i++) {
-         p0->xZ[i] = i;
-         p1->xZ[i] = i;
-      }
-   }
-// Determine algorithm to use:
-// * for SKS input or output - use SKS solver (overrides user settings)
-// * default is to use Algo=1
-   if (algo == 0) {
-      algo = 1;
-   }
-   if (sparseissks(a) || fmt == 2) {
-      algo = 2;
-   }
-   algo = 2;
-   if (algo == 2) {
-   // Skyline Cholesky with non-skyline output.
-   //
-   // Call CholeskyX() recursively with Buf.S as output matrix,
-   // then perform conversion from SKS to desired format. We can
-   // use Buf.S in reccurrent call because SKS-to-SKS CholeskyX()
-   // does not uses this field.
-      if (fmt != 2) {
-         result = sparsecholeskyx(a, n, isupper, p0, p1, -3, algo, 2, buf, &buf->s);
-         if (result) {
-            sparsecopytobuf(&buf->s, fmt, c);
-         }
-         ae_frame_leave();
-         return result;
-      }
-   // Skyline Cholesky with skyline output
-      if (sparseissks(a) && ordering == -1) {
-      // Non-permuted skyline matrix.
-      //
-      // Quickly copy matrix to output buffer without permutation.
-      //
-      // NOTE: Buf.D is used as dummy vector filled with zeros.
-         vectorsetlengthatleast(&buf->d, n);
-         for (i = 0; i < n; i++) {
-            buf->d.xZ[i] = 0;
-         }
-         if (isupper) {
-         // Create strictly upper-triangular matrix,
-         // copy upper triangle of input.
-            sparsecreatesksbuf(n, n, &buf->d, &a->uidx, c);
-            for (i = 0; i < n; i++) {
-               t0 = a->ridx.xZ[i + 1] - a->uidx.xZ[i] - 1;
-               t1 = a->ridx.xZ[i + 1] - 1;
-               k = c->ridx.xZ[i + 1] - c->uidx.xZ[i] - 1;
-               for (j = t0; j <= t1; j++) {
-                  c->vals.xR[k] = a->vals.xR[j];
-                  k++;
-               }
-            }
-         } else {
-         // Create strictly lower-triangular matrix,
-         // copy lower triangle of input.
-            sparsecreatesksbuf(n, n, &a->didx, &buf->d, c);
-            for (i = 0; i < n; i++) {
-               t0 = a->ridx.xZ[i];
-               t1 = a->ridx.xZ[i] + a->didx.xZ[i];
-               k = c->ridx.xZ[i];
-               for (j = t0; j <= t1; j++) {
-                  c->vals.xR[k] = a->vals.xR[j];
-                  k++;
-               }
-            }
-         }
-      } else {
-      // Non-identity permutations OR non-skyline input:
-      // * investigate profile of permuted A
-      // * create skyline matrix in output buffer
-      // * copy input with permutation
-         vectorsetlengthatleast(&buf->d, n);
-         vectorsetlengthatleast(&buf->u, n);
-         for (i = 0; i < n; i++) {
-            buf->d.xZ[i] = 0;
-            buf->u.xZ[i] = 0;
-         }
-         t0 = 0;
-         t1 = 0;
-         while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
-            if (isupper? j >= i: j <= i) {
-               i = p1->xZ[i];
-               j = p1->xZ[j];
-               if (isupper? j < i: j > i) {
-                  swapi(&i, &j);
-               }
-               if (i > j) {
-                  buf->d.xZ[i] = imax2(buf->d.xZ[i], i - j);
-               } else {
-                  buf->u.xZ[j] = imax2(buf->u.xZ[j], j - i);
-               }
-            }
-         }
-         sparsecreatesksbuf(n, n, &buf->d, &buf->u, c);
-         t0 = 0;
-         t1 = 0;
-         while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
-            if (isupper? j >= i: j <= i) {
-               i = p1->xZ[i];
-               j = p1->xZ[j];
-               if (isupper? j < i: j > i) {
-                  swapi(&j, &i);
-               }
-               sparserewriteexisting(c, i, j, v);
-            }
-         }
-      }
-      result = sparsecholeskyskyline(c, n, isupper);
+      result = spsymmfactorize(&analysis.analysis, a, &dummyd, &dummyp);
       ae_frame_leave();
       return result;
    }
-   ae_assert(false, "SparseCholeskyX: internal error - unexpected algorithm");
+// A bit more complex - we need conversion and/or transposition
+   if (isupper) {
+      sparsecopytocrsbuf(a, &analysis.wrkat);
+      sparsecopytransposecrsbuf(&analysis.wrkat, &analysis.wrka);
+   } else {
+      sparsecopytocrsbuf(a, &analysis.wrka);
+   }
+   result = spsymmanalyze(&analysis.wrka, facttype, permtype, &analysis.analysis);
+   if (!result) {
+      ae_frame_leave();
+      return result;
+   }
+   result = spsymmfactorize(&analysis.analysis, &analysis.wrka, &dummyd, &dummyp);
+   if (!result) {
+      ae_frame_leave();
+      return result;
+   }
+   if (isupper) {
+      sparsecopytransposecrsbuf(&analysis.wrka, a);
+   } else {
+      sparsecopybuf(&analysis.wrka, a);
+   }
    ae_frame_leave();
    return result;
+}
+
+// Sparse Cholesky decomposition for a matrix  stored  in  any sparse storage
+// format, with performance-enhancing permutation of rows/cols.
+//
+// Present version is configured  to  perform  supernodal  permutation  which
+// sparsity reducing ordering.
+//
+// This function is a wrapper around generic sparse  decomposition  functions
+// that internally:
+// * calls SparseCholeskyAnalyze()  function  to  perform  symbolic  analysis
+//   phase with best available permutation being configured.
+// * calls SparseCholeskyFactorize() function to perform numerical  phase  of
+//   the factorization.
+//
+// NOTE: using  SparseCholeskyAnalyze() and SparseCholeskyFactorize() directly
+//       may improve  performance  of  repetitive  factorizations  with  same
+//       sparsity patterns. It also allows one to perform  LDLT factorization
+//       of  indefinite  matrix  -  a factorization with strictly diagonal D,
+//       which  is  known to be stable only in few special cases, like quasi-
+//       definite matrices.
+//
+// Inputs:
+//     A       -   a square NxN sparse matrix, stored in any storage format.
+//     IsUpper -   if IsUpper=True, then factorization is performed on  upper
+//                 triangle.  Another triangle is ignored on  input,  dropped
+//                 on output. Similarly, if IsUpper=False, the lower triangle
+//                 is processed.
+//
+// Outputs:
+//     A       -   the result of factorization, stored in CRS format:
+//                 * if IsUpper=True, then the upper triangle contains matrix
+//                   U such  that  A = U^T*U and the lower triangle is empty.
+//                 * similarly, if IsUpper=False, then lower triangular L  is
+//                   returned and we have A = L*(L^T).
+//     P       -   a row/column permutation, a product of P0*P1*...*Pk, k=N-1,
+//                 with Pi being permutation of rows/cols I and P[I]
+//
+// Result:
+//     If  the  matrix  is  positive-definite,  the  function  returns  True.
+//     Otherwise, the function returns False.  Contents  of  A  is  undefined
+//     in such case.
+//
+// NOTE: for  performance  reasons  this  function  does NOT check that input
+//       matrix  includes  only  finite  values. It is your responsibility to
+//       make sure that there are no infinite or NAN values in the matrix.
+// ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
+// API: bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p);
+bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p) {
+   ae_frame _frame_block;
+   ae_int_t facttype;
+   ae_int_t permtype;
+   bool result;
+   ae_frame_make(&_frame_block);
+   SetVector(p);
+   NewObj(sparsedecompositionanalysis, analysis);
+   NewVector(dummyd, 0, DT_REAL);
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyP: A is not square");
+// Quick exit
+   if (sparsegetnrows(a) == 0) {
+      result = true;
+      ae_frame_leave();
+      return result;
+   }
+// Choose factorization and permutation: vanilla Cholesky and best permutation available
+   facttype = 0;
+   permtype = 0;
+// Easy case - CRS matrix in lower triangle, no conversion or transposition is needed
+   if (sparseiscrs(a) && !isupper) {
+      result = spsymmanalyze(a, facttype, permtype, &analysis.analysis);
+      if (!result) {
+         ae_frame_leave();
+         return result;
+      }
+      result = spsymmfactorize(&analysis.analysis, a, &dummyd, p);
+      ae_frame_leave();
+      return result;
+   }
+// A bit more complex - we need conversion and/or transposition
+   if (isupper) {
+      sparsecopytocrsbuf(a, &analysis.wrkat);
+      sparsecopytransposecrsbuf(&analysis.wrkat, &analysis.wrka);
+   } else {
+      sparsecopytocrsbuf(a, &analysis.wrka);
+   }
+   result = spsymmanalyze(&analysis.wrka, facttype, permtype, &analysis.analysis);
+   if (!result) {
+      ae_frame_leave();
+      return result;
+   }
+   result = spsymmfactorize(&analysis.analysis, &analysis.wrka, &dummyd, p);
+   if (!result) {
+      ae_frame_leave();
+      return result;
+   }
+   if (isupper) {
+      sparsecopytransposecrsbuf(&analysis.wrka, a);
+   } else {
+      sparsecopybuf(&analysis.wrka, a);
+   }
+   ae_frame_leave();
+   return result;
+}
+
+// Sparse Cholesky/LDLT decomposition: symbolic analysis phase.
+//
+// This function is a part of the 'expert' sparse Cholesky API:
+// * SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+//   matrix to be factorized into internal storage
+// * SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+//   with lower bounds on pivot magnitudes and additional overflow safeguards
+// * SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+//   precomputed symbolic analysis and internally stored matrix - and outputs
+//   result
+// * SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+//   pattern into internal storage so  one  may  reuse  previously  allocated
+//   temporaries and previously performed symbolic analysis
+//
+// This specific function performs preliminary analysis of the  Cholesky/LDLT
+// factorization. It allows to choose  different  permutation  types  and  to
+// choose between classic Cholesky and  indefinite  LDLT  factorization  (the
+// latter is computed with strictly diagonal D, i.e.  without  Bunch-Kauffman
+// pivoting).
+//
+// NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+//       matrices. However, numerical stability is guaranteed ONLY for a class
+//       of quasi-definite matrices.
+//
+// NOTE: all internal processing is performed with lower triangular  matrices
+//       stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+//       triangular storage means  that  one  format  conversion  and/or  one
+//       transposition will be performed  internally  for  the  analysis  and
+//       factorization phases. Thus, highest  performance  is  achieved  when
+//       input is a lower triangular CRS matrix.
+//
+// Inputs:
+//     A           -   sparse square matrix in any sparse storage format.
+//     IsUpper     -   whether upper or lower  triangle  is  decomposed  (the
+//                     other one is ignored).
+//     FactType    -   factorization type:
+//                     * 0 for traditional Cholesky of SPD matrix
+//                     * 1 for LDLT decomposition with strictly  diagonal  D,
+//                         which may have non-positive entries.
+//     PermType    -   permutation type:
+//                     *-1 for absence of permutation
+//                     * 0 for best fill-in reducing permutation available
+//                     * 1 for supernodal ordering (improves locality and
+//                       performance, does NOT change fill-in factor)
+//                     * 2 for AMD (approximate minimum degree) ordering
+//
+// Outputs:
+//     Analysis    -   contains:
+//                     * symbolic analysis of the matrix structure which will
+//                       be used later to guide numerical factorization.
+//                     * specific numeric values loaded into internal  memory
+//                       waiting for the factorization to be performed
+//
+// This function fails if and only if the matrix A is symbolically degenerate
+// i.e. has diagonal element which is exactly zero. In  such  case  False  is
+// returned, contents of Analysis object is undefined.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+// API: bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis);
+bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis *analysis) {
+   bool result;
+   SetObj(sparsedecompositionanalysis, analysis);
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyAnalyze: A is not square");
+   ae_assert(facttype == 0 || facttype == 1, "SparseCholeskyAnalyze: unexpected FactType");
+   ae_assert(permtype == 0 || permtype == 1 || permtype == 2 || permtype == -1 || permtype == -2, "SparseCholeskyAnalyze: unexpected PermType");
+   analysis->n = sparsegetnrows(a);
+   analysis->facttype = facttype;
+   analysis->permtype = permtype;
+   if (!sparseiscrs(a)) {
+   // The matrix is stored in non-CRS format. First, we have to convert
+   // it to CRS. Then we may need to transpose it in order to get lower
+   // triangular one (as supported by SPSymmAnalyze).
+      sparsecopytocrs(a, &analysis->crsa);
+      if (isupper) {
+         sparsecopytransposecrsbuf(&analysis->crsa, &analysis->crsat);
+         result = spsymmanalyze(&analysis->crsat, facttype, permtype, &analysis->analysis);
+      } else {
+         result = spsymmanalyze(&analysis->crsa, facttype, permtype, &analysis->analysis);
+      }
+   } else {
+   // The matrix is stored in CRS format. However we may need to
+   // transpose it in order to get lower triangular one (as supported
+   // by SPSymmAnalyze).
+      if (isupper) {
+         sparsecopytransposecrsbuf(a, &analysis->crsat);
+         result = spsymmanalyze(&analysis->crsat, facttype, permtype, &analysis->analysis);
+      } else {
+         result = spsymmanalyze(a, facttype, permtype, &analysis->analysis);
+      }
+   }
+   return result;
+}
+
+// Allows to control stability-improving  modification  strategy  for  sparse
+// Cholesky/LDLT decompositions. Modified Cholesky is more  robust  than  its
+// unmodified counterpart.
+//
+// This function is a part of the 'expert' sparse Cholesky API:
+// * SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+//   matrix to be factorized into internal storage
+// * SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+//   with lower bounds on pivot magnitudes and additional overflow safeguards
+// * SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+//   precomputed symbolic analysis and internally stored matrix - and outputs
+//   result
+// * SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+//   pattern into internal storage so  one  may  reuse  previously  allocated
+//   temporaries and previously performed symbolic analysis
+//
+// Inputs:
+//     Analysis    -   symbolic analysis of the matrix structure
+//     ModStrategy -   modification type:
+//                     * 0 for traditional Cholesky/LDLT (Cholesky fails when
+//                       encounters nonpositive pivot, LDLT fails  when  zero
+//                       pivot   is  encountered,  no  stability  checks  for
+//                       overflows/underflows)
+//                     * 1 for modified Cholesky with additional checks:
+//                       * pivots less than ModParam0 are increased; (similar
+//                         sign-preserving procedure is applied during LDLT)
+//                       * if,  at  some  moment,  sum  of absolute values of
+//                         elements in column  J  will  become  greater  than
+//                         ModParam1, Cholesky/LDLT will treat it as  failure
+//                         and will stop immediately
+//     P0, P1, P2,P3 - modification parameters #0 #1, #2 and #3.
+//                     Params #2 and #3 are ignored in current version.
+//
+// Outputs:
+//     Analysis    -   symbolic analysis of the matrix structure, new strategy
+//                     Results will be seen with next SparseCholeskyFactorize()
+//                     call.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3) {
+   spsymmsetmodificationstrategy(&analysis->analysis, modstrategy, p0, p1, p2, p3);
+}
+
+// Sparse Cholesky decomposition: numerical analysis phase.
+//
+// This function is a part of the 'expert' sparse Cholesky API:
+// * SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+//   matrix to be factorized into internal storage
+// * SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+//   with lower bounds on pivot magnitudes and additional overflow safeguards
+// * SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+//   precomputed symbolic analysis and internally stored matrix - and outputs
+//   result
+// * SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+//   pattern into internal storage so  one  may  reuse  previously  allocated
+//   temporaries and previously performed symbolic analysis
+//
+// Depending on settings specified during SparseCholeskyAnalyze() call it may
+// produce classic Cholesky or L*D*LT  decomposition  (with strictly diagonal
+// D), without permutation or with performance-enhancing permutation P.
+//
+// NOTE: all internal processing is performed with lower triangular  matrices
+//       stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+//       triangular storage means  that  one  format  conversion  and/or  one
+//       transposition will be performed  internally  for  the  analysis  and
+//       factorization phases. Thus, highest  performance  is  achieved  when
+//       input is a lower triangular CRS matrix, and lower triangular  output
+//       is requested.
+//
+// NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+//       matrices. However, numerical stability is guaranteed ONLY for a class
+//       of quasi-definite matrices.
+//
+// Inputs:
+//     Analysis    -   prior analysis with internally stored matrix which will
+//                     be factorized
+//     NeedUpper   -   whether upper triangular or lower triangular output is
+//                     needed
+//
+// Outputs:
+//     A           -   Cholesky decomposition of A stored in lower triangular
+//                     CRS format, i.e. A=L*L' (or upper triangular CRS, with
+//                     A=U'*U, depending on NeedUpper parameter).
+//     D           -   array[N], diagonal factor. If no diagonal  factor  was
+//                     required during analysis  phase,  still  returned  but
+//                     filled with 1's
+//     P           -   array[N], pivots. Permutation matrix P is a product of
+//                     P(0)*P(1)*...*P(N-1), where P(i) is a  permutation  of
+//                     row/col I and P[I] (with P[I] >= I).
+//                     If no permutation was requested during analysis phase,
+//                     still returned but filled with identity permutation.
+//
+// The function returns True  when  factorization  resulted  in nondegenerate
+// matrix. False is returned when factorization fails (Cholesky factorization
+// of indefinite matrix) or LDLT factorization has exactly zero  elements  at
+// the diagonal. In the latter case contents of A, D and P is undefined.
+//
+// The analysis object is not changed during  the  factorization.  Subsequent
+// calls to SparseCholeskyFactorize() will result in same factorization being
+// performed one more time.
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+// API: bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p);
+bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupper, sparsematrix *a, RVector *d, ZVector *p) {
+   bool result;
+   SetObj(sparsematrix, a);
+   SetVector(d);
+   SetVector(p);
+   if (needupper) {
+      result = spsymmfactorize(&analysis->analysis, &analysis->wrka, d, p);
+      if (!result) {
+         return result;
+      }
+      sparsecopytransposecrsbuf(&analysis->wrka, a);
+   } else {
+      result = spsymmfactorize(&analysis->analysis, a, d, p);
+   }
+   return result;
+}
+
+// Sparse  Cholesky  decomposition:  update  internally  stored  matrix  with
+// another one with exactly same sparsity pattern.
+//
+// This function is a part of the 'expert' sparse Cholesky API:
+// * SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+//   matrix to be factorized into internal storage
+// * SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+//   with lower bounds on pivot magnitudes and additional overflow safeguards
+// * SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+//   precomputed symbolic analysis and internally stored matrix - and outputs
+//   result
+// * SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+//   pattern into internal storage so  one  may  reuse  previously  allocated
+//   temporaries and previously performed symbolic analysis
+//
+// This specific function replaces internally stored  numerical  values  with
+// ones from another sparse matrix (but having exactly same sparsity  pattern
+// as one that was used for initial SparseCholeskyAnalyze() call).
+//
+// NOTE: all internal processing is performed with lower triangular  matrices
+//       stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+//       triangular storage means  that  one  format  conversion  and/or  one
+//       transposition will be performed  internally  for  the  analysis  and
+//       factorization phases. Thus, highest  performance  is  achieved  when
+//       input is a lower triangular CRS matrix.
+//
+// Inputs:
+//     Analysis    -   analysis object
+//     A           -   sparse square matrix in any sparse storage format.  It
+//                     MUST have exactly same sparsity pattern as that of the
+//                     matrix that was passed to SparseCholeskyAnalyze().
+//                     Any difference (missing elements or additional elements)
+//                     may result in unpredictable and undefined  behavior  -
+//                     an algorithm may fail due to memory access violation.
+//     IsUpper     -   whether upper or lower  triangle  is  decomposed  (the
+//                     other one is ignored).
+//
+// Outputs:
+//     Analysis    -   contains:
+//                     * symbolic analysis of the matrix structure which will
+//                       be used later to guide numerical factorization.
+//                     * specific numeric values loaded into internal  memory
+//                       waiting for the factorization to be performed
+// ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+// API: void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper);
+void sparsecholeskyreload(sparsedecompositionanalysis *analysis, sparsematrix *a, bool isupper) {
+   ae_assert(sparsegetnrows(a) == sparsegetncols(a), "SparseCholeskyReload: A is not square");
+   ae_assert(sparsegetnrows(a) == analysis->n, "SparseCholeskyReload: size of A does not match that stored in Analysis");
+   if (!sparseiscrs(a)) {
+   // The matrix is stored in non-CRS format. First, we have to convert
+   // it to CRS. Then we may need to transpose it in order to get lower
+   // triangular one (as supported by SPSymmAnalyze).
+      sparsecopytocrs(a, &analysis->crsa);
+      if (isupper) {
+         sparsecopytransposecrsbuf(&analysis->crsa, &analysis->crsat);
+         spsymmreload(&analysis->analysis, &analysis->crsat);
+      } else {
+         spsymmreload(&analysis->analysis, &analysis->crsa);
+      }
+   } else {
+   // The matrix is stored in CRS format. However we may need to
+   // transpose it in order to get lower triangular one (as supported
+   // by SPSymmAnalyze).
+      if (isupper) {
+         sparsecopytransposecrsbuf(a, &analysis->crsat);
+         spsymmreload(&analysis->analysis, &analysis->crsat);
+      } else {
+         spsymmreload(&analysis->analysis, a);
+      }
+   }
 }
 
 void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots) {
@@ -11463,7 +15660,6 @@ static bool trfac_spdmatrixcholesky2(RMatrix *aaa, ae_int_t offs, ae_int_t n, bo
 // Result:
 //     True, on success
 //     False, on failure
-//
 // ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp) {
    ae_int_t n1;
@@ -11528,9 +15724,45 @@ bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, R
    }
    return result;
 }
+
+void sparsedecompositionanalysis_init(void *_p, bool make_automatic) {
+   sparsedecompositionanalysis *p = (sparsedecompositionanalysis *)_p;
+   spcholanalysis_init(&p->analysis, make_automatic);
+   sparsematrix_init(&p->wrka, make_automatic);
+   sparsematrix_init(&p->wrkat, make_automatic);
+   sparsematrix_init(&p->crsa, make_automatic);
+   sparsematrix_init(&p->crsat, make_automatic);
+}
+
+void sparsedecompositionanalysis_copy(void *_dst, void *_src, bool make_automatic) {
+   sparsedecompositionanalysis *dst = (sparsedecompositionanalysis *)_dst;
+   sparsedecompositionanalysis *src = (sparsedecompositionanalysis *)_src;
+   dst->n = src->n;
+   dst->facttype = src->facttype;
+   dst->permtype = src->permtype;
+   spcholanalysis_copy(&dst->analysis, &src->analysis, make_automatic);
+   sparsematrix_copy(&dst->wrka, &src->wrka, make_automatic);
+   sparsematrix_copy(&dst->wrkat, &src->wrkat, make_automatic);
+   sparsematrix_copy(&dst->crsa, &src->crsa, make_automatic);
+   sparsematrix_copy(&dst->crsat, &src->crsat, make_automatic);
+}
+
+void sparsedecompositionanalysis_free(void *_p, bool make_automatic) {
+   sparsedecompositionanalysis *p = (sparsedecompositionanalysis *)_p;
+   spcholanalysis_free(&p->analysis, make_automatic);
+   sparsematrix_free(&p->wrka, make_automatic);
+   sparsematrix_free(&p->wrkat, make_automatic);
+   sparsematrix_free(&p->crsa, make_automatic);
+   sparsematrix_free(&p->crsat, make_automatic);
+}
 } // end of namespace alglib_impl
 
 namespace alglib {
+// An analysis of the sparse matrix decomposition, performed prior to  actual
+// numerical factorization. You should not directly  access  fields  of  this
+// object - use appropriate ALGLIB functions to work with this object.
+DefClass(sparsedecompositionanalysis, EndD)
+
 void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots) {
    alglib_impl::ae_state_init();
    TryCatch()
@@ -11603,6 +15835,45 @@ bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool i
    bool Ok = alglib_impl::sparsecholeskyskyline(ConstT(sparsematrix, a), n, isupper);
    alglib_impl::ae_state_clear();
    return Ok;
+}
+
+bool sparsecholesky(const sparsematrix &a, const bool isupper) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::sparsecholesky(ConstT(sparsematrix, a), isupper);
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::sparsecholeskyp(ConstT(sparsematrix, a), isupper, ConstT(ae_vector, p));
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::sparsecholeskyanalyze(ConstT(sparsematrix, a), isupper, facttype, permtype, ConstT(sparsedecompositionanalysis, analysis));
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::sparsecholeskyfactorize(ConstT(sparsedecompositionanalysis, analysis), needupper, ConstT(sparsematrix, a), ConstT(ae_vector, d), ConstT(ae_vector, p));
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::sparsecholeskyreload(ConstT(sparsedecompositionanalysis, analysis), ConstT(sparsematrix, a), isupper);
+   alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
 
@@ -11686,7 +15957,7 @@ Spawn:
       }
       flg = false;
       for (i = 1; i <= n; i++) {
-         if (x->xR[i] >= 0.0 && isgn->xZ[i] < 0 || x->xR[i] < 0.0 && isgn->xZ[i] >= 0) {
+         if (isgn->xZ[i] >= 0? x->xR[i] < 0.0: x->xR[i] >= 0.0) {
             flg = true;
          }
       }
@@ -14030,7 +18301,6 @@ static void matinv_cmatrixluinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, CV
 // Subroutine sets following fields of the Rep structure:
 // * R1        reciprocal of condition number: 1/cond(A), 1-norm.
 // * RInf      reciprocal of condition number: 1/cond(A), inf-norm.
-//
 // ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 // API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void rmatrixluinverse(real_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
@@ -14101,7 +18371,6 @@ void rmatrixluinverse(RMatrix *a, ZVector *pivots, ae_int_t n, ae_int_t *info, m
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 // API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, const ae_int_t n, ae_int_t &info, matinvreport &rep);
 // API: void cmatrixluinverse(complex_2d_array &a, const integer_1d_array &pivots, ae_int_t &info, matinvreport &rep);
@@ -14226,7 +18495,6 @@ void cmatrixinverse(CMatrix *a, ae_int_t n, ae_int_t *info, matinvreport *rep) {
 // Recursive subroutine for SPD inversion.
 //
 // NOTE: this function expects that matris is strictly positive-definite.
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, RVector *tmp) {
    ae_frame _frame_block;
@@ -14343,7 +18611,6 @@ static void matinv_spdmatrixcholeskyinverserec(RMatrix *a, ae_int_t offs, ae_int
 }
 
 // Recursive subroutine for HPD inversion.
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, CVector *tmp) {
    ae_frame _frame_block;
@@ -14484,7 +18751,6 @@ static void matinv_hpdmatrixcholeskyinverserec(CMatrix *a, ae_int_t offs, ae_int
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 // API: void spdmatrixcholeskyinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void spdmatrixcholeskyinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -14561,7 +18827,6 @@ void spdmatrixcholeskyinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 // API: void hpdmatrixcholeskyinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void hpdmatrixcholeskyinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -14641,7 +18906,6 @@ void hpdmatrixcholeskyinverse(CMatrix *a, ae_int_t n, bool isupper, ae_int_t *in
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 // API: void spdmatrixinverse(real_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void spdmatrixinverse(real_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -14688,7 +18952,6 @@ void spdmatrixinverse(RMatrix *a, ae_int_t n, bool isupper, ae_int_t *info, mati
 //     Info    -   return code, same as in RMatrixLUInverse
 //     Rep     -   solver report, same as in RMatrixLUInverse
 //     A       -   inverse of matrix A, same as in RMatrixLUInverse
-//
 // ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 // API: void hpdmatrixinverse(complex_2d_array &a, const ae_int_t n, const bool isupper, ae_int_t &info, matinvreport &rep);
 // API: void hpdmatrixinverse(complex_2d_array &a, ae_int_t &info, matinvreport &rep);
@@ -15074,7 +19337,6 @@ namespace alglib_impl {
 //     T           -   array[BlockSize,2*BlockSize]. Left BlockSize*BlockSize
 //                     submatrix stores triangular factor on exit.
 //     WORK        -   array[BlockSize]
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 static void ortfac_rmatrixblockreflector(RMatrix *a, RVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, RMatrix *t, RVector *work) {
    ae_int_t i;
@@ -15136,8 +19398,6 @@ static void ortfac_rmatrixblockreflector(RMatrix *a, RVector *tau, bool columnwi
 // * fill unused parts of reflectors matrix by zeros
 // * fill diagonal of reflectors matrix by ones
 // * generate triangular factor T
-//
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 static void ortfac_cmatrixblockreflector(CMatrix *a, CVector *tau, bool columnwisea, ae_int_t lengtha, ae_int_t blocksize, CMatrix *t, CVector *work) {
    ae_int_t i;
@@ -15272,7 +19532,6 @@ static void ortfac_cmatrixqrbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
 //
 // where tau is a scalar stored in Tau[I]; v - real vector,
 // so that v(0:i-1) = 0, v(i) = 1, v(i+1:m-1) stored in A(i+1:m-1,i).
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqr(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixqr(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
@@ -15541,7 +19800,6 @@ static void ortfac_cmatrixlqbasecase(CMatrix *a, ae_int_t m, ae_int_t n, CVector
 //
 // where tau is a scalar stored in Tau[I]; v - real vector, so that v(0:i-1)=0,
 // v(i) = 1, v(i+1:n-1) stored in A(i,i+1:n-1).
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlq(real_2d_array &a, const ae_int_t m, const ae_int_t n, real_1d_array &tau);
 void rmatrixlq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau) {
@@ -15731,7 +19989,6 @@ void cmatrixlq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau) {
 //     Q       -   first QColumns columns of matrix Q.
 //                 Array whose indexes range within [0..M-1, 0..QColumns-1].
 //                 If QColumns=0, the array remains unchanged.
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqrunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qcolumns, real_2d_array &q);
 void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qcolumns, RMatrix *q) {
@@ -15831,7 +20088,6 @@ void rmatrixqrunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 //     Q           -   first QColumns columns of matrix Q.
 //                     Array whose index ranges within [0..M-1, 0..QColumns-1].
 //                     If QColumns=0, array isn't changed.
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixqrunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qcolumns, complex_2d_array &q);
 void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qcolumns, CMatrix *q) {
@@ -15929,7 +20185,6 @@ void cmatrixqrunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
 //
 // Outputs:
 //     R       -   matrix R, array[0..M-1, 0..N-1].
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixqrunpackr(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &r);
 void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r) {
@@ -15962,7 +20217,6 @@ void rmatrixqrunpackr(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *r) {
 //
 // Outputs:
 //     R       -   matrix R, array[0..M-1, 0..N-1].
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixqrunpackr(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &r);
 void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r) {
@@ -16000,7 +20254,6 @@ void cmatrixqrunpackr(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *r) {
 //     Q       -   first QRows rows of matrix Q. Array whose indexes range
 //                 within [0..QRows-1, 0..N-1]. If QRows=0, the array remains
 //                 unchanged.
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlqunpackq(const real_2d_array &a, const ae_int_t m, const ae_int_t n, const real_1d_array &tau, const ae_int_t qrows, real_2d_array &q);
 void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t qrows, RMatrix *q) {
@@ -16100,7 +20353,6 @@ void rmatrixlqunpackq(RMatrix *a, ae_int_t m, ae_int_t n, RVector *tau, ae_int_t
 //     Q           -   first QRows rows of matrix Q.
 //                     Array whose index ranges within [0..QRows-1, 0..N-1].
 //                     If QRows=0, array isn't changed.
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixlqunpackq(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, const complex_1d_array &tau, const ae_int_t qrows, complex_2d_array &q);
 void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t qrows, CMatrix *q) {
@@ -16197,7 +20449,6 @@ void cmatrixlqunpackq(CMatrix *a, ae_int_t m, ae_int_t n, CVector *tau, ae_int_t
 //
 // Outputs:
 //     L       -   matrix L, array[0..M-1, 0..N-1].
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void rmatrixlqunpackl(const real_2d_array &a, const ae_int_t m, const ae_int_t n, real_2d_array &l);
 void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l) {
@@ -16230,7 +20481,6 @@ void rmatrixlqunpackl(RMatrix *a, ae_int_t m, ae_int_t n, RMatrix *l) {
 //
 // Outputs:
 //     L       -   matrix L, array[0..M-1, 0..N-1].
-//
 // ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 // API: void cmatrixlqunpackl(const complex_2d_array &a, const ae_int_t m, const ae_int_t n, complex_2d_array &l);
 void cmatrixlqunpackl(CMatrix *a, ae_int_t m, ae_int_t n, CMatrix *l) {
@@ -16945,7 +21195,6 @@ void rmatrixhessenbergunpackh(RMatrix *a, ae_int_t n, RMatrix *h) {
 //     E       -   secondary diagonal of symmetric matrix T.
 //                 array with elements [0..N-2].
 //
-//
 //   If IsUpper=True, the matrix Q is represented as a product of elementary
 //   reflectors
 //
@@ -17116,7 +21365,6 @@ void smatrixtd(RMatrix *a, ae_int_t n, bool isupper, RVector *tau, RVector *d, R
 //                 array with elements [0..N-1].
 //     E       -   secondary diagonal of real symmetric matrix T.
 //                 array with elements [0..N-2].
-//
 //
 //   If IsUpper=True, the matrix Q is represented as a product of elementary
 //   reflectors
@@ -17580,6 +21828,7 @@ void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool is
 } // end of namespace alglib
 
 // === FBLS Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
 // Depends on: ORTFAC
 namespace alglib_impl {
 // Basic Cholesky solver for ScaleA*Cholesky(A)'*x = y.
@@ -17779,7 +22028,7 @@ void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, 
 
 // Construction of linear conjugate gradient solver.
 //
-// State parameter passed using "var" semantics (i.e. previous state  is  NOT
+// State parameter passed using "shared" semantics (i.e. previous state is NOT
 // erased). When it is already initialized, we can reause prevously allocated
 // memory.
 //
@@ -17948,6 +22197,201 @@ Pause:
    return true;
 }
 
+// Construction of GMRES(k) solver.
+//
+// State parameter passed using "shared" semantics (i.e. previous state is NOT
+// erased). When it is already initialized, we can reause prevously allocated
+// memory.
+//
+// After (but not before!) initialization you can tweak following fields (they
+// are initialized by default values, but you can change it):
+// * State.EpsOrt - stop if norm of new candidate for orthogonalization is below EpsOrt
+// * State.EpsRes - stop of residual decreased below EpsRes*|B|
+// * State.EpsRed - stop if relative reduction of residual |R(k+1)|/|R(k)|>EpsRed
+//
+// Inputs:
+//     B       -   right part
+//     N       -   system size
+//     K       -   iterations count, K >= 1
+//     State   -   structure; may be preallocated, if we want to reuse memory
+//
+// Outputs:
+//     State   -   structure which is used by FBLSGMRESIteration() to store
+//                 algorithm state between subsequent calls.
+//
+// NOTE: no error checking is done; caller must check all parameters, prevent
+//       overflows, and so on.
+// ALGLIB: Copyright 18.11.2020 by Sergey Bochkanov
+void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state) {
+   ae_assert(n > 0 && k > 0 && k <= n, "FBLSGMRESCreate: incorrect params");
+   state->n = n;
+   state->itscnt = k;
+   state->epsort = (1000.0 + sqrt(n)) * ae_machineepsilon;
+   state->epsres = (1000.0 + sqrt(n)) * ae_machineepsilon;
+   state->epsred = 1.0;
+   state->epsdiag = (10000.0 + n) * ae_machineepsilon;
+   state->itsperformed = 0;
+   state->retcode = 0;
+   rcopyallocv(n, b, &state->b);
+   rallocv(n, &state->x);
+   rallocv(n, &state->ax);
+   state->PQ = -1;
+}
+
+// Linear CG solver, function relying on reverse communication to calculate
+// matrix-vector products.
+//
+// See comments for FBLSLinCGState structure for more info.
+// ALGLIB: Copyright 22.10.2009 by Sergey Bochkanov
+bool fblsgmresiteration(fblsgmresstate *state) {
+   AutoS ae_int_t n;
+   AutoS ae_int_t itidx;
+   AutoS ae_int_t kdim;
+   AutoS double rmax;
+   AutoS double rmindiag;
+   AutoS double cs;
+   AutoS double sn;
+   AutoS double v;
+   AutoS double vv;
+   AutoS double anrm;
+   AutoS double qnrm;
+   AutoS double bnrm;
+   AutoS double resnrm;
+   AutoS double prevresnrm;
+   AutoS ae_int_t i;
+   AutoS ae_int_t j;
+// Reverse communication preparations
+// I know it looks ugly, but it works the same way anywhere from C++ to Python.
+// This code initializes locals by:
+// * random values determined during code generation - on first subroutine call
+// * values from previous call - on subsequent calls
+   if (state->PQ >= 0) switch (state->PQ) {
+      case 0: goto Resume0;
+      default: goto Exit;
+   }
+   j = 763;
+   cs = -900;
+   sn = -318;
+   v = -940;
+   vv = 1016;
+   anrm = -229;
+   qnrm = -536;
+   prevresnrm = 886;
+Spawn:
+   n = state->n;
+   state->retcode = 1;
+// Set up Q0
+   rsetallocv(n, 0.0, &state->xs);
+   bnrm = sqrt(rdotv2(n, &state->b));
+   if (bnrm == 0.0) {
+      goto Exit;
+   }
+   rallocm(state->itscnt + 1, n, &state->qi);
+   rallocm(state->itscnt, n, &state->aqi);
+   rcopymulvr(n, 1 / bnrm, &state->b, &state->qi, 0);
+   rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->h);
+   rsetallocm(state->itscnt + 1, state->itscnt, 0.0, &state->hr);
+   rsetallocm(state->itscnt + 1, state->itscnt + 1, 0.0, &state->hq);
+   for (i = 0; i <= state->itscnt; i++) {
+      state->hq.xyR[i][i] = 1.0;
+   }
+   rsetallocv(state->itscnt + 1, 0.0, &state->hqb);
+   state->hqb.xR[0] = bnrm;
+// Perform iteration
+   resnrm = bnrm;
+   kdim = 0;
+   rmax = 0.0;
+   rmindiag = 1.0E99;
+   rsetallocv(state->itscnt, 0.0, &state->ys);
+   rallocv(imax2(n, state->itscnt + 2), &state->tmp0);
+   rallocv(imax2(n, state->itscnt + 2), &state->tmp1);
+   for (itidx = 0; itidx < state->itscnt; itidx++) {
+      prevresnrm = resnrm;
+   // Compute A*Qi[ItIdx], then compute Qi[ItIdx+1]
+      rcopyrv(n, &state->qi, itidx, &state->x);
+      state->PQ = 0; goto Pause; Resume0:
+      rcopyvr(n, &state->ax, &state->aqi, itidx);
+      anrm = sqrt(rdotv2(n, &state->ax));
+      if (anrm == 0.0) {
+         state->retcode = 2;
+         break;
+      }
+      rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp0, true);
+      rowwisegramschmidt(&state->qi, itidx + 1, n, &state->ax, &state->tmp1, true);
+      raddvc(itidx + 1, 1.0, &state->tmp0, &state->h, itidx);
+      raddvc(itidx + 1, 1.0, &state->tmp1, &state->h, itidx);
+      qnrm = sqrt(rdotv2(n, &state->ax));
+      state->h.xyR[itidx + 1][itidx] = qnrm;
+      rmulv(n, 1 / coalesce(qnrm, 1.0), &state->ax);
+      rcopyvr(n, &state->ax, &state->qi, itidx + 1);
+   // We have QR decomposition of H from the previous iteration:
+   // * (ItIdx+1)*(ItIdx+1) orthogonal HQ embedded into larger (ItIdx+2)*(ItIdx+2) identity matrix
+   // * (ItIdx+1)*ItIdx     triangular HR embedded into larger (ItIdx+2)*(ItIdx+1) zero matrix
+   //
+   // We just have to update QR decomposition after one more column is added to H:
+   // * multiply this column by HQ to obtain (ItIdx+2)-dimensional vector X
+   // * generate rotation to nullify last element of X to obtain (ItIdx+1)-dimensional vector Y
+   //   that is copied into (ItIdx+1)-th column of HR
+   // * apply same rotation to HQ
+   // * apply same rotation to HQB - current right-hand side
+      rcopycv(itidx + 2, &state->h, itidx, &state->tmp0);
+      rmatrixgemv(itidx + 2, itidx + 2, 1.0, &state->hq, 0, 0, 0, &state->tmp0, 0, 0.0, &state->tmp1, 0);
+      generaterotation(state->tmp1.xR[itidx], state->tmp1.xR[itidx + 1], &cs, &sn, &v);
+      state->tmp1.xR[itidx] = v;
+      state->tmp1.xR[itidx + 1] = 0.0;
+      rmax = rmax2(rmax, rmaxabsv(itidx + 2, &state->tmp1));
+      rmindiag = rmin2(rmindiag, fabs(v));
+      if (rmindiag <= rmax * state->epsdiag) {
+         state->retcode = 3;
+         break;
+      }
+      rcopyvc(itidx + 2, &state->tmp1, &state->hr, itidx);
+      for (j = 0; j <= itidx + 1; j++) {
+         v = state->hq.xyR[itidx][j];
+         vv = state->hq.xyR[itidx + 1][j];
+         state->hq.xyR[itidx][j] = cs * v + sn * vv;
+         state->hq.xyR[itidx + 1][j] = -sn * v + cs * vv;
+      }
+      v = state->hqb.xR[itidx];
+      vv = state->hqb.xR[itidx + 1];
+      state->hqb.xR[itidx] = cs * v + sn * vv;
+      state->hqb.xR[itidx + 1] = -sn * v + cs * vv;
+      resnrm = fabs(state->hqb.xR[itidx + 1]);
+   // Previous attempt to extend R was successful (no small diagonal elements).
+   // Increase Krylov subspace dimensionality.
+      kdim++;
+   // Iteration is over.
+   // Terminate if:
+   // * last Qi was nearly zero after orthogonalization.
+   // * sufficient decrease of residual
+   // * stagnation of residual
+      state->itsperformed++;
+      if (qnrm <= state->epsort * anrm || qnrm == 0.0) {
+         state->retcode = 4;
+         break;
+      }
+      if (resnrm <= state->epsres * bnrm) {
+         state->retcode = 5;
+         break;
+      }
+      if (resnrm / prevresnrm > state->epsred) {
+         state->retcode = 6;
+         break;
+      }
+   }
+// Post-solve
+   if (kdim > 0) {
+      rcopyv(kdim, &state->hqb, &state->ys);
+      rmatrixtrsv(kdim, &state->hr, 0, 0, true, false, 0, &state->ys, 0);
+      rmatrixmv(n, kdim, &state->qi, 0, 0, 1, &state->ys, 0, &state->xs, 0);
+   }
+Exit:
+   state->PQ = -1;
+   return false;
+Pause:
+   return true;
+}
+
 // Fast  least  squares  solver,  solves  well  conditioned  system   without
 // performing  any  checks  for  degeneracy,  and using user-provided buffers
 // (which are automatically reallocated if too small).
@@ -18053,6 +22497,67 @@ void fblslincgstate_free(void *_p, bool make_automatic) {
    ae_vector_free(&p->pk1, make_automatic);
    ae_vector_free(&p->b, make_automatic);
    ae_vector_free(&p->tmp2, make_automatic);
+}
+
+void fblsgmresstate_init(void *_p, bool make_automatic) {
+   fblsgmresstate *p = (fblsgmresstate *)_p;
+   ae_vector_init(&p->b, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ax, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->xs, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->qi, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->aqi, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->h, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->hq, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->hr, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->hqb, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ys, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmp1, 0, DT_REAL, make_automatic);
+}
+
+void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic) {
+   fblsgmresstate *dst = (fblsgmresstate *)_dst;
+   fblsgmresstate *src = (fblsgmresstate *)_src;
+   ae_vector_copy(&dst->b, &src->b, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, make_automatic);
+   ae_vector_copy(&dst->ax, &src->ax, make_automatic);
+   ae_vector_copy(&dst->xs, &src->xs, make_automatic);
+   ae_matrix_copy(&dst->qi, &src->qi, make_automatic);
+   ae_matrix_copy(&dst->aqi, &src->aqi, make_automatic);
+   ae_matrix_copy(&dst->h, &src->h, make_automatic);
+   ae_matrix_copy(&dst->hq, &src->hq, make_automatic);
+   ae_matrix_copy(&dst->hr, &src->hr, make_automatic);
+   ae_vector_copy(&dst->hqb, &src->hqb, make_automatic);
+   ae_vector_copy(&dst->ys, &src->ys, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
+   ae_vector_copy(&dst->tmp1, &src->tmp1, make_automatic);
+   dst->n = src->n;
+   dst->itscnt = src->itscnt;
+   dst->epsort = src->epsort;
+   dst->epsres = src->epsres;
+   dst->epsred = src->epsred;
+   dst->epsdiag = src->epsdiag;
+   dst->itsperformed = src->itsperformed;
+   dst->retcode = src->retcode;
+   dst->PQ = src->PQ;
+}
+
+void fblsgmresstate_free(void *_p, bool make_automatic) {
+   fblsgmresstate *p = (fblsgmresstate *)_p;
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->ax, make_automatic);
+   ae_vector_free(&p->xs, make_automatic);
+   ae_matrix_free(&p->qi, make_automatic);
+   ae_matrix_free(&p->aqi, make_automatic);
+   ae_matrix_free(&p->h, make_automatic);
+   ae_matrix_free(&p->hq, make_automatic);
+   ae_matrix_free(&p->hr, make_automatic);
+   ae_vector_free(&p->hqb, make_automatic);
+   ae_vector_free(&p->ys, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
+   ae_vector_free(&p->tmp1, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -19256,7 +23761,6 @@ namespace alglib_impl {
 // Outputs:
 //     State   -   structure which stores algorithm state
 //
-//
 // NOTE: this algorithm is effectively deterministic, i.e. it always  returns
 // same result when repeatedly called for the same matrix. In fact, algorithm
 // uses randomized starting vectors, but internal  random  numbers  generator
@@ -19590,7 +24094,6 @@ void rmatrixinternalschurdecomposition(RMatrix *h, ae_int_t n, ae_int_t tneeded,
 //     H   -   matrix to be decomposed.
 //             Array whose indexes range within [1..N, 1..N].
 //     N   -   size of H, N >= 0.
-//
 //
 // Outputs:
 //     H   -   contains the matrix T.
@@ -20629,7 +25132,7 @@ void eigsubspacesetwarmstart(eigsubspacestate *state, bool usewarmstart) {
    state->usewarmstart = usewarmstart;
 }
 
-// Clears request fileds (to be sure that we don't forgot to clear something)
+// Clears request fields (to be sure that we don't forgot to clear something)
 static void evd_clearrfields(eigsubspacestate *state) {
    state->requesttype = -1;
    state->requestsize = -1;
@@ -21669,7 +26172,6 @@ static void evd_tdevde2(double a, double b, double c, double *rt1, double *rt2) 
 //
 //    [ CS1  SN1 ] [  A   B  ] [ CS1 -SN1 ]  =  [ RT1  0  ]
 //    [-SN1  CS1 ] [  B   C  ] [ SN1  CS1 ]     [  0  RT2 ].
-//
 //
 //   -- LAPACK auxiliary routine (version 3.0) --
 //      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
@@ -25115,9 +29617,7 @@ bool smatrixtdevdr(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, double 
 //                  * 2, contains the matrix of the eigenvalues found.
 //                    Array whose indexes range within [0..N-1, 0..I2-I1].
 //
-//
 // Result:
-//
 //     True, if successful. In that case, D contains the eigenvalues,
 //     Z contains the eigenvectors (if needed).
 //     It should be noted that the subroutine changes the size of arrays D and Z.
@@ -25340,7 +29840,6 @@ bool smatrixtdevdi(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, ae_int_
 //     of shifts in the QR algorithm (similarly to the block width in block-matrix
 //     algorithms of linear algebra). If you require maximum performance
 //     on your machine, it is recommended to adjust this parameter manually.
-//
 //
 // See also the InternalTREVC subroutine.
 //
@@ -25690,7 +30189,6 @@ namespace alglib_impl {
 //     A   -   matrix to be decomposed.
 //             Array whose indexes range within [0..N-1, 0..N-1].
 //     N   -   size of A, N >= 0.
-//
 //
 // Outputs:
 //     A   -   contains matrix T.
@@ -26114,7 +30612,6 @@ namespace alglib_impl {
 //     UpdRow  -   row where the element to be updated is stored.
 //     UpdColumn - column where the element to be updated is stored.
 //     UpdVal  -   a number to be added to the element.
-//
 //
 // Outputs:
 //     InvA    -   inverse of modified matrix A.

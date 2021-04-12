@@ -284,7 +284,6 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a) {
 }
 
 // Internal subroutine. Never call it directly!
-//
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan *plan) {
    double x;
@@ -326,7 +325,6 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
 }
 
 // Internal subroutine. Never call it directly!
-//
 // ALGLIB: Copyright 01.06.2009 by Sergey Bochkanov
 void fftr1dinvinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan *plan) {
    double x;

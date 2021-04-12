@@ -44,7 +44,6 @@ static const double idw_defaultlambda0 = 0.3333;
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with  IDW model object  which
 //            was used to initialize buffer. Any attempt to use buffer   with
 //            different object is dangerous - you may  get  memory  violation
@@ -95,7 +94,6 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf) {
 //
 // Outputs:
 //     State-  builder object
-//
 // ALGLIB Project: Copyright 22.10.2018 by Sergey Bochkanov
 // API: void idwbuildercreate(const ae_int_t nx, const ae_int_t ny, idwbuilder &state);
 void idwbuildercreate(ae_int_t nx, ae_int_t ny, idwbuilder *state) {
@@ -208,7 +206,6 @@ void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n) {
 // scattered multidimensional interpolation. Although it has  its  drawbacks,
 // it is easy to use and robust, which makes it a good first step.
 //
-//
 // Inputs:
 //     State   -   builder object
 //     SRad    -   initial search radius, SRad > 0 is required. A model  value
@@ -228,7 +225,6 @@ void idwbuildersetpoints(idwbuilder *state, RMatrix *xy, ae_int_t n) {
 //         details at distances smaller than SRad/65536.  Smaller value   may
 //         be necessary if you have to save memory and  computing  time,  and
 //         ready to sacrifice some model quality.
-//
 //
 // ALGORITHM DESCRIPTION
 //
@@ -1807,7 +1803,6 @@ void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df
 //
 // Outputs:
 //     B       -   transformed interpolant with X replaced by T
-//
 // ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 // API: void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb);
 void barycentriclintransx(barycentricinterpolant *b, double ca, double cb) {
@@ -1852,7 +1847,6 @@ void barycentriclintransx(barycentricinterpolant *b, double ca, double cb) {
 //
 // Outputs:
 //     B       -   transformed interpolant
-//
 // ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 // API: void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb);
 void barycentriclintransy(barycentricinterpolant *b, double ca, double cb) {
@@ -1998,7 +1992,6 @@ void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycen
 // Note:
 //     this algorithm always succeeds and calculates the weights  with  close
 //     to machine precision.
-//
 // ALGLIB Project: Copyright 17.06.2007 by Sergey Bochkanov
 // API: void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b);
 void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b) {
@@ -2736,7 +2729,6 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
 // function; however, solutions to  MZ may be non-unique, and in some unlucky
 // cases it is also possible to "run away to infinity".
 //
-//
 // NOTE: ON THE NONLINEARLY CONSTRAINED PROGRAMMING APPROACH
 //
 // The problem formulation for MC  (minimum circumscribed   circle;  for  the
@@ -2758,7 +2750,6 @@ void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t prob
 // linear target function. Such problem statement is 100% equivalent  to  the
 // original nonsmooth one, but much easier  to  approach.  We solve  it  with
 // MinNLC solver provided by ALGLIB.
-//
 //
 // NOTE: ON INSTABILITY OF SEQUENTIAL LINEARIZATION APPROACH
 //
@@ -2996,7 +2987,6 @@ namespace alglib_impl {
 //                 transformation makes mean(Y)=0, stddev(Y)=1
 //
 // * YC            transformed accordingly to SA, SB, DC[I]
-//
 // ALGLIB Project: Copyright 08.09.2009 by Sergey Bochkanov
 void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, double *xa, double *xb, double *sa, double *sb, RVector *xoriginal, RVector *yoriginal) {
    double xmin;
@@ -3489,11 +3479,9 @@ void heapsortdpoints(RVector *x, RVector *y, RVector *d, ae_int_t n) {
 // Outputs:
 //     C   -   spline interpolant
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
-//
 // ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 // API: void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c);
 // API: void spline1dbuildlinear(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
@@ -3615,7 +3603,6 @@ static void spline1d_solvecyclictridiagonal(RVector *a, RVector *b, RVector *c, 
 //
 // Y is passed as var-parameter because we may need to force last element  to
 // be equal to the first one (if periodic boundary conditions are specified).
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, double boundl, ae_int_t boundrtype, double boundr, RVector *d, RVector *a1, RVector *a2, RVector *a3, RVector *b) {
    ae_int_t i;
@@ -3737,11 +3724,9 @@ static void spline1d_spline1dgriddiffcubicinternal(RVector *x, RVector *y, ae_in
 // Outputs:
 //     C           -   spline interpolant.
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
-//
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 // API: void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, const ae_int_t n, spline1dinterpolant &c);
 // API: void spline1dbuildhermite(const real_1d_array &x, const real_1d_array &y, const real_1d_array &d, spline1dinterpolant &c);
@@ -3838,7 +3823,6 @@ void spline1dbuildhermite(RVector *x, RVector *y, RVector *d, ae_int_t n, spline
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 // API: void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, spline1dinterpolant &c);
 // API: void spline1dbuildcubic(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
@@ -3913,7 +3897,6 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 // Outputs:
 //     C           -   spline interpolant
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -3926,7 +3909,6 @@ void spline1dbuildcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype,
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 // API: void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundtype, const double tension, spline1dinterpolant &c);
 // API: void spline1dbuildcatmullrom(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
@@ -4005,11 +3987,9 @@ void spline1dbuildcatmullrom(RVector *x, RVector *y, ae_int_t n, ae_int_t boundt
 // Outputs:
 //     C           -   spline interpolant
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
-//
 // ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 // API: void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c);
 // API: void spline1dbuildakima(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
@@ -4073,7 +4053,6 @@ void spline1dbuildakima(RVector *x, RVector *y, ae_int_t n, spline1dinterpolant 
 //
 // Outputs:
 //     C           -   spline interpolant.
-//
 // ALGLIB Project: Copyright 21.06.2012 by Sergey Bochkanov
 // API: void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, spline1dinterpolant &c);
 // API: void spline1dbuildmonotone(const real_1d_array &x, const real_1d_array &y, spline1dinterpolant &c);
@@ -4237,7 +4216,6 @@ void spline1dbuildmonotone(RVector *x, RVector *y, ae_int_t n, spline1dinterpola
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 // API: void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d);
 // API: void spline1dgriddiffcubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d);
@@ -4350,7 +4328,6 @@ void spline1dgriddiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 // API: void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, real_1d_array &d1, real_1d_array &d2);
 // API: void spline1dgriddiff2cubic(const real_1d_array &x, const real_1d_array &y, real_1d_array &d1, real_1d_array &d2);
@@ -4461,11 +4438,10 @@ void spline1dgriddiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //                 (reallocate if too small)
 //     NeedD2  -   do we need D1?
 //
-// OUTPUT ARRAYS:
+// Outputs:
 //     Y       -   values, if needed
 //     D1      -   first derivative, if needed
 //     D2      -   second derivative, if needed
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold, ae_int_t n, RVector *x2, ae_int_t n2, RVector *y, RVector *d1, RVector *d2) {
    ae_int_t intervalindex;
@@ -4615,7 +4591,6 @@ static void spline1dconvdiffinternal(RVector *xold, RVector *yold, RVector *dold
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 // API: void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2);
 // API: void spline1dconvcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2);
@@ -4754,7 +4729,6 @@ void spline1dconvcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundltype, 
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 // API: void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2);
 // API: void spline1dconvdiffcubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2);
@@ -4900,7 +4874,6 @@ void spline1dconvdiffcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlty
 // copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 // Y[last_point]. However it is recommended to pass consistent values of Y[],
 // i.e. to make Y[first_point]=Y[last_point].
-//
 // ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 // API: void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t boundltype, const double boundl, const ae_int_t boundrtype, const double boundr, const real_1d_array &x2, const ae_int_t n2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2);
 // API: void spline1dconvdiff2cubic(const real_1d_array &x, const real_1d_array &y, const real_1d_array &x2, real_1d_array &y2, real_1d_array &d2, real_1d_array &dd2);
@@ -4995,7 +4968,6 @@ void spline1dconvdiff2cubic(RVector *x, RVector *y, ae_int_t n, ae_int_t boundlt
 //
 // Result:
 //     S(x)
-//
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 // API: double spline1dcalc(const spline1dinterpolant &c, const double x);
 double spline1dcalc(spline1dinterpolant *c, double x) {
@@ -5043,7 +5015,6 @@ double spline1dcalc(spline1dinterpolant *c, double x) {
 //     S   -   S(x)
 //     DS  -   S'(x)
 //     D2S -   S''(x)
-//
 // ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 // API: void spline1ddiff(const spline1dinterpolant &c, const double x, double &s, double &ds, double &d2s);
 void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, double *d2s) {
@@ -5093,7 +5064,6 @@ void spline1ddiff(spline1dinterpolant *c, double x, double *s, double *ds, doubl
 //
 // Result:
 //     CC  -   spline copy
-//
 // ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc) {
    ae_int_t s;
@@ -5132,7 +5102,6 @@ void spline1dcopy(spline1dinterpolant *c, spline1dinterpolant *cc) {
 //     You  can rebuild spline with  Spline1DBuildHermite()  function,  which
 //     accepts as inputs function values and derivatives at nodes, which  are
 //     easy to calculate when you have coefficients.
-//
 // ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 // API: void spline1dunpack(const spline1dinterpolant &c, ae_int_t &n, real_2d_array &tbl);
 void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl) {
@@ -5159,7 +5128,6 @@ void spline1dunpack(spline1dinterpolant *c, ae_int_t *n, RMatrix *tbl) {
 //     A, B-   transformation coefficients: x = A*t + B
 // Result:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 // API: void spline1dlintransx(const spline1dinterpolant &c, const double a, const double b);
 void spline1dlintransx(spline1dinterpolant *c, double a, double b) {
@@ -5219,7 +5187,6 @@ void spline1dlintransx(spline1dinterpolant *c, double a, double b) {
 //     A, B-   transformation coefficients: S2(x) = A*S(x) + B
 // Result:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 // API: void spline1dlintransy(const spline1dinterpolant &c, const double a, const double b);
 void spline1dlintransy(spline1dinterpolant *c, double a, double b) {
@@ -5246,7 +5213,6 @@ void spline1dlintransy(spline1dinterpolant *c, double a, double b) {
 //             here 'a' denotes min(x[])
 // Result:
 //     integral(S(t)dt,a,x)
-//
 // ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 // API: double spline1dintegrate(const spline1dinterpolant &c, const double x);
 double spline1dintegrate(spline1dinterpolant *c, double x) {
@@ -5332,7 +5298,6 @@ double spline1dintegrate(spline1dinterpolant *c, double x) {
 // and more memory-efficient implementation.
 //
 // Do NOT use this function in the new code!
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfitpenalized(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -5368,7 +5333,6 @@ void spline1dfitpenalized(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double
 // and more memory-efficient implementation.
 //
 // Do NOT use this function in the new code!
-//
 // ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
 // API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -5625,7 +5589,6 @@ void spline1dfitpenalizedw(RVector *x, RVector *y, RVector *w, ae_int_t n, ae_in
 //             * AvgError      average error on the (X,Y).
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
-//
 // ALGLIB Project: Copyright 27.08.2019 by Sergey Bochkanov
 // API: void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -5921,7 +5884,6 @@ void spline1dfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, double lambdans
 // Outputs:
 //     S    -   value of a function at T
 //     B0   -   value of a derivative function at T
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 static void spline1d_hermitecalc(double p0, double m0, double p1, double m1, double t, double *s, double *ds) {
    *s = 0;
@@ -5945,13 +5907,11 @@ static void spline1d_hermitecalc(double p0, double m0, double p1, double m1, dou
 //
 // We assume, that B0>A0.
 //
-//
 // REMARK:
 //
 // Assume, that exist one root only at [A;B], else
 // function may be work incorrectly.
 // The function dont check value A0,B0!
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, double b, double *x) {
    double vacuum;
@@ -6043,13 +6003,11 @@ ae_int_t bisectmethod(double pa, double ma, double pb, double mb, double a, doub
 // Parameters for this procedure has't to be zero simultaneously. Is expected,
 // that input polinom is't degenerate or constant identicaly ZERO.
 //
-//
 // REMARK:
 //
 // The procedure always fill value for X1 and X2, even if it is't belongs to [0;1].
 // But first true root(even if existing one) is in X1.
 // Number of roots is NR.
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, double *x1, ae_int_t *nr) {
    double a;
@@ -6247,7 +6205,6 @@ void solvepolinom2(double p0, double m0, double p1, double m1, double *x0, doubl
 // REMARK:
 //
 // The function dont check value A0,B0 and A1,B1!
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 static double spline1d_rescaleval(double a0, double b0, double a1, double b1, double t) {
    double result;
@@ -6290,12 +6247,10 @@ static double spline1d_rescaleval(double a0, double b0, double a1, double b1, do
 //
 // Length of [A;B] must be positive and is't zero, i.e. A != B and A < B.
 //
-//
 // REMARK:
 //
 // If 'NR' is -1 it's mean, than polinom has infiniti roots.
 // If 'NE' is -1 it's mean, than polinom has infiniti extremums.
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, double b, double *x0, double *x1, double *x2, double *ex0, double *ex1, ae_int_t *nr, ae_int_t *ne, RVector *tempdata) {
    ae_int_t i;
@@ -6547,7 +6502,6 @@ void solvecubicpolinom(double pa, double ma, double pb, double mb, double a, dou
 // 2. This function does NOT report following kinds of extrema:
 //    * intervals where function is a constant
 //    * extrema which are outside of (A,B) (note: it WON'T return A or B)
-//
 // ALGLIB Project: Copyright 26.09.2011 by Sergey Bochkanov
 void spline1drootsandextrema(spline1dinterpolant *c, RVector *r, ae_int_t *nr, bool *dr, RVector *e, ZVector *et, ae_int_t *ne, bool *de) {
    ae_frame _frame_block;
@@ -7311,13 +7265,11 @@ static void parametric_pspline2par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector
 // Outputs:
 //     P   -   parametric spline interpolant
 //
-//
 // NOTES:
 // * this function  assumes  that  there all consequent points  are distinct.
 //   I.e. (x0,y0) != (x1,y1),  (x1,y1) != (x2,y2),  (x2,y2) != (x3,y3)  and  so on.
 //   However, non-consequent points may coincide, i.e. we can  have  (x0,y0)=
 //   =(x2,y2).
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
 void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p) {
@@ -7398,7 +7350,6 @@ static void parametric_pspline3par(RMatrix *xy, ae_int_t n, ae_int_t pt, RVector
 //
 // Same as PSpline2Build() function, but for 3D, so we  won't  duplicate  its
 // description here.
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
 void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p) {
@@ -7470,7 +7421,6 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 // Outputs:
 //     P   -   parametric spline interpolant
 //
-//
 // NOTES:
 // * this function  assumes  that there all consequent points  are  distinct.
 //   I.e. (x0,y0) != (x1,y1), (x1,y1) != (x2,y2),  (x2,y2) != (x3,y3)  and  so  on.
@@ -7478,7 +7428,6 @@ void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3in
 //   =(x2,y2).
 // * last point of sequence is NOT equal to the first  point.  You  shouldn't
 //   make curve "explicitly periodic" by making them equal.
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
 void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p) {
@@ -7524,7 +7473,6 @@ void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, ps
 //
 // Same as PSpline2Build() function, but for 3D, so we  won't  duplicate  its
 // description here.
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
 void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p) {
@@ -7585,11 +7533,9 @@ void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, ps
 //     N   -   array size
 //     T   -   array[0..N-1]
 //
-//
 // NOTES:
 // * for non-periodic splines U[0]=0, U[0] < U[1] < ... < U[N-1], U[N-1]=1
 // * for periodic splines     U[0]=0, U[0] < U[1] < ... < U[N-1], U[N-1] < 1
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t);
 void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t) {
@@ -7608,7 +7554,6 @@ void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t) {
 // This function returns vector of parameter values correspoding to points.
 //
 // Same as PSpline2ParameterValues(), but for 3D.
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t);
 void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t) {
@@ -7639,15 +7584,13 @@ void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t) {
 // Outputs:
 //     X   -   X-position
 //     Y   -   Y-position
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y);
 void pspline2calc(pspline2interpolant *p, double t, double *x, double *y) {
    *x = 0;
    *y = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    *x = spline1dcalc(&p->x, t);
    *y = spline1dcalc(&p->y, t);
@@ -7669,8 +7612,6 @@ void pspline2calc(pspline2interpolant *p, double t, double *x, double *y) {
 //     X   -   X-position
 //     Y   -   Y-position
 //     Z   -   Z-position
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
 void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z) {
@@ -7678,7 +7619,7 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
    *y = 0;
    *z = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    *x = spline1dcalc(&p->x, t);
    *y = spline1dcalc(&p->y, t);
@@ -7702,8 +7643,6 @@ void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double
 //
 // NOTE:
 //     X^2+Y^2 is either 1 (for non-zero tangent vector) or 0.
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y);
 void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y) {
@@ -7713,7 +7652,7 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y) {
    *x = 0;
    *y = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    pspline2diff(p, t, &v0, x, &v1, y);
    if (*x != 0.0 || *y != 0.0) {
@@ -7743,8 +7682,6 @@ void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y) {
 //
 // NOTE:
 //     X^2+Y^2+Z^2 is either 1 (for non-zero tangent vector) or 0.
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
 void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, double *z) {
@@ -7756,7 +7693,7 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
    *y = 0;
    *z = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    pspline3diff(p, t, &v0, x, &v1, y, &v2, z);
    if (*x != 0.0 || *y != 0.0 || *z != 0.0) {
@@ -7783,8 +7720,6 @@ void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, dou
 //     DX  -   X-derivative
 //     Y   -   Y-value
 //     DY  -   Y-derivative
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy);
 void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy) {
@@ -7794,7 +7729,7 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
    *y = 0;
    *dy = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    spline1ddiff(&p->x, t, x, dx, &d2s);
    spline1ddiff(&p->y, t, y, dy, &d2s);
@@ -7818,8 +7753,6 @@ void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, doubl
 //     DY  -   Y-derivative
 //     Z   -   Z-value
 //     DZ  -   Z-derivative
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz);
 void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz) {
@@ -7831,7 +7764,7 @@ void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, doubl
    *z = 0;
    *dz = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    spline1ddiff(&p->x, t, x, dx, &d2s);
    spline1ddiff(&p->y, t, y, dy, &d2s);
@@ -7856,8 +7789,6 @@ void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, doubl
 //     Y   -   Y-value
 //     DY  -   derivative
 //     D2Y -   second derivative
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y);
 void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y) {
@@ -7868,7 +7799,7 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
    *dy = 0;
    *d2y = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    spline1ddiff(&p->x, t, x, dx, d2x);
    spline1ddiff(&p->y, t, y, dy, d2y);
@@ -7895,8 +7826,6 @@ void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, doub
 //     Z   -   Z-value
 //     DZ  -   derivative
 //     D2Z -   second derivative
-//
-//
 // ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 // API: void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z);
 void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z) {
@@ -7910,7 +7839,7 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
    *dz = 0;
    *d2z = 0;
    if (p->periodic) {
-      t = t - FloorZ(t);
+      t -= FloorZ(t);
    }
    spline1ddiff(&p->x, t, x, dx, d2x);
    spline1ddiff(&p->y, t, y, dy, d2y);
@@ -7928,8 +7857,6 @@ void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, doub
 //
 // Result:
 //     length of arc starting at T=A and ending at T=B.
-//
-//
 // ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 // API: double pspline2arclength(const pspline2interpolant &p, const double a, const double b);
 double pspline2arclength(pspline2interpolant *p, double a, double b) {
@@ -7966,8 +7893,6 @@ double pspline2arclength(pspline2interpolant *p, double a, double b) {
 //
 // Result:
 //     length of arc starting at T=A and ending at T=B.
-//
-//
 // ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 // API: double pspline3arclength(const pspline3interpolant &p, const double a, const double b);
 double pspline3arclength(pspline3interpolant *p, double a, double b) {
@@ -8013,7 +7938,6 @@ double pspline3arclength(pspline3interpolant *p, double a, double b) {
 //
 // NOTE: this function guarantees that it returns exactly zero for a section
 //       with less than 3 points.
-//
 // ALGLIB Project: Copyright 02.10.2014 by Sergey Bochkanov
 static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i1, ae_int_t d, ae_int_t *worstidx, double *worsterror) {
    ae_int_t i;
@@ -8090,7 +8014,6 @@ static void parametric_rdpanalyzesectionpar(RMatrix *xy, ae_int_t i0, ae_int_t i
 // a number of points in dataset. As result, it returns reduced  dataset  X2,
 // which can be used to build  parametric  curve  X2(t),  which  approximates
 // X(t) with desired precision (or has specified number of sections).
-//
 //
 // Inputs:
 //     X       -   array of multidimensional points:
@@ -8464,7 +8387,6 @@ namespace alglib_impl {
 //     FX  -   dS(x,y,z)/dX
 //     FY  -   dS(x,y,z)/dY
 //     FXY -   d2S(x,y,z)/dXdY
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, double z, double *f, double *fx, double *fy, double *fxy) {
    double xd;
@@ -8554,7 +8476,6 @@ static void spline3d_spline3ddiff(spline3dinterpolant *c, double x, double y, do
 //
 // Outputs:
 //     F   -   array[D] (or larger) which stores function values
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
 void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVector *f) {
@@ -8642,7 +8563,6 @@ void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVec
 //             want  to    reuse  previously  allocated  F,   you   may   use
 //             Spline2DCalcVBuf(),  which  reallocates  F only when it is too
 //             small.
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
 void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f) {
@@ -8664,7 +8584,6 @@ void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector
 //
 // Result:
 //     S(x,y,z)
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z);
 double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
@@ -8686,7 +8605,6 @@ double spline3dcalc(spline3dinterpolant *c, double x, double y, double z) {
 //
 // Outputs:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz);
 void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz) {
@@ -8852,7 +8770,6 @@ void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay
 //
 // Outputs:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b);
 void spline3dlintransf(spline3dinterpolant *c, double a, double b) {
@@ -8894,7 +8811,6 @@ void spline3dlintransf(spline3dinterpolant *c, double a, double b) {
 //
 // Outputs:
 //     CC  -   spline copy
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc) {
    ae_int_t tblsize;
@@ -8946,7 +8862,6 @@ void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc) {
 //                         B[..]       x=0,y=1,z=0
 //                         B[..]       ...
 //                         ...
-//
 // ALGLIB Routine: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b);
 void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycount, ae_int_t oldxcount, ae_int_t newzcount, ae_int_t newycount, ae_int_t newxcount, RVector *b) {
@@ -9025,7 +8940,6 @@ void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycoun
 //
 // Outputs:
 //     C   -   spline interpolant
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c);
 void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *z, ae_int_t l, RVector *f, ae_int_t d, spline3dinterpolant *c) {
@@ -9172,7 +9086,6 @@ void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVe
 //             NOTE: format of Tbl is given for SType=1. Future versions of
 //                   ALGLIB can use different formats for different values of
 //                   SType.
-//
 // ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 // API: void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl);
 void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t *l, ae_int_t *d, ae_int_t *stype, RMatrix *tbl) {
@@ -9708,7 +9621,6 @@ void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a
 //
 // Outputs:
 //     P   -   polynomial in barycentric form
-//
 //
 // NOTES:
 // 1.  this function accepts offset and scale, which can be  set  to  improve
@@ -10588,7 +10500,6 @@ namespace alglib_impl {
 //
 // NOTE: this function guarantees that it returns exactly zero for a section
 //       with less than 3 points.
-//
 // ALGLIB Project: Copyright 02.10.2014 by Sergey Bochkanov
 static void lsfit_rdpanalyzesection(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1, ae_int_t *worstidx, double *worsterror) {
    ae_int_t i;
@@ -10807,7 +10718,6 @@ void lstfitpiecewiselinearrdpfixed(RVector *x, RVector *y, ae_int_t n, ae_int_t 
 // Outputs:
 //     XOut, YOut  -   curve generated by RDP algorithm, UNSORTED
 //     NOut        -   number of points in curve
-//
 // ALGLIB Project: Copyright 02.10.2014 by Sergey Bochkanov
 static void lsfit_rdprecursive(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1, double eps, RVector *xout, RVector *yout, ae_int_t *nout) {
    ae_int_t worstidx;
@@ -10854,7 +10764,6 @@ static void lsfit_rdprecursive(RVector *x, RVector *y, ae_int_t i0, ae_int_t i1,
 //                 * at least N elements
 //     N       -   number of elements in X/Y
 //     Eps     -   positive number, desired precision.
-//
 //
 // Outputs:
 //     X2      -   X-values of corner points for piecewise approximation,
@@ -11001,7 +10910,6 @@ static void lsfit_clearreport(lsfitreport *rep) {
 //
 // IMPORTANT:
 //     this subroitine doesn't calculate task's condition number for K != 0.
-//
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep) {
    ae_frame _frame_block;
@@ -11200,7 +11108,6 @@ static void lsfit_internalchebyshevfit(RVector *x, RVector *y, RVector *w, ae_in
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 // API: void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep);
 // API: void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep);
@@ -11360,7 +11267,6 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
-//
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 // API: void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep);
 // API: void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep);
@@ -11417,8 +11323,6 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 // NOTE: this function performs a lot of checks;  if  you  need  really  high
 //       performance, consider evaluating model  yourself,  without  checking
 //       for degenerate cases.
-//
-//
 // ALGLIB Project: Copyright 14.05.2014 by Sergey Bochkanov
 // API: double logisticcalc4(const double x, const double a, const double b, const double c, const double d);
 double logisticcalc4(double x, double a, double b, double c, double d) {
@@ -11478,8 +11382,6 @@ double logisticcalc4(double x, double a, double b, double c, double d) {
 // NOTE: this function performs a lot of checks;  if  you  need  really  high
 //       performance, consider evaluating model  yourself,  without  checking
 //       for degenerate cases.
-//
-//
 // ALGLIB Project: Copyright 14.05.2014 by Sergey Bochkanov
 // API: double logisticcalc5(const double x, const double a, const double b, const double c, const double d, const double g);
 double logisticcalc5(double x, double a, double b, double c, double d, double g) {
@@ -11584,8 +11486,6 @@ double logisticcalc5(double x, double a, double b, double c, double d, double g)
 //       fitted before we compare its length with EpsX. Thus,  this  function
 //       can be used to fit data with very small or very large values without
 //       changing EpsX.
-//
-//
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit4(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, lsfitreport &rep);
 void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, lsfitreport *rep) {
@@ -11701,8 +11601,6 @@ void logisticfit4(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // fitting), and CnstrRight contains right  one.  For  4PL,  left  constraint
 // ALWAYS corresponds to parameter A, and right one is ALWAYS  constraint  on
 // D. That's because 4PL model is normalized in such way that B >= 0.
-//
-//
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit4ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, lsfitreport &rep);
 void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, lsfitreport *rep) {
@@ -11795,8 +11693,6 @@ void logisticfit4ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 //       fitted before we compare its length with EpsX. Thus,  this  function
 //       can be used to fit data with very small or very large values without
 //       changing EpsX.
-//
-//
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit5(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep);
 void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep) {
@@ -11922,8 +11818,6 @@ void logisticfit5(RVector *x, RVector *y, ae_int_t n, double *a, double *b, doub
 // You do not have to decide what parameter to  constrain  -  algorithm  will
 // automatically determine correct parameters as fitting progresses. However,
 // question highlighted above is important when you interpret fitting results.
-//
-//
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit5ec(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep);
 void logisticfit5ec(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep) {
@@ -12057,7 +11951,6 @@ static void lsfit_logisticfitinternal(RVector *x, RVector *y, ae_int_t n, bool i
 // Calculate errors for 4PL/5PL fit.
 // Leaves other fields of Rep unchanged, so caller should properly initialize
 // it with ClearRep() call.
-//
 // ALGLIB Project: Copyright 28.04.2017 by Sergey Bochkanov
 static void lsfit_logisticfit45errors(RVector *x, RVector *y, ae_int_t n, double a, double b, double c, double d, double g, lsfitreport *rep) {
    ae_int_t i;
@@ -12219,8 +12112,6 @@ static void lsfit_logisticfit45errors(RVector *x, RVector *y, ae_int_t n, double
 // You do not have to decide what parameter to  constrain  -  algorithm  will
 // automatically determine correct parameters as fitting progresses. However,
 // question highlighted above is important when you interpret fitting results.
-//
-//
 // ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 // API: void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const double cnstrleft, const double cnstrright, const bool is4pl, const double lambdav, const double epsx, const ae_int_t rscnt, double &a, double &b, double &c, double &d, double &g, lsfitreport &rep);
 void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double cnstrright, bool is4pl, double lambdav, double epsx, ae_int_t rscnt, double *a, double *b, double *c, double *d, double *g, lsfitreport *rep) {
@@ -12875,7 +12766,6 @@ static void lsfit_barycentricfitwcfixedd(RVector *x, RVector *y, RVector *w, ae_
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  WHEN  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep);
 void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep) {
@@ -12977,7 +12867,6 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep);
 void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep) {
@@ -13006,7 +12895,6 @@ void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m
 }
 
 // Internal spline fitting subroutine
-//
 // ALGLIB Project: Copyright 08.09.2009 by Sergey Bochkanov
 static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep) {
    ae_frame _frame_block;
@@ -13306,7 +13194,6 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
 // IMPORTANT:
 //     this subroitine doesn't calculate task's condition number for K != 0.
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -13337,8 +13224,6 @@ static void lsfit_spline1dfitinternal(ae_int_t st, RVector *x, RVector *y, RVect
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  WHEN  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -13436,7 +13321,6 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 // IMPORTANT:
 //     this subroitine supports only even M's
 //
-//
 // ORDER OF POINTS
 //
 // Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -13467,7 +13351,6 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -13503,7 +13386,6 @@ void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVecto
 // This subroutine is "lightweight" alternative for more complex and feature-
 // rich Spline1DFitCubicWC().  See  Spline1DFitCubicWC() for more information
 // about subroutine parameters (we don't duplicate it here because of length)
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -13538,7 +13420,6 @@ void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *
 // rich Spline1DFitHermiteWC().  See Spline1DFitHermiteWC()  description  for
 // more information about subroutine parameters (we don't duplicate  it  here
 // because of length).
-//
 // ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 // API: void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 // API: void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
@@ -13651,7 +13532,6 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 //             all practical purposes except for the situation when you  want
 //             to compare ALGLIB results with "reference"  implementation  up
 //             to the last significant digit.
-//
 // ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 static void lsfit_estimateerrors(RMatrix *f1, RVector *f0, RVector *y, RVector *w, RVector *x, RVector *s, ae_int_t n, ae_int_t k, lsfitreport *rep, RMatrix *z, ae_int_t zkind) {
    ae_frame _frame_block;
@@ -16677,7 +16557,6 @@ static void rbfv2_allocatecalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf) {
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with  RBF model object  which
 //            was used to initialize buffer. Any attempt to use buffer   with
 //            different object is dangerous - you may  get  memory  violation
@@ -16760,7 +16639,6 @@ static void rbfv2_converttreerec(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_in
 
 // Extracts structure (and XY-values too) from  kd-tree  built  for  a  small
 // subset of points and appends it to multi-tree.
-//
 // ALGLIB: Copyright 20.06.2016 by Sergey Bochkanov
 static void rbfv2_convertandappendtree(kdtree *curtree, ae_int_t n, ae_int_t nx, ae_int_t ny, ZVector *kdnodes, RVector *kdsplits, RVector *cw) {
    ae_frame _frame_block;
@@ -19270,7 +19148,6 @@ static const double spline2d_lambdadecay = 0.5;
 //
 // Result:
 //     S(x,y)
-//
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: double spline2dcalc(const spline2dinterpolant &c, const double x, const double y);
 double spline2dcalc(spline2dinterpolant *c, double x, double y) {
@@ -19402,7 +19279,6 @@ double spline2dcalc(spline2dinterpolant *c, double x, double y) {
 //
 // Outputs:
 //     F   -   array[D] (or larger) which stores function values
-//
 // ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 // API: void spline2dcalcvbuf(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f);
 void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f) {
@@ -19539,7 +19415,6 @@ void spline2dcalcvbuf(spline2dinterpolant *c, double x, double y, RVector *f) {
 //             want  to    reuse  previously  allocated  F,   you   may   use
 //             Spline2DCalcVBuf(),  which  reallocates  F only when it is too
 //             small.
-//
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dcalcv(const spline2dinterpolant &c, const double x, const double y, real_1d_array &f);
 void spline2dcalcv(spline2dinterpolant *c, double x, double y, RVector *f) {
@@ -19560,7 +19435,6 @@ void spline2dcalcv(spline2dinterpolant *c, double x, double y, RVector *f) {
 //
 // Result:
 //     value of I-th component
-//
 // ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 // API: double spline2dcalcvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i);
 double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i) {
@@ -19692,7 +19566,6 @@ double spline2dcalcvi(spline2dinterpolant *c, double x, double y, ae_int_t i) {
 //     FX  -   dS(x,y)/dX
 //     FY  -   dS(x,y)/dY
 //     FXY -   d2S(x,y)/dXdY
-//
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: void spline2ddiff(const spline2dinterpolant &c, const double x, const double y, double &f, double &fx, double &fy, double &fxy);
 void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double *fx, double *fy, double *fxy) {
@@ -19884,7 +19757,6 @@ void spline2ddiff(spline2dinterpolant *c, double x, double y, double *f, double 
 //     FX  -   dS(x,y)/dX
 //     FY  -   dS(x,y)/dY
 //     FXY -   d2S(x,y)/dXdY
-//
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: void spline2ddiffvi(const spline2dinterpolant &c, const double x, const double y, const ae_int_t i, double &f, double &fx, double &fy, double &fxy);
 void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, double *f, double *fx, double *fy, double *fxy) {
@@ -20071,7 +19943,6 @@ void spline2ddiffvi(spline2dinterpolant *c, double x, double y, ae_int_t i, doub
 //     AY, BY  -   transformation coefficients: y = A*u + B
 // Result:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 // API: void spline2dlintransxy(const spline2dinterpolant &c, const double ax, const double bx, const double ay, const double by);
 void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay, double by) {
@@ -20164,7 +20035,6 @@ void spline2dlintransxy(spline2dinterpolant *c, double ax, double bx, double ay,
 //
 // Outputs:
 //     C   -   transformed spline
-//
 // ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 // API: void spline2dlintransf(const spline2dinterpolant &c, const double a, const double b);
 void spline2dlintransf(spline2dinterpolant *c, double a, double b) {
@@ -20204,7 +20074,6 @@ void spline2dlintransf(spline2dinterpolant *c, double a, double b) {
 //
 // Outputs:
 //     CC  -   spline copy
-//
 // ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 // API: void spline2dcopy(const spline2dinterpolant &c, spline2dinterpolant &cc);
 void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc) {
@@ -20244,7 +20113,6 @@ void spline2dcopy(spline2dinterpolant *c, spline2dinterpolant *cc) {
 // Outputs:
 //     B           -   function values at the new grid,
 //                     array[0..NewHeight-1, 0..NewWidth-1]
-//
 // ALGLIB Routine: Copyright 2007 May 15 by Sergey Bochkanov
 // API: void spline2dresamplebicubic(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth);
 void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, RMatrix *b, ae_int_t newheight, ae_int_t newwidth) {
@@ -20310,7 +20178,6 @@ void spline2dresamplebicubic(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, 
 // Outputs:
 //     B           -   function values at the new grid,
 //                     array[0..NewHeight-1, 0..NewWidth-1]
-//
 // ALGLIB Routine: Copyright 09.07.2007 by Sergey Bochkanov
 // API: void spline2dresamplebilinear(const real_2d_array &a, const ae_int_t oldheight, const ae_int_t oldwidth, real_2d_array &b, const ae_int_t newheight, const ae_int_t newwidth);
 void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth, RMatrix *b, ae_int_t newheight, ae_int_t newwidth) {
@@ -20356,7 +20223,6 @@ void spline2dresamplebilinear(RMatrix *a, ae_int_t oldheight, ae_int_t oldwidth,
 //
 // Outputs:
 //     C   -   spline interpolant
-//
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dbuildbilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c) {
@@ -20504,7 +20370,6 @@ static void spline2d_bicubiccalcderivatives(RMatrix *a, RVector *x, RVector *y, 
 //
 // Outputs:
 //     C   -   spline interpolant
-//
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dbuildbicubicv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &f, const ae_int_t d, spline2dinterpolant &c);
 void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *f, ae_int_t d, spline2dinterpolant *c) {
@@ -20609,7 +20474,6 @@ void spline2dbuildbicubicv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVect
 //
 // We recommend you to switch  to  Spline2DBuildBilinearV(),  which  is  more
 // flexible and accepts its arguments in more convenient order.
-//
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: void spline2dbuildbilinear(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c);
 void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c) {
@@ -20677,7 +20541,6 @@ void spline2dbuildbilinear(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_in
 //
 // We recommend you to switch  to  Spline2DBuildBicubicV(),  which  is  more
 // flexible and accepts its arguments in more convenient order.
-//
 // ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 // API: void spline2dbuildbicubic(const real_1d_array &x, const real_1d_array &y, const real_2d_array &f, const ae_int_t m, const ae_int_t n, spline2dinterpolant &c);
 void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int_t n, spline2dinterpolant *c) {
@@ -20800,7 +20663,6 @@ void spline2dbuildbicubic(RVector *x, RVector *y, RMatrix *f, ae_int_t m, ae_int
 //                 S(x) = SUM(c[i,j]*(t^i)*(u^j), i=0..3, j=0..3)
 //                 t = x-x[j]
 //                 u = y-y[i]
-//
 // ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 // API: void spline2dunpackv(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, ae_int_t &d, real_2d_array &tbl);
 void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t *d, RMatrix *tbl) {
@@ -20898,7 +20760,6 @@ void spline2dunpackv(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, ae_int_t 
 //
 // We recommend you to switch  to  Spline2DUnpackV(),  which is more flexible
 // and accepts its arguments in more convenient order.
-//
 // ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 // API: void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real_2d_array &tbl);
 void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *tbl) {
@@ -21026,7 +20887,6 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
 //
 // Outputs:
 //     S   -   solver object
-//
 // ALGLIB Project: Copyright 29.01.2018 by Sergey Bochkanov
 // API: void spline2dbuildercreate(const ae_int_t d, spline2dbuilder &state);
 void spline2dbuildercreate(ae_int_t d, spline2dbuilder *state) {
@@ -21753,7 +21613,6 @@ static void spline2d_xdesignblockata(spline2dxdesignmatrix *a, RMatrix *blockata
 //                 so it is non-constant.
 //     X       -   array[A.KX*A.KY]
 //
-//
 // Outputs:
 //     Y       -   product, array[A.NRows], automatically allocated
 // ALGLIB: Copyright 05.02.2018 by Sergey Bochkanov
@@ -21815,7 +21674,6 @@ static void spline2d_xdesignmv(spline2dxdesignmatrix *a, RVector *x, RVector *y)
 //                 some fields of A are used for temporaries,
 //                 so it is non-constant.
 //     X       -   array[A.NRows]
-//
 //
 // Outputs:
 //     Y       -   product, array[A.KX*A.KY], automatically allocated
@@ -21906,7 +21764,6 @@ static void spline2d_xdesignmtv(spline2dxdesignmatrix *a, RVector *x, RVector *y
 //     Rep     -   report structure; fields which are not set by this function
 //                 are left intact
 //     TSS     -   total sum of squares; used to calculate R2
-//
 //
 // Outputs:
 //     XY      -   destroyed in process
@@ -22129,7 +21986,6 @@ static void spline2d_updatesplinetable(RVector *z, ae_int_t kx, ae_int_t ky, ae_
 //     LambdaNS-   nonlinearity penalty, exactly zero value is specially handled
 //                 (entire set of rows is not added to the matrix)
 //     Basis1  -   single-dimensional B-spline
-//
 //
 // Outputs:
 //     A       -   design matrix
@@ -22882,7 +22738,6 @@ static void spline2d_generatedesignmatrix(RVector *xy, ae_int_t npoints, ae_int_
 //                     are left intact
 //     TSS         -   total sum of squares; used to calculate R2
 //
-//
 // Outputs:
 //     XY          -   destroyed in process
 //     Z           -   array[KX*KY*D], filled by solution; KX*KY coefficients
@@ -23040,7 +22895,6 @@ static void spline2d_fastddmfit(RVector *xy, ae_int_t npoints, ae_int_t d, ae_in
 //     Rep     -   report structure; fields which are not set by this function
 //                 are left intact
 //     TSS     -   total sum of squares; used to calculate R2
-//
 //
 // Outputs:
 //     XY      -   destroyed in process
@@ -24247,7 +24101,6 @@ void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s) {
 //
 // Outputs:
 //     Buf         -   external buffer.
-//
 //
 // IMPORTANT: buffer object should be used only with  RBF model object  which
 //            was used to initialize buffer. Any attempt to use buffer   with
@@ -26094,7 +25947,6 @@ void rbfcreate(ae_int_t nx, ae_int_t ny, rbfmodel *s) {
 //
 // Outputs:
 //     Buf         -   external buffer.
-//
 //
 // IMPORTANT: buffer object should be used only with  RBF model object  which
 //            was used to initialize buffer. Any attempt to use buffer   with
@@ -28292,7 +28144,7 @@ void rbfrequesttermination(const rbfmodel &s) {
 } // end of namespace alglib
 
 // === INTCOMP Package ===
-// Depends on: FITSPHERE SPLINE1D
+// Depends on: FITSPHERE, SPLINE1D
 namespace alglib_impl {
 // This function is left for backward compatibility.
 // Use fitspherex() instead.

@@ -164,7 +164,6 @@ with special exception made to ALGLIB Project, who may integrate this into their
 </p>
 <p>
 
-
 <a name=int_doc_license class=sheader></a><h3>1.3. Documentation License</h3>
 This reference manual is derived from the <a href="https://www.alglib.net/translator/man/manual.cpp.html">ALGLIB Reference Manual (C++ version)</a>. It inherits the same license, which is reproduced below with updates to include ALGLIB++:
 <div style='width: 80%;'>
@@ -1516,6 +1515,8 @@ Therefore, a short summary is provided here for each of the subpackages.
 <a href=#sub_hqrndmiduniformr class=toc>hqrndmiduniformr</a> |
 <a href=#sub_hqrndnormal class=toc>hqrndnormal</a> |
 <a href=#sub_hqrndnormal2 class=toc>hqrndnormal2</a> |
+<a href=#sub_hqrndnormalm class=toc>hqrndnormalm</a> |
+<a href=#sub_hqrndnormalv class=toc>hqrndnormalv</a> |
 <a href=#sub_hqrndrandomize class=toc>hqrndrandomize</a> |
 <a href=#sub_hqrndseed class=toc>hqrndseed</a> |
 <a href=#sub_hqrnduniformi class=toc>hqrnduniformi</a> |
@@ -1637,6 +1638,34 @@ ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> hqrndnormal2(hqrndstate state, <b>double</b> &amp;x1, <b>double</b> &amp;x2);
+</pre>
+<a name=sub_hqrndnormalm></a><h6 class=pageheader>hqrndnormalm Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Random number generator: matrix with random entries (normal distribution)
+
+This function generates MxN random matrix.
+
+State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> hqrndnormalm(hqrndstate state, ae_int_t m, ae_int_t n, real_2d_array &amp;x);
+</pre>
+<a name=sub_hqrndnormalv></a><h6 class=pageheader>hqrndnormalv Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Random number generator: vector with random entries (normal distribution)
+
+This function generates N random numbers from normal distribution.
+
+State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> hqrndnormalv(hqrndstate state, ae_int_t n, real_1d_array &amp;x);
 </pre>
 <a name=sub_hqrndrandomize></a><h6 class=pageheader>hqrndrandomize Function</h6>
 <hr width=600 align=left>
@@ -1787,7 +1816,6 @@ Inputs:
 Outputs:
     KDT     -   KD-tree
 
-
 NOTES
 
 1. KD-tree  creation  have O(N*logN) complexity and O(N*(2*NX+NY))  memory
@@ -1867,7 +1895,6 @@ Inputs:
 Outputs:
     Buf         -   external buffer.
 
-
 IMPORTANT: KD-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use buffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -1941,7 +1968,6 @@ Inputs:
     KDT         -   KD-tree
     BoxMin      -   lower bounds, array[0..NX-1].
     BoxMax      -   upper bounds, array[0..NX-1].
-
 
 Result:
     number of actual neighbors found (in [0,N]).
@@ -2848,6 +2874,7 @@ using namespace alglib;
 ]</font>
 </div>
 <a name=struct_xdebugrecord1></a><h6 class=pageheader>xdebugrecord1 Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> xdebugrecord1 {
@@ -3302,7 +3329,7 @@ Accepts:
     BufR    array[0..N-1]       temporaries
     BufI    array[0..N-1]       temporaries
 
-Output:
+Outputs:
     Info    error code (&quot;&gt; 0&quot;=OK, &quot;&lt; 0&quot;=bad)
     RMS     training set RMS error
     CVRMS   leave-one-out RMS error
@@ -4384,7 +4411,7 @@ ALGLIB: Copyright 21.03.2009 by Sergey Bochkanov
 <h5>Examples</h5>
 <table border=0 cellspacing=0 class=pagecontent>
 <tr align=left valign=top><td><a href=#example_randomforest_cls class=toc>randomforest_cls</a></td><td width=15>&nbsp;</td><td>Simple classification with random forests</td></tr>
-<tr align=left valign=top><td><a href=#example_randomforest_reg class=toc>randomforest_reg</a></td><td width=15>&nbsp;</td><td>Simple classification with decision forest</td></tr>
+<tr align=left valign=top><td><a href=#example_randomforest_reg class=toc>randomforest_reg</a></td><td width=15>&nbsp;</td><td>Simple regression with decision forest</td></tr>
 </table>
 </div>
 <a name=struct_decisionforest></a><h6 class=pageheader>decisionforest Class</h6>
@@ -5228,7 +5255,6 @@ Inputs:
 
 Outputs:
     Buf         -   external buffer.
-
 
 IMPORTANT: buffer object should be used only with model which was used  to
            initialize buffer. Any attempt to  use  buffer  with  different
@@ -6177,7 +6203,6 @@ Inputs:
 Outputs:
     Buf         -   external buffer.
 
-
 IMPORTANT: buffer object should be used only with model which was used  to
            initialize buffer. Any attempt to  use  buffer  with  different
            object is dangerous - you  may   get  integrity  check  failure
@@ -6590,7 +6615,6 @@ Inputs:
     NVars       -   number of independent variables, NVars &ge; 1
     NClasses    -   number of classes, NClasses &ge; 2
 
-
 Outputs:
     Info        -   return code:
                     * -4, if internal EVD subroutine hasn't converged
@@ -6626,7 +6650,6 @@ Inputs:
     NPoints     -   training set size, NPoints &ge; 0
     NVars       -   number of independent variables, NVars &ge; 1
     NClasses    -   number of classes, NClasses &ge; 2
-
 
 Outputs:
     Info        -   return code:
@@ -6671,6 +6694,7 @@ ALGLIB: Copyright 31.05.2008 by Sergey Bochkanov
 </table>
 </div>
 <a name=struct_linearmodel></a><h6 class=pageheader>linearmodel Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> linearmodel {
@@ -6856,7 +6880,7 @@ Inputs:
     V           -   coefficients, array[0..NVars]
     NVars       -   number of independent variables
 
-OUTPUT PAREMETERS:
+Outputs:
     LM          -   linear model.
 ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 </pre>
@@ -6965,6 +6989,7 @@ using namespace alglib;
 ]</font>
 </div>
 <a name=struct_logitmodel></a><h6 class=pageheader>logitmodel Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> logitmodel {
@@ -8120,6 +8145,7 @@ NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 };
 </pre>
 <a name=struct_multilayerperceptron></a><h6 class=pageheader>multilayerperceptron Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> multilayerperceptron {
@@ -9883,7 +9909,6 @@ Inputs:
                 NOut, it will be reallocated. If it is large enough, it
                 is NOT reallocated, so we can save some time on reallocation.
 
-
 Outputs:
     Y       -   result. Regression estimate when solving regression  task,
                 vector of posterior probabilities for classification task.
@@ -10044,8 +10069,8 @@ ALGLIB: Copyright 14.03.2011 by Sergey Bochkanov
 <tr align=left valign=top><td><a href=#example_nn_crossvalidation class=toc>nn_crossvalidation</a></td><td width=15>&nbsp;</td><td>Cross-validation</td></tr>
 <tr align=left valign=top><td><a href=#example_nn_ensembles_es class=toc>nn_ensembles_es</a></td><td width=15>&nbsp;</td><td>Early stopping ensembles</td></tr>
 <tr align=left valign=top><td><a href=#example_nn_parallel class=toc>nn_parallel</a></td><td width=15>&nbsp;</td><td>Parallel training</td></tr>
-<tr align=left valign=top><td><a href=#example_nn_regr class=toc>nn_regr</a></td><td width=15>&nbsp;</td><td>Regression problem with one output (2=>1)</td></tr>
-<tr align=left valign=top><td><a href=#example_nn_regr_n class=toc>nn_regr_n</a></td><td width=15>&nbsp;</td><td>Regression problem with multiple outputs (2=>2)</td></tr>
+<tr align=left valign=top><td><a href=#example_nn_regr class=toc>nn_regr</a></td><td width=15>&nbsp;</td><td>Regression problem with one output (2&rArr;1)</td></tr>
+<tr align=left valign=top><td><a href=#example_nn_regr_n class=toc>nn_regr_n</a></td><td width=15>&nbsp;</td><td>Regression problem with multiple outputs (2&rArr;2)</td></tr>
 <tr align=left valign=top><td><a href=#example_nn_trainerobject class=toc>nn_trainerobject</a></td><td width=15>&nbsp;</td><td>Advanced example on trainer object</td></tr>
 </table>
 </div>
@@ -11401,7 +11426,6 @@ Inputs:
                     method. Zero value means that no  limit  on  iteration
                     count is placed (eps-based stopping condition is used).
 
-
 Outputs:
     S2          -   array[NNeeded]. Variance values corresponding
                     to basis vectors.
@@ -11451,7 +11475,6 @@ Inputs:
     MaxIts      -   number of iterations performed by  subspace  iteration
                     method. Zero value means that no  limit  on  iteration
                     count is placed (eps-based stopping condition is used).
-
 
 Outputs:
     S2          -   array[NNeeded]. Variance values corresponding
@@ -11618,7 +11641,6 @@ Outputs:
     Noise           -   array[NTicks], the rest of the signal;
                         it holds that ActualData = Trend+Noise.
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -11635,7 +11657,6 @@ Caching/reuse of previous results is performed:
 
 In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 scratch every time you call this function.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -11695,7 +11716,6 @@ Outputs:
                         it holds that ActualData = Trend+Noise.
     NTicks          -   current WindowSize
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -11712,7 +11732,6 @@ Caching/reuse of previous results is performed:
 
 In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 scratch every time you call this function.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -11775,7 +11794,6 @@ Outputs:
     Noise           -   array[NTicks], the rest of the signal;
                         it holds that ActualData = Trend+Noise.
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -11792,7 +11810,6 @@ Caching/reuse of previous results is performed:
 
 In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 scratch every time you call this function.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12045,7 +12062,6 @@ Inputs:
 Outputs:
     Trend           -   array[NTicks], predicted trend line
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -12059,7 +12075,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12128,7 +12143,6 @@ Inputs:
 Outputs:
     Trend           -   array[ForecastLen], forecasted trend
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -12142,7 +12156,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12206,7 +12219,6 @@ Inputs:
 Outputs:
     Trend           -   array[NTicks], predicted trend line
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -12220,7 +12232,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12278,7 +12289,7 @@ NOTE: this algorithm performs prediction using only one - last  -  sliding
 
 Inputs:
     S               -   SSA model
-    Data            -   array[NTicks], data to forecast
+    Data            -   array[DataLen], data to forecast
     DataLen         -   number of ticks in the data, DataLen &ge; 1
     ForecastLen     -   number of ticks to predict, ForecastLen &ge; 1
     ApplySmoothing  -   whether to apply smoothing trend extraction or not;
@@ -12286,7 +12297,6 @@ Inputs:
 
 Outputs:
     Trend           -   array[ForecastLen], forecasted trend
-
 
 CACHING/REUSE OF THE BASIS
 
@@ -12301,7 +12311,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12350,7 +12359,6 @@ Outputs:
     WindowWidth     -   current window
     NBasis          -   basis size
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -12364,7 +12372,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12393,7 +12400,6 @@ Outputs:
                         Empty array for WindowWidth=1.
     WindowWidth     -   current window width
 
-
 CACHING/REUSE OF THE BASIS
 
 Caching/reuse of previous results is performed:
@@ -12407,7 +12413,6 @@ Caching/reuse of previous results is performed:
   c) ssaappendsequenceandupdate()
   d) ssasetalgotopk...() with exactly same K
   Calling these functions will result in reuse of previously found basis.
-
 
 HANDLING OF DEGENERATE CASES
 
@@ -12479,7 +12484,6 @@ Inputs:
 
 Outputs:
     S               -   updated model
-
 
 NOTE: TopK &gt; WindowWidth is silently decreased to WindowWidth during analysis
       phase
@@ -12858,6 +12862,7 @@ using namespace alglib;
 </table>
 </div>
 <a name=struct_odesolverreport></a><h6 class=pageheader>odesolverreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> odesolverreport {
@@ -12866,6 +12871,7 @@ using namespace alglib;
 };
 </pre>
 <a name=struct_odesolverstate></a><h6 class=pageheader>odesolverstate Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> odesolverstate {
@@ -14020,7 +14026,6 @@ and zero moment Mu0
 
     Mu0 = integral(W(x)dx,a,b)
 
-
 Inputs:
     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
@@ -14601,7 +14606,6 @@ stability. It is somewhat regularized by &quot;circumscribed&quot; term of the m
 function; however, solutions to  MZ may be non-unique, and in some unlucky
 cases it is also possible to &quot;run away to infinity&quot;.
 
-
 NOTE: ON THE NONLINEARLY CONSTRAINED PROGRAMMING APPROACH
 
 The problem formulation for MC  (minimum circumscribed   circle;  for  the
@@ -14623,7 +14627,6 @@ i.e. it becomes smooth quadratically constrained optimization problem with
 linear target function. Such problem statement is 100% equivalent  to  the
 original nonsmooth one, but much easier  to  approach.  We solve  it  with
 MinNLC solver provided by ALGLIB.
-
 
 NOTE: ON INSTABILITY OF SEQUENTIAL LINEARIZATION APPROACH
 
@@ -14772,7 +14775,6 @@ Inputs:
 
 Outputs:
     State-  builder object
-
 ALGLIB Project: Copyright 22.10.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -14810,7 +14812,6 @@ Thus, IDW-MSTAB is  a  good  &quot;default&quot;  option  if  you  want  to  per
 scattered multidimensional interpolation. Although it has  its  drawbacks,
 it is easy to use and robust, which makes it a good first step.
 
-
 Inputs:
     State   -   builder object
     SRad    -   initial search radius, SRad &gt; 0 is required. A model  value
@@ -14830,7 +14831,6 @@ NOTE 3: by default 16 IDW layers are built which is enough for most cases.
         details at distances smaller than SRad/65536.  Smaller value   may
         be necessary if you have to save memory and  computing  time,  and
         ready to sacrifice some model quality.
-
 
 ALGORITHM DESCRIPTION
 
@@ -15159,7 +15159,6 @@ Inputs:
 Outputs:
     Buf         -   external buffer.
 
-
 IMPORTANT: buffer object should be used only with  IDW model object  which
            was used to initialize buffer. Any attempt to use buffer   with
            different object is dangerous - you may  get  memory  violation
@@ -15434,7 +15433,6 @@ It was superseded by spline1dfit(), which is an orders of magnitude faster
 and more memory-efficient implementation.
 
 Do NOT use this function in the new code!
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15453,7 +15451,6 @@ It was superseded by spline1dfit(), which is an orders of magnitude faster
 and more memory-efficient implementation.
 
 Do NOT use this function in the new code!
-
 ALGLIB Project: Copyright 19.10.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15672,7 +15669,6 @@ Outputs:
             * AvgRelError   average relative error on the non-zero Y
             * MaxError      maximum error
                             NON-WEIGHTED ERRORS ARE CALCULATED
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15761,7 +15757,6 @@ constrained barycentric interpolants:
 Our final recommendation is to use constraints  WHEN  AND  ONLY  WHEN  you
 can't solve your task without them. Anything beyond  special  cases  given
 above is not guaranteed and may result in inconsistency.
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15799,8 +15794,6 @@ NOTE: this function also throws exception  if  all  input  parameters  are
 NOTE: this function performs a lot of checks;  if  you  need  really  high
       performance, consider evaluating model  yourself,  without  checking
       for degenerate cases.
-
-
 ALGLIB Project: Copyright 14.05.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15840,8 +15833,6 @@ NOTE: this function also throws exception  if  all  input  parameters  are
 NOTE: this function performs a lot of checks;  if  you  need  really  high
       performance, consider evaluating model  yourself,  without  checking
       for degenerate cases.
-
-
 ALGLIB Project: Copyright 14.05.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -15924,8 +15915,6 @@ NOTE: step is automatically scaled according to scale of parameters  being
       fitted before we compare its length with EpsX. Thus,  this  function
       can be used to fit data with very small or very large values without
       changing EpsX.
-
-
 ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -16037,8 +16026,6 @@ constraint.
 You do not have to decide what parameter to  constrain  -  algorithm  will
 automatically determine correct parameters as fitting progresses. However,
 question highlighted above is important when you interpret fitting results.
-
-
 ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -16146,8 +16133,6 @@ Parameter  CnstrLeft  contains  left  constraint (or NAN for unconstrained
 fitting), and CnstrRight contains right  one.  For  4PL,  left  constraint
 ALWAYS corresponds to parameter A, and right one is ALWAYS  constraint  on
 D. That's because 4PL model is normalized in such way that B &ge; 0.
-
-
 ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -16232,8 +16217,6 @@ NOTE: step is automatically scaled according to scale of parameters  being
       fitted before we compare its length with EpsX. Thus,  this  function
       can be used to fit data with very small or very large values without
       changing EpsX.
-
-
 ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -16352,8 +16335,6 @@ Similarly changes meaning of right constraint.
 You do not have to decide what parameter to  constrain  -  algorithm  will
 automatically determine correct parameters as fitting progresses. However,
 question highlighted above is important when you interpret fitting results.
-
-
 ALGLIB Project: Copyright 14.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17389,7 +17370,6 @@ Inputs:
     N       -   number of elements in X/Y
     Eps     -   positive number, desired precision.
 
-
 Outputs:
     X2      -   X-values of corner points for piecewise approximation,
                 has length NSections+1 or zero (for NSections=0).
@@ -17496,7 +17476,6 @@ Outputs:
             * AvgRelError   average relative error on the non-zero Y
             * MaxError      maximum error
                             NON-WEIGHTED ERRORS ARE CALCULATED
-
 ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17582,7 +17561,6 @@ constrained regression splines:
 Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 can't solve your task without them. Anything beyond  special  cases  given
 above is not guaranteed and may result in inconsistency.
-
 ALGLIB Project: Copyright 10.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17599,7 +17577,6 @@ Least squares fitting by cubic spline.
 This subroutine is &quot;lightweight&quot; alternative for more complex and feature-
 rich Spline1DFitCubicWC().  See  Spline1DFitCubicWC() for more information
 about subroutine parameters (we don't duplicate it here because of length)
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17672,7 +17649,6 @@ Outputs:
 IMPORTANT:
     this subroitine doesn't calculate task's condition number for K &ne; 0.
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -17703,8 +17679,6 @@ constrained regression splines:
 Our final recommendation is to use constraints  WHEN  AND  ONLY  WHEN  you
 can't solve your task without them. Anything beyond  special  cases  given
 above is not guaranteed and may result in inconsistency.
-
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17721,7 +17695,6 @@ This subroutine is &quot;lightweight&quot; alternative for more complex and feat
 rich Spline1DFitHermiteWC().  See Spline1DFitHermiteWC()  description  for
 more information about subroutine parameters (we don't duplicate  it  here
 because of length).
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -17800,7 +17773,6 @@ IMPORTANT:
 IMPORTANT:
     this subroitine supports only even M's
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -17831,7 +17803,6 @@ constrained regression splines:
 Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 can't solve your task without them. Anything beyond  special  cases  given
 above is not guaranteed and may result in inconsistency.
-
 ALGLIB Project: Copyright 18.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18454,7 +18425,6 @@ a number of points in dataset. As result, it returns reduced  dataset  X2,
 which can be used to build  parametric  curve  X2(t),  which  approximates
 X(t) with desired precision (or has specified number of sections).
 
-
 Inputs:
     X       -   array of multidimensional points:
                 * at least N elements, leading N elements are used if more
@@ -18520,8 +18490,6 @@ Inputs:
 
 Result:
     length of arc starting at T=A and ending at T=B.
-
-
 ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18552,13 +18520,11 @@ Inputs:
 Outputs:
     P   -   parametric spline interpolant
 
-
 NOTES:
 * this function  assumes  that  there all consequent points  are distinct.
   I.e. (x0,y0) &ne; (x1,y1),  (x1,y1) &ne; (x2,y2),  (x2,y2) &ne; (x3,y3)  and  so on.
   However, non-consequent points may coincide, i.e. we can  have  (x0,y0)=
   =(x2,y2).
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18589,7 +18555,6 @@ Inputs:
 Outputs:
     P   -   parametric spline interpolant
 
-
 NOTES:
 * this function  assumes  that there all consequent points  are  distinct.
   I.e. (x0,y0) &ne; (x1,y1), (x1,y1) &ne; (x2,y2),  (x2,y2) &ne; (x3,y3)  and  so  on.
@@ -18597,7 +18562,6 @@ NOTES:
   =(x2,y2).
 * last point of sequence is NOT equal to the first  point.  You  shouldn't
   make curve &quot;explicitly periodic&quot; by making them equal.
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18622,8 +18586,6 @@ Inputs:
 Outputs:
     X   -   X-position
     Y   -   Y-position
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18649,8 +18611,6 @@ Outputs:
     DX  -   X-derivative
     Y   -   Y-value
     DY  -   Y-derivative
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18678,8 +18638,6 @@ Outputs:
     Y   -   Y-value
     DY  -   derivative
     D2Y -   second derivative
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18705,11 +18663,9 @@ Outputs:
     N   -   array size
     T   -   array[0..N-1]
 
-
 NOTES:
 * for non-periodic splines U[0]=0, U[0] &lt; U[1] &lt; ... &lt; U[N-1], U[N-1]=1
 * for periodic splines     U[0]=0, U[0] &lt; U[1] &lt; ... &lt; U[N-1], U[N-1] &lt; 1
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18736,8 +18692,6 @@ Outputs:
 
 NOTE:
     X^2+Y^2 is either 1 (for non-zero tangent vector) or 0.
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18758,8 +18712,6 @@ Inputs:
 
 Result:
     length of arc starting at T=A and ending at T=B.
-
-
 ALGLIB Project: Copyright 30.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18774,7 +18726,6 @@ starts at (X[0],Y[0],Z[0]) and ends at (X[N-1],Y[N-1],Z[N-1]).
 
 Same as PSpline2Build() function, but for 3D, so we  won't  duplicate  its
 description here.
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18790,7 +18741,6 @@ and then back to (X[0],Y[0],Z[0]).
 
 Same as PSpline2Build() function, but for 3D, so we  won't  duplicate  its
 description here.
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18816,8 +18766,6 @@ Outputs:
     X   -   X-position
     Y   -   Y-position
     Z   -   Z-position
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18845,8 +18793,6 @@ Outputs:
     DY  -   Y-derivative
     Z   -   Z-value
     DZ  -   Z-derivative
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18877,8 +18823,6 @@ Outputs:
     Z   -   Z-value
     DZ  -   derivative
     D2Z -   second derivative
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18891,7 +18835,6 @@ ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 This function returns vector of parameter values correspoding to points.
 
 Same as PSpline2ParameterValues(), but for 3D.
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -18919,8 +18862,6 @@ Outputs:
 
 NOTE:
     X^2+Y^2+Z^2 is either 1 (for non-zero tangent vector) or 0.
-
-
 ALGLIB Project: Copyright 28.05.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -19316,7 +19257,6 @@ Inputs:
 Outputs:
     P   -   polynomial in barycentric form
 
-
 NOTES:
 1.  this function accepts offset and scale, which can be  set  to  improve
     numerical properties of polynomial. For example, if you interpolate on
@@ -19521,7 +19461,6 @@ Outputs:
 Note:
     this algorithm always succeeds and calculates the weights  with  close
     to machine precision.
-
 ALGLIB Project: Copyright 17.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -19627,7 +19566,6 @@ Inputs:
 
 Outputs:
     B       -   transformed interpolant with X replaced by T
-
 ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -19646,7 +19584,6 @@ Inputs:
 
 Outputs:
     B       -   transformed interpolant
-
 ALGLIB Project: Copyright 19.08.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -20093,7 +20030,6 @@ Inputs:
 
 Outputs:
     Buf         -   external buffer.
-
 
 IMPORTANT: buffer object should be used only with  RBF model object  which
            was used to initialize buffer. Any attempt to use buffer   with
@@ -21444,11 +21380,9 @@ Inputs:
 Outputs:
     C           -   spline interpolant
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
-
 ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21481,7 +21415,6 @@ OPTIONAL PARAMETERS:
 Outputs:
     C           -   spline interpolant
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
@@ -21494,7 +21427,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21553,7 +21485,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21579,11 +21510,9 @@ Inputs:
 Outputs:
     C           -   spline interpolant.
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
-
 ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21608,11 +21537,9 @@ Inputs:
 Outputs:
     C   -   spline interpolant
 
-
 ORDER OF POINTS
 
 Subroutine automatically sorts points, so caller may pass unsorted array.
-
 ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21639,7 +21566,6 @@ Inputs:
 
 Outputs:
     C           -   spline interpolant.
-
 ALGLIB Project: Copyright 21.06.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21659,7 +21585,6 @@ Inputs:
 
 Result:
     S(x)
-
 ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21731,7 +21656,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21807,7 +21731,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21881,7 +21804,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21903,7 +21825,6 @@ Result:
     S   -   S(x)
     DS  -   S'(x)
     D2S -   S''(x)
-
 ALGLIB Project: Copyright 24.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -21955,7 +21876,6 @@ Outputs:
             * AvgError      average error on the (X,Y).
             * AvgRelError   average relative error on the non-zero Y
             * MaxError      maximum error
-
 ALGLIB Project: Copyright 27.08.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22023,7 +21943,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22091,7 +22010,6 @@ the first and last points - it automatically forces them  to  be  equal by
 copying  Y[first_point]  (corresponds  to the leftmost,  minimal  X[])  to
 Y[last_point]. However it is recommended to pass consistent values of Y[],
 i.e. to make Y[first_point]=Y[last_point].
-
 ALGLIB Project: Copyright 03.09.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22111,7 +22029,6 @@ Inputs:
             here 'a' denotes min(x[])
 Result:
     integral(S(t)dt,a,x)
-
 ALGLIB Project: Copyright 23.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22128,7 +22045,6 @@ Inputs:
     A, B-   transformation coefficients: x = A*t + B
 Result:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22145,7 +22061,6 @@ Inputs:
     A, B-   transformation coefficients: S2(x) = A*S(x) + B
 Result:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22178,7 +22093,6 @@ NOTE:
     You  can rebuild spline with  Spline1DBuildHermite()  function,  which
     accepts as inputs function values and derivatives at nodes, which  are
     easy to calculate when you have coefficients.
-
 ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22477,7 +22391,6 @@ This subroutine was deprecated in ALGLIB 3.6.0
 
 We recommend you to switch  to  Spline2DBuildBicubicV(),  which  is  more
 flexible and accepts its arguments in more convenient order.
-
 ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22502,7 +22415,6 @@ Inputs:
 
 Outputs:
     C   -   spline interpolant
-
 ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22517,7 +22429,6 @@ This subroutine was deprecated in ALGLIB 3.6.0
 
 We recommend you to switch  to  Spline2DBuildBilinearV(),  which  is  more
 flexible and accepts its arguments in more convenient order.
-
 ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22542,7 +22453,6 @@ Inputs:
 
 Outputs:
     C   -   spline interpolant
-
 ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22586,7 +22496,6 @@ Inputs:
 
 Outputs:
     S   -   solver object
-
 ALGLIB Project: Copyright 29.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22900,7 +22809,6 @@ Inputs:
 
 Result:
     S(x,y)
-
 ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22924,7 +22832,6 @@ Outputs:
             want  to    reuse  previously  allocated  F,   you   may   use
             Spline2DCalcVBuf(),  which  reallocates  F only when it is too
             small.
-
 ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22950,7 +22857,6 @@ Inputs:
 
 Outputs:
     F   -   array[D] (or larger) which stores function values
-
 ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22971,7 +22877,6 @@ Inputs:
 
 Result:
     value of I-th component
-
 ALGLIB Project: Copyright 01.02.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -22988,7 +22893,6 @@ Inputs:
 
 Outputs:
     CC  -   spline copy
-
 ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23011,7 +22915,6 @@ Outputs:
     FX  -   dS(x,y)/dX
     FY  -   dS(x,y)/dY
     FXY -   d2S(x,y)/dXdY
-
 ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23034,7 +22937,6 @@ Outputs:
     FX  -   dS(x,y)/dX
     FY  -   dS(x,y)/dY
     FXY -   d2S(x,y)/dXdY
-
 ALGLIB Project: Copyright 05.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23072,7 +22974,6 @@ Inputs:
 
 Outputs:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23091,7 +22992,6 @@ Inputs:
     AY, BY  -   transformation coefficients: y = A*u + B
 Result:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 30.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23115,7 +23015,6 @@ Inputs:
 Outputs:
     B           -   function values at the new grid,
                     array[0..NewHeight-1, 0..NewWidth-1]
-
 ALGLIB Routine: Copyright 2007 May 15 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23138,7 +23037,6 @@ Inputs:
 Outputs:
     B           -   function values at the new grid,
                     array[0..NewHeight-1, 0..NewWidth-1]
-
 ALGLIB Routine: Copyright 09.07.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23173,7 +23071,6 @@ This subroutine was deprecated in ALGLIB 3.6.0
 
 We recommend you to switch  to  Spline2DUnpackV(),  which is more flexible
 and accepts its arguments in more convenient order.
-
 ALGLIB Project: Copyright 29.06.2007 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23216,7 +23113,6 @@ Result:
                 S(x) = SUM(c[i,j]*(t^i)*(u^j), i=0..3, j=0..3)
                 t = x-x[j]
                 u = y-y[i]
-
 ALGLIB Project: Copyright 16.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23516,7 +23412,6 @@ Inputs:
 
 Outputs:
     C   -   spline interpolant
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23538,7 +23433,6 @@ Inputs:
 
 Result:
     S(x,y,z)
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23563,7 +23457,6 @@ Outputs:
             want  to    reuse  previously  allocated  F,   you   may   use
             Spline2DCalcVBuf(),  which  reallocates  F only when it is too
             small.
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23587,7 +23480,6 @@ Inputs:
 
 Outputs:
     F   -   array[D] (or larger) which stores function values
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23605,7 +23497,6 @@ Inputs:
 
 Outputs:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23625,7 +23516,6 @@ Inputs:
 
 Outputs:
     C   -   transformed spline
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23664,7 +23554,6 @@ Outputs:
                         B[..]       x=0,y=1,z=0
                         B[..]       ...
                         ...
-
 ALGLIB Routine: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23718,7 +23607,6 @@ Result:
             NOTE: format of Tbl is given for SType=1. Future versions of
                   ALGLIB can use different formats for different values of
                   SType.
-
 ALGLIB Project: Copyright 26.04.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23932,7 +23820,6 @@ Inputs:
     C       -   matrix (PREALLOCATED, large enough to store result)
     IC      -   submatrix offset
     JC      -   submatrix offset
-
 ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -23971,7 +23858,6 @@ Inputs:
     IsUpper -   whether upper or lower triangle of C is updated;
                 this function updates only one half of C, leaving
                 other half unchanged (not referenced at all).
-
 ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24003,7 +23889,6 @@ Inputs:
     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
     I2  -   submatrix offset
     J2  -   submatrix offset
-
 ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24037,8 +23922,6 @@ Outputs:
 
 if M=0, then subroutine does nothing.
 if N=0, Y is filled by zeros.
-
-
 ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24089,7 +23972,6 @@ Inputs:
     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
     I2  -   submatrix offset
     J2  -   submatrix offset
-
 ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24102,7 +23984,6 @@ ALGLIB Routine: Copyright 20.01.2018 by Sergey Bochkanov
 This subroutine is an older version of CMatrixHERK(), one with wrong  name
 (it is HErmitian update, not SYmmetric). It  is  left  here  for  backward
 compatibility.
-
 ALGLIB Routine: Copyright 16.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24145,7 +24026,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixcopy(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixcopy(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
 </pre>
 <a name=sub_rmatrixenforcesymmetricity></a><h6 class=pageheader>rmatrixenforcesymmetricity Function</h6>
 <hr width=600 align=left>
@@ -24206,7 +24087,6 @@ Inputs:
     C       -   PREALLOCATED output matrix, large enough to store result
     IC      -   submatrix offset
     JC      -   submatrix offset
-
 ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24215,9 +24095,11 @@ ALGLIB Routine: Copyright 2009-2019 by Sergey Bochkanov
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_gemm class=nav>ablas_d_gemm</a> ]</p>
 <a name=sub_rmatrixgemv></a><h6 class=pageheader>rmatrixgemv Function</h6>
+<hr width=600 align=left>
 <pre class=narration>
 Scaled matrix-vector addition: y += alpha a x.
 </pre>
+<hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rmatrixgemv(ae_int_t m, ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </pre>
@@ -24266,8 +24148,6 @@ Inputs:
     IU  -   subvector offset
     V   -   vector #2
     IV  -   subvector offset
-
-
 ALGLIB Routine: Copyright 16.10.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24297,7 +24177,6 @@ Inputs:
     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
     I2  -   submatrix offset
     J2  -   submatrix offset
-
 ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24331,13 +24210,11 @@ Outputs:
 
 if M=0, then subroutine does nothing.
 if N=0, Y is filled by zeros.
-
-
 ALGLIB Routine: Copyright 28.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixmv(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, real_1d_array y, ae_int_t iy);
+<b>void</b> rmatrixmv(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, ae_int_t opa, real_1d_array x, ae_int_t ix, real_1d_array &amp;y, ae_int_t iy);
 </pre>
 <a name=sub_rmatrixrank1></a><h6 class=pageheader>rmatrixrank1 Function</h6>
 <hr width=600 align=left>
@@ -24385,7 +24262,6 @@ Inputs:
     X   -   matrix, actial matrix is stored in X[I2:I2+M-1,J2:J2+N-1]
     I2  -   submatrix offset
     J2  -   submatrix offset
-
 ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24393,9 +24269,11 @@ ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 <b>void</b> rmatrixrighttrsm(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t i1, ae_int_t j1, <b>bool</b> isupper, <b>bool</b> isunit, ae_int_t optype, real_2d_array x, ae_int_t i2, ae_int_t j2);
 </pre>
 <a name=sub_rmatrixsymv></a><h6 class=pageheader>rmatrixsymv Function</h6>
+<hr width=600 align=left>
 <pre class=narration>
 Scaled vector-matrix-vector addition: y = alpha a x + beta y.
 </pre>
+<hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rmatrixsymv(ae_int_t n, <b>double</b> alpha, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, <b>double</b> beta, real_1d_array y, ae_int_t iy);
 </pre>
@@ -24428,7 +24306,6 @@ Inputs:
     IC      -   submatrix offset (row index)
     JC      -   submatrix offset (column index)
     IsUpper -   whether C is upper triangular or lower triangular
-
 ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -24437,9 +24314,11 @@ ALGLIB Routine: Copyright 16.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_ablas_d_syrk class=nav>ablas_d_syrk</a> ]</p>
 <a name=sub_rmatrixsyvmv></a><h6 class=pageheader>rmatrixsyvmv Function</h6>
+<hr width=600 align=left>
 <pre class=narration>
 Vector-matrix-vector multiplication: x^T a x (with tmp = a x).
 </pre>
+<hr width=600 align=left>
 <pre class=declaration>
 <b>double</b> rmatrixsyvmv(ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, <b>bool</b> isupper, real_1d_array x, ae_int_t ix, real_1d_array tmp);
 </pre>
@@ -24460,7 +24339,7 @@ Inputs:
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> rmatrixtranspose(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array b, ae_int_t ib, ae_int_t jb);
+<b>void</b> rmatrixtranspose(ae_int_t m, ae_int_t n, real_2d_array a, ae_int_t ia, ae_int_t ja, real_2d_array &amp;b, ae_int_t ib, ae_int_t jb);
 </pre>
 <a name=sub_rmatrixtrsv></a><h6 class=pageheader>rmatrixtrsv Function</h6>
 <hr width=600 align=left>
@@ -24491,7 +24370,6 @@ Inputs:
 
 Outputs:
     X       -   solution replaces elements X[IX:IX+N-1]
-
 ALGLIB Routine: Copyright (c) 2017 by Sergey Bochkanov - converted to ALGLIB, remastered from LAPACK's DTRSV.
 Copyright (c) 2016 Reference BLAS level1 routine (LAPACK version 3.7.0)
      Reference BLAS is a software package provided by Univ. of Tennessee,
@@ -25350,7 +25228,6 @@ Note 2:
     algorithms of linear algebra). If you require maximum performance
     on your machine, it is recommended to adjust this parameter manually.
 
-
 See also the InternalTREVC subroutine.
 
 The algorithm is based on the LAPACK 3.0 library.
@@ -25576,9 +25453,7 @@ Outputs:
                  * 2, contains the matrix of the eigenvalues found.
                    Array whose indexes range within [0..N-1, 0..I2-I1].
 
-
 Result:
-
     True, if successful. In that case, D contains the eigenvalues,
     Z contains the eigenvectors (if needed).
     It should be noted that the subroutine changes the size of arrays D and Z.
@@ -25724,7 +25599,6 @@ Inputs:
     UpdRow  -   row where the element to be updated is stored.
     UpdColumn - column where the element to be updated is stored.
     UpdVal  -   a number to be added to the element.
-
 
 Outputs:
     InvA    -   inverse of modified matrix A.
@@ -26032,7 +25906,6 @@ Inputs:
 
 Outputs:
     A   -   random matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26060,7 +25933,6 @@ NOTE: this function uses algorithm  described  in  Stewart, G. W.  (1980),
       * constructs a Householder reflection from the vector, then applies
         it to the smaller matrix (embedded in the larger size with a 1 at
         the bottom right corner).
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26079,7 +25951,6 @@ Inputs:
 
 Outputs:
     A   -   Q*A, where Q is random MxM orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26098,7 +25969,6 @@ Inputs:
 
 Outputs:
     A   -   A*Q, where Q is random NxN orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26117,7 +25987,6 @@ Inputs:
 
 Outputs:
     A   -   random matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26136,7 +26005,6 @@ Inputs:
 
 Outputs:
     A   -   Q^H*A*Q, where Q is random NxN orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26155,7 +26023,6 @@ Inputs:
 
 Outputs:
     A   -   random HPD matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26173,7 +26040,6 @@ Inputs:
 
 Outputs:
     A   -   random matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26201,7 +26067,6 @@ NOTE: this function uses algorithm  described  in  Stewart, G. W.  (1980),
       * constructs a Householder reflection from the vector, then applies
         it to the smaller matrix (embedded in the larger size with a 1 at
         the bottom right corner).
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26219,7 +26084,6 @@ Inputs:
 
 Outputs:
     A   -   Q*A, where Q is random MxM orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26237,7 +26101,6 @@ Inputs:
 
 Outputs:
     A   -   A*Q, where Q is random NxN orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26256,7 +26119,6 @@ Inputs:
 
 Outputs:
     A   -   random matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26275,7 +26137,6 @@ Inputs:
 
 Outputs:
     A   -   Q'*A*Q, where Q is random NxN orthogonal matrix
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26294,7 +26155,6 @@ Inputs:
 
 Outputs:
     A   -   random SPD matrix with norm2(A)=1 and cond(A)=C
-
 ALGLIB Routine: Copyright 04.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26385,7 +26245,6 @@ Outputs:
     Info    -   return code, same as in RMatrixLUInverse
     Rep     -   solver report, same as in RMatrixLUInverse
     A       -   inverse of matrix A, same as in RMatrixLUInverse
-
 ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26464,7 +26323,6 @@ Outputs:
     Info    -   return code, same as in RMatrixLUInverse
     Rep     -   solver report, same as in RMatrixLUInverse
     A       -   inverse of matrix A, same as in RMatrixLUInverse
-
 ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26503,7 +26361,6 @@ Outputs:
     Info    -   return code, same as in RMatrixLUInverse
     Rep     -   solver report, same as in RMatrixLUInverse
     A       -   inverse of matrix A, same as in RMatrixLUInverse
-
 ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26572,7 +26429,6 @@ SOLVER REPORT
 Subroutine sets following fields of the Rep structure:
 * R1        reciprocal of condition number: 1/cond(A), 1-norm.
 * RInf      reciprocal of condition number: 1/cond(A), inf-norm.
-
 ALGLIB Routine: Copyright 05.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26651,7 +26507,6 @@ Outputs:
     Info    -   return code, same as in RMatrixLUInverse
     Rep     -   solver report, same as in RMatrixLUInverse
     A       -   inverse of matrix A, same as in RMatrixLUInverse
-
 ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26690,7 +26545,6 @@ Outputs:
     Info    -   return code, same as in RMatrixLUInverse
     Rep     -   solver report, same as in RMatrixLUInverse
     A       -   inverse of matrix A, same as in RMatrixLUInverse
-
 ALGLIB Routine: Copyright 10.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26810,7 +26664,6 @@ Inputs:
 
 Outputs:
     State   -   structure which stores algorithm state
-
 
 NOTE: this algorithm is effectively deterministic, i.e. it always  returns
 same result when repeatedly called for the same matrix. In fact, algorithm
@@ -26951,7 +26804,6 @@ Inputs:
 
 Outputs:
     L       -   matrix L, array[0..M-1, 0..N-1].
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -26976,7 +26828,6 @@ Outputs:
     Q           -   first QRows rows of matrix Q.
                     Array whose index ranges within [0..QRows-1, 0..N-1].
                     If QRows=0, array isn't changed.
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27028,7 +26879,6 @@ Outputs:
     Q           -   first QColumns columns of matrix Q.
                     Array whose index ranges within [0..M-1, 0..QColumns-1].
                     If QColumns=0, array isn't changed.
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27048,7 +26898,6 @@ Inputs:
 
 Outputs:
     R       -   matrix R, array[0..M-1, 0..N-1].
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27079,7 +26928,6 @@ Outputs:
                 array with elements [0..N-1].
     E       -   secondary diagonal of real symmetric matrix T.
                 array with elements [0..N-2].
-
 
   If IsUpper=True, the matrix Q is represented as a product of elementary
   reflectors
@@ -27465,7 +27313,6 @@ H(i) = 1 - tau * v * (v^T)
 
 where tau is a scalar stored in Tau[I]; v - real vector, so that v(0:i-1)=0,
 v(i) = 1, v(i+1:n-1) stored in A(i,i+1:n-1).
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27485,7 +27332,6 @@ Inputs:
 
 Outputs:
     L       -   matrix L, array[0..M-1, 0..N-1].
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27510,7 +27356,6 @@ Outputs:
     Q       -   first QRows rows of matrix Q. Array whose indexes range
                 within [0..QRows-1, 0..N-1]. If QRows=0, the array remains
                 unchanged.
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27549,7 +27394,6 @@ H(i) = 1 - tau * v * (v^T)
 
 where tau is a scalar stored in Tau[I]; v - real vector,
 so that v(0:i-1) = 0, v(i) = 1, v(i+1:m-1) stored in A(i+1:m-1,i).
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27574,7 +27418,6 @@ Outputs:
     Q       -   first QColumns columns of matrix Q.
                 Array whose indexes range within [0..M-1, 0..QColumns-1].
                 If QColumns=0, the array remains unchanged.
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27594,7 +27437,6 @@ Inputs:
 
 Outputs:
     R       -   matrix R, array[0..M-1, 0..N-1].
-
 ALGLIB Routine: Copyright 17.02.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -27625,7 +27467,6 @@ Outputs:
                 array with elements [0..N-1].
     E       -   secondary diagonal of symmetric matrix T.
                 array with elements [0..N-2].
-
 
   If IsUpper=True, the matrix Q is represented as a product of elementary
   reflectors
@@ -28153,7 +27994,6 @@ Inputs:
             Array whose indexes range within [0..N-1, 0..N-1].
     N   -   size of A, N &ge; 0.
 
-
 Outputs:
     A   -   contains matrix T.
             Array whose indexes range within [0..N-1, 0..N-1].
@@ -28216,6 +28056,7 @@ Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library)
 <a href=#sub_sparsecreatesksbandbuf class=toc>sparsecreatesksbandbuf</a> |
 <a href=#sub_sparsecreatesksbuf class=toc>sparsecreatesksbuf</a> |
 <a href=#sub_sparseenumerate class=toc>sparseenumerate</a> |
+<a href=#sub_sparseexists class=toc>sparseexists</a> |
 <a href=#sub_sparsefree class=toc>sparsefree</a> |
 <a href=#sub_sparsegemv class=toc>sparsegemv</a> |
 <a href=#sub_sparseget class=toc>sparseget</a> |
@@ -28242,6 +28083,8 @@ Algorithm implemented on the basis of the DHSEQR subroutine (LAPACK 3.0 library)
 <a href=#sub_sparsesmm class=toc>sparsesmm</a> |
 <a href=#sub_sparsesmv class=toc>sparsesmv</a> |
 <a href=#sub_sparseswap class=toc>sparseswap</a> |
+<a href=#sub_sparsesymmpermtbl class=toc>sparsesymmpermtbl</a> |
+<a href=#sub_sparsesymmpermtblbuf class=toc>sparsesymmpermtblbuf</a> |
 <a href=#sub_sparsetransposecrs class=toc>sparsetransposecrs</a> |
 <a href=#sub_sparsetransposesks class=toc>sparsetransposesks</a> |
 <a href=#sub_sparsetrmv class=toc>sparsetrmv</a> |
@@ -28299,6 +28142,7 @@ Tables below outline information about these two formats:
     OPERATIONS WITH MATRIX      HASH        CRS         SKS
     creation                    +           +           +
     SparseGet                   +           +           +
+    SparseExists                +           +           +
     SparseRewriteExisting       +           +           +
     SparseSet                   +           +           +
     SparseAdd                   +
@@ -28333,7 +28177,6 @@ Outputs:
 
 NOTE 1:  when  S[i,j]  is exactly zero after modification, it is  deleted
 from the table.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28362,7 +28205,6 @@ NOTE: in-place conversion wastes a lot of memory which is  used  to  store
       temporaries.  If  you  perform  a  lot  of  repeated conversions, we
       recommend to use out-of-place buffered  conversion  functions,  like
       SparseCopyToBuf(), which can reuse already allocated memory.
-
 ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28390,7 +28232,6 @@ NOTE: this function allocates temporary memory to store a   copy  of  the
       matrix. If you perform a lot of repeated conversions, we  recommend
       you  to  use  SparseCopyToCRSBuf()  function,   which   can   reuse
       previously allocated memory.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28416,7 +28257,6 @@ NOTE: in-place conversion involves allocation of temporary arrays. If  you
       perform a lot of repeated in- place  conversions,  it  may  lead  to
       memory fragmentation. Consider using out-of-place SparseCopyToHashBuf()
       function in this case.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28441,7 +28281,6 @@ NOTE: in-place conversion involves allocation of temporary arrays. If  you
       perform a lot of repeated in- place  conversions,  it  may  lead  to
       memory fragmentation. Consider using out-of-place SparseCopyToSKSBuf()
       function in this case.
-
 ALGLIB Project: Copyright 15.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28457,7 +28296,6 @@ copy of S0. If you want to reuse memory, use SparseCopyBuf.
 
 NOTE:  this  function  does  not verify its arguments, it just copies all
 fields of the structure.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28472,7 +28310,6 @@ Memory already allocated in S1 is reused as much as possible.
 
 NOTE:  this  function  does  not verify its arguments, it just copies all
 fields of the structure.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28496,7 +28333,6 @@ Inputs:
 
 Outputs:
     S1          -   sparse matrix in requested format.
-
 ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28522,7 +28358,6 @@ NOTE: this function de-allocates memory occupied by S1 before starting CRS
       lead to memory fragmentation. In this case we recommend you  to  use
       SparseCopyToCRSBuf() function which re-uses memory in S1 as much  as
       possible.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28545,7 +28380,6 @@ Outputs:
     S1          -   sparse matrix in CRS format.
 
 NOTE: if S0 is stored as CRS, it is just copied without conversion.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28571,7 +28405,6 @@ NOTE: this function de-allocates memory  occupied  by  S1 before  starting
       lead to memory fragmentation. In this case we recommend you  to  use
       SparseCopyToHashBuf() function which re-uses memory in S1 as much as
       possible.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28592,7 +28425,6 @@ Outputs:
     S1          -   sparse matrix in Hash table format.
 
 NOTE: if S0 is stored as Hash-table, it is just copied without conversion.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28618,7 +28450,6 @@ NOTE: this function de-allocates memory  occupied  by  S1 before  starting
       lead to memory fragmentation. In this case we recommend you  to  use
       SparseCopyToSKSBuf() function which re-uses memory in S1 as much  as
       possible.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28639,7 +28470,6 @@ Outputs:
     S1          -   sparse matrix in SKS format.
 
 NOTE: if S0 is stored as SKS, it is just copied without conversion.
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28656,7 +28486,6 @@ Inputs:
 
 Outputs:
     S1      -   sparse matrix, transposed
-
 ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28676,7 +28505,6 @@ Inputs:
 Outputs:
     S1      -   sparse matrix, transposed; previously allocated memory  is
                 reused if possible.
-
 ALGLIB Project: Copyright 23.07.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28739,7 +28567,6 @@ NOTE 3
 This function completely  overwrites S with new sparse matrix. Previously
 allocated storage is NOT reused. If you  want  to reuse already allocated
 memory, call SparseCreateBuf function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28773,7 +28600,6 @@ Outputs:
                     All elements of the matrix are zero.
                     Previously allocated storage is reused, if  its  size
                     is compatible with expected number of non-zeros K.
-
 ALGLIB Project: Copyright 14.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28813,7 +28639,6 @@ Outputs:
 NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
       Previously allocated storage is NOT reused. If you  want  to  reuse
       already allocated memory, call SparseCreateCRSBuf function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28852,7 +28677,6 @@ Outputs:
     S           -   sparse M*N matrix in CRS representation.
                     You have to fill ALL non-zero elements by calling
                     SparseSet() BEFORE you try to use this matrix.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28886,7 +28710,6 @@ Outputs:
 NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
       Previously allocated storage is NOT reused. If you  want  to  reuse
       already allocated memory, call SparseCreateSKSBuf function.
-
 ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28919,7 +28742,6 @@ Outputs:
 NOTE: this function completely  overwrites  S  with  new  sparse  matrix.
       Previously allocated storage is NOT reused. If you  want  to  reuse
       already allocated memory, call sparsecreatesksbandbuf function.
-
 ALGLIB Project: Copyright 25.12.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28947,7 +28769,6 @@ Outputs:
     S           -   sparse M*N matrix in SKS representation.
                     All elements are filled by zeros.
                     You may use sparseset() to change their values.
-
 ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -28980,7 +28801,6 @@ Outputs:
     S           -   sparse M*N matrix in SKS representation.
                     All elements are filled by zeros.
                     You may use sparseset() to change their values.
-
 ALGLIB Project: Copyright 13.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29025,12 +28845,36 @@ Result:
 NOTE: you may call SparseRewriteExisting() during enumeration, but it  is
       THE  ONLY  matrix  modification  function  you  can  call!!!  Other
       matrix modification functions should not be called during enumeration!
-
 ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>bool</b> sparseenumerate(sparsematrix s, ae_int_t &amp;t0, ae_int_t &amp;t1, ae_int_t &amp;i, ae_int_t &amp;j, <b>double</b> &amp;v);
+</pre>
+<a name=sub_sparseexists></a><h6 class=pageheader>sparseexists Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function checks whether S[i,j] is present in the sparse  matrix.  It
+returns True even for elements  that  are  numerically  zero  (but  still
+have place allocated for them).
+
+The matrix  can be in any mode (Hash-Table, CRS, SKS), but this  function
+is less efficient for CRS matrices. Hash-Table and SKS matrices can  find
+element in O(1) time, while  CRS  matrices need O(log(RS)) time, where RS
+is an number of non-zero elements in a row.
+
+Inputs:
+    S           -   sparse M*N matrix
+    I           -   row index of the element to modify, 0 &le; I &lt; M
+    J           -   column index of the element to modify, 0 &le; J &lt; N
+
+Result:
+    whether S[I,J] is present in the data structure or not
+ALGLIB Project: Copyright 14.10.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparseexists(sparsematrix s, ae_int_t i, ae_int_t j);
 </pre>
 <a name=sub_sparsefree></a><h6 class=pageheader>sparsefree Function</h6>
 <hr width=600 align=left>
@@ -29040,7 +28884,6 @@ structure becomes unusable after this call.
 
 Outputs:
     S   -   sparse matrix to delete
-
 ALGLIB Project: Copyright 24.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29094,7 +28937,6 @@ HANDLING OF SPECIAL CASES:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 10.12.2019 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29111,14 +28953,12 @@ time, while  CRS  matrices need O(log(RS)) time, where RS is an number of
 non-zero elements in a row.
 
 Inputs:
-    S           -   sparse M*N matrix in Hash-Table representation.
-                    Exception will be thrown for CRS matrix.
+    S           -   sparse M*N matrix
     I           -   row index of the element to modify, 0 &le; I &lt; M
     J           -   column index of the element to modify, 0 &le; J &lt; N
 
 Result:
     value of S[I,J] or zero (in case no element with such index is found)
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29163,7 +29003,6 @@ NOTE: this function may allocate additional, unnecessary place for  ColIdx
       some &quot;extra&quot;-space, than performing two passes over matrix  -  first
       time to calculate exact space required for data, second  time  -  to
       store data itself.
-
 ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29187,7 +29026,6 @@ Inputs:
 
 Result:
     value of S[I,I] or zero (in case no element with such index is found)
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29208,7 +29046,6 @@ This function has different cost for different types of matrices:
 * for CRS and SKS matrix types cost of counting is O(N) (N - matrix size).
 
 Result: number of non-zero elements strictly below main diagonal
-
 ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29231,8 +29068,6 @@ Result:
 
 NOTE: future  versions  of  ALGLIB  may  include additional sparse storage
       formats.
-
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29245,7 +29080,6 @@ ae_int_t sparsegetmatrixtype(sparsematrix s);
 The function returns number of columns of a sparse matrix.
 
 Result: number of columns of a sparse matrix.
-
 ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29258,7 +29092,6 @@ ae_int_t sparsegetncols(sparsematrix s);
 The function returns number of rows of a sparse matrix.
 
 Result: number of rows of a sparse matrix.
-
 ALGLIB Project: Copyright 23.08.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29291,7 +29124,6 @@ NOTE: If you have O(non-zeros-per-row) time and memory  requirements,  use
 
 NOTE: when  incorrect  I  (outside  of  [0,M-1]) or  matrix (non  CRS/SKS)
       is passed, this function throws exception.
-
 ALGLIB Project: Copyright 10.12.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29312,7 +29144,6 @@ This function has different cost for different types of matrices:
 * for CRS and SKS matrix types cost of counting is O(N) (N - matrix size).
 
 Result: number of non-zero elements strictly above main diagonal
-
 ALGLIB Project: Copyright 12.02.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29331,7 +29162,6 @@ Inputs:
 Result:
     True if matrix type is CRS
     False if matrix type is not CRS
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29350,7 +29180,6 @@ Inputs:
 Result:
     True if matrix type is Hash table
     False if matrix type is not Hash table
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29369,7 +29198,6 @@ Inputs:
 Result:
     True if matrix type is SKS
     False if matrix type is not SKS
-
 ALGLIB Project: Copyright 20.07.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29398,7 +29226,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29433,7 +29260,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29462,7 +29288,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29490,7 +29315,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29518,7 +29342,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29553,7 +29376,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29566,7 +29388,6 @@ ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 This procedure resizes Hash-Table matrix. It can be called when you  have
 deleted too many elements from the matrix, and you want to  free unneeded
 memory.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29596,10 +29417,10 @@ Inputs:
 
 Outputs:
     S           -   modified matrix
+
 Result:
     True in case when element exists
     False in case when element doesn't exist or it is zero
-
 ALGLIB Project: Copyright 14.03.2012 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29642,7 +29463,6 @@ Inputs:
 
 Outputs:
     S           -   modified matrix
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29679,7 +29499,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29714,7 +29533,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29725,12 +29543,92 @@ ALGLIB Project: Copyright 14.10.2011 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=narration>
 This function efficiently swaps contents of S0 and S1.
-
 ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> sparseswap(sparsematrix s0, sparsematrix s1);
+</pre>
+<a name=sub_sparsesymmpermtbl></a><h6 class=pageheader>sparsesymmpermtbl Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function applies permutation given by permutation table P (as opposed
+to product form of permutation) to sparse symmetric  matrix  A,  given  by
+either upper or lower triangle: B := P*A*P'.
+
+This function allocates completely new instance of B. Use buffered version
+SparseSymmPermTblBuf() if you want to reuse already allocated structure.
+
+Inputs:
+    A           -   sparse square matrix in CRS format.
+    IsUpper     -   whether upper or lower triangle of A is used:
+                    * if upper triangle is given,  only   A[i,j] for  j &ge; i
+                      are used, and lower triangle is  ignored (it can  be
+                      empty - these elements are not referenced at all).
+                    * if lower triangle is given,  only   A[i,j] for  j &le; i
+                      are used, and upper triangle is ignored.
+    P           -   array[N] which stores permutation table;  P[I]=J means
+                    that I-th row/column of matrix  A  is  moved  to  J-th
+                    position. For performance reasons we do NOT check that
+                    P[] is  a   correct   permutation  (that there  is  no
+                    repetitions, just that all its elements  are  in [0,N)
+                    range.
+
+Outputs:
+    B           -   permuted matrix.  Permutation  is  applied  to A  from
+                    the both sides, only upper or lower triangle (depending
+                    on IsUpper) is stored.
+
+NOTE: this function throws exception when called for non-CRS  matrix.  You
+      must convert your matrix with SparseConvertToCRS() before using this
+      function.
+ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesymmpermtbl(sparsematrix a, <b>bool</b> isupper, integer_1d_array p, sparsematrix &amp;b);
+</pre>
+<a name=sub_sparsesymmpermtblbuf></a><h6 class=pageheader>sparsesymmpermtblbuf Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function is a buffered version  of  SparseSymmPermTbl()  that  reuses
+previously allocated storage in B as much as possible.
+
+This function applies permutation given by permutation table P (as opposed
+to product form of permutation) to sparse symmetric  matrix  A,  given  by
+either upper or lower triangle: B := P*A*P'.
+
+Inputs:
+    A           -   sparse square matrix in CRS format.
+    IsUpper     -   whether upper or lower triangle of A is used:
+                    * if upper triangle is given,  only   A[i,j] for  j &ge; i
+                      are used, and lower triangle is  ignored (it can  be
+                      empty - these elements are not referenced at all).
+                    * if lower triangle is given,  only   A[i,j] for  j &le; i
+                      are used, and upper triangle is ignored.
+    P           -   array[N] which stores permutation table;  P[I]=J means
+                    that I-th row/column of matrix  A  is  moved  to  J-th
+                    position. For performance reasons we do NOT check that
+                    P[] is  a   correct   permutation  (that there  is  no
+                    repetitions, just that all its elements  are  in [0,N)
+                    range.
+    B           -   sparse matrix object that will hold output.
+                    Previously allocated memory will be reused as much  as
+                    possible.
+
+Outputs:
+    B           -   permuted matrix.  Permutation  is  applied  to A  from
+                    the both sides, only upper or lower triangle (depending
+                    on IsUpper) is stored.
+
+NOTE: this function throws exception when called for non-CRS  matrix.  You
+      must convert your matrix with SparseConvertToCRS() before using this
+      function.
+ALGLIB Project: Copyright 05.10.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsesymmpermtblbuf(sparsematrix a, <b>bool</b> isupper, integer_1d_array p, sparsematrix b);
 </pre>
 <a name=sub_sparsetransposecrs></a><h6 class=pageheader>sparsetransposecrs Function</h6>
 <hr width=600 align=left>
@@ -29745,7 +29643,6 @@ Outputs:
 
 NOTE: internal  temporary  copy  is  allocated   for   the   purposes   of
       transposition. It is deallocated after transposition.
-
 ALGLIB Project: Copyright 30.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29765,7 +29662,6 @@ Inputs:
 
 Outputs:
     S           -   sparse matrix, transposed.
-
 ALGLIB Project: Copyright 16.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29809,7 +29705,6 @@ Outputs:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29856,7 +29751,6 @@ NOTE: this function throws exception when called for  non-CRS/SKS  matrix.
 
 NOTE: no assertion or tests are done during algorithm  operation.   It  is
       your responsibility to provide invertible matrix to algorithm.
-
 ALGLIB Project: Copyright 20.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29888,7 +29782,6 @@ Result:
 NOTE: this function throws exception when called for non-CRS/SKS  matrix.
 You must convert your matrix with SparseConvertToCRS/SKS()  before  using
 this function.
-
 ALGLIB Project: Copyright 27.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -29917,7 +29810,6 @@ using namespace alglib;
    sparseset(s, 0, 0, 2.0);
    sparseset(s, 1, 1, 1.0);
    sparseset(s, 0, 1, 1.0);
-
    sparseadd(s, 1, 1, 4.0);
 <font color=navy>// Now S is equal to</font>
 <font color=navy>//   [ 2 1 ]</font>
@@ -30008,7 +29900,6 @@ using namespace alglib;
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 2.0000</font>
    v = sparseget(s, 2, 3);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 1.0000</font>
-
 <font color=navy>// you may see that you can read zero elements (which are not stored) with sparseget()</font>
    v = sparseget(s, 3, 2);
    printf(<font color=blue><b>&quot;%.2f\n&quot;</b></font>, <b>double</b>(v)); <font color=navy>// EXPECTED: 0.0000</font>
@@ -30203,10 +30094,18 @@ ALGLIB: Copyright 2005 by Sergey Bochkanov
 </pre>
 <a name=unit_trfac></a><h4 class=pageheader>8.7.15. trfac Subpackage</h4>
 <div class=pagecontent>
+<h5>Classes</h5><font size=2>[
+<a href=#struct_sparsedecompositionanalysis class=toc>sparsedecompositionanalysis</a>
+]</font>
 <h5>Functions</h5><font size=2>[
 <a href=#sub_cmatrixlu class=toc>cmatrixlu</a> |
 <a href=#sub_hpdmatrixcholesky class=toc>hpdmatrixcholesky</a> |
 <a href=#sub_rmatrixlu class=toc>rmatrixlu</a> |
+<a href=#sub_sparsecholesky class=toc>sparsecholesky</a> |
+<a href=#sub_sparsecholeskyanalyze class=toc>sparsecholeskyanalyze</a> |
+<a href=#sub_sparsecholeskyfactorize class=toc>sparsecholeskyfactorize</a> |
+<a href=#sub_sparsecholeskyp class=toc>sparsecholeskyp</a> |
+<a href=#sub_sparsecholeskyreload class=toc>sparsecholeskyreload</a> |
 <a href=#sub_sparsecholeskyskyline class=toc>sparsecholeskyskyline</a> |
 <a href=#sub_sparselu class=toc>sparselu</a> |
 <a href=#sub_spdmatrixcholesky class=toc>spdmatrixcholesky</a> |
@@ -30216,6 +30115,18 @@ ALGLIB: Copyright 2005 by Sergey Bochkanov
 <a href=#sub_spdmatrixcholeskyupdatefixbuf class=toc>spdmatrixcholeskyupdatefixbuf</a>
 ]</font>
 </div>
+<a name=struct_sparsedecompositionanalysis></a><h6 class=pageheader>sparsedecompositionanalysis Class</h6>
+<hr width=600 align=left>
+<pre class=narration>
+An analysis of the sparse matrix decomposition, performed prior to  actual
+numerical factorization. You should not directly  access  fields  of  this
+object - use appropriate ALGLIB functions to work with this object.
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>class</b> sparsedecompositionanalysis {
+};
+</pre>
 <a name=sub_cmatrixlu></a><h6 class=pageheader>cmatrixlu Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -30232,14 +30143,12 @@ Inputs:
     M       -   number of rows in matrix A.
     N       -   number of columns in matrix A.
 
-
 Outputs:
     A       -   matrices L and U in compact form:
                 * L is stored under main diagonal
                 * U is stored on and above main diagonal
     Pivots  -   permutation matrix in compact form.
                 array[0..Min(M-1,N-1)].
-
 ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30272,7 +30181,6 @@ Result:
     If  the  matrix  is  positive-definite,  the  function  returns  True.
     Otherwise, the function returns False. Contents of A is not determined
     in such case.
-
 ALGLIB Routine: Copyright 15.12.2009-22.01.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30295,19 +30203,309 @@ Inputs:
     M       -   number of rows in matrix A.
     N       -   number of columns in matrix A.
 
-
 Outputs:
     A       -   matrices L and U in compact form:
                 * L is stored under main diagonal
                 * U is stored on and above main diagonal
     Pivots  -   permutation matrix in compact form.
                 array[0..Min(M-1,N-1)].
-
 ALGLIB Routine: Copyright 10.01.2010 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> rmatrixlu(real_2d_array &amp;a, ae_int_t m, ae_int_t n, integer_1d_array &amp;pivots);
+</pre>
+<a name=sub_sparsecholesky></a><h6 class=pageheader>sparsecholesky Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse Cholesky decomposition for a matrix  stored  in  any sparse storage,
+without rows/cols permutation.
+
+This function is the most convenient (less parameters to specify), although
+less efficient, version of sparse Cholesky.
+
+Internally it:
+* calls SparseCholeskyAnalyze()  function  to  perform  symbolic  analysis
+  phase with no permutation being configured.
+* calls SparseCholeskyFactorize() function to perform numerical  phase  of
+  the factorization
+
+Following alternatives may result in better performance:
+* using SparseCholeskyP(), which selects best  pivoting  available,  which
+  almost always results in improved sparsity and cache locality
+* using  SparseCholeskyAnalyze() and SparseCholeskyFactorize()   functions
+  directly,  which  may  improve  performance of repetitive factorizations
+  with same sparsity patterns.
+
+The latter also allows one to perform  LDLT  factorization  of  indefinite
+matrix (one with strictly diagonal D, which is known  to  be  stable  only
+in few special cases, like quasi-definite matrices).
+
+Inputs:
+    A       -   a square NxN sparse matrix, stored in any storage format.
+    IsUpper -   if IsUpper=True, then factorization is performed on  upper
+                triangle.  Another triangle is ignored on  input,  dropped
+                on output. Similarly, if IsUpper=False, the lower triangle
+                is processed.
+
+Outputs:
+    A       -   the result of factorization, stored in CRS format:
+                * if IsUpper=True, then the upper triangle contains matrix
+                  U such  that  A = U^T*U and the lower triangle is empty.
+                * similarly, if IsUpper=False, then lower triangular L  is
+                  returned and we have A = L*(L^T).
+                Note that THIS function does not  perform  permutation  of
+                the rows to reduce fill-in.
+
+Result:
+    If  the  matrix  is  positive-definite,  the  function  returns  True.
+    Otherwise, the function returns False.  Contents  of  A  is  undefined
+    in such case.
+
+NOTE: for  performance  reasons  this  function  does NOT check that input
+      matrix  includes  only  finite  values. It is your responsibility to
+      make sure that there are no infinite or NAN values in the matrix.
+ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparsecholesky(sparsematrix a, <b>bool</b> isupper);
+</pre>
+<a name=sub_sparsecholeskyanalyze></a><h6 class=pageheader>sparsecholeskyanalyze Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse Cholesky/LDLT decomposition: symbolic analysis phase.
+
+This function is a part of the 'expert' sparse Cholesky API:
+* SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+  matrix to be factorized into internal storage
+* SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+  with lower bounds on pivot magnitudes and additional overflow safeguards
+* SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+  precomputed symbolic analysis and internally stored matrix - and outputs
+  result
+* SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+  pattern into internal storage so  one  may  reuse  previously  allocated
+  temporaries and previously performed symbolic analysis
+
+This specific function performs preliminary analysis of the  Cholesky/LDLT
+factorization. It allows to choose  different  permutation  types  and  to
+choose between classic Cholesky and  indefinite  LDLT  factorization  (the
+latter is computed with strictly diagonal D, i.e.  without  Bunch-Kauffman
+pivoting).
+
+NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+      matrices. However, numerical stability is guaranteed ONLY for a class
+      of quasi-definite matrices.
+
+NOTE: all internal processing is performed with lower triangular  matrices
+      stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+      triangular storage means  that  one  format  conversion  and/or  one
+      transposition will be performed  internally  for  the  analysis  and
+      factorization phases. Thus, highest  performance  is  achieved  when
+      input is a lower triangular CRS matrix.
+
+Inputs:
+    A           -   sparse square matrix in any sparse storage format.
+    IsUpper     -   whether upper or lower  triangle  is  decomposed  (the
+                    other one is ignored).
+    FactType    -   factorization type:
+                    * 0 for traditional Cholesky of SPD matrix
+                    * 1 for LDLT decomposition with strictly  diagonal  D,
+                        which may have non-positive entries.
+    PermType    -   permutation type:
+                    *-1 for absence of permutation
+                    * 0 for best fill-in reducing permutation available
+                    * 1 for supernodal ordering (improves locality and
+                      performance, does NOT change fill-in factor)
+                    * 2 for AMD (approximate minimum degree) ordering
+
+Outputs:
+    Analysis    -   contains:
+                    * symbolic analysis of the matrix structure which will
+                      be used later to guide numerical factorization.
+                    * specific numeric values loaded into internal  memory
+                      waiting for the factorization to be performed
+
+This function fails if and only if the matrix A is symbolically degenerate
+i.e. has diagonal element which is exactly zero. In  such  case  False  is
+returned, contents of Analysis object is undefined.
+ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparsecholeskyanalyze(sparsematrix a, <b>bool</b> isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis &amp;analysis);
+</pre>
+<a name=sub_sparsecholeskyfactorize></a><h6 class=pageheader>sparsecholeskyfactorize Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse Cholesky decomposition: numerical analysis phase.
+
+This function is a part of the 'expert' sparse Cholesky API:
+* SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+  matrix to be factorized into internal storage
+* SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+  with lower bounds on pivot magnitudes and additional overflow safeguards
+* SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+  precomputed symbolic analysis and internally stored matrix - and outputs
+  result
+* SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+  pattern into internal storage so  one  may  reuse  previously  allocated
+  temporaries and previously performed symbolic analysis
+
+Depending on settings specified during SparseCholeskyAnalyze() call it may
+produce classic Cholesky or L*D*LT  decomposition  (with strictly diagonal
+D), without permutation or with performance-enhancing permutation P.
+
+NOTE: all internal processing is performed with lower triangular  matrices
+      stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+      triangular storage means  that  one  format  conversion  and/or  one
+      transposition will be performed  internally  for  the  analysis  and
+      factorization phases. Thus, highest  performance  is  achieved  when
+      input is a lower triangular CRS matrix, and lower triangular  output
+      is requested.
+
+NOTE: L*D*LT family of factorization may be used to  factorize  indefinite
+      matrices. However, numerical stability is guaranteed ONLY for a class
+      of quasi-definite matrices.
+
+Inputs:
+    Analysis    -   prior analysis with internally stored matrix which will
+                    be factorized
+    NeedUpper   -   whether upper triangular or lower triangular output is
+                    needed
+
+Outputs:
+    A           -   Cholesky decomposition of A stored in lower triangular
+                    CRS format, i.e. A=L*L' (or upper triangular CRS, with
+                    A=U'*U, depending on NeedUpper parameter).
+    D           -   array[N], diagonal factor. If no diagonal  factor  was
+                    required during analysis  phase,  still  returned  but
+                    filled with 1's
+    P           -   array[N], pivots. Permutation matrix P is a product of
+                    P(0)*P(1)*...*P(N-1), where P(i) is a  permutation  of
+                    row/col I and P[I] (with P[I] &ge; I).
+                    If no permutation was requested during analysis phase,
+                    still returned but filled with identity permutation.
+
+The function returns True  when  factorization  resulted  in nondegenerate
+matrix. False is returned when factorization fails (Cholesky factorization
+of indefinite matrix) or LDLT factorization has exactly zero  elements  at
+the diagonal. In the latter case contents of A, D and P is undefined.
+
+The analysis object is not changed during  the  factorization.  Subsequent
+calls to SparseCholeskyFactorize() will result in same factorization being
+performed one more time.
+ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparsecholeskyfactorize(sparsedecompositionanalysis analysis, <b>bool</b> needupper, sparsematrix &amp;a, real_1d_array &amp;d, integer_1d_array &amp;p);
+</pre>
+<a name=sub_sparsecholeskyp></a><h6 class=pageheader>sparsecholeskyp Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse Cholesky decomposition for a matrix  stored  in  any sparse storage
+format, with performance-enhancing permutation of rows/cols.
+
+Present version is configured  to  perform  supernodal  permutation  which
+sparsity reducing ordering.
+
+This function is a wrapper around generic sparse  decomposition  functions
+that internally:
+* calls SparseCholeskyAnalyze()  function  to  perform  symbolic  analysis
+  phase with best available permutation being configured.
+* calls SparseCholeskyFactorize() function to perform numerical  phase  of
+  the factorization.
+
+NOTE: using  SparseCholeskyAnalyze() and SparseCholeskyFactorize() directly
+      may improve  performance  of  repetitive  factorizations  with  same
+      sparsity patterns. It also allows one to perform  LDLT factorization
+      of  indefinite  matrix  -  a factorization with strictly diagonal D,
+      which  is  known to be stable only in few special cases, like quasi-
+      definite matrices.
+
+Inputs:
+    A       -   a square NxN sparse matrix, stored in any storage format.
+    IsUpper -   if IsUpper=True, then factorization is performed on  upper
+                triangle.  Another triangle is ignored on  input,  dropped
+                on output. Similarly, if IsUpper=False, the lower triangle
+                is processed.
+
+Outputs:
+    A       -   the result of factorization, stored in CRS format:
+                * if IsUpper=True, then the upper triangle contains matrix
+                  U such  that  A = U^T*U and the lower triangle is empty.
+                * similarly, if IsUpper=False, then lower triangular L  is
+                  returned and we have A = L*(L^T).
+    P       -   a row/column permutation, a product of P0*P1*...*Pk, k=N-1,
+                with Pi being permutation of rows/cols I and P[I]
+
+Result:
+    If  the  matrix  is  positive-definite,  the  function  returns  True.
+    Otherwise, the function returns False.  Contents  of  A  is  undefined
+    in such case.
+
+NOTE: for  performance  reasons  this  function  does NOT check that input
+      matrix  includes  only  finite  values. It is your responsibility to
+      make sure that there are no infinite or NAN values in the matrix.
+ALGLIB Routine: Copyright 16.09.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>bool</b> sparsecholeskyp(sparsematrix a, <b>bool</b> isupper, integer_1d_array &amp;p);
+</pre>
+<a name=sub_sparsecholeskyreload></a><h6 class=pageheader>sparsecholeskyreload Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse  Cholesky  decomposition:  update  internally  stored  matrix  with
+another one with exactly same sparsity pattern.
+
+This function is a part of the 'expert' sparse Cholesky API:
+* SparseCholeskyAnalyze(), that performs symbolic analysis phase and loads
+  matrix to be factorized into internal storage
+* SparseCholeskySetModType(), that allows to  use  modified  Cholesky/LDLT
+  with lower bounds on pivot magnitudes and additional overflow safeguards
+* SparseCholeskyFactorize(),  that performs  numeric  factorization  using
+  precomputed symbolic analysis and internally stored matrix - and outputs
+  result
+* SparseCholeskyReload(), that reloads one more matrix with same  sparsity
+  pattern into internal storage so  one  may  reuse  previously  allocated
+  temporaries and previously performed symbolic analysis
+
+This specific function replaces internally stored  numerical  values  with
+ones from another sparse matrix (but having exactly same sparsity  pattern
+as one that was used for initial SparseCholeskyAnalyze() call).
+
+NOTE: all internal processing is performed with lower triangular  matrices
+      stored  in  CRS  format.  Any  other  storage  formats  and/or upper
+      triangular storage means  that  one  format  conversion  and/or  one
+      transposition will be performed  internally  for  the  analysis  and
+      factorization phases. Thus, highest  performance  is  achieved  when
+      input is a lower triangular CRS matrix.
+
+Inputs:
+    Analysis    -   analysis object
+    A           -   sparse square matrix in any sparse storage format.  It
+                    MUST have exactly same sparsity pattern as that of the
+                    matrix that was passed to SparseCholeskyAnalyze().
+                    Any difference (missing elements or additional elements)
+                    may result in unpredictable and undefined  behavior  -
+                    an algorithm may fail due to memory access violation.
+    IsUpper     -   whether upper or lower  triangle  is  decomposed  (the
+                    other one is ignored).
+
+Outputs:
+    Analysis    -   contains:
+                    * symbolic analysis of the matrix structure which will
+                      be used later to guide numerical factorization.
+                    * specific numeric values loaded into internal  memory
+                      waiting for the factorization to be performed
+ALGLIB Routine: Copyright 20.09.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsecholeskyreload(sparsedecompositionanalysis analysis, sparsematrix a, <b>bool</b> isupper);
 </pre>
 <a name=sub_sparsecholeskyskyline></a><h6 class=pageheader>sparsecholeskyskyline Function</h6>
 <hr width=600 align=left>
@@ -30319,11 +30517,10 @@ The algorithm computes Cholesky decomposition  of  a  symmetric  positive-
 definite sparse matrix. The result of an algorithm is a representation  of
 A as A=U^T*U or A=L*L^T
 
-This  function  is  a  more  efficient alternative to general, but  slower
-SparseCholeskyX(), because it does not  create  temporary  copies  of  the
-target. It performs factorization in-place, which gives  best  performance
-on low-profile matrices. Its drawback, however, is that it can not perform
-profile-reducing permutation of input matrix.
+This function allows to perform very efficient decomposition of low-profile
+matrices (average bandwidth is ~5-10 elements). For larger matrices it  is
+recommended to use supernodal Cholesky decomposition: SparseCholeskyP() or
+SparseCholeskyAnalyze()/SparseCholeskyFactorize().
 
 Inputs:
     A       -   sparse matrix in skyline storage (SKS) format.
@@ -30331,7 +30528,6 @@ Inputs:
     IsUpper -   if IsUpper=True, then factorization is performed on  upper
                 triangle. Another triangle is ignored (it may contant some
                 data, but it is not changed).
-
 
 Outputs:
     A       -   the result of factorization, stored in SKS. If IsUpper=True,
@@ -30350,7 +30546,6 @@ Result:
 NOTE: for  performance  reasons  this  function  does NOT check that input
       matrix  includes  only  finite  values. It is your responsibility to
       make sure that there are no infinite or NAN values in the matrix.
-
 ALGLIB Routine: Copyright 16.01.2014 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30397,8 +30592,6 @@ detect symbolically degenerate matrices:
   non-degenerate
 * function returns FALSE, if the matrix was factorized but U has strictly
   zero elements at the diagonal (the factorization is returned anyway).
-
-
 ALGLIB Routine: Copyright 03.09.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30431,7 +30624,6 @@ Result:
     If  the  matrix  is  positive-definite,  the  function  returns  True.
     Otherwise, the function returns False. Contents of A is not determined
     in such case.
-
 ALGLIB Routine: Copyright 15.12.2009 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30751,7 +30943,6 @@ on optimization, which is available at http://www.alglib.net/optimization/
    with same N but another starting point.
    MinBCRestartFrom() allows to reuse already initialized structure.
 
-
 Inputs:
     N       -   problem dimension, N &gt; 0:
                 * if given, only leading N elements of X are used
@@ -30914,11 +31105,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #0 &quot;strong&quot; report
-    lngrep  -   C1 test #0 &quot;long&quot; report
+    StrRep  -   C1 test #0 &quot;strong&quot; report
+    LngRep  -   C1 test #0 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -30967,11 +31158,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #1 &quot;strong&quot; report
-    lngrep  -   C1 test #1 &quot;long&quot; report
+    StrRep  -   C1 test #1 &quot;strong&quot; report
+    LngRep  -   C1 test #1 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -31026,10 +31217,10 @@ which return detailed error reports, specific points where discontinuities
 were found, and so on.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   generic OptGuard report;  more  detailed  reports  can  be
+    Rep     -   generic OptGuard report;  more  detailed  reports  can  be
                 retrieved with other functions.
 
 NOTE: false negatives (nonsmooth problems are not identified as  nonsmooth
@@ -31088,8 +31279,8 @@ NOTE: OptGuard does  NOT  guarantee  that  it  will  always  detect  C0/C1
       spotted with restart from different initial point).
 
 Inputs:
-    state   -   algorithm state
-    level   -   monitoring level:
+    State   -   algorithm state
+    Level   -   monitoring level:
                 * 0 - monitoring is disabled
                 * 1 - noninvasive low-overhead monitoring; function values
                       and/or gradients are recorded, but OptGuard does not
@@ -31153,7 +31344,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed to MinBCOptimize()  and specific
    function used to create optimizer.
-
 
                      |         USER PASSED TO MinBCOptimize()
    CREATED WITH      |  function only   |  function and gradient
@@ -31953,11 +32143,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #0 &quot;strong&quot; report
-    lngrep  -   C1 test #0 &quot;long&quot; report
+    StrRep  -   C1 test #0 &quot;strong&quot; report
+    LngRep  -   C1 test #0 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -32006,11 +32196,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #1 &quot;strong&quot; report
-    lngrep  -   C1 test #1 &quot;long&quot; report
+    StrRep  -   C1 test #1 &quot;strong&quot; report
+    LngRep  -   C1 test #1 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -32065,10 +32255,10 @@ which return detailed error reports, specific points where discontinuities
 were found, and so on.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   generic OptGuard report;  more  detailed  reports  can  be
+    Rep     -   generic OptGuard report;  more  detailed  reports  can  be
                 retrieved with other functions.
 
 NOTE: false negatives (nonsmooth problems are not identified as  nonsmooth
@@ -32127,8 +32317,8 @@ NOTE: OptGuard does  NOT  guarantee  that  it  will  always  detect  C0/C1
       spotted with restart from different initial point).
 
 Inputs:
-    state   -   algorithm state
-    level   -   monitoring level:
+    State   -   algorithm state
+    Level   -   monitoring level:
                 * 0 - monitoring is disabled
                 * 1 - noninvasive low-overhead monitoring; function values
                       and/or gradients are recorded, but OptGuard does not
@@ -32192,7 +32382,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed to MinBLEICOptimize()  and specific
    function used to create optimizer.
-
 
                      |         USER PASSED TO MinBLEICOptimize()
    CREATED WITH      |  function only   |  function and gradient
@@ -32923,11 +33112,9 @@ These CG methods are globally convergent (even on non-convex functions) as
 long as grad(f) is Lipschitz continuous in  a  some  neighborhood  of  the
 L = { x : f(x) &le; f(x0) }.
 
-
 REQUIREMENTS:
 Algorithm will request following information during its operation:
 * function value F and its gradient G (simultaneously) at given point X
-
 
 USAGE:
 1. User initializes algorithm state with MinCGCreate() call
@@ -32939,7 +33126,6 @@ USAGE:
 5. Optionally, user may call MinCGRestartFrom() to solve another  problem
    with same N but another starting point and/or another function.
    MinCGRestartFrom() allows to reuse already initialized structure.
-
 
 Inputs:
     N       -   problem dimension, N &gt; 0:
@@ -33100,11 +33286,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #0 &quot;strong&quot; report
-    lngrep  -   C1 test #0 &quot;long&quot; report
+    StrRep  -   C1 test #0 &quot;strong&quot; report
+    LngRep  -   C1 test #0 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -33153,11 +33339,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #1 &quot;strong&quot; report
-    lngrep  -   C1 test #1 &quot;long&quot; report
+    StrRep  -   C1 test #1 &quot;strong&quot; report
+    LngRep  -   C1 test #1 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -33212,10 +33398,10 @@ which return detailed error reports, specific points where discontinuities
 were found, and so on.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   generic OptGuard report;  more  detailed  reports  can  be
+    Rep     -   generic OptGuard report;  more  detailed  reports  can  be
                 retrieved with other functions.
 
 NOTE: false negatives (nonsmooth problems are not identified as  nonsmooth
@@ -33275,8 +33461,8 @@ NOTE: OptGuard does  NOT  guarantee  that  it  will  always  detect  C0/C1
       spotted with restart from different initial point).
 
 Inputs:
-    state   -   algorithm state
-    level   -   monitoring level:
+    State   -   algorithm state
+    Level   -   monitoring level:
                 * 0 - monitoring is disabled
                 * 1 - noninvasive low-overhead monitoring; function values
                       and/or gradients are recorded, but OptGuard does not
@@ -33341,7 +33527,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed  to  MinCGOptimize()  and  specific
    function used to create optimizer.
-
 
                   |         USER PASSED TO MinCGOptimize()
    CREATED WITH   |  function only   |  function and gradient
@@ -33920,6 +34105,7 @@ using namespace alglib;
 ]</font>
 </div>
 <a name=struct_minasareport></a><h6 class=pageheader>minasareport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> minasareport {
@@ -33930,11 +34116,12 @@ using namespace alglib;
 };
 </pre>
 <a name=struct_minasastate></a><h6 class=pageheader>minasastate Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> minasastate {
    bool needfg;
-   bool xupdated; 
+   bool xupdated;
    double f;
    real_1d_array g;
    real_1d_array x;
@@ -34160,6 +34347,7 @@ Other fields of this structure are not documented and should not be used!
 };
 </pre>
 <a name=struct_minlbfgsstate></a><h6 class=pageheader>minlbfgsstate Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> minlbfgsstate {
@@ -34168,7 +34356,7 @@ Other fields of this structure are not documented and should not be used!
    bool xupdated;
    double f;
    real_1d_array g;
-   real_1d_array x; 
+   real_1d_array x;
 };
 </pre>
 <a name=sub_minlbfgscreate></a><h6 class=pageheader>minlbfgscreate Function</h6>
@@ -34183,11 +34371,9 @@ using information about the last M steps of the algorithm  (instead of N).
 It lessens a required amount of memory from a value  of  order  N^2  to  a
 value of order 2*N*M.
 
-
 REQUIREMENTS:
 Algorithm will request following information during its operation:
 * function value F and its gradient G (simultaneously) at given point X
-
 
 USAGE:
 1. User initializes algorithm state with MinLBFGSCreate() call
@@ -34200,7 +34386,6 @@ USAGE:
    with same N/M but another starting point and/or another function.
    MinLBFGSRestartFrom() allows to reuse already initialized structure.
 
-
 Inputs:
     N       -   problem dimension. N &gt; 0
     M       -   number of corrections in the BFGS scheme of Hessian
@@ -34210,10 +34395,8 @@ Inputs:
                 performance. M &le; N.
     X       -   initial solution approximation, array[0..N-1].
 
-
 Outputs:
     State   -   structure which stores algorithm state
-
 
 NOTES:
 1. you may tune stopping conditions with MinLBFGSSetCond() function
@@ -34377,11 +34560,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #0 &quot;strong&quot; report
-    lngrep  -   C1 test #0 &quot;long&quot; report
+    StrRep  -   C1 test #0 &quot;strong&quot; report
+    LngRep  -   C1 test #0 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -34430,11 +34613,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #1 &quot;strong&quot; report
-    lngrep  -   C1 test #1 &quot;long&quot; report
+    StrRep  -   C1 test #1 &quot;strong&quot; report
+    LngRep  -   C1 test #1 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -34489,10 +34672,10 @@ which return detailed error reports, specific points where discontinuities
 were found, and so on.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   generic OptGuard report;  more  detailed  reports  can  be
+    Rep     -   generic OptGuard report;  more  detailed  reports  can  be
                 retrieved with other functions.
 
 NOTE: false negatives (nonsmooth problems are not identified as  nonsmooth
@@ -34552,8 +34735,8 @@ NOTE: OptGuard does  NOT  guarantee  that  it  will  always  detect  C0/C1
       spotted with restart from different initial point).
 
 Inputs:
-    state   -   algorithm state
-    level   -   monitoring level:
+    State   -   algorithm state
+    Level   -   monitoring level:
                 * 0 - monitoring is disabled
                 * 1 - noninvasive low-overhead monitoring; function values
                       and/or gradients are recorded, but OptGuard does not
@@ -34618,7 +34801,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed to MinLBFGSOptimize()  and specific
    function used to create optimizer.
-
 
                      |         USER PASSED TO MinLBFGSOptimize()
    CREATED WITH      |  function only   |  function and gradient
@@ -35234,7 +35416,6 @@ using  its  gradient  and  Hessian.  Levenberg-Marquardt modification with
 L-BFGS pre-optimization and internal pre-conditioned  L-BFGS  optimization
 after each Levenberg-Marquardt step is used.
 
-
 REQUIREMENTS:
 This algorithm will request following information during its operation:
 
@@ -35254,7 +35435,6 @@ use incorrect version of MinLMOptimize() (for example, version which  does
 not provide Hessian matrix), but it will lead to  exception  being  thrown
 after first attempt to calculate Hessian.
 
-
 USAGE:
 1. User initializes algorithm state with MinLMCreateFGH() call
 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -35265,7 +35445,6 @@ USAGE:
 5. Optionally, user may call MinLMRestartFrom() to solve  another  problem
    with same N but another starting point and/or another function.
    MinLMRestartFrom() allows to reuse already initialized structure.
-
 
 Inputs:
     N       -   dimension, N &gt; 1
@@ -35326,7 +35505,6 @@ sum of squares:
 using value of function vector f[] only. Finite differences  are  used  to
 calculate Jacobian.
 
-
 REQUIREMENTS:
 This algorithm will request following information during its operation:
 * function vector f[] at given point X
@@ -35341,7 +35519,6 @@ works with general form function and does not accept function vector), but
 it will  lead  to  exception being thrown after first attempt to calculate
 Jacobian.
 
-
 USAGE:
 1. User initializes algorithm state with MinLMCreateV() call
 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -35352,7 +35529,6 @@ USAGE:
 5. Optionally, user may call MinLMRestartFrom() to solve  another  problem
    with same N/M but another starting point and/or another function.
    MinLMRestartFrom() allows to reuse already initialized structure.
-
 
 Inputs:
     N       -   dimension, N &gt; 1
@@ -35403,7 +35579,6 @@ sum of squares:
     F(x) = f[0]^2(x[0],...,x[N-1]) + ... + f[M-1]^2(x[0],...,x[N-1])
 using value of function vector f[] and Jacobian of f[].
 
-
 REQUIREMENTS:
 This algorithm will request following information during its operation:
 
@@ -35422,7 +35597,6 @@ works  with  general  form function and does not provide Jacobian), but it
 will  lead  to  exception  being  thrown  after first attempt to calculate
 Jacobian.
 
-
 USAGE:
 1. User initializes algorithm state with MinLMCreateVJ() call
 2. User tunes solver parameters with MinLMSetCond(),  MinLMSetStpMax() and
@@ -35433,7 +35607,6 @@ USAGE:
 5. Optionally, user may call MinLMRestartFrom() to solve  another  problem
    with same N/M but another starting point and/or another function.
    MinLMRestartFrom() allows to reuse already initialized structure.
-
 
 Inputs:
     N       -   dimension, N &gt; 1
@@ -35547,10 +35720,10 @@ Following flags are set when these errors are suspected:
     differentiation
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   OptGuard report
+    Rep     -   OptGuard report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -36259,6 +36432,8 @@ using namespace alglib;
 <a href=#sub_minlpoptimize class=toc>minlpoptimize</a> |
 <a href=#sub_minlpresults class=toc>minlpresults</a> |
 <a href=#sub_minlpresultsbuf class=toc>minlpresultsbuf</a> |
+<a href=#sub_minlpsetalgodss class=toc>minlpsetalgodss</a> |
+<a href=#sub_minlpsetalgoipm class=toc>minlpsetalgoipm</a> |
 <a href=#sub_minlpsetbc class=toc>minlpsetbc</a> |
 <a href=#sub_minlpsetbcall class=toc>minlpsetbcall</a> |
 <a href=#sub_minlpsetbci class=toc>minlpsetbci</a> |
@@ -36278,9 +36453,13 @@ using namespace alglib;
 <pre class=narration>
 This structure stores optimization report:
 * f                         target function value
+* lagbc                     Lagrange coefficients for box constraints
+* laglc                     Lagrange coefficients for linear constraints
 * y                         dual variables
 * stats                     array[N+M], statuses of box (N) and linear (M)
-                            constraints:
+                            constraints. This array is filled only by  DSS
+                            algorithm because IPM always stops at INTERIOR
+                            point:
                             * stats[i] &gt; 0  &rArr;  constraint at upper bound
                                                 (also used for free non-basic
                                                 variables set to zero)
@@ -36289,8 +36468,11 @@ This structure stores optimization report:
                                                 variable
 * primalerror               primal feasibility error
 * dualerror                 dual feasibility error
+* slackerror                complementary slackness error
 * iterationscount           iteration count
 * terminationtype           completion code (see below)
+
+COMPLETION CODES
 
 Completion codes:
 * -4    LP problem is primal unbounded (dual infeasible)
@@ -36300,15 +36482,31 @@ Completion codes:
 *  7    stopping conditions are too stringent,
         further improvement is impossible,
         X contains best point found so far.
+
+LAGRANGE COEFFICIENTS
+
+Positive Lagrange coefficient means that constraint is at its upper bound.
+Negative coefficient means that constraint is at its lower  bound.  It  is
+expected that at solution the dual feasibility condition holds:
+
+    C + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+
+where
+* C is a cost vector (linear term)
+* Ei is a vector with 1.0 at position I and 0 in other positions
+* Ai is an I-th row of linear constraint matrix
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> minlpreport {
    <b>double</b> f;
+   real_1d_array lagbc;
+   real_1d_array laglc;
    real_1d_array y;
    integer_1d_array stats;
    <b>double</b> primalerror;
    <b>double</b> dualerror;
+   <b>double</b> slackerror;
    ae_int_t iterationscount;
    ae_int_t terminationtype;
 };
@@ -36345,7 +36543,7 @@ Inputs:
     NNZ     -   number of non-zero coefficients in A
     AL, AU  -   lower and upper bounds;
                 * AL=AU    &rArr; equality constraint A*x
-                * AL &lt; AU    &rArr; two-sided constraint AL &le; A*x &le; AU
+                * AL &lt; AU  &rArr; two-sided constraint AL &le; A*x &le; AU
                 * AL=-INF  &rArr; one-sided constraint A*x &le; AU
                 * AU=+INF  &rArr; one-sided constraint AL &le; A*x
                 * AL=-INF, AU=+INF &rArr; constraint is ignored
@@ -36373,7 +36571,7 @@ Inputs:
                 included.
     AL, AU  -   lower and upper bounds;
                 * AL=AU    &rArr; equality constraint Ai*x
-                * AL &lt; AU    &rArr; two-sided constraint AL &le; A*x &le; AU
+                * AL &lt; AU  &rArr; two-sided constraint AL &le; A*x &le; AU
                 * AL=-INF  &rArr; one-sided constraint Ai*x &le; AU
                 * AU=+INF  &rArr; one-sided constraint AL &le; Ai*x
                 * AL=-INF, AU=+INF &rArr; constraint is ignored
@@ -36403,12 +36601,16 @@ In order to actually solve something you should:
 * call minlpoptimize() to run the solver and  minlpresults()  to  get  the
   solution vector and additional information.
 
-Presently  this  optimizer  supports  only  revised  simplex   method   as
-underlying solver. DSE pricing and bounds flipping ratio  test  (aka  long
-dual step) are supported. Large-scale sparse LU solver with  Forest-Tomlin
-is used internally as linear algebra driver.
+By  default,  LP  solver uses best algorithm available. As of ALGLIB 3.17,
+sparse interior point (barrier) solver is used. Future releases of  ALGLIB
+may introduce other solvers.
 
-Future releases of ALGLIB may introduce other solvers.
+User may choose specific LP algorithm by calling:
+* minlpsetalgodss() for revised dual simplex method with DSE  pricing  and
+  bounds flipping ratio test (aka long dual step).  Large-scale  sparse LU
+  solverwith  Forest-Tomlin update is used internally  as  linear  algebra
+  driver.
+* minlpsetalgoipm() for sparse interior point method
 
 Inputs:
     N       -   problem size
@@ -36448,7 +36650,7 @@ Inputs:
     State   -   algorithm state
 
 Outputs:
-    X       -   array[N], solution. Filled by zeros on failure.
+    X       -   array[N], solution (on failure: last trial point)
     Rep     -   optimization report. You should check Rep.TerminationType,
                 which contains completion code, and you may check  another
                 fields which contain another information  about  algorithm
@@ -36457,6 +36659,8 @@ Outputs:
                 Failure codes returned by algorithm are:
                 * -4    LP problem is primal unbounded (dual infeasible)
                 * -3    LP problem is primal infeasible (dual unbounded)
+                * -2    IPM solver detected that problem is either
+                        infeasible or unbounded
 
                 Success codes:
                 *  1..4 successful completion
@@ -36482,6 +36686,59 @@ ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 <hr width=600 align=left>
 <pre class=declaration>
 <b>void</b> minlpresultsbuf(minlpstate state, real_1d_array &amp;x, minlpreport &amp;rep);
+</pre>
+<a name=sub_minlpsetalgodss></a><h6 class=pageheader>minlpsetalgodss Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets LP algorithm to revised dual simplex method.
+
+ALGLIB implementation of dual simplex method supports advanced performance
+and stability improvements like DSE pricing , bounds flipping  ratio  test
+(aka long dual step), Forest-Tomlin update, shifting.
+
+Inputs:
+    State   -   optimizer
+    Eps     -   stopping condition, Eps &ge; 0:
+                * should be small number about 1E-6 or 1E-7.
+                * zero value means that solver automatically selects good
+                  value (can be different in different ALGLIB versions)
+                * default value is zero
+                Algorithm stops when relative error is less than Eps.
+ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> minlpsetalgodss(minlpstate state, <b>double</b> eps);
+</pre>
+<a name=sub_minlpsetalgoipm></a><h6 class=pageheader>minlpsetalgoipm Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+This function sets LP algorithm to sparse interior point method.
+
+ALGORITHM INFORMATION:
+
+* this  algorithm  is  our implementation  of  interior  point  method  as
+  formulated by  R.J.Vanderbei, with minor modifications to the  algorithm
+  (damped Newton directions are extensively used)
+* like all interior point methods, this algorithm  tends  to  converge  in
+  roughly same number of iterations (between 15 and 50) independently from
+  the problem dimensionality
+
+Inputs:
+    State   -   optimizer
+    Eps     -   stopping condition, Eps &ge; 0:
+                * should be small number about 1E-7 or 1E-8.
+                * zero value means that solver automatically selects good
+                  value (can be different in different ALGLIB versions)
+                * default value is zero
+                Algorithm  stops  when  primal  error  AND  dual error AND
+                duality gap are less than Eps.
+ALGLIB: Copyright 08.11.2020 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> minlpsetalgoipm(minlpstate state, <b>double</b> eps);
+<b>void</b> minlpsetalgoipm(minlpstate state);
 </pre>
 <a name=sub_minlpsetbc></a><h6 class=pageheader>minlpsetbc Function</h6>
 <hr width=600 align=left>
@@ -36654,7 +36911,7 @@ Inputs:
                 and last element being right side.
     CT      -   constraint types, array[K]:
                 * if CT[i] &gt; 0, then I-th constraint is A[i,*]*x &ge; A[i,n]
-                * if CT[i]=0, then I-th constraint is A[i,*]*x  = A[i,n]
+                * if CT[i] = 0, then I-th constraint is A[i,*]*x  = A[i,n]
                 * if CT[i] &lt; 0, then I-th constraint is A[i,*]*x &le; A[i,n]
     K       -   number of equality/inequality constraints,  K &ge; 0;  if  not
                 given, inferred from sizes of A and CT.
@@ -36777,7 +37034,7 @@ using namespace alglib;
 <font color=navy>// and general linear constraints</font>
 <font color=navy>//</font>
 <font color=navy>//     x0 - x1 &ge; -1</font>
-<font color=navy>//     x0 + x1 &le; +1</font>
+<font color=navy>//     x0 + x1 &le;  1</font>
 <font color=navy>//</font>
 <font color=navy>// We use dual simplex solver provided by ALGLIB <b>for</b> this task. Box</font>
 <font color=navy>// constraints are specified by means of constraint vectors bndl and</font>
@@ -36798,7 +37055,6 @@ using namespace alglib;
    real_1d_array x;
    minlpstate state;
    minlpreport rep;
-
    minlpcreate(2, state);
 <font color=navy>// Set cost vector, box constraints, general linear constraints.</font>
 <font color=navy>//</font>
@@ -36826,7 +37082,6 @@ using namespace alglib;
 <font color=navy>// and <b>for</b> preconditioning of the algorithm steps.</font>
 <font color=navy>// You can find more information on scaling at http://www.alglib.net/optimization/scaling.php</font>
    minlpsetscale(state, s);
-
 <font color=navy>// Solve</font>
    minlpoptimize(state);
    minlpresults(state, x, rep);
@@ -37062,7 +37317,6 @@ http://www.alglib.net/optimization/
    with same N but another starting point. minnlcrestartfrom()  allows  to
    reuse already initialized structure.
 
-
 Inputs:
     N       -   problem dimension, N &gt; 0:
                 * if given, only leading N elements of X are used
@@ -37231,11 +37485,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #0 &quot;strong&quot; report
-    lngrep  -   C1 test #0 &quot;long&quot; report
+    StrRep  -   C1 test #0 &quot;strong&quot; report
+    LngRep  -   C1 test #0 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -37286,11 +37540,11 @@ In both cases following fields are returned:
 = SHORTLY SPEAKING: build a 2D plot of (stp,f) and look at it -  you  will see where C1 continuity is violated.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    strrep  -   C1 test #1 &quot;strong&quot; report
-    lngrep  -   C1 test #1 &quot;long&quot; report
+    StrRep  -   C1 test #1 &quot;strong&quot; report
+    LngRep  -   C1 test #1 &quot;long&quot; report
 ALGLIB: Copyright 21.11.2018 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -37346,10 +37600,10 @@ which return detailed error reports, specific points where discontinuities
 were found, and so on.
 
 Inputs:
-    state   -   algorithm state
+    State   -   algorithm state
 
 Outputs:
-    rep     -   generic OptGuard report;  more  detailed  reports  can  be
+    Rep     -   generic OptGuard report;  more  detailed  reports  can  be
                 retrieved with other functions.
 
 NOTE: false negatives (nonsmooth problems are not identified as  nonsmooth
@@ -37409,8 +37663,8 @@ NOTE: OptGuard does  NOT  guarantee  that  it  will  always  detect  C0/C1
       spotted with restart from different initial point).
 
 Inputs:
-    state   -   algorithm state
-    level   -   monitoring level:
+    State   -   algorithm state
+    Level   -   monitoring level:
                 * 0 - monitoring is disabled
                 * 1 - noninvasive low-overhead monitoring; function values
                       and/or gradients are recorded, but OptGuard does not
@@ -37462,7 +37716,6 @@ These functions accept following parameters:
     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
                 can be NULL
 
-
 NOTES:
 
 1. This function has two different implementations: one which  uses  exact
@@ -37478,7 +37731,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed to MinNLCOptimize()   and  specific
    function used to create optimizer.
-
 
                      |         USER PASSED TO MinNLCOptimize()
    CREATED WITH      |  function only   |  function and gradient
@@ -37961,7 +38213,7 @@ This function sets stopping conditions for inner iterations of  optimizer.
 
 Inputs:
     State   -   structure which stores algorithm state
-    EpsX    - &ge; 0
+    EpsX    -   &ge; 0
                 The subroutine finishes its work if  on  k+1-th  iteration
                 the condition |v| &le; EpsX is fulfilled, where:
                 * |.| means Euclidian norm
@@ -38942,7 +39194,6 @@ USAGE:
    with same N but another starting point. MinNSRestartFrom()  allows   to
    reuse already initialized structure.
 
-
 Inputs:
     N       -   problem dimension, N &gt; 0:
                 * if given, only leading N elements of X are used
@@ -39019,7 +39270,6 @@ These functions accept following parameters:
     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
                 can be NULL
 
-
 NOTES:
 
 1. This function has two different implementations: one which  uses  exact
@@ -39035,7 +39285,6 @@ NOTES:
    your optimization scheme! Table below lists different  combinations  of
    callback (function/gradient) passed to minnsoptimize()    and  specific
    function used to create optimizer.
-
 
                      |         USER PASSED TO minnsoptimize()
    CREATED WITH      |  function only   |  function and gradient
@@ -39952,7 +40201,10 @@ Completion codes:
 * -3    inconsistent constraints (or, maybe, feasible point is
         too hard to find). If you are sure that constraints are feasible,
         try to restart optimizer with better initial approximation.
-* -1    solver error
+* -2    IPM solver has difficulty finding primal/dual feasible point.
+        It is likely that the problem is either infeasible or unbounded,
+        but it is difficult to determine exact reason for termination.
+        X contains best point found so far.
 *  1..4 successful completion
 *  5    MaxIts steps was taken
 *  7    stopping conditions are too stringent,
@@ -39985,11 +40237,20 @@ Two arrays of multipliers are returned:
 On failure (or when optimizer does not support Lagrange multipliers) these
 arrays are zero-filled.
 
+It is expected that at solution the dual feasibility condition holds:
+
+    C+H*(Xs-X0) + SUM(Ei*LagBC[i],i=0..n-1) + SUM(Ai*LagLC[i],i=0..m-1) ~ 0
+
+where
+* C is a linear term
+* H is a quadratic term
+* Xs is a solution, and X0 is an origin term (zero by default)
+* Ei is a vector with 1.0 at position I and 0 in other positions
+* Ai is an I-th row of linear constraint matrix
+
 NOTE: methods  from  IPM  family  may  also  return  meaningful   Lagrange
-      multipliers on completion with codes -3 (infeasibility detected) and
-      -4  (unboundedness  detected).   It   is   possible   that   seeming
-      infeasibility/unboundedness of the problem is due to rounding errors
-      In this case last values of Lagrange multipliers are returned.
+      multipliers  on  completion   with   code   -2   (infeasibility   or
+      unboundedness  detected).
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
@@ -40170,15 +40431,33 @@ Inputs:
     State   -   algorithm state
 
 Outputs:
-    X       -   array[0..N-1], solution.
-                This array is allocated and initialized only when
-                Rep.TerminationType parameter is positive (success).
+    X       -   array[0..N-1], solution (on failure - the best point found
+                so far).
     Rep     -   optimization report, contains:
                 * completion code in Rep.TerminationType (positive  values
                   denote some kind of success, negative - failures)
-                * Lagrange multipliers - for QP solvers which support then
+                * Lagrange multipliers - for QP solvers which support them
                 * other statistics
                 See comments on minqpreport structure for more information
+
+Following completion codes are returned in Rep.TerminationType:
+* -9    failure of the automatic scale evaluation:  one  of  the  diagonal
+        elements of the quadratic term is non-positive.  Specify  variable
+        scales manually!
+* -5    inappropriate solver was used:
+        * QuickQP solver for problem with general linear constraints
+* -4    the function is unbounded from below even under constraints,
+        no meaningful minimum can be found.
+* -3    inconsistent constraints (or, maybe, feasible point is too hard to
+        find).
+* -2    IPM solver has difficulty finding primal/dual feasible point.
+        It is likely that the problem is either infeasible or unbounded,
+        but it is difficult to determine exact reason for termination.
+        X contains best point found so far.
+*  &gt;0   success
+*  7    stopping conditions are too stringent,
+        further improvement is impossible,
+        X contains best point found so far.
 ALGLIB: Copyright 11.01.2011 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
@@ -40396,11 +40675,11 @@ ALGORITHM FEATURES:
 
 ALGORITHM OUTLINE:
 
-* this  algorithm  is  an  implementation  of  interior  point  method  as
+* this  algorithm  is  our implementation  of  interior  point  method  as
   formulated by  R.J.Vanderbei, with minor modifications to the  algorithm
   (damped Newton directions are extensively used)
 * like all interior point methods, this algorithm  tends  to  converge  in
-  roughly same number of iterations (between 15 and 30) independently from
+  roughly same number of iterations (between 15 and 50) independently from
   the problem dimensionality
 
 ALGORITHM LIMITATIONS:
@@ -40578,11 +40857,11 @@ ALGORITHM FEATURES:
 
 ALGORITHM OUTLINE:
 
-* this  algorithm  is  an  implementation  of  interior  point  method  as
+* this  algorithm  is  our implementation  of  interior  point  method  as
   formulated by  R.J.Vanderbei, with minor modifications to the  algorithm
   (damped Newton directions are extensively used)
 * like all interior point methods, this algorithm  tends  to  converge  in
-  roughly same number of iterations (between 15 and 30) independently from
+  roughly same number of iterations (between 15 and 50) independently from
   the problem dimensionality
 
 ALGORITHM LIMITATIONS:
@@ -40845,7 +41124,7 @@ calls (if such calls were made).
 
 This function may be useful if constraint matrix includes large number  of
 both types of rows - dense and sparse. If you have just a few sparse rows,
-you  may  represent  them  in  dense  format  without loosing performance.
+you  may  represent  them  in  dense  format  without losing performance.
 Similarly, if you have just a few dense rows, you may store them in sparse
 format with almost same performance.
 
@@ -40885,7 +41164,7 @@ minqpsetlcsparse() and minqpsetlcmixed().
 
 This function may be useful if constraint matrix includes large number  of
 both types of rows - dense and sparse. If you have just a few sparse rows,
-you  may  represent  them  in  dense  format  without loosing performance.
+you  may  represent  them  in  dense  format  without losing performance.
 Similarly, if you have just a few dense rows, you may store them in sparse
 format with almost same performance.
 
@@ -41219,14 +41498,12 @@ using namespace alglib;
    real_1d_array x;
    minqpstate state;
    minqpreport rep;
-
 <font color=navy>// create solver, set quadratic/linear terms</font>
    minqpcreate(2, state);
    minqpsetquadraticterm(state, a);
    minqpsetlinearterm(state, b);
    minqpsetstartingpoint(state, x0);
    minqpsetbc(state, bndl, bndu);
-
 <font color=navy>// Set scale of the parameters.</font>
 <font color=navy>// It is strongly recommended that you set scale of your variables.</font>
 <font color=navy>// Knowing their scales is essential <b>for</b> evaluation of stopping criteria</font>
@@ -41303,13 +41580,11 @@ using namespace alglib;
    real_1d_array x;
    minqpstate state;
    minqpreport rep;
-
 <font color=navy>// create solver, set quadratic/linear terms</font>
    minqpcreate(2, state);
    minqpsetquadraticterm(state, a);
    minqpsetlinearterm(state, b);
    minqpsetlc(state, c, ct);
-
 <font color=navy>// Set scale of the parameters.</font>
 <font color=navy>// It is strongly recommended that you set scale of your variables.</font>
 <font color=navy>// Knowing their scales is essential <b>for</b> evaluation of stopping criteria</font>
@@ -41391,13 +41666,11 @@ using namespace alglib;
    real_1d_array x;
    minqpstate state;
    minqpreport rep;
-
 <font color=navy>// create solver, set quadratic/linear terms, constraints</font>
    minqpcreate(2, state);
    minqpsetquadraticterm(state, a);
    minqpsetstartingpoint(state, x0);
    minqpsetbc(state, bndl, bndu);
-
 <font color=navy>// Set scale of the parameters.</font>
 <font color=navy>// It is strongly recommended that you set scale of your variables.</font>
 <font color=navy>// Knowing their scales is essential <b>for</b> evaluation of stopping criteria</font>
@@ -41439,7 +41712,6 @@ using namespace alglib;
    minqpoptimize(state);
    minqpresults(state, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(2).c_str()); <font color=navy>// EXPECTED: [2,2]</font>
-
 <font color=navy>// Hmm... this problem is bounded from below (has solution) only under constraints.</font>
 <font color=navy>// What it we remove them?</font>
 <font color=navy>//</font>
@@ -41488,13 +41760,11 @@ using namespace alglib;
    real_1d_array x;
    minqpstate state;
    minqpreport rep;
-
 <font color=navy>// create solver, set quadratic/linear terms</font>
    minqpcreate(2, state);
    minqpsetquadraticterm(state, a);
    minqpsetlinearterm(state, b);
    minqpsetstartingpoint(state, x0);
-
 <font color=navy>// Set scale of the parameters.</font>
 <font color=navy>// It is strongly recommended that you set scale of your variables.</font>
 <font color=navy>// Knowing their scales is essential <b>for</b> evaluation of stopping criteria</font>
@@ -41575,18 +41845,15 @@ using namespace alglib;
    real_1d_array x;
    minqpstate state;
    minqpreport rep;
-
 <font color=navy>// initialize sparsematrix structure</font>
    sparsecreate(2, 2, 0, a);
    sparseset(a, 0, 0, 2.0);
    sparseset(a, 1, 1, 2.0);
-
 <font color=navy>// create solver, set quadratic/linear terms</font>
    minqpcreate(2, state);
    minqpsetquadratictermsparse(state, a, true);
    minqpsetlinearterm(state, b);
    minqpsetstartingpoint(state, x0);
-
 <font color=navy>// Set scale of the parameters.</font>
 <font color=navy>// It is strongly recommended that you set scale of your variables.</font>
 <font color=navy>// Knowing their scales is essential <b>for</b> evaluation of stopping criteria</font>
@@ -41630,7 +41897,6 @@ continuity violation.
 C0 test  studies  function  values (not gradient!)  obtained  during  line
 searches and monitors estimate of the Lipschitz  constant.  Sudden  spikes
 usually indicate that discontinuity was detected.
-
 
 ==== WHAT IS REPORTED ====
 
@@ -41691,7 +41957,6 @@ searches and monitors behavior of directional  derivative  estimate.  This
 test is less powerful than test #1, but it does  not  depend  on  gradient
 values  and  thus  it  is  more  robust  against  artifacts  introduced by
 numerical differentiation.
-
 
 ==== WHAT IS REPORTED ====
 
@@ -41761,7 +42026,6 @@ of numerical noise and becomes too conservative).
 This test also tells specific components of the gradient which violate  C1
 continuity, which makes it more informative than #0, which just tells that
 continuity is violated.
-
 
 ==== WHAT IS REPORTED ====
 
@@ -41833,7 +42097,6 @@ Following report fields can be set:
 * nonc1suspected
 * badgradsuspected
 
-
 ==== WHAT CAN BE DETECTED WITH OptGuard INTEGRITY CHECKER ====
 
 Following  types  of  errors  in your target function (constraints) can be
@@ -41858,7 +42121,6 @@ Type C errors are coding errors which often prevent optimizer from  making
 even one step  or result in optimizing stopping  too  early,  as  soon  as
 actual descent direction becomes too different from one suggested by user-
 supplied gradient.
-
 
 ==== WHAT IS REPORTED ====
 
@@ -41991,6 +42253,7 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 ]</font>
 </div>
 <a name=struct_densesolverlsreport></a><h6 class=pageheader>densesolverlsreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> densesolverlsreport {
@@ -42001,6 +42264,7 @@ ALGLIB: Copyright 19.11.2018 by Sergey Bochkanov
 };
 </pre>
 <a name=struct_densesolverreport></a><h6 class=pageheader>densesolverreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> densesolverreport {
@@ -42563,7 +42827,6 @@ IMPORTANT: ! this function is NOT the most efficient linear solver provided
            !
            ! In such cases we strongly recommend you to use faster solver,
            ! HPDMatrixCholeskySolveMFast() function.
-
 
 Inputs:
     CHA     -   array[N,N], Cholesky decomposition,
@@ -43680,10 +43943,11 @@ ALGLIB: Copyright 17.03.2015 by Sergey Bochkanov
 <a href=#struct_sparsesolverreport class=toc>sparsesolverreport</a>
 ]</font>
 <h5>Functions</h5><font size=2>[
-<a href=#sub_sparsecholeskysolvesks class=toc>sparsecholeskysolvesks</a> |
 <a href=#sub_sparselusolve class=toc>sparselusolve</a> |
 <a href=#sub_sparsesolve class=toc>sparsesolve</a> |
-<a href=#sub_sparsesolvesks class=toc>sparsesolvesks</a>
+<a href=#sub_sparsespdcholeskysolve class=toc>sparsespdcholeskysolve</a> |
+<a href=#sub_sparsespdsolve class=toc>sparsespdsolve</a> |
+<a href=#sub_sparsespdsolvesks class=toc>sparsespdsolvesks</a>
 ]</font>
 <h5>Examples</h5>
 <table border=0 cellspacing=0 class=pagecontent>
@@ -43703,36 +43967,6 @@ Following fields can be accessed by users:
    ae_int_t terminationtype;
 };
 </pre>
-<a name=sub_sparsecholeskysolvesks></a><h6 class=pageheader>sparsecholeskysolvesks Function</h6>
-<hr width=600 align=left>
-<pre class=narration>
-Sparse linear solver for A*x=b with N*N real  symmetric  positive definite
-matrix A given by its Cholesky decomposition, and N*1 vectors x and b.
-
-IMPORTANT: this solver requires input matrix to be in  the  SKS  (Skyline)
-           sparse storage format. An exception will be  generated  if  you
-           pass matrix in some other format (HASH or CRS).
-
-Inputs:
-    A       -   sparse NxN matrix stored in SKS format, must be NxN exactly
-    N       -   size of A, N &gt; 0
-    IsUpper -   which half of A is provided (another half is ignored)
-    B       -   array[N], right part
-
-Outputs:
-    Rep     -   solver report, following fields are set:
-                * rep.terminationtype - solver status; &gt; 0 for success,
-                  set to -3 on failure (degenerate or non-SPD system).
-    X       -   array[N], it contains:
-                * rep.terminationtype &gt; 0    &rArr;  solution
-                * rep.terminationtype=-3   &rArr;  filled by zeros
-ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
-</pre>
-<hr width=600 align=left>
-<pre class=declaration>
-<b>void</b> sparsecholeskysolvesks(sparsematrix a, ae_int_t n, <b>bool</b> isupper, real_1d_array b, sparsesolverreport &amp;rep, real_1d_array &amp;x);
-</pre>
-<p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_solvesks_d_1 class=nav>solvesks_d_1</a> ]</p>
 <a name=sub_sparselusolve></a><h6 class=pageheader>sparselusolve Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
@@ -43747,7 +43981,6 @@ Inputs:
     A       -   LU factorization of the sparse matrix, must be NxN exactly
                 in CRS storage format
     P, Q    -   pivot indexes from LU factorization
-    N       -   size of A, N &gt; 0
     B       -   array[0..N-1], right part
 
 Outputs:
@@ -43761,7 +43994,7 @@ ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparselusolve(sparsematrix a, integer_1d_array p, integer_1d_array q, ae_int_t n, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+<b>void</b> sparselusolve(sparsematrix a, integer_1d_array p, integer_1d_array q, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
 </pre>
 <a name=sub_sparsesolve></a><h6 class=pageheader>sparsesolve Function</h6>
 <hr width=600 align=left>
@@ -43774,7 +44007,6 @@ and uses sparse triangular solvers to get solution of the original system.
 
 Inputs:
     A       -   sparse matrix, must be NxN exactly, any storage format
-    N       -   size of A, N &gt; 0
     B       -   array[0..N-1], right part
 
 Outputs:
@@ -43788,9 +44020,68 @@ ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparsesolve(sparsematrix a, ae_int_t n, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+<b>void</b> sparsesolve(sparsematrix a, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
 </pre>
-<a name=sub_sparsesolvesks></a><h6 class=pageheader>sparsesolvesks Function</h6>
+<a name=sub_sparsespdcholeskysolve></a><h6 class=pageheader>sparsespdcholeskysolve Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse linear solver for A*x=b with N*N real  symmetric  positive definite
+matrix A given by its Cholesky decomposition, and N*1 vectors x and b.
+
+IMPORTANT: this solver requires input matrix to be in  the  SKS  (Skyline)
+           or CRS (compressed row storage) format. An  exception  will  be
+           generated if you pass matrix in some other format.
+
+Inputs:
+    A       -   sparse NxN matrix stored in CRS or SKS format, must be NxN
+                exactly
+    IsUpper -   which half of A is provided (another half is ignored)
+    B       -   array[N], right part
+
+Outputs:
+    X       -   array[N], it contains:
+                * rep.terminationtype &gt; 0    &rArr;  solution
+                * rep.terminationtype=-3   &rArr;  filled by zeros
+    Rep     -   solver report, following fields are set:
+                * rep.terminationtype - solver status; &gt; 0 for success,
+                  set to -3 on failure (degenerate or non-SPD system).
+ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsespdcholeskysolve(sparsematrix a, <b>bool</b> isupper, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
+<p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_solvesks_d_1 class=nav>solvesks_d_1</a> ]</p>
+<a name=sub_sparsespdsolve></a><h6 class=pageheader>sparsespdsolve Function</h6>
+<hr width=600 align=left>
+<pre class=narration>
+Sparse linear solver for A*x=b with N*N  sparse  real  symmetric  positive
+definite matrix A, N*1 vectors x and b.
+
+This solver  converts  input  matrix  to  CRS  format,  performs  Cholesky
+factorization using supernodal Cholesky  decomposition  with  permutation-
+reducing ordering and uses sparse triangular solver to get solution of the
+original system.
+
+Inputs:
+    A       -   sparse matrix, must be NxN exactly
+    IsUpper -   which half of A is provided (another half is ignored)
+    B       -   array[N], right part
+
+Outputs:
+    X       -   array[N], it contains:
+                * rep.terminationtype &gt; 0  &rArr;  solution
+                * rep.terminationtype=-3   &rArr;  filled by zeros
+    Rep     -   solver report, following fields are set:
+                * rep.terminationtype - solver status; &gt; 0 for success,
+                  set to -3 on failure (degenerate or non-SPD system).
+ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
+<pre class=declaration>
+<b>void</b> sparsespdsolve(sparsematrix a, <b>bool</b> isupper, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
+</pre>
+<a name=sub_sparsespdsolvesks></a><h6 class=pageheader>sparsespdsolvesks Function</h6>
 <hr width=600 align=left>
 <pre class=narration>
 Sparse linear solver for A*x=b with N*N  sparse  real  symmetric  positive
@@ -43803,22 +44094,21 @@ the original system.
 
 Inputs:
     A       -   sparse matrix, must be NxN exactly
-    N       -   size of A, N &gt; 0
     IsUpper -   which half of A is provided (another half is ignored)
     B       -   array[0..N-1], right part
 
 Outputs:
-    Rep     -   solver report, following fields are set:
-                * rep.terminationtype - solver status; &gt; 0 for success,
-                  set to -3 on failure (degenerate or non-SPD system).
     X       -   array[N], it contains:
                 * rep.terminationtype &gt; 0    &rArr;  solution
                 * rep.terminationtype=-3   &rArr;  filled by zeros
+    Rep     -   solver report, following fields are set:
+                * rep.terminationtype - solver status; &gt; 0 for success,
+                  set to -3 on failure (degenerate or non-SPD system).
 ALGLIB: Copyright 26.12.2017 by Sergey Bochkanov
 </pre>
 <hr width=600 align=left>
 <pre class=declaration>
-<b>void</b> sparsesolvesks(sparsematrix a, ae_int_t n, <b>bool</b> isupper, real_1d_array b, sparsesolverreport &amp;rep, real_1d_array &amp;x);
+<b>void</b> sparsespdsolvesks(sparsematrix a, <b>bool</b> isupper, real_1d_array b, real_1d_array &amp;x, sparsesolverreport &amp;rep);
 </pre>
 <p align=left class=pagecontent><span class=inlineheader>Examples:</span> [ <a href=#example_solvesks_d_1 class=nav>solvesks_d_1</a> ]</p>
 <a name=example_solvesks_d_1></a><h6 class=pageheader>solvesks_d_1 Example</h6>
@@ -43869,7 +44159,7 @@ using namespace alglib;
    sparsesolverreport rep;
    real_1d_array x;
    <b>bool</b> isuppertriangle = true;
-   sparsesolvesks(s, n, isuppertriangle, b, rep, x);
+   sparsespdsolvesks(s, isuppertriangle, b, x, rep);
    printf(<font color=blue><b>&quot;%s\n&quot;</b></font>, x.tostring(4).c_str()); <font color=navy>// EXPECTED: [1.0000, 2.0000, 3.0000, 4.0000]</font>
    <b>return</b> 0;
 }
@@ -43899,6 +44189,7 @@ using namespace alglib;
 </table>
 </div>
 <a name=struct_lincgreport></a><h6 class=pageheader>lincgreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> lincgreport {
@@ -44021,7 +44312,6 @@ ALGLIB: Copyright 14.11.2011 by Sergey Bochkanov
 <pre class=declaration>
 <b>void</b> lincgsetcond(lincgstate state, <b>double</b> epsf, ae_int_t maxits);
 </pre>
-
 
 <a name=sub_lincgsetprecdiag></a><h6 class=pageheader>lincgsetprecdiag Function</h6>
 <hr width=600 align=left>
@@ -44258,6 +44548,7 @@ using namespace alglib;
 </table>
 </div>
 <a name=struct_linlsqrreport></a><h6 class=pageheader>linlsqrreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> linlsqrreport {
@@ -44606,6 +44897,7 @@ using namespace alglib;
 ]</font>
 </div>
 <a name=struct_nleqreport></a><h6 class=pageheader>nleqreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> nleqreport {
@@ -44616,6 +44908,7 @@ using namespace alglib;
 };
 </pre>
 <a name=struct_nleqstate></a><h6 class=pageheader>nleqstate Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> nleqstate {
@@ -44649,12 +44942,10 @@ Note that these conditions are much more weaker than usual non-singularity
 conditions. For example, algorithm will converge for any  affine  function
 F (whether its Jacobian singular or not).
 
-
 REQUIREMENTS:
 Algorithm will request following information during its operation:
 * function vector F[] and Jacobian matrix at given point X
 * value of merit function f(x)=F[0]^2(x)+...+F[M-1]^2(x) at given point X
-
 
 USAGE:
 1. User initializes algorithm state with NLEQCreateLM() call
@@ -44669,7 +44960,6 @@ USAGE:
    function vector. NLEQRestartFrom() allows to reuse already  initialized
    structure.
 
-
 Inputs:
     N       -   space dimension, N &gt; 1:
                 * if provided, only leading N elements of X are used
@@ -44677,10 +44967,8 @@ Inputs:
     M       -   system size
     X       -   starting point
 
-
 Outputs:
     State   -   structure which stores algorithm state
-
 
 NOTES:
 1. you may tune stopping conditions with NLEQSetCond() function
@@ -44857,6 +45145,7 @@ ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
 ]</font>
 </div>
 <a name=struct_polynomialsolverreport></a><h6 class=pageheader>polynomialsolverreport Class</h6>
+<hr width=600 align=left>
 <pre class=narration></pre>
 <pre class=declaration>
 <b>class</b> polynomialsolverreport {
@@ -44957,8 +45246,6 @@ and their first derivatives Ai'(x), Bi'(x).
 
 Evaluation is by power series summation for small x,
 by rational minimax approximations for large x.
-
-
 
 ACCURACY:
 Error criterion is absolute when function &le; 1, relative
@@ -45062,7 +45349,6 @@ The domain is divided into the intervals [0, 5] and
 (5, infinity). In the first interval the following rational
 approximation is used:
 
-
        2         2
 (w - r  ) (w - r  ) P (w) / Q (w)
       1         2    3       8
@@ -45135,7 +45421,6 @@ ACCURACY:
                      Absolute error:
 arithmetic   range      # trials      peak         rms
    IEEE      0, 30        5000       4.4e-16     7.9e-17
-
 
 Not suitable for large n or x. Use jv() (fractional order) instead.
 
@@ -45244,8 +45529,6 @@ In the second interval, the Hankel asymptotic expansion
 is employed with two rational functions of degree 6/6
 and 7/7.
 
-
-
 ACCURACY:
 
  Absolute error, when y0(x) &lt; 1; else relative error:
@@ -45325,7 +45608,6 @@ Copyright 1984, 1987, 2000 by Stephen L. Moshier
 <hr width=600 align=left>
 <pre class=narration>
 Beta function
-
 
                   -     -
                  | (a) | (b)
@@ -45605,7 +45887,6 @@ Returns the area under the left hand tail (from 0 to x)
 of the Chi square probability density function with
 v degrees of freedom.
 
-
                                   x
                                    -
                        1          | |  v/2-1  -t/2
@@ -45626,7 +45907,6 @@ The arguments must both be positive.
 ACCURACY:
 
 See incomplete gamma function
-
 
 Cephes Math Library Release 2.8:  June, 2000
 Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -45652,7 +45932,6 @@ function and the relation
 ACCURACY:
 
 See inverse incomplete gamma function
-
 
 Cephes Math Library Release 2.8:  June, 2000
 Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -45715,7 +45994,6 @@ Complete elliptic integral of the second kind
 
 Approximates the integral
 
-
            pi/2
             -
            | |                 2
@@ -45747,8 +46025,6 @@ Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 Complete elliptic integral of the first kind
 
 Approximates the integral
-
-
 
            pi/2
             -
@@ -45783,8 +46059,6 @@ Copyright 1984, 1987, 2000 by Stephen L. Moshier
 Complete elliptic integral of the first kind
 
 Approximates the integral
-
-
 
            pi/2
             -
@@ -45826,7 +46100,6 @@ Incomplete elliptic integral of the second kind
 
 Approximates the integral
 
-
                phi
                 -
                | |
@@ -45862,8 +46135,6 @@ Incomplete elliptic integral of the first kind F(phi|m)
 
 Approximates the integral
 
-
-
                phi
                 -
                | |
@@ -45876,9 +46147,6 @@ F(phi_\m)  =    |    ------------------
 
 of amplitude phi and modulus m, using the arithmetic -
 geometric mean algorithm.
-
-
-
 
 ACCURACY:
 
@@ -45918,8 +46186,6 @@ Exponential integral Ei(x)
 Not defined for x &le; 0.
 See also expn.c.
 
-
-
 ACCURACY:
 
                      Relative error:
@@ -45949,7 +46215,6 @@ Evaluates the exponential integral
                | |     t
                 -
                  1
-
 
 Both n and x must be nonnegative.
 
@@ -45987,7 +46252,6 @@ Returns the area from x to infinity under the F density
 function (also known as Snedcor's density or the
 variance ratio density).
 
-
                      inf.
                       -
              1       | |  a-1      b-1
@@ -45996,12 +46260,10 @@ variance ratio density).
                     -
                      x
 
-
 The incomplete beta integral is used, according to the
 formula
 
 P(x) = incbet( df2/2, df1/2, (df2/(df2 + df1*x) ).
-
 
 ACCURACY:
 
@@ -46035,7 +46297,6 @@ The incomplete beta integral is used, according to the
 formula
 
 P(x) = incbet( df1/2, df2/2, (df1*x/(df2 + df1*x) ).
-
 
 The arguments a and b are greater than zero, and x is
 nonnegative.
@@ -46128,15 +46389,12 @@ S(x) =   |   sin(pi/2 t**2) dt.
         -
          0
 
-
 The integrals are evaluated by a power series for x &lt; 1.
 For x &ge; 1 auxiliary functions f(x) and g(x) are employed
 such that
 
 C(x) = 0.5 + f(x) sin( pi/2 x**2 ) - g(x) cos( pi/2 x**2 )
 S(x) = 0.5 - f(x) cos( pi/2 x**2 ) - g(x) sin( pi/2 x**2 )
-
-
 
 ACCURACY:
 
@@ -46348,7 +46606,6 @@ Given y, the function finds x such that
 The routine performs interval halving or Newton iterations to find the
 root of incbet(a,b,x) - y = 0.
 
-
 ACCURACY:
 
                      Relative error:
@@ -46393,7 +46650,6 @@ The function is defined by
                 | (a)    -
                           0
 
-
 In this implementation both arguments must be positive.
 The integral is evaluated by either a power series or
 continued fraction expansion, depending on the relative
@@ -46420,7 +46676,6 @@ Complemented incomplete gamma integral
 
 The function is defined by
 
-
  igamc(a,x)   =   1 - igam(a,x)
 
                            inf.
@@ -46430,7 +46685,6 @@ The function is defined by
                    -      | |
                   | (a)    -
                             x
-
 
 In this implementation both arguments must be positive.
 The integral is evaluated by either a power series or
@@ -46684,7 +46938,6 @@ Bivariate normal CDF
 Returns the area under the bivariate Gaussian  PDF  with  correlation
 parameter equal to Rho, integrated from minus infinity to (x,y):
 
-
                                           x      y
                                           -      -
                             1            | |    | |
@@ -46693,13 +46946,11 @@ parameter equal to Rho, integrated from minus infinity to (x,y):
                                         -      -
                                        -INF   -INF
 
-
 where
 
                       (    u^2 - 2*rho*u*v + v^2  )
     f(u,v,rho)   = exp( - ----------------------- )
                       (        2*(1-rho^2)        )
-
 
 with -1 &lt; rho &lt; +1 and arbitrary x, y.
 
@@ -46727,7 +46978,6 @@ correlation parameter equal to Rho:
     f(x,y,rho) = ----------------- * exp( - ----------------------- )
                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
 
-
 with -1 &lt; rho &lt; +1 and arbitrary x, y.
 
 This function won't fail as long as Rho is in (-1,+1) range.
@@ -46754,7 +47004,6 @@ The integral is
 
 For 0 &le; |x| &lt; 1, erf(x) = x * P4(x**2)/Q5(x**2); otherwise
 erf(x) = 1 - erfc(x).
-
 
 ACCURACY:
 
@@ -46784,10 +47033,8 @@ Complementary error function
                           -
                            x
 
-
 For small x, erfc(x) = 1 - erf(x); otherwise rational
 approximations are computed.
-
 
 ACCURACY:
 
@@ -46822,7 +47069,6 @@ Inverse of Normal CDF
 Returns the argument, x, for which the area under the
 Gaussian probability density function (integrated from
 minus infinity to x) is equal to y.
-
 
 For small arguments 0 &lt; y &lt; exp(-2), the program computes
 z = sqrt( -2.0 * log(y) );  then the approximation is
@@ -46875,7 +47121,6 @@ function, integrated from minus infinity to x:
 
 where z = x/sqrt(2). Computation is via the functions
 erf and erfc.
-
 
 ACCURACY:
 
@@ -47002,6 +47247,7 @@ gamma integral is employed, according to the relation
 y = pdtr( k, m ) = igamc( k+1, m ).
 
 The arguments must both be positive.
+
 ACCURACY:
 
 See incomplete gamma function
@@ -47177,7 +47423,6 @@ and by Chebyshev expansions for x between 8 and 88.
 For large x, both functions approach exp(x)/2x.
 Arguments greater than 88 in magnitude return MAXNUM.
 
-
 ACCURACY:
 
 Test interval 0 to 88.
@@ -47223,7 +47468,6 @@ such that
 
 Ci(x) = f(x) sin(x) - g(x) cos(x)
 Si(x) = pi/2 - f(x) cos(x) - g(x) sin(x)
-
 
 ACCURACY:
    Test interval = [0,50].

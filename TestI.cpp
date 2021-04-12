@@ -562,8 +562,8 @@ int main() {
    }
 #endif
    try {
-   // printf("TEST nneighbor_d_1: Nearest neighbor search, KNN queries\n"), fflush(stdout);
       bool Ok = true;
+   // printf("TEST nneighbor_d_1: Nearest neighbor search, KNN queries\n"), fflush(stdout);
       for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
             real_2d_array a = "[[0,0],[0,1],[1,0],[1,1]]";
@@ -6566,8 +6566,8 @@ int main() {
          // In order to use multithreading, you have to:
          // 1) Install SMP edition of ALGLIB.
          // 2) This step is specific for C++ users: you should activate OS-specific
-         //    capabilities of ALGLIB by defining AE_OS=AE_POSIX (for *nix systems)
-         //    or AE_OS=AE_WINDOWS (for Windows systems).
+         //    capabilities of ALGLIB by defining AE_OS = AE_POSIX (for *nix systems)
+         //    or AE_OS = AE_WINDOWS (for Windows systems).
          //    C# users do not have to perform this step because C# programs are
          //    portable across different systems without OS-specific tuning.
          // 3) Tell ALGLIB that you want it to use multithreading by means of
@@ -7060,7 +7060,7 @@ int main() {
          fflush(stdout);
       }
       AllOk = AllOk && Ok;
-   // printf("TEST randomforest_reg: Simple classification with decision forest\n"), fflush(stdout);
+   // printf("TEST randomforest_reg: Simple regression with decision forest\n"), fflush(stdout);
       Ok = true;
       for (int _spoil_scenario = -1; _spoil_scenario < 3; _spoil_scenario++) {
          try {
@@ -8353,8 +8353,8 @@ int main() {
          // Temporaries:
          // * values of y=x^2-x sampled at three special grids:
          //   * equdistant grid spanning [0,2],     x[i] = 2*i/(N-1), i=0..N-1
-         //   * Chebyshev-I grid spanning [-1,+1],  x[i] = 1 + cos(PI*(2*i+1)/(2*n)), i=0..N-1
-         //   * Chebyshev-II grid spanning [-1,+1], x[i] = 1 + cos(PI*i/(n-1)), i=0..N-1
+         //   * Chebyshev-I grid spanning [-1,+1],  x[i] = 1 + cos(pi (2i + 1)/(2n)), i = 0..N-1
+         //   * Chebyshev-II grid spanning [-1,+1], x[i] = 1 + cos(pi i/(n - 1)), i = 0..N-1
          // * barycentric interpolants for these three grids
          // * vectors to store coefficients of quadratic representation
          //
@@ -11342,7 +11342,7 @@ int main() {
             sparsesolverreport rep;
             real_1d_array x;
             bool isuppertriangle = true;
-            sparsesolvesks(s, n, isuppertriangle, b, rep, x);
+            sparsespdsolvesks(s, isuppertriangle, b, x, rep);
             Ok = Ok && doc_test_real_vector(x, "[1.0000, 2.0000, 3.0000, 4.0000]", 0.00005);
             Ok = Ok && _spoil_scenario == -1;
          } catch(ap_error) {

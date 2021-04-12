@@ -267,7 +267,6 @@ static void nearestneighbor_kdtreeallocdatasetdependent(kdtree *kdt, ae_int_t n,
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: KD-tree buffer should be used only with  KD-tree  object  which
 //            was used to initialize buffer. Any attempt to use buffer   with
 //            different object is dangerous - you  may  get  integrity  check
@@ -394,7 +393,6 @@ void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_i
 //
 // Outputs:
 //     KDT     -   KD-tree
-//
 //
 // NOTES
 //
@@ -1334,7 +1332,6 @@ ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin
 //     BoxMin      -   lower bounds, array[0..NX-1].
 //     BoxMax      -   upper bounds, array[0..NX-1].
 //
-//
 // Result:
 //     number of actual neighbors found (in [0,N]).
 //
@@ -1780,7 +1777,7 @@ void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax) {
 // indexes. You should keep in  mind  that  future  versions  of  ALGLIB  may
 // introduce new node types.
 //
-// OUTPUT VALUES:
+// Output Value:
 //     NodeType    -   node type:
 //                     * 0 corresponds to leaf node, which can be explored by
 //                       kdtreeexploreleaf() function
@@ -1812,7 +1809,7 @@ void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype) {
 // indexes. You should keep in  mind  that  future  versions  of  ALGLIB  may
 // introduce new node types.
 //
-// OUTPUT VALUES:
+// Output Values:
 //     XT      -   output buffer is reallocated (if too small) and filled by
 //                 XY values
 //     K       -   number of rows in XY
@@ -1845,7 +1842,7 @@ void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k) {
 // indexes. You should keep in  mind  that  future  versions  of  ALGLIB  may
 // introduce new node types.
 //
-// OUTPUT VALUES:
+// Output Values:
 //	*d = Nodes[idx+1]:		the dimension to split
 //	*s = Nodes[idx+2]:		the offset of splitting point in Splits[]
 //	*nodele = Nodes[idx+3]:		the position of left child in Nodes[]
@@ -2382,7 +2379,7 @@ void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r) {
 } // end of namespace alglib
 
 // === HQRND Package ===
-// Depends on: (AlgLibInternal) APSERV
+// Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
 static const ae_int_t hqrnd_hqrndmax = 2147483561;
 static const ae_int_t hqrnd_hqrndm1 = 2147483563;
@@ -2607,6 +2604,61 @@ double hqrndnormal(hqrndstate *state) {
    return result;
 }
 
+// Random number generator: vector with random entries (normal distribution)
+//
+// This function generates N random numbers from normal distribution.
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x);
+void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x) {
+   ae_int_t i;
+   ae_int_t n2;
+   double v1;
+   double v2;
+   SetVector(x);
+   n2 = n / 2;
+   rallocv(n, x);
+   for (i = 0; i < n2; i++) {
+      hqrndnormal2(state, &v1, &v2);
+      x->xR[2 * i] = v1;
+      x->xR[2 * i + 1] = v2;
+   }
+   if (n % 2 != 0) {
+      hqrndnormal2(state, &v1, &v2);
+      x->xR[n - 1] = v1;
+   }
+}
+
+// Random number generator: matrix with random entries (normal distribution)
+//
+// This function generates MxN random matrix.
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x);
+void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t n2;
+   double v1;
+   double v2;
+   SetMatrix(x);
+   n2 = n / 2;
+   ae_matrix_set_length(x, m, n);
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n2; j++) {
+         hqrndnormal2(state, &v1, &v2);
+         x->xyR[i][2 * j] = v1;
+         x->xyR[i][2 * j + 1] = v2;
+      }
+      if (n % 2 != 0) {
+         hqrndnormal2(state, &v1, &v2);
+         x->xyR[i][n - 1] = v1;
+      }
+   }
+}
+
 // Random number generator: random X and Y such that X^2+Y^2=1
 //
 // State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
@@ -2777,6 +2829,20 @@ double hqrndnormal(const hqrndstate &state) {
    double D = alglib_impl::hqrndnormal(ConstT(hqrndstate, state));
    alglib_impl::ae_state_clear();
    return D;
+}
+
+void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndnormalv(ConstT(hqrndstate, state), n, ConstT(ae_vector, x));
+   alglib_impl::ae_state_clear();
+}
+
+void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndnormalm(ConstT(hqrndstate, state), m, n, ConstT(ae_matrix, x));
+   alglib_impl::ae_state_clear();
 }
 
 void hqrndunit2(const hqrndstate &state, double &x, double &y) {

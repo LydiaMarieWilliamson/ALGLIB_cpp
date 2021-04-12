@@ -157,7 +157,6 @@ void pcabuildbasis(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t *info,
 //                     method. Zero value means that no  limit  on  iteration
 //                     count is placed (eps-based stopping condition is used).
 //
-//
 // Outputs:
 //     S2          -   array[NNeeded]. Variance values corresponding
 //                     to basis vectors.
@@ -274,7 +273,6 @@ void pcatruncatedsubspace(RMatrix *x, ae_int_t npoints, ae_int_t nvars, ae_int_t
 //     MaxIts      -   number of iterations performed by  subspace  iteration
 //                     method. Zero value means that no  limit  on  iteration
 //                     count is placed (eps-based stopping condition is used).
-//
 //
 // Outputs:
 //     S2          -   array[NNeeded]. Variance values corresponding
@@ -914,7 +912,7 @@ void dsoptimalsplit2(RVector *a, ZVector *c, ae_int_t n, ae_int_t *info, double 
 //     BufR    array[0..N-1]       temporaries
 //     BufI    array[0..N-1]       temporaries
 //
-// Output:
+// Outputs:
 //     Info    error code ("> 0"=OK, "< 0"=bad)
 //     RMS     training set RMS error
 //     CVRMS   leave-one-out RMS error
@@ -1634,7 +1632,6 @@ static void mlpbase_hladdhiddenlayer(multilayerperceptron *network, ae_int_t *co
 //     ...                     | * we have "0" neuron only when we have classifier
 //     activation function     |
 //     "0" neuron              /
-//
 // ALGLIB: Copyright 30.03.2008 by Sergey Bochkanov
 static void mlpbase_fillhighlevelinformation(multilayerperceptron *network, ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, bool iscls, bool islinearout) {
    ae_int_t idxweights;
@@ -2033,7 +2030,7 @@ void mlpcreateb0(ae_int_t nin, ae_int_t nout, double b, double d, multilayerperc
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, 0, 0, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2075,7 +2072,7 @@ void mlpcreateb1(ae_int_t nin, ae_int_t nhid, ae_int_t nout, double b, double d,
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid, 0, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2119,7 +2116,7 @@ void mlpcreateb2(ae_int_t nin, ae_int_t nhid1, ae_int_t nhid2, ae_int_t nout, do
 // Create
    mlpbase_mlpcreate(nin, nout, &lsizes, &ltypes, &lconnfirst, &lconnlast, layerscount, false, network);
    mlpbase_fillhighlevelinformation(network, nin, nhid1, nhid2, nout, false, false);
-// Turn on ouputs shift/scaling.
+// Turn on outputs shift/scaling.
    for (i = nin; i < nin + nout; i++) {
       network->columnmeans.xR[i] = b;
       network->columnsigmas.xR[i] = d;
@@ -2802,7 +2799,6 @@ void mlprandomize(multilayerperceptron *network) {
 // Buf[Offset+0]        mean value of neuron's output
 // Buf[Offset+1]        standard deviation of neuron's output
 //
-//
    entrysize = 2;
    vectorsetlengthatleast(&network->rndbuf, entrysize * ntotal);
    for (neuronidx = 0; neuronidx < ntotal; neuronidx++) {
@@ -3034,12 +3030,12 @@ void mlpinitpreprocessor(multilayerperceptron *network, RMatrix *xy, ae_int_t ss
 // Internal subroutine.
 // Initialization for preprocessor based on a sample.
 //
-// INPUT
+// Inputs:
 //     Network -   initialized neural network;
 //     XY      -   sample, given by sparse matrix;
 //     SSize   -   sample size.
 //
-// OUTPUT
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 // ALGLIB: Copyright 26.07.2012 by Sergey Bochkanov
 void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, ae_int_t ssize) {
@@ -3151,7 +3147,7 @@ void mlpinitpreprocessorsparse(multilayerperceptron *network, sparsematrix *xy, 
 //                   repetitions.
 //     SubsetSize- number of elements in Idx[] array.
 //
-// OUTPUT:
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 //
 // NOTE: when  SubsetSize < 0 is used full dataset by call MLPInitPreprocessor
@@ -3278,7 +3274,7 @@ void mlpinitpreprocessorsubset(multilayerperceptron *network, RMatrix *xy, ae_in
 //                   repetitions.
 //     SubsetSize- number of elements in Idx[] array.
 //
-// OUTPUT:
+// Outputs:
 //     Network -   neural network with initialised preprocessor.
 //
 // NOTE: when SubsetSize < 0 is used full dataset by call
@@ -7455,7 +7451,6 @@ namespace alglib_impl {
 //     NVars       -   number of independent variables, NVars >= 1
 //     NClasses    -   number of classes, NClasses >= 2
 //
-//
 // Outputs:
 //     Info        -   return code:
 //                     * -4, if internal EVD subroutine hasn't converged
@@ -7498,7 +7493,6 @@ void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses,
 //     NPoints     -   training set size, NPoints >= 0
 //     NVars       -   number of independent variables, NVars >= 1
 //     NClasses    -   number of classes, NClasses >= 2
-//
 //
 // Outputs:
 //     Info        -   return code:
@@ -8138,7 +8132,6 @@ static void ssa_realtimedequeue(ssamodel *s, double beta, ae_int_t cnt) {
 //   performed with probability UpdateIts (larger-than-one values  mean  that
 //   some amount of iterations is always performed).
 //
-//
 // In any case, after calling this function we either:
 // * have an exception
 // * have completely valid basis
@@ -8676,7 +8669,6 @@ void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int
 // Outputs:
 //     S               -   updated model
 //
-//
 // NOTE: TopK > WindowWidth is silently decreased to WindowWidth during analysis
 //       phase
 //
@@ -8776,7 +8768,6 @@ void ssacleardata(ssamodel *s) {
 //     WindowWidth     -   current window
 //     NBasis          -   basis size
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -8790,7 +8781,6 @@ void ssacleardata(ssamodel *s) {
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -8848,7 +8838,6 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
 //                         Empty array for WindowWidth=1.
 //     WindowWidth     -   current window width
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -8862,7 +8851,6 @@ void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae
 //   c) ssaappendsequenceandupdate()
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -8946,7 +8934,6 @@ static bool ssa_issequencebigenough(ssamodel *s, ae_int_t i) {
 //                         it holds that ActualData = Trend+Noise.
 //     NTicks          -   current WindowSize
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -8963,7 +8950,6 @@ static bool ssa_issequencebigenough(ssamodel *s, ae_int_t i) {
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -9044,7 +9030,6 @@ void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t 
 //
 // Outputs:
 //     Trend, Noise - processing results
-//
 // ALGLIB: Copyright 30.10.2017 by Sergey Bochkanov
 static void ssa_analyzesequence(ssamodel *s, RVector *data, ae_int_t i0, ae_int_t i1, RVector *trend, RVector *noise, ae_int_t offs) {
    ae_int_t winw;
@@ -9166,7 +9151,6 @@ static void ssa_analyzesequence(ssamodel *s, RVector *data, ae_int_t i0, ae_int_
 //     Noise           -   array[NTicks], the rest of the signal;
 //                         it holds that ActualData = Trend+Noise.
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9183,7 +9167,6 @@ static void ssa_analyzesequence(ssamodel *s, RVector *data, ae_int_t i0, ae_int_
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -9295,7 +9278,6 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 //     Noise           -   array[NTicks], the rest of the signal;
 //                         it holds that ActualData = Trend+Noise.
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9312,7 +9294,6 @@ void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise
 //
 // In  any  case,  only  basis  is  reused. Reconstruction is performed  from
 // scratch every time you call this function.
-//
 //
 // HANDLING OF DEGENERATE CASES
 //
@@ -9390,7 +9371,6 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9405,7 +9385,6 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
 //
-//
 // HANDLING OF DEGENERATE CASES
 //
 // Following degenerate cases may happen:
@@ -9414,7 +9393,7 @@ void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *tr
 // * no algorithm is specified (no analysis can be done)
 // * last sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -9535,7 +9514,6 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 // Outputs:
 //     Trend           -   array[ForecastLen], forecasted trend
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9550,7 +9528,6 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
 //
-//
 // HANDLING OF DEGENERATE CASES
 //
 // Following degenerate cases may happen:
@@ -9559,7 +9536,7 @@ void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend) {
 // * no algorithm is specified (no analysis can be done)
 // * data sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -9755,7 +9732,6 @@ static void ssa_forecastavgsequence(ssamodel *s, RVector *data, ae_int_t i0, ae_
 // Outputs:
 //     Trend           -   array[NTicks], predicted trend line
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9770,7 +9746,6 @@ static void ssa_forecastavgsequence(ssamodel *s, RVector *data, ae_int_t i0, ae_
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
 //
-//
 // HANDLING OF DEGENERATE CASES
 //
 // Following degenerate cases may happen:
@@ -9779,7 +9754,7 @@ static void ssa_forecastavgsequence(ssamodel *s, RVector *data, ae_int_t i0, ae_
 // * no algorithm is specified (no analysis can be done)
 // * last sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -9885,7 +9860,6 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // Outputs:
 //     Trend           -   array[ForecastLen], forecasted trend
 //
-//
 // CACHING/REUSE OF THE BASIS
 //
 // Caching/reuse of previous results is performed:
@@ -9900,7 +9874,6 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 //   d) ssasetalgotopk...() with exactly same K
 //   Calling these functions will result in reuse of previously found basis.
 //
-//
 // HANDLING OF DEGENERATE CASES
 //
 // Following degenerate cases may happen:
@@ -9909,7 +9882,7 @@ void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend
 // * no algorithm is specified (no analysis can be done)
 // * data sequence is shorter than the WindowWidth   (analysis  can  be done,
 //   but we can not perform forecasting on the last sequence)
-// * window lentgh is 1 (impossible to use for forecasting)
+// * window length is 1 (impossible to use for forecasting)
 // * SSA analysis algorithm is  configured  to  extract  basis  whose size is
 //   equal to window length (impossible to use for  forecasting;  only  basis
 //   whose size is less than window length can be used).
@@ -10882,7 +10855,7 @@ void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars) {
 //     V           -   coefficients, array[0..NVars]
 //     NVars       -   number of independent variables
 //
-// OUTPUT PAREMETERS:
+// Outputs:
 //     LM          -   linear model.
 // ALGLIB: Copyright 30.08.2008 by Sergey Bochkanov
 // API: void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
@@ -13987,7 +13960,6 @@ bool mlpeissoftmax(mlpensemble *ensemble) {
 //                 NOut, it will be reallocated. If it is large enough, it
 //                 is NOT reallocated, so we can save some time on reallocation.
 //
-//
 // Outputs:
 //     Y       -   result. Regression estimate when solving regression  task,
 //                 vector of posterior probabilities for classification task.
@@ -15431,7 +15403,6 @@ static void mlptrain_initmlptrnsessions(multilayerperceptron *networktrained, bo
 // to  train  it.  However,  no  training  is  performed  until first call to
 // MLPContinueTraining() function. Subsequent calls  to MLPContinueTraining()
 // will advance traing progress one iteration further.
-//
 // ALGLIB: Copyright 13.08.2012 by Sergey Bochkanov
 static void mlptrain_mlpstarttrainingx(mlptrainer *s, bool randomstart, ae_int_t algokind, ZVector *subset, ae_int_t subsetsize, smlptrnsession *session) {
    ae_int_t nin;
@@ -15505,7 +15476,6 @@ static void mlptrain_mlpstarttrainingx(mlptrainer *s, bool randomstart, ae_int_t
 //     > while MLPContinueTraining(Trainer, Network) do
 //     >     [visualize training progress]
 //     >
-//
 // ALGLIB: Copyright 13.08.2012 by Sergey Bochkanov
 static bool mlptrain_mlpcontinuetrainingx(mlptrainer *s, ZVector *subset, ae_int_t subsetsize, ae_int_t *ngradbatch, smlptrnsession *session) {
    AutoS ae_int_t nin;
@@ -15789,7 +15759,6 @@ static void mlptrain_mlptrainnetworkx(mlptrainer *s, ae_int_t nrestarts, ae_int_
 }
 
 // Internal subroutine for parallelization function MLPFoldCV.
-//
 //
 // Inputs:
 //     S         -   trainer object;
@@ -16865,7 +16834,6 @@ static void mlptrain_initmlpetrnsessions(multilayerperceptron *individualnetwork
 // current dataset and early stopping training algorithm. Each early stopping
 // round performs NRestarts  random  restarts  (thus,  EnsembleSize*NRestarts
 // training rounds is performed in total).
-//
 // ALGLIB: Copyright 22.08.2012 by Sergey Bochkanov
 static void mlptrain_mlptrainensemblex(mlptrainer *s, mlpensemble *ensemble, ae_int_t idx0, ae_int_t idx1, ae_int_t nrestarts, ae_int_t trainingmethod, ae_int_t *ngrad, bool isrootcall, ae_shared_pool *esessions) {
    ae_frame _frame_block;
@@ -18203,7 +18171,6 @@ void clusterizergetdistances(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, 
 //       * [0,2)*[0,2) will result in evaluation of A00, A01, A11
 //       * [2,4)*[2,4) will result in evaluation of A22, A23, A32, A33
 //       * [2,4)*[0,2) will result in evaluation of empty set of elements
-//
 // ALGLIB: Copyright 07.04.2013 by Sergey Bochkanov
 static void clustering_evaluatedistancematrixrec(RMatrix *xy, ae_int_t nfeatures, ae_int_t disttype, RMatrix *d, ae_int_t i0, ae_int_t i1, ae_int_t j0, ae_int_t j1) {
    double rcomplexity;
@@ -19921,7 +19888,6 @@ static const ae_int_t dforest_permutationimportancebatchsize = 512;
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different
 //            object is dangerous - you  may   get  integrity  check  failure
@@ -21597,7 +21563,7 @@ static void dforest_estimatepermutationimportances(decisionforestbuilder *s, dec
          // update OOB counter
             oobcounts++;
          }
-         treeroot = treeroot + RoundZ(df->trees.xR[treeroot]);
+         treeroot += RoundZ(df->trees.xR[treeroot]);
       }
    // Now YV[] stores NPerm versions of the forest output for various permutations of variable values.
    // Update losses.
@@ -22474,14 +22440,8 @@ static void dforest_compressrec(decisionforest *df, bool usemantissa8, ae_int_t 
    ae_int_t varidx;
    double leafval;
    double splitval;
-   ae_int_t fpwidth;
    ae_int_t dstoffsold;
    dstoffsold = *dstoffs;
-   if (usemantissa8) {
-      fpwidth = 2;
-   } else {
-      fpwidth = 3;
-   }
 // Leaf or split?
    varidx = RoundZ(df->trees.xR[treepos]);
    if (varidx == -1) {
@@ -22568,7 +22528,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
       size8i = dforest_computecompressedsizerec(df, usemantissa8, offssrc, offssrc + 1, &dummyi, false);
       size8 += dforest_computecompresseduintsize(size8i) + size8i;
       maxrawtreesize = imax2(maxrawtreesize, RoundZ(df->trees.xR[offssrc]));
-      offssrc = offssrc + RoundZ(df->trees.xR[offssrc]);
+      offssrc += RoundZ(df->trees.xR[offssrc]);
    }
    result = (double)(8 * df->trees.cnt) / (double)(size8 + 1);
 // Allocate memory and perform compression
@@ -22584,7 +22544,7 @@ static double dforest_binarycompression(decisionforest *df, bool usemantissa8) {
    // Compress recursively
       dforest_compressrec(df, usemantissa8, offssrc, offssrc + 1, &compressedsizes, &df->trees8, &offsdst);
    // Next tree
-      offssrc = offssrc + RoundZ(df->trees.xR[offssrc]);
+      offssrc += RoundZ(df->trees.xR[offssrc]);
    }
    ae_assert(offsdst == size8, "BinaryCompression: integrity check failed (stream length)");
 // Finalize forest conversion, clear previously allocated memory
@@ -22820,7 +22780,7 @@ void dfprocess(decisionforest *df, RVector *x, RVector *y) {
       offs = 0;
       for (i = 0; i < df->ntrees; i++) {
          dforest_dfprocessinternaluncompressed(df, offs, offs + 1, x, y);
-         offs = offs + RoundZ(df->trees.xR[offs]);
+         offs += RoundZ(df->trees.xR[offs]);
       }
       processed = true;
    }
@@ -24124,7 +24084,6 @@ static const ae_int_t knn_knnfirstversion = 0;
 // Outputs:
 //     Buf         -   external buffer.
 //
-//
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different
 //            object is dangerous - you  may   get  integrity  check  failure
@@ -24463,7 +24422,6 @@ void knnprocess(knnmodel *model, RVector *x, RVector *y) {
 // Inputs:
 //     Model       -   KNN model
 //     Buf         -   processing buffer.
-//
 //
 // IMPORTANT: buffer object should be used only with model which was used  to
 //            initialize buffer. Any attempt to  use  buffer  with  different

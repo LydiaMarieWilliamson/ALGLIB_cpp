@@ -4,7 +4,7 @@ In the following, we adopt the following conventions:
 ∙	except:
 		1^x ≡ exp(2πix) = cos(2πx) + i sin(2πx),
 	to denote powers of unity.
-∙	0 = {}, 1 = {0}, 2 = {0,1}, 3 = {0,1,2}, ⋯, ω = {0,1,2,3,⋯}, so that n ∈ N ⇔ 0 ≤ n < N, for N = ω.
+∙	0 = {}, 1 = {0}, 2 = {0,1}, 3 = {0,1,2}, ⋯, ω = {0,1,2,3,⋯}, so that n ∈ N ⇔ 0 ≤ n < N, for N ∈ ω.
 ∙	δ(x) is the delta function; i.e. the distribution for which ∫ f(x₁) δ(x₀ - x₁) dx₁ = f(x₀)
 ∙	δ(n₀,n₁) is the Kroenecker delta; i.e. the *discrete* distribution for which Σ_n₀ f(n₁) δ(n₀,n₁) = f(n₀)
 ∙	()* denotes complex conjugate; i.e. (x + iy)* = x - iy, for x, y ∈ ℝ.
@@ -80,9 +80,9 @@ Generalized Discrete Fourier Transform (DFT):
 	―	Parseval Formula Invariance
 
 Spectrograph, or Windowed Fourier Transform (WFT generalized):
-∙	For the following, let λ ∈ [0,1] be arbitrarily chosen; the cardinal values being: 
+∙	For the following, let λ ∈ [0,1] be arbitrarily chosen; the cardinal values being:
 	―	λ = 0: The phase in F(q,p) reflects the wave form for F_p(q) and yields instantaneous frequency
-	―	λ = 1: The phase in F(q,p) is slowly-varying in q and reflects the wave form for p ↦ F(q,p) and yields impulse timee
+	―	λ = 1: The phase in F(q,p) is slowly-varying in q and reflects the wave form for p ↦ F(q,p) and yields impulse times
 ∙	Continuum Form (Time Domain):
 	―	Forward:	∀ q, p ∈ ℝ:	F(q, p) = ∫ f(t) g(t - q)* 1^{-p(t - q)} 1^{-λpq} dt
 	―	Backward:	∀ t ∈ ℝ:	f(t) = ∫ F(q, p) h(t - q) 1^{+p(t - q)} 1^{+λpq} dq dp
@@ -120,10 +120,10 @@ Spectrograph, or Windowed Fourier Transform (WFT generalized):
 	―	Backward:	∀ t ∈ T:		f(t) = Σ_{(q,p) ∈ T_q × F_p} F(q, p) h(t - q) 1^{p(t - q}} 1^{+λpq} Δq Δp
 
 ∙	Domains:
-	―	t ∈ T: regularly-spaced with width Δt = sample width,
-	―	q ∈ T_q: regularly-spaced with width Δq = spectrograph time width,
-	―	p ∈ F_p: regularly-spaced with width Δp = spectrograph frequency width.
-	―	Q ∈ T_Q = supp(g): regularly-spaced with width ΔQ = windowing function time width = Δt = sample width,
+	―	t ∈ T: regularly-spaced with Δt = sample width,
+	―	q ∈ T_q: regularly-spaced with Δq = spectrograph time width,
+	―	p ∈ F_p: regularly-spaced with Δp = spectrograph frequency width.
+	―	Q ∈ T_Q = supp(g): regularly-spaced with ΔQ = windowing function time width = Δt = sample width,
 ∙	Domain Conditions:
 	―	N ≡ 1/(ΔpΔQ) ∈ { 1, 2, 3, ⋯ }
 	―	card|T_Q| = N = card|F_p|

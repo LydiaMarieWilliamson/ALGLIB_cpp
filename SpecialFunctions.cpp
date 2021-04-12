@@ -342,7 +342,6 @@ static double erfr1(double x) {
 // For 0 <= |x| < 1, erf(x) = x * P4(x**2)/Q5(x**2); otherwise
 // erf(x) = 1 - erfc(x).
 //
-//
 // ACCURACY:
 //
 //                      Relative error:
@@ -371,10 +370,8 @@ double errorfunction(double x) {
 //                           -
 //                            x
 //
-//
 // For small x, erfc(x) = 1 - erf(x); otherwise rational
 // approximations are computed.
-//
 //
 // ACCURACY:
 //
@@ -426,7 +423,6 @@ double normalpdf(double x) {
 //
 // where z = x/sqrt(2). Computation is via the functions
 // erf and erfc.
-//
 //
 // ACCURACY:
 //
@@ -494,7 +490,6 @@ double inverfr2(double z) {
 // Gaussian probability density function (integrated from
 // minus infinity to x) is equal to y.
 //
-//
 // For small arguments 0 < y < exp(-2), the program computes
 // z = sqrt( -2.0 * log(y) );  then the approximation is
 // x = z - log(z)/z  - (1/z) P(1/z) / Q(1/z).
@@ -546,7 +541,6 @@ double inverf(double e) {
 //                          1              (    x^2 - 2*rho*x*y + y^2  )
 //     f(x,y,rho) = ----------------- * exp( - ----------------------- )
 //                  2pi*sqrt(1-rho^2)      (        2*(1-rho^2)        )
-//
 //
 // with -1 < rho < +1 and arbitrary x, y.
 //
@@ -608,7 +602,6 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 // Returns the area under the bivariate Gaussian  PDF  with  correlation
 // parameter equal to Rho, integrated from minus infinity to (x,y):
 //
-//
 //                                           x      y
 //                                           -      -
 //                             1            | |    | |
@@ -617,13 +610,11 @@ static double normaldistr_bvnintegrate6(double rangea, double rangeb, double x, 
 //                                         -      -
 //                                        -INF   -INF
 //
-//
 // where
 //
 //                       (    u^2 - 2*rho*u*v + v^2  )
 //     f(u,v,rho)   = exp( - ----------------------- )
 //                       (        2*(1-rho^2)        )
-//
 //
 // with -1 < rho < +1 and arbitrary x, y.
 //
@@ -822,7 +813,6 @@ namespace alglib_impl {
 //                 | (a)    -
 //                           0
 //
-//
 // In this implementation both arguments must be positive.
 // The integral is evaluated by either a power series or
 // continued fraction expansion, depending on the relative
@@ -877,7 +867,6 @@ double incompletegamma(double a, double x) {
 //
 // The function is defined by
 //
-//
 //  igamc(a,x)   =   1 - igam(a,x)
 //
 //                            inf.
@@ -887,7 +876,6 @@ double incompletegamma(double a, double x) {
 //                    -      | |
 //                   | (a)    -
 //                             x
-//
 //
 // In this implementation both arguments must be positive.
 // The integral is evaluated by either a power series or
@@ -1173,8 +1161,6 @@ namespace alglib_impl {
 //
 // Approximates the integral
 //
-//
-//
 //            pi/2
 //             -
 //            | |
@@ -1242,8 +1228,6 @@ double ellipticintegralkhighprecision(double m1) {
 //
 // Approximates the integral
 //
-//
-//
 //            pi/2
 //             -
 //            | |
@@ -1277,8 +1261,6 @@ double ellipticintegralk(double m) {
 //
 // Approximates the integral
 //
-//
-//
 //                phi
 //                 -
 //                | |
@@ -1291,9 +1273,6 @@ double ellipticintegralk(double m) {
 //
 // of amplitude phi and modulus m, using the arithmetic -
 // geometric mean algorithm.
-//
-//
-//
 //
 // ACCURACY:
 //
@@ -1388,7 +1367,6 @@ double incompleteellipticintegralk(double phi, double m) {
 //
 // Approximates the integral
 //
-//
 //            pi/2
 //             -
 //            | |                 2
@@ -1448,7 +1426,6 @@ double ellipticintegrale(double m) {
 // Incomplete elliptic integral of the second kind
 //
 // Approximates the integral
-//
 //
 //                phi
 //                 -
@@ -1872,7 +1849,6 @@ namespace alglib_impl {
 // Ci(x) = f(x) sin(x) - g(x) cos(x)
 // Si(x) = pi/2 - f(x) cos(x) - g(x) sin(x)
 //
-//
 // ACCURACY:
 //    Test interval = [0,50].
 // Absolute error, except relative when > 1:
@@ -1989,7 +1965,6 @@ void sinecosineintegrals(double x, double *si, double *ci) {
 // and by Chebyshev expansions for x between 8 and 88.
 // For large x, both functions approach exp(x)/2x.
 // Arguments greater than 88 in magnitude return MAXNUM.
-//
 //
 // ACCURACY:
 //
@@ -2143,6 +2118,7 @@ namespace alglib_impl {
 // y = pdtr( k, m ) = igamc( k+1, m ).
 //
 // The arguments must both be positive.
+//
 // ACCURACY:
 //
 // See incomplete gamma function
@@ -2269,7 +2245,6 @@ static void bessel_besselasympt0(double w, double *pzero, double *qzero) {
 // (5, infinity). In the first interval the following rational
 // approximation is used:
 //
-//
 //        2         2
 // (w - r  ) (w - r  ) P (w) / Q (w)
 //       1         2    3       8
@@ -2389,7 +2364,6 @@ double besselj1(double x) {
 // arithmetic   range      # trials      peak         rms
 //    IEEE      0, 30        5000       4.4e-16     7.9e-17
 //
-//
 // Not suitable for large n or x. Use jv() (fractional order) instead.
 //
 // Cephes Math Library Release 2.8:  June, 2000
@@ -2446,8 +2420,6 @@ double besseljn(ae_int_t n, double x) {
 // In the second interval, the Hankel asymptotic expansion
 // is employed with two rational functions of degree 6/6
 // and 7/7.
-//
-//
 //
 // ACCURACY:
 //
@@ -3386,7 +3358,6 @@ double incompletebeta(double a, double b, double x) {
 // The routine performs interval halving or Newton iterations to find the
 // root of incbet(a,b,x) - y = 0.
 //
-//
 // ACCURACY:
 //
 //                      Relative error:
@@ -3766,7 +3737,6 @@ namespace alglib_impl {
 //
 // P(x) = incbet( df1/2, df2/2, (df1*x/(df2 + df1*x) ).
 //
-//
 // The arguments a and b are greater than zero, and x is
 // nonnegative.
 //
@@ -3800,7 +3770,6 @@ double fdistribution(ae_int_t a, ae_int_t b, double x) {
 // function (also known as Snedcor's density or the
 // variance ratio density).
 //
-//
 //                      inf.
 //                       -
 //              1       | |  a-1      b-1
@@ -3809,12 +3778,10 @@ double fdistribution(ae_int_t a, ae_int_t b, double x) {
 //                     -
 //                      x
 //
-//
 // The incomplete beta integral is used, according to the
 // formula
 //
 // P(x) = incbet( df2/2, df1/2, (df2/(df2 + df1*x) ).
-//
 //
 // ACCURACY:
 //
@@ -3939,15 +3906,12 @@ namespace alglib_impl {
 //         -
 //          0
 //
-//
 // The integrals are evaluated by a power series for x < 1.
 // For x >= 1 auxiliary functions f(x) and g(x) are employed
 // such that
 //
 // C(x) = 0.5 + f(x) sin( pi/2 x**2 ) - g(x) cos( pi/2 x**2 )
 // S(x) = 0.5 - f(x) cos( pi/2 x**2 ) - g(x) sin( pi/2 x**2 )
-//
-//
 //
 // ACCURACY:
 //
@@ -4353,8 +4317,6 @@ namespace alglib_impl {
 // Not defined for x <= 0.
 // See also expn.c.
 //
-//
-//
 // ACCURACY:
 //
 //                      Relative error:
@@ -4542,7 +4504,6 @@ double exponentialintegralei(double x) {
 //                | |     t
 //                 -
 //                  1
-//
 //
 // Both n and x must be nonnegative.
 //
@@ -4804,7 +4765,6 @@ namespace alglib_impl {
 // of the Chi square probability density function with
 // v degrees of freedom.
 //
-//
 //                                   x
 //                                    -
 //                        1          | |  v/2-1  -t/2
@@ -4825,7 +4785,6 @@ namespace alglib_impl {
 // ACCURACY:
 //
 // See incomplete gamma function
-//
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -4888,7 +4847,6 @@ double chisquarecdistribution(double v, double x) {
 // ACCURACY:
 //
 // See inverse incomplete gamma function
-//
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
@@ -5044,7 +5002,6 @@ void legendrecoefficients(const ae_int_t n, real_1d_array &c) {
 // Depends on: GAMMAFUNC
 namespace alglib_impl {
 // Beta function
-//
 //
 //                   -     -
 //                  | (a) | (b)
@@ -5690,8 +5647,6 @@ namespace alglib_impl {
 //
 // Evaluation is by power series summation for small x,
 // by rational minimax approximations for large x.
-//
-//
 //
 // ACCURACY:
 // Error criterion is absolute when function <= 1, relative

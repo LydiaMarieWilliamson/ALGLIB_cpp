@@ -60,6 +60,7 @@ void sparseswap(sparsematrix *s0, sparsematrix *s1);
 void sparseadd(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
 void sparseset(sparsematrix *s, ae_int_t i, ae_int_t j, double v);
 double sparseget(sparsematrix *s, ae_int_t i, ae_int_t j);
+bool sparseexists(sparsematrix *s, ae_int_t i, ae_int_t j);
 double sparsegetdiagonal(sparsematrix *s, ae_int_t i);
 void sparsemv(sparsematrix *s, RVector *x, RVector *y);
 void sparsemtv(sparsematrix *s, RVector *x, RVector *y);
@@ -73,6 +74,8 @@ void sparsemm2(sparsematrix *s, RMatrix *a, ae_int_t k, RMatrix *b0, RMatrix *b1
 void sparsesmm(sparsematrix *s, bool isupper, RMatrix *a, ae_int_t k, RMatrix *b);
 void sparsetrmv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x, RVector *y);
 void sparsetrsv(sparsematrix *s, bool isupper, bool isunit, ae_int_t optype, RVector *x);
+void sparsesymmpermtbl(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b);
+void sparsesymmpermtblbuf(sparsematrix *a, bool isupper, ZVector *p, sparsematrix *b);
 void sparseresizematrix(sparsematrix *s);
 void sparseinitduidx(sparsematrix *s);
 double sparsegetaveragelengthofchain(sparsematrix *s);
@@ -127,6 +130,7 @@ void sparseswap(const sparsematrix &s0, const sparsematrix &s1);
 void sparseadd(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 void sparseset(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
 double sparseget(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
+bool sparseexists(const sparsematrix &s, const ae_int_t i, const ae_int_t j);
 double sparsegetdiagonal(const sparsematrix &s, const ae_int_t i);
 void sparsemv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
 void sparsemtv(const sparsematrix &s, const real_1d_array &x, real_1d_array &y);
@@ -140,6 +144,8 @@ void sparsemm2(const sparsematrix &s, const real_2d_array &a, const ae_int_t k, 
 void sparsesmm(const sparsematrix &s, const bool isupper, const real_2d_array &a, const ae_int_t k, real_2d_array &b);
 void sparsetrmv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x, real_1d_array &y);
 void sparsetrsv(const sparsematrix &s, const bool isupper, const bool isunit, const ae_int_t optype, const real_1d_array &x);
+void sparsesymmpermtbl(const sparsematrix &a, const bool isupper, const integer_1d_array &p, sparsematrix &b);
+void sparsesymmpermtblbuf(const sparsematrix &a, const bool isupper, const integer_1d_array &p, const sparsematrix &b);
 void sparseresizematrix(const sparsematrix &s);
 bool sparseenumerate(const sparsematrix &s, ae_int_t &t0, ae_int_t &t1, ae_int_t &i, ae_int_t &j, double &v);
 bool sparserewriteexisting(const sparsematrix &s, const ae_int_t i, const ae_int_t j, const double v);
@@ -172,7 +178,7 @@ ae_int_t sparsegetlowercount(const sparsematrix &s);
 } // end of namespace alglib
 
 // === ABLAS Package ===
-// Depends on: (AlgLibInternal) APSERV, ABLASMKL, ABLASF
+// Depends on: (AlgLibInternal) APSERV, ABLASF, ABLASMKL
 namespace alglib_impl {
 ae_int_t ablassplitlength(RMatrix *a, ae_int_t n);
 ae_int_t ablascomplexsplitlength(CMatrix *a, ae_int_t n);
@@ -208,6 +214,7 @@ void cmatrixherk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, 
 void cmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 void rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 void cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
+void rowwisegramschmidt(RMatrix *q, ae_int_t m, ae_int_t n, RVector *x, RVector *qx, bool needqx);
 } // end of namespace alglib_impl
 
 namespace alglib {
@@ -319,6 +326,156 @@ void sluv2buffer_free(void *_p, bool make_automatic);
 bool sptrflu(sparsematrix *a, ae_int_t pivottype, ZVector *pr, ZVector *pc, sluv2buffer *buf);
 } // end of namespace alglib_impl
 
+// === AMDORDERING Package ===
+// Depends on: SPARSE, ABLAS
+namespace alglib_impl {
+struct amdnset {
+   ae_int_t n;
+   ae_int_t nstored;
+   ae_vector items;
+   ae_vector locationof;
+   ae_int_t iteridx;
+};
+void amdnset_init(void *_p, bool make_automatic);
+void amdnset_copy(void *_dst, void *_src, bool make_automatic);
+void amdnset_free(void *_p, bool make_automatic);
+
+struct amdknset {
+   ae_int_t k;
+   ae_int_t n;
+   ae_vector flagarray;
+   ae_vector vbegin;
+   ae_vector vallocated;
+   ae_vector vcnt;
+   ae_vector data;
+   ae_int_t dataused;
+   ae_int_t iterrow;
+   ae_int_t iteridx;
+};
+void amdknset_init(void *_p, bool make_automatic);
+void amdknset_copy(void *_dst, void *_src, bool make_automatic);
+void amdknset_free(void *_p, bool make_automatic);
+
+struct amdvertexset {
+   ae_int_t n;
+   bool checkexactdegrees;
+   ae_int_t smallestdegree;
+   ae_vector approxd;
+   ae_vector optionalexactd;
+   ae_vector isvertex;
+   ae_vector vbegin;
+   ae_vector vprev;
+   ae_vector vnext;
+};
+void amdvertexset_init(void *_p, bool make_automatic);
+void amdvertexset_copy(void *_dst, void *_src, bool make_automatic);
+void amdvertexset_free(void *_p, bool make_automatic);
+
+struct amdllmatrix {
+   ae_int_t n;
+   ae_vector vbegin;
+   ae_vector vcolcnt;
+   ae_vector entries;
+   ae_int_t entriesinitialized;
+};
+void amdllmatrix_init(void *_p, bool make_automatic);
+void amdllmatrix_copy(void *_dst, void *_src, bool make_automatic);
+void amdllmatrix_free(void *_p, bool make_automatic);
+
+struct amdbuffer {
+   ae_int_t n;
+   bool checkexactdegrees;
+   ae_vector iseliminated;
+   ae_vector issupernode;
+   amdknset setsuper;
+   amdknset seta;
+   amdknset sete;
+   amdllmatrix mtxl;
+   amdvertexset vertexdegrees;
+   ae_vector perm;
+   ae_vector invperm;
+   ae_vector columnswaps;
+   amdnset lp;
+   amdnset plp;
+   amdnset ep;
+   amdnset adji;
+   amdnset adjj;
+   ae_vector ls;
+   ae_int_t lscnt;
+   amdnset exactdegreetmp0;
+   amdknset hashbuckets;
+   amdnset nonemptybuckets;
+   ae_vector sncandidates;
+   ae_vector tmp0;
+   ae_vector arrwe;
+   ae_matrix dbga;
+};
+void amdbuffer_init(void *_p, bool make_automatic);
+void amdbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void amdbuffer_free(void *_p, bool make_automatic);
+
+void generateamdpermutation(sparsematrix *a, ae_int_t n, ZVector *perm, ZVector *invperm, amdbuffer *buf);
+} // end of namespace alglib_impl
+
+// === SPCHOL Package ===
+// Depends on: AMDORDERING
+namespace alglib_impl {
+struct spcholanalysis {
+   ae_int_t tasktype;
+   ae_int_t n;
+   ae_int_t permtype;
+   bool unitd;
+   ae_int_t modtype;
+   double modparam0;
+   double modparam1;
+   double modparam2;
+   double modparam3;
+   ae_int_t nsuper;
+   ae_vector parentsupernode;
+   ae_vector supercolrange;
+   ae_vector superrowridx;
+   ae_vector superrowidx;
+   ae_vector fillinperm;
+   ae_vector invfillinperm;
+   ae_vector superperm;
+   ae_vector invsuperperm;
+   ae_vector effectiveperm;
+   ae_vector inveffectiveperm;
+   bool istopologicalordering;
+   bool applypermutationtooutput;
+   ae_vector ladjplusr;
+   ae_vector ladjplus;
+   ae_vector outrowcounts;
+   sparsematrix wrkat;
+   ae_vector rowstorage;
+   ae_vector rowstrides;
+   ae_vector rowoffsets;
+   ae_vector diagd;
+   ae_vector wrkrows;
+   ae_vector flagarray;
+   ae_vector tmpparent;
+   ae_vector node2supernode;
+   ae_vector u2smap;
+   ae_vector raw2smap;
+   amdbuffer amdtmp;
+   ae_vector tmp0;
+   ae_vector tmp1;
+   ae_vector tmp2;
+   ae_vector tmp3;
+   ae_vector tmp4;
+   sparsematrix tmpa;
+};
+void spcholanalysis_init(void *_p, bool make_automatic);
+void spcholanalysis_copy(void *_dst, void *_src, bool make_automatic);
+void spcholanalysis_free(void *_p, bool make_automatic);
+
+ae_int_t spsymmgetmaxfastkernel();
+bool spsymmanalyze(sparsematrix *a, ae_int_t facttype, ae_int_t permtype, spcholanalysis *analysis);
+void spsymmsetmodificationstrategy(spcholanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
+void spsymmreload(spcholanalysis *analysis, sparsematrix *a);
+bool spsymmfactorize(spcholanalysis *analysis, sparsematrix *a, RVector *d, ZVector *p);
+} // end of namespace alglib_impl
+
 // === MATGEN Package ===
 // Depends on: (AlgLibInternal) CREFLECTIONS
 // Depends on: (AlgLibMisc) HQRND
@@ -359,8 +516,22 @@ void hmatrixrndmultiply(complex_2d_array &a, const ae_int_t n);
 
 // === TRFAC Package ===
 // Depends on: (AlgLibInternal) ROTATIONS
-// Depends on: SPTRF, MATGEN
+// Depends on: SPTRF, SPCHOL, MATGEN
 namespace alglib_impl {
+struct sparsedecompositionanalysis {
+   ae_int_t n;
+   ae_int_t facttype;
+   ae_int_t permtype;
+   spcholanalysis analysis;
+   sparsematrix wrka;
+   sparsematrix wrkat;
+   sparsematrix crsa;
+   sparsematrix crsat;
+};
+void sparsedecompositionanalysis_init(void *_p, bool make_automatic);
+void sparsedecompositionanalysis_copy(void *_dst, void *_src, bool make_automatic);
+void sparsedecompositionanalysis_free(void *_p, bool make_automatic);
+
 void rmatrixlu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 void cmatrixlu(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 bool spdmatrixcholesky(RMatrix *a, ae_int_t n, bool isupper);
@@ -371,7 +542,12 @@ void spdmatrixcholeskyupdateadd1buf(RMatrix *a, ae_int_t n, bool isupper, RVecto
 void spdmatrixcholeskyupdatefixbuf(RMatrix *a, ae_int_t n, bool isupper, BVector *fix, RVector *bufr);
 bool sparselu(sparsematrix *a, ae_int_t pivottype, ZVector *p, ZVector *q);
 bool sparsecholeskyskyline(sparsematrix *a, ae_int_t n, bool isupper);
-bool sparsecholeskyx(sparsematrix *a, ae_int_t n, bool isupper, ZVector *p0, ZVector *p1, ae_int_t ordering, ae_int_t algo, ae_int_t fmt, sparsebuffers *buf, sparsematrix *c);
+bool sparsecholesky(sparsematrix *a, bool isupper);
+bool sparsecholeskyp(sparsematrix *a, bool isupper, ZVector *p);
+bool sparsecholeskyanalyze(sparsematrix *a, bool isupper, ae_int_t facttype, ae_int_t permtype, sparsedecompositionanalysis *analysis);
+void sparsecholeskysetmodtype(sparsedecompositionanalysis *analysis, ae_int_t modstrategy, double p0, double p1, double p2, double p3);
+bool sparsecholeskyfactorize(sparsedecompositionanalysis *analysis, bool needupper, sparsematrix *a, RVector *d, ZVector *p);
+void sparsecholeskyreload(sparsedecompositionanalysis *analysis, sparsematrix *a, bool isupper);
 void rmatrixlup(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 void cmatrixlup(CMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
 void rmatrixplu(RMatrix *a, ae_int_t m, ae_int_t n, ZVector *pivots);
@@ -380,6 +556,8 @@ bool spdmatrixcholeskyrec(RMatrix *a, ae_int_t offs, ae_int_t n, bool isupper, R
 } // end of namespace alglib_impl
 
 namespace alglib {
+DecClass(sparsedecompositionanalysis, EndD);
+
 void rmatrixlu(real_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 void cmatrixlu(complex_2d_array &a, const ae_int_t m, const ae_int_t n, integer_1d_array &pivots);
 bool spdmatrixcholesky(real_2d_array &a, const ae_int_t n, const bool isupper);
@@ -390,6 +568,11 @@ void spdmatrixcholeskyupdateadd1buf(const real_2d_array &a, const ae_int_t n, co
 void spdmatrixcholeskyupdatefixbuf(const real_2d_array &a, const ae_int_t n, const bool isupper, const boolean_1d_array &fix, real_1d_array &bufr);
 bool sparselu(const sparsematrix &a, const ae_int_t pivottype, integer_1d_array &p, integer_1d_array &q);
 bool sparsecholeskyskyline(const sparsematrix &a, const ae_int_t n, const bool isupper);
+bool sparsecholesky(const sparsematrix &a, const bool isupper);
+bool sparsecholeskyp(const sparsematrix &a, const bool isupper, integer_1d_array &p);
+bool sparsecholeskyanalyze(const sparsematrix &a, const bool isupper, const ae_int_t facttype, const ae_int_t permtype, sparsedecompositionanalysis &analysis);
+bool sparsecholeskyfactorize(const sparsedecompositionanalysis &analysis, const bool needupper, sparsematrix &a, real_1d_array &d, integer_1d_array &p);
+void sparsecholeskyreload(const sparsedecompositionanalysis &analysis, const sparsematrix &a, const bool isupper);
 } // end of namespace alglib
 
 // === RCOND Package ===
@@ -544,6 +727,7 @@ void hmatrixtdunpackq(const complex_2d_array &a, const ae_int_t n, const bool is
 } // end of namespace alglib
 
 // === FBLS Package ===
+// Depends on: (AlgLibInternal) ROTATIONS
 // Depends on: ORTFAC
 namespace alglib_impl {
 struct fblslincgstate {
@@ -567,10 +751,40 @@ void fblslincgstate_init(void *_p, bool make_automatic);
 void fblslincgstate_copy(void *_dst, void *_src, bool make_automatic);
 void fblslincgstate_free(void *_p, bool make_automatic);
 
+struct fblsgmresstate {
+   ae_vector b;
+   ae_vector x;
+   ae_vector ax;
+   ae_vector xs;
+   ae_matrix qi;
+   ae_matrix aqi;
+   ae_matrix h;
+   ae_matrix hq;
+   ae_matrix hr;
+   ae_vector hqb;
+   ae_vector ys;
+   ae_vector tmp0;
+   ae_vector tmp1;
+   ae_int_t n;
+   ae_int_t itscnt;
+   double epsort;
+   double epsres;
+   double epsred;
+   double epsdiag;
+   ae_int_t itsperformed;
+   ae_int_t retcode;
+   ae_int_t PQ;
+};
+void fblsgmresstate_init(void *_p, bool make_automatic);
+void fblsgmresstate_copy(void *_dst, void *_src, bool make_automatic);
+void fblsgmresstate_free(void *_p, bool make_automatic);
+
 void fblscholeskysolve(RMatrix *cha, double sqrtscalea, ae_int_t n, bool isupper, RVector *xb, RVector *tmp);
 void fblssolvecgx(RMatrix *a, ae_int_t m, ae_int_t n, double alpha, RVector *b, RVector *x, RVector *buf);
 void fblscgcreate(RVector *x, RVector *b, ae_int_t n, fblslincgstate *state);
 bool fblscgiteration(fblslincgstate *state);
+void fblsgmrescreate(RVector *b, ae_int_t n, ae_int_t k, fblsgmresstate *state);
+bool fblsgmresiteration(fblsgmresstate *state);
 void fblssolvels(RMatrix *a, RVector *b, ae_int_t m, ae_int_t n, RVector *tmp0, RVector *tmp1, RVector *tmp2);
 } // end of namespace alglib_impl
 
