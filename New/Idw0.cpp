@@ -927,7 +927,7 @@ void IdwBuf::IdwMakeBuf(const IdwQ &Q) {
    Assert(Q._Ls >= 0, "IdwBuf::IdwMakeBuf: integrity check failed");
    Assert(Q._Op >= 0, "IdwBuf::IdwMakeBuf: integrity check failed");
    _X.InitVector(Q._Xs), _Y.InitVector(Q._Ys);
-   _YWb.InitVector(Q._Ys*Max(Q._Ls, 1)), _Wb.InitVector(Max(Q._Ls, 1)), _XYb.InitMatrix();
+   _YWb.InitVector(Q._Ys*Max(Q._Ls, (Integer)1)), _Wb.InitVector(Max(Q._Ls, (Integer)1)), _XYb.InitMatrix();
    _Rb.InitVector();
    if (Q._Ls >= 1 && Q._Op != 0) _Kb.MakeKdBuf(Q._Kd); else _Kb.InitKdTreeReq();
 }
