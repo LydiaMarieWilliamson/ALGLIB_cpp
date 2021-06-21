@@ -4384,8 +4384,8 @@ static bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_
 static bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
    if (m > alglib_c_block || n > alglib_c_block)
       return false;
-#ifdef AE_HAS_SSE2_INTRINSICS
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
+#ifdef AE_HAS_SSE2_INTRINSICS
 // Check for SSE2 support.
    if (CurCPU & CPU_SSE2) {
       cmv = &_ialglib_cmv_sse2;

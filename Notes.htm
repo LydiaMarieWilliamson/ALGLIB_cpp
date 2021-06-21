@@ -483,7 +483,7 @@ ABC───	│ Commercial Edition of ALGLIB includes following important impro
 ───DE─	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
 ─────F	│ Commercial version of ALGLIB includes two important improvements of this function, which can be used from C++ and C#:
 ABC───	│ ∙	high-performance native backend with same C# interface (C# version)
-─BC───	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
+─BC───	│ ∙	hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86_64 platform)
 ───DEF	│ ∙	Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
 AB────	│ ∙	multithreading support (C++ and C# versions)
 ─────F	│ ∙	multithreading support
@@ -688,7 +688,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 03	The rcomm-related structures removed and replaced by an integer "stage" variable; the AutoS macro added (for "static Thread_local").
 04	The FP operations removed, except for the FP comparison operations.
 05	The FP comparison operations replaced by macros that directly invoke the floating point operators {==,!=,&lt;,&lt;=,&gt;,&gt;=} with the optimization bug fixed;
-	this requires repairing a flaw in GCC on x86/x64 platforms and possibly elsewhere.
+	this requires repairing a flaw in GCC on x86_64 platforms and possibly elsewhere.
 06	*_clear(), *_destroy() merged into *_free(); and *_init_copy() renamed *_copy().
 07	The state structure removed, except the frame pointers --
 	to regain thread-safety will require making TopFr, CurMsg, CurFlags, CurBreakAt thread-local;
@@ -1164,6 +1164,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 38	2310 3413 3486 3284 1612909655 (60230c57) 234 // Completed update of TestC.
 38	2273 3425 3461 3257 1613188134 (60274c26) 245 // Final upgrades to code, documentation and comments.
 38	2299 3472 3510 3254 1613195786 (60276a0a) 232 // Corrections made to TestC to fix minor problems inherited from ALGLIB.
+38	3571 5525 5684 4897 1624304616 (60d0ebe8) 84 // Testing on System B.
 </pre>
 </p>
 </div>

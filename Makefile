@@ -79,7 +79,9 @@ test:	TestI$X TestY$X TestX$X TestC$X TestZ$X
 	echo "TestC: Internal Routines"
 	./TestC$X
 clean:
-	rm -f Test{I,X,Y,Z,C}$X Test{I,X,Y,Z,C}$O ${Objs}
+	rm -f Test{I,X,Y,Z,C}$O ${Objs}
+clobber: clean
+	rm -f Test{I,X,Y,Z,C}$X
 
 ## Source - Header dependencies:
 Ap.cpp: Ap.h

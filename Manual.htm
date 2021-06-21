@@ -524,6 +524,7 @@ Further information may be found in the supplement <a href="Notes.htm#supp_DemoF
 <a name=gs_compile_examples_win class=sheader></a><h4>4.4.2. Compiling under Windows</h4>
 <b><font color=red>Note:</font></b> the description here for Windows implementation has been adapted from <a href="https://www.alglib.net/translator/man/manual.cpp.html#gs_compile_examples_win">the description given here for ALGLIB</a>, but has not been verified for ALGLIB++.
 If you are using Windows, you will need to experiment with this.
+We may soon experiment with this on Windows with clang/llvm; and provide updates to the Makefile for this configuration, if successful.
 </p>
 
 <pre class=p_code_head>
@@ -603,7 +604,7 @@ OS-agnostic mode, with <b><font color=red>/Ox</font></b> optimization
 Performance: 0.9 GFLOPS
 </pre>
 <pre class=p_code_head>
-OS-agnostic mode, with <b><font color=red>SSE2</font></b>-detection enabled: ALGLIB++ is told it is on x86/x64
+OS-agnostic mode, with <b><font color=red>SSE2</font></b>-detection enabled: ALGLIB++ is told it is on x86_64
 </pre>
 <pre class=p_code_body>
 <b>&gt;</b> cl /I. /EHsc /FeDemo.exe /Ox <span style='font-weight: bold; color: red;'>/DAE_CPU=AE_INTEL</span> *.cpp
@@ -679,7 +680,7 @@ using namespace alglib;
 <p>
 The examples below cover Linux compilation on Linux from the command line with GCC.
 The results cited by the original developers were on a 2-core x64 Intel CPU with 2x Hyperthreading enabled.
-The results cited below are on an x86 Intel Core 2 Duo processor
+The results cited below are on an x86 Intel Core 2 Duo processor and an AMD Ryzen processor.
 </p>
 <p>
 The first example covers platform-agnostic compilation without optimization settings - the simplest way to compile ALGLIB++.
@@ -703,12 +704,13 @@ OS-agnostic mode, with -O3 optimization
 Performance: 2.0 GFLOPS
 </pre>
 <pre class=p_code_head>
-OS-agnostic mode, with <b><font color=red>SSE2</font></b>-detection enabled: ALGLIB++ is told it is on x86/x64
+OS-agnostic mode, with <b><font color=red>SSE2</font></b>-detection enabled: ALGLIB++ is told it is on x86_64
 </pre>
 <pre class=p_code_body style='white-space: pre-wrap;'>
 <b>&gt;</b> g++ -I. -o Demo.out -O3 <span style='font-weight: bold; color: red;'>-lpthread -DAE_OS=AE_LINUX -DAE_CPU=AE_INTEL -msse2</span> *.cpp &amp;&amp; ./Demo.out
 Performance: 3.4 GFLOPS
 </pre>
+These counts are system-dependent; but the relative speed-up is proportional (e.g. on a second, newer, system; the respective counts are 1.0, 3.6 and 5.2 GFLOPS, respectively).
 <p>
 <font size=2>The <code>-lpthread</code>: there is further discussion about the use of the pthreads, whose library was included in the third test, in the <a href=#gs_using_threadsafety class=sheader>Thread-Safety</a> section below.</font>
 </p>
@@ -860,7 +862,7 @@ Discussed in further detail below.</li>
 <b><font color=red>Note:</font></b>
 Floating-point comparisons require special handling; particularly in the types of numeric and scientific applications that ALGLIB++ is geared for.
 Not all CPU's have have or use native floating point operations that conform strictly to IEEE 754.
-In particular, Intel x86/x64 use an 80-bit FPU, which may produce internal results that lie outside the (64-bit) range of numbers conforming to the IEEE standard.
+In particular, Intel x86_64 use an 80-bit FPU, which may produce internal results that lie outside the (64-bit) range of numbers conforming to the IEEE standard.
 Depending on the CPU and compiler being used, floating point operations may not be rounded correctly to the precision required by the programming languaage being compiled.
 For C and C++, this becomes an issue if floating point operations need to produce results of types "float" or "double".
 </p>
