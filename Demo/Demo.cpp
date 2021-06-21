@@ -44,7 +44,7 @@ int main() {
 // Set global threading settings (applied to all ALGLIB/C++ functions);
 // the default is to perform serial computations, unless parallel execution is activated.
 // Parallel execution tries to utilize all cores; this behavior can be changed with setnworkers().
-   setglobalthreading(parallel);
+   setglobalthreading(ParTH);
 // Perform matrix-matrix product.
    flops = 2*pow(n, 3);
    timeneeded = counter();
