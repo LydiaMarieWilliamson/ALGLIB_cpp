@@ -1043,8 +1043,10 @@ int main()
             const double v10 =  2, v11 =  3.5, v12 = -0.25, v13=1, v14 = 2, v15 = 3, v10_mod = 9;
             const double v20 =  5, v21 =  4, v22 =  3.126;
             const double v30 =  6, v31 =  7, v32 =  3, v33 = -400, v34=-3, v35=-1, v30_mod = -6;
-            /*double v40 =  9, v41 =  5, v42 =-12, v43 = -0.01;
-            double v50 =  1, v51 =  7, v52 =  2, v53 = 1;*/
+#if 0
+            double v40 =  9, v41 =  5, v42 =-12, v43 = -0.01;
+            double v50 =  1, v51 =  7, v52 =  2, v53 = 1;
+#endif
             double r;
 
             alglib::real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
@@ -1760,7 +1762,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             passed = false;
         }
         catch(...)
-        { /* do nothing, it is expected to fail */ }
+        { } // do nothing, it is expected to fail
 
         try
         {

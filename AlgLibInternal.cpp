@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -388,17 +386,15 @@ static ae_bool hpccores_hpcfinalizechunkedgradientx(RVector * buf,
 #if defined(AE_COMPILE_APSERV) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Internally calls SetErrorFlag() with condition:
-
-    Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
-
-This function is used to test relative error in Val against  RefVal,  with
-relative error being replaced by absolute when scale  of  RefVal  is  less
-than S.
-
-This function returns value of COND.
-*************************************************************************/
+// Internally calls SetErrorFlag() with condition:
+//
+//     Abs(Val-RefVal)>Tol*Max(Abs(RefVal),S)
+//
+// This function is used to test relative error in Val against  RefVal,  with
+// relative error being replaced by absolute when scale  of  RefVal  is  less
+// than S.
+//
+// This function returns value of COND.
 void seterrorflagdiff(ae_bool* flag,
      double val,
      double refval,
@@ -412,13 +408,11 @@ void seterrorflagdiff(ae_bool* flag,
 }
 
 
-/*************************************************************************
-The function always returns False.
-It may be used sometimes to prevent spurious warnings.
-
-  -- ALGLIB --
-     Copyright 17.09.2012 by Bochkanov Sergey
-*************************************************************************/
+// The function always returns False.
+// It may be used sometimes to prevent spurious warnings.
+//
+//   -- ALGLIB --
+//      Copyright 17.09.2012 by Bochkanov Sergey
 ae_bool alwaysfalse(ae_state *_state)
 {
     ae_bool result;
@@ -429,14 +423,12 @@ ae_bool alwaysfalse(ae_state *_state)
 }
 
 
-/*************************************************************************
-The function "touches" integer - it is used  to  avoid  compiler  messages
-about unused variables (in rare cases when we do NOT want to remove  these
-variables).
-
-  -- ALGLIB --
-     Copyright 17.09.2012 by Bochkanov Sergey
-*************************************************************************/
+// The function "touches" integer - it is used  to  avoid  compiler  messages
+// about unused variables (in rare cases when we do NOT want to remove  these
+// variables).
+//
+//   -- ALGLIB --
+//      Copyright 17.09.2012 by Bochkanov Sergey
 void touchint(ae_int_t* a, ae_state *_state)
 {
 
@@ -444,14 +436,12 @@ void touchint(ae_int_t* a, ae_state *_state)
 }
 
 
-/*************************************************************************
-The function "touches" real   -  it is used  to  avoid  compiler  messages
-about unused variables (in rare cases when we do NOT want to remove  these
-variables).
-
-  -- ALGLIB --
-     Copyright 17.09.2012 by Bochkanov Sergey
-*************************************************************************/
+// The function "touches" real   -  it is used  to  avoid  compiler  messages
+// about unused variables (in rare cases when we do NOT want to remove  these
+// variables).
+//
+//   -- ALGLIB --
+//      Copyright 17.09.2012 by Bochkanov Sergey
 void touchreal(double* a, ae_state *_state)
 {
 
@@ -459,14 +449,12 @@ void touchreal(double* a, ae_state *_state)
 }
 
 
-/*************************************************************************
-The function performs zero-coalescing on real value.
-
-NOTE: no check is performed for B<>0
-
-  -- ALGLIB --
-     Copyright 18.05.2015 by Bochkanov Sergey
-*************************************************************************/
+// The function performs zero-coalescing on real value.
+//
+// NOTE: no check is performed for B<>0
+//
+//   -- ALGLIB --
+//      Copyright 18.05.2015 by Bochkanov Sergey
 double coalesce(double a, double b, ae_state *_state)
 {
     double result;
@@ -481,14 +469,12 @@ double coalesce(double a, double b, ae_state *_state)
 }
 
 
-/*************************************************************************
-The function performs zero-coalescing on integer value.
-
-NOTE: no check is performed for B<>0
-
-  -- ALGLIB --
-     Copyright 18.05.2015 by Bochkanov Sergey
-*************************************************************************/
+// The function performs zero-coalescing on integer value.
+//
+// NOTE: no check is performed for B<>0
+//
+//   -- ALGLIB --
+//      Copyright 18.05.2015 by Bochkanov Sergey
 ae_int_t coalescei(ae_int_t a, ae_int_t b, ae_state *_state)
 {
     ae_int_t result;
@@ -503,12 +489,10 @@ ae_int_t coalescei(ae_int_t a, ae_int_t b, ae_state *_state)
 }
 
 
-/*************************************************************************
-The function convert integer value to real value.
-
-  -- ALGLIB --
-     Copyright 17.09.2012 by Bochkanov Sergey
-*************************************************************************/
+// The function convert integer value to real value.
+//
+//   -- ALGLIB --
+//      Copyright 17.09.2012 by Bochkanov Sergey
 double inttoreal(ae_int_t a, ae_state *_state)
 {
     double result;
@@ -519,14 +503,12 @@ double inttoreal(ae_int_t a, ae_state *_state)
 }
 
 
-/*************************************************************************
-The function calculates binary logarithm.
-
-NOTE: it costs twice as much as Ln(x)
-
-  -- ALGLIB --
-     Copyright 17.09.2012 by Bochkanov Sergey
-*************************************************************************/
+// The function calculates binary logarithm.
+//
+// NOTE: it costs twice as much as Ln(x)
+//
+//   -- ALGLIB --
+//      Copyright 17.09.2012 by Bochkanov Sergey
 double logbase2(double x, ae_state *_state)
 {
     double result;
@@ -537,14 +519,12 @@ double logbase2(double x, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function compares two numbers for approximate equality, with tolerance
-to errors as large as tol.
-
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function compares two numbers for approximate equality, with tolerance
+// to errors as large as tol.
+//
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 ae_bool approxequal(double a, double b, double tol, ae_state *_state)
 {
     ae_bool result;
@@ -555,14 +535,12 @@ ae_bool approxequal(double a, double b, double tol, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function compares two numbers for approximate equality, with tolerance
-to errors as large as max(|a|,|b|)*tol.
-
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function compares two numbers for approximate equality, with tolerance
+// to errors as large as max(|a|,|b|)*tol.
+//
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 ae_bool approxequalrel(double a, double b, double tol, ae_state *_state)
 {
     ae_bool result;
@@ -573,15 +551,13 @@ ae_bool approxequalrel(double a, double b, double tol, ae_state *_state)
 }
 
 
-/*************************************************************************
-This  function  generates  1-dimensional  general  interpolation task with
-moderate Lipshitz constant (close to 1.0)
-
-If N=1 then suborutine generates only one point at the middle of [A,B]
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This  function  generates  1-dimensional  general  interpolation task with
+// moderate Lipshitz constant (close to 1.0)
+//
+// If N=1 then suborutine generates only one point at the middle of [A,B]
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 void taskgenint1d(double a,
      double b,
      ae_int_t n,
@@ -624,15 +600,13 @@ void taskgenint1d(double a,
 }
 
 
-/*************************************************************************
-This function generates  1-dimensional equidistant interpolation task with
-moderate Lipshitz constant (close to 1.0)
-
-If N=1 then suborutine generates only one point at the middle of [A,B]
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function generates  1-dimensional equidistant interpolation task with
+// moderate Lipshitz constant (close to 1.0)
+//
+// If N=1 then suborutine generates only one point at the middle of [A,B]
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 void taskgenint1dequidist(double a,
      double b,
      ae_int_t n,
@@ -668,15 +642,13 @@ void taskgenint1dequidist(double a,
 }
 
 
-/*************************************************************************
-This function generates  1-dimensional Chebyshev-1 interpolation task with
-moderate Lipshitz constant (close to 1.0)
-
-If N=1 then suborutine generates only one point at the middle of [A,B]
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function generates  1-dimensional Chebyshev-1 interpolation task with
+// moderate Lipshitz constant (close to 1.0)
+//
+// If N=1 then suborutine generates only one point at the middle of [A,B]
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 void taskgenint1dcheb1(double a,
      double b,
      ae_int_t n,
@@ -715,15 +687,13 @@ void taskgenint1dcheb1(double a,
 }
 
 
-/*************************************************************************
-This function generates  1-dimensional Chebyshev-2 interpolation task with
-moderate Lipshitz constant (close to 1.0)
-
-If N=1 then suborutine generates only one point at the middle of [A,B]
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function generates  1-dimensional Chebyshev-2 interpolation task with
+// moderate Lipshitz constant (close to 1.0)
+//
+// If N=1 then suborutine generates only one point at the middle of [A,B]
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 void taskgenint1dcheb2(double a,
      double b,
      ae_int_t n,
@@ -762,22 +732,20 @@ void taskgenint1dcheb2(double a,
 }
 
 
-/*************************************************************************
-This function checks that all values from X[] are distinct. It does more
-than just usual floating point comparison:
-* first, it calculates max(X) and min(X)
-* second, it maps X[] from [min,max] to [1,2]
-* only at this stage actual comparison is done
-
-The meaning of such check is to ensure that all values are "distinct enough"
-and will not cause interpolation subroutine to fail.
-
-NOTE:
-    X[] must be sorted by ascending (subroutine ASSERT's it)
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that all values from X[] are distinct. It does more
+// than just usual floating point comparison:
+// * first, it calculates max(X) and min(X)
+// * second, it maps X[] from [min,max] to [1,2]
+// * only at this stage actual comparison is done
+//
+// The meaning of such check is to ensure that all values are "distinct enough"
+// and will not cause interpolation subroutine to fail.
+//
+// NOTE:
+//     X[] must be sorted by ascending (subroutine ASSERT's it)
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 ae_bool aredistinct(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -793,10 +761,8 @@ ae_bool aredistinct(RVector * x,
     if( n==1 )
     {
 
-        /*
-         * everything is alright, it is up to caller to decide whether it
-         * can interpolate something with just one point
-         */
+        // everything is alright, it is up to caller to decide whether it
+        // can interpolate something with just one point
         result = ae_true;
         return result;
     }
@@ -823,13 +789,11 @@ ae_bool aredistinct(RVector * x,
 }
 
 
-/*************************************************************************
-This function checks that two boolean values are the same (both  are  True
-or both are False).
-
-  -- ALGLIB --
-     Copyright 02.12.2009 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that two boolean values are the same (both  are  True
+// or both are False).
+//
+//   -- ALGLIB --
+//      Copyright 02.12.2009 by Bochkanov Sergey
 ae_bool aresameboolean(ae_bool v1, ae_bool v2, ae_state *_state)
 {
     ae_bool result;
@@ -840,12 +804,10 @@ ae_bool aresameboolean(ae_bool v1, ae_bool v2, ae_state *_state)
 }
 
 
-/*************************************************************************
-Resizes X and fills by zeros
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Resizes X and fills by zeros
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void setlengthzero(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -862,12 +824,10 @@ void setlengthzero(RVector * x,
 }
 
 
-/*************************************************************************
-If Length(X)<N, resizes X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// If Length(X)<N, resizes X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void bvectorsetlengthatleast(BVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -881,12 +841,10 @@ void bvectorsetlengthatleast(BVector * x,
 }
 
 
-/*************************************************************************
-If Length(X)<N, resizes X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// If Length(X)<N, resizes X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void ivectorsetlengthatleast(ZVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -900,12 +858,10 @@ void ivectorsetlengthatleast(ZVector * x,
 }
 
 
-/*************************************************************************
-If Length(X)<N, resizes X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// If Length(X)<N, resizes X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rvectorsetlengthatleast(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -919,12 +875,10 @@ void rvectorsetlengthatleast(RVector * x,
 }
 
 
-/*************************************************************************
-If Cols(X)<N or Rows(X)<M, resizes X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// If Cols(X)<N or Rows(X)<M, resizes X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rmatrixsetlengthatleast(RMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -942,12 +896,10 @@ void rmatrixsetlengthatleast(RMatrix * x,
 }
 
 
-/*************************************************************************
-If Cols(X)<N or Rows(X)<M, resizes X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// If Cols(X)<N or Rows(X)<M, resizes X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void bmatrixsetlengthatleast(BMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -965,16 +917,14 @@ void bmatrixsetlengthatleast(BMatrix * x,
 }
 
 
-/*************************************************************************
-Grows X, i.e. changes its size in such a way that:
-a) contents is preserved
-b) new size is at least N
-c) new size can be larger than N, so subsequent grow() calls can return
-   without reallocation
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) new size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void bvectorgrowto(BVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -989,23 +939,17 @@ void bvectorgrowto(BVector * x,
     ae_vector_init(&oldx, 0, DT_BOOL, _state, ae_true);
 
 
-    /*
-     * Enough place
-     */
+    // Enough place
     if( x->cnt>=n )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Choose new size
-     */
+    // Choose new size
     n = ae_maxint(n, ae_round(1.8*x->cnt+1, _state), _state);
 
-    /*
-     * Grow
-     */
+    // Grow
     n2 = x->cnt;
     ae_swap_vectors(x, &oldx);
     ae_vector_set_length(x, n, _state);
@@ -1024,16 +968,14 @@ void bvectorgrowto(BVector * x,
 }
 
 
-/*************************************************************************
-Grows X, i.e. changes its size in such a way that:
-a) contents is preserved
-b) new size is at least N
-c) new size can be larger than N, so subsequent grow() calls can return
-   without reallocation
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) new size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void ivectorgrowto(ZVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -1048,23 +990,17 @@ void ivectorgrowto(ZVector * x,
     ae_vector_init(&oldx, 0, DT_INT, _state, ae_true);
 
 
-    /*
-     * Enough place
-     */
+    // Enough place
     if( x->cnt>=n )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Choose new size
-     */
+    // Choose new size
     n = ae_maxint(n, ae_round(1.8*x->cnt+1, _state), _state);
 
-    /*
-     * Grow
-     */
+    // Grow
     n2 = x->cnt;
     ae_swap_vectors(x, &oldx);
     ae_vector_set_length(x, n, _state);
@@ -1083,19 +1019,17 @@ void ivectorgrowto(ZVector * x,
 }
 
 
-/*************************************************************************
-Grows X, i.e. appends rows in such a way that:
-a) contents is preserved
-b) new row count is at least N
-c) new row count can be larger than N, so subsequent grow() calls can return
-   without reallocation
-d) new matrix has at least MinCols columns (if less than specified amount
-   of columns is present, new columns are added with undefined contents);
-   MinCols can be 0 or negative value = ignored
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. appends rows in such a way that:
+// a) contents is preserved
+// b) new row count is at least N
+// c) new row count can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+// d) new matrix has at least MinCols columns (if less than specified amount
+//    of columns is present, new columns are added with undefined contents);
+//    MinCols can be 0 or negative value = ignored
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rmatrixgrowrowsto(RMatrix * a,
      ae_int_t n,
      ae_int_t mincols,
@@ -1113,18 +1047,14 @@ void rmatrixgrowrowsto(RMatrix * a,
     ae_matrix_init(&olda, 0, 0, DT_REAL, _state, ae_true);
 
 
-    /*
-     * Enough place?
-     */
+    // Enough place?
     if( a->rows>=n&&a->cols>=mincols )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Sizes and metrics
-     */
+    // Sizes and metrics
     if( a->rows<n )
     {
         n = ae_maxint(n, ae_round(1.8*a->rows+1, _state), _state);
@@ -1132,9 +1062,7 @@ void rmatrixgrowrowsto(RMatrix * a,
     n2 = ae_minint(a->rows, n, _state);
     m = a->cols;
 
-    /*
-     * Grow
-     */
+    // Grow
     ae_swap_matrices(a, &olda);
     ae_matrix_set_length(a, n, ae_maxint(m, mincols, _state), _state);
     for(i=0; i<=n2-1; i++)
@@ -1148,19 +1076,17 @@ void rmatrixgrowrowsto(RMatrix * a,
 }
 
 
-/*************************************************************************
-Grows X, i.e. appends cols in such a way that:
-a) contents is preserved
-b) new col count is at least N
-c) new col count can be larger than N, so subsequent grow() calls can return
-   without reallocation
-d) new matrix has at least MinRows row (if less than specified amount
-   of rows is present, new rows are added with undefined contents);
-   MinRows can be 0 or negative value = ignored
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. appends cols in such a way that:
+// a) contents is preserved
+// b) new col count is at least N
+// c) new col count can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+// d) new matrix has at least MinRows row (if less than specified amount
+//    of rows is present, new rows are added with undefined contents);
+//    MinRows can be 0 or negative value = ignored
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rmatrixgrowcolsto(RMatrix * a,
      ae_int_t n,
      ae_int_t minrows,
@@ -1178,18 +1104,14 @@ void rmatrixgrowcolsto(RMatrix * a,
     ae_matrix_init(&olda, 0, 0, DT_REAL, _state, ae_true);
 
 
-    /*
-     * Enough place?
-     */
+    // Enough place?
     if( a->cols>=n&&a->rows>=minrows )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Sizes and metrics
-     */
+    // Sizes and metrics
     if( a->cols<n )
     {
         n = ae_maxint(n, ae_round(1.8*a->cols+1, _state), _state);
@@ -1197,9 +1119,7 @@ void rmatrixgrowcolsto(RMatrix * a,
     n2 = ae_minint(a->cols, n, _state);
     m = a->rows;
 
-    /*
-     * Grow
-     */
+    // Grow
     ae_swap_matrices(a, &olda);
     ae_matrix_set_length(a, ae_maxint(m, minrows, _state), n, _state);
     for(i=0; i<=m-1; i++)
@@ -1213,16 +1133,14 @@ void rmatrixgrowcolsto(RMatrix * a,
 }
 
 
-/*************************************************************************
-Grows X, i.e. changes its size in such a way that:
-a) contents is preserved
-b) new size is at least N
-c) new size can be larger than N, so subsequent grow() calls can return
-   without reallocation
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) new size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rvectorgrowto(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -1237,23 +1155,17 @@ void rvectorgrowto(RVector * x,
     ae_vector_init(&oldx, 0, DT_REAL, _state, ae_true);
 
 
-    /*
-     * Enough place
-     */
+    // Enough place
     if( x->cnt>=n )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Choose new size
-     */
+    // Choose new size
     n = ae_maxint(n, ae_round(1.8*x->cnt+1, _state), _state);
 
-    /*
-     * Grow
-     */
+    // Grow
     n2 = x->cnt;
     ae_swap_vectors(x, &oldx);
     ae_vector_set_length(x, n, _state);
@@ -1272,14 +1184,12 @@ void rvectorgrowto(RVector * x,
 }
 
 
-/*************************************************************************
-Resizes X and:
-* preserves old contents of X
-* fills new elements by zeros
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Resizes X and:
+// * preserves old contents of X
+// * fills new elements by zeros
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void ivectorresize(ZVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -1311,14 +1221,12 @@ void ivectorresize(ZVector * x,
 }
 
 
-/*************************************************************************
-Resizes X and:
-* preserves old contents of X
-* fills new elements by zeros
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Resizes X and:
+// * preserves old contents of X
+// * fills new elements by zeros
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rvectorresize(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -1350,14 +1258,12 @@ void rvectorresize(RVector * x,
 }
 
 
-/*************************************************************************
-Resizes X and:
-* preserves old contents of X
-* fills new elements by zeros
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Resizes X and:
+// * preserves old contents of X
+// * fills new elements by zeros
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rmatrixresize(RMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -1396,14 +1302,12 @@ void rmatrixresize(RMatrix * x,
 }
 
 
-/*************************************************************************
-Resizes X and:
-* preserves old contents of X
-* fills new elements by zeros
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Resizes X and:
+// * preserves old contents of X
+// * fills new elements by zeros
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void imatrixresize(ZMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -1442,12 +1346,10 @@ void imatrixresize(ZMatrix * x,
 }
 
 
-/*************************************************************************
-appends element to X
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// appends element to X
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void ivectorappend(ZVector * x,
      ae_int_t v,
      ae_state *_state)
@@ -1473,13 +1375,11 @@ void ivectorappend(ZVector * x,
 }
 
 
-/*************************************************************************
-This function checks that length(X) is at least N and first N values  from
-X[] are finite
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that length(X) is at least N and first N values  from
+// X[] are finite
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool isfinitevector(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -1510,12 +1410,10 @@ ae_bool isfinitevector(RVector * x,
 }
 
 
-/*************************************************************************
-This function checks that first N values from X[] are finite
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that first N values from X[] are finite
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool isfinitecvector(CVector * z,
      ae_int_t n,
      ae_state *_state)
@@ -1538,13 +1436,11 @@ ae_bool isfinitecvector(CVector * z,
 }
 
 
-/*************************************************************************
-This function checks that size of X is at least MxN and values from
-X[0..M-1,0..N-1] are finite.
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that size of X is at least MxN and values from
+// X[0..M-1,0..N-1] are finite.
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool apservisfinitematrix(RMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -1583,12 +1479,10 @@ ae_bool apservisfinitematrix(RMatrix * x,
 }
 
 
-/*************************************************************************
-This function checks that all values from X[0..M-1,0..N-1] are finite
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that all values from X[0..M-1,0..N-1] are finite
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool apservisfinitecmatrix(CMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -1617,13 +1511,11 @@ ae_bool apservisfinitecmatrix(CMatrix * x,
 }
 
 
-/*************************************************************************
-This function checks that size of X is at least NxN and all values from
-upper/lower triangle of X[0..N-1,0..N-1] are finite
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that size of X is at least NxN and all values from
+// upper/lower triangle of X[0..N-1,0..N-1] are finite
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool isfinitertrmatrix(RMatrix * x,
      ae_int_t n,
      ae_bool isupper,
@@ -1673,13 +1565,11 @@ ae_bool isfinitertrmatrix(RMatrix * x,
 }
 
 
-/*************************************************************************
-This function checks that all values from upper/lower triangle of
-X[0..N-1,0..N-1] are finite
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that all values from upper/lower triangle of
+// X[0..N-1,0..N-1] are finite
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool apservisfinitectrmatrix(CMatrix * x,
      ae_int_t n,
      ae_bool isupper,
@@ -1719,13 +1609,11 @@ ae_bool apservisfinitectrmatrix(CMatrix * x,
 }
 
 
-/*************************************************************************
-This function checks that all values from X[0..M-1,0..N-1] are  finite  or
-NaN's.
-
-  -- ALGLIB --
-     Copyright 18.06.2010 by Bochkanov Sergey
-*************************************************************************/
+// This function checks that all values from X[0..M-1,0..N-1] are  finite  or
+// NaN's.
+//
+//   -- ALGLIB --
+//      Copyright 18.06.2010 by Bochkanov Sergey
 ae_bool apservisfiniteornanmatrix(RMatrix * x,
      ae_int_t m,
      ae_int_t n,
@@ -1754,12 +1642,10 @@ ae_bool apservisfiniteornanmatrix(RMatrix * x,
 }
 
 
-/*************************************************************************
-Safe sqrt(x^2+y^2)
-
-  -- ALGLIB --
-     Copyright by Bochkanov Sergey
-*************************************************************************/
+// Safe sqrt(x^2+y^2)
+//
+//   -- ALGLIB --
+//      Copyright by Bochkanov Sergey
 double safepythag2(double x, double y, ae_state *_state)
 {
     double w;
@@ -1785,12 +1671,10 @@ double safepythag2(double x, double y, ae_state *_state)
 }
 
 
-/*************************************************************************
-Safe sqrt(x^2+y^2)
-
-  -- ALGLIB --
-     Copyright by Bochkanov Sergey
-*************************************************************************/
+// Safe sqrt(x^2+y^2)
+//
+//   -- ALGLIB --
+//      Copyright by Bochkanov Sergey
 double safepythag3(double x, double y, double z, ae_state *_state)
 {
     double w;
@@ -1811,24 +1695,22 @@ double safepythag3(double x, double y, double z, ae_state *_state)
 }
 
 
-/*************************************************************************
-Safe division.
-
-This function attempts to calculate R=X/Y without overflow.
-
-It returns:
-* +1, if abs(X/Y)>=MaxRealNumber or undefined - overflow-like situation
-      (no overlfow is generated, R is either NAN, PosINF, NegINF)
-*  0, if MinRealNumber<abs(X/Y)<MaxRealNumber or X=0, Y<>0
-      (R contains result, may be zero)
-* -1, if 0<abs(X/Y)<MinRealNumber - underflow-like situation
-      (R contains zero; it corresponds to underflow)
-
-No overflow is generated in any case.
-
-  -- ALGLIB --
-     Copyright by Bochkanov Sergey
-*************************************************************************/
+// Safe division.
+//
+// This function attempts to calculate R=X/Y without overflow.
+//
+// It returns:
+// * +1, if abs(X/Y)>=MaxRealNumber or undefined - overflow-like situation
+//       (no overlfow is generated, R is either NAN, PosINF, NegINF)
+// *  0, if MinRealNumber<abs(X/Y)<MaxRealNumber or X=0, Y<>0
+//       (R contains result, may be zero)
+// * -1, if 0<abs(X/Y)<MinRealNumber - underflow-like situation
+//       (R contains zero; it corresponds to underflow)
+//
+// No overflow is generated in any case.
+//
+//   -- ALGLIB --
+//      Copyright by Bochkanov Sergey
 ae_int_t saferdiv(double x, double y, double* r, ae_state *_state)
 {
     ae_int_t result;
@@ -1836,11 +1718,9 @@ ae_int_t saferdiv(double x, double y, double* r, ae_state *_state)
     *r = 0;
 
 
-    /*
-     * Two special cases:
-     * * Y=0
-     * * X=0 and Y<>0
-     */
+    // Two special cases:
+    // * Y=0
+    // * X=0 and Y<>0
     if( ae_fp_eq(y,(double)(0)) )
     {
         result = 1;
@@ -1865,18 +1745,14 @@ ae_int_t saferdiv(double x, double y, double* r, ae_state *_state)
         return result;
     }
 
-    /*
-     * make Y>0
-     */
+    // make Y>0
     if( ae_fp_less(y,(double)(0)) )
     {
         x = -x;
         y = -y;
     }
 
-    /*
-     *
-     */
+    //
     if( ae_fp_greater_eq(y,(double)(1)) )
     {
         *r = x/y;
@@ -1914,13 +1790,11 @@ ae_int_t saferdiv(double x, double y, double* r, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function calculates "safe" min(X/Y,V) for positive finite X, Y, V.
-No overflow is generated in any case.
-
-  -- ALGLIB --
-     Copyright by Bochkanov Sergey
-*************************************************************************/
+// This function calculates "safe" min(X/Y,V) for positive finite X, Y, V.
+// No overflow is generated in any case.
+//
+//   -- ALGLIB --
+//      Copyright by Bochkanov Sergey
 double safeminposrv(double x, double y, double v, ae_state *_state)
 {
     double r;
@@ -1930,9 +1804,7 @@ double safeminposrv(double x, double y, double v, ae_state *_state)
     if( ae_fp_greater_eq(y,(double)(1)) )
     {
 
-        /*
-         * Y>=1, we can safely divide by Y
-         */
+        // Y>=1, we can safely divide by Y
         r = x/y;
         result = v;
         if( ae_fp_greater(v,r) )
@@ -1947,9 +1819,7 @@ double safeminposrv(double x, double y, double v, ae_state *_state)
     else
     {
 
-        /*
-         * Y<1, we can safely multiply by Y
-         */
+        // Y<1, we can safely multiply by Y
         if( ae_fp_less(x,v*y) )
         {
             result = x/y;
@@ -1963,20 +1833,18 @@ double safeminposrv(double x, double y, double v, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function makes periodic mapping of X to [A,B].
-
-It accepts X, A, B (A>B). It returns T which lies in  [A,B] and integer K,
-such that X = T + K*(B-A).
-
-NOTES:
-* K is represented as real value, although actually it is integer
-* T is guaranteed to be in [A,B]
-* T replaces X
-
-  -- ALGLIB --
-     Copyright by Bochkanov Sergey
-*************************************************************************/
+// This function makes periodic mapping of X to [A,B].
+//
+// It accepts X, A, B (A>B). It returns T which lies in  [A,B] and integer K,
+// such that X = T + K*(B-A).
+//
+// NOTES:
+// * K is represented as real value, although actually it is integer
+// * T is guaranteed to be in [A,B]
+// * T replaces X
+//
+//   -- ALGLIB --
+//      Copyright by Bochkanov Sergey
 void apperiodicmap(double* x,
      double a,
      double b,
@@ -2004,12 +1872,10 @@ void apperiodicmap(double* x,
 }
 
 
-/*************************************************************************
-Returns random normal number using low-quality system-provided generator
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns random normal number using low-quality system-provided generator
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 double randomnormal(ae_state *_state)
 {
     double u;
@@ -2026,10 +1892,8 @@ double randomnormal(ae_state *_state)
         if( ae_fp_greater(s,(double)(0))&&ae_fp_less(s,(double)(1)) )
         {
 
-            /*
-             * two Sqrt's instead of one to
-             * avoid overflow when S is too small
-             */
+            // two Sqrt's instead of one to
+            // avoid overflow when S is too small
             s = ae_sqrt(-2*ae_log(s, _state), _state)/ae_sqrt(s, _state);
             result = u*s;
             break;
@@ -2039,13 +1903,11 @@ double randomnormal(ae_state *_state)
 }
 
 
-/*************************************************************************
-Generates random unit vector using low-quality system-provided generator.
-Reallocates array if its size is too short.
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Generates random unit vector using low-quality system-provided generator.
+// Reallocates array if its size is too short.
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void randomunit(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
@@ -2077,9 +1939,7 @@ void randomunit(ae_int_t n, RVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to swap two integer values
-*************************************************************************/
+// This function is used to swap two integer values
 void swapi(ae_int_t* v0, ae_int_t* v1, ae_state *_state)
 {
     ae_int_t v;
@@ -2091,9 +1951,7 @@ void swapi(ae_int_t* v0, ae_int_t* v1, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to swap two real values
-*************************************************************************/
+// This function is used to swap two real values
 void swapr(double* v0, double* v1, ae_state *_state)
 {
     double v;
@@ -2105,10 +1963,8 @@ void swapr(double* v0, double* v1, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to swap two rows of the matrix; if NCols<0, automatically
-determined from the matrix size.
-*************************************************************************/
+// This function is used to swap two rows of the matrix; if NCols<0, automatically
+// determined from the matrix size.
 void swaprows(RMatrix * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -2136,10 +1992,8 @@ void swaprows(RMatrix * a,
 }
 
 
-/*************************************************************************
-This function is used to swap two cols of the matrix; if NRows<0, automatically
-determined from the matrix size.
-*************************************************************************/
+// This function is used to swap two cols of the matrix; if NRows<0, automatically
+// determined from the matrix size.
 void swapcols(RMatrix * a,
      ae_int_t j0,
      ae_int_t j1,
@@ -2167,10 +2021,8 @@ void swapcols(RMatrix * a,
 }
 
 
-/*************************************************************************
-This function is used to swap two "entries" in 1-dimensional array composed
-from D-element entries
-*************************************************************************/
+// This function is used to swap two "entries" in 1-dimensional array composed
+// from D-element entries
 void swapentries(RVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -2198,9 +2050,7 @@ void swapentries(RVector * a,
 }
 
 
-/*************************************************************************
-This function is used to swap two elements of the vector
-*************************************************************************/
+// This function is used to swap two elements of the vector
 void swapelements(RVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -2219,9 +2069,7 @@ void swapelements(RVector * a,
 }
 
 
-/*************************************************************************
-This function is used to swap two elements of the vector
-*************************************************************************/
+// This function is used to swap two elements of the vector
 void swapelementsi(ZVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -2240,9 +2088,7 @@ void swapelementsi(ZVector * a,
 }
 
 
-/*************************************************************************
-This function is used to return maximum of three real values
-*************************************************************************/
+// This function is used to return maximum of three real values
 double maxreal3(double v0, double v1, double v2, ae_state *_state)
 {
     double result;
@@ -2261,9 +2107,7 @@ double maxreal3(double v0, double v1, double v2, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to increment value of integer variable
-*************************************************************************/
+// This function is used to increment value of integer variable
 void inc(ae_int_t* v, ae_state *_state)
 {
 
@@ -2272,9 +2116,7 @@ void inc(ae_int_t* v, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to decrement value of integer variable
-*************************************************************************/
+// This function is used to decrement value of integer variable
 void dec(ae_int_t* v, ae_state *_state)
 {
 
@@ -2283,12 +2125,10 @@ void dec(ae_int_t* v, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to increment value of integer variable; name of  the
-function suggests that increment is done in multithreaded setting  in  the
-thread-unsafe manner (optional progress reports which do not need guaranteed
-correctness)
-*************************************************************************/
+// This function is used to increment value of integer variable; name of  the
+// function suggests that increment is done in multithreaded setting  in  the
+// thread-unsafe manner (optional progress reports which do not need guaranteed
+// correctness)
 void threadunsafeinc(ae_int_t* v, ae_state *_state)
 {
 
@@ -2297,12 +2137,10 @@ void threadunsafeinc(ae_int_t* v, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used to increment value of integer variable; name of  the
-function suggests that increment is done in multithreaded setting  in  the
-thread-unsafe manner (optional progress reports which do not need guaranteed
-correctness)
-*************************************************************************/
+// This function is used to increment value of integer variable; name of  the
+// function suggests that increment is done in multithreaded setting  in  the
+// thread-unsafe manner (optional progress reports which do not need guaranteed
+// correctness)
 void threadunsafeincby(ae_int_t* v, ae_int_t k, ae_state *_state)
 {
 
@@ -2311,12 +2149,10 @@ void threadunsafeincby(ae_int_t* v, ae_int_t k, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function performs two operations:
-1. decrements value of integer variable, if it is positive
-2. explicitly sets variable to zero if it is non-positive
-It is used by some algorithms to decrease value of internal counters.
-*************************************************************************/
+// This function performs two operations:
+// 1. decrements value of integer variable, if it is positive
+// 2. explicitly sets variable to zero if it is non-positive
+// It is used by some algorithms to decrease value of internal counters.
 void countdown(ae_int_t* v, ae_state *_state)
 {
 
@@ -2332,10 +2168,8 @@ void countdown(ae_int_t* v, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns +1 or -1 depending on sign of X.
-x=0 results in +1 being returned.
-*************************************************************************/
+// This function returns +1 or -1 depending on sign of X.
+// x=0 results in +1 being returned.
 double possign(double x, ae_state *_state)
 {
     double result;
@@ -2353,10 +2187,8 @@ double possign(double x, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns product of two real numbers. It is convenient when
-you have to perform typecast-and-product of two INTEGERS.
-*************************************************************************/
+// This function returns product of two real numbers. It is convenient when
+// you have to perform typecast-and-product of two INTEGERS.
 double rmul2(double v0, double v1, ae_state *_state)
 {
     double result;
@@ -2367,10 +2199,8 @@ double rmul2(double v0, double v1, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns product of three real numbers. It is convenient when
-you have to perform typecast-and-product of two INTEGERS.
-*************************************************************************/
+// This function returns product of three real numbers. It is convenient when
+// you have to perform typecast-and-product of two INTEGERS.
 double rmul3(double v0, double v1, double v2, ae_state *_state)
 {
     double result;
@@ -2381,10 +2211,8 @@ double rmul3(double v0, double v1, double v2, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns (A div B) rounded up; it expects that A>0, B>0, but
-does not check it.
-*************************************************************************/
+// This function returns (A div B) rounded up; it expects that A>0, B>0, but
+// does not check it.
 ae_int_t idivup(ae_int_t a, ae_int_t b, ae_state *_state)
 {
     ae_int_t result;
@@ -2399,9 +2227,7 @@ ae_int_t idivup(ae_int_t a, ae_int_t b, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns min(i0,i1)
-*************************************************************************/
+// This function returns min(i0,i1)
 ae_int_t imin2(ae_int_t i0, ae_int_t i1, ae_state *_state)
 {
     ae_int_t result;
@@ -2416,9 +2242,7 @@ ae_int_t imin2(ae_int_t i0, ae_int_t i1, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns min(i0,i1,i2)
-*************************************************************************/
+// This function returns min(i0,i1,i2)
 ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state)
 {
     ae_int_t result;
@@ -2437,9 +2261,7 @@ ae_int_t imin3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns max(i0,i1)
-*************************************************************************/
+// This function returns max(i0,i1)
 ae_int_t imax2(ae_int_t i0, ae_int_t i1, ae_state *_state)
 {
     ae_int_t result;
@@ -2454,9 +2276,7 @@ ae_int_t imax2(ae_int_t i0, ae_int_t i1, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns max(i0,i1,i2)
-*************************************************************************/
+// This function returns max(i0,i1,i2)
 ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state)
 {
     ae_int_t result;
@@ -2475,9 +2295,7 @@ ae_int_t imax3(ae_int_t i0, ae_int_t i1, ae_int_t i2, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns max(r0,r1,r2)
-*************************************************************************/
+// This function returns max(r0,r1,r2)
 double rmax3(double r0, double r1, double r2, ae_state *_state)
 {
     double result;
@@ -2496,9 +2314,7 @@ double rmax3(double r0, double r1, double r2, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns max(|r0|,|r1|,|r2|)
-*************************************************************************/
+// This function returns max(|r0|,|r1|,|r2|)
 double rmaxabs3(double r0, double r1, double r2, ae_state *_state)
 {
     double result;
@@ -2520,12 +2336,10 @@ double rmaxabs3(double r0, double r1, double r2, ae_state *_state)
 }
 
 
-/*************************************************************************
-'bounds' value: maps X to [B1,B2]
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// 'bounds' value: maps X to [B1,B2]
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 double boundval(double x, double b1, double b2, ae_state *_state)
 {
     double result;
@@ -2546,12 +2360,10 @@ double boundval(double x, double b1, double b2, ae_state *_state)
 }
 
 
-/*************************************************************************
-'bounds' value: maps X to [B1,B2]
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// 'bounds' value: maps X to [B1,B2]
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state)
 {
     ae_int_t result;
@@ -2572,12 +2384,10 @@ ae_int_t iboundval(ae_int_t x, ae_int_t b1, ae_int_t b2, ae_state *_state)
 }
 
 
-/*************************************************************************
-'bounds' value: maps X to [B1,B2]
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// 'bounds' value: maps X to [B1,B2]
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 double rboundval(double x, double b1, double b2, ae_state *_state)
 {
     double result;
@@ -2598,9 +2408,7 @@ double rboundval(double x, double b1, double b2, ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns number of non-zeros
-*************************************************************************/
+// Returns number of non-zeros
 ae_int_t countnz1(RVector * v,
      ae_int_t n,
      ae_state *_state)
@@ -2621,9 +2429,7 @@ ae_int_t countnz1(RVector * v,
 }
 
 
-/*************************************************************************
-Returns number of non-zeros
-*************************************************************************/
+// Returns number of non-zeros
 ae_int_t countnz2(RMatrix * v,
      ae_int_t m,
      ae_int_t n,
@@ -2649,9 +2455,7 @@ ae_int_t countnz2(RMatrix * v,
 }
 
 
-/*************************************************************************
-Allocation of serializer: complex value
-*************************************************************************/
+// Allocation of serializer: complex value
 void alloccomplex(ae_serializer* s, ae_complex v, ae_state *_state)
 {
 
@@ -2661,9 +2465,7 @@ void alloccomplex(ae_serializer* s, ae_complex v, ae_state *_state)
 }
 
 
-/*************************************************************************
-Serialization: complex value
-*************************************************************************/
+// Serialization: complex value
 void serializecomplex(ae_serializer* s, ae_complex v, ae_state *_state)
 {
 
@@ -2673,9 +2475,7 @@ void serializecomplex(ae_serializer* s, ae_complex v, ae_state *_state)
 }
 
 
-/*************************************************************************
-Unserialization: complex value
-*************************************************************************/
+// Unserialization: complex value
 ae_complex unserializecomplex(ae_serializer* s, ae_state *_state)
 {
     ae_complex result;
@@ -2687,9 +2487,7 @@ ae_complex unserializecomplex(ae_serializer* s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Allocation of serializer: real array
-*************************************************************************/
+// Allocation of serializer: real array
 void allocrealarray(ae_serializer* s,
      RVector * v,
      ae_int_t n,
@@ -2710,9 +2508,7 @@ void allocrealarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Serialization: complex value
-*************************************************************************/
+// Serialization: complex value
 void serializerealarray(ae_serializer* s,
      RVector * v,
      ae_int_t n,
@@ -2733,9 +2529,7 @@ void serializerealarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Unserialization: complex value
-*************************************************************************/
+// Unserialization: complex value
 void unserializerealarray(ae_serializer* s,
      RVector * v,
      ae_state *_state)
@@ -2760,9 +2554,7 @@ void unserializerealarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Allocation of serializer: Integer array
-*************************************************************************/
+// Allocation of serializer: Integer array
 void allocintegerarray(ae_serializer* s,
      ZVector * v,
      ae_int_t n,
@@ -2783,9 +2575,7 @@ void allocintegerarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Serialization: Integer array
-*************************************************************************/
+// Serialization: Integer array
 void serializeintegerarray(ae_serializer* s,
      ZVector * v,
      ae_int_t n,
@@ -2806,9 +2596,7 @@ void serializeintegerarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Unserialization: complex value
-*************************************************************************/
+// Unserialization: complex value
 void unserializeintegerarray(ae_serializer* s,
      ZVector * v,
      ae_state *_state)
@@ -2833,9 +2621,7 @@ void unserializeintegerarray(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Allocation of serializer: real matrix
-*************************************************************************/
+// Allocation of serializer: real matrix
 void allocrealmatrix(ae_serializer* s,
      RMatrix * v,
      ae_int_t n0,
@@ -2866,9 +2652,7 @@ void allocrealmatrix(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Serialization: complex value
-*************************************************************************/
+// Serialization: complex value
 void serializerealmatrix(ae_serializer* s,
      RMatrix * v,
      ae_int_t n0,
@@ -2899,9 +2683,7 @@ void serializerealmatrix(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Unserialization: complex value
-*************************************************************************/
+// Unserialization: complex value
 void unserializerealmatrix(ae_serializer* s,
      RMatrix * v,
      ae_state *_state)
@@ -2932,9 +2714,7 @@ void unserializerealmatrix(ae_serializer* s,
 }
 
 
-/*************************************************************************
-Copy boolean array
-*************************************************************************/
+// Copy boolean array
 void copybooleanarray(BVector * src,
      BVector * dst,
      ae_state *_state)
@@ -2954,9 +2734,7 @@ void copybooleanarray(BVector * src,
 }
 
 
-/*************************************************************************
-Copy integer array
-*************************************************************************/
+// Copy integer array
 void copyintegerarray(ZVector * src,
      ZVector * dst,
      ae_state *_state)
@@ -2976,9 +2754,7 @@ void copyintegerarray(ZVector * src,
 }
 
 
-/*************************************************************************
-Copy real array
-*************************************************************************/
+// Copy real array
 void copyrealarray(RVector * src,
      RVector * dst,
      ae_state *_state)
@@ -2998,9 +2774,7 @@ void copyrealarray(RVector * src,
 }
 
 
-/*************************************************************************
-Copy real matrix
-*************************************************************************/
+// Copy real matrix
 void copyrealmatrix(RMatrix * src,
      RMatrix * dst,
      ae_state *_state)
@@ -3024,9 +2798,7 @@ void copyrealmatrix(RMatrix * src,
 }
 
 
-/*************************************************************************
-Clears integer array
-*************************************************************************/
+// Clears integer array
 void unsetintegerarray(ZVector * a, ae_state *_state)
 {
 
@@ -3035,9 +2807,7 @@ void unsetintegerarray(ZVector * a, ae_state *_state)
 }
 
 
-/*************************************************************************
-Clears real array
-*************************************************************************/
+// Clears real array
 void unsetrealarray(RVector * a, ae_state *_state)
 {
 
@@ -3046,9 +2816,7 @@ void unsetrealarray(RVector * a, ae_state *_state)
 }
 
 
-/*************************************************************************
-Clears real matrix
-*************************************************************************/
+// Clears real matrix
 void unsetrealmatrix(RMatrix * a, ae_state *_state)
 {
 
@@ -3057,20 +2825,18 @@ void unsetrealmatrix(RMatrix * a, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function is used in parallel functions for recurrent division of large
-task into two smaller tasks.
-
-It has following properties:
-* it works only for TaskSize>=2 and TaskSize>TileSize (assertion is thrown otherwise)
-* Task0+Task1=TaskSize, Task0>0, Task1>0
-* Task0 and Task1 are close to each other
-* Task0>=Task1
-* Task0 is always divisible by TileSize
-
-  -- ALGLIB --
-     Copyright 07.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function is used in parallel functions for recurrent division of large
+// task into two smaller tasks.
+//
+// It has following properties:
+// * it works only for TaskSize>=2 and TaskSize>TileSize (assertion is thrown otherwise)
+// * Task0+Task1=TaskSize, Task0>0, Task1>0
+// * Task0 and Task1 are close to each other
+// * Task0>=Task1
+// * Task0 is always divisible by TileSize
+//
+//   -- ALGLIB --
+//      Copyright 07.04.2013 by Bochkanov Sergey
 void tiledsplit(ae_int_t tasksize,
      ae_int_t tilesize,
      ae_int_t* task0,
@@ -3095,20 +2861,18 @@ void tiledsplit(ae_int_t tasksize,
 }
 
 
-/*************************************************************************
-This function searches integer array. Elements in this array are actually
-records, each NRec elements wide. Each record has unique header - NHeader
-integer values, which identify it. Records are lexicographically sorted by
-header.
-
-Records are identified by their index, not offset (offset = NRec*index).
-
-This function searches A (records with indices [I0,I1)) for a record with
-header B. It returns index of this record (not offset!), or -1 on failure.
-
-  -- ALGLIB --
-     Copyright 28.03.2011 by Bochkanov Sergey
-*************************************************************************/
+// This function searches integer array. Elements in this array are actually
+// records, each NRec elements wide. Each record has unique header - NHeader
+// integer values, which identify it. Records are lexicographically sorted by
+// header.
+//
+// Records are identified by their index, not offset (offset = NRec*index).
+//
+// This function searches A (records with indices [I0,I1)) for a record with
+// header B. It returns index of this record (not offset!), or -1 on failure.
+//
+//   -- ALGLIB --
+//      Copyright 28.03.2011 by Bochkanov Sergey
 ae_int_t recsearch(ZVector * a,
      ae_int_t nrec,
      ae_int_t nheader,
@@ -3165,20 +2929,18 @@ ae_int_t recsearch(ZVector * a,
 }
 
 
-/*************************************************************************
-This function is used in parallel functions for recurrent division of large
-task into two smaller tasks.
-
-It has following properties:
-* it works only for TaskSize>=2 (assertion is thrown otherwise)
-* for TaskSize=2, it returns Task0=1, Task1=1
-* in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
-* in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
-  and both Task0 and Task1 are even, Task0>=Task1
-
-  -- ALGLIB --
-     Copyright 07.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function is used in parallel functions for recurrent division of large
+// task into two smaller tasks.
+//
+// It has following properties:
+// * it works only for TaskSize>=2 (assertion is thrown otherwise)
+// * for TaskSize=2, it returns Task0=1, Task1=1
+// * in case TaskSize is odd,  Task0=TaskSize-1, Task1=1
+// * in case TaskSize is even, Task0 and Task1 are approximately TaskSize/2
+//   and both Task0 and Task1 are even, Task0>=Task1
+//
+//   -- ALGLIB --
+//      Copyright 07.04.2013 by Bochkanov Sergey
 void splitlengtheven(ae_int_t tasksize,
      ae_int_t* task0,
      ae_int_t* task1,
@@ -3198,9 +2960,7 @@ void splitlengtheven(ae_int_t tasksize,
     if( tasksize%2==0 )
     {
 
-        /*
-         * Even division
-         */
+        // Even division
         *task0 = tasksize/2;
         *task1 = tasksize/2;
         if( *task0%2!=0 )
@@ -3212,9 +2972,7 @@ void splitlengtheven(ae_int_t tasksize,
     else
     {
 
-        /*
-         * Odd task size, split trailing odd part from it.
-         */
+        // Odd task size, split trailing odd part from it.
         *task0 = tasksize-1;
         *task1 = 1;
     }
@@ -3223,17 +2981,15 @@ void splitlengtheven(ae_int_t tasksize,
 }
 
 
-/*************************************************************************
-This function is used to calculate number of chunks (including partial,
-non-complete chunks) in some set. It expects that ChunkSize>=1, TaskSize>=0.
-Assertion is thrown otherwise.
-
-Function result is equivalent to Ceil(TaskSize/ChunkSize), but with guarantees
-that rounding errors won't ruin results.
-
-  -- ALGLIB --
-     Copyright 21.01.2015 by Bochkanov Sergey
-*************************************************************************/
+// This function is used to calculate number of chunks (including partial,
+// non-complete chunks) in some set. It expects that ChunkSize>=1, TaskSize>=0.
+// Assertion is thrown otherwise.
+//
+// Function result is equivalent to Ceil(TaskSize/ChunkSize), but with guarantees
+// that rounding errors won't ruin results.
+//
+//   -- ALGLIB --
+//      Copyright 21.01.2015 by Bochkanov Sergey
 ae_int_t chunkscount(ae_int_t tasksize,
      ae_int_t chunksize,
      ae_state *_state)
@@ -3252,15 +3008,13 @@ ae_int_t chunkscount(ae_int_t tasksize,
 }
 
 
-/*************************************************************************
-Returns maximum density for level 2 sparse/dense functions. Density values
-below one returned by this function are better to handle via sparse Level 2
-functionality.
-
-  -- ALGLIB routine --
-     10.01.2019
-     Bochkanov Sergey
-*************************************************************************/
+// Returns maximum density for level 2 sparse/dense functions. Density values
+// below one returned by this function are better to handle via sparse Level 2
+// functionality.
+//
+//   -- ALGLIB routine --
+//      10.01.2019
+//      Bochkanov Sergey
 double sparselevel2density(ae_state *_state)
 {
     double result;
@@ -3271,16 +3025,14 @@ double sparselevel2density(ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns A-tile size for a matrix.
-
-A-tiles are smallest tiles (32x32), suitable for processing by ALGLIB  own
-implementation of Level 3 linear algebra.
-
-  -- ALGLIB routine --
-     10.01.2019
-     Bochkanov Sergey
-*************************************************************************/
+// Returns A-tile size for a matrix.
+//
+// A-tiles are smallest tiles (32x32), suitable for processing by ALGLIB  own
+// implementation of Level 3 linear algebra.
+//
+//   -- ALGLIB routine --
+//      10.01.2019
+//      Bochkanov Sergey
 ae_int_t matrixtilesizea(ae_state *_state)
 {
     ae_int_t result;
@@ -3291,16 +3043,14 @@ ae_int_t matrixtilesizea(ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns B-tile size for a matrix.
-
-B-tiles are larger  tiles (64x64), suitable for parallel execution or for
-processing by vendor's implementation of Level 3 linear algebra.
-
-  -- ALGLIB routine --
-     10.01.2019
-     Bochkanov Sergey
-*************************************************************************/
+// Returns B-tile size for a matrix.
+//
+// B-tiles are larger  tiles (64x64), suitable for parallel execution or for
+// processing by vendor's implementation of Level 3 linear algebra.
+//
+//   -- ALGLIB routine --
+//      10.01.2019
+//      Bochkanov Sergey
 ae_int_t matrixtilesizeb(ae_state *_state)
 {
 #ifndef ALGLIB_INTERCEPTS_MKL
@@ -3315,14 +3065,12 @@ ae_int_t matrixtilesizeb(ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns minimum cost of task which is feasible for
-multithreaded processing. It returns real number in order to avoid overflow
-problems.
-
-  -- ALGLIB --
-     Copyright 10.01.2018 by Bochkanov Sergey
-*************************************************************************/
+// This function returns minimum cost of task which is feasible for
+// multithreaded processing. It returns real number in order to avoid overflow
+// problems.
+//
+//   -- ALGLIB --
+//      Copyright 10.01.2018 by Bochkanov Sergey
 double smpactivationlevel(ae_state *_state)
 {
     double nn;
@@ -3335,15 +3083,13 @@ double smpactivationlevel(ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns minimum cost of task which is feasible for
-spawn (given that multithreading is active).
-
-It returns real number in order to avoid overflow problems.
-
-  -- ALGLIB --
-     Copyright 10.01.2018 by Bochkanov Sergey
-*************************************************************************/
+// This function returns minimum cost of task which is feasible for
+// spawn (given that multithreading is active).
+//
+// It returns real number in order to avoid overflow problems.
+//
+//   -- ALGLIB --
+//      Copyright 10.01.2018 by Bochkanov Sergey
 double spawnlevel(ae_state *_state)
 {
     double nn;
@@ -3356,22 +3102,20 @@ double spawnlevel(ae_state *_state)
 }
 
 
-/*************************************************************************
---- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD ---
-
-This function is used in parallel functions for recurrent division of large
-task into two smaller tasks.
-
-It has following properties:
-* it works only for TaskSize>=2 and ChunkSize>=2
-  (assertion is thrown otherwise)
-* Task0+Task1=TaskSize, Task0>0, Task1>0
-* Task0 and Task1 are close to each other
-* in case TaskSize>ChunkSize, Task0 is always divisible by ChunkSize
-
-  -- ALGLIB --
-     Copyright 07.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// --- OBSOLETE FUNCTION, USE TILED SPLIT INSTEAD ---
+//
+// This function is used in parallel functions for recurrent division of large
+// task into two smaller tasks.
+//
+// It has following properties:
+// * it works only for TaskSize>=2 and ChunkSize>=2
+//   (assertion is thrown otherwise)
+// * Task0+Task1=TaskSize, Task0>0, Task1>0
+// * Task0 and Task1 are close to each other
+// * in case TaskSize>ChunkSize, Task0 is always divisible by ChunkSize
+//
+//   -- ALGLIB --
+//      Copyright 07.04.2013 by Bochkanov Sergey
 void splitlength(ae_int_t tasksize,
      ae_int_t chunksize,
      ae_int_t* task0,
@@ -3395,14 +3139,12 @@ void splitlength(ae_int_t tasksize,
 }
 
 
-/*************************************************************************
-Outputs vector A[I0,I1-1] to trace log using either:
-a)  6-digit exponential format (no trace flags is set)
-b) 15-ditit exponential format ('PREC.E15' trace flag is set)
-b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
-
-This function checks trace flags every time it is called.
-*************************************************************************/
+// Outputs vector A[I0,I1-1] to trace log using either:
+// a)  6-digit exponential format (no trace flags is set)
+// b) 15-ditit exponential format ('PREC.E15' trace flag is set)
+// b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
+//
+// This function checks trace flags every time it is called.
 void tracevectorautoprec(RVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -3413,9 +3155,7 @@ void tracevectorautoprec(RVector * a,
 
 
 
-    /*
-     * Determine precision to use
-     */
+    // Determine precision to use
     prectouse = 0;
     if( ae_is_trace_enabled("PREC.E15") )
     {
@@ -3426,9 +3166,7 @@ void tracevectorautoprec(RVector * a,
         prectouse = 2;
     }
 
-    /*
-     * Output
-     */
+    // Output
     ae_trace("[ ");
     for(i=i0; i<=i1-1; i++)
     {
@@ -3456,14 +3194,12 @@ void tracevectorautoprec(RVector * a,
 }
 
 
-/*************************************************************************
-Outputs row A[I,J0..J1-1] to trace log using either:
-a)  6-digit exponential format (no trace flags is set)
-b) 15-ditit exponential format ('PREC.E15' trace flag is set)
-b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
-
-This function checks trace flags every time it is called.
-*************************************************************************/
+// Outputs row A[I,J0..J1-1] to trace log using either:
+// a)  6-digit exponential format (no trace flags is set)
+// b) 15-ditit exponential format ('PREC.E15' trace flag is set)
+// b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
+//
+// This function checks trace flags every time it is called.
 void tracerowautoprec(RMatrix * a,
      ae_int_t i,
      ae_int_t j0,
@@ -3475,9 +3211,7 @@ void tracerowautoprec(RMatrix * a,
 
 
 
-    /*
-     * Determine precision to use
-     */
+    // Determine precision to use
     prectouse = 0;
     if( ae_is_trace_enabled("PREC.E15") )
     {
@@ -3488,9 +3222,7 @@ void tracerowautoprec(RMatrix * a,
         prectouse = 2;
     }
 
-    /*
-     * Output
-     */
+    // Output
     ae_trace("[ ");
     for(j=j0; j<=j1-1; j++)
     {
@@ -3518,16 +3250,14 @@ void tracerowautoprec(RMatrix * a,
 }
 
 
-/*************************************************************************
-Unscales/unshifts vector A[N] by computing A*Scl+Sft and outputs result to
-trace log using either:
-a)  6-digit exponential format (no trace flags is set)
-b) 15-ditit exponential format ('PREC.E15' trace flag is set)
-b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
-
-This function checks trace flags every time it is called.
-Both Scl and Sft can be omitted.
-*************************************************************************/
+// Unscales/unshifts vector A[N] by computing A*Scl+Sft and outputs result to
+// trace log using either:
+// a)  6-digit exponential format (no trace flags is set)
+// b) 15-ditit exponential format ('PREC.E15' trace flag is set)
+// b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
+//
+// This function checks trace flags every time it is called.
+// Both Scl and Sft can be omitted.
 void tracevectorunscaledunshiftedautoprec(RVector * x,
      ae_int_t n,
      RVector * scl,
@@ -3542,9 +3272,7 @@ void tracevectorunscaledunshiftedautoprec(RVector * x,
 
 
 
-    /*
-     * Determine precision to use
-     */
+    // Determine precision to use
     prectouse = 0;
     if( ae_is_trace_enabled("PREC.E15") )
     {
@@ -3555,9 +3283,7 @@ void tracevectorunscaledunshiftedautoprec(RVector * x,
         prectouse = 2;
     }
 
-    /*
-     * Output
-     */
+    // Output
     ae_trace("[ ");
     for(i=0; i<=n-1; i++)
     {
@@ -3594,15 +3320,13 @@ void tracevectorunscaledunshiftedautoprec(RVector * x,
 }
 
 
-/*************************************************************************
-Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
-trace log using either:
-a)  6-digit exponential format (no trace flags is set)
-b) 15-ditit exponential format ('PREC.E15' trace flag is set)
-b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
-
-This function checks trace flags every time it is called.
-*************************************************************************/
+// Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
+// trace log using either:
+// a)  6-digit exponential format (no trace flags is set)
+// b) 15-ditit exponential format ('PREC.E15' trace flag is set)
+// b)  6-ditit fixed-point format ('PREC.F6' trace flag is set)
+//
+// This function checks trace flags every time it is called.
 void tracerownrm1autoprec(RMatrix * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -3617,9 +3341,7 @@ void tracerownrm1autoprec(RMatrix * a,
 
 
 
-    /*
-     * Determine precision to use
-     */
+    // Determine precision to use
     prectouse = 0;
     if( ae_is_trace_enabled("PREC.E15") )
     {
@@ -3630,9 +3352,7 @@ void tracerownrm1autoprec(RMatrix * a,
         prectouse = 2;
     }
 
-    /*
-     * Output
-     */
+    // Output
     ae_trace("[ ");
     for(i=i0; i<=i1-1; i++)
     {
@@ -3665,9 +3385,7 @@ void tracerownrm1autoprec(RMatrix * a,
 }
 
 
-/*************************************************************************
-Outputs vector A[I0,I1-1] to trace log using E8 precision
-*************************************************************************/
+// Outputs vector A[I0,I1-1] to trace log using E8 precision
 void tracevectore6(RVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -3690,9 +3408,7 @@ void tracevectore6(RVector * a,
 }
 
 
-/*************************************************************************
-Outputs vector A[I0,I1-1] to trace log using E8 or E15 precision
-*************************************************************************/
+// Outputs vector A[I0,I1-1] to trace log using E8 or E15 precision
 void tracevectore615(RVector * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -3724,10 +3440,8 @@ void tracevectore615(RVector * a,
 }
 
 
-/*************************************************************************
-Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
-trace log using E8 precision
-*************************************************************************/
+// Outputs vector of 1-norms of rows [I0,I1-1] of A[I0...I1-1,J0...J1-1]   to
+// trace log using E8 precision
 void tracerownrm1e6(RMatrix * a,
      ae_int_t i0,
      ae_int_t i1,
@@ -4080,20 +3794,18 @@ void _scomplexarray_destroy(void* _p)
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    Y       -   array[N], vector to process
-
-RESULT:
-    (X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     Y       -   array[N], vector to process
+//
+// RESULT:
+//     (X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -4114,21 +3826,19 @@ double rdotv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    A       -   array[?,N], matrix to process
-    I       -   row index
-
-RESULT:
-    (X,Ai)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotvr(ae_int_t n,
      RVector * x,
      RMatrix * a,
@@ -4150,21 +3860,19 @@ double rdotvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    A       -   array[?,N], matrix to process
-    I       -   row index
-
-RESULT:
-    (X,Ai)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotrr(ae_int_t n,
      RMatrix * a,
      ae_int_t ia,
@@ -4187,19 +3895,17 @@ double rdotrr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Computes dot product (X,X) for elements [0,N) of X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-RESULT:
-    (X,X)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,X) for elements [0,N) of X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     (X,X)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotv2(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
@@ -4219,21 +3925,19 @@ double rdotv2(ae_int_t n, RVector * x, ae_state *_state)
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace addition of Y[] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[N], vector to process
-    X       -   array[N], vector to process
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[N], vector to process
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddv(ae_int_t n,
      double alpha,
      RVector * y,
@@ -4252,23 +3956,21 @@ void raddv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace addition of Y[] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   source vector
-    OffsY   -   source offset
-    X       -   destination vector
-    OffsX   -   destination offset
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   source vector
+//     OffsY   -   source offset
+//     X       -   destination vector
+//     OffsX   -   destination offset
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddvx(ae_int_t n,
      double alpha,
      RVector * y,
@@ -4288,21 +3990,19 @@ void raddvx(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Performs inplace addition of vector Y[] to column X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   vector to add
-    X       -   target column ColIdx
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of vector Y[] to column X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   target column ColIdx
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddvc(ae_int_t n,
      double alpha,
      RVector * y,
@@ -4321,21 +4021,19 @@ void raddvc(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace addition of vector Y[] to row X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   vector to add
-    X       -   target row RowIdx
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of vector Y[] to row X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddvr(ae_int_t n,
      double alpha,
      RVector * y,
@@ -4355,20 +4053,18 @@ void raddvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise multiplication of vector X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target vector
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of vector X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -4386,20 +4082,18 @@ void rmergemulv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise multiplication of row X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -4418,20 +4112,18 @@ void rmergemulvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise multiplication of row X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulrv(ae_int_t n,
      RMatrix * y,
      ae_int_t rowidx,
@@ -4450,20 +4142,18 @@ void rmergemulrv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of vector X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target vector
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -4481,20 +4171,18 @@ void rmergemaxv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of row X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -4513,20 +4201,18 @@ void rmergemaxvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of row X[I] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix, I-th row is source
-    X       -   target row RowIdx
-
-RESULT:
-    Y := componentwise_max(Y,X)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     Y := componentwise_max(Y,X)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxrv(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -4545,20 +4231,18 @@ void rmergemaxrv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of vector X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target vector
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -4576,20 +4260,18 @@ void rmergeminv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of row X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -4608,20 +4290,18 @@ void rmergeminvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs componentwise max of row X[I] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix, I-th row is source
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminrv(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -4640,22 +4320,20 @@ void rmergeminrv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace addition of Y[RIdx,...] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[?,N], matrix whose RIdx-th row is added
-    RIdx    -   row index
-    X       -   array[N], vector to process
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[RIdx,...] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdx-th row is added
+//     RIdx    -   row index
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddrv(ae_int_t n,
      double alpha,
      RMatrix * y,
@@ -4675,23 +4353,21 @@ void raddrv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[?,N], matrix whose RIdxSrc-th row is added
-    RIdxSrc -   source row index
-    X       -   array[?,N], matrix whose RIdxDst-th row is target
-    RIdxDst -   destination row index
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
+//     RIdxSrc -   source row index
+//     X       -   array[?,N], matrix whose RIdxDst-th row is target
+//     RIdxDst -   destination row index
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddrr(ae_int_t n,
      double alpha,
      RMatrix * y,
@@ -4712,20 +4388,18 @@ void raddrr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace multiplication of X[] by V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements 0...N-1 multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulv(ae_int_t n,
      double v,
      RVector * x,
@@ -4743,20 +4417,18 @@ void rmulv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace multiplication of X[] by V
-
-INPUT PARAMETERS:
-    N       -   row length
-    X       -   array[?,N], row to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements 0...N-1 of row RowIdx are multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   row length
+//     X       -   array[?,N], row to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulr(ae_int_t n,
      double v,
      RMatrix * x,
@@ -4775,20 +4447,18 @@ void rmulr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
-
-INPUT PARAMETERS:
-    N       -   subvector length
-    X       -   vector to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements OffsX:OffsX+N-1 multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     X       -   vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements OffsX:OffsX+N-1 multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulvx(ae_int_t n,
      double v,
      RVector * x,
@@ -4807,20 +4477,18 @@ void rmulvx(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Returns maximum X
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-OUTPUT PARAMETERS:
-    max(X[i])
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(X[i])
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
@@ -4848,20 +4516,18 @@ double rmaxv(ae_int_t n, RVector * x, ae_state *_state)
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Returns maximum |X|
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-OUTPUT PARAMETERS:
-    max(|X[i]|)
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(|X[i]|)
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxabsv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
@@ -4884,20 +4550,18 @@ double rmaxabsv(ae_int_t n, RVector * x, ae_state *_state)
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Returns maximum X
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix to process, RowIdx-th row is processed
-
-OUTPUT PARAMETERS:
-    max(X[RowIdx,i])
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(X[RowIdx,i])
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxr(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -4928,20 +4592,18 @@ double rmaxr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Returns maximum |X|
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix to process, RowIdx-th row is processed
-
-OUTPUT PARAMETERS:
-    max(|X[RowIdx,i]|)
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(|X[RowIdx,i]|)
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxabsr(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -4967,20 +4629,18 @@ double rmaxabsr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetv(ae_int_t n,
      double v,
      RVector * x,
@@ -4998,20 +4658,18 @@ void rsetv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets X[OffsX:OffsX+N-1] to V
-
-INPUT PARAMETERS:
-    N       -   subvector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   X[OffsX:OffsX+N-1] is replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetvx(ae_int_t n,
      double v,
      RVector * x,
@@ -5030,20 +4688,18 @@ void rsetvx(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void isetv(ae_int_t n,
      ae_int_t v,
      ZVector * x,
@@ -5061,20 +4717,18 @@ void isetv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bsetv(ae_int_t n,
      ae_bool v,
      BVector * x,
@@ -5092,20 +4746,18 @@ void bsetv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets matrix A[] to V
-
-INPUT PARAMETERS:
-    M, N    -   rows/cols count
-    V       -   value to set
-    A       -   array[M,N]
-
-OUTPUT PARAMETERS:
-    A       -   leading M rows, N cols are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets matrix A[] to V
+//
+// INPUT PARAMETERS:
+//     M, N    -   rows/cols count
+//     V       -   value to set
+//     A       -   array[M,N]
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading M rows, N cols are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetm(ae_int_t m,
      ae_int_t n,
      double v,
@@ -5127,21 +4779,19 @@ void rsetm(ae_int_t m,
 #endif
 
 
-/*************************************************************************
-Sets vector X[] to V, reallocating X[] if too small
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V; array is reallocated
-                if its length is less than N.
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetallocv(ae_int_t n,
      double v,
      RVector * x,
@@ -5157,22 +4807,20 @@ void rsetallocv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Sets vector A[] to V, reallocating A[] if too small.
-
-INPUT PARAMETERS:
-    M       -   rows count
-    N       -   cols count
-    V       -   value to set
-    A       -   possibly preallocated matrix
-
-OUTPUT PARAMETERS:
-    A       -   leading M rows, N cols are replaced by V; the matrix is
-                reallocated if its rows/cols count is less than M/N.
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector A[] to V, reallocating A[] if too small.
+//
+// INPUT PARAMETERS:
+//     M       -   rows count
+//     N       -   cols count
+//     V       -   value to set
+//     A       -   possibly preallocated matrix
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading M rows, N cols are replaced by V; the matrix is
+//                 reallocated if its rows/cols count is less than M/N.
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetallocm(ae_int_t m,
      ae_int_t n,
      double v,
@@ -5189,20 +4837,18 @@ void rsetallocm(ae_int_t m,
 }
 
 
-/*************************************************************************
-Reallocates X[] if its length is less than required value. Does not change
-its length and contents if it is large enough.
-
-INPUT PARAMETERS:
-    N       -   desired vector length
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   length(X)>=N
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Reallocates X[] if its length is less than required value. Does not change
+// its length and contents if it is large enough.
+//
+// INPUT PARAMETERS:
+//     N       -   desired vector length
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   length(X)>=N
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rallocv(ae_int_t n, RVector * x, ae_state *_state)
 {
 
@@ -5214,20 +4860,18 @@ void rallocv(ae_int_t n, RVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Reallocates X[] if its length is less than required value. Does not change
-its length and contents if it is large enough.
-
-INPUT PARAMETERS:
-    N       -   desired vector length
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   length(X)>=N
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Reallocates X[] if its length is less than required value. Does not change
+// its length and contents if it is large enough.
+//
+// INPUT PARAMETERS:
+//     N       -   desired vector length
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   length(X)>=N
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void iallocv(ae_int_t n, ZVector * x, ae_state *_state)
 {
 
@@ -5239,20 +4883,18 @@ void iallocv(ae_int_t n, ZVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Reallocates X[] if its length is less than required value. Does not change
-its length and contents if it is large enough.
-
-INPUT PARAMETERS:
-    N       -   desired vector length
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   length(X)>=N
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Reallocates X[] if its length is less than required value. Does not change
+// its length and contents if it is large enough.
+//
+// INPUT PARAMETERS:
+//     N       -   desired vector length
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   length(X)>=N
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void ballocv(ae_int_t n, BVector * x, ae_state *_state)
 {
 
@@ -5264,21 +4906,19 @@ void ballocv(ae_int_t n, BVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Reallocates matrix if its rows or cols count is less than  required.  Does
-not change its size if it is exactly that size or larger.
-
-INPUT PARAMETERS:
-    M       -   rows count
-    N       -   cols count
-    A       -   possibly preallocated matrix
-
-OUTPUT PARAMETERS:
-    A       -   size is at least M*N
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Reallocates matrix if its rows or cols count is less than  required.  Does
+// not change its size if it is exactly that size or larger.
+//
+// INPUT PARAMETERS:
+//     M       -   rows count
+//     N       -   cols count
+//     A       -   possibly preallocated matrix
+//
+// OUTPUT PARAMETERS:
+//     A       -   size is at least M*N
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rallocm(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -5293,21 +4933,19 @@ void rallocm(ae_int_t m,
 }
 
 
-/*************************************************************************
-Sets vector X[] to V, reallocating X[] if too small
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V; array is reallocated
-                if its length is less than N.
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void isetallocv(ae_int_t n,
      ae_int_t v,
      ZVector * x,
@@ -5323,21 +4961,19 @@ void isetallocv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Sets vector X[] to V, reallocating X[] if too small
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   possibly preallocated array
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V; array is reallocated
-                if its length is less than N.
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V, reallocating X[] if too small
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   possibly preallocated array
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V; array is reallocated
+//                 if its length is less than N.
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bsetallocv(ae_int_t n,
      ae_bool v,
      BVector * x,
@@ -5354,21 +4990,19 @@ void bsetallocv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Sets row I of A[,] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    A       -   array[N,N] or larger
-    I       -   row index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of I-th row are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets row I of A[,] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     I       -   row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetr(ae_int_t n,
      double v,
      RMatrix * a,
@@ -5386,21 +5020,19 @@ void rsetr(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Sets col J of A[,] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    A       -   array[N,N] or larger
-    J       -   col index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of I-th col are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets col J of A[,] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     J       -   col index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th col are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetc(ae_int_t n,
      double v,
      RMatrix * a,
@@ -5418,23 +5050,21 @@ void rsetc(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -5452,23 +5082,21 @@ void rcopyv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bcopyv(ae_int_t n,
      BVector * x,
      BVector * y,
@@ -5486,24 +5114,22 @@ void bcopyv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to Y[], extended version
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    OffsX   -   source offset
-    Y       -   preallocated array[N]
-    OffsY   -   destination offset
-
-OUTPUT PARAMETERS:
-    Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyvx(ae_int_t n,
      RVector * x,
      ae_int_t offsx,
@@ -5522,20 +5148,18 @@ void rcopyvx(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Copies vector X[] to Y[], resizing Y[] if needed.
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   possibly preallocated array[N] (resized if needed)
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly preallocated array[N] (resized if needed)
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyallocv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -5551,22 +5175,20 @@ void rcopyallocv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
-Y[] are increased - but not decreased.
-
-INPUT PARAMETERS:
-    M       -   rows count
-    N       -   cols count
-    X       -   array[M,N], source
-    Y       -   possibly preallocated array[M,N] (resized if needed)
-
-OUTPUT PARAMETERS:
-    Y       -   leading [M,N] elements are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
+// Y[] are increased - but not decreased.
+//
+// INPUT PARAMETERS:
+//     M       -   rows count
+//     N       -   cols count
+//     X       -   array[M,N], source
+//     Y       -   possibly preallocated array[M,N] (resized if needed)
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading [M,N] elements are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopym(ae_int_t m,
      ae_int_t n,
      RMatrix * x,
@@ -5591,22 +5213,20 @@ void rcopym(ae_int_t m,
 }
 
 
-/*************************************************************************
-Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
-Y[] are increased - but not decreased.
-
-INPUT PARAMETERS:
-    M       -   rows count
-    N       -   cols count
-    X       -   array[M,N], source
-    Y       -   possibly preallocated array[M,N] (resized if needed)
-
-OUTPUT PARAMETERS:
-    Y       -   leading [M,N] elements are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies matrix X[] to Y[], resizing Y[] if needed. On resize, dimensions of
+// Y[] are increased - but not decreased.
+//
+// INPUT PARAMETERS:
+//     M       -   rows count
+//     N       -   cols count
+//     X       -   array[M,N], source
+//     Y       -   possibly preallocated array[M,N] (resized if needed)
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading [M,N] elements are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyallocm(ae_int_t m,
      ae_int_t n,
      RMatrix * x,
@@ -5627,20 +5247,18 @@ void rcopyallocm(ae_int_t m,
 }
 
 
-/*************************************************************************
-Copies vector X[] to Y[], resizing Y[] if needed.
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   possibly preallocated array[N] (resized if needed)
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly preallocated array[N] (resized if needed)
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void icopyallocv(ae_int_t n,
      ZVector * x,
      ZVector * y,
@@ -5656,20 +5274,18 @@ void icopyallocv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Copies vector X[] to Y[], resizing Y[] if needed.
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   possibly preallocated array[N] (resized if needed)
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], resizing Y[] if needed.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   possibly preallocated array[N] (resized if needed)
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bcopyallocv(ae_int_t n,
      BVector * x,
      BVector * y,
@@ -5686,20 +5302,18 @@ void bcopyallocv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   X copied to Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   X copied to Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void icopyv(ae_int_t n,
      ZVector * x,
      ZVector * y,
@@ -5717,24 +5331,22 @@ void icopyv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to Y[], extended version
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    OffsX   -   source offset
-    Y       -   preallocated array[N]
-    OffsY   -   destination offset
-
-OUTPUT PARAMETERS:
-    Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void icopyvx(ae_int_t n,
      ZVector * x,
      ae_int_t offsx,
@@ -5753,16 +5365,14 @@ void icopyvx(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Grows X, i.e. changes its size in such a way that:
-a) contents is preserved
-b) new size is at least N
-c) actual size can be larger than N, so subsequent grow() calls can return
-   without reallocation
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) actual size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void igrowv(ae_int_t newn, ZVector * x, ae_state *_state)
 {
     ae_frame _frame_block;
@@ -5787,16 +5397,14 @@ void igrowv(ae_int_t newn, ZVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Grows X, i.e. changes its size in such a way that:
-a) contents is preserved
-b) new size is at least N
-c) actual size can be larger than N, so subsequent grow() calls can return
-   without reallocation
-
-  -- ALGLIB --
-     Copyright 20.03.2009 by Bochkanov Sergey
-*************************************************************************/
+// Grows X, i.e. changes its size in such a way that:
+// a) contents is preserved
+// b) new size is at least N
+// c) actual size can be larger than N, so subsequent grow() calls can return
+//    without reallocation
+//
+//   -- ALGLIB --
+//      Copyright 20.03.2009 by Bochkanov Sergey
 void rgrowv(ae_int_t newn, RVector * x, ae_state *_state)
 {
     ae_frame _frame_block;
@@ -5822,21 +5430,19 @@ void rgrowv(ae_int_t newn, RVector * x, ae_state *_state)
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs copying with multiplication of V*X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   multiplier
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   array[N], Y = V*X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs copying with multiplication of V*X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   array[N], Y = V*X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopymulv(ae_int_t n,
      double v,
      RVector * x,
@@ -5855,22 +5461,20 @@ void rcopymulv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Performs copying with multiplication of V*X[] to Y[I,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   multiplier
-    X       -   array[N], source
-    Y       -   preallocated array[?,N]
-    RIdx    -   destination row index
-
-OUTPUT PARAMETERS:
-    Y       -   Y[RIdx,...] = V*X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs copying with multiplication of V*X[] to Y[I,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[?,N]
+//     RIdx    -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     Y       -   Y[RIdx,...] = V*X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopymulvr(ae_int_t n,
      double v,
      RVector * x,
@@ -5889,22 +5493,20 @@ void rcopymulvr(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Performs copying with multiplication of V*X[] to Y[*,J]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   multiplier
-    X       -   array[N], source
-    Y       -   preallocated array[N,?]
-    CIdx    -   destination rocol index
-
-OUTPUT PARAMETERS:
-    Y       -   Y[RIdx,...] = V*X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs copying with multiplication of V*X[] to Y[*,J]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[N,?]
+//     CIdx    -   destination rocol index
+//
+// OUTPUT PARAMETERS:
+//     Y       -   Y[RIdx,...] = V*X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopymulvc(ae_int_t n,
      double v,
      RVector * x,
@@ -5923,21 +5525,19 @@ void rcopymulvc(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies vector X[] to row I of A[,]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    A       -   preallocated 2D array large enough to store result
-    I       -   destination row index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of I-th row are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to row I of A[,]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   preallocated 2D array large enough to store result
+//     I       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyvr(ae_int_t n,
      RVector * x,
      RMatrix * a,
@@ -5956,21 +5556,19 @@ void rcopyvr(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies row I of A[,] to vector X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    A       -   2D array, source
-    I       -   source row index
-    X       -   preallocated destination
-
-OUTPUT PARAMETERS:
-    X       -   array[N], destination
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies row I of A[,] to vector X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     X       -   preallocated destination
+//
+// OUTPUT PARAMETERS:
+//     X       -   array[N], destination
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyrv(ae_int_t n,
      RMatrix * a,
      ae_int_t i,
@@ -5989,24 +5587,22 @@ void rcopyrv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Copies row I of A[,] to row K of B[,].
-
-A[i,...] and B[k,...] may overlap.
-
-INPUT PARAMETERS:
-    N       -   vector length
-    A       -   2D array, source
-    I       -   source row index
-    B       -   preallocated destination
-    K       -   destination row index
-
-OUTPUT PARAMETERS:
-    B       -   row K overwritten
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies row I of A[,] to row K of B[,].
+//
+// A[i,...] and B[k,...] may overlap.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     B       -   preallocated destination
+//     K       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     B       -   row K overwritten
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyrr(ae_int_t n,
      RMatrix * a,
      ae_int_t i,
@@ -6025,21 +5621,19 @@ void rcopyrr(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Copies vector X[] to column J of A[,]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    A       -   preallocated 2D array large enough to store result
-    J       -   destination col index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of J-th column are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to column J of A[,]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   preallocated 2D array large enough to store result
+//     J       -   destination col index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of J-th column are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyvc(ae_int_t n,
      RVector * x,
      RMatrix * a,
@@ -6056,20 +5650,18 @@ void rcopyvc(ae_int_t n,
 }
 
 
-/*************************************************************************
-Copies column J of A[,] to vector X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    A       -   source 2D array
-    J       -   source col index
-
-OUTPUT PARAMETERS:
-    X       -   preallocated array[N], destination
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies column J of A[,] to vector X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   source 2D array
+//     J       -   source col index
+//
+// OUTPUT PARAMETERS:
+//     X       -   preallocated array[N], destination
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopycv(ae_int_t n,
      RMatrix * a,
      ae_int_t j,
@@ -6087,45 +5679,43 @@ void rcopycv(ae_int_t n,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Matrix-vector product: y := alpha*op(A)*x + beta*y
-
-NOTE: this  function  expects  Y  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, x, y.
-
-INPUT PARAMETERS:
-    M   -   number of rows of op(A)
-    N   -   number of columns of op(A)
-    Alpha-  coefficient
-    A   -   source matrix
-    OpA -   operation type:
-            * OpA=0     =>  op(A) = A
-            * OpA=1     =>  op(A) = A^T
-    X   -   input vector, has at least N elements
-    Beta-   coefficient
-    Y   -   preallocated output array, has at least M elements
-
-OUTPUT PARAMETERS:
-    Y   -   vector which stores result
-
-HANDLING OF SPECIAL CASES:
-    * if M=0, then subroutine does nothing. It does not even touch arrays.
-    * if N=0 or Alpha=0.0, then:
-      * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-        at all. Initial values of Y are ignored (we do not  multiply  Y by
-        zero, we just rewrite it by zeros)
-      * if Beta<>0, then Y is replaced by Beta*Y
-    * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-       initial state of Y is ignored (rewritten by  A*x,  without  initial
-       multiplication by zeros).
-
-
-  -- ALGLIB routine --
-
-     01.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N elements
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M elements
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+//
+//
+//   -- ALGLIB routine --
+//
+//      01.09.2021
+//      Bochkanov Sergey
 void rgemv(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -6142,12 +5732,10 @@ void rgemv(ae_int_t m,
 
 
 
-    /*
-     * Properly premultiply Y by Beta.
-     *
-     * Quick exit for M=0, N=0 or Alpha=0.
-     * After this block we have M>0, N>0, Alpha<>0.
-     */
+    // Properly premultiply Y by Beta.
+    //
+    // Quick exit for M=0, N=0 or Alpha=0.
+    // After this block we have M>0, N>0, Alpha<>0.
     if( m<=0 )
     {
         return;
@@ -6165,15 +5753,11 @@ void rgemv(ae_int_t m,
         return;
     }
 
-    /*
-     * Generic code
-     */
+    // Generic code
     if( opa==0 )
     {
 
-        /*
-         * y += A*x
-         */
+        // y += A*x
         for(i=0; i<=m-1; i++)
         {
             v = (double)(0);
@@ -6188,9 +5772,7 @@ void rgemv(ae_int_t m,
     if( opa==1 )
     {
 
-        /*
-         * y += A^T*x
-         */
+        // y += A^T*x
         for(i=0; i<=n-1; i++)
         {
             v = alpha*x->ptr.p_double[i];
@@ -6206,51 +5788,49 @@ void rgemv(ae_int_t m,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Matrix-vector product: y := alpha*op(A)*x + beta*y
-
-Here x, y, A are subvectors/submatrices of larger vectors/matrices.
-
-NOTE: this  function  expects  Y  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, x, y.
-
-INPUT PARAMETERS:
-    M   -   number of rows of op(A)
-    N   -   number of columns of op(A)
-    Alpha-  coefficient
-    A   -   source matrix
-    IA  -   submatrix offset (row index)
-    JA  -   submatrix offset (column index)
-    OpA -   operation type:
-            * OpA=0     =>  op(A) = A
-            * OpA=1     =>  op(A) = A^T
-    X   -   input vector, has at least N+IX elements
-    IX  -   subvector offset
-    Beta-   coefficient
-    Y   -   preallocated output array, has at least M+IY elements
-    IY  -   subvector offset
-
-OUTPUT PARAMETERS:
-    Y   -   vector which stores result
-
-HANDLING OF SPECIAL CASES:
-    * if M=0, then subroutine does nothing. It does not even touch arrays.
-    * if N=0 or Alpha=0.0, then:
-      * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-        at all. Initial values of Y are ignored (we do not  multiply  Y by
-        zero, we just rewrite it by zeros)
-      * if Beta<>0, then Y is replaced by Beta*Y
-    * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-       initial state of Y is ignored (rewritten by  A*x,  without  initial
-       multiplication by zeros).
-
-
-  -- ALGLIB routine --
-
-     01.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// Here x, y, A are subvectors/submatrices of larger vectors/matrices.
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     IA  -   submatrix offset (row index)
+//     JA  -   submatrix offset (column index)
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N+IX elements
+//     IX  -   subvector offset
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M+IY elements
+//     IY  -   subvector offset
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+//
+//
+//   -- ALGLIB routine --
+//
+//      01.09.2021
+//      Bochkanov Sergey
 void rgemvx(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -6271,12 +5851,10 @@ void rgemvx(ae_int_t m,
 
 
 
-    /*
-     * Properly premultiply Y by Beta.
-     *
-     * Quick exit for M=0, N=0 or Alpha=0.
-     * After this block we have M>0, N>0, Alpha<>0.
-     */
+    // Properly premultiply Y by Beta.
+    //
+    // Quick exit for M=0, N=0 or Alpha=0.
+    // After this block we have M>0, N>0, Alpha<>0.
     if( m<=0 )
     {
         return;
@@ -6294,15 +5872,11 @@ void rgemvx(ae_int_t m,
         return;
     }
 
-    /*
-     * Generic code
-     */
+    // Generic code
     if( opa==0 )
     {
 
-        /*
-         * y += A*x
-         */
+        // y += A*x
         for(i=0; i<=m-1; i++)
         {
             v = (double)(0);
@@ -6317,9 +5891,7 @@ void rgemvx(ae_int_t m,
     if( opa==1 )
     {
 
-        /*
-         * y += A^T*x
-         */
+        // y += A^T*x
         for(i=0; i<=n-1; i++)
         {
             v = alpha*x->ptr.p_double[ix+i];
@@ -6335,26 +5907,24 @@ void rgemvx(ae_int_t m,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Rank-1 correction: A := A + alpha*u*v'
-
-NOTE: this  function  expects  A  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, u, v.
-
-INPUT PARAMETERS:
-    M   -   number of rows
-    N   -   number of columns
-    A   -   target MxN matrix
-    Alpha-  coefficient
-    U   -   vector #1
-    V   -   vector #2
-
-
-  -- ALGLIB routine --
-     07.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Rank-1 correction: A := A + alpha*u*v'
+//
+// NOTE: this  function  expects  A  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, u, v.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows
+//     N   -   number of columns
+//     A   -   target MxN matrix
+//     Alpha-  coefficient
+//     U   -   vector #1
+//     V   -   vector #2
+//
+//
+//   -- ALGLIB routine --
+//      07.09.2021
+//      Bochkanov Sergey
 void rger(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -6385,37 +5955,35 @@ void rger(ae_int_t m,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-This subroutine solves linear system op(A)*x=b where:
-* A is NxN upper/lower triangular/unitriangular matrix
-* X and B are Nx1 vectors
-* "op" may be identity transformation or transposition
-
-Solution replaces X.
-
-IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
-           * no integrity checks for operand sizes, out-of-bounds accesses
-             and so on is performed
-
-INPUT PARAMETERS
-    N   -   matrix size, N>=0
-    A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    IsUpper -   whether matrix is upper triangular
-    IsUnit  -   whether matrix is unitriangular
-    OpType  -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-    X       -   right part, actual vector is stored in X[IX:IX+N-1]
-    IX      -   offset
-
-OUTPUT PARAMETERS
-    X       -   solution replaces elements X[IX:IX+N-1]
-
-  -- ALGLIB routine --
-     (c) 07.09.2021 Bochkanov Sergey
-*************************************************************************/
+// This subroutine solves linear system op(A)*x=b where:
+// * A is NxN upper/lower triangular/unitriangular matrix
+// * X and B are Nx1 vectors
+// * "op" may be identity transformation or transposition
+//
+// Solution replaces X.
+//
+// IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
+//            * no integrity checks for operand sizes, out-of-bounds accesses
+//              and so on is performed
+//
+// INPUT PARAMETERS
+//     N   -   matrix size, N>=0
+//     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     IsUpper -   whether matrix is upper triangular
+//     IsUnit  -   whether matrix is unitriangular
+//     OpType  -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     X       -   right part, actual vector is stored in X[IX:IX+N-1]
+//     IX      -   offset
+//
+// OUTPUT PARAMETERS
+//     X       -   solution replaces elements X[IX:IX+N-1]
+//
+//   -- ALGLIB routine --
+//      (c) 07.09.2021 Bochkanov Sergey
 void rtrsvx(ae_int_t n,
      RMatrix * a,
      ae_int_t ia,
@@ -6517,13 +6085,11 @@ void rtrsvx(ae_int_t n,
 #endif
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixgerf(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -6548,13 +6114,11 @@ ae_bool rmatrixgerf(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixrank1f(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -6578,13 +6142,11 @@ ae_bool cmatrixrank1f(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixrank1f(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -6608,13 +6170,11 @@ ae_bool rmatrixrank1f(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixrighttrsmf(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -6640,13 +6200,11 @@ ae_bool cmatrixrighttrsmf(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixlefttrsmf(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -6672,13 +6230,11 @@ ae_bool cmatrixlefttrsmf(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixrighttrsmf(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -6704,13 +6260,11 @@ ae_bool rmatrixrighttrsmf(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixlefttrsmf(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -6736,13 +6290,11 @@ ae_bool rmatrixlefttrsmf(ae_int_t m,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixherkf(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -6769,13 +6321,11 @@ ae_bool cmatrixherkf(ae_int_t n,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixsyrkf(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -6802,13 +6352,11 @@ ae_bool rmatrixsyrkf(ae_int_t n,
 }
 
 
-/*************************************************************************
-Fast kernel
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixgemmf(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -6839,55 +6387,53 @@ ae_bool cmatrixgemmf(ae_int_t m,
 }
 
 
-/*************************************************************************
-CMatrixGEMM kernel, basecase code for CMatrixGEMM.
-
-This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-* C is MxN general matrix
-* op1(A) is MxK matrix
-* op2(B) is KxN matrix
-* "op" may be identity transformation, transposition, conjugate transposition
-
-Additional info:
-* multiplication result replaces C. If Beta=0, C elements are not used in
-  calculations (not multiplied by zero - just not referenced)
-* if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-* if both Beta and Alpha are zero, C is filled by zeros.
-
-IMPORTANT:
-
-This function does NOT preallocate output matrix C, it MUST be preallocated
-by caller prior to calling this function. In case C does not have  enough
-space to store result, exception will be generated.
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    OpTypeA -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-                * 2 - conjugate transposition
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    OpTypeB -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-                * 2 - conjugate transposition
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// CMatrixGEMM kernel, basecase code for CMatrixGEMM.
+//
+// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
+// * C is MxN general matrix
+// * op1(A) is MxK matrix
+// * op2(B) is KxN matrix
+// * "op" may be identity transformation, transposition, conjugate transposition
+//
+// Additional info:
+// * multiplication result replaces C. If Beta=0, C elements are not used in
+//   calculations (not multiplied by zero - just not referenced)
+// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if both Beta and Alpha are zero, C is filled by zeros.
+//
+// IMPORTANT:
+//
+// This function does NOT preallocate output matrix C, it MUST be preallocated
+// by caller prior to calling this function. In case C does not have  enough
+// space to store result, exception will be generated.
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     OpTypeA -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//                 * 2 - conjugate transposition
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     OpTypeB -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//                 * 2 - conjugate transposition
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void cmatrixgemmk(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -6945,25 +6491,19 @@ void cmatrixgemmk(ae_int_t m,
 
 
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * Try optimized code
-     */
+    // Try optimized code
     if( cmatrixgemmf(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state) )
     {
         return;
     }
 
-    /*
-     * if K=0 or Alpha=0, then C=Beta*C
-     */
+    // if K=0 or Alpha=0, then C=Beta*C
     if( k==0||ae_c_eq_d(alpha,(double)(0)) )
     {
         if( ae_c_neq_d(beta,(double)(1)) )
@@ -6992,10 +6532,8 @@ void cmatrixgemmk(ae_int_t m,
         return;
     }
 
-    /*
-     * This phase is not really necessary, but compiler complains
-     * about "possibly uninitialized variables"
-     */
+    // This phase is not really necessary, but compiler complains
+    // about "possibly uninitialized variables"
     a0x = (double)(0);
     a0y = (double)(0);
     a1x = (double)(0);
@@ -7005,9 +6543,7 @@ void cmatrixgemmk(ae_int_t m,
     b1x = (double)(0);
     b1y = (double)(0);
 
-    /*
-     * General case
-     */
+    // General case
     i = 0;
     while(i<m)
     {
@@ -7015,19 +6551,15 @@ void cmatrixgemmk(ae_int_t m,
         while(j<n)
         {
 
-            /*
-             * Choose between specialized 4x4 code and general code
-             */
+            // Choose between specialized 4x4 code and general code
             if( i+2<=m&&j+2<=n )
             {
 
-                /*
-                 * Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-                 *
-                 * This submatrix is calculated as sum of K rank-1 products,
-                 * with operands cached in local variables in order to speed
-                 * up operations with arrays.
-                 */
+                // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+                //
+                // This submatrix is calculated as sum of K rank-1 products,
+                // with operands cached in local variables in order to speed
+                // up operations with arrays.
                 v00x = 0.0;
                 v00y = 0.0;
                 v01x = 0.0;
@@ -7141,17 +6673,13 @@ void cmatrixgemmk(ae_int_t m,
             else
             {
 
-                /*
-                 * Determine submatrix [I0..I1]x[J0..J1] to process
-                 */
+                // Determine submatrix [I0..I1]x[J0..J1] to process
                 i0 = i;
                 i1 = ae_minint(i+1, m-1, _state);
                 j0 = j;
                 j1 = ae_minint(j+1, n-1, _state);
 
-                /*
-                 * Process submatrix
-                 */
+                // Process submatrix
                 for(ik=i0; ik<=i1; ik++)
                 {
                     for(jk=j0; jk<=j1; jk++)
@@ -7218,53 +6746,51 @@ void cmatrixgemmk(ae_int_t m,
 }
 
 
-/*************************************************************************
-RMatrixGEMM kernel, basecase code for RMatrixGEMM.
-
-This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
-* C is MxN general matrix
-* op1(A) is MxK matrix
-* op2(B) is KxN matrix
-* "op" may be identity transformation, transposition
-
-Additional info:
-* multiplication result replaces C. If Beta=0, C elements are not used in
-  calculations (not multiplied by zero - just not referenced)
-* if Alpha=0, A is not used (not multiplied by zero - just not referenced)
-* if both Beta and Alpha are zero, C is filled by zeros.
-
-IMPORTANT:
-
-This function does NOT preallocate output matrix C, it MUST be preallocated
-by caller prior to calling this function. In case C does not have  enough
-space to store result, exception will be generated.
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    OpTypeA -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    OpTypeB -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM.
+//
+// This subroutine calculates C = alpha*op1(A)*op2(B) +beta*C where:
+// * C is MxN general matrix
+// * op1(A) is MxK matrix
+// * op2(B) is KxN matrix
+// * "op" may be identity transformation, transposition
+//
+// Additional info:
+// * multiplication result replaces C. If Beta=0, C elements are not used in
+//   calculations (not multiplied by zero - just not referenced)
+// * if Alpha=0, A is not used (not multiplied by zero - just not referenced)
+// * if both Beta and Alpha are zero, C is filled by zeros.
+//
+// IMPORTANT:
+//
+// This function does NOT preallocate output matrix C, it MUST be preallocated
+// by caller prior to calling this function. In case C does not have  enough
+// space to store result, exception will be generated.
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     OpTypeA -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     OpTypeB -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void rmatrixgemmk(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -7288,25 +6814,19 @@ void rmatrixgemmk(ae_int_t m,
 
 
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * Try optimized code
-     */
+    // Try optimized code
     if( ablasf_rgemm32basecase(m, n, k, alpha, a, ia, ja, optypea, b, ib, jb, optypeb, beta, c, ic, jc, _state) )
     {
         return;
     }
 
-    /*
-     * if K=0 or Alpha=0, then C=Beta*C
-     */
+    // if K=0 or Alpha=0, then C=Beta*C
     if( k==0||ae_fp_eq(alpha,(double)(0)) )
     {
         if( ae_fp_neq(beta,(double)(1)) )
@@ -7335,13 +6855,11 @@ void rmatrixgemmk(ae_int_t m,
         return;
     }
 
-    /*
-     * Call specialized code.
-     *
-     * NOTE: specialized code was moved to separate function because of strange
-     *       issues with instructions cache on some systems; Having too long
-     *       functions significantly slows down internal loop of the algorithm.
-     */
+    // Call specialized code.
+    //
+    // NOTE: specialized code was moved to separate function because of strange
+    //       issues with instructions cache on some systems; Having too long
+    //       functions significantly slows down internal loop of the algorithm.
     if( optypea==0&&optypeb==0 )
     {
         rmatrixgemmk44v00(m, n, k, alpha, a, ia, ja, b, ib, jb, beta, c, ic, jc, _state);
@@ -7361,33 +6879,31 @@ void rmatrixgemmk(ae_int_t m,
 }
 
 
-/*************************************************************************
-RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-with OpTypeA=0 and OpTypeB=0.
-
-Additional info:
-* this function requires that Alpha<>0 (assertion is thrown otherwise)
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
+// with OpTypeA=0 and OpTypeB=0.
+//
+// Additional info:
+// * this function requires that Alpha<>0 (assertion is thrown otherwise)
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void rmatrixgemmk44v00(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -7452,17 +6968,13 @@ void rmatrixgemmk44v00(ae_int_t m,
 
     ae_assert(ae_fp_neq(alpha,(double)(0)), "RMatrixGEMMK44V00: internal error (Alpha=0)", _state);
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * A*B
-     */
+    // A*B
     i = 0;
     while(i<m)
     {
@@ -7470,19 +6982,15 @@ void rmatrixgemmk44v00(ae_int_t m,
         while(j<n)
         {
 
-            /*
-             * Choose between specialized 4x4 code and general code
-             */
+            // Choose between specialized 4x4 code and general code
             if( i+4<=m&&j+4<=n )
             {
 
-                /*
-                 * Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-                 *
-                 * This submatrix is calculated as sum of K rank-1 products,
-                 * with operands cached in local variables in order to speed
-                 * up operations with arrays.
-                 */
+                // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+                //
+                // This submatrix is calculated as sum of K rank-1 products,
+                // with operands cached in local variables in order to speed
+                // up operations with arrays.
                 idxa0 = ia+i+0;
                 idxa1 = ia+i+1;
                 idxa2 = ia+i+2;
@@ -7510,9 +7018,7 @@ void rmatrixgemmk44v00(ae_int_t m,
                 v32 = 0.0;
                 v33 = 0.0;
 
-                /*
-                 * Different variants of internal loop
-                 */
+                // Different variants of internal loop
                 for(t=0; t<=k-1; t++)
                 {
                     a0 = a->ptr.pp_double[idxa0][offsa];
@@ -7584,17 +7090,13 @@ void rmatrixgemmk44v00(ae_int_t m,
             else
             {
 
-                /*
-                 * Determine submatrix [I0..I1]x[J0..J1] to process
-                 */
+                // Determine submatrix [I0..I1]x[J0..J1] to process
                 i0 = i;
                 i1 = ae_minint(i+3, m-1, _state);
                 j0 = j;
                 j1 = ae_minint(j+3, n-1, _state);
 
-                /*
-                 * Process submatrix
-                 */
+                // Process submatrix
                 for(ik=i0; ik<=i1; ik++)
                 {
                     for(jk=j0; jk<=j1; jk++)
@@ -7625,33 +7127,31 @@ void rmatrixgemmk44v00(ae_int_t m,
 }
 
 
-/*************************************************************************
-RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-with OpTypeA=0 and OpTypeB=1.
-
-Additional info:
-* this function requires that Alpha<>0 (assertion is thrown otherwise)
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
+// with OpTypeA=0 and OpTypeB=1.
+//
+// Additional info:
+// * this function requires that Alpha<>0 (assertion is thrown otherwise)
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void rmatrixgemmk44v01(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -7716,17 +7216,13 @@ void rmatrixgemmk44v01(ae_int_t m,
 
     ae_assert(ae_fp_neq(alpha,(double)(0)), "RMatrixGEMMK44V00: internal error (Alpha=0)", _state);
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * A*B'
-     */
+    // A*B'
     i = 0;
     while(i<m)
     {
@@ -7734,19 +7230,15 @@ void rmatrixgemmk44v01(ae_int_t m,
         while(j<n)
         {
 
-            /*
-             * Choose between specialized 4x4 code and general code
-             */
+            // Choose between specialized 4x4 code and general code
             if( i+4<=m&&j+4<=n )
             {
 
-                /*
-                 * Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-                 *
-                 * This submatrix is calculated as sum of K rank-1 products,
-                 * with operands cached in local variables in order to speed
-                 * up operations with arrays.
-                 */
+                // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+                //
+                // This submatrix is calculated as sum of K rank-1 products,
+                // with operands cached in local variables in order to speed
+                // up operations with arrays.
                 idxa0 = ia+i+0;
                 idxa1 = ia+i+1;
                 idxa2 = ia+i+2;
@@ -7844,17 +7336,13 @@ void rmatrixgemmk44v01(ae_int_t m,
             else
             {
 
-                /*
-                 * Determine submatrix [I0..I1]x[J0..J1] to process
-                 */
+                // Determine submatrix [I0..I1]x[J0..J1] to process
                 i0 = i;
                 i1 = ae_minint(i+3, m-1, _state);
                 j0 = j;
                 j1 = ae_minint(j+3, n-1, _state);
 
-                /*
-                 * Process submatrix
-                 */
+                // Process submatrix
                 for(ik=i0; ik<=i1; ik++)
                 {
                     for(jk=j0; jk<=j1; jk++)
@@ -7885,33 +7373,31 @@ void rmatrixgemmk44v01(ae_int_t m,
 }
 
 
-/*************************************************************************
-RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-with OpTypeA=1 and OpTypeB=0.
-
-Additional info:
-* this function requires that Alpha<>0 (assertion is thrown otherwise)
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
+// with OpTypeA=1 and OpTypeB=0.
+//
+// Additional info:
+// * this function requires that Alpha<>0 (assertion is thrown otherwise)
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void rmatrixgemmk44v10(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -7976,17 +7462,13 @@ void rmatrixgemmk44v10(ae_int_t m,
 
     ae_assert(ae_fp_neq(alpha,(double)(0)), "RMatrixGEMMK44V00: internal error (Alpha=0)", _state);
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * A'*B
-     */
+    // A'*B
     i = 0;
     while(i<m)
     {
@@ -7994,19 +7476,15 @@ void rmatrixgemmk44v10(ae_int_t m,
         while(j<n)
         {
 
-            /*
-             * Choose between specialized 4x4 code and general code
-             */
+            // Choose between specialized 4x4 code and general code
             if( i+4<=m&&j+4<=n )
             {
 
-                /*
-                 * Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-                 *
-                 * This submatrix is calculated as sum of K rank-1 products,
-                 * with operands cached in local variables in order to speed
-                 * up operations with arrays.
-                 */
+                // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+                //
+                // This submatrix is calculated as sum of K rank-1 products,
+                // with operands cached in local variables in order to speed
+                // up operations with arrays.
                 idxa0 = ja+i+0;
                 idxa1 = ja+i+1;
                 idxa2 = ja+i+2;
@@ -8104,17 +7582,13 @@ void rmatrixgemmk44v10(ae_int_t m,
             else
             {
 
-                /*
-                 * Determine submatrix [I0..I1]x[J0..J1] to process
-                 */
+                // Determine submatrix [I0..I1]x[J0..J1] to process
                 i0 = i;
                 i1 = ae_minint(i+3, m-1, _state);
                 j0 = j;
                 j1 = ae_minint(j+3, n-1, _state);
 
-                /*
-                 * Process submatrix
-                 */
+                // Process submatrix
                 for(ik=i0; ik<=i1; ik++)
                 {
                     for(jk=j0; jk<=j1; jk++)
@@ -8146,33 +7620,31 @@ void rmatrixgemmk44v10(ae_int_t m,
 }
 
 
-/*************************************************************************
-RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
-with OpTypeA=1 and OpTypeB=1.
-
-Additional info:
-* this function requires that Alpha<>0 (assertion is thrown otherwise)
-
-INPUT PARAMETERS
-    M       -   matrix size, M>0
-    N       -   matrix size, N>0
-    K       -   matrix size, K>0
-    Alpha   -   coefficient
-    A       -   matrix
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    B       -   matrix
-    IB      -   submatrix offset
-    JB      -   submatrix offset
-    Beta    -   coefficient
-    C       -   PREALLOCATED output matrix
-    IC      -   submatrix offset
-    JC      -   submatrix offset
-
-  -- ALGLIB routine --
-     27.03.2013
-     Bochkanov Sergey
-*************************************************************************/
+// RMatrixGEMM kernel, basecase code for RMatrixGEMM, specialized for sitation
+// with OpTypeA=1 and OpTypeB=1.
+//
+// Additional info:
+// * this function requires that Alpha<>0 (assertion is thrown otherwise)
+//
+// INPUT PARAMETERS
+//     M       -   matrix size, M>0
+//     N       -   matrix size, N>0
+//     K       -   matrix size, K>0
+//     Alpha   -   coefficient
+//     A       -   matrix
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     B       -   matrix
+//     IB      -   submatrix offset
+//     JB      -   submatrix offset
+//     Beta    -   coefficient
+//     C       -   PREALLOCATED output matrix
+//     IC      -   submatrix offset
+//     JC      -   submatrix offset
+//
+//   -- ALGLIB routine --
+//      27.03.2013
+//      Bochkanov Sergey
 void rmatrixgemmk44v11(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -8237,17 +7709,13 @@ void rmatrixgemmk44v11(ae_int_t m,
 
     ae_assert(ae_fp_neq(alpha,(double)(0)), "RMatrixGEMMK44V00: internal error (Alpha=0)", _state);
 
-    /*
-     * if matrix size is zero
-     */
+    // if matrix size is zero
     if( m==0||n==0 )
     {
         return;
     }
 
-    /*
-     * A'*B'
-     */
+    // A'*B'
     i = 0;
     while(i<m)
     {
@@ -8255,19 +7723,15 @@ void rmatrixgemmk44v11(ae_int_t m,
         while(j<n)
         {
 
-            /*
-             * Choose between specialized 4x4 code and general code
-             */
+            // Choose between specialized 4x4 code and general code
             if( i+4<=m&&j+4<=n )
             {
 
-                /*
-                 * Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
-                 *
-                 * This submatrix is calculated as sum of K rank-1 products,
-                 * with operands cached in local variables in order to speed
-                 * up operations with arrays.
-                 */
+                // Specialized 4x4 code for [I..I+3]x[J..J+3] submatrix of C.
+                //
+                // This submatrix is calculated as sum of K rank-1 products,
+                // with operands cached in local variables in order to speed
+                // up operations with arrays.
                 idxa0 = ja+i+0;
                 idxa1 = ja+i+1;
                 idxa2 = ja+i+2;
@@ -8365,17 +7829,13 @@ void rmatrixgemmk44v11(ae_int_t m,
             else
             {
 
-                /*
-                 * Determine submatrix [I0..I1]x[J0..J1] to process
-                 */
+                // Determine submatrix [I0..I1]x[J0..J1] to process
                 i0 = i;
                 i1 = ae_minint(i+3, m-1, _state);
                 j0 = j;
                 j1 = ae_minint(j+3, n-1, _state);
 
-                /*
-                 * Process submatrix
-                 */
+                // Process submatrix
                 for(ik=i0; ik<=i1; ik++)
                 {
                     for(jk=j0; jk<=j1; jk++)
@@ -8408,13 +7868,11 @@ void rmatrixgemmk44v11(ae_int_t m,
 
 
 #ifdef ALGLIB_NO_FAST_KERNELS
-/*************************************************************************
-Fast kernel (new version with AVX2/SSE2)
-
-  -- ALGLIB routine --
-     19.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernel (new version with AVX2/SSE2)
+//
+//   -- ALGLIB routine --
+//      19.01.2010
+//      Bochkanov Sergey
 static ae_bool ablasf_rgemm32basecase(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -8471,41 +7929,33 @@ void hermitianmatrixvectormultiply(CMatrix * a,
         return;
     }
 
-    /*
-     * Let A = L + D + U, where
-     *  L is strictly lower triangular (main diagonal is zero)
-     *  D is diagonal
-     *  U is strictly upper triangular (main diagonal is zero)
-     *
-     * A*x = L*x + D*x + U*x
-     *
-     * Calculate D*x first
-     */
+    // Let A = L + D + U, where
+    //  L is strictly lower triangular (main diagonal is zero)
+    //  D is diagonal
+    //  U is strictly upper triangular (main diagonal is zero)
+    //
+    // A*x = L*x + D*x + U*x
+    //
+    // Calculate D*x first
     for(i=i1; i<=i2; i++)
     {
         y->ptr.p_complex[i-i1+1] = ae_c_mul(a->ptr.pp_complex[i][i],x->ptr.p_complex[i-i1+1]);
     }
 
-    /*
-     * Add L*x + U*x
-     */
+    // Add L*x + U*x
     if( isupper )
     {
         for(i=i1; i<=i2-1; i++)
         {
 
-            /*
-             * Add L*x to the result
-             */
+            // Add L*x to the result
             v = x->ptr.p_complex[i-i1+1];
             by1 = i-i1+2;
             by2 = n;
             ba1 = i+1;
             ae_v_caddc(&y->ptr.p_complex[by1], 1, &a->ptr.pp_complex[i][ba1], 1, "Conj", ae_v_len(by1,by2), v);
 
-            /*
-             * Add U*x to the result
-             */
+            // Add U*x to the result
             bx1 = i-i1+2;
             bx2 = n;
             ba1 = i+1;
@@ -8518,18 +7968,14 @@ void hermitianmatrixvectormultiply(CMatrix * a,
         for(i=i1+1; i<=i2; i++)
         {
 
-            /*
-             * Add L*x to the result
-             */
+            // Add L*x to the result
             bx1 = 1;
             bx2 = i-i1;
             ba1 = i1;
             v = ae_v_cdotproduct(&x->ptr.p_complex[bx1], 1, "N", &a->ptr.pp_complex[i][ba1], 1, "N", ae_v_len(bx1,bx2));
             y->ptr.p_complex[i-i1+1] = ae_c_add(y->ptr.p_complex[i-i1+1],v);
 
-            /*
-             * Add U*x to the result
-             */
+            // Add U*x to the result
             v = x->ptr.p_complex[i-i1+1];
             by1 = 1;
             by2 = i-i1;
@@ -8590,42 +8036,40 @@ void hermitianrank2update(CMatrix * a,
 #if defined(AE_COMPILE_CREFLECTIONS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Generation of an elementary complex reflection transformation
-
-The subroutine generates elementary complex reflection H of  order  N,  so
-that, for a given X, the following equality holds true:
-
-     ( X(1) )   ( Beta )
-H' * (  ..  ) = (  0   ),   H'*H = I,   Beta is a real number
-     ( X(n) )   (  0   )
-
-where
-
-              ( V(1) )
-H = 1 - Tau * (  ..  ) * ( conj(V(1)), ..., conj(V(n)) )
-              ( V(n) )
-
-where the first component of vector V equals 1.
-
-Input parameters:
-    X   -   vector. Array with elements [1..N].
-    N   -   reflection order.
-
-Output parameters:
-    X   -   components from 2 to N are replaced by vector V.
-            The first component is replaced with parameter Beta.
-    Tau -   scalar value Tau.
-
-This subroutine is the modification of CLARFG subroutines  from the LAPACK
-library. It has similar functionality except for the fact that it  doesn't
-handle errors when intermediate results cause an overflow.
-
-  -- LAPACK auxiliary routine (version 3.0) --
-     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-     Courant Institute, Argonne National Lab, and Rice University
-     September 30, 1994
-*************************************************************************/
+// Generation of an elementary complex reflection transformation
+//
+// The subroutine generates elementary complex reflection H of  order  N,  so
+// that, for a given X, the following equality holds true:
+//
+//      ( X(1) )   ( Beta )
+// H' * (  ..  ) = (  0   ),   H'*H = I,   Beta is a real number
+//      ( X(n) )   (  0   )
+//
+// where
+//
+//               ( V(1) )
+// H = 1 - Tau * (  ..  ) * ( conj(V(1)), ..., conj(V(n)) )
+//               ( V(n) )
+//
+// where the first component of vector V equals 1.
+//
+// Input parameters:
+//     X   -   vector. Array with elements [1..N].
+//     N   -   reflection order.
+//
+// Output parameters:
+//     X   -   components from 2 to N are replaced by vector V.
+//             The first component is replaced with parameter Beta.
+//     Tau -   scalar value Tau.
+//
+// This subroutine is the modification of CLARFG subroutines  from the LAPACK
+// library. It has similar functionality except for the fact that it  doesn't
+// handle errors when intermediate results cause an overflow.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
 void complexgeneratereflection(CVector * x,
      ae_int_t n,
      ae_complex* tau,
@@ -8651,10 +8095,8 @@ void complexgeneratereflection(CVector * x,
         return;
     }
 
-    /*
-     * Scale if needed (to avoid overflow/underflow during intermediate
-     * calculations).
-     */
+    // Scale if needed (to avoid overflow/underflow during intermediate
+    // calculations).
     mx = (double)(0);
     for(j=1; j<=n; j++)
     {
@@ -8677,9 +8119,7 @@ void complexgeneratereflection(CVector * x,
         }
     }
 
-    /*
-     * calculate
-     */
+    // calculate
     alpha = x->ptr.p_complex[1];
     mx = (double)(0);
     for(j=2; j<=n; j++)
@@ -8721,44 +8161,40 @@ void complexgeneratereflection(CVector * x,
     alpha = ae_complex_from_d(beta);
     x->ptr.p_complex[1] = alpha;
 
-    /*
-     * Scale back
-     */
+    // Scale back
     x->ptr.p_complex[1] = ae_c_mul_d(x->ptr.p_complex[1],s);
 }
 
 
-/*************************************************************************
-Application of an elementary reflection to a rectangular matrix of size MxN
-
-The  algorithm  pre-multiplies  the  matrix  by  an  elementary reflection
-transformation  which  is  given  by  column  V  and  scalar  Tau (see the
-description of the GenerateReflection). Not the whole matrix  but  only  a
-part of it is transformed (rows from M1 to M2, columns from N1 to N2). Only
-the elements of this submatrix are changed.
-
-Note: the matrix is multiplied by H, not by H'.   If  it  is  required  to
-multiply the matrix by H', it is necessary to pass Conj(Tau) instead of Tau.
-
-Input parameters:
-    C       -   matrix to be transformed.
-    Tau     -   scalar defining transformation.
-    V       -   column defining transformation.
-                Array whose index ranges within [1..M2-M1+1]
-    M1, M2  -   range of rows to be transformed.
-    N1, N2  -   range of columns to be transformed.
-    WORK    -   working array whose index goes from N1 to N2.
-
-Output parameters:
-    C       -   the result of multiplying the input matrix C by the
-                transformation matrix which is given by Tau and V.
-                If N1>N2 or M1>M2, C is not modified.
-
-  -- LAPACK auxiliary routine (version 3.0) --
-     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-     Courant Institute, Argonne National Lab, and Rice University
-     September 30, 1994
-*************************************************************************/
+// Application of an elementary reflection to a rectangular matrix of size MxN
+//
+// The  algorithm  pre-multiplies  the  matrix  by  an  elementary reflection
+// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
+// description of the GenerateReflection). Not the whole matrix  but  only  a
+// part of it is transformed (rows from M1 to M2, columns from N1 to N2). Only
+// the elements of this submatrix are changed.
+//
+// Note: the matrix is multiplied by H, not by H'.   If  it  is  required  to
+// multiply the matrix by H', it is necessary to pass Conj(Tau) instead of Tau.
+//
+// Input parameters:
+//     C       -   matrix to be transformed.
+//     Tau     -   scalar defining transformation.
+//     V       -   column defining transformation.
+//                 Array whose index ranges within [1..M2-M1+1]
+//     M1, M2  -   range of rows to be transformed.
+//     N1, N2  -   range of columns to be transformed.
+//     WORK    -   working array whose index goes from N1 to N2.
+//
+// Output parameters:
+//     C       -   the result of multiplying the input matrix C by the
+//                 transformation matrix which is given by Tau and V.
+//                 If N1>N2 or M1>M2, C is not modified.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
 void complexapplyreflectionfromtheleft(CMatrix * c,
      ae_complex tau,
      CVector * v,
@@ -8778,9 +8214,7 @@ void complexapplyreflectionfromtheleft(CMatrix * c,
         return;
     }
 
-    /*
-     * w := C^T * conj(v)
-     */
+    // w := C^T * conj(v)
     for(i=n1; i<=n2; i++)
     {
         work->ptr.p_complex[i] = ae_complex_from_i(0);
@@ -8791,9 +8225,7 @@ void complexapplyreflectionfromtheleft(CMatrix * c,
         ae_v_caddc(&work->ptr.p_complex[n1], 1, &c->ptr.pp_complex[i][n1], 1, "N", ae_v_len(n1,n2), t);
     }
 
-    /*
-     * C := C - tau * v * w^T
-     */
+    // C := C - tau * v * w^T
     for(i=m1; i<=m2; i++)
     {
         t = ae_c_mul(v->ptr.p_complex[i-m1+1],tau);
@@ -8802,34 +8234,32 @@ void complexapplyreflectionfromtheleft(CMatrix * c,
 }
 
 
-/*************************************************************************
-Application of an elementary reflection to a rectangular matrix of size MxN
-
-The  algorithm  post-multiplies  the  matrix  by  an elementary reflection
-transformation  which  is  given  by  column  V  and  scalar  Tau (see the
-description  of  the  GenerateReflection). Not the whole matrix but only a
-part  of  it  is  transformed (rows from M1 to M2, columns from N1 to N2).
-Only the elements of this submatrix are changed.
-
-Input parameters:
-    C       -   matrix to be transformed.
-    Tau     -   scalar defining transformation.
-    V       -   column defining transformation.
-                Array whose index ranges within [1..N2-N1+1]
-    M1, M2  -   range of rows to be transformed.
-    N1, N2  -   range of columns to be transformed.
-    WORK    -   working array whose index goes from M1 to M2.
-
-Output parameters:
-    C       -   the result of multiplying the input matrix C by the
-                transformation matrix which is given by Tau and V.
-                If N1>N2 or M1>M2, C is not modified.
-
-  -- LAPACK auxiliary routine (version 3.0) --
-     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-     Courant Institute, Argonne National Lab, and Rice University
-     September 30, 1994
-*************************************************************************/
+// Application of an elementary reflection to a rectangular matrix of size MxN
+//
+// The  algorithm  post-multiplies  the  matrix  by  an elementary reflection
+// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
+// description  of  the  GenerateReflection). Not the whole matrix but only a
+// part  of  it  is  transformed (rows from M1 to M2, columns from N1 to N2).
+// Only the elements of this submatrix are changed.
+//
+// Input parameters:
+//     C       -   matrix to be transformed.
+//     Tau     -   scalar defining transformation.
+//     V       -   column defining transformation.
+//                 Array whose index ranges within [1..N2-N1+1]
+//     M1, M2  -   range of rows to be transformed.
+//     N1, N2  -   range of columns to be transformed.
+//     WORK    -   working array whose index goes from M1 to M2.
+//
+// Output parameters:
+//     C       -   the result of multiplying the input matrix C by the
+//                 transformation matrix which is given by Tau and V.
+//                 If N1>N2 or M1>M2, C is not modified.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
 void complexapplyreflectionfromtheright(CMatrix * c,
      ae_complex tau,
      CVector * v,
@@ -8850,9 +8280,7 @@ void complexapplyreflectionfromtheright(CMatrix * c,
         return;
     }
 
-    /*
-     * w := C * v
-     */
+    // w := C * v
     vm = n2-n1+1;
     for(i=m1; i<=m2; i++)
     {
@@ -8860,9 +8288,7 @@ void complexapplyreflectionfromtheright(CMatrix * c,
         work->ptr.p_complex[i] = t;
     }
 
-    /*
-     * C := C - w * conj(v^T)
-     */
+    // C := C - w * conj(v^T)
     ae_v_cmove(&v->ptr.p_complex[1], 1, &v->ptr.p_complex[1], 1, "Conj", ae_v_len(1,vm));
     for(i=m1; i<=m2; i++)
     {
@@ -8903,32 +8329,26 @@ void symmetricmatrixvectormultiply(RMatrix * a,
         return;
     }
 
-    /*
-     * Let A = L + D + U, where
-     *  L is strictly lower triangular (main diagonal is zero)
-     *  D is diagonal
-     *  U is strictly upper triangular (main diagonal is zero)
-     *
-     * A*x = L*x + D*x + U*x
-     *
-     * Calculate D*x first
-     */
+    // Let A = L + D + U, where
+    //  L is strictly lower triangular (main diagonal is zero)
+    //  D is diagonal
+    //  U is strictly upper triangular (main diagonal is zero)
+    //
+    // A*x = L*x + D*x + U*x
+    //
+    // Calculate D*x first
     for(i=i1; i<=i2; i++)
     {
         y->ptr.p_double[i-i1+1] = a->ptr.pp_double[i][i]*x->ptr.p_double[i-i1+1];
     }
 
-    /*
-     * Add L*x + U*x
-     */
+    // Add L*x + U*x
     if( isupper )
     {
         for(i=i1; i<=i2-1; i++)
         {
 
-            /*
-             * Add L*x to the result
-             */
+            // Add L*x to the result
             v = x->ptr.p_double[i-i1+1];
             by1 = i-i1+2;
             by2 = n;
@@ -8936,9 +8356,7 @@ void symmetricmatrixvectormultiply(RMatrix * a,
             ba2 = i2;
             ae_v_addd(&y->ptr.p_double[by1], 1, &a->ptr.pp_double[i][ba1], 1, ae_v_len(by1,by2), v);
 
-            /*
-             * Add U*x to the result
-             */
+            // Add U*x to the result
             bx1 = i-i1+2;
             bx2 = n;
             ba1 = i+1;
@@ -8952,9 +8370,7 @@ void symmetricmatrixvectormultiply(RMatrix * a,
         for(i=i1+1; i<=i2; i++)
         {
 
-            /*
-             * Add L*x to the result
-             */
+            // Add L*x to the result
             bx1 = 1;
             bx2 = i-i1;
             ba1 = i1;
@@ -8962,9 +8378,7 @@ void symmetricmatrixvectormultiply(RMatrix * a,
             v = ae_v_dotproduct(&x->ptr.p_double[bx1], 1, &a->ptr.pp_double[i][ba1], 1, ae_v_len(bx1,bx2));
             y->ptr.p_double[i-i1+1] = y->ptr.p_double[i-i1+1]+v;
 
-            /*
-             * Add U*x to the result
-             */
+            // Add U*x to the result
             v = x->ptr.p_double[i-i1+1];
             by1 = 1;
             by2 = i-i1;
@@ -9029,13 +8443,11 @@ void symmetricrank2update(RMatrix * a,
 #if defined(AE_COMPILE_ABLASMKL) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixgermkl(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -9060,13 +8472,11 @@ ae_bool rmatrixgermkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool cmatrixrank1mkl(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -9090,13 +8500,11 @@ ae_bool cmatrixrank1mkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixrank1mkl(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -9120,13 +8528,11 @@ ae_bool rmatrixrank1mkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool cmatrixmvmkl(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -9151,13 +8557,11 @@ ae_bool cmatrixmvmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixmvmkl(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -9182,13 +8586,11 @@ ae_bool rmatrixmvmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixgemvmkl(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -9215,13 +8617,11 @@ ae_bool rmatrixgemvmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     12.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      12.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixtrsvmkl(ae_int_t n,
      RMatrix * a,
      ae_int_t ia,
@@ -9245,13 +8645,11 @@ ae_bool rmatrixtrsvmkl(ae_int_t n,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     01.10.2013
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      01.10.2013
+//      Bochkanov Sergey
 ae_bool rmatrixsyrkmkl(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -9278,13 +8676,11 @@ ae_bool rmatrixsyrkmkl(ae_int_t n,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     01.10.2013
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      01.10.2013
+//      Bochkanov Sergey
 ae_bool cmatrixherkmkl(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -9311,13 +8707,11 @@ ae_bool cmatrixherkmkl(ae_int_t n,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     01.10.2013
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      01.10.2013
+//      Bochkanov Sergey
 ae_bool rmatrixgemmmkl(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -9348,13 +8742,11 @@ ae_bool rmatrixgemmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     01.10.2017
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      01.10.2017
+//      Bochkanov Sergey
 ae_bool rmatrixsymvmkl(ae_int_t n,
      double alpha,
      RMatrix * a,
@@ -9380,13 +8772,11 @@ ae_bool rmatrixsymvmkl(ae_int_t n,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool cmatrixgemmmkl(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -9417,13 +8807,11 @@ ae_bool cmatrixgemmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool cmatrixlefttrsmmkl(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -9449,13 +8837,11 @@ ae_bool cmatrixlefttrsmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool cmatrixrighttrsmmkl(ae_int_t m,
      ae_int_t n,
      CMatrix * a,
@@ -9481,13 +8867,11 @@ ae_bool cmatrixrighttrsmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixlefttrsmmkl(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -9513,13 +8897,11 @@ ae_bool rmatrixlefttrsmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixrighttrsmmkl(ae_int_t m,
      ae_int_t n,
      RMatrix * a,
@@ -9545,19 +8927,17 @@ ae_bool rmatrixrighttrsmmkl(ae_int_t m,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE:
-
-if function returned False, CholResult is NOT modified. Not ever referenced!
-if function returned True, CholResult is set to status of Cholesky decomposition
-(True on succeess).
-
-  -- ALGLIB routine --
-     16.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE:
+//
+// if function returned False, CholResult is NOT modified. Not ever referenced!
+// if function returned True, CholResult is set to status of Cholesky decomposition
+// (True on succeess).
+//
+//   -- ALGLIB routine --
+//      16.10.2014
+//      Bochkanov Sergey
 ae_bool spdmatrixcholeskymkl(RMatrix * a,
      ae_int_t offs,
      ae_int_t n,
@@ -9577,13 +8957,11 @@ ae_bool spdmatrixcholeskymkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixplumkl(RMatrix * a,
      ae_int_t offs,
      ae_int_t m,
@@ -9603,16 +8981,14 @@ ae_bool rmatrixplumkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: this function needs preallocated output/temporary arrays.
-      D and E must be at least max(M,N)-wide.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: this function needs preallocated output/temporary arrays.
+//       D and E must be at least max(M,N)-wide.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixbdmkl(RMatrix * a,
      ae_int_t m,
      ae_int_t n,
@@ -9634,16 +9010,14 @@ ae_bool rmatrixbdmkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-If ByQ is True,  TauP is not used (can be empty array).
-If ByQ is False, TauQ is not used (can be empty array).
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// If ByQ is True,  TauP is not used (can be empty array).
+// If ByQ is False, TauQ is not used (can be empty array).
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixbdmultiplybymkl(RMatrix * qp,
      ae_int_t m,
      ae_int_t n,
@@ -9669,15 +9043,13 @@ ae_bool rmatrixbdmultiplybymkl(RMatrix * qp,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Tau must be preallocated array with at least N-1 elements.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Tau must be preallocated array with at least N-1 elements.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixhessenbergmkl(RMatrix * a,
      ae_int_t n,
      RVector * tau,
@@ -9695,15 +9067,13 @@ ae_bool rmatrixhessenbergmkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Q must be preallocated N*N array
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Q must be preallocated N*N array
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixhessenbergunpackqmkl(RMatrix * a,
      ae_int_t n,
      RVector * tau,
@@ -9722,17 +9092,15 @@ ae_bool rmatrixhessenbergunpackqmkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Tau, D, E must be preallocated arrays;
-      length(E)=length(Tau)=N-1 (or larger)
-      length(D)=N (or larger)
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Tau, D, E must be preallocated arrays;
+//       length(E)=length(Tau)=N-1 (or larger)
+//       length(D)=N (or larger)
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool smatrixtdmkl(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
@@ -9753,15 +9121,13 @@ ae_bool smatrixtdmkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Q must be preallocated N*N array
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Q must be preallocated N*N array
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool smatrixtdunpackqmkl(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
@@ -9781,17 +9147,15 @@ ae_bool smatrixtdunpackqmkl(RMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Tau, D, E must be preallocated arrays;
-      length(E)=length(Tau)=N-1 (or larger)
-      length(D)=N (or larger)
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Tau, D, E must be preallocated arrays;
+//       length(E)=length(Tau)=N-1 (or larger)
+//       length(D)=N (or larger)
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool hmatrixtdmkl(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
@@ -9812,15 +9176,13 @@ ae_bool hmatrixtdmkl(CMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-NOTE: Q must be preallocated N*N array
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// NOTE: Q must be preallocated N*N array
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool hmatrixtdunpackqmkl(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
@@ -9840,21 +9202,19 @@ ae_bool hmatrixtdunpackqmkl(CMatrix * a,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-Returns True if MKL was present and handled request (MKL  completion  code
-is returned as separate output parameter).
-
-D and E are pre-allocated arrays with length N (both of them!). On output,
-D constraints singular values, and E is destroyed.
-
-SVDResult is modified if and only if MKL is present.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints singular values, and E is destroyed.
+//
+// SVDResult is modified if and only if MKL is present.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixbdsvdmkl(RVector * d,
      RVector * e,
      ae_int_t n,
@@ -9880,18 +9240,16 @@ ae_bool rmatrixbdsvdmkl(RVector * d,
 }
 
 
-/*************************************************************************
-MKL-based DHSEQR kernel.
-
-Returns True if MKL was present and handled request.
-
-WR and WI are pre-allocated arrays with length N.
-Z is pre-allocated array[N,N].
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based DHSEQR kernel.
+//
+// Returns True if MKL was present and handled request.
+//
+// WR and WI are pre-allocated arrays with length N.
+// Z is pre-allocated array[N,N].
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixinternalschurdecompositionmkl(RMatrix * h,
      ae_int_t n,
      ae_int_t tneeded,
@@ -9914,20 +9272,18 @@ ae_bool rmatrixinternalschurdecompositionmkl(RMatrix * h,
 }
 
 
-/*************************************************************************
-MKL-based DTREVC kernel.
-
-Returns True if MKL was present and handled request.
-
-NOTE: this function does NOT support HOWMNY=3!!!!
-
-VL and VR are pre-allocated arrays with length N*N, if required. If particalar
-variables is not required, it can be dummy (empty) array.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based DTREVC kernel.
+//
+// Returns True if MKL was present and handled request.
+//
+// NOTE: this function does NOT support HOWMNY=3!!!!
+//
+// VL and VR are pre-allocated arrays with length N*N, if required. If particalar
+// variables is not required, it can be dummy (empty) array.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool rmatrixinternaltrevcmkl(RMatrix * t,
      ae_int_t n,
      ae_int_t side,
@@ -9950,23 +9306,21 @@ ae_bool rmatrixinternaltrevcmkl(RMatrix * t,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-Returns True if MKL was present and handled request (MKL  completion  code
-is returned as separate output parameter).
-
-D and E are pre-allocated arrays with length N (both of them!). On output,
-D constraints eigenvalues, and E is destroyed.
-
-Z is preallocated array[N,N] for ZNeeded<>0; ignored for ZNeeded=0.
-
-EVDResult is modified if and only if MKL is present.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints eigenvalues, and E is destroyed.
+//
+// Z is preallocated array[N,N] for ZNeeded<>0; ignored for ZNeeded=0.
+//
+// EVDResult is modified if and only if MKL is present.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool smatrixtdevdmkl(RVector * d,
      RVector * e,
      ae_int_t n,
@@ -9987,23 +9341,21 @@ ae_bool smatrixtdevdmkl(RVector * d,
 }
 
 
-/*************************************************************************
-MKL-based kernel.
-
-Returns True if MKL was present and handled request (MKL  completion  code
-is returned as separate output parameter).
-
-D and E are pre-allocated arrays with length N (both of them!). On output,
-D constraints eigenvalues, and E is destroyed.
-
-Z is preallocated array[N,N] for ZNeeded<>0; ignored for ZNeeded=0.
-
-EVDResult is modified if and only if MKL is present.
-
-  -- ALGLIB routine --
-     20.10.2014
-     Bochkanov Sergey
-*************************************************************************/
+// MKL-based kernel.
+//
+// Returns True if MKL was present and handled request (MKL  completion  code
+// is returned as separate output parameter).
+//
+// D and E are pre-allocated arrays with length N (both of them!). On output,
+// D constraints eigenvalues, and E is destroyed.
+//
+// Z is preallocated array[N,N] for ZNeeded<>0; ignored for ZNeeded=0.
+//
+// EVDResult is modified if and only if MKL is present.
+//
+//   -- ALGLIB routine --
+//      20.10.2014
+//      Bochkanov Sergey
 ae_bool sparsegemvcrsmkl(ae_int_t opa,
      ae_int_t arows,
      ae_int_t acols,
@@ -10138,35 +9490,33 @@ ae_int_t getlptestserializationcode(ae_state *_state)
 #if defined(AE_COMPILE_TSORT) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-This function sorts array of real keys by ascending.
-
-Its results are:
-* sorted array A
-* permutation tables P1, P2
-
-Algorithm outputs permutation tables using two formats:
-* as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
-  value which was moved there from J-th position.
-* as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
-  swaping A[i] and A[P2[i]] for all i from 0 to N-1.
-
-INPUT PARAMETERS:
-    A       -   unsorted array
-    N       -   array size
-
-OUPUT PARAMETERS:
-    A       -   sorted array
-    P1, P2  -   permutation tables, array[N]
-
-NOTES:
-    this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-
-  -- ALGLIB --
-     Copyright 14.05.2008 by Bochkanov Sergey
-*************************************************************************/
+// This function sorts array of real keys by ascending.
+//
+// Its results are:
+// * sorted array A
+// * permutation tables P1, P2
+//
+// Algorithm outputs permutation tables using two formats:
+// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
+//   value which was moved there from J-th position.
+// * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
+//   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
+//
+// INPUT PARAMETERS:
+//     A       -   unsorted array
+//     N       -   array size
+//
+// OUPUT PARAMETERS:
+//     A       -   sorted array
+//     P1, P2  -   permutation tables, array[N]
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+//
+//   -- ALGLIB --
+//      Copyright 14.05.2008 by Bochkanov Sergey
 void tagsort(RVector * a,
      ae_int_t n,
      ZVector * p1,
@@ -10187,18 +9537,16 @@ void tagsort(RVector * a,
 }
 
 
-/*************************************************************************
-Buffered variant of TagSort, which accepts preallocated output arrays as
-well as special structure for buffered allocations. If arrays are too
-short, they are reallocated. If they are large enough, no memory
-allocation is done.
-
-It is intended to be used in the performance-critical parts of code, where
-additional allocations can lead to severe performance degradation
-
-  -- ALGLIB --
-     Copyright 14.05.2008 by Bochkanov Sergey
-*************************************************************************/
+// Buffered variant of TagSort, which accepts preallocated output arrays as
+// well as special structure for buffered allocations. If arrays are too
+// short, they are reallocated. If they are large enough, no memory
+// allocation is done.
+//
+// It is intended to be used in the performance-critical parts of code, where
+// additional allocations can lead to severe performance degradation
+//
+//   -- ALGLIB --
+//      Copyright 14.05.2008 by Bochkanov Sergey
 void tagsortbuf(RVector * a,
      ae_int_t n,
      ZVector * p1,
@@ -10214,9 +9562,7 @@ void tagsortbuf(RVector * a,
 
 
 
-    /*
-     * Special cases
-     */
+    // Special cases
     if( n<=0 )
     {
         return;
@@ -10230,34 +9576,28 @@ void tagsortbuf(RVector * a,
         return;
     }
 
-    /*
-     * General case, N>1: prepare permutations table P1
-     */
+    // General case, N>1: prepare permutations table P1
     ivectorsetlengthatleast(p1, n, _state);
     for(i=0; i<=n-1; i++)
     {
         p1->ptr.p_int[i] = i;
     }
 
-    /*
-     * General case, N>1: sort, update P1
-     */
+    // General case, N>1: sort, update P1
     rvectorsetlengthatleast(&buf->ra0, n, _state);
     ivectorsetlengthatleast(&buf->ia0, n, _state);
     tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n, _state);
 
-    /*
-     * General case, N>1: fill permutations table P2
-     *
-     * To fill P2 we maintain two arrays:
-     * * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
-     * * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
-     *
-     * At each step we making permutation of two items:
-     *   Left, which is given by position/value pair LP/LV
-     *   and Right, which is given by RP/RV
-     * and updating PV[] and VP[] correspondingly.
-     */
+    // General case, N>1: fill permutations table P2
+    //
+    // To fill P2 we maintain two arrays:
+    // * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
+    // * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
+    //
+    // At each step we making permutation of two items:
+    //   Left, which is given by position/value pair LP/LV
+    //   and Right, which is given by RP/RV
+    // and updating PV[] and VP[] correspondingly.
     ivectorsetlengthatleast(&buf->ia0, n, _state);
     ivectorsetlengthatleast(&buf->ia1, n, _state);
     ivectorsetlengthatleast(p2, n, _state);
@@ -10269,22 +9609,16 @@ void tagsortbuf(RVector * a,
     for(i=0; i<=n-1; i++)
     {
 
-        /*
-         * calculate LP, LV, RP, RV
-         */
+        // calculate LP, LV, RP, RV
         lp = i;
         lv = buf->ia1.ptr.p_int[lp];
         rv = p1->ptr.p_int[i];
         rp = buf->ia0.ptr.p_int[rv];
 
-        /*
-         * Fill P2
-         */
+        // Fill P2
         p2->ptr.p_int[i] = rp;
 
-        /*
-         * update PV and VP
-         */
+        // update PV and VP
         buf->ia1.ptr.p_int[lp] = rv;
         buf->ia1.ptr.p_int[rp] = lv;
         buf->ia0.ptr.p_int[lv] = rp;
@@ -10293,22 +9627,20 @@ void tagsortbuf(RVector * a,
 }
 
 
-/*************************************************************************
-Same as TagSort, but optimized for real keys and integer labels.
-
-A is sorted, and same permutations are applied to B.
-
-NOTES:
-1.  this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-2.  this function uses two buffers, BufA and BufB, each is N elements large.
-    They may be preallocated (which will save some time) or not, in which
-    case function will automatically allocate memory.
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Same as TagSort, but optimized for real keys and integer labels.
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
+//     They may be preallocated (which will save some time) or not, in which
+//     case function will automatically allocate memory.
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void tagsortfasti(RVector * a,
      ZVector * b,
      RVector * bufa,
@@ -10325,17 +9657,13 @@ void tagsortfasti(RVector * a,
 
 
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * Test for already sorted set
-     */
+    // Test for already sorted set
     isascending = ae_true;
     isdescending = ae_true;
     for(i=1; i<=n-1; i++)
@@ -10366,9 +9694,7 @@ void tagsortfasti(RVector * a,
         return;
     }
 
-    /*
-     * General case
-     */
+    // General case
     if( bufa->cnt<n )
     {
         ae_vector_set_length(bufa, n, _state);
@@ -10381,22 +9707,20 @@ void tagsortfasti(RVector * a,
 }
 
 
-/*************************************************************************
-Same as TagSort, but optimized for real keys and real labels.
-
-A is sorted, and same permutations are applied to B.
-
-NOTES:
-1.  this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-2.  this function uses two buffers, BufA and BufB, each is N elements large.
-    They may be preallocated (which will save some time) or not, in which
-    case function will automatically allocate memory.
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Same as TagSort, but optimized for real keys and real labels.
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses two buffers, BufA and BufB, each is N elements large.
+//     They may be preallocated (which will save some time) or not, in which
+//     case function will automatically allocate memory.
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void tagsortfastr(RVector * a,
      RVector * b,
      RVector * bufa,
@@ -10412,17 +9736,13 @@ void tagsortfastr(RVector * a,
 
 
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * Test for already sorted set
-     */
+    // Test for already sorted set
     isascending = ae_true;
     isdescending = ae_true;
     for(i=1; i<=n-1; i++)
@@ -10453,9 +9773,7 @@ void tagsortfastr(RVector * a,
         return;
     }
 
-    /*
-     * General case
-     */
+    // General case
     if( bufa->cnt<n )
     {
         ae_vector_set_length(bufa, n, _state);
@@ -10468,22 +9786,20 @@ void tagsortfastr(RVector * a,
 }
 
 
-/*************************************************************************
-Same as TagSort, but optimized for real keys without labels.
-
-A is sorted, and that's all.
-
-NOTES:
-1.  this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-2.  this function uses buffer, BufA, which is N elements large. It may be
-    preallocated (which will save some time) or not, in which case
-    function will automatically allocate memory.
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Same as TagSort, but optimized for real keys without labels.
+//
+// A is sorted, and that's all.
+//
+// NOTES:
+// 1.  this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// 2.  this function uses buffer, BufA, which is N elements large. It may be
+//     preallocated (which will save some time) or not, in which case
+//     function will automatically allocate memory.
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void tagsortfast(RVector * a,
      RVector * bufa,
      ae_int_t n,
@@ -10497,17 +9813,13 @@ void tagsortfast(RVector * a,
 
 
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * Test for already sorted set
-     */
+    // Test for already sorted set
     isascending = ae_true;
     isdescending = ae_true;
     for(i=1; i<=n-1; i++)
@@ -10535,9 +9847,7 @@ void tagsortfast(RVector * a,
         return;
     }
 
-    /*
-     * General case
-     */
+    // General case
     if( bufa->cnt<n )
     {
         ae_vector_set_length(bufa, n, _state);
@@ -10546,20 +9856,18 @@ void tagsortfast(RVector * a,
 }
 
 
-/*************************************************************************
-Sorting function optimized for integer keys and real labels, can be used
-to sort middle of the array
-
-A is sorted, and same permutations are applied to B.
-
-NOTES:
-    this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Sorting function optimized for integer keys and real labels, can be used
+// to sort middle of the array
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void tagsortmiddleir(ZVector * a,
      RVector * b,
      ae_int_t offset,
@@ -10580,17 +9888,13 @@ void tagsortmiddleir(ZVector * a,
 
 
 
-    /*
-     * Special cases
-     */
+    // Special cases
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * General case, N>1: sort, update B
-     */
+    // General case, N>1: sort, update B
     for(i=2; i<=n; i++)
     {
         t = i;
@@ -10660,20 +9964,18 @@ void tagsortmiddleir(ZVector * a,
 }
 
 
-/*************************************************************************
-Sorting function optimized for integer keys and real labels, can be used
-to sort middle of the array
-
-A is sorted, and same permutations are applied to B.
-
-NOTES:
-    this function assumes that A[] is finite; it doesn't checks that
-    condition. All other conditions (size of input arrays, etc.) are not
-    checked too.
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Sorting function optimized for integer keys and real labels, can be used
+// to sort middle of the array
+//
+// A is sorted, and same permutations are applied to B.
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void tagsortmiddlei(ZVector * a,
      ae_int_t offset,
      ae_int_t n,
@@ -10691,17 +9993,13 @@ void tagsortmiddlei(ZVector * a,
 
 
 
-    /*
-     * Special cases
-     */
+    // Special cases
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * General case, N>1: sort, update B
-     */
+    // General case, N>1: sort, update B
     for(i=2; i<=n; i++)
     {
         t = i;
@@ -10762,13 +10060,11 @@ void tagsortmiddlei(ZVector * a,
 }
 
 
-/*************************************************************************
-Sorting function optimized for integer values (only keys, no labels),  can
-be used to sort middle of the array
-
-  -- ALGLIB --
-     Copyright 11.12.2008 by Bochkanov Sergey
-*************************************************************************/
+// Sorting function optimized for integer values (only keys, no labels),  can
+// be used to sort middle of the array
+//
+//   -- ALGLIB --
+//      Copyright 11.12.2008 by Bochkanov Sergey
 void sortmiddlei(ZVector * a,
      ae_int_t offset,
      ae_int_t n,
@@ -10786,17 +10082,13 @@ void sortmiddlei(ZVector * a,
 
 
 
-    /*
-     * Special cases
-     */
+    // Special cases
     if( n<=1 )
     {
         return;
     }
 
-    /*
-     * General case, N>1: sort, update B
-     */
+    // General case, N>1: sort, update B
     for(i=2; i<=n; i++)
     {
         t = i;
@@ -10857,21 +10149,19 @@ void sortmiddlei(ZVector * a,
 }
 
 
-/*************************************************************************
-Heap operations: adds element to the heap
-
-PARAMETERS:
-    A       -   heap itself, must be at least array[0..N]
-    B       -   array of integer tags, which are updated according to
-                permutations in the heap
-    N       -   size of the heap (without new element).
-                updated on output
-    VA      -   value of the element being added
-    VB      -   value of the tag
-
-  -- ALGLIB --
-     Copyright 28.02.2010 by Bochkanov Sergey
-*************************************************************************/
+// Heap operations: adds element to the heap
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap (without new element).
+//                 updated on output
+//     VA      -   value of the element being added
+//     VB      -   value of the tag
+//
+//   -- ALGLIB --
+//      Copyright 28.02.2010 by Bochkanov Sergey
 void tagheappushi(RVector * a,
      ZVector * b,
      ae_int_t* n,
@@ -10889,9 +10179,7 @@ void tagheappushi(RVector * a,
         return;
     }
 
-    /*
-     * N=0 is a special case
-     */
+    // N=0 is a special case
     if( *n==0 )
     {
         a->ptr.p_double[0] = va;
@@ -10900,14 +10188,12 @@ void tagheappushi(RVector * a,
         return;
     }
 
-    /*
-     * add current point to the heap
-     * (add to the bottom, then move up)
-     *
-     * we don't write point to the heap
-     * until its final position is determined
-     * (it allow us to reduce number of array access operations)
-     */
+    // add current point to the heap
+    // (add to the bottom, then move up)
+    //
+    // we don't write point to the heap
+    // until its final position is determined
+    // (it allow us to reduce number of array access operations)
     j = *n;
     *n = *n+1;
     while(j>0)
@@ -10917,9 +10203,7 @@ void tagheappushi(RVector * a,
         if( v<va )
         {
 
-            /*
-             * swap with higher element
-             */
+            // swap with higher element
             a->ptr.p_double[j] = v;
             b->ptr.p_int[j] = b->ptr.p_int[k];
             j = k;
@@ -10927,9 +10211,7 @@ void tagheappushi(RVector * a,
         else
         {
 
-            /*
-             * element in its place. terminate.
-             */
+            // element in its place. terminate.
             break;
         }
     }
@@ -10938,21 +10220,19 @@ void tagheappushi(RVector * a,
 }
 
 
-/*************************************************************************
-Heap operations: replaces top element with new element
-(which is moved down)
-
-PARAMETERS:
-    A       -   heap itself, must be at least array[0..N-1]
-    B       -   array of integer tags, which are updated according to
-                permutations in the heap
-    N       -   size of the heap
-    VA      -   value of the element which replaces top element
-    VB      -   value of the tag
-
-  -- ALGLIB --
-     Copyright 28.02.2010 by Bochkanov Sergey
-*************************************************************************/
+// Heap operations: replaces top element with new element
+// (which is moved down)
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap
+//     VA      -   value of the element which replaces top element
+//     VB      -   value of the tag
+//
+//   -- ALGLIB --
+//      Copyright 28.02.2010 by Bochkanov Sergey
 void tagheapreplacetopi(RVector * a,
      ZVector * b,
      ae_int_t n,
@@ -10973,9 +10253,7 @@ void tagheapreplacetopi(RVector * a,
         return;
     }
 
-    /*
-     * N=1 is a special case
-     */
+    // N=1 is a special case
     if( n==1 )
     {
         a->ptr.p_double[0] = va;
@@ -10983,16 +10261,14 @@ void tagheapreplacetopi(RVector * a,
         return;
     }
 
-    /*
-     * move down through heap:
-     * * J  -   current element
-     * * K1 -   first child (always exists)
-     * * K2 -   second child (may not exists)
-     *
-     * we don't write point to the heap
-     * until its final position is determined
-     * (it allow us to reduce number of array access operations)
-     */
+    // move down through heap:
+    // * J  -   current element
+    // * K1 -   first child (always exists)
+    // * K2 -   second child (may not exists)
+    //
+    // we don't write point to the heap
+    // until its final position is determined
+    // (it allow us to reduce number of array access operations)
     j = 0;
     k1 = 1;
     k2 = 2;
@@ -11001,12 +10277,10 @@ void tagheapreplacetopi(RVector * a,
         if( k2>=n )
         {
 
-            /*
-             * only one child.
-             *
-             * swap and terminate (because this child
-             * have no siblings due to heap structure)
-             */
+            // only one child.
+            //
+            // swap and terminate (because this child
+            // have no siblings due to heap structure)
             v = a->ptr.p_double[k1];
             if( v>va )
             {
@@ -11019,9 +10293,7 @@ void tagheapreplacetopi(RVector * a,
         else
         {
 
-            /*
-             * two childs
-             */
+            // two childs
             v1 = a->ptr.p_double[k1];
             v2 = a->ptr.p_double[k2];
             if( v1>v2 )
@@ -11059,21 +10331,19 @@ void tagheapreplacetopi(RVector * a,
 }
 
 
-/*************************************************************************
-Heap operations: pops top element from the heap
-
-PARAMETERS:
-    A       -   heap itself, must be at least array[0..N-1]
-    B       -   array of integer tags, which are updated according to
-                permutations in the heap
-    N       -   size of the heap, N>=1
-
-On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
-decreased by 1.
-
-  -- ALGLIB --
-     Copyright 28.02.2010 by Bochkanov Sergey
-*************************************************************************/
+// Heap operations: pops top element from the heap
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap, N>=1
+//
+// On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
+// decreased by 1.
+//
+//   -- ALGLIB --
+//      Copyright 28.02.2010 by Bochkanov Sergey
 void tagheappopi(RVector * a,
      ZVector * b,
      ae_int_t* n,
@@ -11088,19 +10358,15 @@ void tagheappopi(RVector * a,
         return;
     }
 
-    /*
-     * N=1 is a special case
-     */
+    // N=1 is a special case
     if( *n==1 )
     {
         *n = 0;
         return;
     }
 
-    /*
-     * swap top element and last element,
-     * then reorder heap
-     */
+    // swap top element and last element,
+    // then reorder heap
     va = a->ptr.p_double[*n-1];
     vb = b->ptr.p_int[*n-1];
     a->ptr.p_double[*n-1] = a->ptr.p_double[0];
@@ -11110,18 +10376,16 @@ void tagheappopi(RVector * a,
 }
 
 
-/*************************************************************************
-Search first element less than T in sorted array.
-
-PARAMETERS:
-    A - sorted array by ascending from 0 to N-1
-    N - number of elements in array
-    T - the desired element
-
-RESULT:
-    The very first element's index, which isn't less than T.
-In the case when there aren't such elements, returns N.
-*************************************************************************/
+// Search first element less than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+// RESULT:
+//     The very first element's index, which isn't less than T.
+// In the case when there aren't such elements, returns N.
 ae_int_t lowerbound(RVector * a,
      ae_int_t n,
      double t,
@@ -11155,18 +10419,16 @@ ae_int_t lowerbound(RVector * a,
 }
 
 
-/*************************************************************************
-Search first element more than T in sorted array.
-
-PARAMETERS:
-    A - sorted array by ascending from 0 to N-1
-    N - number of elements in array
-    T - the desired element
-
-    RESULT:
-    The very first element's index, which more than T.
-In the case when there aren't such elements, returns N.
-*************************************************************************/
+// Search first element more than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+//     RESULT:
+//     The very first element's index, which more than T.
+// In the case when there aren't such elements, returns N.
 ae_int_t upperbound(RVector * a,
      ae_int_t n,
      double t,
@@ -11200,13 +10462,11 @@ ae_int_t upperbound(RVector * a,
 }
 
 
-/*************************************************************************
-Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
-applies same permutations to B.
-
-  -- ALGLIB --
-     Copyright 06.09.2010 by Bochkanov Sergey
-*************************************************************************/
+// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2010 by Bochkanov Sergey
 static void tsort_tagsortfastirec(RVector * a,
      ZVector * b,
      RVector * bufa,
@@ -11230,28 +10490,22 @@ static void tsort_tagsortfastirec(RVector * a,
 
 
 
-    /*
-     * Fast exit
-     */
+    // Fast exit
     if( i2<=i1 )
     {
         return;
     }
 
-    /*
-     * Non-recursive sort for small arrays
-     */
+    // Non-recursive sort for small arrays
     if( i2-i1<=16 )
     {
         for(j=i1+1; j<=i2; j++)
         {
 
-            /*
-             * Search elements [I1..J-1] for place to insert Jth element.
-             *
-             * This code stops immediately if we can leave A[J] at J-th position
-             * (all elements have same value of A[J] larger than any of them)
-             */
+            // Search elements [I1..J-1] for place to insert Jth element.
+            //
+            // This code stops immediately if we can leave A[J] at J-th position
+            // (all elements have same value of A[J] larger than any of them)
             tmpr = a->ptr.p_double[j];
             tmpi = j;
             for(k=j-1; k>=i1; k--)
@@ -11264,9 +10518,7 @@ static void tsort_tagsortfastirec(RVector * a,
             }
             k = tmpi;
 
-            /*
-             * Insert Jth element into Kth position
-             */
+            // Insert Jth element into Kth position
             if( k!=j )
             {
                 tmpr = a->ptr.p_double[j];
@@ -11283,10 +10535,8 @@ static void tsort_tagsortfastirec(RVector * a,
         return;
     }
 
-    /*
-     * Quicksort: choose pivot
-     * Here we assume that I2-I1>=2
-     */
+    // Quicksort: choose pivot
+    // Here we assume that I2-I1>=2
     v0 = a->ptr.p_double[i1];
     v1 = a->ptr.p_double[i1+(i2-i1)/2];
     v2 = a->ptr.p_double[i2];
@@ -11310,14 +10560,12 @@ static void tsort_tagsortfastirec(RVector * a,
     }
     vp = v1;
 
-    /*
-     * now pass through A/B and:
-     * * move elements that are LESS than VP to the left of A/B
-     * * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-     * * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-     * * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-     * * move elements from the left of BufA/BufB to the end of A/B
-     */
+    // now pass through A/B and:
+    // * move elements that are LESS than VP to the left of A/B
+    // * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+    // * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+    // * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+    // * move elements from the left of BufA/BufB to the end of A/B
     cntless = 0;
     cnteq = 0;
     cntgreater = 0;
@@ -11327,9 +10575,7 @@ static void tsort_tagsortfastirec(RVector * a,
         if( v0<vp )
         {
 
-            /*
-             * LESS
-             */
+            // LESS
             k = i1+cntless;
             if( i!=k )
             {
@@ -11342,9 +10588,7 @@ static void tsort_tagsortfastirec(RVector * a,
         if( v0==vp )
         {
 
-            /*
-             * EQUAL
-             */
+            // EQUAL
             k = i2-cnteq;
             bufa->ptr.p_double[k] = v0;
             bufb->ptr.p_int[k] = b->ptr.p_int[i];
@@ -11352,9 +10596,7 @@ static void tsort_tagsortfastirec(RVector * a,
             continue;
         }
 
-        /*
-         * GREATER
-         */
+        // GREATER
         k = i1+cntgreater;
         bufa->ptr.p_double[k] = v0;
         bufb->ptr.p_int[k] = b->ptr.p_int[i];
@@ -11375,21 +10617,17 @@ static void tsort_tagsortfastirec(RVector * a,
         b->ptr.p_int[j] = bufb->ptr.p_int[k];
     }
 
-    /*
-     * Sort left and right parts of the array (ignoring middle part)
-     */
+    // Sort left and right parts of the array (ignoring middle part)
     tsort_tagsortfastirec(a, b, bufa, bufb, i1, i1+cntless-1, _state);
     tsort_tagsortfastirec(a, b, bufa, bufb, i1+cntless+cnteq, i2, _state);
 }
 
 
-/*************************************************************************
-Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
-applies same permutations to B.
-
-  -- ALGLIB --
-     Copyright 06.09.2010 by Bochkanov Sergey
-*************************************************************************/
+// Internal TagSortFastR: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2010 by Bochkanov Sergey
 static void tsort_tagsortfastrrec(RVector * a,
      RVector * b,
      RVector * bufa,
@@ -11414,28 +10652,22 @@ static void tsort_tagsortfastrrec(RVector * a,
 
 
 
-    /*
-     * Fast exit
-     */
+    // Fast exit
     if( i2<=i1 )
     {
         return;
     }
 
-    /*
-     * Non-recursive sort for small arrays
-     */
+    // Non-recursive sort for small arrays
     if( i2-i1<=16 )
     {
         for(j=i1+1; j<=i2; j++)
         {
 
-            /*
-             * Search elements [I1..J-1] for place to insert Jth element.
-             *
-             * This code stops immediatly if we can leave A[J] at J-th position
-             * (all elements have same value of A[J] larger than any of them)
-             */
+            // Search elements [I1..J-1] for place to insert Jth element.
+            //
+            // This code stops immediatly if we can leave A[J] at J-th position
+            // (all elements have same value of A[J] larger than any of them)
             tmpr = a->ptr.p_double[j];
             tmpi = j;
             for(k=j-1; k>=i1; k--)
@@ -11448,9 +10680,7 @@ static void tsort_tagsortfastrrec(RVector * a,
             }
             k = tmpi;
 
-            /*
-             * Insert Jth element into Kth position
-             */
+            // Insert Jth element into Kth position
             if( k!=j )
             {
                 tmpr = a->ptr.p_double[j];
@@ -11467,10 +10697,8 @@ static void tsort_tagsortfastrrec(RVector * a,
         return;
     }
 
-    /*
-     * Quicksort: choose pivot
-     * Here we assume that I2-I1>=16
-     */
+    // Quicksort: choose pivot
+    // Here we assume that I2-I1>=16
     v0 = a->ptr.p_double[i1];
     v1 = a->ptr.p_double[i1+(i2-i1)/2];
     v2 = a->ptr.p_double[i2];
@@ -11494,14 +10722,12 @@ static void tsort_tagsortfastrrec(RVector * a,
     }
     vp = v1;
 
-    /*
-     * now pass through A/B and:
-     * * move elements that are LESS than VP to the left of A/B
-     * * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-     * * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-     * * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-     * * move elements from the left of BufA/BufB to the end of A/B
-     */
+    // now pass through A/B and:
+    // * move elements that are LESS than VP to the left of A/B
+    // * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+    // * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+    // * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+    // * move elements from the left of BufA/BufB to the end of A/B
     cntless = 0;
     cnteq = 0;
     cntgreater = 0;
@@ -11511,9 +10737,7 @@ static void tsort_tagsortfastrrec(RVector * a,
         if( v0<vp )
         {
 
-            /*
-             * LESS
-             */
+            // LESS
             k = i1+cntless;
             if( i!=k )
             {
@@ -11526,9 +10750,7 @@ static void tsort_tagsortfastrrec(RVector * a,
         if( v0==vp )
         {
 
-            /*
-             * EQUAL
-             */
+            // EQUAL
             k = i2-cnteq;
             bufa->ptr.p_double[k] = v0;
             bufb->ptr.p_double[k] = b->ptr.p_double[i];
@@ -11536,9 +10758,7 @@ static void tsort_tagsortfastrrec(RVector * a,
             continue;
         }
 
-        /*
-         * GREATER
-         */
+        // GREATER
         k = i1+cntgreater;
         bufa->ptr.p_double[k] = v0;
         bufb->ptr.p_double[k] = b->ptr.p_double[i];
@@ -11559,21 +10779,17 @@ static void tsort_tagsortfastrrec(RVector * a,
         b->ptr.p_double[j] = bufb->ptr.p_double[k];
     }
 
-    /*
-     * Sort left and right parts of the array (ignoring middle part)
-     */
+    // Sort left and right parts of the array (ignoring middle part)
     tsort_tagsortfastrrec(a, b, bufa, bufb, i1, i1+cntless-1, _state);
     tsort_tagsortfastrrec(a, b, bufa, bufb, i1+cntless+cnteq, i2, _state);
 }
 
 
-/*************************************************************************
-Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
-applies same permutations to B.
-
-  -- ALGLIB --
-     Copyright 06.09.2010 by Bochkanov Sergey
-*************************************************************************/
+// Internal TagSortFastI: sorts A[I1...I2] (both bounds are included),
+// applies same permutations to B.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2010 by Bochkanov Sergey
 static void tsort_tagsortfastrec(RVector * a,
      RVector * bufa,
      ae_int_t i1,
@@ -11595,28 +10811,22 @@ static void tsort_tagsortfastrec(RVector * a,
 
 
 
-    /*
-     * Fast exit
-     */
+    // Fast exit
     if( i2<=i1 )
     {
         return;
     }
 
-    /*
-     * Non-recursive sort for small arrays
-     */
+    // Non-recursive sort for small arrays
     if( i2-i1<=16 )
     {
         for(j=i1+1; j<=i2; j++)
         {
 
-            /*
-             * Search elements [I1..J-1] for place to insert Jth element.
-             *
-             * This code stops immediatly if we can leave A[J] at J-th position
-             * (all elements have same value of A[J] larger than any of them)
-             */
+            // Search elements [I1..J-1] for place to insert Jth element.
+            //
+            // This code stops immediatly if we can leave A[J] at J-th position
+            // (all elements have same value of A[J] larger than any of them)
             tmpr = a->ptr.p_double[j];
             tmpi = j;
             for(k=j-1; k>=i1; k--)
@@ -11629,9 +10839,7 @@ static void tsort_tagsortfastrec(RVector * a,
             }
             k = tmpi;
 
-            /*
-             * Insert Jth element into Kth position
-             */
+            // Insert Jth element into Kth position
             if( k!=j )
             {
                 tmpr = a->ptr.p_double[j];
@@ -11645,10 +10853,8 @@ static void tsort_tagsortfastrec(RVector * a,
         return;
     }
 
-    /*
-     * Quicksort: choose pivot
-     * Here we assume that I2-I1>=16
-     */
+    // Quicksort: choose pivot
+    // Here we assume that I2-I1>=16
     v0 = a->ptr.p_double[i1];
     v1 = a->ptr.p_double[i1+(i2-i1)/2];
     v2 = a->ptr.p_double[i2];
@@ -11672,14 +10878,12 @@ static void tsort_tagsortfastrec(RVector * a,
     }
     vp = v1;
 
-    /*
-     * now pass through A/B and:
-     * * move elements that are LESS than VP to the left of A/B
-     * * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
-     * * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
-     * * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
-     * * move elements from the left of BufA/BufB to the end of A/B
-     */
+    // now pass through A/B and:
+    // * move elements that are LESS than VP to the left of A/B
+    // * move elements that are EQUAL to VP to the right of BufA/BufB (in the reverse order)
+    // * move elements that are GREATER than VP to the left of BufA/BufB (in the normal order
+    // * move elements from the tail of BufA/BufB to the middle of A/B (restoring normal order)
+    // * move elements from the left of BufA/BufB to the end of A/B
     cntless = 0;
     cnteq = 0;
     cntgreater = 0;
@@ -11689,9 +10893,7 @@ static void tsort_tagsortfastrec(RVector * a,
         if( v0<vp )
         {
 
-            /*
-             * LESS
-             */
+            // LESS
             k = i1+cntless;
             if( i!=k )
             {
@@ -11703,18 +10905,14 @@ static void tsort_tagsortfastrec(RVector * a,
         if( v0==vp )
         {
 
-            /*
-             * EQUAL
-             */
+            // EQUAL
             k = i2-cnteq;
             bufa->ptr.p_double[k] = v0;
             cnteq = cnteq+1;
             continue;
         }
 
-        /*
-         * GREATER
-         */
+        // GREATER
         k = i1+cntgreater;
         bufa->ptr.p_double[k] = v0;
         cntgreater = cntgreater+1;
@@ -11732,9 +10930,7 @@ static void tsort_tagsortfastrec(RVector * a,
         a->ptr.p_double[j] = bufa->ptr.p_double[k];
     }
 
-    /*
-     * Sort left and right parts of the array (ignoring middle part)
-     */
+    // Sort left and right parts of the array (ignoring middle part)
     tsort_tagsortfastrec(a, bufa, i1, i1+cntless-1, _state);
     tsort_tagsortfastrec(a, bufa, i1+cntless+cnteq, i2, _state);
 }
@@ -12006,9 +11202,7 @@ void matrixvectormultiply(RMatrix * a,
     if( !trans )
     {
 
-        /*
-         * y := alpha*A*x + beta*y;
-         */
+        // y := alpha*A*x + beta*y;
         if( i1>i2||j1>j2 )
         {
             return;
@@ -12016,9 +11210,7 @@ void matrixvectormultiply(RMatrix * a,
         ae_assert(j2-j1==ix2-ix1, "MatrixVectorMultiply: A and X dont match!", _state);
         ae_assert(i2-i1==iy2-iy1, "MatrixVectorMultiply: A and Y dont match!", _state);
 
-        /*
-         * beta*y
-         */
+        // beta*y
         if( ae_fp_eq(beta,(double)(0)) )
         {
             for(i=iy1; i<=iy2; i++)
@@ -12031,9 +11223,7 @@ void matrixvectormultiply(RMatrix * a,
             ae_v_muld(&y->ptr.p_double[iy1], 1, ae_v_len(iy1,iy2), beta);
         }
 
-        /*
-         * alpha*A*x
-         */
+        // alpha*A*x
         for(i=i1; i<=i2; i++)
         {
             v = ae_v_dotproduct(&a->ptr.pp_double[i][j1], 1, &x->ptr.p_double[ix1], 1, ae_v_len(j1,j2));
@@ -12043,9 +11233,7 @@ void matrixvectormultiply(RMatrix * a,
     else
     {
 
-        /*
-         * y := alpha*A'*x + beta*y;
-         */
+        // y := alpha*A'*x + beta*y;
         if( i1>i2||j1>j2 )
         {
             return;
@@ -12053,9 +11241,7 @@ void matrixvectormultiply(RMatrix * a,
         ae_assert(i2-i1==ix2-ix1, "MatrixVectorMultiply: A and X dont match!", _state);
         ae_assert(j2-j1==iy2-iy1, "MatrixVectorMultiply: A and Y dont match!", _state);
 
-        /*
-         * beta*y
-         */
+        // beta*y
         if( ae_fp_eq(beta,(double)(0)) )
         {
             for(i=iy1; i<=iy2; i++)
@@ -12068,9 +11254,7 @@ void matrixvectormultiply(RMatrix * a,
             ae_v_muld(&y->ptr.p_double[iy1], 1, ae_v_len(iy1,iy2), beta);
         }
 
-        /*
-         * alpha*A'*x
-         */
+        // alpha*A'*x
         for(i=i1; i<=i2; i++)
         {
             v = alpha*x->ptr.p_double[ix1+i-i1];
@@ -12141,9 +11325,7 @@ void matrixmatrixmultiply(RMatrix * a,
 
 
 
-    /*
-     * Setup
-     */
+    // Setup
     if( !transa )
     {
         arows = ai2-ai1+1;
@@ -12171,18 +11353,14 @@ void matrixmatrixmultiply(RMatrix * a,
     }
     crows = arows;
 
-    /*
-     * Test WORK
-     */
+    // Test WORK
     i = ae_maxint(arows, acols, _state);
     i = ae_maxint(brows, i, _state);
     i = ae_maxint(i, bcols, _state);
     work->ptr.p_double[1] = (double)(0);
     work->ptr.p_double[i] = (double)(0);
 
-    /*
-     * Prepare C
-     */
+    // Prepare C
     if( ae_fp_eq(beta,(double)(0)) )
     {
         for(i=ci1; i<=ci2; i++)
@@ -12201,9 +11379,7 @@ void matrixmatrixmultiply(RMatrix * a,
         }
     }
 
-    /*
-     * A*B
-     */
+    // A*B
     if( !transa&&!transb )
     {
         for(l=ai1; l<=ai2; l++)
@@ -12218,9 +11394,7 @@ void matrixmatrixmultiply(RMatrix * a,
         return;
     }
 
-    /*
-     * A*B'
-     */
+    // A*B'
     if( !transa&&transb )
     {
         if( arows*acols<brows*bcols )
@@ -12249,9 +11423,7 @@ void matrixmatrixmultiply(RMatrix * a,
         }
     }
 
-    /*
-     * A'*B
-     */
+    // A'*B
     if( transa&&!transb )
     {
         for(l=aj1; l<=aj2; l++)
@@ -12266,9 +11438,7 @@ void matrixmatrixmultiply(RMatrix * a,
         return;
     }
 
-    /*
-     * A'*B'
-     */
+    // A'*B'
     if( transa&&transb )
     {
         if( arows*acols<brows*bcols )
@@ -12311,31 +11481,29 @@ void matrixmatrixmultiply(RMatrix * a,
 #if defined(AE_COMPILE_ROTATIONS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Application of a sequence of  elementary rotations to a matrix
-
-The algorithm pre-multiplies the matrix by a sequence of rotation
-transformations which is given by arrays C and S. Depending on the value
-of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
-rows are rotated, or the rows N and N-1, N-2 and N-3 and so on, are rotated.
-
-Not the whole matrix but only a part of it is transformed (rows from M1 to
-M2, columns from N1 to N2). Only the elements of this submatrix are changed.
-
-Input parameters:
-    IsForward   -   the sequence of the rotation application.
-    M1,M2       -   the range of rows to be transformed.
-    N1, N2      -   the range of columns to be transformed.
-    C,S         -   transformation coefficients.
-                    Array whose index ranges within [1..M2-M1].
-    A           -   processed matrix.
-    WORK        -   working array whose index ranges within [N1..N2].
-
-Output parameters:
-    A           -   transformed matrix.
-
-Utility subroutine.
-*************************************************************************/
+// Application of a sequence of  elementary rotations to a matrix
+//
+// The algorithm pre-multiplies the matrix by a sequence of rotation
+// transformations which is given by arrays C and S. Depending on the value
+// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
+// rows are rotated, or the rows N and N-1, N-2 and N-3 and so on, are rotated.
+//
+// Not the whole matrix but only a part of it is transformed (rows from M1 to
+// M2, columns from N1 to N2). Only the elements of this submatrix are changed.
+//
+// Input parameters:
+//     IsForward   -   the sequence of the rotation application.
+//     M1,M2       -   the range of rows to be transformed.
+//     N1, N2      -   the range of columns to be transformed.
+//     C,S         -   transformation coefficients.
+//                     Array whose index ranges within [1..M2-M1].
+//     A           -   processed matrix.
+//     WORK        -   working array whose index ranges within [N1..N2].
+//
+// Output parameters:
+//     A           -   transformed matrix.
+//
+// Utility subroutine.
 void applyrotationsfromtheleft(ae_bool isforward,
      ae_int_t m1,
      ae_int_t m2,
@@ -12359,17 +11527,13 @@ void applyrotationsfromtheleft(ae_bool isforward,
         return;
     }
 
-    /*
-     * Form  P * A
-     */
+    // Form  P * A
     if( isforward )
     {
         if( n1!=n2 )
         {
 
-            /*
-             * Common case: N1<>N2
-             */
+            // Common case: N1<>N2
             for(j=m1; j<=m2-1; j++)
             {
                 ctemp = c->ptr.p_double[j-m1+1];
@@ -12388,9 +11552,7 @@ void applyrotationsfromtheleft(ae_bool isforward,
         else
         {
 
-            /*
-             * Special case: N1=N2
-             */
+            // Special case: N1=N2
             for(j=m1; j<=m2-1; j++)
             {
                 ctemp = c->ptr.p_double[j-m1+1];
@@ -12409,9 +11571,7 @@ void applyrotationsfromtheleft(ae_bool isforward,
         if( n1!=n2 )
         {
 
-            /*
-             * Common case: N1<>N2
-             */
+            // Common case: N1<>N2
             for(j=m2-1; j>=m1; j--)
             {
                 ctemp = c->ptr.p_double[j-m1+1];
@@ -12430,9 +11590,7 @@ void applyrotationsfromtheleft(ae_bool isforward,
         else
         {
 
-            /*
-             * Special case: N1=N2
-             */
+            // Special case: N1=N2
             for(j=m2-1; j>=m1; j--)
             {
                 ctemp = c->ptr.p_double[j-m1+1];
@@ -12449,31 +11607,29 @@ void applyrotationsfromtheleft(ae_bool isforward,
 }
 
 
-/*************************************************************************
-Application of a sequence of  elementary rotations to a matrix
-
-The algorithm post-multiplies the matrix by a sequence of rotation
-transformations which is given by arrays C and S. Depending on the value
-of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
-rows are rotated, or the rows N and N-1, N-2 and N-3 and so on are rotated.
-
-Not the whole matrix but only a part of it is transformed (rows from M1
-to M2, columns from N1 to N2). Only the elements of this submatrix are changed.
-
-Input parameters:
-    IsForward   -   the sequence of the rotation application.
-    M1,M2       -   the range of rows to be transformed.
-    N1, N2      -   the range of columns to be transformed.
-    C,S         -   transformation coefficients.
-                    Array whose index ranges within [1..N2-N1].
-    A           -   processed matrix.
-    WORK        -   working array whose index ranges within [M1..M2].
-
-Output parameters:
-    A           -   transformed matrix.
-
-Utility subroutine.
-*************************************************************************/
+// Application of a sequence of  elementary rotations to a matrix
+//
+// The algorithm post-multiplies the matrix by a sequence of rotation
+// transformations which is given by arrays C and S. Depending on the value
+// of the IsForward parameter either 1 and 2, 3 and 4 and so on (if IsForward=true)
+// rows are rotated, or the rows N and N-1, N-2 and N-3 and so on are rotated.
+//
+// Not the whole matrix but only a part of it is transformed (rows from M1
+// to M2, columns from N1 to N2). Only the elements of this submatrix are changed.
+//
+// Input parameters:
+//     IsForward   -   the sequence of the rotation application.
+//     M1,M2       -   the range of rows to be transformed.
+//     N1, N2      -   the range of columns to be transformed.
+//     C,S         -   transformation coefficients.
+//                     Array whose index ranges within [1..N2-N1].
+//     A           -   processed matrix.
+//     WORK        -   working array whose index ranges within [M1..M2].
+//
+// Output parameters:
+//     A           -   transformed matrix.
+//
+// Utility subroutine.
 void applyrotationsfromtheright(ae_bool isforward,
      ae_int_t m1,
      ae_int_t m2,
@@ -12493,17 +11649,13 @@ void applyrotationsfromtheright(ae_bool isforward,
 
 
 
-    /*
-     * Form A * P'
-     */
+    // Form A * P'
     if( isforward )
     {
         if( m1!=m2 )
         {
 
-            /*
-             * Common case: M1<>M2
-             */
+            // Common case: M1<>M2
             for(j=n1; j<=n2-1; j++)
             {
                 ctemp = c->ptr.p_double[j-n1+1];
@@ -12522,9 +11674,7 @@ void applyrotationsfromtheright(ae_bool isforward,
         else
         {
 
-            /*
-             * Special case: M1=M2
-             */
+            // Special case: M1=M2
             for(j=n1; j<=n2-1; j++)
             {
                 ctemp = c->ptr.p_double[j-n1+1];
@@ -12543,9 +11693,7 @@ void applyrotationsfromtheright(ae_bool isforward,
         if( m1!=m2 )
         {
 
-            /*
-             * Common case: M1<>M2
-             */
+            // Common case: M1<>M2
             for(j=n2-1; j>=n1; j--)
             {
                 ctemp = c->ptr.p_double[j-n1+1];
@@ -12564,9 +11712,7 @@ void applyrotationsfromtheright(ae_bool isforward,
         else
         {
 
-            /*
-             * Special case: M1=M2
-             */
+            // Special case: M1=M2
             for(j=n2-1; j>=n1; j--)
             {
                 ctemp = c->ptr.p_double[j-n1+1];
@@ -12583,14 +11729,12 @@ void applyrotationsfromtheright(ae_bool isforward,
 }
 
 
-/*************************************************************************
-The subroutine generates the elementary rotation, so that:
-
-[  CS  SN  ]  .  [ F ]  =  [ R ]
-[ -SN  CS  ]     [ G ]     [ 0 ]
-
-CS**2 + SN**2 = 1
-*************************************************************************/
+// The subroutine generates the elementary rotation, so that:
+//
+// [  CS  SN  ]  .  [ F ]  =  [ R ]
+// [ -SN  CS  ]     [ G ]     [ 0 ]
+//
+// CS**2 + SN**2 = 1
 void generaterotation(double f,
      double g,
      double* cs,
@@ -12648,22 +11792,20 @@ void generaterotation(double f,
 #if defined(AE_COMPILE_BASICSTATOPS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Internal tied ranking subroutine.
-
-INPUT PARAMETERS:
-    X       -   array to rank
-    N       -   array size
-    IsCentered- whether ranks are centered or not:
-                * True      -   ranks are centered in such way that  their
-                                sum is zero
-                * False     -   ranks are not centered
-    Buf     -   temporary buffers
-
-NOTE: when IsCentered is True and all X[] are equal, this  function  fills
-      X by zeros (exact zeros are used, not sum which is only approximately
-      equal to zero).
-*************************************************************************/
+// Internal tied ranking subroutine.
+//
+// INPUT PARAMETERS:
+//     X       -   array to rank
+//     N       -   array size
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 sum is zero
+//                 * False     -   ranks are not centered
+//     Buf     -   temporary buffers
+//
+// NOTE: when IsCentered is True and all X[] are equal, this  function  fills
+//       X by zeros (exact zeros are used, not sum which is only approximately
+//       equal to zero).
 void rankx(RVector * x,
      ae_int_t n,
      ae_bool iscentered,
@@ -12678,9 +11820,7 @@ void rankx(RVector * x,
 
 
 
-    /*
-     * Prepare
-     */
+    // Prepare
     if( n<1 )
     {
         return;
@@ -12705,9 +11845,7 @@ void rankx(RVector * x,
     }
     tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n, _state);
 
-    /*
-     * Special test for all values being equal
-     */
+    // Special test for all values being equal
     if( ae_fp_eq(buf->ra1.ptr.p_double[0],buf->ra1.ptr.p_double[n-1]) )
     {
         if( iscentered )
@@ -12725,9 +11863,7 @@ void rankx(RVector * x,
         return;
     }
 
-    /*
-     * compute tied ranks
-     */
+    // compute tied ranks
     i = 0;
     while(i<=n-1)
     {
@@ -12747,9 +11883,7 @@ void rankx(RVector * x,
         i = j;
     }
 
-    /*
-     * back to x
-     */
+    // back to x
     if( iscentered )
     {
         voffs = (double)(n-1)/(double)2;
@@ -12765,16 +11899,14 @@ void rankx(RVector * x,
 }
 
 
-/*************************************************************************
-Internal untied ranking subroutine.
-
-INPUT PARAMETERS:
-    X       -   array to rank
-    N       -   array size
-    Buf     -   temporary buffers
-
-Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
-*************************************************************************/
+// Internal untied ranking subroutine.
+//
+// INPUT PARAMETERS:
+//     X       -   array to rank
+//     N       -   array size
+//     Buf     -   temporary buffers
+//
+// Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
 void rankxuntied(RVector * x,
      ae_int_t n,
      apbuffers* buf,
@@ -12784,9 +11916,7 @@ void rankxuntied(RVector * x,
 
 
 
-    /*
-     * Prepare
-     */
+    // Prepare
     if( n<1 )
     {
         return;
@@ -12821,47 +11951,45 @@ void rankxuntied(RVector * x,
 #if defined(AE_COMPILE_TRLINSOLVE) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Utility subroutine performing the "safe" solution of system of linear
-equations with triangular coefficient matrices.
-
-The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
-is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
-represented by a floating-point number. The closer the system  gets  to  a
-singular, the less s is. If the system is singular, s=0 and x contains the
-non-trivial solution of equation A*x=0.
-
-The feature of an algorithm is that it could not cause an  overflow  or  a
-division by zero regardless of the matrix used as the input.
-
-The algorithm can solve systems of equations with  upper/lower  triangular
-matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
-(where A' is a transposed matrix A).
-
-Input parameters:
-    A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
-    N       -   size of matrix A.
-    X       -   right-hand member of a system.
-                Array whose index ranges within [0..N-1].
-    IsUpper -   matrix type. If it is True, the system matrix is the upper
-                triangular and is located in  the  corresponding  part  of
-                matrix A.
-    Trans   -   problem type. If it is True, the problem to be  solved  is
-                A'*x=b, otherwise it is A*x=b.
-    Isunit  -   matrix type. If it is True, the system matrix has  a  unit
-                diagonal (the elements on the main diagonal are  not  used
-                in the calculation process), otherwise the matrix is considered
-                to be a general triangular matrix.
-
-Output parameters:
-    X       -   solution. Array whose index ranges within [0..N-1].
-    S       -   scaling factor.
-
-  -- LAPACK auxiliary routine (version 3.0) --
-     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-     Courant Institute, Argonne National Lab, and Rice University
-     June 30, 1992
-*************************************************************************/
+// Utility subroutine performing the "safe" solution of system of linear
+// equations with triangular coefficient matrices.
+//
+// The subroutine uses scaling and solves the scaled system A*x=s*b (where  s
+// is  a  scalar  value)  instead  of  A*x=b,  choosing  s  so  that x can be
+// represented by a floating-point number. The closer the system  gets  to  a
+// singular, the less s is. If the system is singular, s=0 and x contains the
+// non-trivial solution of equation A*x=0.
+//
+// The feature of an algorithm is that it could not cause an  overflow  or  a
+// division by zero regardless of the matrix used as the input.
+//
+// The algorithm can solve systems of equations with  upper/lower  triangular
+// matrices,  with/without unit diagonal, and systems of type A*x=b or A'*x=b
+// (where A' is a transposed matrix A).
+//
+// Input parameters:
+//     A       -   system matrix. Array whose indexes range within [0..N-1, 0..N-1].
+//     N       -   size of matrix A.
+//     X       -   right-hand member of a system.
+//                 Array whose index ranges within [0..N-1].
+//     IsUpper -   matrix type. If it is True, the system matrix is the upper
+//                 triangular and is located in  the  corresponding  part  of
+//                 matrix A.
+//     Trans   -   problem type. If it is True, the problem to be  solved  is
+//                 A'*x=b, otherwise it is A*x=b.
+//     Isunit  -   matrix type. If it is True, the system matrix has  a  unit
+//                 diagonal (the elements on the main diagonal are  not  used
+//                 in the calculation process), otherwise the matrix is considered
+//                 to be a general triangular matrix.
+//
+// Output parameters:
+//     X       -   solution. Array whose index ranges within [0..N-1].
+//     S       -   scaling factor.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      June 30, 1992
 void rmatrixtrsafesolve(RMatrix * a,
      ae_int_t n,
      RVector * x,
@@ -12888,9 +12016,7 @@ void rmatrixtrsafesolve(RMatrix * a,
     ae_vector_init(&x1, 0, DT_REAL, _state, ae_true);
 
 
-    /*
-     * From 0-based to 1-based
-     */
+    // From 0-based to 1-based
     normin = ae_false;
     ae_matrix_set_length(&a1, n+1, n+1, _state);
     ae_vector_set_length(&x1, n+1, _state);
@@ -12900,23 +12026,17 @@ void rmatrixtrsafesolve(RMatrix * a,
     }
     ae_v_move(&x1.ptr.p_double[1], 1, &x->ptr.p_double[0], 1, ae_v_len(1,n));
 
-    /*
-     * Solve 1-based
-     */
+    // Solve 1-based
     safesolvetriangular(&a1, n, &x1, s, isupper, istrans, isunit, normin, &cnorm, _state);
 
-    /*
-     * From 1-based to 0-based
-     */
+    // From 1-based to 0-based
     ae_v_move(&x->ptr.p_double[0], 1, &x1.ptr.p_double[1], 1, ae_v_len(0,n-1));
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-Obsolete 1-based subroutine.
-See RMatrixTRSafeSolve for 0-based replacement.
-*************************************************************************/
+// Obsolete 1-based subroutine.
+// See RMatrixTRSafeSolve for 0-based replacement.
 void safesolvetriangular(RMatrix * a,
      ae_int_t n,
      RVector * x,
@@ -12965,23 +12085,17 @@ void safesolvetriangular(RMatrix * a,
     notran = !istrans;
     nounit = !isunit;
 
-    /*
-     * these initializers are not really necessary,
-     * but without them compiler complains about uninitialized locals
-     */
+    // these initializers are not really necessary,
+    // but without them compiler complains about uninitialized locals
     tjjs = (double)(0);
 
-    /*
-     * Quick return if possible
-     */
+    // Quick return if possible
     if( n==0 )
     {
         return;
     }
 
-    /*
-     * Determine machine dependent parameters to control overflow.
-     */
+    // Determine machine dependent parameters to control overflow.
     smlnum = ae_minrealnumber/(ae_machineepsilon*2);
     bignum = 1/smlnum;
     *s = (double)(1);
@@ -12989,15 +12103,11 @@ void safesolvetriangular(RMatrix * a,
     {
         ae_vector_set_length(cnorm, n+1, _state);
 
-        /*
-         * Compute the 1-norm of each column, not including the diagonal.
-         */
+        // Compute the 1-norm of each column, not including the diagonal.
         if( upper )
         {
 
-            /*
-             * A is upper triangular.
-             */
+            // A is upper triangular.
             for(j=1; j<=n; j++)
             {
                 v = (double)(0);
@@ -13011,9 +12121,7 @@ void safesolvetriangular(RMatrix * a,
         else
         {
 
-            /*
-             * A is lower triangular.
-             */
+            // A is lower triangular.
             for(j=1; j<=n-1; j++)
             {
                 v = (double)(0);
@@ -13027,10 +12135,8 @@ void safesolvetriangular(RMatrix * a,
         }
     }
 
-    /*
-     * Scale the column norms by TSCAL if the maximum element in CNORM is
-     * greater than BIGNUM.
-     */
+    // Scale the column norms by TSCAL if the maximum element in CNORM is
+    // greater than BIGNUM.
     imax = 1;
     for(k=2; k<=n; k++)
     {
@@ -13050,10 +12156,8 @@ void safesolvetriangular(RMatrix * a,
         ae_v_muld(&cnorm->ptr.p_double[1], 1, ae_v_len(1,n), tscal);
     }
 
-    /*
-     * Compute a bound on the computed solution vector to see if the
-     * Level 2 BLAS routine DTRSV can be used.
-     */
+    // Compute a bound on the computed solution vector to see if the
+    // Level 2 BLAS routine DTRSV can be used.
     j = 1;
     for(k=2; k<=n; k++)
     {
@@ -13067,9 +12171,7 @@ void safesolvetriangular(RMatrix * a,
     if( notran )
     {
 
-        /*
-         * Compute the growth in A * x = b.
-         */
+        // Compute the growth in A * x = b.
         if( upper )
         {
             jfirst = n;
@@ -13091,45 +12193,35 @@ void safesolvetriangular(RMatrix * a,
             if( nounit )
             {
 
-                /*
-                 * A is non-unit triangular.
-                 *
-                 * Compute GROW = 1/G(j) and XBND = 1/M(j).
-                 * Initially, G(0) = max{x(i), i=1,...,n}.
-                 */
+                // A is non-unit triangular.
+                //
+                // Compute GROW = 1/G(j) and XBND = 1/M(j).
+                // Initially, G(0) = max{x(i), i=1,...,n}.
                 grow = 1/ae_maxreal(xbnd, smlnum, _state);
                 xbnd = grow;
                 j = jfirst;
                 while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
                 {
 
-                    /*
-                     * Exit the loop if the growth factor is too small.
-                     */
+                    // Exit the loop if the growth factor is too small.
                     if( ae_fp_less_eq(grow,smlnum) )
                     {
                         break;
                     }
 
-                    /*
-                     * M(j) = G(j-1) / abs(A(j,j))
-                     */
+                    // M(j) = G(j-1) / abs(A(j,j))
                     tjj = ae_fabs(a->ptr.pp_double[j][j], _state);
                     xbnd = ae_minreal(xbnd, ae_minreal((double)(1), tjj, _state)*grow, _state);
                     if( ae_fp_greater_eq(tjj+cnorm->ptr.p_double[j],smlnum) )
                     {
 
-                        /*
-                         * G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) )
-                         */
+                        // G(j) = G(j-1)*( 1 + CNORM(j) / abs(A(j,j)) )
                         grow = grow*(tjj/(tjj+cnorm->ptr.p_double[j]));
                     }
                     else
                     {
 
-                        /*
-                         * G(j) could overflow, set GROW to 0.
-                         */
+                        // G(j) could overflow, set GROW to 0.
                         grow = (double)(0);
                     }
                     if( j==jlast )
@@ -13142,27 +12234,21 @@ void safesolvetriangular(RMatrix * a,
             else
             {
 
-                /*
-                 * A is unit triangular.
-                 *
-                 * Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
-                 */
+                // A is unit triangular.
+                //
+                // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
                 grow = ae_minreal((double)(1), 1/ae_maxreal(xbnd, smlnum, _state), _state);
                 j = jfirst;
                 while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
                 {
 
-                    /*
-                     * Exit the loop if the growth factor is too small.
-                     */
+                    // Exit the loop if the growth factor is too small.
                     if( ae_fp_less_eq(grow,smlnum) )
                     {
                         break;
                     }
 
-                    /*
-                     * G(j) = G(j-1)*( 1 + CNORM(j) )
-                     */
+                    // G(j) = G(j-1)*( 1 + CNORM(j) )
                     grow = grow*(1/(1+cnorm->ptr.p_double[j]));
                     j = j+jinc;
                 }
@@ -13172,9 +12258,7 @@ void safesolvetriangular(RMatrix * a,
     else
     {
 
-        /*
-         * Compute the growth in A' * x = b.
-         */
+        // Compute the growth in A' * x = b.
         if( upper )
         {
             jfirst = 1;
@@ -13196,35 +12280,27 @@ void safesolvetriangular(RMatrix * a,
             if( nounit )
             {
 
-                /*
-                 * A is non-unit triangular.
-                 *
-                 * Compute GROW = 1/G(j) and XBND = 1/M(j).
-                 * Initially, M(0) = max{x(i), i=1,...,n}.
-                 */
+                // A is non-unit triangular.
+                //
+                // Compute GROW = 1/G(j) and XBND = 1/M(j).
+                // Initially, M(0) = max{x(i), i=1,...,n}.
                 grow = 1/ae_maxreal(xbnd, smlnum, _state);
                 xbnd = grow;
                 j = jfirst;
                 while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
                 {
 
-                    /*
-                     * Exit the loop if the growth factor is too small.
-                     */
+                    // Exit the loop if the growth factor is too small.
                     if( ae_fp_less_eq(grow,smlnum) )
                     {
                         break;
                     }
 
-                    /*
-                     * G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) )
-                     */
+                    // G(j) = max( G(j-1), M(j-1)*( 1 + CNORM(j) ) )
                     xj = 1+cnorm->ptr.p_double[j];
                     grow = ae_minreal(grow, xbnd/xj, _state);
 
-                    /*
-                     * M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j))
-                     */
+                    // M(j) = M(j-1)*( 1 + CNORM(j) ) / abs(A(j,j))
                     tjj = ae_fabs(a->ptr.pp_double[j][j], _state);
                     if( ae_fp_greater(xj,tjj) )
                     {
@@ -13240,27 +12316,21 @@ void safesolvetriangular(RMatrix * a,
             else
             {
 
-                /*
-                 * A is unit triangular.
-                 *
-                 * Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
-                 */
+                // A is unit triangular.
+                //
+                // Compute GROW = 1/G(j), where G(0) = max{x(i), i=1,...,n}.
                 grow = ae_minreal((double)(1), 1/ae_maxreal(xbnd, smlnum, _state), _state);
                 j = jfirst;
                 while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
                 {
 
-                    /*
-                     * Exit the loop if the growth factor is too small.
-                     */
+                    // Exit the loop if the growth factor is too small.
                     if( ae_fp_less_eq(grow,smlnum) )
                     {
                         break;
                     }
 
-                    /*
-                     * G(j) = ( 1 + CNORM(j) )*G(j-1)
-                     */
+                    // G(j) = ( 1 + CNORM(j) )*G(j-1)
                     xj = 1+cnorm->ptr.p_double[j];
                     grow = grow/xj;
                     j = j+jinc;
@@ -13271,10 +12341,8 @@ void safesolvetriangular(RMatrix * a,
     if( ae_fp_greater(grow*tscal,smlnum) )
     {
 
-        /*
-         * Use the Level 2 BLAS solve if the reciprocal of the bound on
-         * elements of X is not too small.
-         */
+        // Use the Level 2 BLAS solve if the reciprocal of the bound on
+        // elements of X is not too small.
         if( (upper&&notran)||(!upper&&!notran) )
         {
             if( nounit )
@@ -13345,16 +12413,12 @@ void safesolvetriangular(RMatrix * a,
     else
     {
 
-        /*
-         * Use a Level 1 BLAS solve, scaling intermediate results.
-         */
+        // Use a Level 1 BLAS solve, scaling intermediate results.
         if( ae_fp_greater(xmax,bignum) )
         {
 
-            /*
-             * Scale X so that its components are less than or equal to
-             * BIGNUM in absolute value.
-             */
+            // Scale X so that its components are less than or equal to
+            // BIGNUM in absolute value.
             *s = bignum/xmax;
             ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), *s);
             xmax = bignum;
@@ -13362,16 +12426,12 @@ void safesolvetriangular(RMatrix * a,
         if( notran )
         {
 
-            /*
-             * Solve A * x = b
-             */
+            // Solve A * x = b
             j = jfirst;
             while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
             {
 
-                /*
-                 * Compute x(j) = b(j) / A(j,j), scaling x if necessary.
-                 */
+                // Compute x(j) = b(j) / A(j,j), scaling x if necessary.
                 xj = ae_fabs(x->ptr.p_double[j], _state);
                 flg = 0;
                 if( nounit )
@@ -13392,17 +12452,13 @@ void safesolvetriangular(RMatrix * a,
                     if( ae_fp_greater(tjj,smlnum) )
                     {
 
-                        /*
-                         * abs(A(j,j)) > SMLNUM:
-                         */
+                        // abs(A(j,j)) > SMLNUM:
                         if( ae_fp_less(tjj,(double)(1)) )
                         {
                             if( ae_fp_greater(xj,tjj*bignum) )
                             {
 
-                                /*
-                                 * Scale x by 1/b(j).
-                                 */
+                                // Scale x by 1/b(j).
                                 rec = 1/xj;
                                 ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), rec);
                                 *s = *s*rec;
@@ -13417,24 +12473,18 @@ void safesolvetriangular(RMatrix * a,
                         if( ae_fp_greater(tjj,(double)(0)) )
                         {
 
-                            /*
-                             * 0 < abs(A(j,j)) <= SMLNUM:
-                             */
+                            // 0 < abs(A(j,j)) <= SMLNUM:
                             if( ae_fp_greater(xj,tjj*bignum) )
                             {
 
-                                /*
-                                 * Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM
-                                 * to avoid overflow when dividing by A(j,j).
-                                 */
+                                // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM
+                                // to avoid overflow when dividing by A(j,j).
                                 rec = tjj*bignum/xj;
                                 if( ae_fp_greater(cnorm->ptr.p_double[j],(double)(1)) )
                                 {
 
-                                    /*
-                                     * Scale by 1/CNORM(j) to avoid overflow when
-                                     * multiplying x(j) times column j.
-                                     */
+                                    // Scale by 1/CNORM(j) to avoid overflow when
+                                    // multiplying x(j) times column j.
                                     rec = rec/cnorm->ptr.p_double[j];
                                 }
                                 ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), rec);
@@ -13447,10 +12497,8 @@ void safesolvetriangular(RMatrix * a,
                         else
                         {
 
-                            /*
-                             * A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
-                             * scale = 0, and compute a solution to A*x = 0.
-                             */
+                            // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
+                            // scale = 0, and compute a solution to A*x = 0.
                             for(i=1; i<=n; i++)
                             {
                                 x->ptr.p_double[i] = (double)(0);
@@ -13463,19 +12511,15 @@ void safesolvetriangular(RMatrix * a,
                     }
                 }
 
-                /*
-                 * Scale x if necessary to avoid overflow when adding a
-                 * multiple of column j of A.
-                 */
+                // Scale x if necessary to avoid overflow when adding a
+                // multiple of column j of A.
                 if( ae_fp_greater(xj,(double)(1)) )
                 {
                     rec = 1/xj;
                     if( ae_fp_greater(cnorm->ptr.p_double[j],(bignum-xmax)*rec) )
                     {
 
-                        /*
-                         * Scale x by 1/(2*abs(x(j))).
-                         */
+                        // Scale x by 1/(2*abs(x(j))).
                         rec = rec*0.5;
                         ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), rec);
                         *s = *s*rec;
@@ -13486,9 +12530,7 @@ void safesolvetriangular(RMatrix * a,
                     if( ae_fp_greater(xj*cnorm->ptr.p_double[j],bignum-xmax) )
                     {
 
-                        /*
-                         * Scale x by 1/2.
-                         */
+                        // Scale x by 1/2.
                         ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), 0.5);
                         *s = *s*0.5;
                     }
@@ -13498,10 +12540,8 @@ void safesolvetriangular(RMatrix * a,
                     if( j>1 )
                     {
 
-                        /*
-                         * Compute the update
-                         * x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j)
-                         */
+                        // Compute the update
+                        // x(1:j-1) := x(1:j-1) - x(j) * A(1:j-1,j)
                         v = x->ptr.p_double[j]*tscal;
                         jm1 = j-1;
                         ae_v_subd(&x->ptr.p_double[1], 1, &a->ptr.pp_double[1][j], a->stride, ae_v_len(1,jm1), v);
@@ -13521,10 +12561,8 @@ void safesolvetriangular(RMatrix * a,
                     if( j<n )
                     {
 
-                        /*
-                         * Compute the update
-                         * x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j)
-                         */
+                        // Compute the update
+                        // x(j+1:n) := x(j+1:n) - x(j) * A(j+1:n,j)
                         jp1 = j+1;
                         v = x->ptr.p_double[j]*tscal;
                         ae_v_subd(&x->ptr.p_double[jp1], 1, &a->ptr.pp_double[jp1][j], a->stride, ae_v_len(jp1,n), v);
@@ -13545,26 +12583,20 @@ void safesolvetriangular(RMatrix * a,
         else
         {
 
-            /*
-             * Solve A' * x = b
-             */
+            // Solve A' * x = b
             j = jfirst;
             while((jinc>0&&j<=jlast)||(jinc<0&&j>=jlast))
             {
 
-                /*
-                 * Compute x(j) = b(j) - sum A(k,j)*x(k).
-                 *   k<>j
-                 */
+                // Compute x(j) = b(j) - sum A(k,j)*x(k).
+                //   k<>j
                 xj = ae_fabs(x->ptr.p_double[j], _state);
                 uscal = tscal;
                 rec = 1/ae_maxreal(xmax, (double)(1), _state);
                 if( ae_fp_greater(cnorm->ptr.p_double[j],(bignum-xj)*rec) )
                 {
 
-                    /*
-                     * If x(j) could overflow, scale x by 1/(2*XMAX).
-                     */
+                    // If x(j) could overflow, scale x by 1/(2*XMAX).
                     rec = rec*0.5;
                     if( nounit )
                     {
@@ -13578,9 +12610,7 @@ void safesolvetriangular(RMatrix * a,
                     if( ae_fp_greater(tjj,(double)(1)) )
                     {
 
-                        /*
-                         * Divide by A(j,j) when scaling x if A(j,j) > 1.
-                         */
+                        // Divide by A(j,j) when scaling x if A(j,j) > 1.
                         rec = ae_minreal((double)(1), rec*tjj, _state);
                         uscal = uscal/tjjs;
                     }
@@ -13595,10 +12625,8 @@ void safesolvetriangular(RMatrix * a,
                 if( ae_fp_eq(uscal,(double)(1)) )
                 {
 
-                    /*
-                     * If the scaling needed for A in the dot product is 1,
-                     * call DDOT to perform the dot product.
-                     */
+                    // If the scaling needed for A in the dot product is 1,
+                    // call DDOT to perform the dot product.
                     if( upper )
                     {
                         if( j>1 )
@@ -13623,9 +12651,7 @@ void safesolvetriangular(RMatrix * a,
                 else
                 {
 
-                    /*
-                     * Otherwise, use in-line code for the dot product.
-                     */
+                    // Otherwise, use in-line code for the dot product.
                     if( upper )
                     {
                         for(i=1; i<=j-1; i++)
@@ -13649,10 +12675,8 @@ void safesolvetriangular(RMatrix * a,
                 if( ae_fp_eq(uscal,tscal) )
                 {
 
-                    /*
-                     * Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
-                     * was not used to scale the dotproduct.
-                     */
+                    // Compute x(j) := ( x(j) - sumj ) / A(j,j) if 1/A(j,j)
+                    // was not used to scale the dotproduct.
                     x->ptr.p_double[j] = x->ptr.p_double[j]-sumj;
                     xj = ae_fabs(x->ptr.p_double[j], _state);
                     flg = 0;
@@ -13669,26 +12693,20 @@ void safesolvetriangular(RMatrix * a,
                         }
                     }
 
-                    /*
-                     * Compute x(j) = x(j) / A(j,j), scaling if necessary.
-                     */
+                    // Compute x(j) = x(j) / A(j,j), scaling if necessary.
                     if( flg!=150 )
                     {
                         tjj = ae_fabs(tjjs, _state);
                         if( ae_fp_greater(tjj,smlnum) )
                         {
 
-                            /*
-                             * abs(A(j,j)) > SMLNUM:
-                             */
+                            // abs(A(j,j)) > SMLNUM:
                             if( ae_fp_less(tjj,(double)(1)) )
                             {
                                 if( ae_fp_greater(xj,tjj*bignum) )
                                 {
 
-                                    /*
-                                     * Scale X by 1/abs(x(j)).
-                                     */
+                                    // Scale X by 1/abs(x(j)).
                                     rec = 1/xj;
                                     ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), rec);
                                     *s = *s*rec;
@@ -13702,15 +12720,11 @@ void safesolvetriangular(RMatrix * a,
                             if( ae_fp_greater(tjj,(double)(0)) )
                             {
 
-                                /*
-                                 * 0 < abs(A(j,j)) <= SMLNUM:
-                                 */
+                                // 0 < abs(A(j,j)) <= SMLNUM:
                                 if( ae_fp_greater(xj,tjj*bignum) )
                                 {
 
-                                    /*
-                                     * Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM.
-                                     */
+                                    // Scale x by (1/abs(x(j)))*abs(A(j,j))*BIGNUM.
                                     rec = tjj*bignum/xj;
                                     ae_v_muld(&x->ptr.p_double[1], 1, ae_v_len(1,n), rec);
                                     *s = *s*rec;
@@ -13721,10 +12735,8 @@ void safesolvetriangular(RMatrix * a,
                             else
                             {
 
-                                /*
-                                 * A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
-                                 * scale = 0, and compute a solution to A'*x = 0.
-                                 */
+                                // A(j,j) = 0:  Set x(1:n) = 0, x(j) = 1, and
+                                // scale = 0, and compute a solution to A'*x = 0.
                                 for(i=1; i<=n; i++)
                                 {
                                     x->ptr.p_double[i] = (double)(0);
@@ -13739,10 +12751,8 @@ void safesolvetriangular(RMatrix * a,
                 else
                 {
 
-                    /*
-                     * Compute x(j) := x(j) / A(j,j)  - sumj if the dot
-                     * product has already been divided by 1/A(j,j).
-                     */
+                    // Compute x(j) := x(j) / A(j,j)  - sumj if the dot
+                    // product has already been divided by 1/A(j,j).
                     x->ptr.p_double[j] = x->ptr.p_double[j]/tjjs-sumj;
                 }
                 xmax = ae_maxreal(xmax, ae_fabs(x->ptr.p_double[j], _state), _state);
@@ -13752,9 +12762,7 @@ void safesolvetriangular(RMatrix * a,
         *s = *s/tscal;
     }
 
-    /*
-     * Scale the column norms by 1/TSCAL for return.
-     */
+    // Scale the column norms by 1/TSCAL for return.
     if( ae_fp_neq(tscal,(double)(1)) )
     {
         v = 1/tscal;
@@ -13767,13 +12775,11 @@ void safesolvetriangular(RMatrix * a,
 #if defined(AE_COMPILE_SAFESOLVE) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Real implementation of CMatrixScaledTRSafeSolve
-
-  -- ALGLIB routine --
-     21.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Real implementation of CMatrixScaledTRSafeSolve
+//
+//   -- ALGLIB routine --
+//      21.01.2010
+//      Bochkanov Sergey
 ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
      double sa,
      ae_int_t n,
@@ -13805,18 +12811,14 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
     result = ae_true;
     lnmax = ae_log(ae_maxrealnumber, _state);
 
-    /*
-     * Quick return if possible
-     */
+    // Quick return if possible
     if( n<=0 )
     {
         ae_frame_leave(_state);
         return result;
     }
 
-    /*
-     * Load norms: right part and X
-     */
+    // Load norms: right part and X
     nrmb = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -13824,23 +12826,17 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
     }
     nrmx = (double)(0);
 
-    /*
-     * Solve
-     */
+    // Solve
     ae_vector_set_length(&tmp, n, _state);
     result = ae_true;
     if( isupper&&trans==0 )
     {
 
-        /*
-         * U*x = b
-         */
+        // U*x = b
         for(i=n-1; i>=0; i--)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -13860,9 +12856,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
                 beta = ae_complex_from_d(x->ptr.p_double[i]);
             }
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx, _state);
             if( !result )
             {
@@ -13877,15 +12871,11 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
     if( !isupper&&trans==0 )
     {
 
-        /*
-         * L*x = b
-         */
+        // L*x = b
         for(i=0; i<=n-1; i++)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -13905,9 +12895,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
                 beta = ae_complex_from_d(x->ptr.p_double[i]);
             }
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx, _state);
             if( !result )
             {
@@ -13922,15 +12910,11 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
     if( isupper&&trans==1 )
     {
 
-        /*
-         * U^T*x = b
-         */
+        // U^T*x = b
         for(i=0; i<=n-1; i++)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -13941,9 +12925,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
             }
             beta = ae_complex_from_d(x->ptr.p_double[i]);
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx, _state);
             if( !result )
             {
@@ -13952,9 +12934,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
             }
             x->ptr.p_double[i] = cx.x;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i<n-1 )
             {
                 vr = cx.x;
@@ -13968,15 +12948,11 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
     if( !isupper&&trans==1 )
     {
 
-        /*
-         * L^T*x = b
-         */
+        // L^T*x = b
         for(i=n-1; i>=0; i--)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -13987,9 +12963,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
             }
             beta = ae_complex_from_d(x->ptr.p_double[i]);
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &cx, _state);
             if( !result )
             {
@@ -13998,9 +12972,7 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
             }
             x->ptr.p_double[i] = cx.x;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i>0 )
             {
                 vr = cx.x;
@@ -14017,24 +12989,22 @@ ae_bool rmatrixscaledtrsafesolve(RMatrix * a,
 }
 
 
-/*************************************************************************
-Internal subroutine for safe solution of
-
-    SA*op(A)=b
-
-where  A  is  NxN  upper/lower  triangular/unitriangular  matrix, op(A) is
-either identity transform, transposition or Hermitian transposition, SA is
-a scaling factor such that max(|SA*A[i,j]|) is close to 1.0 in magnutude.
-
-This subroutine  limits  relative  growth  of  solution  (in inf-norm)  by
-MaxGrowth,  returning  False  if  growth  exceeds MaxGrowth. Degenerate or
-near-degenerate matrices are handled correctly (False is returned) as long
-as MaxGrowth is significantly less than MaxRealNumber/norm(b).
-
-  -- ALGLIB routine --
-     21.01.2010
-     Bochkanov Sergey
-*************************************************************************/
+// Internal subroutine for safe solution of
+//
+//     SA*op(A)=b
+//
+// where  A  is  NxN  upper/lower  triangular/unitriangular  matrix, op(A) is
+// either identity transform, transposition or Hermitian transposition, SA is
+// a scaling factor such that max(|SA*A[i,j]|) is close to 1.0 in magnutude.
+//
+// This subroutine  limits  relative  growth  of  solution  (in inf-norm)  by
+// MaxGrowth,  returning  False  if  growth  exceeds MaxGrowth. Degenerate or
+// near-degenerate matrices are handled correctly (False is returned) as long
+// as MaxGrowth is significantly less than MaxRealNumber/norm(b).
+//
+//   -- ALGLIB routine --
+//      21.01.2010
+//      Bochkanov Sergey
 ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
      double sa,
      ae_int_t n,
@@ -14065,18 +13035,14 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     result = ae_true;
     lnmax = ae_log(ae_maxrealnumber, _state);
 
-    /*
-     * Quick return if possible
-     */
+    // Quick return if possible
     if( n<=0 )
     {
         ae_frame_leave(_state);
         return result;
     }
 
-    /*
-     * Load norms: right part and X
-     */
+    // Load norms: right part and X
     nrmb = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -14084,23 +13050,17 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     }
     nrmx = (double)(0);
 
-    /*
-     * Solve
-     */
+    // Solve
     ae_vector_set_length(&tmp, n, _state);
     result = ae_true;
     if( isupper&&trans==0 )
     {
 
-        /*
-         * U*x = b
-         */
+        // U*x = b
         for(i=n-1; i>=0; i--)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14120,9 +13080,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
                 beta = x->ptr.p_complex[i];
             }
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14137,15 +13095,11 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     if( !isupper&&trans==0 )
     {
 
-        /*
-         * L*x = b
-         */
+        // L*x = b
         for(i=0; i<=n-1; i++)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14165,9 +13119,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
                 beta = x->ptr.p_complex[i];
             }
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14182,15 +13134,11 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     if( isupper&&trans==1 )
     {
 
-        /*
-         * U^T*x = b
-         */
+        // U^T*x = b
         for(i=0; i<=n-1; i++)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14201,9 +13149,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             beta = x->ptr.p_complex[i];
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14212,9 +13158,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             x->ptr.p_complex[i] = vc;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i<n-1 )
             {
                 ae_v_cmoved(&tmp.ptr.p_complex[i+1], 1, &a->ptr.pp_complex[i][i+1], 1, "N", ae_v_len(i+1,n-1), sa);
@@ -14227,15 +13171,11 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     if( !isupper&&trans==1 )
     {
 
-        /*
-         * L^T*x = b
-         */
+        // L^T*x = b
         for(i=n-1; i>=0; i--)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14246,9 +13186,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             beta = x->ptr.p_complex[i];
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14257,9 +13195,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             x->ptr.p_complex[i] = vc;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i>0 )
             {
                 ae_v_cmoved(&tmp.ptr.p_complex[0], 1, &a->ptr.pp_complex[i][0], 1, "N", ae_v_len(0,i-1), sa);
@@ -14272,15 +13208,11 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     if( isupper&&trans==2 )
     {
 
-        /*
-         * U^H*x = b
-         */
+        // U^H*x = b
         for(i=0; i<=n-1; i++)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14291,9 +13223,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             beta = x->ptr.p_complex[i];
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14302,9 +13232,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             x->ptr.p_complex[i] = vc;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i<n-1 )
             {
                 ae_v_cmoved(&tmp.ptr.p_complex[i+1], 1, &a->ptr.pp_complex[i][i+1], 1, "Conj", ae_v_len(i+1,n-1), sa);
@@ -14317,15 +13245,11 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
     if( !isupper&&trans==2 )
     {
 
-        /*
-         * L^T*x = b
-         */
+        // L^T*x = b
         for(i=n-1; i>=0; i--)
         {
 
-            /*
-             * Task is reduced to alpha*x[i] = beta
-             */
+            // Task is reduced to alpha*x[i] = beta
             if( isunit )
             {
                 alpha = ae_complex_from_d(sa);
@@ -14336,9 +13260,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             beta = x->ptr.p_complex[i];
 
-            /*
-             * solve alpha*x[i] = beta
-             */
+            // solve alpha*x[i] = beta
             result = safesolve_cbasicsolveandupdate(alpha, beta, lnmax, nrmb, maxgrowth, &nrmx, &vc, _state);
             if( !result )
             {
@@ -14347,9 +13269,7 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
             }
             x->ptr.p_complex[i] = vc;
 
-            /*
-             * update the rest of right part
-             */
+            // update the rest of right part
             if( i>0 )
             {
                 ae_v_cmoved(&tmp.ptr.p_complex[0], 1, &a->ptr.pp_complex[i][0], 1, "Conj", ae_v_len(0,i-1), sa);
@@ -14365,28 +13285,26 @@ ae_bool cmatrixscaledtrsafesolve(CMatrix * a,
 }
 
 
-/*************************************************************************
-complex basic solver-updater for reduced linear system
-
-    alpha*x[i] = beta
-
-solves this equation and updates it in overlfow-safe manner (keeping track
-of relative growth of solution).
-
-Parameters:
-    Alpha   -   alpha
-    Beta    -   beta
-    LnMax   -   precomputed Ln(MaxRealNumber)
-    BNorm   -   inf-norm of b (right part of original system)
-    MaxGrowth-  maximum growth of norm(x) relative to norm(b)
-    XNorm   -   inf-norm of other components of X (which are already processed)
-                it is updated by CBasicSolveAndUpdate.
-    X       -   solution
-
-  -- ALGLIB routine --
-     26.01.2009
-     Bochkanov Sergey
-*************************************************************************/
+// complex basic solver-updater for reduced linear system
+//
+//     alpha*x[i] = beta
+//
+// solves this equation and updates it in overlfow-safe manner (keeping track
+// of relative growth of solution).
+//
+// Parameters:
+//     Alpha   -   alpha
+//     Beta    -   beta
+//     LnMax   -   precomputed Ln(MaxRealNumber)
+//     BNorm   -   inf-norm of b (right part of original system)
+//     MaxGrowth-  maximum growth of norm(x) relative to norm(b)
+//     XNorm   -   inf-norm of other components of X (which are already processed)
+//                 it is updated by CBasicSolveAndUpdate.
+//     X       -   solution
+//
+//   -- ALGLIB routine --
+//      26.01.2009
+//      Bochkanov Sergey
 static ae_bool safesolve_cbasicsolveandupdate(ae_complex alpha,
      ae_complex beta,
      double lnmax,
@@ -14410,9 +13328,7 @@ static ae_bool safesolve_cbasicsolveandupdate(ae_complex alpha,
     if( ae_c_neq_d(beta,(double)(0)) )
     {
 
-        /*
-         * alpha*x[i]=beta
-         */
+        // alpha*x[i]=beta
         v = ae_log(ae_c_abs(beta, _state), _state)-ae_log(ae_c_abs(alpha, _state), _state);
         if( ae_fp_greater(v,lnmax) )
         {
@@ -14423,15 +13339,11 @@ static ae_bool safesolve_cbasicsolveandupdate(ae_complex alpha,
     else
     {
 
-        /*
-         * alpha*x[i]=0
-         */
+        // alpha*x[i]=0
         *x = ae_complex_from_i(0);
     }
 
-    /*
-     * update NrmX, test growth limit
-     */
+    // update NrmX, test growth limit
     *xnorm = ae_maxreal(*xnorm, ae_c_abs(*x, _state), _state);
     if( ae_fp_greater(*xnorm,maxgrowth*bnorm) )
     {
@@ -14446,27 +13358,25 @@ static ae_bool safesolve_cbasicsolveandupdate(ae_complex alpha,
 #if defined(AE_COMPILE_XBLAS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-More precise dot-product. Absolute error of  subroutine  result  is  about
-1 ulp of max(MX,V), where:
-    MX = max( |a[i]*b[i]| )
-    V  = |(a,b)|
-
-INPUT PARAMETERS
-    A       -   array[0..N-1], vector 1
-    B       -   array[0..N-1], vector 2
-    N       -   vectors length, N<2^29.
-    Temp    -   array[0..N-1], pre-allocated temporary storage
-
-OUTPUT PARAMETERS
-    R       -   (A,B)
-    RErr    -   estimate of error. This estimate accounts for both  errors
-                during  calculation  of  (A,B)  and  errors  introduced by
-                rounding of A and B to fit in double (about 1 ulp).
-
-  -- ALGLIB --
-     Copyright 24.08.2009 by Bochkanov Sergey
-*************************************************************************/
+// More precise dot-product. Absolute error of  subroutine  result  is  about
+// 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
+//
+// INPUT PARAMETERS
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..N-1], pre-allocated temporary storage
+//
+// OUTPUT PARAMETERS
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
+//
+//   -- ALGLIB --
+//      Copyright 24.08.2009 by Bochkanov Sergey
 void xdot(RVector * a,
      RVector * b,
      ae_int_t n,
@@ -14483,10 +13393,8 @@ void xdot(RVector * a,
     *rerr = 0;
 
 
-    /*
-     * special cases:
-     * * N=0
-     */
+    // special cases:
+    // * N=0
     if( n==0 )
     {
         *r = (double)(0);
@@ -14510,27 +13418,25 @@ void xdot(RVector * a,
 }
 
 
-/*************************************************************************
-More precise complex dot-product. Absolute error of  subroutine  result is
-about 1 ulp of max(MX,V), where:
-    MX = max( |a[i]*b[i]| )
-    V  = |(a,b)|
-
-INPUT PARAMETERS
-    A       -   array[0..N-1], vector 1
-    B       -   array[0..N-1], vector 2
-    N       -   vectors length, N<2^29.
-    Temp    -   array[0..2*N-1], pre-allocated temporary storage
-
-OUTPUT PARAMETERS
-    R       -   (A,B)
-    RErr    -   estimate of error. This estimate accounts for both  errors
-                during  calculation  of  (A,B)  and  errors  introduced by
-                rounding of A and B to fit in double (about 1 ulp).
-
-  -- ALGLIB --
-     Copyright 27.01.2010 by Bochkanov Sergey
-*************************************************************************/
+// More precise complex dot-product. Absolute error of  subroutine  result is
+// about 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
+//
+// INPUT PARAMETERS
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
+//
+// OUTPUT PARAMETERS
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
+//
+//   -- ALGLIB --
+//      Copyright 27.01.2010 by Bochkanov Sergey
 void xcdot(CVector * a,
      CVector * b,
      ae_int_t n,
@@ -14550,10 +13456,8 @@ void xcdot(CVector * a,
     *rerr = 0;
 
 
-    /*
-     * special cases:
-     * * N=0
-     */
+    // special cases:
+    // * N=0
     if( n==0 )
     {
         *r = ae_complex_from_i(0);
@@ -14561,9 +13465,7 @@ void xcdot(CVector * a,
         return;
     }
 
-    /*
-     * calculate real part
-     */
+    // calculate real part
     mx = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -14584,9 +13486,7 @@ void xcdot(CVector * a,
         xblas_xsum(temp, mx, 2*n, &r->x, &rerrx, _state);
     }
 
-    /*
-     * calculate imaginary part
-     */
+    // calculate imaginary part
     mx = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -14607,9 +13507,7 @@ void xcdot(CVector * a,
         xblas_xsum(temp, mx, 2*n, &r->y, &rerry, _state);
     }
 
-    /*
-     * total error
-     */
+    // total error
     if( ae_fp_eq(rerrx,(double)(0))&&ae_fp_eq(rerry,(double)(0)) )
     {
         *rerr = (double)(0);
@@ -14621,22 +13519,20 @@ void xcdot(CVector * a,
 }
 
 
-/*************************************************************************
-Internal subroutine for extra-precise calculation of SUM(w[i]).
-
-INPUT PARAMETERS:
-    W   -   array[0..N-1], values to be added
-            W is modified during calculations.
-    MX  -   max(W[i])
-    N   -   array size
-
-OUTPUT PARAMETERS:
-    R   -   SUM(w[i])
-    RErr-   error estimate for R
-
-  -- ALGLIB --
-     Copyright 24.08.2009 by Bochkanov Sergey
-*************************************************************************/
+// Internal subroutine for extra-precise calculation of SUM(w[i]).
+//
+// INPUT PARAMETERS:
+//     W   -   array[0..N-1], values to be added
+//             W is modified during calculations.
+//     MX  -   max(W[i])
+//     N   -   array size
+//
+// OUTPUT PARAMETERS:
+//     R   -   SUM(w[i])
+//     RErr-   error estimate for R
+//
+//   -- ALGLIB --
+//      Copyright 24.08.2009 by Bochkanov Sergey
 static void xblas_xsum(RVector * w,
      double mx,
      ae_int_t n,
@@ -14658,11 +13554,9 @@ static void xblas_xsum(RVector * w,
     *rerr = 0;
 
 
-    /*
-     * special cases:
-     * * N=0
-     * * N is too large to use integer arithmetics
-     */
+    // special cases:
+    // * N=0
+    // * N is too large to use integer arithmetics
     if( n==0 )
     {
         *r = (double)(0);
@@ -14677,25 +13571,19 @@ static void xblas_xsum(RVector * w,
     }
     ae_assert(n<536870912, "XDot: N is too large!", _state);
 
-    /*
-     * Prepare
-     */
+    // Prepare
     ln2 = ae_log((double)(2), _state);
     *rerr = mx*ae_machineepsilon;
 
-    /*
-     * 1. find S such that 0.5<=S*MX<1
-     * 2. multiply W by S, so task is normalized in some sense
-     * 3. S:=1/S so we can obtain original vector multiplying by S
-     */
+    // 1. find S such that 0.5<=S*MX<1
+    // 2. multiply W by S, so task is normalized in some sense
+    // 3. S:=1/S so we can obtain original vector multiplying by S
     k = ae_round(ae_log(mx, _state)/ln2, _state);
     s = xblas_xfastpow((double)(2), -k, _state);
     if( !ae_isfinite(s, _state) )
     {
 
-        /*
-         * Overflow or underflow during evaluation of S; fallback low-precision code
-         */
+        // Overflow or underflow during evaluation of S; fallback low-precision code
         *r = (double)(0);
         *rerr = mx*ae_machineepsilon;
         for(i=0; i<=n-1; i++)
@@ -14715,13 +13603,11 @@ static void xblas_xsum(RVector * w,
     ae_v_muld(&w->ptr.p_double[0], 1, ae_v_len(0,n-1), s);
     s = 1/s;
 
-    /*
-     * find Chunk=2^M such that N*Chunk<2^29
-     *
-     * we have chosen upper limit (2^29) with enough space left
-     * to tolerate possible problems with rounding and N's close
-     * to the limit, so we don't want to be very strict here.
-     */
+    // find Chunk=2^M such that N*Chunk<2^29
+    //
+    // we have chosen upper limit (2^29) with enough space left
+    // to tolerate possible problems with rounding and N's close
+    // to the limit, so we don't want to be very strict here.
     k = ae_trunc(ae_log((double)536870912/(double)n, _state)/ln2, _state);
     chunk = xblas_xfastpow((double)(2), k, _state);
     if( ae_fp_less(chunk,(double)(2)) )
@@ -14730,9 +13616,7 @@ static void xblas_xsum(RVector * w,
     }
     invchunk = 1/chunk;
 
-    /*
-     * calculate result
-     */
+    // calculate result
     *r = (double)(0);
     ae_v_muld(&w->ptr.p_double[0], 1, ae_v_len(0,n-1), chunk);
     for(;;)
@@ -14759,19 +13643,15 @@ static void xblas_xsum(RVector * w,
         }
     }
 
-    /*
-     * correct error
-     */
+    // correct error
     *rerr = ae_maxreal(*rerr, ae_fabs(*r, _state)*ae_machineepsilon, _state);
 }
 
 
-/*************************************************************************
-Fast Pow
-
-  -- ALGLIB --
-     Copyright 24.08.2009 by Bochkanov Sergey
-*************************************************************************/
+// Fast Pow
+//
+//   -- ALGLIB --
+//      Copyright 24.08.2009 by Bochkanov Sergey
 static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state)
 {
     double result;
@@ -14806,13 +13686,11 @@ static double xblas_xfastpow(double r, ae_int_t n, ae_state *_state)
 #if defined(AE_COMPILE_LINMIN) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Normalizes direction/step pair: makes |D|=1, scales Stp.
-If |D|=0, it returns, leavind D/Stp unchanged.
-
-  -- ALGLIB --
-     Copyright 01.04.2010 by Bochkanov Sergey
-*************************************************************************/
+// Normalizes direction/step pair: makes |D|=1, scales Stp.
+// If |D|=0, it returns, leavind D/Stp unchanged.
+//
+//   -- ALGLIB --
+//      Copyright 01.04.2010 by Bochkanov Sergey
 void linminnormalized(RVector * d,
      double* stp,
      ae_int_t n,
@@ -14824,9 +13702,7 @@ void linminnormalized(RVector * d,
 
 
 
-    /*
-     * first, scale D to avoid underflow/overflow durng squaring
-     */
+    // first, scale D to avoid underflow/overflow durng squaring
     mx = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -14840,9 +13716,7 @@ void linminnormalized(RVector * d,
     ae_v_muld(&d->ptr.p_double[0], 1, ae_v_len(0,n-1), s);
     *stp = *stp/s;
 
-    /*
-     * normalize D
-     */
+    // normalize D
     s = ae_v_dotproduct(&d->ptr.p_double[0], 1, &d->ptr.p_double[0], 1, ae_v_len(0,n-1));
     s = 1/ae_sqrt(s, _state);
     ae_v_muld(&d->ptr.p_double[0], 1, ae_v_len(0,n-1), s);
@@ -14850,122 +13724,120 @@ void linminnormalized(RVector * d,
 }
 
 
-/*************************************************************************
-THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
-DECREASE CONDITION AND A CURVATURE CONDITION.
-
-AT EACH STAGE THE SUBROUTINE  UPDATES  AN  INTERVAL  OF  UNCERTAINTY  WITH
-ENDPOINTS  STX  AND  STY.  THE INTERVAL OF UNCERTAINTY IS INITIALLY CHOSEN
-SO THAT IT CONTAINS A MINIMIZER OF THE MODIFIED FUNCTION
-
-    F(X+STP*S) - F(X) - FTOL*STP*(GRADF(X)'S).
-
-IF  A STEP  IS OBTAINED FOR  WHICH THE MODIFIED FUNCTION HAS A NONPOSITIVE
-FUNCTION  VALUE  AND  NONNEGATIVE  DERIVATIVE,   THEN   THE   INTERVAL  OF
-UNCERTAINTY IS CHOSEN SO THAT IT CONTAINS A MINIMIZER OF F(X+STP*S).
-
-THE  ALGORITHM  IS  DESIGNED TO FIND A STEP WHICH SATISFIES THE SUFFICIENT
-DECREASE CONDITION
-
-    F(X+STP*S) .LE. F(X) + FTOL*STP*(GRADF(X)'S),
-
-AND THE CURVATURE CONDITION
-
-    ABS(GRADF(X+STP*S)'S)) .LE. GTOL*ABS(GRADF(X)'S).
-
-IF  FTOL  IS  LESS  THAN GTOL AND IF, FOR EXAMPLE, THE FUNCTION IS BOUNDED
-BELOW,  THEN  THERE  IS  ALWAYS  A  STEP  WHICH SATISFIES BOTH CONDITIONS.
-IF  NO  STEP  CAN BE FOUND  WHICH  SATISFIES  BOTH  CONDITIONS,  THEN  THE
-ALGORITHM  USUALLY STOPS  WHEN  ROUNDING ERRORS  PREVENT FURTHER PROGRESS.
-IN THIS CASE STP ONLY SATISFIES THE SUFFICIENT DECREASE CONDITION.
-
-
-:::::::::::::IMPORTANT NOTES:::::::::::::
-
-NOTE 1:
-
-This routine  guarantees that it will stop at the last point where function
-value was calculated. It won't make several additional function evaluations
-after finding good point. So if you store function evaluations requested by
-this routine, you can be sure that last one is the point where we've stopped.
-
-NOTE 2:
-
-when 0<StpMax<StpMin, algorithm will terminate with INFO=5 and Stp=StpMax
-
-NOTE 3:
-
-this algorithm guarantees that, if MCINFO=1 or MCINFO=5, then:
-* F(final_point)<F(initial_point) - strict inequality
-* final_point<>initial_point - after rounding to machine precision
-
-NOTE 4:
-
-when non-descent direction is specified, algorithm stops with MCINFO=0,
-Stp=0 and initial point at X[].
-:::::::::::::::::::::::::::::::::::::::::
-
-
-PARAMETERS DESCRIPRION
-
-STAGE IS ZERO ON FIRST CALL, ZERO ON FINAL EXIT
-
-N IS A POSITIVE INTEGER INPUT VARIABLE SET TO THE NUMBER OF VARIABLES.
-
-X IS  AN  ARRAY  OF  LENGTH N. ON INPUT IT MUST CONTAIN THE BASE POINT FOR
-THE LINE SEARCH. ON OUTPUT IT CONTAINS X+STP*S.
-
-F IS  A  VARIABLE. ON INPUT IT MUST CONTAIN THE VALUE OF F AT X. ON OUTPUT
-IT CONTAINS THE VALUE OF F AT X + STP*S.
-
-G IS AN ARRAY OF LENGTH N. ON INPUT IT MUST CONTAIN THE GRADIENT OF F AT X.
-ON OUTPUT IT CONTAINS THE GRADIENT OF F AT X + STP*S.
-
-S IS AN INPUT ARRAY OF LENGTH N WHICH SPECIFIES THE SEARCH DIRECTION.
-
-STP  IS  A NONNEGATIVE VARIABLE. ON INPUT STP CONTAINS AN INITIAL ESTIMATE
-OF A SATISFACTORY STEP. ON OUTPUT STP CONTAINS THE FINAL ESTIMATE.
-
-FTOL AND GTOL ARE NONNEGATIVE INPUT VARIABLES. TERMINATION OCCURS WHEN THE
-SUFFICIENT DECREASE CONDITION AND THE DIRECTIONAL DERIVATIVE CONDITION ARE
-SATISFIED.
-
-XTOL IS A NONNEGATIVE INPUT VARIABLE. TERMINATION OCCURS WHEN THE RELATIVE
-WIDTH OF THE INTERVAL OF UNCERTAINTY IS AT MOST XTOL.
-
-STPMIN AND STPMAX ARE NONNEGATIVE INPUT VARIABLES WHICH SPECIFY LOWER  AND
-UPPER BOUNDS FOR THE STEP.
-
-MAXFEV IS A POSITIVE INTEGER INPUT VARIABLE. TERMINATION OCCURS WHEN THE
-NUMBER OF CALLS TO FCN IS AT LEAST MAXFEV BY THE END OF AN ITERATION.
-
-INFO IS AN INTEGER OUTPUT VARIABLE SET AS FOLLOWS:
-    INFO = 0  IMPROPER INPUT PARAMETERS.
-
-    INFO = 1  THE SUFFICIENT DECREASE CONDITION AND THE
-              DIRECTIONAL DERIVATIVE CONDITION HOLD.
-
-    INFO = 2  RELATIVE WIDTH OF THE INTERVAL OF UNCERTAINTY
-              IS AT MOST XTOL.
-
-    INFO = 3  NUMBER OF CALLS TO FCN HAS REACHED MAXFEV.
-
-    INFO = 4  THE STEP IS AT THE LOWER BOUND STPMIN.
-
-    INFO = 5  THE STEP IS AT THE UPPER BOUND STPMAX.
-
-    INFO = 6  ROUNDING ERRORS PREVENT FURTHER PROGRESS.
-              THERE MAY NOT BE A STEP WHICH SATISFIES THE
-              SUFFICIENT DECREASE AND CURVATURE CONDITIONS.
-              TOLERANCES MAY BE TOO SMALL.
-
-NFEV IS AN INTEGER OUTPUT VARIABLE SET TO THE NUMBER OF CALLS TO FCN.
-
-WA IS A WORK ARRAY OF LENGTH N.
-
-ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
-JORGE J. MORE', DAVID J. THUENTE
-*************************************************************************/
+// THE  PURPOSE  OF  MCSRCH  IS  TO  FIND A STEP WHICH SATISFIES A SUFFICIENT
+// DECREASE CONDITION AND A CURVATURE CONDITION.
+//
+// AT EACH STAGE THE SUBROUTINE  UPDATES  AN  INTERVAL  OF  UNCERTAINTY  WITH
+// ENDPOINTS  STX  AND  STY.  THE INTERVAL OF UNCERTAINTY IS INITIALLY CHOSEN
+// SO THAT IT CONTAINS A MINIMIZER OF THE MODIFIED FUNCTION
+//
+//     F(X+STP*S) - F(X) - FTOL*STP*(GRADF(X)'S).
+//
+// IF  A STEP  IS OBTAINED FOR  WHICH THE MODIFIED FUNCTION HAS A NONPOSITIVE
+// FUNCTION  VALUE  AND  NONNEGATIVE  DERIVATIVE,   THEN   THE   INTERVAL  OF
+// UNCERTAINTY IS CHOSEN SO THAT IT CONTAINS A MINIMIZER OF F(X+STP*S).
+//
+// THE  ALGORITHM  IS  DESIGNED TO FIND A STEP WHICH SATISFIES THE SUFFICIENT
+// DECREASE CONDITION
+//
+//     F(X+STP*S) .LE. F(X) + FTOL*STP*(GRADF(X)'S),
+//
+// AND THE CURVATURE CONDITION
+//
+//     ABS(GRADF(X+STP*S)'S)) .LE. GTOL*ABS(GRADF(X)'S).
+//
+// IF  FTOL  IS  LESS  THAN GTOL AND IF, FOR EXAMPLE, THE FUNCTION IS BOUNDED
+// BELOW,  THEN  THERE  IS  ALWAYS  A  STEP  WHICH SATISFIES BOTH CONDITIONS.
+// IF  NO  STEP  CAN BE FOUND  WHICH  SATISFIES  BOTH  CONDITIONS,  THEN  THE
+// ALGORITHM  USUALLY STOPS  WHEN  ROUNDING ERRORS  PREVENT FURTHER PROGRESS.
+// IN THIS CASE STP ONLY SATISFIES THE SUFFICIENT DECREASE CONDITION.
+//
+//
+// :::::::::::::IMPORTANT NOTES:::::::::::::
+//
+// NOTE 1:
+//
+// This routine  guarantees that it will stop at the last point where function
+// value was calculated. It won't make several additional function evaluations
+// after finding good point. So if you store function evaluations requested by
+// this routine, you can be sure that last one is the point where we've stopped.
+//
+// NOTE 2:
+//
+// when 0<StpMax<StpMin, algorithm will terminate with INFO=5 and Stp=StpMax
+//
+// NOTE 3:
+//
+// this algorithm guarantees that, if MCINFO=1 or MCINFO=5, then:
+// * F(final_point)<F(initial_point) - strict inequality
+// * final_point<>initial_point - after rounding to machine precision
+//
+// NOTE 4:
+//
+// when non-descent direction is specified, algorithm stops with MCINFO=0,
+// Stp=0 and initial point at X[].
+// :::::::::::::::::::::::::::::::::::::::::
+//
+//
+// PARAMETERS DESCRIPRION
+//
+// STAGE IS ZERO ON FIRST CALL, ZERO ON FINAL EXIT
+//
+// N IS A POSITIVE INTEGER INPUT VARIABLE SET TO THE NUMBER OF VARIABLES.
+//
+// X IS  AN  ARRAY  OF  LENGTH N. ON INPUT IT MUST CONTAIN THE BASE POINT FOR
+// THE LINE SEARCH. ON OUTPUT IT CONTAINS X+STP*S.
+//
+// F IS  A  VARIABLE. ON INPUT IT MUST CONTAIN THE VALUE OF F AT X. ON OUTPUT
+// IT CONTAINS THE VALUE OF F AT X + STP*S.
+//
+// G IS AN ARRAY OF LENGTH N. ON INPUT IT MUST CONTAIN THE GRADIENT OF F AT X.
+// ON OUTPUT IT CONTAINS THE GRADIENT OF F AT X + STP*S.
+//
+// S IS AN INPUT ARRAY OF LENGTH N WHICH SPECIFIES THE SEARCH DIRECTION.
+//
+// STP  IS  A NONNEGATIVE VARIABLE. ON INPUT STP CONTAINS AN INITIAL ESTIMATE
+// OF A SATISFACTORY STEP. ON OUTPUT STP CONTAINS THE FINAL ESTIMATE.
+//
+// FTOL AND GTOL ARE NONNEGATIVE INPUT VARIABLES. TERMINATION OCCURS WHEN THE
+// SUFFICIENT DECREASE CONDITION AND THE DIRECTIONAL DERIVATIVE CONDITION ARE
+// SATISFIED.
+//
+// XTOL IS A NONNEGATIVE INPUT VARIABLE. TERMINATION OCCURS WHEN THE RELATIVE
+// WIDTH OF THE INTERVAL OF UNCERTAINTY IS AT MOST XTOL.
+//
+// STPMIN AND STPMAX ARE NONNEGATIVE INPUT VARIABLES WHICH SPECIFY LOWER  AND
+// UPPER BOUNDS FOR THE STEP.
+//
+// MAXFEV IS A POSITIVE INTEGER INPUT VARIABLE. TERMINATION OCCURS WHEN THE
+// NUMBER OF CALLS TO FCN IS AT LEAST MAXFEV BY THE END OF AN ITERATION.
+//
+// INFO IS AN INTEGER OUTPUT VARIABLE SET AS FOLLOWS:
+//     INFO = 0  IMPROPER INPUT PARAMETERS.
+//
+//     INFO = 1  THE SUFFICIENT DECREASE CONDITION AND THE
+//               DIRECTIONAL DERIVATIVE CONDITION HOLD.
+//
+//     INFO = 2  RELATIVE WIDTH OF THE INTERVAL OF UNCERTAINTY
+//               IS AT MOST XTOL.
+//
+//     INFO = 3  NUMBER OF CALLS TO FCN HAS REACHED MAXFEV.
+//
+//     INFO = 4  THE STEP IS AT THE LOWER BOUND STPMIN.
+//
+//     INFO = 5  THE STEP IS AT THE UPPER BOUND STPMAX.
+//
+//     INFO = 6  ROUNDING ERRORS PREVENT FURTHER PROGRESS.
+//               THERE MAY NOT BE A STEP WHICH SATISFIES THE
+//               SUFFICIENT DECREASE AND CURVATURE CONDITIONS.
+//               TOLERANCES MAY BE TOO SMALL.
+//
+// NFEV IS AN INTEGER OUTPUT VARIABLE SET TO THE NUMBER OF CALLS TO FCN.
+//
+// WA IS A WORK ARRAY OF LENGTH N.
+//
+// ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
+// JORGE J. MORE', DAVID J. THUENTE
 void mcsrch(ae_int_t n,
      RVector * x,
      double* f,
@@ -14989,9 +13861,7 @@ void mcsrch(ae_int_t n,
 
 
 
-    /*
-     * init
-     */
+    // init
     p5 = 0.5;
     p66 = 0.66;
     state->xtrapf = 4.0;
@@ -15009,17 +13879,13 @@ void mcsrch(ae_int_t n,
         *stp = stpmax;
     }
 
-    /*
-     * Main cycle
-     */
+    // Main cycle
     for(;;)
     {
         if( *stage==0 )
         {
 
-            /*
-             * NEXT
-             */
+            // NEXT
             *stage = 2;
             continue;
         }
@@ -15028,9 +13894,7 @@ void mcsrch(ae_int_t n,
             state->infoc = 1;
             *info = 0;
 
-            /*
-             *     CHECK THE INPUT PARAMETERS FOR ERRORS.
-             */
+            //     CHECK THE INPUT PARAMETERS FOR ERRORS.
             if( ae_fp_less(stpmax,linmin_stpmin)&&ae_fp_greater(stpmax,(double)(0)) )
             {
                 *info = 5;
@@ -15044,10 +13908,8 @@ void mcsrch(ae_int_t n,
                 return;
             }
 
-            /*
-             *     COMPUTE THE INITIAL GRADIENT IN THE SEARCH DIRECTION
-             *     AND CHECK THAT S IS A DESCENT DIRECTION.
-             */
+            //     COMPUTE THE INITIAL GRADIENT IN THE SEARCH DIRECTION
+            //     AND CHECK THAT S IS A DESCENT DIRECTION.
             v = ae_v_dotproduct(&g->ptr.p_double[0], 1, &s->ptr.p_double[0], 1, ae_v_len(0,n-1));
             state->dginit = v;
             if( ae_fp_greater_eq(state->dginit,(double)(0)) )
@@ -15057,9 +13919,7 @@ void mcsrch(ae_int_t n,
                 return;
             }
 
-            /*
-             *     INITIALIZE LOCAL VARIABLES.
-             */
+            //     INITIALIZE LOCAL VARIABLES.
             state->brackt = ae_false;
             state->stage1 = ae_true;
             *nfev = 0;
@@ -15069,15 +13929,13 @@ void mcsrch(ae_int_t n,
             state->width1 = state->width/p5;
             ae_v_move(&wa->ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0,n-1));
 
-            /*
-             *     THE VARIABLES STX, FX, DGX CONTAIN THE VALUES OF THE STEP,
-             *     FUNCTION, AND DIRECTIONAL DERIVATIVE AT THE BEST STEP.
-             *     THE VARIABLES STY, FY, DGY CONTAIN THE VALUE OF THE STEP,
-             *     FUNCTION, AND DERIVATIVE AT THE OTHER ENDPOINT OF
-             *     THE INTERVAL OF UNCERTAINTY.
-             *     THE VARIABLES STP, F, DG CONTAIN THE VALUES OF THE STEP,
-             *     FUNCTION, AND DERIVATIVE AT THE CURRENT STEP.
-             */
+            //     THE VARIABLES STX, FX, DGX CONTAIN THE VALUES OF THE STEP,
+            //     FUNCTION, AND DIRECTIONAL DERIVATIVE AT THE BEST STEP.
+            //     THE VARIABLES STY, FY, DGY CONTAIN THE VALUE OF THE STEP,
+            //     FUNCTION, AND DERIVATIVE AT THE OTHER ENDPOINT OF
+            //     THE INTERVAL OF UNCERTAINTY.
+            //     THE VARIABLES STP, F, DG CONTAIN THE VALUES OF THE STEP,
+            //     FUNCTION, AND DERIVATIVE AT THE CURRENT STEP.
             state->stx = (double)(0);
             state->fx = state->finit;
             state->dgx = state->dginit;
@@ -15085,21 +13943,17 @@ void mcsrch(ae_int_t n,
             state->fy = state->finit;
             state->dgy = state->dginit;
 
-            /*
-             * NEXT
-             */
+            // NEXT
             *stage = 3;
             continue;
         }
         if( *stage==3 )
         {
 
-            /*
-             *     START OF ITERATION.
-             *
-             *     SET THE MINIMUM AND MAXIMUM STEPS TO CORRESPOND
-             *     TO THE PRESENT INTERVAL OF UNCERTAINTY.
-             */
+            //     START OF ITERATION.
+            //
+            //     SET THE MINIMUM AND MAXIMUM STEPS TO CORRESPOND
+            //     TO THE PRESENT INTERVAL OF UNCERTAINTY.
             if( state->brackt )
             {
                 if( ae_fp_less(state->stx,state->sty) )
@@ -15119,9 +13973,7 @@ void mcsrch(ae_int_t n,
                 state->stmax = *stp+state->xtrapf*(*stp-state->stx);
             }
 
-            /*
-             *        FORCE THE STEP TO BE WITHIN THE BOUNDS STPMAX AND STPMIN.
-             */
+            //        FORCE THE STEP TO BE WITHIN THE BOUNDS STPMAX AND STPMIN.
             if( ae_fp_greater(*stp,stpmax) )
             {
                 *stp = stpmax;
@@ -15131,25 +13983,19 @@ void mcsrch(ae_int_t n,
                 *stp = linmin_stpmin;
             }
 
-            /*
-             *        IF AN UNUSUAL TERMINATION IS TO OCCUR THEN LET
-             *        STP BE THE LOWEST POINT OBTAINED SO FAR.
-             */
+            //        IF AN UNUSUAL TERMINATION IS TO OCCUR THEN LET
+            //        STP BE THE LOWEST POINT OBTAINED SO FAR.
             if( (((state->brackt&&(ae_fp_less_eq(*stp,state->stmin)||ae_fp_greater_eq(*stp,state->stmax)))||*nfev>=linmin_maxfev-1)||state->infoc==0)||(state->brackt&&ae_fp_less_eq(state->stmax-state->stmin,linmin_xtol*state->stmax)) )
             {
                 *stp = state->stx;
             }
 
-            /*
-             *        EVALUATE THE FUNCTION AND GRADIENT AT STP
-             *        AND COMPUTE THE DIRECTIONAL DERIVATIVE.
-             */
+            //        EVALUATE THE FUNCTION AND GRADIENT AT STP
+            //        AND COMPUTE THE DIRECTIONAL DERIVATIVE.
             ae_v_move(&x->ptr.p_double[0], 1, &wa->ptr.p_double[0], 1, ae_v_len(0,n-1));
             ae_v_addd(&x->ptr.p_double[0], 1, &s->ptr.p_double[0], 1, ae_v_len(0,n-1), *stp);
 
-            /*
-             * NEXT
-             */
+            // NEXT
             *stage = 4;
             return;
         }
@@ -15161,9 +14007,7 @@ void mcsrch(ae_int_t n,
             state->dg = v;
             state->ftest1 = state->finit+*stp*state->dgtest;
 
-            /*
-             *        TEST FOR CONVERGENCE.
-             */
+            //        TEST FOR CONVERGENCE.
             if( (state->brackt&&(ae_fp_less_eq(*stp,state->stmin)||ae_fp_greater_eq(*stp,state->stmax)))||state->infoc==0 )
             {
                 *info = 6;
@@ -15189,15 +14033,11 @@ void mcsrch(ae_int_t n,
                 *info = 1;
             }
 
-            /*
-             *        CHECK FOR TERMINATION.
-             */
+            //        CHECK FOR TERMINATION.
             if( *info!=0 )
             {
 
-                /*
-                 * Check guarantees provided by the function for INFO=1 or INFO=5
-                 */
+                // Check guarantees provided by the function for INFO=1 or INFO=5
                 if( *info==1||*info==5 )
                 {
                     v = 0.0;
@@ -15214,28 +14054,22 @@ void mcsrch(ae_int_t n,
                 return;
             }
 
-            /*
-             *        IN THE FIRST STAGE WE SEEK A STEP FOR WHICH THE MODIFIED
-             *        FUNCTION HAS A NONPOSITIVE VALUE AND NONNEGATIVE DERIVATIVE.
-             */
+            //        IN THE FIRST STAGE WE SEEK A STEP FOR WHICH THE MODIFIED
+            //        FUNCTION HAS A NONPOSITIVE VALUE AND NONNEGATIVE DERIVATIVE.
             if( (state->stage1&&ae_fp_less_eq(*f,state->ftest1))&&ae_fp_greater_eq(state->dg,ae_minreal(linmin_ftol, gtol, _state)*state->dginit) )
             {
                 state->stage1 = ae_false;
             }
 
-            /*
-             *        A MODIFIED FUNCTION IS USED TO PREDICT THE STEP ONLY IF
-             *        WE HAVE NOT OBTAINED A STEP FOR WHICH THE MODIFIED
-             *        FUNCTION HAS A NONPOSITIVE FUNCTION VALUE AND NONNEGATIVE
-             *        DERIVATIVE, AND IF A LOWER FUNCTION VALUE HAS BEEN
-             *        OBTAINED BUT THE DECREASE IS NOT SUFFICIENT.
-             */
+            //        A MODIFIED FUNCTION IS USED TO PREDICT THE STEP ONLY IF
+            //        WE HAVE NOT OBTAINED A STEP FOR WHICH THE MODIFIED
+            //        FUNCTION HAS A NONPOSITIVE FUNCTION VALUE AND NONNEGATIVE
+            //        DERIVATIVE, AND IF A LOWER FUNCTION VALUE HAS BEEN
+            //        OBTAINED BUT THE DECREASE IS NOT SUFFICIENT.
             if( (state->stage1&&ae_fp_less_eq(*f,state->fx))&&ae_fp_greater(*f,state->ftest1) )
             {
 
-                /*
-                 *           DEFINE THE MODIFIED FUNCTION AND DERIVATIVE VALUES.
-                 */
+                //           DEFINE THE MODIFIED FUNCTION AND DERIVATIVE VALUES.
                 state->fm = *f-*stp*state->dgtest;
                 state->fxm = state->fx-state->stx*state->dgtest;
                 state->fym = state->fy-state->sty*state->dgtest;
@@ -15243,15 +14077,11 @@ void mcsrch(ae_int_t n,
                 state->dgxm = state->dgx-state->dgtest;
                 state->dgym = state->dgy-state->dgtest;
 
-                /*
-                 *           CALL CSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
-                 *           AND TO COMPUTE THE NEW STEP.
-                 */
+                //           CALL CSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
+                //           AND TO COMPUTE THE NEW STEP.
                 linmin_mcstep(&state->stx, &state->fxm, &state->dgxm, &state->sty, &state->fym, &state->dgym, stp, state->fm, state->dgm, &state->brackt, state->stmin, state->stmax, &state->infoc, _state);
 
-                /*
-                 *           RESET THE FUNCTION AND GRADIENT VALUES FOR F.
-                 */
+                //           RESET THE FUNCTION AND GRADIENT VALUES FOR F.
                 state->fx = state->fxm+state->stx*state->dgtest;
                 state->fy = state->fym+state->sty*state->dgtest;
                 state->dgx = state->dgxm+state->dgtest;
@@ -15260,17 +14090,13 @@ void mcsrch(ae_int_t n,
             else
             {
 
-                /*
-                 *           CALL MCSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
-                 *           AND TO COMPUTE THE NEW STEP.
-                 */
+                //           CALL MCSTEP TO UPDATE THE INTERVAL OF UNCERTAINTY
+                //           AND TO COMPUTE THE NEW STEP.
                 linmin_mcstep(&state->stx, &state->fx, &state->dgx, &state->sty, &state->fy, &state->dgy, stp, *f, state->dg, &state->brackt, state->stmin, state->stmax, &state->infoc, _state);
             }
 
-            /*
-             *        FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
-             *        INTERVAL OF UNCERTAINTY.
-             */
+            //        FORCE A SUFFICIENT DECREASE IN THE SIZE OF THE
+            //        INTERVAL OF UNCERTAINTY.
             if( state->brackt )
             {
                 if( ae_fp_greater_eq(ae_fabs(state->sty-state->stx, _state),p66*state->width1) )
@@ -15281,9 +14107,7 @@ void mcsrch(ae_int_t n,
                 state->width = ae_fabs(state->sty-state->stx, _state);
             }
 
-            /*
-             *  NEXT.
-             */
+            //  NEXT.
             *stage = 3;
             continue;
         }
@@ -15291,31 +14115,29 @@ void mcsrch(ae_int_t n,
 }
 
 
-/*************************************************************************
-These functions perform Armijo line search using  at  most  FMAX  function
-evaluations.  It  doesn't  enforce  some  kind  of  " sufficient decrease"
-criterion - it just tries different Armijo steps and returns optimum found
-so far.
-
-Optimization is done using F-rcomm interface:
-* ArmijoCreate initializes State structure
-  (reusing previously allocated buffers)
-* ArmijoIteration is subsequently called
-* ArmijoResults returns results
-
-INPUT PARAMETERS:
-    N       -   problem size
-    X       -   array[N], starting point
-    F       -   F(X+S*STP)
-    S       -   step direction, S>0
-    STP     -   step length
-    STPMAX  -   maximum value for STP or zero (if no limit is imposed)
-    FMAX    -   maximum number of function evaluations
-    State   -   optimization state
-
-  -- ALGLIB --
-     Copyright 05.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// These functions perform Armijo line search using  at  most  FMAX  function
+// evaluations.  It  doesn't  enforce  some  kind  of  " sufficient decrease"
+// criterion - it just tries different Armijo steps and returns optimum found
+// so far.
+//
+// Optimization is done using F-rcomm interface:
+// * ArmijoCreate initializes State structure
+//   (reusing previously allocated buffers)
+// * ArmijoIteration is subsequently called
+// * ArmijoResults returns results
+//
+// INPUT PARAMETERS:
+//     N       -   problem size
+//     X       -   array[N], starting point
+//     F       -   F(X+S*STP)
+//     S       -   step direction, S>0
+//     STP     -   step length
+//     STPMAX  -   maximum value for STP or zero (if no limit is imposed)
+//     FMAX    -   maximum number of function evaluations
+//     State   -   optimization state
+//
+//   -- ALGLIB --
+//      Copyright 05.10.2010 by Bochkanov Sergey
 void armijocreate(ae_int_t n,
      RVector * x,
      double f,
@@ -15353,12 +14175,10 @@ void armijocreate(ae_int_t n,
 }
 
 
-/*************************************************************************
-This is rcomm-based search function
-
-  -- ALGLIB --
-     Copyright 05.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// This is rcomm-based search function
+//
+//   -- ALGLIB --
+//      Copyright 05.10.2010 by Bochkanov Sergey
 ae_bool armijoiteration(armijostate* state, ae_state *_state)
 {
     double v;
@@ -15367,16 +14187,14 @@ ae_bool armijoiteration(armijostate* state, ae_state *_state)
 
 
 
-    /*
-     * Reverse communication preparations
-     * I know it looks ugly, but it works the same way
-     * anywhere from C++ to Python.
-     *
-     * This code initializes locals by:
-     * * random values determined during code
-     *   generation - on first subroutine call
-     * * values from previous call - on subsequent calls
-     */
+    // Reverse communication preparations
+    // I know it looks ugly, but it works the same way
+    // anywhere from C++ to Python.
+    //
+    // This code initializes locals by:
+    // * random values determined during code
+    //   generation - on first subroutine call
+    // * values from previous call - on subsequent calls
     if( state->rstate.stage>=0 )
     {
         n = state->rstate.ia.ptr.p_int[0];
@@ -15404,9 +14222,7 @@ ae_bool armijoiteration(armijostate* state, ae_state *_state)
         goto lbl_3;
     }
 
-    /*
-     * Routine body
-     */
+    // Routine body
     if( (ae_fp_less_eq(state->stplen,(double)(0))||ae_fp_less(state->stpmax,(double)(0)))||state->fmax<2 )
     {
         state->info = 0;
@@ -15422,22 +14238,16 @@ ae_bool armijoiteration(armijostate* state, ae_state *_state)
     n = state->n;
     state->nfev = 0;
 
-    /*
-     * We always need F
-     */
+    // We always need F
     state->needf = ae_true;
 
-    /*
-     * Bound StpLen
-     */
+    // Bound StpLen
     if( ae_fp_greater(state->stplen,state->stpmax)&&ae_fp_neq(state->stpmax,(double)(0)) )
     {
         state->stplen = state->stpmax;
     }
 
-    /*
-     * Increase length
-     */
+    // Increase length
     v = state->stplen*linmin_armijofactor;
     if( ae_fp_greater(v,state->stpmax)&&ae_fp_neq(state->stpmax,(double)(0)) )
     {
@@ -15461,9 +14271,7 @@ lbl_6:
         goto lbl_7;
     }
 
-    /*
-     * test stopping conditions
-     */
+    // test stopping conditions
     if( state->nfev>=state->fmax )
     {
         state->info = 3;
@@ -15477,9 +14285,7 @@ lbl_6:
         return result;
     }
 
-    /*
-     * evaluate F
-     */
+    // evaluate F
     v = state->stplen*linmin_armijofactor;
     if( ae_fp_greater(v,state->stpmax)&&ae_fp_neq(state->stpmax,(double)(0)) )
     {
@@ -15492,9 +14298,7 @@ lbl_6:
 lbl_1:
     state->nfev = state->nfev+1;
 
-    /*
-     * make decision
-     */
+    // make decision
     if( ae_fp_less(state->f,state->fcur) )
     {
         state->stplen = v;
@@ -15510,9 +14314,7 @@ lbl_1:
 lbl_7:
 lbl_4:
 
-    /*
-     * Decrease length
-     */
+    // Decrease length
     v = state->stplen/linmin_armijofactor;
     ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0,n-1));
     ae_v_addd(&state->x.ptr.p_double[0], 1, &state->s.ptr.p_double[0], 1, ae_v_len(0,n-1), v);
@@ -15532,9 +14334,7 @@ lbl_10:
         goto lbl_11;
     }
 
-    /*
-     * test stopping conditions
-     */
+    // test stopping conditions
     if( state->nfev>=state->fmax )
     {
         state->info = 3;
@@ -15548,9 +14348,7 @@ lbl_10:
         return result;
     }
 
-    /*
-     * evaluate F
-     */
+    // evaluate F
     v = state->stplen/linmin_armijofactor;
     ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0,n-1));
     ae_v_addd(&state->x.ptr.p_double[0], 1, &state->s.ptr.p_double[0], 1, ae_v_len(0,n-1), v);
@@ -15559,9 +14357,7 @@ lbl_10:
 lbl_3:
     state->nfev = state->nfev+1;
 
-    /*
-     * make decision
-     */
+    // make decision
     if( ae_fp_less(state->f,state->fcur) )
     {
         state->stplen = state->stplen/linmin_armijofactor;
@@ -15577,16 +14373,12 @@ lbl_3:
 lbl_11:
 lbl_8:
 
-    /*
-     * Nothing to be done
-     */
+    // Nothing to be done
     state->info = 1;
     result = ae_false;
     return result;
 
-    /*
-     * Saving state
-     */
+    // Saving state
 lbl_rcomm:
     result = ae_true;
     state->rstate.ia.ptr.p_int[0] = n;
@@ -15595,23 +14387,21 @@ lbl_rcomm:
 }
 
 
-/*************************************************************************
-Results of Armijo search
-
-OUTPUT PARAMETERS:
-    INFO    -   on output it is set to one of the return codes:
-                * 0     improper input params
-                * 1     optimum step is found with at most FMAX evaluations
-                * 3     FMAX evaluations were used,
-                        X contains optimum found so far
-                * 4     step is at lower bound STPMIN
-                * 5     step is at upper bound
-    STP     -   step length (in case of failure it is still returned)
-    F       -   function value (in case of failure it is still returned)
-
-  -- ALGLIB --
-     Copyright 05.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Results of Armijo search
+//
+// OUTPUT PARAMETERS:
+//     INFO    -   on output it is set to one of the return codes:
+//                 * 0     improper input params
+//                 * 1     optimum step is found with at most FMAX evaluations
+//                 * 3     FMAX evaluations were used,
+//                         X contains optimum found so far
+//                 * 4     step is at lower bound STPMIN
+//                 * 5     step is at upper bound
+//     STP     -   step length (in case of failure it is still returned)
+//     F       -   function value (in case of failure it is still returned)
+//
+//   -- ALGLIB --
+//      Copyright 05.10.2010 by Bochkanov Sergey
 void armijoresults(armijostate* state,
      ae_int_t* info,
      double* stp,
@@ -15656,25 +14446,19 @@ static void linmin_mcstep(double* stx,
 
     *info = 0;
 
-    /*
-     *     CHECK THE INPUT PARAMETERS FOR ERRORS.
-     */
+    //     CHECK THE INPUT PARAMETERS FOR ERRORS.
     if( ((*brackt&&(ae_fp_less_eq(*stp,ae_minreal(*stx, *sty, _state))||ae_fp_greater_eq(*stp,ae_maxreal(*stx, *sty, _state))))||ae_fp_greater_eq(*dx*(*stp-(*stx)),(double)(0)))||ae_fp_less(stmax,stmin) )
     {
         return;
     }
 
-    /*
-     *     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
-     */
+    //     DETERMINE IF THE DERIVATIVES HAVE OPPOSITE SIGN.
     sgnd = dp*(*dx/ae_fabs(*dx, _state));
 
-    /*
-     *     FIRST CASE. A HIGHER FUNCTION VALUE.
-     *     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
-     *     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
-     *     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
-     */
+    //     FIRST CASE. A HIGHER FUNCTION VALUE.
+    //     THE MINIMUM IS BRACKETED. IF THE CUBIC STEP IS CLOSER
+    //     TO STX THAN THE QUADRATIC STEP, THE CUBIC STEP IS TAKEN,
+    //     ELSE THE AVERAGE OF THE CUBIC AND QUADRATIC STEPS IS TAKEN.
     if( ae_fp_greater(fp,*fx) )
     {
         *info = 1;
@@ -15706,12 +14490,10 @@ static void linmin_mcstep(double* stx,
         if( ae_fp_less(sgnd,(double)(0)) )
         {
 
-            /*
-             *     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
-             *     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
-             *     STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
-             *     THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
-             */
+            //     SECOND CASE. A LOWER FUNCTION VALUE AND DERIVATIVES OF
+            //     OPPOSITE SIGN. THE MINIMUM IS BRACKETED. IF THE CUBIC
+            //     STEP IS CLOSER TO STX THAN THE QUADRATIC (SECANT) STEP,
+            //     THE CUBIC STEP IS TAKEN, ELSE THE QUADRATIC STEP IS TAKEN.
             *info = 2;
             bound = ae_false;
             theta = 3*(*fx-fp)/(*stp-(*stx))+(*dx)+dp;
@@ -15741,25 +14523,21 @@ static void linmin_mcstep(double* stx,
             if( ae_fp_less(ae_fabs(dp, _state),ae_fabs(*dx, _state)) )
             {
 
-                /*
-                 *     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-                 *     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
-                 *     THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
-                 *     IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
-                 *     IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
-                 *     EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
-                 *     COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
-                 *     CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
-                 */
+                //     THIRD CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+                //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DECREASES.
+                //     THE CUBIC STEP IS ONLY USED IF THE CUBIC TENDS TO INFINITY
+                //     IN THE DIRECTION OF THE STEP OR IF THE MINIMUM OF THE CUBIC
+                //     IS BEYOND STP. OTHERWISE THE CUBIC STEP IS DEFINED TO BE
+                //     EITHER STPMIN OR STPMAX. THE QUADRATIC (SECANT) STEP IS ALSO
+                //     COMPUTED AND IF THE MINIMUM IS BRACKETED THEN THE THE STEP
+                //     CLOSEST TO STX IS TAKEN, ELSE THE STEP FARTHEST AWAY IS TAKEN.
                 *info = 3;
                 bound = ae_true;
                 theta = 3*(*fx-fp)/(*stp-(*stx))+(*dx)+dp;
                 s = ae_maxreal(ae_fabs(theta, _state), ae_maxreal(ae_fabs(*dx, _state), ae_fabs(dp, _state), _state), _state);
 
-                /*
-                 *        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
-                 *        TO INFINITY IN THE DIRECTION OF THE STEP.
-                 */
+                //        THE CASE GAMMA = 0 ONLY ARISES IF THE CUBIC DOES NOT TEND
+                //        TO INFINITY IN THE DIRECTION OF THE STEP.
                 gamma = s*ae_sqrt(ae_maxreal((double)(0), ae_sqr(theta/s, _state)-*dx/s*(dp/s), _state), _state);
                 if( ae_fp_greater(*stp,*stx) )
                 {
@@ -15810,12 +14588,10 @@ static void linmin_mcstep(double* stx,
             else
             {
 
-                /*
-                 *     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
-                 *     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
-                 *     NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
-                 *     IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
-                 */
+                //     FOURTH CASE. A LOWER FUNCTION VALUE, DERIVATIVES OF THE
+                //     SAME SIGN, AND THE MAGNITUDE OF THE DERIVATIVE DOES
+                //     NOT DECREASE. IF THE MINIMUM IS NOT BRACKETED, THE STEP
+                //     IS EITHER STPMIN OR STPMAX, ELSE THE CUBIC STEP IS TAKEN.
                 *info = 4;
                 bound = ae_false;
                 if( *brackt )
@@ -15848,10 +14624,8 @@ static void linmin_mcstep(double* stx,
         }
     }
 
-    /*
-     *     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
-     *     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
-     */
+    //     UPDATE THE INTERVAL OF UNCERTAINTY. THIS UPDATE DOES NOT
+    //     DEPEND ON THE NEW STEP OR THE CASE ANALYSIS ABOVE.
     if( ae_fp_greater(fp,*fx) )
     {
         *sty = *stp;
@@ -15871,9 +14645,7 @@ static void linmin_mcstep(double* stx,
         *dx = dp;
     }
 
-    /*
-     *     COMPUTE THE NEW STEP AND SAFEGUARD IT.
-     */
+    //     COMPUTE THE NEW STEP AND SAFEGUARD IT.
     stpf = ae_minreal(stmax, stpf, _state);
     stpf = ae_maxreal(stmin, stpf, _state);
     *stp = stpf;
@@ -16120,41 +14892,33 @@ void findprimitiverootandinverse(ae_int_t n,
     *proot = 0;
     *invproot = 0;
 
-    /*
-     * check that N is prime
-     */
+    // check that N is prime
     ae_assert(ntheory_isprime(n, _state), "FindPrimitiveRoot: N is not prime", _state);
 
-    /*
-     * Because N is prime, Euler totient function is equal to N-1
-     */
+    // Because N is prime, Euler totient function is equal to N-1
     phin = n-1;
 
-    /*
-     * Test different values of PRoot - from 2 to N-1.
-     * One of these values MUST be primitive root.
-     *
-     * For testing we use algorithm from Wiki (Primitive root modulo n):
-     * * compute phi(N)
-     * * determine the different prime factors of phi(N), say p1, ..., pk
-     * * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i=1..k
-     *   using a fast algorithm for modular exponentiation.
-     * * a number m for which these k results are all different from 1 is a
-     *   primitive root.
-     */
+    // Test different values of PRoot - from 2 to N-1.
+    // One of these values MUST be primitive root.
+    //
+    // For testing we use algorithm from Wiki (Primitive root modulo n):
+    // * compute phi(N)
+    // * determine the different prime factors of phi(N), say p1, ..., pk
+    // * for every element m of Zn*, compute m^(phi(N)/pi) mod N for i=1..k
+    //   using a fast algorithm for modular exponentiation.
+    // * a number m for which these k results are all different from 1 is a
+    //   primitive root.
     for(candroot=2; candroot<=n-1; candroot++)
     {
 
-        /*
-         * We have current candidate root in CandRoot.
-         *
-         * Scan different prime factors of PhiN. Here:
-         * * F is a current candidate factor
-         * * Q is a current quotient - amount which was left after dividing PhiN
-         *   by all previous factors
-         *
-         * For each factor, perform test mentioned above.
-         */
+        // We have current candidate root in CandRoot.
+        //
+        // Scan different prime factors of PhiN. Here:
+        // * F is a current candidate factor
+        // * Q is a current quotient - amount which was left after dividing PhiN
+        //   by all previous factors
+        //
+        // For each factor, perform test mentioned above.
         q = phin;
         f = 2;
         allnonone = ae_true;
@@ -16183,9 +14947,7 @@ void findprimitiverootandinverse(ae_int_t n,
     }
     ae_assert(*proot>=2, "FindPrimitiveRoot: internal error (root not found)", _state);
 
-    /*
-     * Use extended Euclidean algorithm to find multiplicative inverse of primitive root
-     */
+    // Use extended Euclidean algorithm to find multiplicative inverse of primitive root
     x = 0;
     lastx = 1;
     y = 1;
@@ -16211,10 +14973,8 @@ void findprimitiverootandinverse(ae_int_t n,
     }
     *invproot = lastx;
 
-    /*
-     * Check that it is safe to perform multiplication modulo N.
-     * Check results for consistency.
-     */
+    // Check that it is safe to perform multiplication modulo N.
+    // Check results for consistency.
     n2 = (n-1)*(n-1);
     ae_assert(n2/(n-1)==n-1, "FindPrimitiveRoot: internal error", _state);
     ae_assert(*proot*(*invproot)/(*proot)==(*invproot), "FindPrimitiveRoot: internal error", _state);
@@ -16258,9 +15018,7 @@ static ae_int_t ntheory_modmul(ae_int_t a,
     ae_assert(a>=0&&a<n, "ModMul: A<0 or A>=N", _state);
     ae_assert(b>=0&&b<n, "ModMul: B<0 or B>=N", _state);
 
-    /*
-     * Base cases
-     */
+    // Base cases
     ra = (double)(a);
     rb = (double)(b);
     if( b==0||a==0 )
@@ -16279,23 +15037,19 @@ static ae_int_t ntheory_modmul(ae_int_t a,
         return result;
     }
 
-    /*
-     * Non-base cases
-     */
+    // Non-base cases
     if( b%2==0 )
     {
 
-        /*
-         * A*B = (A*(B/2)) * 2
-         *
-         * Product T=A*(B/2) is calculated recursively, product T*2 is
-         * calculated as follows:
-         * * result:=T-N
-         * * result:=result+T
-         * * if result<0 then result:=result+N
-         *
-         * In case integer result overflows, we generate exception
-         */
+        // A*B = (A*(B/2)) * 2
+        //
+        // Product T=A*(B/2) is calculated recursively, product T*2 is
+        // calculated as follows:
+        // * result:=T-N
+        // * result:=result+T
+        // * if result<0 then result:=result+N
+        //
+        // In case integer result overflows, we generate exception
         t = ntheory_modmul(a, b/2, n, _state);
         result = t-n;
         result = result+t;
@@ -16307,17 +15061,15 @@ static ae_int_t ntheory_modmul(ae_int_t a,
     else
     {
 
-        /*
-         * A*B = (A*(B div 2)) * 2 + A
-         *
-         * Product T=A*(B/2) is calculated recursively, product T*2 is
-         * calculated as follows:
-         * * result:=T-N
-         * * result:=result+T
-         * * if result<0 then result:=result+N
-         *
-         * In case integer result overflows, we generate exception
-         */
+        // A*B = (A*(B div 2)) * 2 + A
+        //
+        // Product T=A*(B/2) is calculated recursively, product T*2 is
+        // calculated as follows:
+        // * result:=T-N
+        // * result:=result+T
+        // * if result<0 then result:=result+N
+        //
+        // In case integer result overflows, we generate exception
         t = ntheory_modmul(a, b/2, n, _state);
         result = t-n;
         result = result+t;
@@ -16348,9 +15100,7 @@ static ae_int_t ntheory_modexp(ae_int_t a,
     ae_assert(a>=0&&a<n, "ModExp: A<0 or A>=N", _state);
     ae_assert(b>=0, "ModExp: B<0", _state);
 
-    /*
-     * Base cases
-     */
+    // Base cases
     if( b==0 )
     {
         result = 1;
@@ -16362,9 +15112,7 @@ static ae_int_t ntheory_modexp(ae_int_t a,
         return result;
     }
 
-    /*
-     * Non-base cases
-     */
+    // Non-base cases
     if( b%2==0 )
     {
         t = ntheory_modmul(a, a, n, _state);
@@ -16384,19 +15132,17 @@ static ae_int_t ntheory_modexp(ae_int_t a,
 #if defined(AE_COMPILE_FTBASE) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-This subroutine generates FFT plan for K complex FFT's with length N each.
-
-INPUT PARAMETERS:
-    N           -   FFT length (in complex numbers), N>=1
-    K           -   number of repetitions, K>=1
-
-OUTPUT PARAMETERS:
-    Plan        -   plan
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine generates FFT plan for K complex FFT's with length N each.
+//
+// INPUT PARAMETERS:
+//     N           -   FFT length (in complex numbers), N>=1
+//     K           -   number of repetitions, K>=1
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   plan
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 void ftcomplexfftplan(ae_int_t n,
      ae_int_t k,
      fasttransformplan* plan,
@@ -16417,27 +15163,23 @@ void ftcomplexfftplan(ae_int_t n,
     _srealarray_init(&bluesteinbuf, _state, ae_true);
 
 
-    /*
-     * Initial check for parameters
-     */
+    // Initial check for parameters
     ae_assert(n>0, "FTComplexFFTPlan: N<=0", _state);
     ae_assert(k>0, "FTComplexFFTPlan: K<=0", _state);
 
-    /*
-     * Determine required sizes of precomputed real and integer
-     * buffers. This stage of code is highly dependent on internals
-     * of FTComplexFFTPlanRec() and must be kept synchronized with
-     * possible changes in internals of plan generation function.
-     *
-     * Buffer size is determined as follows:
-     * * N is factorized
-     * * we factor out anything which is less or equal to MaxRadix
-     * * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-     *   real entries to store precomputed Quantities for Bluestein's
-     *   transformation
-     * * prime factor F<=RaderThreshold does NOT require
-     *   precomputed storage
-     */
+    // Determine required sizes of precomputed real and integer
+    // buffers. This stage of code is highly dependent on internals
+    // of FTComplexFFTPlanRec() and must be kept synchronized with
+    // possible changes in internals of plan generation function.
+    //
+    // Buffer size is determined as follows:
+    // * N is factorized
+    // * we factor out anything which is less or equal to MaxRadix
+    // * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+    //   real entries to store precomputed Quantities for Bluestein's
+    //   transformation
+    // * prime factor F<=RaderThreshold does NOT require
+    //   precomputed storage
     precrsize = 0;
     precisize = 0;
     ftbase_ftdeterminespacerequirements(n, &precrsize, &precisize, _state);
@@ -16450,9 +15192,7 @@ void ftcomplexfftplan(ae_int_t n,
         ae_vector_set_length(&plan->preci, precisize, _state);
     }
 
-    /*
-     * Generate plan
-     */
+    // Generate plan
     rowptr = 0;
     precrptr = 0;
     preciptr = 0;
@@ -16462,34 +15202,30 @@ void ftcomplexfftplan(ae_int_t n,
     ae_vector_set_length(&bluesteinbuf.val, bluesteinsize, _state);
     ae_shared_pool_set_seed(&plan->bluesteinpool, &bluesteinbuf, sizeof(bluesteinbuf), _srealarray_init, _srealarray_init_copy, _srealarray_destroy, _state);
 
-    /*
-     * Check that actual amount of precomputed space used by transformation
-     * plan is EXACTLY equal to amount of space allocated by us.
-     */
+    // Check that actual amount of precomputed space used by transformation
+    // plan is EXACTLY equal to amount of space allocated by us.
     ae_assert(precrptr==precrsize, "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)", _state);
     ae_assert(preciptr==precisize, "FTComplexFFTPlan: internal error (PrecRPtr<>PrecRSize)", _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-This subroutine applies transformation plan to input/output array A.
-
-INPUT PARAMETERS:
-    Plan        -   transformation plan
-    A           -   array, must be large enough for plan to work
-    OffsA       -   offset of the subarray to process
-    RepCnt      -   repetition count (transformation is repeatedly applied
-                    to subsequent subarrays)
-
-OUTPUT PARAMETERS:
-    Plan        -   plan (temporary buffers can be modified, plan itself
-                    is unchanged and can be reused)
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies transformation plan to input/output array A.
+//
+// INPUT PARAMETERS:
+//     Plan        -   transformation plan
+//     A           -   array, must be large enough for plan to work
+//     OffsA       -   offset of the subarray to process
+//     RepCnt      -   repetition count (transformation is repeatedly applied
+//                     to subsequent subarrays)
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   plan (temporary buffers can be modified, plan itself
+//                     is unchanged and can be reused)
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 void ftapplyplan(fasttransformplan* plan,
      RVector * a,
      ae_int_t offsa,
@@ -16508,17 +15244,15 @@ void ftapplyplan(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-Returns good factorization N=N1*N2.
-
-Usually N1<=N2 (but not always - small N's may be exception).
-if N1<>1 then N2<>1.
-
-Factorization is chosen depending on task type and codelets we have.
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns good factorization N=N1*N2.
+//
+// Usually N1<=N2 (but not always - small N's may be exception).
+// if N1<>1 then N2<>1.
+//
+// Factorization is chosen depending on task type and codelets we have.
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 void ftbasefactorize(ae_int_t n,
      ae_int_t tasktype,
      ae_int_t* n1,
@@ -16533,9 +15267,7 @@ void ftbasefactorize(ae_int_t n,
     *n1 = 0;
     *n2 = 0;
 
-    /*
-     * try to find good codelet
-     */
+    // try to find good codelet
     if( *n1*(*n2)!=n )
     {
         for(j=ftbase_ftbasecodeletrecommended; j>=2; j--)
@@ -16549,9 +15281,7 @@ void ftbasefactorize(ae_int_t n,
         }
     }
 
-    /*
-     * try to factorize N
-     */
+    // try to factorize N
     if( *n1*(*n2)!=n )
     {
         for(j=ftbase_ftbasecodeletrecommended+1; j<=n-1; j++)
@@ -16565,18 +15295,14 @@ void ftbasefactorize(ae_int_t n,
         }
     }
 
-    /*
-     * looks like N is prime :(
-     */
+    // looks like N is prime :(
     if( *n1*(*n2)!=n )
     {
         *n1 = 1;
         *n2 = n;
     }
 
-    /*
-     * normalize
-     */
+    // normalize
     if( *n2==1&&*n1!=1 )
     {
         *n2 = *n1;
@@ -16585,12 +15311,10 @@ void ftbasefactorize(ae_int_t n,
 }
 
 
-/*************************************************************************
-Is number smooth?
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Is number smooth?
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 ae_bool ftbaseissmooth(ae_int_t n, ae_state *_state)
 {
     ae_int_t i;
@@ -16609,13 +15333,11 @@ ae_bool ftbaseissmooth(ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
-than or equal to max(N,2)
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns smallest smooth (divisible only by 2, 3, 5) number that is greater
+// than or equal to max(N,2)
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state)
 {
     ae_int_t best;
@@ -16633,13 +15355,11 @@ ae_int_t ftbasefindsmooth(ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
-greater than or equal to max(N,2)
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  smallest  smooth  (divisible only by 2, 3, 5) even number that is
+// greater than or equal to max(N,2)
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state)
 {
     ae_int_t best;
@@ -16657,17 +15377,15 @@ ae_int_t ftbasefindsmootheven(ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns estimate of FLOP count for the FFT.
-
-It is only an estimate based on operations count for the PERFECT FFT
-and relative inefficiency of the algorithm actually used.
-
-N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns estimate of FLOP count for the FFT.
+//
+// It is only an estimate based on operations count for the PERFECT FFT
+// and relative inefficiency of the algorithm actually used.
+//
+// N should be power of 2, estimates are badly wrong for non-power-of-2 N's.
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 double ftbasegetflopestimate(ae_int_t n, ae_state *_state)
 {
     double result;
@@ -16678,25 +15396,23 @@ double ftbasegetflopestimate(ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-This function returns EXACT estimate of the space requirements for N-point
-FFT. Internals of this function are highly dependent on details of different
-FFTs employed by this unit, so every time algorithm is changed this function
-has to be rewritten.
-
-INPUT PARAMETERS:
-    N           -   transform length
-    PrecRSize   -   must be set to zero
-    PrecISize   -   must be set to zero
-
-OUTPUT PARAMETERS:
-    PrecRSize   -   number of real temporaries required for transformation
-    PrecISize   -   number of integer temporaries required for transformation
-
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function returns EXACT estimate of the space requirements for N-point
+// FFT. Internals of this function are highly dependent on details of different
+// FFTs employed by this unit, so every time algorithm is changed this function
+// has to be rewritten.
+//
+// INPUT PARAMETERS:
+//     N           -   transform length
+//     PrecRSize   -   must be set to zero
+//     PrecISize   -   must be set to zero
+//
+// OUTPUT PARAMETERS:
+//     PrecRSize   -   number of real temporaries required for transformation
+//     PrecISize   -   number of integer temporaries required for transformation
+//
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftdeterminespacerequirements(ae_int_t n,
      ae_int_t* precrsize,
      ae_int_t* precisize,
@@ -16708,21 +15424,19 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n,
 
 
 
-    /*
-     * Determine required sizes of precomputed real and integer
-     * buffers. This stage of code is highly dependent on internals
-     * of FTComplexFFTPlanRec() and must be kept synchronized with
-     * possible changes in internals of plan generation function.
-     *
-     * Buffer size is determined as follows:
-     * * N is factorized
-     * * we factor out anything which is less or equal to MaxRadix
-     * * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
-     *   real entries to store precomputed Quantities for Bluestein's
-     *   transformation
-     * * prime factor F<=RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
-     *   precomputed storage
-     */
+    // Determine required sizes of precomputed real and integer
+    // buffers. This stage of code is highly dependent on internals
+    // of FTComplexFFTPlanRec() and must be kept synchronized with
+    // possible changes in internals of plan generation function.
+    //
+    // Buffer size is determined as follows:
+    // * N is factorized
+    // * we factor out anything which is less or equal to MaxRadix
+    // * prime factor F>RaderThreshold requires 4*FTBaseFindSmooth(2*F-1)
+    //   real entries to store precomputed Quantities for Bluestein's
+    //   transformation
+    // * prime factor F<=RaderThreshold requires 2*(F-1)+ESTIMATE(F-1)
+    //   precomputed storage
     ncur = n;
     for(i=2; i<=ftbase_maxradix; i++)
     {
@@ -16752,49 +15466,47 @@ static void ftbase_ftdeterminespacerequirements(ae_int_t n,
 }
 
 
-/*************************************************************************
-Recurrent function called by FTComplexFFTPlan() and other functions. It
-recursively builds transformation plan
-
-INPUT PARAMETERS:
-    N           -   FFT length (in complex numbers), N>=1
-    K           -   number of repetitions, K>=1
-    ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
-                    plan header/footer.
-    TopmostPlan -   if True, plan generator assumes that it is topmost plan:
-                    * it may use global buffer for transpositions
-                    and there is no other plan which executes in parallel
-    RowPtr      -   index which points to past-the-last entry generated so far
-    BluesteinSize-  amount of storage (in real numbers) required for Bluestein buffer
-    PrecRPtr    -   pointer to unused part of precomputed real buffer (Plan.PrecR):
-                    * when this function stores some data to precomputed buffer,
-                      it advances pointer.
-                    * it is responsibility of the function to assert that
-                      Plan.PrecR has enough space to store data before actually
-                      writing to buffer.
-                    * it is responsibility of the caller to allocate enough
-                      space before calling this function
-    PrecIPtr    -   pointer to unused part of precomputed integer buffer (Plan.PrecI):
-                    * when this function stores some data to precomputed buffer,
-                      it advances pointer.
-                    * it is responsibility of the function to assert that
-                      Plan.PrecR has enough space to store data before actually
-                      writing to buffer.
-                    * it is responsibility of the caller to allocate enough
-                      space before calling this function
-    Plan        -   plan (generated so far)
-
-OUTPUT PARAMETERS:
-    RowPtr      -   updated pointer (advanced by number of entries generated
-                    by function)
-    BluesteinSize-  updated amount
-                    (may be increased, but may never be decreased)
-
-NOTE: in case TopmostPlan is True, ChildPlan is also must be True.
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Recurrent function called by FTComplexFFTPlan() and other functions. It
+// recursively builds transformation plan
+//
+// INPUT PARAMETERS:
+//     N           -   FFT length (in complex numbers), N>=1
+//     K           -   number of repetitions, K>=1
+//     ChildPlan   -   if True, plan generator inserts OpStart/opEnd in the
+//                     plan header/footer.
+//     TopmostPlan -   if True, plan generator assumes that it is topmost plan:
+//                     * it may use global buffer for transpositions
+//                     and there is no other plan which executes in parallel
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     BluesteinSize-  amount of storage (in real numbers) required for Bluestein buffer
+//     PrecRPtr    -   pointer to unused part of precomputed real buffer (Plan.PrecR):
+//                     * when this function stores some data to precomputed buffer,
+//                       it advances pointer.
+//                     * it is responsibility of the function to assert that
+//                       Plan.PrecR has enough space to store data before actually
+//                       writing to buffer.
+//                     * it is responsibility of the caller to allocate enough
+//                       space before calling this function
+//     PrecIPtr    -   pointer to unused part of precomputed integer buffer (Plan.PrecI):
+//                     * when this function stores some data to precomputed buffer,
+//                       it advances pointer.
+//                     * it is responsibility of the function to assert that
+//                       Plan.PrecR has enough space to store data before actually
+//                       writing to buffer.
+//                     * it is responsibility of the caller to allocate enough
+//                       space before calling this function
+//     Plan        -   plan (generated so far)
+//
+// OUTPUT PARAMETERS:
+//     RowPtr      -   updated pointer (advanced by number of entries generated
+//                     by function)
+//     BluesteinSize-  updated amount
+//                     (may be increased, but may never be decreased)
+//
+// NOTE: in case TopmostPlan is True, ChildPlan is also must be True.
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftcomplexfftplanrec(ae_int_t n,
      ae_int_t k,
      ae_bool childplan,
@@ -16826,25 +15538,19 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
     ae_assert(k>0, "FTComplexFFTPlan: K<=0", _state);
     ae_assert(!topmostplan||childplan, "FTComplexFFTPlan: ChildPlan is inconsistent with TopmostPlan", _state);
 
-    /*
-     * Try to generate "topmost" plan
-     */
+    // Try to generate "topmost" plan
     if( topmostplan&&n>ftbase_recursivethreshold )
     {
         ftbase_ftfactorize(n, ae_false, &n1, &n2, _state);
         if( n1*n2==0 )
         {
 
-            /*
-             * Handle prime-factor FFT with Bluestein's FFT.
-             * Determine size of Bluestein's buffer.
-             */
+            // Handle prime-factor FFT with Bluestein's FFT.
+            // Determine size of Bluestein's buffer.
             m = ftbasefindsmooth(2*n-1, _state);
             *bluesteinsize = ae_maxint(2*m, *bluesteinsize, _state);
 
-            /*
-             * Generate plan
-             */
+            // Generate plan
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
             ftbase_ftpushentry4(plan, rowptr, ftbase_opbluesteinsfft, k, n, 2, m, 2, *precrptr, 0, _state);
             row0 = *rowptr;
@@ -16854,23 +15560,17 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
             plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1-row0;
             ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
 
-            /*
-             * Fill precomputed buffer
-             */
+            // Fill precomputed buffer
             ftbase_ftprecomputebluesteinsfft(n, m, &plan->precr, *precrptr, _state);
 
-            /*
-             * Update pointer to the precomputed area
-             */
+            // Update pointer to the precomputed area
             *precrptr = *precrptr+4*m;
         }
         else
         {
 
-            /*
-             * Handle composite FFT with recursive Cooley-Tukey which
-             * uses global buffer instead of local one.
-             */
+            // Handle composite FFT with recursive Cooley-Tukey which
+            // uses global buffer instead of local one.
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
             ftbase_ftpushentry(plan, rowptr, ftbase_opcomplextranspose, k, n, 2, n1, _state);
             row0 = *rowptr;
@@ -16892,27 +15592,21 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
         return;
     }
 
-    /*
-     * Prepare "non-topmost" plan:
-     * * calculate factorization
-     * * use local (shared) buffer
-     * * update buffer size - ANY plan will need at least
-     *   2*N temporaries, additional requirements can be
-     *   applied later
-     */
+    // Prepare "non-topmost" plan:
+    // * calculate factorization
+    // * use local (shared) buffer
+    // * update buffer size - ANY plan will need at least
+    //   2*N temporaries, additional requirements can be
+    //   applied later
     ftbase_ftfactorize(n, ae_false, &n1, &n2, _state);
 
-    /*
-     * Handle FFT's with N1*N2=0: either small-N or prime-factor
-     */
+    // Handle FFT's with N1*N2=0: either small-N or prime-factor
     if( n1*n2==0 )
     {
         if( n<=ftbase_maxradix )
         {
 
-            /*
-             * Small-N FFT
-             */
+            // Small-N FFT
             if( childplan )
             {
                 ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
@@ -16928,9 +15622,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
         if( n<=ftbase_raderthreshold )
         {
 
-            /*
-             * Handle prime-factor FFT's with Rader's FFT
-             */
+            // Handle prime-factor FFT's with Rader's FFT
             m = n-1;
             if( childplan )
             {
@@ -16953,9 +15645,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
         else
         {
 
-            /*
-             * Handle prime-factor FFT's with Bluestein's FFT
-             */
+            // Handle prime-factor FFT's with Bluestein's FFT
             m = ftbasefindsmooth(2*n-1, _state);
             *bluesteinsize = ae_maxint(2*m, *bluesteinsize, _state);
             if( childplan )
@@ -16979,18 +15669,14 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
         return;
     }
 
-    /*
-     * Handle Cooley-Tukey FFT with small N1
-     */
+    // Handle Cooley-Tukey FFT with small N1
     if( n1<=ftbase_maxradix )
     {
 
-        /*
-         * Specialized transformation for small N1:
-         * * N2 short inplace FFT's, each N1-point, with integrated twiddle factors
-         * * N1 long FFT's
-         * * final transposition
-         */
+        // Specialized transformation for small N1:
+        // * N2 short inplace FFT's, each N1-point, with integrated twiddle factors
+        // * N1 long FFT's
+        // * final transposition
         if( childplan )
         {
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
@@ -17006,16 +15692,12 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
         return;
     }
 
-    /*
-     * Handle general Cooley-Tukey FFT, either "flat" or "recursive"
-     */
+    // Handle general Cooley-Tukey FFT, either "flat" or "recursive"
     if( n<=ftbase_recursivethreshold )
     {
 
-        /*
-         * General code for large N1/N2, "flat" version without explicit recurrence
-         * (nested subplans are inserted directly into the body of the plan)
-         */
+        // General code for large N1/N2, "flat" version without explicit recurrence
+        // (nested subplans are inserted directly into the body of the plan)
         if( childplan )
         {
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
@@ -17034,12 +15716,10 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
     else
     {
 
-        /*
-         * General code for large N1/N2, "recursive" version - nested subplans
-         * are separated from the plan body.
-         *
-         * Generate parent plan.
-         */
+        // General code for large N1/N2, "recursive" version - nested subplans
+        // are separated from the plan body.
+        //
+        // Generate parent plan.
         if( childplan )
         {
             ftbase_ftpushentry2(plan, rowptr, ftbase_opstart, k, n, 2, -1, ftbase_ftoptimisticestimate(n, _state), _state);
@@ -17057,9 +15737,7 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
             ftbase_ftpushentry(plan, rowptr, ftbase_opend, k, n, 2, 0, _state);
         }
 
-        /*
-         * Generate child subplans, insert refence to parent plans
-         */
+        // Generate child subplans, insert refence to parent plans
         row1 = *rowptr;
         ftbase_ftcomplexfftplanrec(n1, 1, ae_true, ae_false, rowptr, bluesteinsize, precrptr, preciptr, plan, _state);
         plan->entries.ptr.pp_int[row0][ftbase_colparam0] = row1-row0;
@@ -17071,28 +15749,26 @@ static void ftbase_ftcomplexfftplanrec(ae_int_t n,
 }
 
 
-/*************************************************************************
-This function pushes one more entry to the plan. It resizes Entries matrix
-if needed.
-
-INPUT PARAMETERS:
-    Plan        -   plan (generated so far)
-    RowPtr      -   index which points to past-the-last entry generated so far
-    EType       -   entry type
-    EOpCnt      -   operands count
-    EOpSize     -   operand size
-    EMcvSize    -   microvector size
-    EParam0     -   parameter 0
-
-OUTPUT PARAMETERS:
-    Plan        -   updated plan
-    RowPtr      -   updated pointer
-
-NOTE: Param1 is set to -1.
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function pushes one more entry to the plan. It resizes Entries matrix
+// if needed.
+//
+// INPUT PARAMETERS:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+//
+// NOTE: Param1 is set to -1.
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftpushentry(fasttransformplan* plan,
      ae_int_t* rowptr,
      ae_int_t etype,
@@ -17108,28 +15784,26 @@ static void ftbase_ftpushentry(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-Same as FTPushEntry(), but sets Param0 AND Param1.
-This function pushes one more entry to the plan. It resized Entries matrix
-if needed.
-
-INPUT PARAMETERS:
-    Plan        -   plan (generated so far)
-    RowPtr      -   index which points to past-the-last entry generated so far
-    EType       -   entry type
-    EOpCnt      -   operands count
-    EOpSize     -   operand size
-    EMcvSize    -   microvector size
-    EParam0     -   parameter 0
-    EParam1     -   parameter 1
-
-OUTPUT PARAMETERS:
-    Plan        -   updated plan
-    RowPtr      -   updated pointer
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Same as FTPushEntry(), but sets Param0 AND Param1.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
+//
+// INPUT PARAMETERS:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftpushentry2(fasttransformplan* plan,
      ae_int_t* rowptr,
      ae_int_t etype,
@@ -17158,30 +15832,28 @@ static void ftbase_ftpushentry2(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
-This function pushes one more entry to the plan. It resized Entries matrix
-if needed.
-
-INPUT PARAMETERS:
-    Plan        -   plan (generated so far)
-    RowPtr      -   index which points to past-the-last entry generated so far
-    EType       -   entry type
-    EOpCnt      -   operands count
-    EOpSize     -   operand size
-    EMcvSize    -   microvector size
-    EParam0     -   parameter 0
-    EParam1     -   parameter 1
-    EParam2     -   parameter 2
-    EParam3     -   parameter 3
-
-OUTPUT PARAMETERS:
-    Plan        -   updated plan
-    RowPtr      -   updated pointer
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Same as FTPushEntry(), but sets Param0, Param1, Param2 and Param3.
+// This function pushes one more entry to the plan. It resized Entries matrix
+// if needed.
+//
+// INPUT PARAMETERS:
+//     Plan        -   plan (generated so far)
+//     RowPtr      -   index which points to past-the-last entry generated so far
+//     EType       -   entry type
+//     EOpCnt      -   operands count
+//     EOpSize     -   operand size
+//     EMcvSize    -   microvector size
+//     EParam0     -   parameter 0
+//     EParam1     -   parameter 1
+//     EParam2     -   parameter 2
+//     EParam3     -   parameter 3
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   updated plan
+//     RowPtr      -   updated pointer
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftpushentry4(fasttransformplan* plan,
      ae_int_t* rowptr,
      ae_int_t etype,
@@ -17212,32 +15884,30 @@ static void ftbase_ftpushentry4(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-This subroutine applies subplan to input/output array A.
-
-INPUT PARAMETERS:
-    Plan        -   transformation plan
-    SubPlan     -   subplan index
-    A           -   array, must be large enough for plan to work
-    ABase       -   base offset in array A, this value points to start of
-                    subarray whose length is equal to length of the plan
-    AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
-                    This is an offset within large PlanLength-subarray of
-                    the chunk to process.
-    Buf         -   temporary buffer whose length is equal to plan length
-                    (without taking into account RepCnt) or larger.
-    OffsBuf     -   offset in the buffer array
-    RepCnt      -   repetition count (transformation is repeatedly applied
-                    to subsequent subarrays)
-
-OUTPUT PARAMETERS:
-    Plan        -   plan (temporary buffers can be modified, plan itself
-                    is unchanged and can be reused)
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies subplan to input/output array A.
+//
+// INPUT PARAMETERS:
+//     Plan        -   transformation plan
+//     SubPlan     -   subplan index
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     Buf         -   temporary buffer whose length is equal to plan length
+//                     (without taking into account RepCnt) or larger.
+//     OffsBuf     -   offset in the buffer array
+//     RepCnt      -   repetition count (transformation is repeatedly applied
+//                     to subsequent subarrays)
+//
+// OUTPUT PARAMETERS:
+//     Plan        -   plan (temporary buffers can be modified, plan itself
+//                     is unchanged and can be reused)
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftapplysubplan(fasttransformplan* plan,
      ae_int_t subplan,
      RVector * a,
@@ -17293,21 +15963,17 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
         param1 = plan->entries.ptr.pp_int[rowidx][ftbase_colparam1];
         touchint(&param1, _state);
 
-        /*
-         * Process "jump" operation
-         */
+        // Process "jump" operation
         if( operation==ftbase_opjmp )
         {
             rowidx = rowidx+plan->entries.ptr.pp_int[rowidx][ftbase_colparam0];
             continue;
         }
 
-        /*
-         * Process "parallel call" operation:
-         * * we perform initial check for consistency between parent and child plans
-         * * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
-         *   several parallel tasks
-         */
+        // Process "parallel call" operation:
+        // * we perform initial check for consistency between parent and child plans
+        // * we call FTSplitAndApplyParallelPlan(), which splits parallel plan into
+        //   several parallel tasks
         if( operation==ftbase_opparallelcall )
         {
             parentsize = operandsize*microvectorsize;
@@ -17331,9 +15997,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process "reference complex FFT" operation
-         */
+        // Process "reference complex FFT" operation
         if( operation==ftbase_opcomplexreffft )
         {
             ftbase_ftapplycomplexreffft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, buf, _state);
@@ -17341,9 +16005,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process "codelet FFT" operation
-         */
+        // Process "codelet FFT" operation
         if( operation==ftbase_opcomplexcodeletfft )
         {
             ftbase_ftapplycomplexcodeletfft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, _state);
@@ -17351,9 +16013,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process "integrated codelet FFT" operation
-         */
+        // Process "integrated codelet FFT" operation
         if( operation==ftbase_opcomplexcodelettwfft )
         {
             ftbase_ftapplycomplexcodelettwfft(a, abase+aoffset, operandscnt, operandsize, microvectorsize, _state);
@@ -17361,9 +16021,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process Bluestein's FFT operation
-         */
+        // Process Bluestein's FFT operation
         if( operation==ftbase_opbluesteinsfft )
         {
             ae_assert(microvectorsize==2, "FTApplySubPlan: microvectorsize!=2 for Bluesteins FFT", _state);
@@ -17380,9 +16038,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process Rader's FFT
-         */
+        // Process Rader's FFT
         if( operation==ftbase_opradersfft )
         {
             ftbase_ftradersfft(plan, a, abase, aoffset, operandscnt, operandsize, rowidx+plan->entries.ptr.pp_int[rowidx][ftbase_colparam0], plan->entries.ptr.pp_int[rowidx][ftbase_colparam1], plan->entries.ptr.pp_int[rowidx][ftbase_colparam2], plan->entries.ptr.pp_int[rowidx][ftbase_colparam3], buf, _state);
@@ -17390,9 +16046,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process "complex twiddle factors" operation
-         */
+        // Process "complex twiddle factors" operation
         if( operation==ftbase_opcomplexfftfactors )
         {
             ae_assert(microvectorsize==2, "FTApplySubPlan: MicrovectorSize<>1", _state);
@@ -17406,9 +16060,7 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Process "complex transposition" operation
-         */
+        // Process "complex transposition" operation
         if( operation==ftbase_opcomplextranspose )
         {
             ae_assert(microvectorsize==2, "FTApplySubPlan: MicrovectorSize<>1", _state);
@@ -17422,34 +16074,30 @@ static void ftbase_ftapplysubplan(fasttransformplan* plan,
             continue;
         }
 
-        /*
-         * Error
-         */
+        // Error
         ae_assert(ae_false, "FTApplySubPlan: unexpected plan type", _state);
     }
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-This subroutine applies complex reference FFT to input/output array A.
-
-VERY SLOW OPERATION, do not use it in real life plans :)
-
-INPUT PARAMETERS:
-    A           -   array, must be large enough for plan to work
-    Offs        -   offset of the subarray to process
-    OperandsCnt -   operands count (see description of FastTransformPlan)
-    OperandSize -   operand size (see description of FastTransformPlan)
-    MicrovectorSize-microvector size (see description of FastTransformPlan)
-    Buf         -   temporary array, must be at least OperandsCnt*OperandSize*MicrovectorSize
-
-OUTPUT PARAMETERS:
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies complex reference FFT to input/output array A.
+//
+// VERY SLOW OPERATION, do not use it in real life plans :)
+//
+// INPUT PARAMETERS:
+//     A           -   array, must be large enough for plan to work
+//     Offs        -   offset of the subarray to process
+//     OperandsCnt -   operands count (see description of FastTransformPlan)
+//     OperandSize -   operand size (see description of FastTransformPlan)
+//     MicrovectorSize-microvector size (see description of FastTransformPlan)
+//     Buf         -   temporary array, must be at least OperandsCnt*OperandSize*MicrovectorSize
+//
+// OUTPUT PARAMETERS:
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftapplycomplexreffft(RVector * a,
      ae_int_t offs,
      ae_int_t operandscnt,
@@ -17500,22 +16148,20 @@ static void ftbase_ftapplycomplexreffft(RVector * a,
 }
 
 
-/*************************************************************************
-This subroutine applies complex codelet FFT to input/output array A.
-
-INPUT PARAMETERS:
-    A           -   array, must be large enough for plan to work
-    Offs        -   offset of the subarray to process
-    OperandsCnt -   operands count (see description of FastTransformPlan)
-    OperandSize -   operand size (see description of FastTransformPlan)
-    MicrovectorSize-microvector size, must be 2
-
-OUTPUT PARAMETERS:
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies complex codelet FFT to input/output array A.
+//
+// INPUT PARAMETERS:
+//     A           -   array, must be large enough for plan to work
+//     Offs        -   offset of the subarray to process
+//     OperandsCnt -   operands count (see description of FastTransformPlan)
+//     OperandSize -   operand size (see description of FastTransformPlan)
+//     MicrovectorSize-microvector size, must be 2
+//
+// OUTPUT PARAMETERS:
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftapplycomplexcodeletfft(RVector * a,
      ae_int_t offs,
      ae_int_t operandscnt,
@@ -17585,9 +16231,7 @@ static void ftbase_ftapplycomplexcodeletfft(RVector * a,
     ae_assert(microvectorsize==2, "FTApplyComplexCodeletFFT: MicrovectorSize<>2", _state);
     n = operandsize;
 
-    /*
-     * Hard-coded transforms for different N's
-     */
+    // Hard-coded transforms for different N's
     ae_assert(n<=ftbase_maxradix, "FTApplyComplexCodeletFFT: N>MaxRadix", _state);
     if( n==2 )
     {
@@ -17824,27 +16468,25 @@ static void ftbase_ftapplycomplexcodeletfft(RVector * a,
 }
 
 
-/*************************************************************************
-This subroutine applies complex "integrated" codelet FFT  to  input/output
-array A. "Integrated" codelet differs from "normal" one in following ways:
-* it can work with MicrovectorSize>1
-* hence, it can be used in Cooley-Tukey FFT without transpositions
-* it performs inlined multiplication by twiddle factors of Cooley-Tukey
-  FFT with N2=MicrovectorSize/2.
-
-INPUT PARAMETERS:
-    A           -   array, must be large enough for plan to work
-    Offs        -   offset of the subarray to process
-    OperandsCnt -   operands count (see description of FastTransformPlan)
-    OperandSize -   operand size (see description of FastTransformPlan)
-    MicrovectorSize-microvector size, must be 1
-
-OUTPUT PARAMETERS:
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies complex "integrated" codelet FFT  to  input/output
+// array A. "Integrated" codelet differs from "normal" one in following ways:
+// * it can work with MicrovectorSize>1
+// * hence, it can be used in Cooley-Tukey FFT without transpositions
+// * it performs inlined multiplication by twiddle factors of Cooley-Tukey
+//   FFT with N2=MicrovectorSize/2.
+//
+// INPUT PARAMETERS:
+//     A           -   array, must be large enough for plan to work
+//     Offs        -   offset of the subarray to process
+//     OperandsCnt -   operands count (see description of FastTransformPlan)
+//     OperandSize -   operand size (see description of FastTransformPlan)
+//     MicrovectorSize-microvector size, must be 1
+//
+// OUTPUT PARAMETERS:
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftapplycomplexcodelettwfft(RVector * a,
      ae_int_t offs,
      ae_int_t operandscnt,
@@ -17938,9 +16580,7 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector * a,
     n = operandsize;
     m = microvectorsize/2;
 
-    /*
-     * Hard-coded transforms for different N's
-     */
+    // Hard-coded transforms for different N's
     ae_assert(n<=ftbase_maxradix, "FTApplyComplexCodeletTwFFT: N>MaxRadix", _state);
     if( n==2 )
     {
@@ -18375,29 +17015,27 @@ static void ftbase_ftapplycomplexcodelettwfft(RVector * a,
 }
 
 
-/*************************************************************************
-This subroutine precomputes data for complex Bluestein's  FFT  and  writes
-them to array PrecR[] at specified offset. It  is  responsibility  of  the
-caller to make sure that PrecR[] is large enough.
-
-INPUT PARAMETERS:
-    N           -   original size of the transform
-    M           -   size of the "padded" Bluestein's transform
-    PrecR       -   preallocated array
-    Offs        -   offset
-
-OUTPUT PARAMETERS:
-    PrecR       -   data at Offs:Offs+4*M-1 are modified:
-                    * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
-                    * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
-                    Other parts of PrecR are unchanged.
-
-NOTE: this function performs internal M-point FFT. It allocates temporary
-      plan which is destroyed after leaving this function.
-
-  -- ALGLIB --
-     Copyright 08.05.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine precomputes data for complex Bluestein's  FFT  and  writes
+// them to array PrecR[] at specified offset. It  is  responsibility  of  the
+// caller to make sure that PrecR[] is large enough.
+//
+// INPUT PARAMETERS:
+//     N           -   original size of the transform
+//     M           -   size of the "padded" Bluestein's transform
+//     PrecR       -   preallocated array
+//     Offs        -   offset
+//
+// OUTPUT PARAMETERS:
+//     PrecR       -   data at Offs:Offs+4*M-1 are modified:
+//                     * PrecR[Offs:Offs+2*M-1] stores Z[k]=exp(i*pi*k^2/N)
+//                     * PrecR[Offs+2*M:Offs+4*M-1] stores FFT of the Z
+//                     Other parts of PrecR are unchanged.
+//
+// NOTE: this function performs internal M-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+//
+//   -- ALGLIB --
+//      Copyright 08.05.2013 by Bochkanov Sergey
 static void ftbase_ftprecomputebluesteinsfft(ae_int_t n,
      ae_int_t m,
      RVector * precr,
@@ -18415,9 +17053,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n,
     _fasttransformplan_init(&plan, _state, ae_true);
 
 
-    /*
-     * Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
-     */
+    // Fill first half of PrecR with b[k] = exp(i*pi*k^2/N)
     for(i=0; i<=2*m-1; i++)
     {
         precr->ptr.p_double[offs+i] = (double)(0);
@@ -18432,9 +17068,7 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n,
         precr->ptr.p_double[offs+2*((m-i)%m)+1] = by;
     }
 
-    /*
-     * Precomputed FFT
-     */
+    // Precomputed FFT
     ftcomplexfftplan(m, 1, &plan, _state);
     for(i=0; i<=2*m-1; i++)
     {
@@ -18445,34 +17079,32 @@ static void ftbase_ftprecomputebluesteinsfft(ae_int_t n,
 }
 
 
-/*************************************************************************
-This subroutine applies complex Bluestein's FFT to input/output array A.
-
-INPUT PARAMETERS:
-    Plan        -   transformation plan
-    A           -   array, must be large enough for plan to work
-    ABase       -   base offset in array A, this value points to start of
-                    subarray whose length is equal to length of the plan
-    AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
-                    This is an offset within large PlanLength-subarray of
-                    the chunk to process.
-    OperandsCnt -   number of repeated operands (length N each)
-    N           -   original data length (measured in complex numbers)
-    M           -   padded data length (measured in complex numbers)
-    PrecOffs    -   offset of the precomputed data for the plan
-    SubPlan     -   position of the length-M FFT subplan which is used by
-                    transformation
-    BufA        -   temporary buffer, at least 2*M elements
-    BufB        -   temporary buffer, at least 2*M elements
-    BufC        -   temporary buffer, at least 2*M elements
-    BufD        -   temporary buffer, at least 2*M elements
-
-OUTPUT PARAMETERS:
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies complex Bluestein's FFT to input/output array A.
+//
+// INPUT PARAMETERS:
+//     Plan        -   transformation plan
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     M           -   padded data length (measured in complex numbers)
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     SubPlan     -   position of the length-M FFT subplan which is used by
+//                     transformation
+//     BufA        -   temporary buffer, at least 2*M elements
+//     BufB        -   temporary buffer, at least 2*M elements
+//     BufC        -   temporary buffer, at least 2*M elements
+//     BufD        -   temporary buffer, at least 2*M elements
+//
+// OUTPUT PARAMETERS:
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftbluesteinsfft(fasttransformplan* plan,
      RVector * a,
      ae_int_t abase,
@@ -18506,12 +17138,10 @@ static void ftbase_ftbluesteinsfft(fasttransformplan* plan,
     for(op=0; op<=operandscnt-1; op++)
     {
 
-        /*
-         * Multiply A by conj(Z), store to buffer.
-         * Pad A by zeros.
-         *
-         * NOTE: Z[k]=exp(i*pi*k^2/N)
-         */
+        // Multiply A by conj(Z), store to buffer.
+        // Pad A by zeros.
+        //
+        // NOTE: Z[k]=exp(i*pi*k^2/N)
         p0 = abase+aoffset+op*2*n;
         p1 = precoffs;
         for(i=0; i<=n-1; i++)
@@ -18530,10 +17160,8 @@ static void ftbase_ftbluesteinsfft(fasttransformplan* plan,
             bufa->ptr.p_double[i] = (double)(0);
         }
 
-        /*
-         * Perform convolution of A and Z (using precomputed
-         * FFT of Z stored in Plan structure).
-         */
+        // Perform convolution of A and Z (using precomputed
+        // FFT of Z stored in Plan structure).
         ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
         p0 = 0;
         p1 = precoffs+2*m;
@@ -18550,12 +17178,10 @@ static void ftbase_ftbluesteinsfft(fasttransformplan* plan,
         }
         ftbase_ftapplysubplan(plan, subplan, bufa, 0, 0, bufc, 1, _state);
 
-        /*
-         * Post processing:
-         *     A:=conj(Z)*conj(A)/M
-         * Here conj(A)/M corresponds to last stage of inverse DFT,
-         * and conj(Z) comes from Bluestein's FFT algorithm.
-         */
+        // Post processing:
+        //     A:=conj(Z)*conj(A)/M
+        // Here conj(A)/M corresponds to last stage of inverse DFT,
+        // and conj(Z) comes from Bluestein's FFT algorithm.
         p0 = precoffs;
         p1 = 0;
         p2 = abase+aoffset+op*2*n;
@@ -18575,28 +17201,26 @@ static void ftbase_ftbluesteinsfft(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-This subroutine precomputes data for complex Rader's FFT and  writes  them
-to array PrecR[] at specified offset. It  is  responsibility of the caller
-to make sure that PrecR[] is large enough.
-
-INPUT PARAMETERS:
-    N           -   original size of the transform (before reduction to N-1)
-    RQ          -   primitive root modulo N
-    RIQ         -   inverse of primitive root modulo N
-    PrecR       -   preallocated array
-    Offs        -   offset
-
-OUTPUT PARAMETERS:
-    PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
-                    other parts of PrecR are unchanged.
-
-NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
-      plan which is destroyed after leaving this function.
-
-  -- ALGLIB --
-     Copyright 08.05.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine precomputes data for complex Rader's FFT and  writes  them
+// to array PrecR[] at specified offset. It  is  responsibility of the caller
+// to make sure that PrecR[] is large enough.
+//
+// INPUT PARAMETERS:
+//     N           -   original size of the transform (before reduction to N-1)
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecR       -   preallocated array
+//     Offs        -   offset
+//
+// OUTPUT PARAMETERS:
+//     PrecR       -   data at Offs:Offs+2*(N-1)-1 store FFT of Rader's factors,
+//                     other parts of PrecR are unchanged.
+//
+// NOTE: this function performs internal (N-1)-point FFT. It allocates temporary
+//       plan which is destroyed after leaving this function.
+//
+//   -- ALGLIB --
+//      Copyright 08.05.2013 by Bochkanov Sergey
 static void ftbase_ftprecomputeradersfft(ae_int_t n,
      ae_int_t rq,
      ae_int_t riq,
@@ -18615,9 +17239,7 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n,
     _fasttransformplan_init(&plan, _state, ae_true);
 
 
-    /*
-     * Fill PrecR with Rader factors, perform FFT
-     */
+    // Fill PrecR with Rader factors, perform FFT
     kiq = 1;
     for(q=0; q<=n-2; q++)
     {
@@ -18632,31 +17254,29 @@ static void ftbase_ftprecomputeradersfft(ae_int_t n,
 }
 
 
-/*************************************************************************
-This subroutine applies complex Rader's FFT to input/output array A.
-
-INPUT PARAMETERS:
-    A           -   array, must be large enough for plan to work
-    ABase       -   base offset in array A, this value points to start of
-                    subarray whose length is equal to length of the plan
-    AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
-                    This is an offset within large PlanLength-subarray of
-                    the chunk to process.
-    OperandsCnt -   number of repeated operands (length N each)
-    N           -   original data length (measured in complex numbers)
-    SubPlan     -   position of the (N-1)-point FFT subplan which is used
-                    by transformation
-    RQ          -   primitive root modulo N
-    RIQ         -   inverse of primitive root modulo N
-    PrecOffs    -   offset of the precomputed data for the plan
-    Buf         -   temporary array
-
-OUTPUT PARAMETERS:
-    A           -   transformed array
-
-  -- ALGLIB --
-     Copyright 05.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This subroutine applies complex Rader's FFT to input/output array A.
+//
+// INPUT PARAMETERS:
+//     A           -   array, must be large enough for plan to work
+//     ABase       -   base offset in array A, this value points to start of
+//                     subarray whose length is equal to length of the plan
+//     AOffset     -   offset with respect to ABase, 0<=AOffset<PlanLength.
+//                     This is an offset within large PlanLength-subarray of
+//                     the chunk to process.
+//     OperandsCnt -   number of repeated operands (length N each)
+//     N           -   original data length (measured in complex numbers)
+//     SubPlan     -   position of the (N-1)-point FFT subplan which is used
+//                     by transformation
+//     RQ          -   primitive root modulo N
+//     RIQ         -   inverse of primitive root modulo N
+//     PrecOffs    -   offset of the precomputed data for the plan
+//     Buf         -   temporary array
+//
+// OUTPUT PARAMETERS:
+//     A           -   transformed array
+//
+//   -- ALGLIB --
+//      Copyright 05.04.2013 by Bochkanov Sergey
 static void ftbase_ftradersfft(fasttransformplan* plan,
      RVector * a,
      ae_int_t abase,
@@ -18689,15 +17309,11 @@ static void ftbase_ftradersfft(fasttransformplan* plan,
 
     ae_assert(operandscnt>=1, "FTApplyComplexRefFFT: OperandsCnt<1", _state);
 
-    /*
-     * Process operands
-     */
+    // Process operands
     for(opidx=0; opidx<=operandscnt-1; opidx++)
     {
 
-        /*
-         * fill QA
-         */
+        // fill QA
         kq = 1;
         p0 = abase+aoffset+opidx*n*2;
         p1 = aoffset+opidx*n*2;
@@ -18726,9 +17342,7 @@ static void ftbase_ftradersfft(fasttransformplan* plan,
             p1 = p1+2;
         }
 
-        /*
-         * Convolution
-         */
+        // Convolution
         ftbase_ftapplysubplan(plan, subplan, a, abase, aoffset+opidx*n*2, buf, 1, _state);
         p0 = abase+aoffset+opidx*n*2;
         p1 = precoffs;
@@ -18752,9 +17366,7 @@ static void ftbase_ftradersfft(fasttransformplan* plan,
             p0 = p0+2;
         }
 
-        /*
-         * Result
-         */
+        // Result
         buf->ptr.p_double[aoffset+opidx*n*2+0] = rx;
         buf->ptr.p_double[aoffset+opidx*n*2+1] = ry;
         kiq = 1;
@@ -18780,22 +17392,20 @@ static void ftbase_ftradersfft(fasttransformplan* plan,
 }
 
 
-/*************************************************************************
-Factorizes task size N into product of two smaller sizes N1 and N2
-
-INPUT PARAMETERS:
-    N       -   task size, N>0
-    IsRoot  -   whether taks is root task (first one in a sequence)
-
-OUTPUT PARAMETERS:
-    N1, N2  -   such numbers that:
-                * for prime N:                  N1=N2=0
-                * for composite N<=MaxRadix:    N1=N2=0
-                * for composite N>MaxRadix:     1<=N1<=N2, N1*N2=N
-
-  -- ALGLIB --
-     Copyright 08.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Factorizes task size N into product of two smaller sizes N1 and N2
+//
+// INPUT PARAMETERS:
+//     N       -   task size, N>0
+//     IsRoot  -   whether taks is root task (first one in a sequence)
+//
+// OUTPUT PARAMETERS:
+//     N1, N2  -   such numbers that:
+//                 * for prime N:                  N1=N2=0
+//                 * for composite N<=MaxRadix:    N1=N2=0
+//                 * for composite N>MaxRadix:     1<=N1<=N2, N1*N2=N
+//
+//   -- ALGLIB --
+//      Copyright 08.04.2013 by Bochkanov Sergey
 static void ftbase_ftfactorize(ae_int_t n,
      ae_bool isroot,
      ae_int_t* n1,
@@ -18812,17 +17422,13 @@ static void ftbase_ftfactorize(ae_int_t n,
     *n1 = 0;
     *n2 = 0;
 
-    /*
-     * Small N
-     */
+    // Small N
     if( n<=ftbase_maxradix )
     {
         return;
     }
 
-    /*
-     * Large N, recursive split
-     */
+    // Large N, recursive split
     if( n>ftbase_recursivethreshold )
     {
         k = ae_iceil(ae_sqrt((double)(n), _state), _state)+1;
@@ -18838,9 +17444,7 @@ static void ftbase_ftfactorize(ae_int_t n,
         }
     }
 
-    /*
-     * N>MaxRadix, try to find good codelet
-     */
+    // N>MaxRadix, try to find good codelet
     for(j=ftbase_maxradix; j>=2; j--)
     {
         if( n%j==0 )
@@ -18851,10 +17455,8 @@ static void ftbase_ftfactorize(ae_int_t n,
         }
     }
 
-    /*
-     * In case no good codelet was found,
-     * try to factorize N into product of ANY primes.
-     */
+    // In case no good codelet was found,
+    // try to factorize N into product of ANY primes.
     if( *n1*(*n2)!=n )
     {
         for(j=2; j<=n-1; j++)
@@ -18872,9 +17474,7 @@ static void ftbase_ftfactorize(ae_int_t n,
         }
     }
 
-    /*
-     * normalize
-     */
+    // normalize
     if( *n1>(*n2) )
     {
         j = *n1;
@@ -18884,20 +17484,18 @@ static void ftbase_ftfactorize(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
-
-INPUT PARAMETERS:
-    N       -   task size, N>0
-
-RESULU:
-    cost in UNITs, rounded down to nearest integer
-
-NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
-
-  -- ALGLIB --
-     Copyright 08.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Returns optimistic estimate of the FFT cost, in UNITs (1 UNIT = 100 KFLOPs)
+//
+// INPUT PARAMETERS:
+//     N       -   task size, N>0
+//
+// RESULU:
+//     cost in UNITs, rounded down to nearest integer
+//
+// NOTE: If FFT cost is less than 1 UNIT, it will return 0 as result.
+//
+//   -- ALGLIB --
+//      Copyright 08.04.2013 by Bochkanov Sergey
 static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state)
 {
     ae_int_t result;
@@ -18909,12 +17507,10 @@ static ae_int_t ftbase_ftoptimisticestimate(ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-Twiddle factors calculation
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Twiddle factors calculation
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 static void ftbase_ffttwcalc(RVector * a,
      ae_int_t aoffset,
      ae_int_t n1,
@@ -18941,49 +17537,47 @@ static void ftbase_ffttwcalc(RVector * a,
 
 
 
-    /*
-     * Multiplication by twiddle factors for complex Cooley-Tukey FFT
-     * with N factorized as N1*N2.
-     *
-     * Naive solution to this problem is given below:
-     *
-     *     > for K:=1 to N2-1 do
-     *     >     for J:=1 to N1-1 do
-     *     >     begin
-     *     >         Idx:=K*N1+J;
-     *     >         X:=A[AOffset+2*Idx+0];
-     *     >         Y:=A[AOffset+2*Idx+1];
-     *     >         TwX:=Cos(-2*Pi()*K*J/(N1*N2));
-     *     >         TwY:=Sin(-2*Pi()*K*J/(N1*N2));
-     *     >         A[AOffset+2*Idx+0]:=X*TwX-Y*TwY;
-     *     >         A[AOffset+2*Idx+1]:=X*TwY+Y*TwX;
-     *     >     end;
-     *
-     * However, there are exist more efficient solutions.
-     *
-     * Each pass of the inner cycle corresponds to multiplication of one
-     * entry of A by W[k,j]=exp(-I*2*pi*k*j/N). This factor can be rewritten
-     * as exp(-I*2*pi*k/N)^j. So we can replace costly exponentiation by
-     * repeated multiplication: W[k,j+1]=W[k,j]*exp(-I*2*pi*k/N), with
-     * second factor being computed once in the beginning of the iteration.
-     *
-     * Also, exp(-I*2*pi*k/N) can be represented as exp(-I*2*pi/N)^k, i.e.
-     * we have W[K+1,1]=W[K,1]*W[1,1].
-     *
-     * In our loop we use following variables:
-     * * [TwBaseXM1,TwBaseY] =   [cos(2*pi/N)-1,     sin(2*pi/N)]
-     * * [TwRowXM1, TwRowY]  =   [cos(2*pi*I/N)-1,   sin(2*pi*I/N)]
-     * * [TwXM1,    TwY]     =   [cos(2*pi*I*J/N)-1, sin(2*pi*I*J/N)]
-     *
-     * Meaning of the variables:
-     * * [TwXM1,TwY] is current twiddle factor W[I,J]
-     * * [TwRowXM1, TwRowY] is W[I,1]
-     * * [TwBaseXM1,TwBaseY] is W[1,1]
-     *
-     * During inner loop we multiply current twiddle factor by W[I,1],
-     * during outer loop we update W[I,1].
-     *
-     */
+    // Multiplication by twiddle factors for complex Cooley-Tukey FFT
+    // with N factorized as N1*N2.
+    //
+    // Naive solution to this problem is given below:
+    //
+    //     > for K:=1 to N2-1 do
+    //     >     for J:=1 to N1-1 do
+    //     >     begin
+    //     >         Idx:=K*N1+J;
+    //     >         X:=A[AOffset+2*Idx+0];
+    //     >         Y:=A[AOffset+2*Idx+1];
+    //     >         TwX:=Cos(-2*Pi()*K*J/(N1*N2));
+    //     >         TwY:=Sin(-2*Pi()*K*J/(N1*N2));
+    //     >         A[AOffset+2*Idx+0]:=X*TwX-Y*TwY;
+    //     >         A[AOffset+2*Idx+1]:=X*TwY+Y*TwX;
+    //     >     end;
+    //
+    // However, there are exist more efficient solutions.
+    //
+    // Each pass of the inner cycle corresponds to multiplication of one
+    // entry of A by W[k,j]=exp(-I*2*pi*k*j/N). This factor can be rewritten
+    // as exp(-I*2*pi*k/N)^j. So we can replace costly exponentiation by
+    // repeated multiplication: W[k,j+1]=W[k,j]*exp(-I*2*pi*k/N), with
+    // second factor being computed once in the beginning of the iteration.
+    //
+    // Also, exp(-I*2*pi*k/N) can be represented as exp(-I*2*pi/N)^k, i.e.
+    // we have W[K+1,1]=W[K,1]*W[1,1].
+    //
+    // In our loop we use following variables:
+    // * [TwBaseXM1,TwBaseY] =   [cos(2*pi/N)-1,     sin(2*pi/N)]
+    // * [TwRowXM1, TwRowY]  =   [cos(2*pi*I/N)-1,   sin(2*pi*I/N)]
+    // * [TwXM1,    TwY]     =   [cos(2*pi*I*J/N)-1, sin(2*pi*I*J/N)]
+    //
+    // Meaning of the variables:
+    // * [TwXM1,TwY] is current twiddle factor W[I,J]
+    // * [TwRowXM1, TwRowY] is W[I,1]
+    // * [TwBaseXM1,TwBaseY] is W[1,1]
+    //
+    // During inner loop we multiply current twiddle factor by W[I,1],
+    // during outer loop we update W[I,1].
+    //
     ae_assert(ftbase_updatetw>=2, "FFTTwCalc: internal error - UpdateTw<2", _state);
     updatetw2 = ftbase_updatetw/2;
     halfn1 = n1/2;
@@ -18997,26 +17591,20 @@ static void ftbase_ffttwcalc(RVector * a,
     for(i=0; i<=n2-1; i++)
     {
 
-        /*
-         * Initialize twiddle factor for current row
-         */
+        // Initialize twiddle factor for current row
         twxm1 = (double)(0);
         twy = (double)(0);
 
-        /*
-         * N1-point block is separated into 2-point chunks and residual 1-point chunk
-         * (in case N1 is odd). Unrolled loop is several times faster.
-         */
+        // N1-point block is separated into 2-point chunks and residual 1-point chunk
+        // (in case N1 is odd). Unrolled loop is several times faster.
         for(j2=0; j2<=halfn1-1; j2++)
         {
 
-            /*
-             * Processing:
-             * * process first element in a chunk.
-             * * update twiddle factor (unconditional update)
-             * * process second element
-             * * conditional update of the twiddle factor
-             */
+            // Processing:
+            // * process first element in a chunk.
+            // * update twiddle factor (unconditional update)
+            // * process second element
+            // * conditional update of the twiddle factor
             x = a->ptr.p_double[offs+0];
             y = a->ptr.p_double[offs+1];
             tmpx = x*(1+twxm1)-y*twy;
@@ -19036,9 +17624,7 @@ static void ftbase_ffttwcalc(RVector * a,
             if( (j2+1)%updatetw2==0&&j2<halfn1-1 )
             {
 
-                /*
-                 * Recalculate twiddle factor
-                 */
+                // Recalculate twiddle factor
                 v = -2*ae_pi*i*2*(j2+1)/n;
                 twxm1 = ae_sin(0.5*v, _state);
                 twxm1 = -2*twxm1*twxm1;
@@ -19047,9 +17633,7 @@ static void ftbase_ffttwcalc(RVector * a,
             else
             {
 
-                /*
-                 * Update twiddle factor
-                 */
+                // Update twiddle factor
                 tmpx = (1+twxm1)*twrowxm1-twy*twrowy;
                 twy = twy+(1+twxm1)*twrowy+twy*twrowxm1;
                 twxm1 = twxm1+tmpx;
@@ -19058,9 +17642,7 @@ static void ftbase_ffttwcalc(RVector * a,
         if( n1%2==1 )
         {
 
-            /*
-             * Handle residual chunk
-             */
+            // Handle residual chunk
             x = a->ptr.p_double[offs+0];
             y = a->ptr.p_double[offs+1];
             tmpx = x*(1+twxm1)-y*twy;
@@ -19070,9 +17652,7 @@ static void ftbase_ffttwcalc(RVector * a,
             offs = offs+2;
         }
 
-        /*
-         * update TwRow: TwRow(new) = TwRow(old)*TwBase
-         */
+        // update TwRow: TwRow(new) = TwRow(old)*TwBase
         if( i<n2-1 )
         {
             if( (i+1)%ftbase_updatetw==0 )
@@ -19094,12 +17674,10 @@ static void ftbase_ffttwcalc(RVector * a,
 }
 
 
-/*************************************************************************
-Linear transpose: transpose complex matrix stored in 1-dimensional array
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Linear transpose: transpose complex matrix stored in 1-dimensional array
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 static void ftbase_internalcomplexlintranspose(RVector * a,
      ae_int_t m,
      ae_int_t n,
@@ -19114,19 +17692,17 @@ static void ftbase_internalcomplexlintranspose(RVector * a,
 }
 
 
-/*************************************************************************
-Recurrent subroutine for a InternalComplexLinTranspose
-
-Write A^T to B, where:
-* A is m*n complex matrix stored in array A as pairs of real/image values,
-  beginning from AStart position, with AStride stride
-* B is n*m complex matrix stored in array B as pairs of real/image values,
-  beginning from BStart position, with BStride stride
-stride is measured in complex numbers, i.e. in real/image pairs.
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Recurrent subroutine for a InternalComplexLinTranspose
+//
+// Write A^T to B, where:
+// * A is m*n complex matrix stored in array A as pairs of real/image values,
+//   beginning from AStart position, with AStride stride
+// * B is n*m complex matrix stored in array B as pairs of real/image values,
+//   beginning from BStart position, with BStride stride
+// stride is measured in complex numbers, i.e. in real/image pairs.
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 static void ftbase_ffticltrec(RVector * a,
      ae_int_t astart,
      ae_int_t astride,
@@ -19170,12 +17746,10 @@ static void ftbase_ffticltrec(RVector * a,
     if( n>m )
     {
 
-        /*
-         * New partition:
-         *
-         * "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
-         *                                  ( B2 )
-         */
+        // New partition:
+        //
+        // "A^T -> B" becomes "(A1 A2)^T -> ( B1 )
+        //                                  ( B2 )
         n1 = n/2;
         if( n-n1>=8&&n1%8!=0 )
         {
@@ -19188,12 +17762,10 @@ static void ftbase_ffticltrec(RVector * a,
     else
     {
 
-        /*
-         * New partition:
-         *
-         * "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
-         *                     ( A2 )
-         */
+        // New partition:
+        //
+        // "A^T -> B" becomes "( A1 )^T -> ( B1 B2 )
+        //                     ( A2 )
         m1 = m/2;
         if( m-m1>=8&&m1%8!=0 )
         {
@@ -19206,12 +17778,10 @@ static void ftbase_ffticltrec(RVector * a,
 }
 
 
-/*************************************************************************
-recurrent subroutine for FFTFindSmoothRec
-
-  -- ALGLIB --
-     Copyright 01.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// recurrent subroutine for FFTFindSmoothRec
+//
+//   -- ALGLIB --
+//      Copyright 01.05.2009 by Bochkanov Sergey
 static void ftbase_ftbasefindsmoothrec(ae_int_t n,
      ae_int_t seed,
      ae_int_t leastfactor,
@@ -19293,19 +17863,17 @@ void _fasttransformplan_destroy(void* _p)
 #if defined(AE_COMPILE_HPCCORES) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
-You  have to call this function  before  calling  HPCChunkedGradient() for
-a new set of weights. You have to call it only once, see example below:
-
-HOW TO PROCESS DATASET WITH THIS FUNCTION:
-    Grad:=0
-    HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
-    foreach chunk-of-dataset do
-        HPCChunkedGradient(...)
-    HPCFinalizeChunkedGradient(Buf, Grad)
-
-*************************************************************************/
+// Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
+// You  have to call this function  before  calling  HPCChunkedGradient() for
+// a new set of weights. You have to call it only once, see example below:
+//
+// HOW TO PROCESS DATASET WITH THIS FUNCTION:
+//     Grad:=0
+//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
+//     foreach chunk-of-dataset do
+//         HPCChunkedGradient(...)
+//     HPCFinalizeChunkedGradient(Buf, Grad)
+//
 void hpcpreparechunkedgradient(RVector * weights,
      ae_int_t wcount,
      ae_int_t ntotal,
@@ -19372,19 +17940,17 @@ void hpcpreparechunkedgradient(RVector * weights,
 }
 
 
-/*************************************************************************
-Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
-You  have to call this function  after  calling  HPCChunkedGradient()  for
-a new set of weights. You have to call it only once, see example below:
-
-HOW TO PROCESS DATASET WITH THIS FUNCTION:
-    Grad:=0
-    HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
-    foreach chunk-of-dataset do
-        HPCChunkedGradient(...)
-    HPCFinalizeChunkedGradient(Buf, Grad)
-
-*************************************************************************/
+// Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
+// You  have to call this function  after  calling  HPCChunkedGradient()  for
+// a new set of weights. You have to call it only once, see example below:
+//
+// HOW TO PROCESS DATASET WITH THIS FUNCTION:
+//     Grad:=0
+//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
+//     foreach chunk-of-dataset do
+//         HPCChunkedGradient(...)
+//     HPCFinalizeChunkedGradient(Buf, Grad)
+//
 void hpcfinalizechunkedgradient(mlpbuffers* buf,
      RVector * grad,
      ae_state *_state)
@@ -19402,10 +17968,8 @@ void hpcfinalizechunkedgradient(mlpbuffers* buf,
 }
 
 
-/*************************************************************************
-Fast kernel for chunked gradient.
-
-*************************************************************************/
+// Fast kernel for chunked gradient.
+//
 ae_bool hpcchunkedgradient(RVector * weights,
      ZVector * structinfo,
      RVector * columnmeans,
@@ -19431,10 +17995,8 @@ ae_bool hpcchunkedgradient(RVector * weights,
 }
 
 
-/*************************************************************************
-Fast kernel for chunked processing.
-
-*************************************************************************/
+// Fast kernel for chunked processing.
+//
 ae_bool hpcchunkedprocess(RVector * weights,
      ZVector * structinfo,
      RVector * columnmeans,
@@ -19458,13 +18020,11 @@ ae_bool hpcchunkedprocess(RVector * weights,
 }
 
 
-/*************************************************************************
-Stub function.
-
-  -- ALGLIB routine --
-     14.06.2013
-     Bochkanov Sergey
-*************************************************************************/
+// Stub function.
+//
+//   -- ALGLIB routine --
+//      14.06.2013
+//      Bochkanov Sergey
 static ae_bool hpccores_hpcpreparechunkedgradientx(RVector * weights,
      ae_int_t wcount,
      RVector * hpcbuf,
@@ -19482,13 +18042,11 @@ static ae_bool hpccores_hpcpreparechunkedgradientx(RVector * weights,
 }
 
 
-/*************************************************************************
-Stub function.
-
-  -- ALGLIB routine --
-     14.06.2013
-     Bochkanov Sergey
-*************************************************************************/
+// Stub function.
+//
+//   -- ALGLIB routine --
+//      14.06.2013
+//      Bochkanov Sergey
 static ae_bool hpccores_hpcfinalizechunkedgradientx(RVector * buf,
      ae_int_t wcount,
      RVector * grad,

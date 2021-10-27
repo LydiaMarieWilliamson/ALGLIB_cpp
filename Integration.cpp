@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -53,42 +51,40 @@ namespace alglib
 #endif
 
 #if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Computation of nodes and weights for a Gauss quadrature formula
-
-The algorithm generates the N-point Gauss quadrature formula  with  weight
-function given by coefficients alpha and beta  of  a  recurrence  relation
-which generates a system of orthogonal polynomials:
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-1], alpha coefficients
-    Beta    -   array[0..N-1], beta coefficients
-                Zero-indexed element is not used and may be arbitrary.
-                Beta[I]>0.
-    Mu0     -   zeroth moment of the weight function.
-    N       -   number of nodes of the quadrature formula, N>=1
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss quadrature formula
+//
+// The algorithm generates the N-point Gauss quadrature formula  with  weight
+// function given by coefficients alpha and beta  of  a  recurrence  relation
+// which generates a system of orthogonal polynomials:
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-1], alpha coefficients
+//     Beta    -   array[0..N-1], beta coefficients
+//                 Zero-indexed element is not used and may be arbitrary.
+//                 Beta[I]>0.
+//     Mu0     -   zeroth moment of the weight function.
+//     N       -   number of nodes of the quadrature formula, N>=1
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -111,45 +107,43 @@ void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const 
     return;
 }
 
-/*************************************************************************
-Computation of nodes and weights for a Gauss-Lobatto quadrature formula
-
-The algorithm generates the N-point Gauss-Lobatto quadrature formula  with
-weight function given by coefficients alpha and beta of a recurrence which
-generates a system of orthogonal polynomials.
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-2], alpha coefficients
-    Beta    -   array[0..N-2], beta coefficients.
-                Zero-indexed element is not used, may be arbitrary.
-                Beta[I]>0
-    Mu0     -   zeroth moment of the weighting function.
-    A       -   left boundary of the integration interval.
-    B       -   right boundary of the integration interval.
-    N       -   number of nodes of the quadrature formula, N>=3
-                (including the left and right boundary nodes).
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss-Lobatto quadrature formula
+//
+// The algorithm generates the N-point Gauss-Lobatto quadrature formula  with
+// weight function given by coefficients alpha and beta of a recurrence which
+// generates a system of orthogonal polynomials.
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-2], alpha coefficients
+//     Beta    -   array[0..N-2], beta coefficients.
+//                 Zero-indexed element is not used, may be arbitrary.
+//                 Beta[I]>0
+//     Mu0     -   zeroth moment of the weighting function.
+//     A       -   left boundary of the integration interval.
+//     B       -   right boundary of the integration interval.
+//     N       -   number of nodes of the quadrature formula, N>=3
+//                 (including the left and right boundary nodes).
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -172,45 +166,43 @@ void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &
     return;
 }
 
-/*************************************************************************
-Computation of nodes and weights for a Gauss-Radau quadrature formula
-
-The algorithm generates the N-point Gauss-Radau  quadrature  formula  with
-weight function given by the coefficients alpha and  beta  of a recurrence
-which generates a system of orthogonal polynomials.
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-2], alpha coefficients.
-    Beta    -   array[0..N-1], beta coefficients
-                Zero-indexed element is not used.
-                Beta[I]>0
-    Mu0     -   zeroth moment of the weighting function.
-    A       -   left boundary of the integration interval.
-    N       -   number of nodes of the quadrature formula, N>=2
-                (including the left boundary node).
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss-Radau quadrature formula
+//
+// The algorithm generates the N-point Gauss-Radau  quadrature  formula  with
+// weight function given by the coefficients alpha and  beta  of a recurrence
+// which generates a system of orthogonal polynomials.
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-2], alpha coefficients.
+//     Beta    -   array[0..N-1], beta coefficients
+//                 Zero-indexed element is not used.
+//                 Beta[I]>0
+//     Mu0     -   zeroth moment of the weighting function.
+//     A       -   left boundary of the integration interval.
+//     N       -   number of nodes of the quadrature formula, N>=2
+//                 (including the left boundary node).
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -233,30 +225,28 @@ void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &be
     return;
 }
 
-/*************************************************************************
-Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
-nodes.
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't  converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
+// nodes.
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't  converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -279,33 +269,31 @@ void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x,
     return;
 }
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
-function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-    Alpha       -   power-law coefficient, Alpha>-1
-    Beta        -   power-law coefficient, Beta>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha or  Beta  are  too  close
-                            to -1 to obtain weights/nodes with high enough
-                            accuracy, or, may be, N is too large.  Try  to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha/Beta was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
+// function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//     Alpha       -   power-law coefficient, Alpha>-1
+//     Beta        -   power-law coefficient, Beta>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha/Beta was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -328,32 +316,30 @@ void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double be
     return;
 }
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
-weight function W(x)=Power(x,Alpha)*Exp(-x)
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-    Alpha       -   power-law coefficient, Alpha>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha is too  close  to  -1  to
-                            obtain weights/nodes with high enough accuracy
-                            or, may  be,  N  is  too  large.  Try  to  use
-                            multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
+// weight function W(x)=Power(x,Alpha)*Exp(-x)
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//     Alpha       -   power-law coefficient, Alpha>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha is too  close  to  -1  to
+//                             obtain weights/nodes with high enough accuracy
+//                             or, may  be,  N  is  too  large.  Try  to  use
+//                             multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -376,29 +362,27 @@ void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &inf
     return;
 }
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
-weight function W(x)=Exp(-x*x)
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes.  May be, N is too large. Try to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
+// weight function W(x)=Exp(-x*x)
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes.  May be, N is too large. Try to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -423,52 +407,50 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 #endif
 
 #if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Computation of nodes and weights of a Gauss-Kronrod quadrature formula
-
-The algorithm generates the N-point Gauss-Kronrod quadrature formula  with
-weight  function  given  by  coefficients  alpha  and beta of a recurrence
-relation which generates a system of orthogonal polynomials:
-
-    P-1(x)   =  0
-    P0(x)    =  1
-    Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zero moment Mu0
-
-    Mu0 = integral(W(x)dx,a,b)
-
-
-INPUT PARAMETERS:
-    Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
-    Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
-                    Beta[0] is not used and may be arbitrary.
-                    Beta[I]>0.
-    Mu0         -   zeroth moment of the weight function.
-    N           -   number of nodes of the Gauss-Kronrod quadrature formula,
-                    N >= 3,
-                    N =  2*K+1.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -5    no real and positive Gauss-Kronrod formula can
-                            be created for such a weight function  with  a
-                            given number of nodes.
-                    * -4    N is too large, task may be ill  conditioned -
-                            x[i]=x[i+1] found.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -2    Beta[i]<=0
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-  -- ALGLIB --
-     Copyright 08.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights of a Gauss-Kronrod quadrature formula
+//
+// The algorithm generates the N-point Gauss-Kronrod quadrature formula  with
+// weight  function  given  by  coefficients  alpha  and beta of a recurrence
+// relation which generates a system of orthogonal polynomials:
+//
+//     P-1(x)   =  0
+//     P0(x)    =  1
+//     Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zero moment Mu0
+//
+//     Mu0 = integral(W(x)dx,a,b)
+//
+//
+// INPUT PARAMETERS:
+//     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
+//     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
+//                     Beta[0] is not used and may be arbitrary.
+//                     Beta[I]>0.
+//     Mu0         -   zeroth moment of the weight function.
+//     N           -   number of nodes of the Gauss-Kronrod quadrature formula,
+//                     N >= 3,
+//                     N =  2*K+1.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    N is too large, task may be ill  conditioned -
+//                             x[i]=x[i+1] found.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -2    Beta[i]<=0
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//   -- ALGLIB --
+//      Copyright 08.05.2009 by Bochkanov Sergey
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -491,35 +473,33 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
     return;
 }
 
-/*************************************************************************
-Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
-quadrature with N points.
-
-GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
-used depending on machine precision and number of nodes.
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
+// quadrature with N points.
+//
+// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
+// used depending on machine precision and number of nodes.
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -542,42 +522,40 @@ void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x
     return;
 }
 
-/*************************************************************************
-Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
-quadrature on [-1,1] with weight function
-
-    W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-    Alpha       -   power-law coefficient, Alpha>-1
-    Beta        -   power-law coefficient, Beta>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -5    no real and positive Gauss-Kronrod formula can
-                            be created for such a weight function  with  a
-                            given number of nodes.
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha or  Beta  are  too  close
-                            to -1 to obtain weights/nodes with high enough
-                            accuracy, or, may be, N is too large.  Try  to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-                    * +2    OK, but quadrature rule have exterior  nodes,
-                            x[0]<-1 or x[n-1]>+1
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
+// quadrature on [-1,1] with weight function
+//
+//     W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//     Alpha       -   power-law coefficient, Alpha>-1
+//     Beta        -   power-law coefficient, Beta>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//                     * +2    OK, but quadrature rule have exterior  nodes,
+//                             x[0]<-1 or x[n-1]>+1
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -600,32 +578,30 @@ void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double b
     return;
 }
 
-/*************************************************************************
-Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
-
-Reduction to tridiagonal eigenproblem is used.
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
+//
+// Reduction to tridiagonal eigenproblem is used.
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -648,28 +624,26 @@ void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d
     return;
 }
 
-/*************************************************************************
-Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
-pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
-1.0E-32 (if MPFR version of ALGLIB is used). In standard double  precision
-accuracy reduces to something about 2.0E-16 (depending  on your compiler's
-handling of long floating point constants).
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes.
-                    N can be 15, 21, 31, 41, 51, 61.
-
-OUTPUT PARAMETERS:
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
+// pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
+// 1.0E-32 (if MPFR version of ALGLIB is used). In standard double  precision
+// accuracy reduces to something about 2.0E-16 (depending  on your compiler's
+// handling of long floating point constants).
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes.
+//                     N can be 15, 21, 31, 41, 51, 61.
+//
+// OUTPUT PARAMETERS:
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -694,17 +668,15 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 #endif
 
 #if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Integration report:
-* TerminationType = completetion code:
-    * -5    non-convergence of Gauss-Kronrod nodes
-            calculation subroutine.
-    * -1    incorrect parameters were specified
-    *  1    OK
-* Rep.NFEV countains number of function calculations
-* Rep.NIntervals contains number of intervals [a,b]
-  was partitioned into.
-*************************************************************************/
+// Integration report:
+// * TerminationType = completetion code:
+//     * -5    non-convergence of Gauss-Kronrod nodes
+//             calculation subroutine.
+//     * -1    incorrect parameters were specified
+//     *  1    OK
+// * Rep.NFEV countains number of function calculations
+// * Rep.NIntervals contains number of intervals [a,b]
+//   was partitioned into.
 _autogkreport_owner::_autogkreport_owner()
 {
     jmp_buf _break_jump;
@@ -830,15 +802,13 @@ autogkreport::~autogkreport()
 }
 
 
-/*************************************************************************
-This structure stores state of the integration algorithm.
-
-Although this class has public fields,  they are not intended for external
-use. You should use ALGLIB functions to work with this class:
-* autogksmooth()/AutoGKSmoothW()/... to create objects
-* autogkintegrate() to begin integration
-* autogkresults() to get results
-*************************************************************************/
+// This structure stores state of the integration algorithm.
+//
+// Although this class has public fields,  they are not intended for external
+// use. You should use ALGLIB functions to work with this class:
+// * autogksmooth()/AutoGKSmoothW()/... to create objects
+// * autogkintegrate() to begin integration
+// * autogkresults() to get results
 _autogkstate_owner::_autogkstate_owner()
 {
     jmp_buf _break_jump;
@@ -963,32 +933,30 @@ autogkstate::~autogkstate()
 {
 }
 
-/*************************************************************************
-Integration of a smooth function F(x) on a finite interval [a,b].
-
-Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-is calculated with accuracy close to the machine precision.
-
-Algorithm works well only with smooth integrands.  It  may  be  used  with
-continuous non-smooth integrands, but with  less  performance.
-
-It should never be used with integrands which have integrable singularities
-at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
-cases.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmoothW, AutoGKSingular, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// Algorithm works well only with smooth integrands.  It  may  be  used  with
+// continuous non-smooth integrands, but with  less  performance.
+//
+// It should never be used with integrands which have integrable singularities
+// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
+// cases.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1011,29 +979,27 @@ void autogksmooth(const double a, const double b, autogkstate &state, const xpar
     return;
 }
 
-/*************************************************************************
-Integration of a smooth function F(x) on a finite interval [a,b].
-
-This subroutine is same as AutoGKSmooth(), but it guarantees that interval
-[a,b] is partitioned into subintervals which have width at most XWidth.
-
-Subroutine  can  be  used  when  integrating nearly-constant function with
-narrow "bumps" (about XWidth wide). If "bumps" are too narrow, AutoGKSmooth
-subroutine can overlook them.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmooth, AutoGKSingular, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// This subroutine is same as AutoGKSmooth(), but it guarantees that interval
+// [a,b] is partitioned into subintervals which have width at most XWidth.
+//
+// Subroutine  can  be  used  when  integrating nearly-constant function with
+// narrow "bumps" (about XWidth wide). If "bumps" are too narrow, AutoGKSmooth
+// subroutine can overlook them.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmooth, AutoGKSingular, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1056,38 +1022,36 @@ void autogksmoothw(const double a, const double b, const double xwidth, autogkst
     return;
 }
 
-/*************************************************************************
-Integration on a finite interval [A,B].
-Integrand have integrable singularities at A/B.
-
-F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
-alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
-from below can be used (but these estimates should be greater than -1 too).
-
-One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
-which means than function F(x) is non-singular at A/B. Anyway (singular at
-bounds or not), function F(x) is supposed to be continuous on (A,B).
-
-Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-is calculated with accuracy close to the machine precision.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-    Alpha   -   power-law coefficient of the F(x) at A,
-                Alpha>-1
-    Beta    -   power-law coefficient of the F(x) at B,
-                Beta>-1
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration on a finite interval [A,B].
+// Integrand have integrable singularities at A/B.
+//
+// F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
+// alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
+// from below can be used (but these estimates should be greater than -1 too).
+//
+// One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
+// which means than function F(x) is non-singular at A/B. Anyway (singular at
+// bounds or not), function F(x) is supposed to be continuous on (A,B).
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     Alpha   -   power-law coefficient of the F(x) at A,
+//                 Alpha>-1
+//     Beta    -   power-law coefficient of the F(x) at B,
+//                 Beta>-1
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1110,11 +1074,9 @@ void autogksingular(const double a, const double b, const double alpha, const do
     return;
 }
 
-/*************************************************************************
-This function provides reverse communication interface
-Reverse communication interface is not documented or recommended to use.
-See below for functions which provide better documented API
-*************************************************************************/
+// This function provides reverse communication interface
+// Reverse communication interface is not documented or recommended to use.
+// See below for functions which provide better documented API
 bool autogkiteration(const autogkstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1175,21 +1137,19 @@ void autogkintegrate(autogkstate &state,
 
 
 
-/*************************************************************************
-Adaptive integration results
-
-Called after AutoGKIteration returned False.
-
-Input parameters:
-    State   -   algorithm state (used by AutoGKIteration).
-
-Output parameters:
-    V       -   integral(f(x)dx,a,b)
-    Rep     -   optimization report (see AutoGKReport description)
-
-  -- ALGLIB --
-     Copyright 14.11.2007 by Bochkanov Sergey
-*************************************************************************/
+// Adaptive integration results
+//
+// Called after AutoGKIteration returned False.
+//
+// Input parameters:
+//     State   -   algorithm state (used by AutoGKIteration).
+//
+// Output parameters:
+//     V       -   integral(f(x)dx,a,b)
+//     Rep     -   optimization report (see AutoGKReport description)
+//
+//   -- ALGLIB --
+//      Copyright 14.11.2007 by Bochkanov Sergey
 void autogkresults(const autogkstate &state, double &v, autogkreport &rep, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1259,42 +1219,40 @@ static void autogk_mheapresize(RMatrix * heap,
 #if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Computation of nodes and weights for a Gauss quadrature formula
-
-The algorithm generates the N-point Gauss quadrature formula  with  weight
-function given by coefficients alpha and beta  of  a  recurrence  relation
-which generates a system of orthogonal polynomials:
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-1], alpha coefficients
-    Beta    -   array[0..N-1], beta coefficients
-                Zero-indexed element is not used and may be arbitrary.
-                Beta[I]>0.
-    Mu0     -   zeroth moment of the weight function.
-    N       -   number of nodes of the quadrature formula, N>=1
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss quadrature formula
+//
+// The algorithm generates the N-point Gauss quadrature formula  with  weight
+// function given by coefficients alpha and beta  of  a  recurrence  relation
+// which generates a system of orthogonal polynomials:
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-1], alpha coefficients
+//     Beta    -   array[0..N-1], beta coefficients
+//                 Zero-indexed element is not used and may be arbitrary.
+//                 Beta[I]>0.
+//     Mu0     -   zeroth moment of the weight function.
+//     N       -   number of nodes of the quadrature formula, N>=1
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgeneraterec(RVector * alpha,
      RVector * beta,
      double mu0,
@@ -1329,9 +1287,7 @@ void gqgeneraterec(RVector * alpha,
     }
     *info = 1;
 
-    /*
-     * Initialize
-     */
+    // Initialize
     ae_vector_set_length(&d, n, _state);
     ae_vector_set_length(&e, n, _state);
     for(i=1; i<=n-1; i++)
@@ -1347,9 +1303,7 @@ void gqgeneraterec(RVector * alpha,
     }
     d.ptr.p_double[n-1] = alpha->ptr.p_double[n-1];
 
-    /*
-     * EVD
-     */
+    // EVD
     if( !smatrixtdevd(&d, &e, n, 3, &z, _state) )
     {
         *info = -3;
@@ -1357,9 +1311,7 @@ void gqgeneraterec(RVector * alpha,
         return;
     }
 
-    /*
-     * Generate
-     */
+    // Generate
     ae_vector_set_length(x, n, _state);
     ae_vector_set_length(w, n, _state);
     for(i=1; i<=n; i++)
@@ -1371,45 +1323,43 @@ void gqgeneraterec(RVector * alpha,
 }
 
 
-/*************************************************************************
-Computation of nodes and weights for a Gauss-Lobatto quadrature formula
-
-The algorithm generates the N-point Gauss-Lobatto quadrature formula  with
-weight function given by coefficients alpha and beta of a recurrence which
-generates a system of orthogonal polynomials.
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-2], alpha coefficients
-    Beta    -   array[0..N-2], beta coefficients.
-                Zero-indexed element is not used, may be arbitrary.
-                Beta[I]>0
-    Mu0     -   zeroth moment of the weighting function.
-    A       -   left boundary of the integration interval.
-    B       -   right boundary of the integration interval.
-    N       -   number of nodes of the quadrature formula, N>=3
-                (including the left and right boundary nodes).
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss-Lobatto quadrature formula
+//
+// The algorithm generates the N-point Gauss-Lobatto quadrature formula  with
+// weight function given by coefficients alpha and beta of a recurrence which
+// generates a system of orthogonal polynomials.
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-2], alpha coefficients
+//     Beta    -   array[0..N-2], beta coefficients.
+//                 Zero-indexed element is not used, may be arbitrary.
+//                 Beta[I]>0
+//     Mu0     -   zeroth moment of the weighting function.
+//     A       -   left boundary of the integration interval.
+//     B       -   right boundary of the integration interval.
+//     N       -   number of nodes of the quadrature formula, N>=3
+//                 (including the left and right boundary nodes).
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategausslobattorec(RVector * alpha,
      RVector * beta,
      double mu0,
@@ -1467,9 +1417,7 @@ void gqgenerategausslobattorec(RVector * alpha,
     }
     *info = 1;
 
-    /*
-     * Initialize, D[1:N+1], E[1:N]
-     */
+    // Initialize, D[1:N+1], E[1:N]
     n = n-2;
     ae_vector_set_length(&d, n+2, _state);
     ae_vector_set_length(&e, n+1, _state);
@@ -1488,9 +1436,7 @@ void gqgenerategausslobattorec(RVector * alpha,
         e.ptr.p_double[i-1] = ae_sqrt(beta->ptr.p_double[i], _state);
     }
 
-    /*
-     * Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
-     */
+    // Caclulate Pn(a), Pn+1(a), Pn(b), Pn+1(b)
     beta->ptr.p_double[0] = (double)(0);
     pim1a = (double)(0);
     pia = (double)(1);
@@ -1499,24 +1445,18 @@ void gqgenerategausslobattorec(RVector * alpha,
     for(i=1; i<=n+1; i++)
     {
 
-        /*
-         * Pi(a)
-         */
+        // Pi(a)
         t = (a-alpha->ptr.p_double[i-1])*pia-beta->ptr.p_double[i-1]*pim1a;
         pim1a = pia;
         pia = t;
 
-        /*
-         * Pi(b)
-         */
+        // Pi(b)
         t = (b-alpha->ptr.p_double[i-1])*pib-beta->ptr.p_double[i-1]*pim1b;
         pim1b = pib;
         pib = t;
     }
 
-    /*
-     * Calculate alpha'(n+1), beta'(n+1)
-     */
+    // Calculate alpha'(n+1), beta'(n+1)
     a11 = pia;
     a12 = pim1a;
     a21 = pib;
@@ -1546,9 +1486,7 @@ void gqgenerategausslobattorec(RVector * alpha,
     d.ptr.p_double[n+1] = alph;
     e.ptr.p_double[n] = ae_sqrt(bet, _state);
 
-    /*
-     * EVD
-     */
+    // EVD
     if( !smatrixtdevd(&d, &e, n+2, 3, &z, _state) )
     {
         *info = -3;
@@ -1556,9 +1494,7 @@ void gqgenerategausslobattorec(RVector * alpha,
         return;
     }
 
-    /*
-     * Generate
-     */
+    // Generate
     ae_vector_set_length(x, n+2, _state);
     ae_vector_set_length(w, n+2, _state);
     for(i=1; i<=n+2; i++)
@@ -1570,45 +1506,43 @@ void gqgenerategausslobattorec(RVector * alpha,
 }
 
 
-/*************************************************************************
-Computation of nodes and weights for a Gauss-Radau quadrature formula
-
-The algorithm generates the N-point Gauss-Radau  quadrature  formula  with
-weight function given by the coefficients alpha and  beta  of a recurrence
-which generates a system of orthogonal polynomials.
-
-P-1(x)   =  0
-P0(x)    =  1
-Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zeroth moment Mu0
-
-Mu0 = integral(W(x)dx,a,b)
-
-INPUT PARAMETERS:
-    Alpha   -   array[0..N-2], alpha coefficients.
-    Beta    -   array[0..N-1], beta coefficients
-                Zero-indexed element is not used.
-                Beta[I]>0
-    Mu0     -   zeroth moment of the weighting function.
-    A       -   left boundary of the integration interval.
-    N       -   number of nodes of the quadrature formula, N>=2
-                (including the left boundary node).
-
-OUTPUT PARAMETERS:
-    Info    -   error code:
-                * -3    internal eigenproblem solver hasn't converged
-                * -2    Beta[i]<=0
-                * -1    incorrect N was passed
-                *  1    OK
-    X       -   array[0..N-1] - array of quadrature nodes,
-                in ascending order.
-    W       -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 2005-2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights for a Gauss-Radau quadrature formula
+//
+// The algorithm generates the N-point Gauss-Radau  quadrature  formula  with
+// weight function given by the coefficients alpha and  beta  of a recurrence
+// which generates a system of orthogonal polynomials.
+//
+// P-1(x)   =  0
+// P0(x)    =  1
+// Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zeroth moment Mu0
+//
+// Mu0 = integral(W(x)dx,a,b)
+//
+// INPUT PARAMETERS:
+//     Alpha   -   array[0..N-2], alpha coefficients.
+//     Beta    -   array[0..N-1], beta coefficients
+//                 Zero-indexed element is not used.
+//                 Beta[I]>0
+//     Mu0     -   zeroth moment of the weighting function.
+//     A       -   left boundary of the integration interval.
+//     N       -   number of nodes of the quadrature formula, N>=2
+//                 (including the left boundary node).
+//
+// OUTPUT PARAMETERS:
+//     Info    -   error code:
+//                 * -3    internal eigenproblem solver hasn't converged
+//                 * -2    Beta[i]<=0
+//                 * -1    incorrect N was passed
+//                 *  1    OK
+//     X       -   array[0..N-1] - array of quadrature nodes,
+//                 in ascending order.
+//     W       -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategaussradaurec(RVector * alpha,
      RVector * beta,
      double mu0,
@@ -1655,9 +1589,7 @@ void gqgenerategaussradaurec(RVector * alpha,
     }
     *info = 1;
 
-    /*
-     * Initialize, D[1:N], E[1:N]
-     */
+    // Initialize, D[1:N], E[1:N]
     n = n-1;
     ae_vector_set_length(&d, n+1, _state);
     ae_vector_set_length(&e, n, _state);
@@ -1673,9 +1605,7 @@ void gqgenerategaussradaurec(RVector * alpha,
         e.ptr.p_double[i-1] = ae_sqrt(beta->ptr.p_double[i], _state);
     }
 
-    /*
-     * Caclulate Pn(a), Pn-1(a), and D[N+1]
-     */
+    // Caclulate Pn(a), Pn-1(a), and D[N+1]
     beta->ptr.p_double[0] = (double)(0);
     polim1 = (double)(0);
     poli = (double)(1);
@@ -1687,9 +1617,7 @@ void gqgenerategaussradaurec(RVector * alpha,
     }
     d.ptr.p_double[n] = a-beta->ptr.p_double[n]*polim1/poli;
 
-    /*
-     * EVD
-     */
+    // EVD
     if( !smatrixtdevd(&d, &e, n+1, 3, &z, _state) )
     {
         *info = -3;
@@ -1697,9 +1625,7 @@ void gqgenerategaussradaurec(RVector * alpha,
         return;
     }
 
-    /*
-     * Generate
-     */
+    // Generate
     ae_vector_set_length(x, n+1, _state);
     ae_vector_set_length(w, n+1, _state);
     for(i=1; i<=n+1; i++)
@@ -1711,30 +1637,28 @@ void gqgenerategaussradaurec(RVector * alpha,
 }
 
 
-/*************************************************************************
-Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
-nodes.
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't  converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
+// nodes.
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't  converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslegendre(ae_int_t n,
      ae_int_t* info,
      RVector * x,
@@ -1774,9 +1698,7 @@ void gqgenerategausslegendre(ae_int_t n,
     }
     gqgeneraterec(&alpha, &beta, beta.ptr.p_double[0], n, info, x, w, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         if( ae_fp_less(x->ptr.p_double[0],(double)(-1))||ae_fp_greater(x->ptr.p_double[n-1],(double)(1)) )
@@ -1795,33 +1717,31 @@ void gqgenerategausslegendre(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
-function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-    Alpha       -   power-law coefficient, Alpha>-1
-    Beta        -   power-law coefficient, Beta>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha or  Beta  are  too  close
-                            to -1 to obtain weights/nodes with high enough
-                            accuracy, or, may be, N is too large.  Try  to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha/Beta was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
+// function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//     Alpha       -   power-law coefficient, Alpha>-1
+//     Beta        -   power-law coefficient, Beta>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha/Beta was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategaussjacobi(ae_int_t n,
      double alpha,
      double beta,
@@ -1881,9 +1801,7 @@ void gqgenerategaussjacobi(ae_int_t n,
     }
     gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         if( ae_fp_less(x->ptr.p_double[0],(double)(-1))||ae_fp_greater(x->ptr.p_double[n-1],(double)(1)) )
@@ -1902,32 +1820,30 @@ void gqgenerategaussjacobi(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
-weight function W(x)=Power(x,Alpha)*Exp(-x)
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-    Alpha       -   power-law coefficient, Alpha>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha is too  close  to  -1  to
-                            obtain weights/nodes with high enough accuracy
-                            or, may  be,  N  is  too  large.  Try  to  use
-                            multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
+// weight function W(x)=Power(x,Alpha)*Exp(-x)
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//     Alpha       -   power-law coefficient, Alpha>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha is too  close  to  -1  to
+//                             obtain weights/nodes with high enough accuracy
+//                             or, may  be,  N  is  too  large.  Try  to  use
+//                             multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslaguerre(ae_int_t n,
      double alpha,
      ae_int_t* info,
@@ -1978,9 +1894,7 @@ void gqgenerategausslaguerre(ae_int_t n,
     }
     gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         if( ae_fp_less(x->ptr.p_double[0],(double)(0)) )
@@ -1999,29 +1913,27 @@ void gqgenerategausslaguerre(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
-weight function W(x)=Exp(-x*x)
-
-INPUT PARAMETERS:
-    N           -   number of nodes, >=1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes.  May be, N is too large. Try to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N/Alpha was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    W           -   array[0..N-1] - array of quadrature weights.
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
+// weight function W(x)=Exp(-x*x)
+//
+// INPUT PARAMETERS:
+//     N           -   number of nodes, >=1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes.  May be, N is too large. Try to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N/Alpha was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     W           -   array[0..N-1] - array of quadrature weights.
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausshermite(ae_int_t n,
      ae_int_t* info,
      RVector * x,
@@ -2064,9 +1976,7 @@ void gqgenerategausshermite(ae_int_t n,
     }
     gqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, w, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         for(i=0; i<=n-2; i++)
@@ -2085,52 +1995,50 @@ void gqgenerategausshermite(ae_int_t n,
 #if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Computation of nodes and weights of a Gauss-Kronrod quadrature formula
-
-The algorithm generates the N-point Gauss-Kronrod quadrature formula  with
-weight  function  given  by  coefficients  alpha  and beta of a recurrence
-relation which generates a system of orthogonal polynomials:
-
-    P-1(x)   =  0
-    P0(x)    =  1
-    Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
-
-and zero moment Mu0
-
-    Mu0 = integral(W(x)dx,a,b)
-
-
-INPUT PARAMETERS:
-    Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
-    Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
-                    Beta[0] is not used and may be arbitrary.
-                    Beta[I]>0.
-    Mu0         -   zeroth moment of the weight function.
-    N           -   number of nodes of the Gauss-Kronrod quadrature formula,
-                    N >= 3,
-                    N =  2*K+1.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -5    no real and positive Gauss-Kronrod formula can
-                            be created for such a weight function  with  a
-                            given number of nodes.
-                    * -4    N is too large, task may be ill  conditioned -
-                            x[i]=x[i+1] found.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -2    Beta[i]<=0
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes,
-                    in ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-  -- ALGLIB --
-     Copyright 08.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Computation of nodes and weights of a Gauss-Kronrod quadrature formula
+//
+// The algorithm generates the N-point Gauss-Kronrod quadrature formula  with
+// weight  function  given  by  coefficients  alpha  and beta of a recurrence
+// relation which generates a system of orthogonal polynomials:
+//
+//     P-1(x)   =  0
+//     P0(x)    =  1
+//     Pn+1(x)  =  (x-alpha(n))*Pn(x)  -  beta(n)*Pn-1(x)
+//
+// and zero moment Mu0
+//
+//     Mu0 = integral(W(x)dx,a,b)
+//
+//
+// INPUT PARAMETERS:
+//     Alpha       -   alpha coefficients, array[0..floor(3*K/2)].
+//     Beta        -   beta coefficients,  array[0..ceil(3*K/2)].
+//                     Beta[0] is not used and may be arbitrary.
+//                     Beta[I]>0.
+//     Mu0         -   zeroth moment of the weight function.
+//     N           -   number of nodes of the Gauss-Kronrod quadrature formula,
+//                     N >= 3,
+//                     N =  2*K+1.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    N is too large, task may be ill  conditioned -
+//                             x[i]=x[i+1] found.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -2    Beta[i]<=0
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes,
+//                     in ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//   -- ALGLIB --
+//      Copyright 08.05.2009 by Bochkanov Sergey
 void gkqgeneraterec(RVector * alpha,
      RVector * beta,
      double mu0,
@@ -2197,15 +2105,11 @@ void gkqgeneraterec(RVector * alpha,
     }
     *info = 1;
 
-    /*
-     * from external conventions about N/Beta/Mu0 to internal
-     */
+    // from external conventions about N/Beta/Mu0 to internal
     n = n/2;
     beta->ptr.p_double[0] = mu0;
 
-    /*
-     * Calculate Gauss nodes/weights, save them for later processing
-     */
+    // Calculate Gauss nodes/weights, save them for later processing
     gqgeneraterec(alpha, beta, mu0, n, info, &xgtmp, &wgtmp, _state);
     if( *info<0 )
     {
@@ -2213,11 +2117,9 @@ void gkqgeneraterec(RVector * alpha,
         return;
     }
 
-    /*
-     * Resize:
-     * * A from 0..floor(3*n/2) to 0..2*n
-     * * B from 0..ceil(3*n/2)  to 0..2*n
-     */
+    // Resize:
+    // * A from 0..floor(3*n/2) to 0..2*n
+    // * B from 0..ceil(3*n/2)  to 0..2*n
     ae_vector_set_length(&ta, ae_ifloor((double)(3*n)/(double)2, _state)+1, _state);
     ae_v_move(&ta.ptr.p_double[0], 1, &alpha->ptr.p_double[0], 1, ae_v_len(0,ae_ifloor((double)(3*n)/(double)2, _state)));
     ae_vector_set_length(alpha, 2*n+1, _state);
@@ -2235,9 +2137,7 @@ void gkqgeneraterec(RVector * alpha,
         beta->ptr.p_double[i] = (double)(0);
     }
 
-    /*
-     * Initialize T, S
-     */
+    // Initialize T, S
     wlen = 2+n/2;
     ae_vector_set_length(&t, wlen, _state);
     ae_vector_set_length(&s, wlen, _state);
@@ -2249,9 +2149,7 @@ void gkqgeneraterec(RVector * alpha,
         s.ptr.p_double[i] = (double)(0);
     }
 
-    /*
-     * Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
-     */
+    // Algorithm from Dirk P. Laurie, "Calculation of Gauss-Kronrod quadrature rules", 1997.
     t.ptr.p_double[woffs+0] = beta->ptr.p_double[n+1];
     for(m=0; m<=n-2; m++)
     {
@@ -2296,9 +2194,7 @@ void gkqgeneraterec(RVector * alpha,
     }
     alpha->ptr.p_double[2*n] = alpha->ptr.p_double[n-1]-beta->ptr.p_double[2*n]*s.ptr.p_double[woffs+0]/t.ptr.p_double[woffs+0];
 
-    /*
-     * calculation of Kronrod nodes and weights, unpacking of Gauss weights
-     */
+    // calculation of Kronrod nodes and weights, unpacking of Gauss weights
     gqgeneraterec(alpha, beta, mu0, 2*n+1, info, x, wkronrod, _state);
     if( *info==-2 )
     {
@@ -2334,35 +2230,33 @@ void gkqgeneraterec(RVector * alpha,
 }
 
 
-/*************************************************************************
-Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
-quadrature with N points.
-
-GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
-used depending on machine precision and number of nodes.
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
+// quadrature with N points.
+//
+// GKQLegendreCalc (calculation) or  GKQLegendreTbl  (precomputed  table)  is
+// used depending on machine precision and number of nodes.
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategausslegendre(ae_int_t n,
      ae_int_t* info,
      RVector * x,
@@ -2389,42 +2283,40 @@ void gkqgenerategausslegendre(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
-quadrature on [-1,1] with weight function
-
-    W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-    Alpha       -   power-law coefficient, Alpha>-1
-    Beta        -   power-law coefficient, Beta>-1
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -5    no real and positive Gauss-Kronrod formula can
-                            be created for such a weight function  with  a
-                            given number of nodes.
-                    * -4    an  error  was   detected   when   calculating
-                            weights/nodes. Alpha or  Beta  are  too  close
-                            to -1 to obtain weights/nodes with high enough
-                            accuracy, or, may be, N is too large.  Try  to
-                            use multiple precision version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-                    * +2    OK, but quadrature rule have exterior  nodes,
-                            x[0]<-1 or x[n-1]>+1
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
+// quadrature on [-1,1] with weight function
+//
+//     W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//     Alpha       -   power-law coefficient, Alpha>-1
+//     Beta        -   power-law coefficient, Beta>-1
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -5    no real and positive Gauss-Kronrod formula can
+//                             be created for such a weight function  with  a
+//                             given number of nodes.
+//                     * -4    an  error  was   detected   when   calculating
+//                             weights/nodes. Alpha or  Beta  are  too  close
+//                             to -1 to obtain weights/nodes with high enough
+//                             accuracy, or, may be, N is too large.  Try  to
+//                             use multiple precision version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//                     * +2    OK, but quadrature rule have exterior  nodes,
+//                             x[0]<-1 or x[n-1]>+1
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategaussjacobi(ae_int_t n,
      double alpha,
      double beta,
@@ -2498,9 +2390,7 @@ void gkqgenerategaussjacobi(ae_int_t n,
     }
     gkqgeneraterec(&a, &b, b.ptr.p_double[0], n, info, x, wkronrod, wgauss, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         if( ae_fp_less(x->ptr.p_double[0],(double)(-1))||ae_fp_greater(x->ptr.p_double[n-1],(double)(1)) )
@@ -2519,32 +2409,30 @@ void gkqgenerategaussjacobi(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
-
-Reduction to tridiagonal eigenproblem is used.
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes, must be odd number, >=3.
-
-OUTPUT PARAMETERS:
-    Info        -   error code:
-                    * -4    an  error   was   detected   when  calculating
-                            weights/nodes.  N  is  too  large   to  obtain
-                            weights/nodes  with  high   enough   accuracy.
-                            Try  to   use   multiple   precision  version.
-                    * -3    internal eigenproblem solver hasn't converged
-                    * -1    incorrect N was passed
-                    * +1    OK
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
+//
+// Reduction to tridiagonal eigenproblem is used.
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes, must be odd number, >=3.
+//
+// OUTPUT PARAMETERS:
+//     Info        -   error code:
+//                     * -4    an  error   was   detected   when  calculating
+//                             weights/nodes.  N  is  too  large   to  obtain
+//                             weights/nodes  with  high   enough   accuracy.
+//                             Try  to   use   multiple   precision  version.
+//                     * -3    internal eigenproblem solver hasn't converged
+//                     * -1    incorrect N was passed
+//                     * +1    OK
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendrecalc(ae_int_t n,
      ae_int_t* info,
      RVector * x,
@@ -2593,9 +2481,7 @@ void gkqlegendrecalc(ae_int_t n,
     }
     gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss, _state);
 
-    /*
-     * test basic properties to detect errors
-     */
+    // test basic properties to detect errors
     if( *info>0 )
     {
         if( ae_fp_less(x->ptr.p_double[0],(double)(-1))||ae_fp_greater(x->ptr.p_double[n-1],(double)(1)) )
@@ -2614,28 +2500,26 @@ void gkqlegendrecalc(ae_int_t n,
 }
 
 
-/*************************************************************************
-Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
-pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
-1.0E-32 (if MPFR version of ALGLIB is used). In standard double  precision
-accuracy reduces to something about 2.0E-16 (depending  on your compiler's
-handling of long floating point constants).
-
-INPUT PARAMETERS:
-    N           -   number of Kronrod nodes.
-                    N can be 15, 21, 31, 41, 51, 61.
-
-OUTPUT PARAMETERS:
-    X           -   array[0..N-1] - array of quadrature nodes, ordered in
-                    ascending order.
-    WKronrod    -   array[0..N-1] - Kronrod weights
-    WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
-                    corresponding to extended Kronrod nodes).
-
-
-  -- ALGLIB --
-     Copyright 12.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
+// pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
+// 1.0E-32 (if MPFR version of ALGLIB is used). In standard double  precision
+// accuracy reduces to something about 2.0E-16 (depending  on your compiler's
+// handling of long floating point constants).
+//
+// INPUT PARAMETERS:
+//     N           -   number of Kronrod nodes.
+//                     N can be 15, 21, 31, 41, 51, 61.
+//
+// OUTPUT PARAMETERS:
+//     X           -   array[0..N-1] - array of quadrature nodes, ordered in
+//                     ascending order.
+//     WKronrod    -   array[0..N-1] - Kronrod weights
+//     WGauss      -   array[0..N-1] - Gauss weights (interleaved with zeros
+//                     corresponding to extended Kronrod nodes).
+//
+//
+//   -- ALGLIB --
+//      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendretbl(ae_int_t n,
      RVector * x,
      RVector * wkronrod,
@@ -2661,15 +2545,11 @@ void gkqlegendretbl(ae_int_t n,
     ae_vector_init(&p2, 0, DT_INT, _state, ae_true);
 
 
-    /*
-     * these initializers are not really necessary,
-     * but without them compiler complains about uninitialized locals
-     */
+    // these initializers are not really necessary,
+    // but without them compiler complains about uninitialized locals
     ng = 0;
 
-    /*
-     * Process
-     */
+    // Process
     ae_assert(((((n==15||n==21)||n==31)||n==41)||n==51)||n==61, "GKQNodesTbl: incorrect N!", _state);
     ae_vector_set_length(x, n, _state);
     ae_vector_set_length(wkronrod, n, _state);
@@ -2987,25 +2867,19 @@ void gkqlegendretbl(ae_int_t n,
         wkronrod->ptr.p_double[30] = 0.051494729429451567558340433647099;
     }
 
-    /*
-     * copy nodes
-     */
+    // copy nodes
     for(i=n-1; i>=n/2; i--)
     {
         x->ptr.p_double[i] = -x->ptr.p_double[n-1-i];
     }
 
-    /*
-     * copy Kronrod weights
-     */
+    // copy Kronrod weights
     for(i=n-1; i>=n/2; i--)
     {
         wkronrod->ptr.p_double[i] = wkronrod->ptr.p_double[n-1-i];
     }
 
-    /*
-     * copy Gauss weights
-     */
+    // copy Gauss weights
     for(i=ng-1; i>=0; i--)
     {
         wgauss->ptr.p_double[n-2-2*i] = wgauss->ptr.p_double[i];
@@ -3016,9 +2890,7 @@ void gkqlegendretbl(ae_int_t n,
         wgauss->ptr.p_double[2*i] = (double)(0);
     }
 
-    /*
-     * reorder
-     */
+    // reorder
     tagsort(x, n, &p1, &p2, _state);
     for(i=0; i<=n-1; i++)
     {
@@ -3037,32 +2909,30 @@ void gkqlegendretbl(ae_int_t n,
 #if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Integration of a smooth function F(x) on a finite interval [a,b].
-
-Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-is calculated with accuracy close to the machine precision.
-
-Algorithm works well only with smooth integrands.  It  may  be  used  with
-continuous non-smooth integrands, but with  less  performance.
-
-It should never be used with integrands which have integrable singularities
-at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
-cases.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmoothW, AutoGKSingular, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// Algorithm works well only with smooth integrands.  It  may  be  used  with
+// continuous non-smooth integrands, but with  less  performance.
+//
+// It should never be used with integrands which have integrable singularities
+// at lower or upper limits - algorithm may crash. Use AutoGKSingular in such
+// cases.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmooth(double a,
      double b,
      autogkstate* state,
@@ -3077,29 +2947,27 @@ void autogksmooth(double a,
 }
 
 
-/*************************************************************************
-Integration of a smooth function F(x) on a finite interval [a,b].
-
-This subroutine is same as AutoGKSmooth(), but it guarantees that interval
-[a,b] is partitioned into subintervals which have width at most XWidth.
-
-Subroutine  can  be  used  when  integrating nearly-constant function with
-narrow "bumps" (about XWidth wide). If "bumps" are too narrow, AutoGKSmooth
-subroutine can overlook them.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmooth, AutoGKSingular, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration of a smooth function F(x) on a finite interval [a,b].
+//
+// This subroutine is same as AutoGKSmooth(), but it guarantees that interval
+// [a,b] is partitioned into subintervals which have width at most XWidth.
+//
+// Subroutine  can  be  used  when  integrating nearly-constant function with
+// narrow "bumps" (about XWidth wide). If "bumps" are too narrow, AutoGKSmooth
+// subroutine can overlook them.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmooth, AutoGKSingular, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmoothw(double a,
      double b,
      double xwidth,
@@ -3122,38 +2990,36 @@ void autogksmoothw(double a,
 }
 
 
-/*************************************************************************
-Integration on a finite interval [A,B].
-Integrand have integrable singularities at A/B.
-
-F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
-alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
-from below can be used (but these estimates should be greater than -1 too).
-
-One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
-which means than function F(x) is non-singular at A/B. Anyway (singular at
-bounds or not), function F(x) is supposed to be continuous on (A,B).
-
-Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
-is calculated with accuracy close to the machine precision.
-
-INPUT PARAMETERS:
-    A, B    -   interval boundaries (A<B, A=B or A>B)
-    Alpha   -   power-law coefficient of the F(x) at A,
-                Alpha>-1
-    Beta    -   power-law coefficient of the F(x) at B,
-                Beta>-1
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state
-
-SEE ALSO
-    AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 06.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// Integration on a finite interval [A,B].
+// Integrand have integrable singularities at A/B.
+//
+// F(X) must diverge as "(x-A)^alpha" at A, as "(B-x)^beta" at B,  with known
+// alpha/beta (alpha>-1, beta>-1).  If alpha/beta  are  not known,  estimates
+// from below can be used (but these estimates should be greater than -1 too).
+//
+// One  of  alpha/beta variables (or even both alpha/beta) may be equal to 0,
+// which means than function F(x) is non-singular at A/B. Anyway (singular at
+// bounds or not), function F(x) is supposed to be continuous on (A,B).
+//
+// Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
+// is calculated with accuracy close to the machine precision.
+//
+// INPUT PARAMETERS:
+//     A, B    -   interval boundaries (A<B, A=B or A>B)
+//     Alpha   -   power-law coefficient of the F(x) at A,
+//                 Alpha>-1
+//     Beta    -   power-law coefficient of the F(x) at B,
+//                 Beta>-1
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state
+//
+// SEE ALSO
+//     AutoGKSmooth, AutoGKSmoothW, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksingular(double a,
      double b,
      double alpha,
@@ -3180,11 +3046,9 @@ void autogksingular(double a,
 }
 
 
-/*************************************************************************
-
-  -- ALGLIB --
-     Copyright 07.05.2009 by Bochkanov Sergey
-*************************************************************************/
+//
+//   -- ALGLIB --
+//      Copyright 07.05.2009 by Bochkanov Sergey
 ae_bool autogkiteration(autogkstate* state, ae_state *_state)
 {
     double s;
@@ -3202,16 +3066,14 @@ ae_bool autogkiteration(autogkstate* state, ae_state *_state)
 
 
 
-    /*
-     * Reverse communication preparations
-     * I know it looks ugly, but it works the same way
-     * anywhere from C++ to Python.
-     *
-     * This code initializes locals by:
-     * * random values determined during code
-     *   generation - on first subroutine call
-     * * values from previous call - on subsequent calls
-     */
+    // Reverse communication preparations
+    // I know it looks ugly, but it works the same way
+    // anywhere from C++ to Python.
+    //
+    // This code initializes locals by:
+    // * random values determined during code
+    //   generation - on first subroutine call
+    // * values from previous call - on subsequent calls
     if( state->rstate.stage>=0 )
     {
         s = state->rstate.ra.ptr.p_double[0];
@@ -3253,9 +3115,7 @@ ae_bool autogkiteration(autogkstate* state, ae_state *_state)
         goto lbl_2;
     }
 
-    /*
-     * Routine body
-     */
+    // Routine body
     eps = (double)(0);
     a = state->a;
     b = state->b;
@@ -3265,17 +3125,13 @@ ae_bool autogkiteration(autogkstate* state, ae_state *_state)
     state->nfev = 0;
     state->nintervals = 0;
 
-    /*
-     * smooth function  at a finite interval
-     */
+    // smooth function  at a finite interval
     if( state->wrappermode!=0 )
     {
         goto lbl_3;
     }
 
-    /*
-     * special case
-     */
+    // special case
     if( ae_fp_eq(a,b) )
     {
         state->terminationtype = 1;
@@ -3284,9 +3140,7 @@ ae_bool autogkiteration(autogkstate* state, ae_state *_state)
         return result;
     }
 
-    /*
-     * general case
-     */
+    // general case
     autogk_autogkinternalprepare(a, b, eps, state->xwidth, &state->internalstate, _state);
 lbl_5:
     if( !autogk_autogkinternaliteration(&state->internalstate, _state) )
@@ -3313,17 +3167,13 @@ lbl_6:
     return result;
 lbl_3:
 
-    /*
-     * function with power-law singularities at the ends of a finite interval
-     */
+    // function with power-law singularities at the ends of a finite interval
     if( state->wrappermode!=1 )
     {
         goto lbl_7;
     }
 
-    /*
-     * test coefficients
-     */
+    // test coefficients
     if( ae_fp_less_eq(alpha,(double)(-1))||ae_fp_less_eq(beta,(double)(-1)) )
     {
         state->terminationtype = -1;
@@ -3332,9 +3182,7 @@ lbl_3:
         return result;
     }
 
-    /*
-     * special cases
-     */
+    // special cases
     if( ae_fp_eq(a,b) )
     {
         state->terminationtype = 1;
@@ -3343,9 +3191,7 @@ lbl_3:
         return result;
     }
 
-    /*
-     * reduction to general form
-     */
+    // reduction to general form
     if( ae_fp_less(a,b) )
     {
         s = (double)(1);
@@ -3363,11 +3209,9 @@ lbl_3:
     alpha = ae_minreal(alpha, (double)(0), _state);
     beta = ae_minreal(beta, (double)(0), _state);
 
-    /*
-     * first, integrate left half of [a,b]:
-     *     integral(f(x)dx, a, (b+a)/2) =
-     *     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
-     */
+    // first, integrate left half of [a,b]:
+    //     integral(f(x)dx, a, (b+a)/2) =
+    //     = 1/(1+alpha) * integral(t^(-alpha/(1+alpha))*f(a+t^(1/(1+alpha)))dt, 0, (0.5*(b-a))^(1+alpha))
     autogk_autogkinternalprepare((double)(0), ae_pow(0.5*(b-a), 1+alpha, _state), eps, state->xwidth, &state->internalstate, _state);
 lbl_9:
     if( !autogk_autogkinternaliteration(&state->internalstate, _state) )
@@ -3375,10 +3219,8 @@ lbl_9:
         goto lbl_10;
     }
 
-    /*
-     * Fill State.X, State.XMinusA, State.BMinusX.
-     * Latter two are filled correctly even if B<A.
-     */
+    // Fill State.X, State.XMinusA, State.BMinusX.
+    // Latter two are filled correctly even if B<A.
     x = state->internalstate.x;
     t = ae_pow(x, 1/(1+alpha), _state);
     state->x = a+t;
@@ -3411,11 +3253,9 @@ lbl_10:
     v1 = state->internalstate.r;
     state->nintervals = state->nintervals+state->internalstate.heapused;
 
-    /*
-     * then, integrate right half of [a,b]:
-     *     integral(f(x)dx, (b+a)/2, b) =
-     *     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
-     */
+    // then, integrate right half of [a,b]:
+    //     integral(f(x)dx, (b+a)/2, b) =
+    //     = 1/(1+beta) * integral(t^(-beta/(1+beta))*f(b-t^(1/(1+beta)))dt, 0, (0.5*(b-a))^(1+beta))
     autogk_autogkinternalprepare((double)(0), ae_pow(0.5*(b-a), 1+beta, _state), eps, state->xwidth, &state->internalstate, _state);
 lbl_11:
     if( !autogk_autogkinternaliteration(&state->internalstate, _state) )
@@ -3423,10 +3263,8 @@ lbl_11:
         goto lbl_12;
     }
 
-    /*
-     * Fill State.X, State.XMinusA, State.BMinusX.
-     * Latter two are filled correctly (X-A, B-X) even if B<A.
-     */
+    // Fill State.X, State.XMinusA, State.BMinusX.
+    // Latter two are filled correctly (X-A, B-X) even if B<A.
     x = state->internalstate.x;
     t = ae_pow(x, 1/(1+beta), _state);
     state->x = b-t;
@@ -3459,9 +3297,7 @@ lbl_12:
     v2 = state->internalstate.r;
     state->nintervals = state->nintervals+state->internalstate.heapused;
 
-    /*
-     * final result
-     */
+    // final result
     state->v = s*(v1+v2);
     state->terminationtype = 1;
     result = ae_false;
@@ -3470,9 +3306,7 @@ lbl_7:
     result = ae_false;
     return result;
 
-    /*
-     * Saving state
-     */
+    // Saving state
 lbl_rcomm:
     result = ae_true;
     state->rstate.ra.ptr.p_double[0] = s;
@@ -3490,21 +3324,19 @@ lbl_rcomm:
 }
 
 
-/*************************************************************************
-Adaptive integration results
-
-Called after AutoGKIteration returned False.
-
-Input parameters:
-    State   -   algorithm state (used by AutoGKIteration).
-
-Output parameters:
-    V       -   integral(f(x)dx,a,b)
-    Rep     -   optimization report (see AutoGKReport description)
-
-  -- ALGLIB --
-     Copyright 14.11.2007 by Bochkanov Sergey
-*************************************************************************/
+// Adaptive integration results
+//
+// Called after AutoGKIteration returned False.
+//
+// Input parameters:
+//     State   -   algorithm state (used by AutoGKIteration).
+//
+// Output parameters:
+//     V       -   integral(f(x)dx,a,b)
+//     Rep     -   optimization report (see AutoGKReport description)
+//
+//   -- ALGLIB --
+//      Copyright 14.11.2007 by Bochkanov Sergey
 void autogkresults(autogkstate* state,
      double* v,
      autogkreport* rep,
@@ -3521,14 +3353,12 @@ void autogkresults(autogkstate* state,
 }
 
 
-/*************************************************************************
-Internal AutoGK subroutine
-eps<0   - error
-eps=0   - automatic eps selection
-
-width<0 -   error
-width=0 -   no width requirements
-*************************************************************************/
+// Internal AutoGK subroutine
+// eps<0   - error
+// eps=0   - automatic eps selection
+//
+// width<0 -   error
+// width=0 -   no width requirements
 static void autogk_autogkinternalprepare(double a,
      double b,
      double eps,
@@ -3539,26 +3369,20 @@ static void autogk_autogkinternalprepare(double a,
 
 
 
-    /*
-     * Save settings
-     */
+    // Save settings
     state->a = a;
     state->b = b;
     state->eps = eps;
     state->xwidth = xwidth;
 
-    /*
-     * Prepare RComm structure
-     */
+    // Prepare RComm structure
     ae_vector_set_length(&state->rstate.ia, 3+1, _state);
     ae_vector_set_length(&state->rstate.ra, 8+1, _state);
     state->rstate.stage = -1;
 }
 
 
-/*************************************************************************
-Internal AutoGK subroutine
-*************************************************************************/
+// Internal AutoGK subroutine
 static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
      ae_state *_state)
 {
@@ -3579,16 +3403,14 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
 
 
 
-    /*
-     * Reverse communication preparations
-     * I know it looks ugly, but it works the same way
-     * anywhere from C++ to Python.
-     *
-     * This code initializes locals by:
-     * * random values determined during code
-     *   generation - on first subroutine call
-     * * values from previous call - on subsequent calls
-     */
+    // Reverse communication preparations
+    // I know it looks ugly, but it works the same way
+    // anywhere from C++ to Python.
+    //
+    // This code initializes locals by:
+    // * random values determined during code
+    //   generation - on first subroutine call
+    // * values from previous call - on subsequent calls
     if( state->rstate.stage>=0 )
     {
         i = state->rstate.ia.ptr.p_int[0];
@@ -3634,14 +3456,10 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
         goto lbl_2;
     }
 
-    /*
-     * Routine body
-     */
+    // Routine body
 
-    /*
-     * initialize quadratures.
-     * use 15-point Gauss-Kronrod formula.
-     */
+    // initialize quadratures.
+    // use 15-point Gauss-Kronrod formula.
     state->n = 15;
     gkqgenerategausslegendre(state->n, &info, &state->qn, &state->wk, &state->wg, _state);
     if( info<0 )
@@ -3667,9 +3485,7 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
         state->wr.ptr.p_double[i] = 0.5*ae_fabs(state->qn.ptr.p_double[i-1]-state->qn.ptr.p_double[i+1], _state);
     }
 
-    /*
-     * special case
-     */
+    // special case
     if( ae_fp_eq(state->a,state->b) )
     {
         state->info = 1;
@@ -3678,9 +3494,7 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
         return result;
     }
 
-    /*
-     * test parameters
-     */
+    // test parameters
     if( ae_fp_less(state->eps,(double)(0))||ae_fp_less(state->xwidth,(double)(0)) )
     {
         state->info = -1;
@@ -3694,23 +3508,19 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
         state->eps = 100000*ae_machineepsilon;
     }
 
-    /*
-     * First, prepare heap
-     * * column 0   -   absolute error
-     * * column 1   -   integral of a F(x) (calculated using Kronrod extension nodes)
-     * * column 2   -   integral of a |F(x)| (calculated using modified rect. method)
-     * * column 3   -   left boundary of a subinterval
-     * * column 4   -   right boundary of a subinterval
-     */
+    // First, prepare heap
+    // * column 0   -   absolute error
+    // * column 1   -   integral of a F(x) (calculated using Kronrod extension nodes)
+    // * column 2   -   integral of a |F(x)| (calculated using modified rect. method)
+    // * column 3   -   left boundary of a subinterval
+    // * column 4   -   right boundary of a subinterval
     if( ae_fp_neq(state->xwidth,(double)(0)) )
     {
         goto lbl_3;
     }
 
-    /*
-     * no maximum width requirements
-     * start from one big subinterval
-     */
+    // no maximum width requirements
+    // start from one big subinterval
     state->heapwidth = 5;
     state->heapsize = 1;
     state->heapused = 1;
@@ -3727,28 +3537,22 @@ lbl_5:
         goto lbl_7;
     }
 
-    /*
-     * obtain F
-     */
+    // obtain F
     state->x = c1*state->qn.ptr.p_double[i]+c2;
     state->rstate.stage = 0;
     goto lbl_rcomm;
 lbl_0:
     v = state->f;
 
-    /*
-     * Gauss-Kronrod formula
-     */
+    // Gauss-Kronrod formula
     intk = intk+v*state->wk.ptr.p_double[i];
     if( i%2==1 )
     {
         intg = intg+v*state->wg.ptr.p_double[i];
     }
 
-    /*
-     * Integral |F(x)|
-     * Use rectangles method
-     */
+    // Integral |F(x)|
+    // Use rectangles method
     inta = inta+ae_fabs(v, _state)*state->wr.ptr.p_double[i];
     i = i+1;
     goto lbl_5;
@@ -3766,10 +3570,8 @@ lbl_7:
     goto lbl_4;
 lbl_3:
 
-    /*
-     * maximum subinterval should be no more than XWidth.
-     * so we create Ceil((B-A)/XWidth)+1 small subintervals
-     */
+    // maximum subinterval should be no more than XWidth.
+    // so we create Ceil((B-A)/XWidth)+1 small subintervals
     ns = ae_iceil(ae_fabs(state->b-state->a, _state)/state->xwidth, _state)+1;
     state->heapsize = ns;
     state->heapused = ns;
@@ -3797,28 +3599,22 @@ lbl_11:
         goto lbl_13;
     }
 
-    /*
-     * obtain F
-     */
+    // obtain F
     state->x = c1*state->qn.ptr.p_double[i]+c2;
     state->rstate.stage = 1;
     goto lbl_rcomm;
 lbl_1:
     v = state->f;
 
-    /*
-     * Gauss-Kronrod formula
-     */
+    // Gauss-Kronrod formula
     intk = intk+v*state->wk.ptr.p_double[i];
     if( i%2==1 )
     {
         intg = intg+v*state->wg.ptr.p_double[i];
     }
 
-    /*
-     * Integral |F(x)|
-     * Use rectangles method
-     */
+    // Integral |F(x)|
+    // Use rectangles method
     inta = inta+ae_fabs(v, _state)*state->wr.ptr.p_double[i];
     i = i+1;
     goto lbl_11;
@@ -3838,26 +3634,20 @@ lbl_13:
 lbl_10:
 lbl_4:
 
-    /*
-     * method iterations
-     */
+    // method iterations
 lbl_14:
     if( ae_false )
     {
         goto lbl_15;
     }
 
-    /*
-     * additional memory if needed
-     */
+    // additional memory if needed
     if( state->heapused==state->heapsize )
     {
         autogk_mheapresize(&state->heap, &state->heapsize, 4*state->heapsize, state->heapwidth, _state);
     }
 
-    /*
-     * TODO: every 20 iterations recalculate errors/sums
-     */
+    // TODO: every 20 iterations recalculate errors/sums
     if( ae_fp_less_eq(state->sumerr,state->eps*state->sumabs)||state->heapused>=autogk_maxsubintervals )
     {
         state->r = (double)(0);
@@ -3869,16 +3659,12 @@ lbl_14:
         return result;
     }
 
-    /*
-     * Exclude interval with maximum absolute error
-     */
+    // Exclude interval with maximum absolute error
     autogk_mheappop(&state->heap, state->heapused, state->heapwidth, _state);
     state->sumerr = state->sumerr-state->heap.ptr.pp_double[state->heapused-1][0];
     state->sumabs = state->sumabs-state->heap.ptr.pp_double[state->heapused-1][2];
 
-    /*
-     * Divide interval, create subintervals
-     */
+    // Divide interval, create subintervals
     ta = state->heap.ptr.pp_double[state->heapused-1][3];
     tb = state->heap.ptr.pp_double[state->heapused-1][4];
     state->heap.ptr.pp_double[state->heapused-1][3] = ta;
@@ -3903,28 +3689,22 @@ lbl_19:
         goto lbl_21;
     }
 
-    /*
-     * F(x)
-     */
+    // F(x)
     state->x = c1*state->qn.ptr.p_double[i]+c2;
     state->rstate.stage = 2;
     goto lbl_rcomm;
 lbl_2:
     v = state->f;
 
-    /*
-     * Gauss-Kronrod formula
-     */
+    // Gauss-Kronrod formula
     intk = intk+v*state->wk.ptr.p_double[i];
     if( i%2==1 )
     {
         intg = intg+v*state->wg.ptr.p_double[i];
     }
 
-    /*
-     * Integral |F(x)|
-     * Use rectangles method
-     */
+    // Integral |F(x)|
+    // Use rectangles method
     inta = inta+ae_fabs(v, _state)*state->wr.ptr.p_double[i];
     i = i+1;
     goto lbl_19;
@@ -3948,9 +3728,7 @@ lbl_15:
     result = ae_false;
     return result;
 
-    /*
-     * Saving state
-     */
+    // Saving state
 lbl_rcomm:
     result = ae_true;
     state->rstate.ia.ptr.p_int[0] = i;

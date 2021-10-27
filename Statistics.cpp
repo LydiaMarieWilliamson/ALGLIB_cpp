@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -73,26 +71,24 @@ namespace alglib
 #endif
 
 #if defined(AE_COMPILE_BASESTAT) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-OUTPUT PARAMETERS
-    Mean    -   mean.
-    Variance-   variance.
-    Skewness-   skewness (if variance<>0; zero otherwise).
-    Kurtosis-   kurtosis (if variance<>0; zero otherwise).
-
-NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// OUTPUT PARAMETERS
+//     Mean    -   mean.
+//     Variance-   variance.
+//     Skewness-   skewness (if variance<>0; zero otherwise).
+//     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
+//
+// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -115,26 +111,24 @@ void samplemoments(const real_1d_array &x, const ae_int_t n, double &mean, doubl
     return;
 }
 
-/*************************************************************************
-Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-OUTPUT PARAMETERS
-    Mean    -   mean.
-    Variance-   variance.
-    Skewness-   skewness (if variance<>0; zero otherwise).
-    Kurtosis-   kurtosis (if variance<>0; zero otherwise).
-
-NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// OUTPUT PARAMETERS
+//     Mean    -   mean.
+//     Variance-   variance.
+//     Skewness-   skewness (if variance<>0; zero otherwise).
+//     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
+//
+// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams)
 {
@@ -156,24 +150,22 @@ void samplemoments(const real_1d_array &x, double &mean, double &variance, doubl
 }
 #endif
 
-/*************************************************************************
-Calculation of the mean.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Mean' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the mean.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Mean' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -196,24 +188,22 @@ double samplemean(const real_1d_array &x, const ae_int_t n, const xparams _xpara
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Calculation of the mean.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Mean' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the mean.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Mean' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplemean(const real_1d_array &x, const xparams _xparams)
 {
@@ -235,24 +225,22 @@ double samplemean(const real_1d_array &x, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Calculation of the variance.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Variance' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the variance.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Variance' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -275,24 +263,22 @@ double samplevariance(const real_1d_array &x, const ae_int_t n, const xparams _x
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Calculation of the variance.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Variance' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the variance.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Variance' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplevariance(const real_1d_array &x, const xparams _xparams)
 {
@@ -314,24 +300,22 @@ double samplevariance(const real_1d_array &x, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Calculation of the skewness.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Skewness' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the skewness.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Skewness' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -354,24 +338,22 @@ double sampleskewness(const real_1d_array &x, const ae_int_t n, const xparams _x
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Calculation of the skewness.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Skewness' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the skewness.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Skewness' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double sampleskewness(const real_1d_array &x, const xparams _xparams)
 {
@@ -393,24 +375,22 @@ double sampleskewness(const real_1d_array &x, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Calculation of the kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Kurtosis' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Kurtosis' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -433,24 +413,22 @@ double samplekurtosis(const real_1d_array &x, const ae_int_t n, const xparams _x
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Calculation of the kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Kurtosis' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Kurtosis' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double samplekurtosis(const real_1d_array &x, const xparams _xparams)
 {
@@ -472,21 +450,19 @@ double samplekurtosis(const real_1d_array &x, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-ADev
-
-Input parameters:
-    X   -   sample
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    ADev-   ADev
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// ADev
+//
+// Input parameters:
+//     X   -   sample
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     ADev-   ADev
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -509,21 +485,19 @@ void sampleadev(const real_1d_array &x, const ae_int_t n, double &adev, const xp
     return;
 }
 
-/*************************************************************************
-ADev
-
-Input parameters:
-    X   -   sample
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    ADev-   ADev
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// ADev
+//
+// Input parameters:
+//     X   -   sample
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     ADev-   ADev
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams)
 {
@@ -545,21 +519,19 @@ void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Median calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    Median
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Median calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     Median
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -582,21 +554,19 @@ void samplemedian(const real_1d_array &x, const ae_int_t n, double &median, cons
     return;
 }
 
-/*************************************************************************
-Median calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    Median
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Median calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     Median
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplemedian(const real_1d_array &x, double &median, const xparams _xparams)
 {
@@ -618,22 +588,20 @@ void samplemedian(const real_1d_array &x, double &median, const xparams _xparams
 }
 #endif
 
-/*************************************************************************
-Percentile calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-    P   -   percentile (0<=P<=1)
-
-Output parameters:
-    V   -   percentile
-
-  -- ALGLIB --
-     Copyright 01.03.2008 by Bochkanov Sergey
-*************************************************************************/
+// Percentile calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//     P   -   percentile (0<=P<=1)
+//
+// Output parameters:
+//     V   -   percentile
+//
+//   -- ALGLIB --
+//      Copyright 01.03.2008 by Bochkanov Sergey
 void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, double &v, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -656,22 +624,20 @@ void samplepercentile(const real_1d_array &x, const ae_int_t n, const double p, 
     return;
 }
 
-/*************************************************************************
-Percentile calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-    P   -   percentile (0<=P<=1)
-
-Output parameters:
-    V   -   percentile
-
-  -- ALGLIB --
-     Copyright 01.03.2008 by Bochkanov Sergey
-*************************************************************************/
+// Percentile calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//     P   -   percentile (0<=P<=1)
+//
+// Output parameters:
+//     V   -   percentile
+//
+//   -- ALGLIB --
+//      Copyright 01.03.2008 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams)
 {
@@ -693,22 +659,20 @@ void samplepercentile(const real_1d_array &x, const double p, double &v, const x
 }
 #endif
 
-/*************************************************************************
-2-sample covariance
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    covariance (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// 2-sample covariance
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     covariance (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -731,22 +695,20 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, co
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-2-sample covariance
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    covariance (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// 2-sample covariance
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     covariance (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
@@ -769,23 +731,21 @@ double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xpara
 }
 #endif
 
-/*************************************************************************
-Pearson product-moment correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Pearson product-moment correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Pearson product-moment correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -808,23 +768,21 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const ae_int
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Pearson product-moment correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Pearson product-moment correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Pearson product-moment correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
@@ -847,23 +805,21 @@ double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparam
 }
 #endif
 
-/*************************************************************************
-Spearman's rank correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Spearman's rank correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Spearman's rank correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -886,23 +842,21 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const ae_in
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Spearman's rank correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Spearman's rank correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Spearman's rank correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
@@ -925,39 +879,37 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xpara
 }
 #endif
 
-/*************************************************************************
-Covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -980,39 +932,37 @@ void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_ar
     return;
 }
 
-/*************************************************************************
-Covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
@@ -1036,39 +986,37 @@ void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Pearson product-moment correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1091,39 +1039,37 @@ void pearsoncorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, re
     return;
 }
 
-/*************************************************************************
-Pearson product-moment correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
@@ -1147,39 +1093,37 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xpara
 }
 #endif
 
-/*************************************************************************
-Spearman's rank correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1202,39 +1146,37 @@ void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, r
     return;
 }
 
-/*************************************************************************
-Spearman's rank correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
@@ -1258,45 +1200,43 @@ void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xpar
 }
 #endif
 
-/*************************************************************************
-Cross-covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Cross-covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1319,45 +1259,43 @@ void covm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, con
     return;
 }
 
-/*************************************************************************
-Cross-covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Cross-covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
@@ -1384,45 +1322,43 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, con
 }
 #endif
 
-/*************************************************************************
-Pearson product-moment cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1445,45 +1381,43 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
     return;
 }
 
-/*************************************************************************
-Pearson product-moment cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
@@ -1510,45 +1444,43 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array
 }
 #endif
 
-/*************************************************************************
-Spearman's rank cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_t n, const ae_int_t m1, const ae_int_t m2, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1571,45 +1503,43 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int
     return;
 }
 
-/*************************************************************************
-Spearman's rank cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
@@ -1636,37 +1566,35 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
 }
 #endif
 
-/*************************************************************************
-This function replaces data in XY by their ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* ranking starts from 0, ends at NFeatures-1
-* sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * ranking starts from 0, ends at NFeatures-1
+// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1689,37 +1617,35 @@ void rankdata(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nf
     return;
 }
 
-/*************************************************************************
-This function replaces data in XY by their ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* ranking starts from 0, ends at NFeatures-1
-* sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * ranking starts from 0, ends at NFeatures-1
+// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void rankdata(real_2d_array &xy, const xparams _xparams)
 {
@@ -1743,39 +1669,37 @@ void rankdata(real_2d_array &xy, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-This function replaces data in XY by their CENTERED ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* centered ranks are just usual ranks, but centered in such way  that  sum
-  of within-row values is equal to 0.0.
-* centering is performed by subtracting mean from each row, i.e it changes
-  mean value, but does NOT change higher moments
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their CENTERED ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * centered ranks are just usual ranks, but centered in such way  that  sum
+//   of within-row values is equal to 0.0.
+// * centering is performed by subtracting mean from each row, i.e it changes
+//   mean value, but does NOT change higher moments
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nfeatures, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1798,39 +1722,37 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
     return;
 }
 
-/*************************************************************************
-This function replaces data in XY by their CENTERED ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* centered ranks are just usual ranks, but centered in such way  that  sum
-  of within-row values is equal to 0.0.
-* centering is performed by subtracting mean from each row, i.e it changes
-  mean value, but does NOT change higher moments
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their CENTERED ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * centered ranks are just usual ranks, but centered in such way  that  sum
+//   of within-row values is equal to 0.0.
+// * centering is performed by subtracting mean from each row, i.e it changes
+//   mean value, but does NOT change higher moments
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void rankdatacentered(real_2d_array &xy, const xparams _xparams)
 {
@@ -1854,12 +1776,10 @@ void rankdatacentered(real_2d_array &xy, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-Obsolete function, we recommend to use PearsonCorr2().
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Obsolete function, we recommend to use PearsonCorr2().
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1882,12 +1802,10 @@ double pearsoncorrelation(const real_1d_array &x, const real_1d_array &y, const 
     return *(reinterpret_cast<double*>(&result));
 }
 
-/*************************************************************************
-Obsolete function, we recommend to use SpearmanCorr2().
-
-    -- ALGLIB --
-    Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Obsolete function, we recommend to use SpearmanCorr2().
+//
+//     -- ALGLIB --
+//     Copyright 09.04.2007 by Bochkanov Sergey
 double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1912,42 +1830,40 @@ double spearmanrankcorrelation(const real_1d_array &x, const real_1d_array &y, c
 #endif
 
 #if defined(AE_COMPILE_CORRELATIONTESTS) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Pearson's correlation coefficient significance test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous  distributions  having  zero  correlation  or   whether   their
-correlation is non-zero.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - X and Y have zero correlation)
-    * left-tailed test (null hypothesis - the correlation  coefficient  is
-      greater than or equal to 0)
-    * right-tailed test (null hypothesis - the correlation coefficient  is
-      less than or equal to 0).
-
-Requirements:
-    * the number of elements in each sample is not less than 5
-    * normality of distributions of X and Y.
-
-Input parameters:
-    R   -   Pearson's correlation coefficient for X and Y
-    N   -   number of elements in samples, N>=5.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Pearson's correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5
+//     * normality of distributions of X and Y.
+//
+// Input parameters:
+//     R   -   Pearson's correlation coefficient for X and Y
+//     N   -   number of elements in samples, N>=5.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1970,44 +1886,42 @@ void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bo
     return;
 }
 
-/*************************************************************************
-Spearman's rank correlation coefficient significance test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous  distributions  having  zero  correlation  or   whether   their
-correlation is non-zero.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - X and Y have zero correlation)
-    * left-tailed test (null hypothesis - the correlation  coefficient  is
-      greater than or equal to 0)
-    * right-tailed test (null hypothesis - the correlation coefficient  is
-      less than or equal to 0).
-
-Requirements:
-    * the number of elements in each sample is not less than 5.
-
-The test is non-parametric and doesn't require distributions X and Y to be
-normal.
-
-Input parameters:
-    R   -   Spearman's rank correlation coefficient for X and Y
-    N   -   number of elements in samples, N>=5.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5.
+//
+// The test is non-parametric and doesn't require distributions X and Y to be
+// normal.
+//
+// Input parameters:
+//     R   -   Spearman's rank correlation coefficient for X and Y
+//     N   -   number of elements in samples, N>=5.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2032,36 +1946,34 @@ void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, doubl
 #endif
 
 #if defined(AE_COMPILE_JARQUEBERA) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Jarque-Bera test
-
-This test checks hypotheses about the fact that a  given  sample  X  is  a
-sample of normal random variable.
-
-Requirements:
-    * the number of elements in the sample is not less than 5.
-
-Input parameters:
-    X   -   sample. Array whose index goes from 0 to N-1.
-    N   -   size of the sample. N>=5
-
-Output parameters:
-    P           -   p-value for the test
-
-Accuracy of the approximation used (5<=N<=1951):
-
-p-value  	    relative error (5<=N<=1951)
-[1, 0.1]            < 1%
-[0.1, 0.01]         < 2%
-[0.01, 0.001]       < 6%
-[0.001, 0]          wasn't measured
-
-For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
-from table values.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Jarque-Bera test
+//
+// This test checks hypotheses about the fact that a  given  sample  X  is  a
+// sample of normal random variable.
+//
+// Requirements:
+//     * the number of elements in the sample is not less than 5.
+//
+// Input parameters:
+//     X   -   sample. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N>=5
+//
+// Output parameters:
+//     P           -   p-value for the test
+//
+// Accuracy of the approximation used (5<=N<=1951):
+//
+// p-value  	    relative error (5<=N<=1951)
+// [1, 0.1]            < 1%
+// [0.1, 0.01]         < 2%
+// [0.01, 0.001]       < 6%
+// [0.001, 0]          wasn't measured
+//
+// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// from table values.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2086,42 +1998,40 @@ void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p, const x
 #endif
 
 #if defined(AE_COMPILE_VARIANCETESTS) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Two-sample F-test
-
-This test checks three hypotheses about dispersions of the given  samples.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the dispersions are equal)
-    * left-tailed test (null hypothesis  -  the  dispersion  of  the first
-      sample is greater than or equal to  the  dispersion  of  the  second
-      sample).
-    * right-tailed test (null hypothesis - the  dispersion  of  the  first
-      sample is less than or equal to the dispersion of the second sample)
-
-The test is based on the following assumptions:
-    * the given samples have normal distributions
-    * the samples are independent.
-
-Input parameters:
-    X   -   sample 1. Array whose index goes from 0 to N-1.
-    N   -   sample size.
-    Y   -   sample 2. Array whose index goes from 0 to M-1.
-    M   -   sample size.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 19.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample F-test
+//
+// This test checks three hypotheses about dispersions of the given  samples.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersions are equal)
+//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
+//       sample is greater than or equal to  the  dispersion  of  the  second
+//       sample).
+//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
+//       sample is less than or equal to the dispersion of the second sample)
+//
+// The test is based on the following assumptions:
+//     * the given samples have normal distributions
+//     * the samples are independent.
+//
+// Input parameters:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   sample size.
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   sample size.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 19.09.2006 by Bochkanov Sergey
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2144,40 +2054,38 @@ void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, con
     return;
 }
 
-/*************************************************************************
-One-sample chi-square test
-
-This test checks three hypotheses about the dispersion of the given sample
-The following tests are performed:
-    * two-tailed test (null hypothesis - the dispersion equals  the  given
-      number)
-    * left-tailed test (null hypothesis - the dispersion is  greater  than
-      or equal to the given number)
-    * right-tailed test (null hypothesis  -  dispersion is  less  than  or
-      equal to the given number).
-
-Test is based on the following assumptions:
-    * the given sample has a normal distribution.
-
-Input parameters:
-    X           -   sample 1. Array whose index goes from 0 to N-1.
-    N           -   size of the sample.
-    Variance    -   dispersion value to compare with.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 19.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// One-sample chi-square test
+//
+// This test checks three hypotheses about the dispersion of the given sample
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersion equals  the  given
+//       number)
+//     * left-tailed test (null hypothesis - the dispersion is  greater  than
+//       or equal to the given number)
+//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
+//       equal to the given number).
+//
+// Test is based on the following assumptions:
+//     * the given sample has a normal distribution.
+//
+// Input parameters:
+//     X           -   sample 1. Array whose index goes from 0 to N-1.
+//     N           -   size of the sample.
+//     Variance    -   dispersion value to compare with.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 19.09.2006 by Bochkanov Sergey
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2202,55 +2110,53 @@ void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const doubl
 #endif
 
 #if defined(AE_COMPILE_WSR) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Wilcoxon signed-rank test
-
-This test checks three hypotheses about the median  of  the  given sample.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the median is equal to the  given
-      value)
-    * left-tailed test (null hypothesis - the median is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis  -  the  median  is  less than or
-      equal to the given value)
-
-Requirements:
-    * the scale of measurement should be ordinal, interval or  ratio (i.e.
-      the test could not be applied to nominal variables).
-    * the distribution should be continuous and symmetric relative to  its
-      median.
-    * number of distinct values in the X array should be greater than 4
-
-The test is non-parametric and doesn't require distribution X to be normal
-
-Input parameters:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of the sample.
-    Median  -   assumed median value.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-To calculate p-values, special approximation is used. This method lets  us
-calculate p-values with two decimal places in interval [0.0001, 1].
-
-"Two decimal places" does not sound very impressive, but in  practice  the
-relative error of less than 1% is enough to make a decision.
-
-There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-the significance level outlies this interval, the test returns 0.0001.
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Wilcoxon signed-rank test
+//
+// This test checks three hypotheses about the median  of  the  given sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis  -  the  median  is  less than or
+//       equal to the given value)
+//
+// Requirements:
+//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
+//       the test could not be applied to nominal variables).
+//     * the distribution should be continuous and symmetric relative to  its
+//       median.
+//     * number of distinct values in the X array should be greater than 4
+//
+// The test is non-parametric and doesn't require distribution X to be normal
+//
+// Input parameters:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with two decimal places in interval [0.0001, 1].
+//
+// "Two decimal places" does not sound very impressive, but in  practice  the
+// relative error of less than 1% is enough to make a decision.
+//
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2275,74 +2181,72 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
 #endif
 
 #if defined(AE_COMPILE_MANNWHITNEYU) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Mann-Whitney U-test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous distributions of the same shape  and  same  median  or  whether
-their medians are different.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - the medians are equal)
-    * left-tailed test (null hypothesis - the median of the  first  sample
-      is greater than or equal to the median of the second sample)
-    * right-tailed test (null hypothesis - the median of the first  sample
-      is less than or equal to the median of the second sample).
-
-Requirements:
-    * the samples are independent
-    * X and Y are continuous distributions (or discrete distributions well-
-      approximating continuous distributions)
-    * distributions of X and Y have the  same  shape.  The  only  possible
-      difference is their position (i.e. the value of the median)
-    * the number of elements in each sample is not less than 5
-    * the scale of measurement should be ordinal, interval or ratio  (i.e.
-      the test could not be applied to nominal variables).
-
-The test is non-parametric and doesn't require distributions to be normal.
-
-Input parameters:
-    X   -   sample 1. Array whose index goes from 0 to N-1.
-    N   -   size of the sample. N>=5
-    Y   -   sample 2. Array whose index goes from 0 to M-1.
-    M   -   size of the sample. M>=5
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-To calculate p-values, special approximation is used. This method lets  us
-calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
-There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-the significance level outlies this interval, the test returns 0.0001.
-
-Relative precision of approximation of p-value:
-
-N          M          Max.err.   Rms.err.
-5..10      N..10      1.4e-02    6.0e-04
-5..10      N..100     2.2e-02    5.3e-06
-10..15     N..15      1.0e-02    3.2e-04
-10..15     N..100     1.0e-02    2.2e-05
-15..100    N..100     6.1e-03    2.7e-06
-
-For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
-account characteristics of asymptotic approximation used, precision should
-not be sharply different from the values for interval [5, 100].
-
-NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
-      P's outside of this interval are enforced to these bounds. Say,  you
-      may quite often get P equal to exactly 0.25 or 0.0001.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Mann-Whitney U-test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous distributions of the same shape  and  same  median  or  whether
+// their medians are different.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the medians are equal)
+//     * left-tailed test (null hypothesis - the median of the  first  sample
+//       is greater than or equal to the median of the second sample)
+//     * right-tailed test (null hypothesis - the median of the first  sample
+//       is less than or equal to the median of the second sample).
+//
+// Requirements:
+//     * the samples are independent
+//     * X and Y are continuous distributions (or discrete distributions well-
+//       approximating continuous distributions)
+//     * distributions of X and Y have the  same  shape.  The  only  possible
+//       difference is their position (i.e. the value of the median)
+//     * the number of elements in each sample is not less than 5
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distributions to be normal.
+//
+// Input parameters:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N>=5
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   size of the sample. M>=5
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+// Relative precision of approximation of p-value:
+//
+// N          M          Max.err.   Rms.err.
+// 5..10      N..10      1.4e-02    6.0e-04
+// 5..10      N..100     2.2e-02    5.3e-06
+// 10..15     N..15      1.0e-02    3.2e-04
+// 10..15     N..100     1.0e-02    2.2e-05
+// 15..100    N..100     6.1e-03    2.7e-06
+//
+// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// account characteristics of asymptotic approximation used, precision should
+// not be sharply different from the values for interval [5, 100].
+//
+// NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
+//       P's outside of this interval are enforced to these bounds. Say,  you
+//       may quite often get P equal to exactly 0.25 or 0.0001.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2367,46 +2271,44 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 #endif
 
 #if defined(AE_COMPILE_STEST) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-Sign test
-
-This test checks three hypotheses about the median of  the  given  sample.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the median is equal to the  given
-      value)
-    * left-tailed test (null hypothesis - the median is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis - the  median  is  less  than  or
-      equal to the given value)
-
-Requirements:
-    * the scale of measurement should be ordinal, interval or ratio  (i.e.
-      the test could not be applied to nominal variables).
-
-The test is non-parametric and doesn't require distribution X to be normal
-
-Input parameters:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of the sample.
-    Median  -   assumed median value.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-While   calculating   p-values   high-precision   binomial    distribution
-approximation is used, so significance levels have about 15 exact digits.
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Sign test
+//
+// This test checks three hypotheses about the median of  the  given  sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the  median  is  less  than  or
+//       equal to the given value)
+//
+// Requirements:
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distribution X to be normal
+//
+// Input parameters:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// While   calculating   p-values   high-precision   binomial    distribution
+// approximation is used, so significance levels have about 15 exact digits.
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2431,48 +2333,46 @@ void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double me
 #endif
 
 #if defined(AE_COMPILE_STUDENTTTESTS) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-One-sample t-test
-
-This test checks three hypotheses about the mean of the given sample.  The
-following tests are performed:
-    * two-tailed test (null hypothesis - the mean is equal  to  the  given
-      value)
-    * left-tailed test (null hypothesis - the  mean  is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis - the mean is less than or  equal
-      to the given value).
-
-The test is based on the assumption that  a  given  sample  has  a  normal
-distribution and  an  unknown  dispersion.  If  the  distribution  sharply
-differs from normal, the test will work incorrectly.
-
-INPUT PARAMETERS:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of sample, N>=0
-    Mean    -   assumed value of the mean.
-
-OUTPUT PARAMETERS:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0, all p-values are set to 1.0
-      * when variance of X[] is exactly zero, p-values are set
-        to 1.0 or 0.0, depending on difference between sample mean and
-        value of mean being tested.
-
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// One-sample t-test
+//
+// This test checks three hypotheses about the mean of the given sample.  The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
+//       value)
+//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the mean is less than or  equal
+//       to the given value).
+//
+// The test is based on the assumption that  a  given  sample  has  a  normal
+// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
+// differs from normal, the test will work incorrectly.
+//
+// INPUT PARAMETERS:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of sample, N>=0
+//     Mean    -   assumed value of the mean.
+//
+// OUTPUT PARAMETERS:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0, all p-values are set to 1.0
+//       * when variance of X[] is exactly zero, p-values are set
+//         to 1.0 or 0.0, depending on difference between sample mean and
+//         value of mean being tested.
+//
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2495,47 +2395,45 @@ void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, 
     return;
 }
 
-/*************************************************************************
-Two-sample pooled test
-
-This test checks three hypotheses about the mean of the given samples. The
-following tests are performed:
-    * two-tailed test (null hypothesis - the means are equal)
-    * left-tailed test (null hypothesis - the mean of the first sample  is
-      greater than or equal to the mean of the second sample)
-    * right-tailed test (null hypothesis - the mean of the first sample is
-      less than or equal to the mean of the second sample).
-
-Test is based on the following assumptions:
-    * given samples have normal distributions
-    * dispersions are equal
-    * samples are independent.
-
-Input parameters:
-    X       -   sample 1. Array whose index goes from 0 to N-1.
-    N       -   size of sample.
-    Y       -   sample 2. Array whose index goes from 0 to M-1.
-    M       -   size of sample.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0 or M=0, all p-values are set to 1.0
-      * when both samples has exactly zero variance, p-values are set
-        to 1.0 or 0.0, depending on difference between means.
-
-  -- ALGLIB --
-     Copyright 18.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample pooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * dispersions are equal
+//     * samples are independent.
+//
+// Input parameters:
+//     X       -   sample 1. Array whose index goes from 0 to N-1.
+//     N       -   size of sample.
+//     Y       -   sample 2. Array whose index goes from 0 to M-1.
+//     M       -   size of sample.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has exactly zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+//
+//   -- ALGLIB --
+//      Copyright 18.09.2006 by Bochkanov Sergey
 void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2558,49 +2456,47 @@ void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array
     return;
 }
 
-/*************************************************************************
-Two-sample unpooled test
-
-This test checks three hypotheses about the mean of the given samples. The
-following tests are performed:
-    * two-tailed test (null hypothesis - the means are equal)
-    * left-tailed test (null hypothesis - the mean of the first sample  is
-      greater than or equal to the mean of the second sample)
-    * right-tailed test (null hypothesis - the mean of the first sample is
-      less than or equal to the mean of the second sample).
-
-Test is based on the following assumptions:
-    * given samples have normal distributions
-    * samples are independent.
-Equality of variances is NOT required.
-
-Input parameters:
-    X - sample 1. Array whose index goes from 0 to N-1.
-    N - size of the sample.
-    Y - sample 2. Array whose index goes from 0 to M-1.
-    M - size of the sample.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0 or M=0, all p-values are set to 1.0
-      * when both samples has zero variance, p-values are set
-        to 1.0 or 0.0, depending on difference between means.
-      * when only one sample has zero variance, test reduces to 1-sample
-        version.
-
-  -- ALGLIB --
-     Copyright 18.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample unpooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * samples are independent.
+// Equality of variances is NOT required.
+//
+// Input parameters:
+//     X - sample 1. Array whose index goes from 0 to N-1.
+//     N - size of the sample.
+//     Y - sample 2. Array whose index goes from 0 to M-1.
+//     M - size of the sample.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+//       * when only one sample has zero variance, test reduces to 1-sample
+//         version.
+//
+//   -- ALGLIB --
+//      Copyright 18.09.2006 by Bochkanov Sergey
 void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -2920,26 +2816,24 @@ static double mannwhitneyu_usigma(double s,
 #if defined(AE_COMPILE_BASESTAT) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Calculation of the distribution moments: mean, variance, skewness, kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-OUTPUT PARAMETERS
-    Mean    -   mean.
-    Variance-   variance.
-    Skewness-   skewness (if variance<>0; zero otherwise).
-    Kurtosis-   kurtosis (if variance<>0; zero otherwise).
-
-NOTE: variance is calculated by dividing sum of squares by N-1, not N.
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the distribution moments: mean, variance, skewness, kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// OUTPUT PARAMETERS
+//     Mean    -   mean.
+//     Variance-   variance.
+//     Skewness-   skewness (if variance<>0; zero otherwise).
+//     Kurtosis-   kurtosis (if variance<>0; zero otherwise).
+//
+// NOTE: variance is calculated by dividing sum of squares by N-1, not N.
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemoments(RVector * x,
      ae_int_t n,
      double* mean,
@@ -2963,9 +2857,7 @@ void samplemoments(RVector * x,
     ae_assert(x->cnt>=n, "SampleMoments: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleMoments: X is not finite vector", _state);
 
-    /*
-     * Init, special case 'N=0'
-     */
+    // Init, special case 'N=0'
     *mean = (double)(0);
     *variance = (double)(0);
     *skewness = (double)(0);
@@ -2976,18 +2868,14 @@ void samplemoments(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     for(i=0; i<=n-1; i++)
     {
         *mean = *mean+x->ptr.p_double[i];
     }
     *mean = *mean/n;
 
-    /*
-     * Variance (using corrected two-pass algorithm)
-     */
+    // Variance (using corrected two-pass algorithm)
     if( n!=1 )
     {
         v1 = (double)(0);
@@ -3009,9 +2897,7 @@ void samplemoments(RVector * x,
         stddev = ae_sqrt(*variance, _state);
     }
 
-    /*
-     * Skewness and kurtosis
-     */
+    // Skewness and kurtosis
     if( ae_fp_neq(stddev,(double)(0)) )
     {
         for(i=0; i<=n-1; i++)
@@ -3027,24 +2913,22 @@ void samplemoments(RVector * x,
 }
 
 
-/*************************************************************************
-Calculation of the mean.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Mean' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the mean.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Mean' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplemean(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -3062,24 +2946,22 @@ double samplemean(RVector * x,
 }
 
 
-/*************************************************************************
-Calculation of the variance.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Variance' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the variance.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Variance' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplevariance(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -3097,24 +2979,22 @@ double samplevariance(RVector * x,
 }
 
 
-/*************************************************************************
-Calculation of the skewness.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Skewness' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the skewness.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Skewness' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double sampleskewness(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -3132,24 +3012,22 @@ double sampleskewness(RVector * x,
 }
 
 
-/*************************************************************************
-Calculation of the kurtosis.
-
-INPUT PARAMETERS:
-    X       -   sample
-    N       -   N>=0, sample size:
-                * if given, only leading N elements of X are processed
-                * if not given, automatically determined from size of X
-
-NOTE:
-
-This function return result  which calculated by 'SampleMoments' function
-and stored at 'Kurtosis' variable.
-
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Calculation of the kurtosis.
+//
+// INPUT PARAMETERS:
+//     X       -   sample
+//     N       -   N>=0, sample size:
+//                 * if given, only leading N elements of X are processed
+//                 * if not given, automatically determined from size of X
+//
+// NOTE:
+//
+// This function return result  which calculated by 'SampleMoments' function
+// and stored at 'Kurtosis' variable.
+//
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 double samplekurtosis(RVector * x,
      ae_int_t n,
      ae_state *_state)
@@ -3167,21 +3045,19 @@ double samplekurtosis(RVector * x,
 }
 
 
-/*************************************************************************
-ADev
-
-Input parameters:
-    X   -   sample
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    ADev-   ADev
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// ADev
+//
+// Input parameters:
+//     X   -   sample
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     ADev-   ADev
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void sampleadev(RVector * x,
      ae_int_t n,
      double* adev,
@@ -3196,9 +3072,7 @@ void sampleadev(RVector * x,
     ae_assert(x->cnt>=n, "SampleADev: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleADev: X is not finite vector", _state);
 
-    /*
-     * Init, handle N=0
-     */
+    // Init, handle N=0
     mean = (double)(0);
     *adev = (double)(0);
     if( n<=0 )
@@ -3206,18 +3080,14 @@ void sampleadev(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     for(i=0; i<=n-1; i++)
     {
         mean = mean+x->ptr.p_double[i];
     }
     mean = mean/n;
 
-    /*
-     * ADev
-     */
+    // ADev
     for(i=0; i<=n-1; i++)
     {
         *adev = *adev+ae_fabs(x->ptr.p_double[i]-mean, _state);
@@ -3226,21 +3096,19 @@ void sampleadev(RVector * x,
 }
 
 
-/*************************************************************************
-Median calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-
-Output parameters:
-    Median
-
-  -- ALGLIB --
-     Copyright 06.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Median calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//
+// Output parameters:
+//     Median
+//
+//   -- ALGLIB --
+//      Copyright 06.09.2006 by Bochkanov Sergey
 void samplemedian(RVector * x,
      ae_int_t n,
      double* median,
@@ -3267,9 +3135,7 @@ void samplemedian(RVector * x,
     ae_assert(x->cnt>=n, "SampleMedian: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleMedian: X is not finite vector", _state);
 
-    /*
-     * Some degenerate cases
-     */
+    // Some degenerate cases
     *median = (double)(0);
     if( n<=0 )
     {
@@ -3289,10 +3155,8 @@ void samplemedian(RVector * x,
         return;
     }
 
-    /*
-     * Common case, N>=3.
-     * Choose X[(N-1)/2]
-     */
+    // Common case, N>=3.
+    // Choose X[(N-1)/2]
     l = 0;
     ir = n-1;
     k = (n-1)/2;
@@ -3301,9 +3165,7 @@ void samplemedian(RVector * x,
         if( ir<=l+1 )
         {
 
-            /*
-             * 1 or 2 elements in partition
-             */
+            // 1 or 2 elements in partition
             if( ir==l+1&&ae_fp_less(x->ptr.p_double[ir],x->ptr.p_double[l]) )
             {
                 tval = x->ptr.p_double[l];
@@ -3372,9 +3234,7 @@ void samplemedian(RVector * x,
         }
     }
 
-    /*
-     * If N is odd, return result
-     */
+    // If N is odd, return result
     if( n%2==1 )
     {
         *median = x->ptr.p_double[k];
@@ -3394,22 +3254,20 @@ void samplemedian(RVector * x,
 }
 
 
-/*************************************************************************
-Percentile calculation.
-
-Input parameters:
-    X   -   sample (array indexes: [0..N-1])
-    N   -   N>=0, sample size:
-            * if given, only leading N elements of X are processed
-            * if not given, automatically determined from size of X
-    P   -   percentile (0<=P<=1)
-
-Output parameters:
-    V   -   percentile
-
-  -- ALGLIB --
-     Copyright 01.03.2008 by Bochkanov Sergey
-*************************************************************************/
+// Percentile calculation.
+//
+// Input parameters:
+//     X   -   sample (array indexes: [0..N-1])
+//     N   -   N>=0, sample size:
+//             * if given, only leading N elements of X are processed
+//             * if not given, automatically determined from size of X
+//     P   -   percentile (0<=P<=1)
+//
+// Output parameters:
+//     V   -   percentile
+//
+//   -- ALGLIB --
+//      Copyright 01.03.2008 by Bochkanov Sergey
 void samplepercentile(RVector * x,
      ae_int_t n,
      double p,
@@ -3456,22 +3314,20 @@ void samplepercentile(RVector * x,
 }
 
 
-/*************************************************************************
-2-sample covariance
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    covariance (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// 2-sample covariance
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     covariance (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 double cov2(RVector * x,
      RVector * y,
      ae_int_t n,
@@ -3495,27 +3351,23 @@ double cov2(RVector * x,
     ae_assert(isfinitevector(x, n, _state), "Cov2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "Cov2: Y is not finite vector", _state);
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         result = (double)(0);
         return result;
     }
 
-    /*
-     * Calculate mean.
-     *
-     *
-     * Additonally we calculate SameX and SameY -
-     * flag variables which are set to True when
-     * all X[] (or Y[]) contain exactly same value.
-     *
-     * If at least one of them is True, we return zero
-     * (othwerwise we risk to get nonzero covariation
-     * because of roundoff).
-     */
+    // Calculate mean.
+    //
+    //
+    // Additonally we calculate SameX and SameY -
+    // flag variables which are set to True when
+    // all X[] (or Y[]) contain exactly same value.
+    //
+    // If at least one of them is True, we return zero
+    // (othwerwise we risk to get nonzero covariation
+    // because of roundoff).
     xmean = (double)(0);
     ymean = (double)(0);
     samex = ae_true;
@@ -3538,9 +3390,7 @@ double cov2(RVector * x,
         return result;
     }
 
-    /*
-     * covariance
-     */
+    // covariance
     v = (double)1/(double)(n-1);
     result = (double)(0);
     for(i=0; i<=n-1; i++)
@@ -3551,23 +3401,21 @@ double cov2(RVector * x,
 }
 
 
-/*************************************************************************
-Pearson product-moment correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Pearson product-moment correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Pearson product-moment correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 double pearsoncorr2(RVector * x,
      RVector * y,
      ae_int_t n,
@@ -3595,27 +3443,23 @@ double pearsoncorr2(RVector * x,
     ae_assert(isfinitevector(x, n, _state), "PearsonCorr2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "PearsonCorr2: Y is not finite vector", _state);
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         result = (double)(0);
         return result;
     }
 
-    /*
-     * Calculate mean.
-     *
-     *
-     * Additonally we calculate SameX and SameY -
-     * flag variables which are set to True when
-     * all X[] (or Y[]) contain exactly same value.
-     *
-     * If at least one of them is True, we return zero
-     * (othwerwise we risk to get nonzero correlation
-     * because of roundoff).
-     */
+    // Calculate mean.
+    //
+    //
+    // Additonally we calculate SameX and SameY -
+    // flag variables which are set to True when
+    // all X[] (or Y[]) contain exactly same value.
+    //
+    // If at least one of them is True, we return zero
+    // (othwerwise we risk to get nonzero correlation
+    // because of roundoff).
     xmean = (double)(0);
     ymean = (double)(0);
     samex = ae_true;
@@ -3638,9 +3482,7 @@ double pearsoncorr2(RVector * x,
         return result;
     }
 
-    /*
-     * numerator and denominator
-     */
+    // numerator and denominator
     s = (double)(0);
     xv = (double)(0);
     yv = (double)(0);
@@ -3664,23 +3506,21 @@ double pearsoncorr2(RVector * x,
 }
 
 
-/*************************************************************************
-Spearman's rank correlation coefficient
-
-Input parameters:
-    X       -   sample 1 (array indexes: [0..N-1])
-    Y       -   sample 2 (array indexes: [0..N-1])
-    N       -   N>=0, sample size:
-                * if given, only N leading elements of X/Y are processed
-                * if not given, automatically determined from input sizes
-
-Result:
-    Spearman's rank correlation coefficient
-    (zero for N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation coefficient
+//
+// Input parameters:
+//     X       -   sample 1 (array indexes: [0..N-1])
+//     Y       -   sample 2 (array indexes: [0..N-1])
+//     N       -   N>=0, sample size:
+//                 * if given, only N leading elements of X/Y are processed
+//                 * if not given, automatically determined from input sizes
+//
+// Result:
+//     Spearman's rank correlation coefficient
+//     (zero for N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 double spearmancorr2(RVector * x,
      RVector * y,
      ae_int_t n,
@@ -3708,9 +3548,7 @@ double spearmancorr2(RVector * x,
     ae_assert(isfinitevector(x, n, _state), "SpearmanCorr2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "SpearmanCorr2: Y is not finite vector", _state);
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<=1 )
     {
         result = (double)(0);
@@ -3725,39 +3563,37 @@ double spearmancorr2(RVector * x,
 }
 
 
-/*************************************************************************
-Covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
@@ -3791,9 +3627,7 @@ void covm(RMatrix * x,
     ae_assert(x->cols>=m||n==0, "CovM: Cols(X)<M!", _state);
     ae_assert(apservisfinitematrix(x, n, m, _state), "CovM: X contains infinite/NAN elements", _state);
 
-    /*
-     * N<=1, return zero
-     */
+    // N<=1, return zero
     if( n<=1 )
     {
         ae_matrix_set_length(c, m, m, _state);
@@ -3808,10 +3642,8 @@ void covm(RMatrix * x,
         return;
     }
 
-    /*
-     * Calculate means,
-     * check for constant columns
-     */
+    // Calculate means,
+    // check for constant columns
     ae_vector_set_length(&t, m, _state);
     ae_vector_set_length(&x0, m, _state);
     ae_vector_set_length(&same, m, _state);
@@ -3832,13 +3664,11 @@ void covm(RMatrix * x,
         }
     }
 
-    /*
-     * * center variables;
-     * * if we have constant columns, these columns are
-     *   artificially zeroed (they must be zero in exact arithmetics,
-     *   but unfortunately floating point ops are not exact).
-     * * calculate upper half of symmetric covariance matrix
-     */
+    // * center variables;
+    // * if we have constant columns, these columns are
+    //   artificially zeroed (they must be zero in exact arithmetics,
+    //   but unfortunately floating point ops are not exact).
+    // * calculate upper half of symmetric covariance matrix
     for(i=0; i<=n-1; i++)
     {
         ae_v_sub(&x->ptr.pp_double[i][0], 1, &t.ptr.p_double[0], 1, ae_v_len(0,m-1));
@@ -3856,39 +3686,37 @@ void covm(RMatrix * x,
 }
 
 
-/*************************************************************************
-Pearson product-moment correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
@@ -3936,39 +3764,37 @@ void pearsoncorrm(RMatrix * x,
 }
 
 
-/*************************************************************************
-Spearman's rank correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X are used
-            * if not given, automatically determined from input size
-    M   -   M>0, number of variables:
-            * if given, only leading M columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X are used
+//             * if not given, automatically determined from input size
+//     M   -   M>0, number of variables:
+//             * if given, only leading M columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M,M], correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
@@ -4001,9 +3827,7 @@ void spearmancorrm(RMatrix * x,
     ae_assert(x->cols>=m||n==0, "SpearmanCorrM: Cols(X)<M!", _state);
     ae_assert(apservisfinitematrix(x, n, m, _state), "SpearmanCorrM: X contains infinite/NAN elements", _state);
 
-    /*
-     * N<=1, return zero
-     */
+    // N<=1, return zero
     if( n<=1 )
     {
         ae_matrix_set_length(c, m, m, _state);
@@ -4018,33 +3842,25 @@ void spearmancorrm(RMatrix * x,
         return;
     }
 
-    /*
-     * Allocate
-     */
+    // Allocate
     ae_vector_set_length(&t, ae_maxint(n, m, _state), _state);
     ae_matrix_set_length(c, m, m, _state);
 
-    /*
-     * Replace data with ranks
-     */
+    // Replace data with ranks
     ae_matrix_set_length(&xc, m, n, _state);
     rmatrixtranspose(n, m, x, 0, 0, &xc, 0, 0, _state);
     rankdata(&xc, m, n, _state);
 
-    /*
-     * 1. Calculate means, check for constant columns
-     * 2. Center variables, constant  columns are
-     *   artificialy zeroed (they must be zero in exact arithmetics,
-     *   but unfortunately floating point is not exact).
-     */
+    // 1. Calculate means, check for constant columns
+    // 2. Center variables, constant  columns are
+    //   artificialy zeroed (they must be zero in exact arithmetics,
+    //   but unfortunately floating point is not exact).
     for(i=0; i<=m-1; i++)
     {
 
-        /*
-         * Calculate:
-         * * V - mean value of I-th variable
-         * * B - True in case all variable values are same
-         */
+        // Calculate:
+        // * V - mean value of I-th variable
+        // * B - True in case all variable values are same
         v = (double)(0);
         b = ae_true;
         x0 = xc.ptr.pp_double[i][0];
@@ -4056,15 +3872,11 @@ void spearmancorrm(RMatrix * x,
         }
         v = v/n;
 
-        /*
-         * Center/zero I-th variable
-         */
+        // Center/zero I-th variable
         if( b )
         {
 
-            /*
-             * Zero
-             */
+            // Zero
             for(j=0; j<=n-1; j++)
             {
                 xc.ptr.pp_double[i][j] = 0.0;
@@ -4073,9 +3885,7 @@ void spearmancorrm(RMatrix * x,
         else
         {
 
-            /*
-             * Center
-             */
+            // Center
             for(j=0; j<=n-1; j++)
             {
                 xc.ptr.pp_double[i][j] = xc.ptr.pp_double[i][j]-v;
@@ -4083,14 +3893,10 @@ void spearmancorrm(RMatrix * x,
         }
     }
 
-    /*
-     * Calculate upper half of symmetric covariance matrix
-     */
+    // Calculate upper half of symmetric covariance matrix
     rmatrixsyrk(m, n, (double)1/(double)(n-1), &xc, 0, 0, 0, 0.0, c, 0, 0, ae_true, _state);
 
-    /*
-     * Calculate Pearson coefficients (upper triangle)
-     */
+    // Calculate Pearson coefficients (upper triangle)
     for(i=0; i<=m-1; i++)
     {
         if( ae_fp_greater(c->ptr.pp_double[i][i],(double)(0)) )
@@ -4111,53 +3917,49 @@ void spearmancorrm(RMatrix * x,
         }
     }
 
-    /*
-     * force symmetricity
-     */
+    // force symmetricity
     rmatrixenforcesymmetricity(c, m, ae_true, _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-Cross-covariance matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Cross-covariance matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-covariance matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void covm2(RMatrix * x,
      RMatrix * y,
      ae_int_t n,
@@ -4207,9 +4009,7 @@ void covm2(RMatrix * x,
     ae_assert(y->cols>=m2||n==0, "CovM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "CovM2: X contains infinite/NAN elements", _state);
 
-    /*
-     * N<=1, return zero
-     */
+    // N<=1, return zero
     if( n<=1 )
     {
         ae_matrix_set_length(c, m1, m2, _state);
@@ -4224,9 +4024,7 @@ void covm2(RMatrix * x,
         return;
     }
 
-    /*
-     * Allocate
-     */
+    // Allocate
     ae_vector_set_length(&t, ae_maxint(m1, m2, _state), _state);
     ae_vector_set_length(&x0, m1, _state);
     ae_vector_set_length(&y0, m2, _state);
@@ -4234,13 +4032,11 @@ void covm2(RMatrix * x,
     ae_vector_set_length(&samey, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
 
-    /*
-     * * calculate means of X
-     * * center X
-     * * if we have constant columns, these columns are
-     *   artificially zeroed (they must be zero in exact arithmetics,
-     *   but unfortunately floating point ops are not exact).
-     */
+    // * calculate means of X
+    // * center X
+    // * if we have constant columns, these columns are
+    //   artificially zeroed (they must be zero in exact arithmetics,
+    //   but unfortunately floating point ops are not exact).
     for(i=0; i<=m1-1; i++)
     {
         t.ptr.p_double[i] = (double)(0);
@@ -4268,9 +4064,7 @@ void covm2(RMatrix * x,
         }
     }
 
-    /*
-     * Repeat same steps for Y
-     */
+    // Repeat same steps for Y
     for(i=0; i<=m2-1; i++)
     {
         t.ptr.p_double[i] = (double)(0);
@@ -4298,53 +4092,49 @@ void covm2(RMatrix * x,
         }
     }
 
-    /*
-     * calculate cross-covariance matrix
-     */
+    // calculate cross-covariance matrix
     rmatrixgemm(m1, m2, n, (double)1/(double)(n-1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-Pearson product-moment cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Pearson product-moment cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void pearsoncorrm2(RMatrix * x,
      RMatrix * y,
      ae_int_t n,
@@ -4400,9 +4190,7 @@ void pearsoncorrm2(RMatrix * x,
     ae_assert(y->cols>=m2||n==0, "PearsonCorrM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "PearsonCorrM2: X contains infinite/NAN elements", _state);
 
-    /*
-     * N<=1, return zero
-     */
+    // N<=1, return zero
     if( n<=1 )
     {
         ae_matrix_set_length(c, m1, m2, _state);
@@ -4417,9 +4205,7 @@ void pearsoncorrm2(RMatrix * x,
         return;
     }
 
-    /*
-     * Allocate
-     */
+    // Allocate
     ae_vector_set_length(&t, ae_maxint(m1, m2, _state), _state);
     ae_vector_set_length(&x0, m1, _state);
     ae_vector_set_length(&y0, m2, _state);
@@ -4429,14 +4215,12 @@ void pearsoncorrm2(RMatrix * x,
     ae_vector_set_length(&samey, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
 
-    /*
-     * * calculate means of X
-     * * center X
-     * * if we have constant columns, these columns are
-     *   artificially zeroed (they must be zero in exact arithmetics,
-     *   but unfortunately floating point ops are not exact).
-     * * calculate column variances
-     */
+    // * calculate means of X
+    // * center X
+    // * if we have constant columns, these columns are
+    //   artificially zeroed (they must be zero in exact arithmetics,
+    //   but unfortunately floating point ops are not exact).
+    // * calculate column variances
     for(i=0; i<=m1-1; i++)
     {
         t.ptr.p_double[i] = (double)(0);
@@ -4470,9 +4254,7 @@ void pearsoncorrm2(RMatrix * x,
         sx.ptr.p_double[j] = ae_sqrt(sx.ptr.p_double[j]/(n-1), _state);
     }
 
-    /*
-     * Repeat same steps for Y
-     */
+    // Repeat same steps for Y
     for(i=0; i<=m2-1; i++)
     {
         t.ptr.p_double[i] = (double)(0);
@@ -4506,14 +4288,10 @@ void pearsoncorrm2(RMatrix * x,
         sy.ptr.p_double[j] = ae_sqrt(sy.ptr.p_double[j]/(n-1), _state);
     }
 
-    /*
-     * calculate cross-covariance matrix
-     */
+    // calculate cross-covariance matrix
     rmatrixgemm(m1, m2, n, (double)1/(double)(n-1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
 
-    /*
-     * Divide by standard deviations
-     */
+    // Divide by standard deviations
     for(i=0; i<=m1-1; i++)
     {
         if( ae_fp_neq(sx.ptr.p_double[i],(double)(0)) )
@@ -4548,45 +4326,43 @@ void pearsoncorrm2(RMatrix * x,
 }
 
 
-/*************************************************************************
-Spearman's rank cross-correlation matrix
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  ! * hardware vendor (Intel) implementations of linear algebra primitives
-  !   (C++ and C# versions, x86/x64 platform)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    X   -   array[N,M1], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    Y   -   array[N,M2], sample matrix:
-            * J-th column corresponds to J-th variable
-            * I-th row corresponds to I-th observation
-    N   -   N>=0, number of observations:
-            * if given, only leading N rows of X/Y are used
-            * if not given, automatically determined from input sizes
-    M1  -   M1>0, number of variables in X:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-    M2  -   M2>0, number of variables in Y:
-            * if given, only leading M1 columns of X are used
-            * if not given, automatically determined from input size
-
-OUTPUT PARAMETERS:
-    C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
-
-  -- ALGLIB --
-     Copyright 28.10.2010 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank cross-correlation matrix
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   ! * hardware vendor (Intel) implementations of linear algebra primitives
+//   !   (C++ and C# versions, x86/x64 platform)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     X   -   array[N,M1], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     Y   -   array[N,M2], sample matrix:
+//             * J-th column corresponds to J-th variable
+//             * I-th row corresponds to I-th observation
+//     N   -   N>=0, number of observations:
+//             * if given, only leading N rows of X/Y are used
+//             * if not given, automatically determined from input sizes
+//     M1  -   M1>0, number of variables in X:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//     M2  -   M2>0, number of variables in Y:
+//             * if given, only leading M1 columns of X are used
+//             * if not given, automatically determined from input size
+//
+// OUTPUT PARAMETERS:
+//     C   -   array[M1,M2], cross-correlation matrix (zero if N=0 or N=1)
+//
+//   -- ALGLIB --
+//      Copyright 28.10.2010 by Bochkanov Sergey
 void spearmancorrm2(RMatrix * x,
      RMatrix * y,
      ae_int_t n,
@@ -4636,9 +4412,7 @@ void spearmancorrm2(RMatrix * x,
     ae_assert(y->cols>=m2||n==0, "SpearmanCorrM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "SpearmanCorrM2: X contains infinite/NAN elements", _state);
 
-    /*
-     * N<=1, return zero
-     */
+    // N<=1, return zero
     if( n<=1 )
     {
         ae_matrix_set_length(c, m1, m2, _state);
@@ -4653,17 +4427,13 @@ void spearmancorrm2(RMatrix * x,
         return;
     }
 
-    /*
-     * Allocate
-     */
+    // Allocate
     ae_vector_set_length(&t, ae_maxint(ae_maxint(m1, m2, _state), n, _state), _state);
     ae_vector_set_length(&sx, m1, _state);
     ae_vector_set_length(&sy, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
 
-    /*
-     * Replace data with ranks
-     */
+    // Replace data with ranks
     ae_matrix_set_length(&xc, m1, n, _state);
     ae_matrix_set_length(&yc, m2, n, _state);
     rmatrixtranspose(n, m1, x, 0, 0, &xc, 0, 0, _state);
@@ -4671,18 +4441,16 @@ void spearmancorrm2(RMatrix * x,
     rankdata(&xc, m1, n, _state);
     rankdata(&yc, m2, n, _state);
 
-    /*
-     * 1. Calculate means, variances, check for constant columns
-     * 2. Center variables, constant  columns are
-     *   artificialy zeroed (they must be zero in exact arithmetics,
-     *   but unfortunately floating point is not exact).
-     *
-     * Description of variables:
-     * * V - mean value of I-th variable
-     * * V2- variance
-     * * VV-temporary
-     * * B - True in case all variable values are same
-     */
+    // 1. Calculate means, variances, check for constant columns
+    // 2. Center variables, constant  columns are
+    //   artificialy zeroed (they must be zero in exact arithmetics,
+    //   but unfortunately floating point is not exact).
+    //
+    // Description of variables:
+    // * V - mean value of I-th variable
+    // * V2- variance
+    // * VV-temporary
+    // * B - True in case all variable values are same
     for(i=0; i<=m1-1; i++)
     {
         v = (double)(0);
@@ -4746,14 +4514,10 @@ void spearmancorrm2(RMatrix * x,
         sy.ptr.p_double[i] = ae_sqrt(v2/(n-1), _state);
     }
 
-    /*
-     * calculate cross-covariance matrix
-     */
+    // calculate cross-covariance matrix
     rmatrixgemm(m1, m2, n, (double)1/(double)(n-1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0, _state);
 
-    /*
-     * Divide by standard deviations
-     */
+    // Divide by standard deviations
     for(i=0; i<=m1-1; i++)
     {
         if( ae_fp_neq(sx.ptr.p_double[i],(double)(0)) )
@@ -4788,37 +4552,35 @@ void spearmancorrm2(RMatrix * x,
 }
 
 
-/*************************************************************************
-This function replaces data in XY by their ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* ranking starts from 0, ends at NFeatures-1
-* sum of within-row values is equal to (NFeatures-1)*NFeatures/2
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * ranking starts from 0, ends at NFeatures-1
+// * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdata(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
@@ -4844,16 +4606,14 @@ void rankdata(RMatrix * xy,
     ae_assert(xy->cols>=nfeatures||npoints==0, "RankData: Cols(XY)<NFeatures", _state);
     ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
 
-    /*
-     * Basecase cost is a maximum cost of basecase problems.
-     * Problems harded than that cost will be split.
-     *
-     * Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-     * which is proportional, but NOT equal to number of FLOPs required
-     * to solve problem.
-     *
-     * Try to use serial code for basecase problems, no SMP functionality, no shared pools.
-     */
+    // Basecase cost is a maximum cost of basecase problems.
+    // Problems harded than that cost will be split.
+    //
+    // Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+    // which is proportional, but NOT equal to number of FLOPs required
+    // to solve problem.
+    //
+    // Try to use serial code for basecase problems, no SMP functionality, no shared pools.
     basecasecost = 10000;
     if( ae_fp_less(rmul3((double)(npoints), (double)(nfeatures), logbase2((double)(nfeatures), _state), _state),(double)(basecasecost)) )
     {
@@ -4862,18 +4622,14 @@ void rankdata(RMatrix * xy,
         return;
     }
 
-    /*
-     * Parallel code
-     */
+    // Parallel code
     ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), _apbuffers_init, _apbuffers_init_copy, _apbuffers_destroy, _state);
     basestat_rankdatarec(xy, 0, npoints, nfeatures, ae_false, &pool, basecasecost, _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-Serial stub for GPL edition.
-*************************************************************************/
+// Serial stub for GPL edition.
 ae_bool _trypexec_rankdata(RMatrix * xy,
     ae_int_t npoints,
     ae_int_t nfeatures,
@@ -4883,39 +4639,37 @@ ae_bool _trypexec_rankdata(RMatrix * xy,
 }
 
 
-/*************************************************************************
-This function replaces data in XY by their CENTERED ranks:
-* XY is processed row-by-row
-* rows are processed separately
-* tied data are correctly handled (tied ranks are calculated)
-* centered ranks are just usual ranks, but centered in such way  that  sum
-  of within-row values is equal to 0.0.
-* centering is performed by subtracting mean from each row, i.e it changes
-  mean value, but does NOT change higher moments
-
-  ! COMMERCIAL EDITION OF ALGLIB:
-  !
-  ! Commercial Edition of ALGLIB includes following important improvements
-  ! of this function:
-  ! * high-performance native backend with same C# interface (C# version)
-  ! * multithreading support (C++ and C# versions)
-  !
-  ! We recommend you to read 'Working with commercial version' section  of
-  ! ALGLIB Reference Manual in order to find out how to  use  performance-
-  ! related features provided by commercial edition of ALGLIB.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    NPoints -   number of points
-    NFeatures-  number of features
-
-OUTPUT PARAMETERS:
-    XY      -   data are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// This function replaces data in XY by their CENTERED ranks:
+// * XY is processed row-by-row
+// * rows are processed separately
+// * tied data are correctly handled (tied ranks are calculated)
+// * centered ranks are just usual ranks, but centered in such way  that  sum
+//   of within-row values is equal to 0.0.
+// * centering is performed by subtracting mean from each row, i.e it changes
+//   mean value, but does NOT change higher moments
+//
+//   ! COMMERCIAL EDITION OF ALGLIB:
+//   !
+//   ! Commercial Edition of ALGLIB includes following important improvements
+//   ! of this function:
+//   ! * high-performance native backend with same C# interface (C# version)
+//   ! * multithreading support (C++ and C# versions)
+//   !
+//   ! We recommend you to read 'Working with commercial version' section  of
+//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
+//   ! related features provided by commercial edition of ALGLIB.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     NPoints -   number of points
+//     NFeatures-  number of features
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 void rankdatacentered(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
@@ -4941,16 +4695,14 @@ void rankdatacentered(RMatrix * xy,
     ae_assert(xy->cols>=nfeatures||npoints==0, "RankData: Cols(XY)<NFeatures", _state);
     ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
 
-    /*
-     * Basecase cost is a maximum cost of basecase problems.
-     * Problems harded than that cost will be split.
-     *
-     * Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
-     * which is proportional, but NOT equal to number of FLOPs required
-     * to solve problem.
-     *
-     * Try to use serial code, no SMP functionality, no shared pools.
-     */
+    // Basecase cost is a maximum cost of basecase problems.
+    // Problems harded than that cost will be split.
+    //
+    // Problem cost is assumed to be NPoints*NFeatures*log2(NFeatures),
+    // which is proportional, but NOT equal to number of FLOPs required
+    // to solve problem.
+    //
+    // Try to use serial code, no SMP functionality, no shared pools.
     basecasecost = 10000;
     if( ae_fp_less(rmul3((double)(npoints), (double)(nfeatures), logbase2((double)(nfeatures), _state), _state),(double)(basecasecost)) )
     {
@@ -4959,18 +4711,14 @@ void rankdatacentered(RMatrix * xy,
         return;
     }
 
-    /*
-     * Parallel code
-     */
+    // Parallel code
     ae_shared_pool_set_seed(&pool, &buf0, sizeof(buf0), _apbuffers_init, _apbuffers_init_copy, _apbuffers_destroy, _state);
     basestat_rankdatarec(xy, 0, npoints, nfeatures, ae_true, &pool, basecasecost, _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-Serial stub for GPL edition.
-*************************************************************************/
+// Serial stub for GPL edition.
 ae_bool _trypexec_rankdatacentered(RMatrix * xy,
     ae_int_t npoints,
     ae_int_t nfeatures,
@@ -4980,12 +4728,10 @@ ae_bool _trypexec_rankdatacentered(RMatrix * xy,
 }
 
 
-/*************************************************************************
-Obsolete function, we recommend to use PearsonCorr2().
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Obsolete function, we recommend to use PearsonCorr2().
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 double pearsoncorrelation(RVector * x,
      RVector * y,
      ae_int_t n,
@@ -4999,12 +4745,10 @@ double pearsoncorrelation(RVector * x,
 }
 
 
-/*************************************************************************
-Obsolete function, we recommend to use SpearmanCorr2().
-
-    -- ALGLIB --
-    Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Obsolete function, we recommend to use SpearmanCorr2().
+//
+//     -- ALGLIB --
+//     Copyright 09.04.2007 by Bochkanov Sergey
 double spearmanrankcorrelation(RVector * x,
      RVector * y,
      ae_int_t n,
@@ -5018,31 +4762,29 @@ double spearmanrankcorrelation(RVector * x,
 }
 
 
-/*************************************************************************
-Recurrent code for RankData(), splits problem into  subproblems  or  calls
-basecase code (depending on problem complexity).
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    I0      -   index of first row to process
-    I1      -   index of past-the-last row to process;
-                this function processes half-interval [I0,I1).
-    NFeatures-  number of features
-    IsCentered- whether ranks are centered or not:
-                * True      -   ranks are centered in such way that  their
-                                within-row sum is zero
-                * False     -   ranks are not centered
-    Pool    -   shared pool which holds temporary buffers
-                (APBuffers structure)
-    BasecaseCost-minimum cost of the problem which will be split
-
-OUTPUT PARAMETERS:
-    XY      -   data in [I0,I1) are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Recurrent code for RankData(), splits problem into  subproblems  or  calls
+// basecase code (depending on problem complexity).
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Pool    -   shared pool which holds temporary buffers
+//                 (APBuffers structure)
+//     BasecaseCost-minimum cost of the problem which will be split
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 static void basestat_rankdatarec(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
@@ -5068,9 +4810,7 @@ static void basestat_rankdatarec(RMatrix * xy,
 
     ae_assert(i1>=i0, "RankDataRec: internal error", _state);
 
-    /*
-     * Try to activate parallelism
-     */
+    // Try to activate parallelism
     if( i1-i0>=4&&ae_fp_greater_eq(rmul3((double)(i1-i0), (double)(nfeatures), logbase2((double)(nfeatures), _state), _state),smpactivationlevel(_state)) )
     {
         if( _trypexec_basestat_rankdatarec(xy,i0,i1,nfeatures,iscentered,pool,basecasecost, _state) )
@@ -5080,9 +4820,7 @@ static void basestat_rankdatarec(RMatrix * xy,
         }
     }
 
-    /*
-     * Recursively split problem, if it is too large
-     */
+    // Recursively split problem, if it is too large
     problemcost = rmul3((double)(i1-i0), (double)(nfeatures), logbase2((double)(nfeatures), _state), _state);
     if( i1-i0>=2&&ae_fp_greater(problemcost,spawnlevel(_state)) )
     {
@@ -5093,9 +4831,7 @@ static void basestat_rankdatarec(RMatrix * xy,
         return;
     }
 
-    /*
-     * Retrieve buffers from pool, call serial code, return buffers to pool
-     */
+    // Retrieve buffers from pool, call serial code, return buffers to pool
     ae_shared_pool_retrieve(pool, &_buf0, _state);
     ae_shared_pool_retrieve(pool, &_buf1, _state);
     basestat_rankdatabasecase(xy, i0, i1, nfeatures, iscentered, buf0, buf1, _state);
@@ -5105,9 +4841,7 @@ static void basestat_rankdatarec(RMatrix * xy,
 }
 
 
-/*************************************************************************
-Serial stub for GPL edition.
-*************************************************************************/
+// Serial stub for GPL edition.
 ae_bool _trypexec_basestat_rankdatarec(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
@@ -5121,32 +4855,30 @@ ae_bool _trypexec_basestat_rankdatarec(RMatrix * xy,
 }
 
 
-/*************************************************************************
-Basecase code for RankData(), performs actual work on subset of data using
-temporary buffer passed as parameter.
-
-INPUT PARAMETERS:
-    XY      -   array[NPoints,NFeatures], dataset
-    I0      -   index of first row to process
-    I1      -   index of past-the-last row to process;
-                this function processes half-interval [I0,I1).
-    NFeatures-  number of features
-    IsCentered- whether ranks are centered or not:
-                * True      -   ranks are centered in such way that  their
-                                within-row sum is zero
-                * False     -   ranks are not centered
-    Buf0    -   temporary buffers, may be empty (this function automatically
-                allocates/reuses buffers).
-    Buf1    -   temporary buffers, may be empty (this function automatically
-                allocates/reuses buffers).
-
-OUTPUT PARAMETERS:
-    XY      -   data in [I0,I1) are replaced by their within-row ranks;
-                ranking starts from 0, ends at NFeatures-1
-
-  -- ALGLIB --
-     Copyright 18.04.2013 by Bochkanov Sergey
-*************************************************************************/
+// Basecase code for RankData(), performs actual work on subset of data using
+// temporary buffer passed as parameter.
+//
+// INPUT PARAMETERS:
+//     XY      -   array[NPoints,NFeatures], dataset
+//     I0      -   index of first row to process
+//     I1      -   index of past-the-last row to process;
+//                 this function processes half-interval [I0,I1).
+//     NFeatures-  number of features
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 within-row sum is zero
+//                 * False     -   ranks are not centered
+//     Buf0    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//     Buf1    -   temporary buffers, may be empty (this function automatically
+//                 allocates/reuses buffers).
+//
+// OUTPUT PARAMETERS:
+//     XY      -   data in [I0,I1) are replaced by their within-row ranks;
+//                 ranking starts from 0, ends at NFeatures-1
+//
+//   -- ALGLIB --
+//      Copyright 18.04.2013 by Bochkanov Sergey
 static void basestat_rankdatabasecase(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
@@ -5173,9 +4905,7 @@ static void basestat_rankdatabasecase(RMatrix * xy,
 }
 
 
-/*************************************************************************
-Serial stub for GPL edition.
-*************************************************************************/
+// Serial stub for GPL edition.
 ae_bool _trypexec_basestat_rankdatabasecase(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
@@ -5193,42 +4923,40 @@ ae_bool _trypexec_basestat_rankdatabasecase(RMatrix * xy,
 #if defined(AE_COMPILE_CORRELATIONTESTS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Pearson's correlation coefficient significance test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous  distributions  having  zero  correlation  or   whether   their
-correlation is non-zero.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - X and Y have zero correlation)
-    * left-tailed test (null hypothesis - the correlation  coefficient  is
-      greater than or equal to 0)
-    * right-tailed test (null hypothesis - the correlation coefficient  is
-      less than or equal to 0).
-
-Requirements:
-    * the number of elements in each sample is not less than 5
-    * normality of distributions of X and Y.
-
-Input parameters:
-    R   -   Pearson's correlation coefficient for X and Y
-    N   -   number of elements in samples, N>=5.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Pearson's correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5
+//     * normality of distributions of X and Y.
+//
+// Input parameters:
+//     R   -   Pearson's correlation coefficient for X and Y
+//     N   -   number of elements in samples, N>=5.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void pearsoncorrelationsignificance(double r,
      ae_int_t n,
      double* bothtails,
@@ -5244,9 +4972,7 @@ void pearsoncorrelationsignificance(double r,
     *righttail = 0;
 
 
-    /*
-     * Some special cases
-     */
+    // Some special cases
     if( ae_fp_greater_eq(r,(double)(1)) )
     {
         *bothtails = 0.0;
@@ -5269,9 +4995,7 @@ void pearsoncorrelationsignificance(double r,
         return;
     }
 
-    /*
-     * General case
-     */
+    // General case
     t = r*ae_sqrt((n-2)/(1-ae_sqr(r, _state)), _state);
     p = studenttdistribution(n-2, t, _state);
     *bothtails = 2*ae_minreal(p, 1-p, _state);
@@ -5280,44 +5004,42 @@ void pearsoncorrelationsignificance(double r,
 }
 
 
-/*************************************************************************
-Spearman's rank correlation coefficient significance test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous  distributions  having  zero  correlation  or   whether   their
-correlation is non-zero.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - X and Y have zero correlation)
-    * left-tailed test (null hypothesis - the correlation  coefficient  is
-      greater than or equal to 0)
-    * right-tailed test (null hypothesis - the correlation coefficient  is
-      less than or equal to 0).
-
-Requirements:
-    * the number of elements in each sample is not less than 5.
-
-The test is non-parametric and doesn't require distributions X and Y to be
-normal.
-
-Input parameters:
-    R   -   Spearman's rank correlation coefficient for X and Y
-    N   -   number of elements in samples, N>=5.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Spearman's rank correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5.
+//
+// The test is non-parametric and doesn't require distributions X and Y to be
+// normal.
+//
+// Input parameters:
+//     R   -   Spearman's rank correlation coefficient for X and Y
+//     N   -   number of elements in samples, N>=5.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void spearmanrankcorrelationsignificance(double r,
      ae_int_t n,
      double* bothtails,
@@ -5333,9 +5055,7 @@ void spearmanrankcorrelationsignificance(double r,
     *righttail = 0;
 
 
-    /*
-     * Special case
-     */
+    // Special case
     if( n<5 )
     {
         *bothtails = 1.0;
@@ -5344,9 +5064,7 @@ void spearmanrankcorrelationsignificance(double r,
         return;
     }
 
-    /*
-     * General case
-     */
+    // General case
     if( ae_fp_greater_eq(r,(double)(1)) )
     {
         t = 1.0E10;
@@ -5379,9 +5097,7 @@ void spearmanrankcorrelationsignificance(double r,
 }
 
 
-/*************************************************************************
-Tail(S, 5)
-*************************************************************************/
+// Tail(S, 5)
 static double correlationtests_spearmantail5(double s, ae_state *_state)
 {
     double result;
@@ -5452,9 +5168,7 @@ static double correlationtests_spearmantail5(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6)
-*************************************************************************/
+// Tail(S, 6)
 static double correlationtests_spearmantail6(double s, ae_state *_state)
 {
     double result;
@@ -5520,9 +5234,7 @@ static double correlationtests_spearmantail6(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7)
-*************************************************************************/
+// Tail(S, 7)
 static double correlationtests_spearmantail7(double s, ae_state *_state)
 {
     double result;
@@ -5623,9 +5335,7 @@ static double correlationtests_spearmantail7(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8)
-*************************************************************************/
+// Tail(S, 8)
 static double correlationtests_spearmantail8(double s, ae_state *_state)
 {
     double result;
@@ -5721,9 +5431,7 @@ static double correlationtests_spearmantail8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9)
-*************************************************************************/
+// Tail(S, 9)
 static double correlationtests_spearmantail9(double s, ae_state *_state)
 {
     double result;
@@ -5854,9 +5562,7 @@ static double correlationtests_spearmantail9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(T,N), accepts T<0
-*************************************************************************/
+// Tail(T,N), accepts T<0
 static double correlationtests_spearmantail(double t,
      ae_int_t n,
      ae_state *_state)
@@ -5898,36 +5604,34 @@ static double correlationtests_spearmantail(double t,
 #if defined(AE_COMPILE_JARQUEBERA) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Jarque-Bera test
-
-This test checks hypotheses about the fact that a  given  sample  X  is  a
-sample of normal random variable.
-
-Requirements:
-    * the number of elements in the sample is not less than 5.
-
-Input parameters:
-    X   -   sample. Array whose index goes from 0 to N-1.
-    N   -   size of the sample. N>=5
-
-Output parameters:
-    P           -   p-value for the test
-
-Accuracy of the approximation used (5<=N<=1951):
-
-p-value  	    relative error (5<=N<=1951)
-[1, 0.1]            < 1%
-[0.1, 0.01]         < 2%
-[0.01, 0.001]       < 6%
-[0.001, 0]          wasn't measured
-
-For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
-from table values.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Jarque-Bera test
+//
+// This test checks hypotheses about the fact that a  given  sample  X  is  a
+// sample of normal random variable.
+//
+// Requirements:
+//     * the number of elements in the sample is not less than 5.
+//
+// Input parameters:
+//     X   -   sample. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N>=5
+//
+// Output parameters:
+//     P           -   p-value for the test
+//
+// Accuracy of the approximation used (5<=N<=1951):
+//
+// p-value  	    relative error (5<=N<=1951)
+// [1, 0.1]            < 1%
+// [0.1, 0.01]         < 2%
+// [0.01, 0.001]       < 6%
+// [0.001, 0]          wasn't measured
+//
+// For N>1951 accuracy wasn't measured but it shouldn't be sharply  different
+// from table values.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void jarqueberatest(RVector * x,
      ae_int_t n,
      double* p,
@@ -5938,18 +5642,14 @@ void jarqueberatest(RVector * x,
     *p = 0;
 
 
-    /*
-     * N is too small
-     */
+    // N is too small
     if( n<5 )
     {
         *p = 1.0;
         return;
     }
 
-    /*
-     * N is large enough
-     */
+    // N is large enough
     jarquebera_jarqueberastatistic(x, n, &s, _state);
     *p = jarquebera_jarqueberaapprox(n, s, _state);
 }
@@ -5979,18 +5679,14 @@ static void jarquebera_jarqueberastatistic(RVector * x,
     stddev = (double)(0);
     ae_assert(n>1, "Assertion failed", _state);
 
-    /*
-     * Mean
-     */
+    // Mean
     for(i=0; i<=n-1; i++)
     {
         mean = mean+x->ptr.p_double[i];
     }
     mean = mean/n;
 
-    /*
-     * Variance (using corrected two-pass algorithm)
-     */
+    // Variance (using corrected two-pass algorithm)
     if( n!=1 )
     {
         v1 = (double)(0);
@@ -6012,9 +5708,7 @@ static void jarquebera_jarqueberastatistic(RVector * x,
         stddev = ae_sqrt(variance, _state);
     }
 
-    /*
-     * Skewness and kurtosis
-     */
+    // Skewness and kurtosis
     if( ae_fp_neq(stddev,(double)(0)) )
     {
         for(i=0; i<=n-1; i++)
@@ -6028,9 +5722,7 @@ static void jarquebera_jarqueberastatistic(RVector * x,
         kurtosis = kurtosis/n-3;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     *s = (double)n/(double)6*(ae_sqr(skewness, _state)+ae_sqr(kurtosis, _state)/4);
 }
 
@@ -6071,9 +5763,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 5..20 are tabulated
-     */
+    // N = 5..20 are tabulated
     if( n>=5&&n<=20 )
     {
         if( n==5 )
@@ -6144,11 +5834,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 20, 30, 50 are tabulated.
-     * In-between values are interpolated
-     * using interpolating polynomial of the second degree.
-     */
+    // N = 20, 30, 50 are tabulated.
+    // In-between values are interpolated
+    // using interpolating polynomial of the second degree.
     if( n>20&&n<=50 )
     {
         t1 = -1.0/20.0;
@@ -6170,11 +5858,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 50, 65, 100 are tabulated.
-     * In-between values are interpolated
-     * using interpolating polynomial of the second degree.
-     */
+    // N = 50, 65, 100 are tabulated.
+    // In-between values are interpolated
+    // using interpolating polynomial of the second degree.
     if( n>50&&n<=100 )
     {
         t1 = -1.0/50.0;
@@ -6196,11 +5882,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 100, 130, 200 are tabulated.
-     * In-between values are interpolated
-     * using interpolating polynomial of the second degree.
-     */
+    // N = 100, 130, 200 are tabulated.
+    // In-between values are interpolated
+    // using interpolating polynomial of the second degree.
     if( n>100&&n<=200 )
     {
         t1 = -1.0/100.0;
@@ -6222,11 +5906,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 200, 301, 501 are tabulated.
-     * In-between values are interpolated
-     * using interpolating polynomial of the second degree.
-     */
+    // N = 200, 301, 501 are tabulated.
+    // In-between values are interpolated
+    // using interpolating polynomial of the second degree.
     if( n>200&&n<=501 )
     {
         t1 = -1.0/200.0;
@@ -6248,11 +5930,9 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * N = 501, 701, 1401 are tabulated.
-     * In-between values are interpolated
-     * using interpolating polynomial of the second degree.
-     */
+    // N = 501, 701, 1401 are tabulated.
+    // In-between values are interpolated
+    // using interpolating polynomial of the second degree.
     if( n>501&&n<=1401 )
     {
         t1 = -1.0/501.0;
@@ -6274,9 +5954,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         return result;
     }
 
-    /*
-     * Asymptotic expansion
-     */
+    // Asymptotic expansion
     if( n>1401 )
     {
         result = -0.5*x+(jarquebera_jbtbl1401(x, _state)+0.5*x)*ae_sqrt((double)1401/(double)n, _state);
@@ -8160,42 +7838,40 @@ static void jarquebera_jbcheb(double x,
 #if defined(AE_COMPILE_VARIANCETESTS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Two-sample F-test
-
-This test checks three hypotheses about dispersions of the given  samples.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the dispersions are equal)
-    * left-tailed test (null hypothesis  -  the  dispersion  of  the first
-      sample is greater than or equal to  the  dispersion  of  the  second
-      sample).
-    * right-tailed test (null hypothesis - the  dispersion  of  the  first
-      sample is less than or equal to the dispersion of the second sample)
-
-The test is based on the following assumptions:
-    * the given samples have normal distributions
-    * the samples are independent.
-
-Input parameters:
-    X   -   sample 1. Array whose index goes from 0 to N-1.
-    N   -   sample size.
-    Y   -   sample 2. Array whose index goes from 0 to M-1.
-    M   -   sample size.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 19.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample F-test
+//
+// This test checks three hypotheses about dispersions of the given  samples.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersions are equal)
+//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
+//       sample is greater than or equal to  the  dispersion  of  the  second
+//       sample).
+//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
+//       sample is less than or equal to the dispersion of the second sample)
+//
+// The test is based on the following assumptions:
+//     * the given samples have normal distributions
+//     * the samples are independent.
+//
+// Input parameters:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   sample size.
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   sample size.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 19.09.2006 by Bochkanov Sergey
 void ftest(RVector * x,
      ae_int_t n,
      RVector * y,
@@ -8226,9 +7902,7 @@ void ftest(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     xmean = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -8242,9 +7916,7 @@ void ftest(RVector * x,
     }
     ymean = ymean/m;
 
-    /*
-     * Variance (using corrected two-pass algorithm)
-     */
+    // Variance (using corrected two-pass algorithm)
     xvar = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -8265,9 +7937,7 @@ void ftest(RVector * x,
         return;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     df1 = n-1;
     df2 = m-1;
     stat = ae_minreal(xvar/yvar, yvar/xvar, _state);
@@ -8277,40 +7947,38 @@ void ftest(RVector * x,
 }
 
 
-/*************************************************************************
-One-sample chi-square test
-
-This test checks three hypotheses about the dispersion of the given sample
-The following tests are performed:
-    * two-tailed test (null hypothesis - the dispersion equals  the  given
-      number)
-    * left-tailed test (null hypothesis - the dispersion is  greater  than
-      or equal to the given number)
-    * right-tailed test (null hypothesis  -  dispersion is  less  than  or
-      equal to the given number).
-
-Test is based on the following assumptions:
-    * the given sample has a normal distribution.
-
-Input parameters:
-    X           -   sample 1. Array whose index goes from 0 to N-1.
-    N           -   size of the sample.
-    Variance    -   dispersion value to compare with.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-  -- ALGLIB --
-     Copyright 19.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// One-sample chi-square test
+//
+// This test checks three hypotheses about the dispersion of the given sample
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersion equals  the  given
+//       number)
+//     * left-tailed test (null hypothesis - the dispersion is  greater  than
+//       or equal to the given number)
+//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
+//       equal to the given number).
+//
+// Test is based on the following assumptions:
+//     * the given sample has a normal distribution.
+//
+// Input parameters:
+//     X           -   sample 1. Array whose index goes from 0 to N-1.
+//     N           -   size of the sample.
+//     Variance    -   dispersion value to compare with.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+//   -- ALGLIB --
+//      Copyright 19.09.2006 by Bochkanov Sergey
 void onesamplevariancetest(RVector * x,
      ae_int_t n,
      double variance,
@@ -8337,9 +8005,7 @@ void onesamplevariancetest(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     xmean = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -8347,9 +8013,7 @@ void onesamplevariancetest(RVector * x,
     }
     xmean = xmean/n;
 
-    /*
-     * Variance
-     */
+    // Variance
     xvar = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -8364,9 +8028,7 @@ void onesamplevariancetest(RVector * x,
         return;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     stat = (n-1)*xvar/variance;
     s = chisquaredistribution((double)(n-1), stat, _state);
     *bothtails = 2*ae_minreal(s, 1-s, _state);
@@ -8379,55 +8041,53 @@ void onesamplevariancetest(RVector * x,
 #if defined(AE_COMPILE_WSR) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Wilcoxon signed-rank test
-
-This test checks three hypotheses about the median  of  the  given sample.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the median is equal to the  given
-      value)
-    * left-tailed test (null hypothesis - the median is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis  -  the  median  is  less than or
-      equal to the given value)
-
-Requirements:
-    * the scale of measurement should be ordinal, interval or  ratio (i.e.
-      the test could not be applied to nominal variables).
-    * the distribution should be continuous and symmetric relative to  its
-      median.
-    * number of distinct values in the X array should be greater than 4
-
-The test is non-parametric and doesn't require distribution X to be normal
-
-Input parameters:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of the sample.
-    Median  -   assumed median value.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-To calculate p-values, special approximation is used. This method lets  us
-calculate p-values with two decimal places in interval [0.0001, 1].
-
-"Two decimal places" does not sound very impressive, but in  practice  the
-relative error of less than 1% is enough to make a decision.
-
-There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-the significance level outlies this interval, the test returns 0.0001.
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Wilcoxon signed-rank test
+//
+// This test checks three hypotheses about the median  of  the  given sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis  -  the  median  is  less than or
+//       equal to the given value)
+//
+// Requirements:
+//     * the scale of measurement should be ordinal, interval or  ratio (i.e.
+//       the test could not be applied to nominal variables).
+//     * the distribution should be continuous and symmetric relative to  its
+//       median.
+//     * number of distinct values in the X array should be greater than 4
+//
+// The test is non-parametric and doesn't require distribution X to be normal
+//
+// Input parameters:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with two decimal places in interval [0.0001, 1].
+//
+// "Two decimal places" does not sound very impressive, but in  practice  the
+// relative error of less than 1% is enough to make a decision.
+//
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void wilcoxonsignedranktest(RVector * x,
      ae_int_t n,
      double e,
@@ -8467,9 +8127,7 @@ void wilcoxonsignedranktest(RVector * x,
     ae_vector_init(&c, 0, DT_INT, _state, ae_true);
 
 
-    /*
-     * Prepare
-     */
+    // Prepare
     if( n<5 )
     {
         *bothtails = 1.0;
@@ -8504,9 +8162,7 @@ void wilcoxonsignedranktest(RVector * x,
         c.ptr.p_int[i] = i;
     }
 
-    /*
-     * sort {R, C}
-     */
+    // sort {R, C}
     if( ns!=1 )
     {
         i = 2;
@@ -8581,9 +8237,7 @@ void wilcoxonsignedranktest(RVector * x,
         while(i>=1);
     }
 
-    /*
-     * compute tied ranks
-     */
+    // compute tied ranks
     i = 0;
     while(i<=ns-1)
     {
@@ -8603,9 +8257,7 @@ void wilcoxonsignedranktest(RVector * x,
         i = j;
     }
 
-    /*
-     * Compute W+
-     */
+    // Compute W+
     w = (double)(0);
     for(i=0; i<=ns-1; i++)
     {
@@ -8615,9 +8267,7 @@ void wilcoxonsignedranktest(RVector * x,
         }
     }
 
-    /*
-     * Result
-     */
+    // Result
     mu = rmul2((double)(ns), (double)(ns+1), _state)/4;
     sigma = ae_sqrt(mu*(2*ns+1)/6, _state);
     s = (w-mu)/sigma;
@@ -8638,9 +8288,7 @@ void wilcoxonsignedranktest(RVector * x,
 }
 
 
-/*************************************************************************
-Sequential Chebyshev interpolation.
-*************************************************************************/
+// Sequential Chebyshev interpolation.
 static void wsr_wcheb(double x,
      double c,
      double* tj,
@@ -8658,9 +8306,7 @@ static void wsr_wcheb(double x,
 }
 
 
-/*************************************************************************
-Tail(S, 5)
-*************************************************************************/
+// Tail(S, 5)
 static double wsr_w5(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -8707,9 +8353,7 @@ static double wsr_w5(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6)
-*************************************************************************/
+// Tail(S, 6)
 static double wsr_w6(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -8768,9 +8412,7 @@ static double wsr_w6(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7)
-*************************************************************************/
+// Tail(S, 7)
 static double wsr_w7(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -8845,9 +8487,7 @@ static double wsr_w7(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8)
-*************************************************************************/
+// Tail(S, 8)
 static double wsr_w8(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -8938,9 +8578,7 @@ static double wsr_w8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9)
-*************************************************************************/
+// Tail(S, 9)
 static double wsr_w9(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9047,9 +8685,7 @@ static double wsr_w9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10)
-*************************************************************************/
+// Tail(S, 10)
 static double wsr_w10(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9176,9 +8812,7 @@ static double wsr_w10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11)
-*************************************************************************/
+// Tail(S, 11)
 static double wsr_w11(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9329,9 +8963,7 @@ static double wsr_w11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12)
-*************************************************************************/
+// Tail(S, 12)
 static double wsr_w12(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9506,9 +9138,7 @@ static double wsr_w12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13)
-*************************************************************************/
+// Tail(S, 13)
 static double wsr_w13(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9707,9 +9337,7 @@ static double wsr_w13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 14)
-*************************************************************************/
+// Tail(S, 14)
 static double wsr_w14(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -9936,9 +9564,7 @@ static double wsr_w14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 15)
-*************************************************************************/
+// Tail(S, 15)
 static double wsr_w15(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -10197,9 +9823,7 @@ static double wsr_w15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 16)
-*************************************************************************/
+// Tail(S, 16)
 static double wsr_w16(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -10490,9 +10114,7 @@ static double wsr_w16(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 17)
-*************************************************************************/
+// Tail(S, 17)
 static double wsr_w17(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -10815,9 +10437,7 @@ static double wsr_w17(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 18)
-*************************************************************************/
+// Tail(S, 18)
 static double wsr_w18(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -11176,9 +10796,7 @@ static double wsr_w18(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 19)
-*************************************************************************/
+// Tail(S, 19)
 static double wsr_w19(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -11577,9 +11195,7 @@ static double wsr_w19(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 20)
-*************************************************************************/
+// Tail(S, 20)
 static double wsr_w20(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -12018,9 +11634,7 @@ static double wsr_w20(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 21)
-*************************************************************************/
+// Tail(S, 21)
 static double wsr_w21(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -12499,9 +12113,7 @@ static double wsr_w21(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 22)
-*************************************************************************/
+// Tail(S, 22)
 static double wsr_w22(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -13024,9 +12636,7 @@ static double wsr_w22(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 23)
-*************************************************************************/
+// Tail(S, 23)
 static double wsr_w23(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -13597,9 +13207,7 @@ static double wsr_w23(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 24)
-*************************************************************************/
+// Tail(S, 24)
 static double wsr_w24(double s, ae_state *_state)
 {
     ae_int_t w;
@@ -14218,9 +13826,7 @@ static double wsr_w24(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 25)
-*************************************************************************/
+// Tail(S, 25)
 static double wsr_w25(double s, ae_state *_state)
 {
     double x;
@@ -14248,9 +13854,7 @@ static double wsr_w25(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 26)
-*************************************************************************/
+// Tail(S, 26)
 static double wsr_w26(double s, ae_state *_state)
 {
     double x;
@@ -14278,9 +13882,7 @@ static double wsr_w26(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 27)
-*************************************************************************/
+// Tail(S, 27)
 static double wsr_w27(double s, ae_state *_state)
 {
     double x;
@@ -14308,9 +13910,7 @@ static double wsr_w27(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 28)
-*************************************************************************/
+// Tail(S, 28)
 static double wsr_w28(double s, ae_state *_state)
 {
     double x;
@@ -14338,9 +13938,7 @@ static double wsr_w28(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 29)
-*************************************************************************/
+// Tail(S, 29)
 static double wsr_w29(double s, ae_state *_state)
 {
     double x;
@@ -14368,9 +13966,7 @@ static double wsr_w29(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 30)
-*************************************************************************/
+// Tail(S, 30)
 static double wsr_w30(double s, ae_state *_state)
 {
     double x;
@@ -14398,9 +13994,7 @@ static double wsr_w30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 40)
-*************************************************************************/
+// Tail(S, 40)
 static double wsr_w40(double s, ae_state *_state)
 {
     double x;
@@ -14428,9 +14022,7 @@ static double wsr_w40(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 60)
-*************************************************************************/
+// Tail(S, 60)
 static double wsr_w60(double s, ae_state *_state)
 {
     double x;
@@ -14458,9 +14050,7 @@ static double wsr_w60(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 120)
-*************************************************************************/
+// Tail(S, 120)
 static double wsr_w120(double s, ae_state *_state)
 {
     double x;
@@ -14488,9 +14078,7 @@ static double wsr_w120(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 200)
-*************************************************************************/
+// Tail(S, 200)
 static double wsr_w200(double s, ae_state *_state)
 {
     double x;
@@ -14518,9 +14106,7 @@ static double wsr_w200(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S,N), S>=0
-*************************************************************************/
+// Tail(S,N), S>=0
 static double wsr_wsigma(double s, ae_int_t n, ae_state *_state)
 {
     double f0;
@@ -14675,74 +14261,72 @@ static double wsr_wsigma(double s, ae_int_t n, ae_state *_state)
 #if defined(AE_COMPILE_MANNWHITNEYU) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Mann-Whitney U-test
-
-This test checks hypotheses about whether X  and  Y  are  samples  of  two
-continuous distributions of the same shape  and  same  median  or  whether
-their medians are different.
-
-The following tests are performed:
-    * two-tailed test (null hypothesis - the medians are equal)
-    * left-tailed test (null hypothesis - the median of the  first  sample
-      is greater than or equal to the median of the second sample)
-    * right-tailed test (null hypothesis - the median of the first  sample
-      is less than or equal to the median of the second sample).
-
-Requirements:
-    * the samples are independent
-    * X and Y are continuous distributions (or discrete distributions well-
-      approximating continuous distributions)
-    * distributions of X and Y have the  same  shape.  The  only  possible
-      difference is their position (i.e. the value of the median)
-    * the number of elements in each sample is not less than 5
-    * the scale of measurement should be ordinal, interval or ratio  (i.e.
-      the test could not be applied to nominal variables).
-
-The test is non-parametric and doesn't require distributions to be normal.
-
-Input parameters:
-    X   -   sample 1. Array whose index goes from 0 to N-1.
-    N   -   size of the sample. N>=5
-    Y   -   sample 2. Array whose index goes from 0 to M-1.
-    M   -   size of the sample. M>=5
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-To calculate p-values, special approximation is used. This method lets  us
-calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
-There is no approximation outside the [0.0001, 1] interval. Therefore,  if
-the significance level outlies this interval, the test returns 0.0001.
-
-Relative precision of approximation of p-value:
-
-N          M          Max.err.   Rms.err.
-5..10      N..10      1.4e-02    6.0e-04
-5..10      N..100     2.2e-02    5.3e-06
-10..15     N..15      1.0e-02    3.2e-04
-10..15     N..100     1.0e-02    2.2e-05
-15..100    N..100     6.1e-03    2.7e-06
-
-For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
-account characteristics of asymptotic approximation used, precision should
-not be sharply different from the values for interval [5, 100].
-
-NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
-      P's outside of this interval are enforced to these bounds. Say,  you
-      may quite often get P equal to exactly 0.25 or 0.0001.
-
-  -- ALGLIB --
-     Copyright 09.04.2007 by Bochkanov Sergey
-*************************************************************************/
+// Mann-Whitney U-test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous distributions of the same shape  and  same  median  or  whether
+// their medians are different.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the medians are equal)
+//     * left-tailed test (null hypothesis - the median of the  first  sample
+//       is greater than or equal to the median of the second sample)
+//     * right-tailed test (null hypothesis - the median of the first  sample
+//       is less than or equal to the median of the second sample).
+//
+// Requirements:
+//     * the samples are independent
+//     * X and Y are continuous distributions (or discrete distributions well-
+//       approximating continuous distributions)
+//     * distributions of X and Y have the  same  shape.  The  only  possible
+//       difference is their position (i.e. the value of the median)
+//     * the number of elements in each sample is not less than 5
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distributions to be normal.
+//
+// Input parameters:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N>=5
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   size of the sample. M>=5
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// To calculate p-values, special approximation is used. This method lets  us
+// calculate p-values with satisfactory  accuracy  in  interval  [0.0001, 1].
+// There is no approximation outside the [0.0001, 1] interval. Therefore,  if
+// the significance level outlies this interval, the test returns 0.0001.
+//
+// Relative precision of approximation of p-value:
+//
+// N          M          Max.err.   Rms.err.
+// 5..10      N..10      1.4e-02    6.0e-04
+// 5..10      N..100     2.2e-02    5.3e-06
+// 10..15     N..15      1.0e-02    3.2e-04
+// 10..15     N..100     1.0e-02    2.2e-05
+// 15..100    N..100     6.1e-03    2.7e-06
+//
+// For N,M>100 accuracy checks weren't put into  practice,  but  taking  into
+// account characteristics of asymptotic approximation used, precision should
+// not be sharply different from the values for interval [5, 100].
+//
+// NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
+//       P's outside of this interval are enforced to these bounds. Say,  you
+//       may quite often get P equal to exactly 0.25 or 0.0001.
+//
+//   -- ALGLIB --
+//      Copyright 09.04.2007 by Bochkanov Sergey
 void mannwhitneyutest(RVector * x,
      ae_int_t n,
      RVector * y,
@@ -14783,9 +14367,7 @@ void mannwhitneyutest(RVector * x,
     ae_vector_init(&tiesize, 0, DT_INT, _state, ae_true);
 
 
-    /*
-     * Prepare
-     */
+    // Prepare
     if( n<=4||m<=4 )
     {
         *bothtails = 1.0;
@@ -14808,9 +14390,7 @@ void mannwhitneyutest(RVector * x,
         c.ptr.p_int[n+i] = 1;
     }
 
-    /*
-     * sort {R, C}
-     */
+    // sort {R, C}
     if( ns!=1 )
     {
         i = 2;
@@ -14885,9 +14465,7 @@ void mannwhitneyutest(RVector * x,
         while(i>=1);
     }
 
-    /*
-     * compute tied ranks
-     */
+    // compute tied ranks
     i = 0;
     tiecount = 0;
     ae_vector_set_length(&tiesize, ns-1+1, _state);
@@ -14911,9 +14489,7 @@ void mannwhitneyutest(RVector * x,
         i = j;
     }
 
-    /*
-     * Compute U
-     */
+    // Compute U
     u = (double)(0);
     for(i=0; i<=ns-1; i++)
     {
@@ -14924,9 +14500,7 @@ void mannwhitneyutest(RVector * x,
     }
     u = rmul2((double)(n), (double)(m), _state)+rmul2((double)(n), (double)(n+1), _state)*0.5-u;
 
-    /*
-     * Result
-     */
+    // Result
     mu = rmul2((double)(n), (double)(m), _state)/2;
     tmp = ns*(ae_sqr((double)(ns), _state)-1)/12;
     for(i=0; i<=tiecount-1; i++)
@@ -14952,9 +14526,7 @@ void mannwhitneyutest(RVector * x,
 }
 
 
-/*************************************************************************
-Sequential Chebyshev interpolation.
-*************************************************************************/
+// Sequential Chebyshev interpolation.
 static void mannwhitneyu_ucheb(double x,
      double c,
      double* tj,
@@ -14972,9 +14544,7 @@ static void mannwhitneyu_ucheb(double x,
 }
 
 
-/*************************************************************************
-Three-point polynomial interpolation.
-*************************************************************************/
+// Three-point polynomial interpolation.
 static double mannwhitneyu_uninterpolate(double p1,
      double p2,
      double p3,
@@ -15001,9 +14571,7 @@ static double mannwhitneyu_uninterpolate(double p1,
 }
 
 
-/*************************************************************************
-Tail(0, N1, N2)
-*************************************************************************/
+// Tail(0, N1, N2)
 static double mannwhitneyu_usigma000(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15022,9 +14590,7 @@ static double mannwhitneyu_usigma000(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(0.75, N1, N2)
-*************************************************************************/
+// Tail(0.75, N1, N2)
 static double mannwhitneyu_usigma075(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15043,9 +14609,7 @@ static double mannwhitneyu_usigma075(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(1.5, N1, N2)
-*************************************************************************/
+// Tail(1.5, N1, N2)
 static double mannwhitneyu_usigma150(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15064,9 +14628,7 @@ static double mannwhitneyu_usigma150(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(2.25, N1, N2)
-*************************************************************************/
+// Tail(2.25, N1, N2)
 static double mannwhitneyu_usigma225(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15085,9 +14647,7 @@ static double mannwhitneyu_usigma225(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(3.0, N1, N2)
-*************************************************************************/
+// Tail(3.0, N1, N2)
 static double mannwhitneyu_usigma300(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15106,9 +14666,7 @@ static double mannwhitneyu_usigma300(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(3.33, N1, N2)
-*************************************************************************/
+// Tail(3.33, N1, N2)
 static double mannwhitneyu_usigma333(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15127,9 +14685,7 @@ static double mannwhitneyu_usigma333(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(3.66, N1, N2)
-*************************************************************************/
+// Tail(3.66, N1, N2)
 static double mannwhitneyu_usigma367(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15148,9 +14704,7 @@ static double mannwhitneyu_usigma367(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(4.0, N1, N2)
-*************************************************************************/
+// Tail(4.0, N1, N2)
 static double mannwhitneyu_usigma400(ae_int_t n1,
      ae_int_t n2,
      ae_state *_state)
@@ -15169,9 +14723,7 @@ static double mannwhitneyu_usigma400(ae_int_t n1,
 }
 
 
-/*************************************************************************
-Tail(S, 5, 5)
-*************************************************************************/
+// Tail(S, 5, 5)
 static double mannwhitneyu_utbln5n5(double s, ae_state *_state)
 {
     double x;
@@ -15204,9 +14756,7 @@ static double mannwhitneyu_utbln5n5(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 6)
-*************************************************************************/
+// Tail(S, 5, 6)
 static double mannwhitneyu_utbln5n6(double s, ae_state *_state)
 {
     double x;
@@ -15239,9 +14789,7 @@ static double mannwhitneyu_utbln5n6(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 7)
-*************************************************************************/
+// Tail(S, 5, 7)
 static double mannwhitneyu_utbln5n7(double s, ae_state *_state)
 {
     double x;
@@ -15274,9 +14822,7 @@ static double mannwhitneyu_utbln5n7(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 8)
-*************************************************************************/
+// Tail(S, 5, 8)
 static double mannwhitneyu_utbln5n8(double s, ae_state *_state)
 {
     double x;
@@ -15309,9 +14855,7 @@ static double mannwhitneyu_utbln5n8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 9)
-*************************************************************************/
+// Tail(S, 5, 9)
 static double mannwhitneyu_utbln5n9(double s, ae_state *_state)
 {
     double x;
@@ -15344,9 +14888,7 @@ static double mannwhitneyu_utbln5n9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 10)
-*************************************************************************/
+// Tail(S, 5, 10)
 static double mannwhitneyu_utbln5n10(double s, ae_state *_state)
 {
     double x;
@@ -15379,9 +14921,7 @@ static double mannwhitneyu_utbln5n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 11)
-*************************************************************************/
+// Tail(S, 5, 11)
 static double mannwhitneyu_utbln5n11(double s, ae_state *_state)
 {
     double x;
@@ -15414,9 +14954,7 @@ static double mannwhitneyu_utbln5n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 12)
-*************************************************************************/
+// Tail(S, 5, 12)
 static double mannwhitneyu_utbln5n12(double s, ae_state *_state)
 {
     double x;
@@ -15449,9 +14987,7 @@ static double mannwhitneyu_utbln5n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 13)
-*************************************************************************/
+// Tail(S, 5, 13)
 static double mannwhitneyu_utbln5n13(double s, ae_state *_state)
 {
     double x;
@@ -15484,9 +15020,7 @@ static double mannwhitneyu_utbln5n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 14)
-*************************************************************************/
+// Tail(S, 5, 14)
 static double mannwhitneyu_utbln5n14(double s, ae_state *_state)
 {
     double x;
@@ -15519,9 +15053,7 @@ static double mannwhitneyu_utbln5n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 15)
-*************************************************************************/
+// Tail(S, 5, 15)
 static double mannwhitneyu_utbln5n15(double s, ae_state *_state)
 {
     double x;
@@ -15554,9 +15086,7 @@ static double mannwhitneyu_utbln5n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 16)
-*************************************************************************/
+// Tail(S, 5, 16)
 static double mannwhitneyu_utbln5n16(double s, ae_state *_state)
 {
     double x;
@@ -15589,9 +15119,7 @@ static double mannwhitneyu_utbln5n16(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 17)
-*************************************************************************/
+// Tail(S, 5, 17)
 static double mannwhitneyu_utbln5n17(double s, ae_state *_state)
 {
     double x;
@@ -15624,9 +15152,7 @@ static double mannwhitneyu_utbln5n17(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 18)
-*************************************************************************/
+// Tail(S, 5, 18)
 static double mannwhitneyu_utbln5n18(double s, ae_state *_state)
 {
     double x;
@@ -15659,9 +15185,7 @@ static double mannwhitneyu_utbln5n18(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 19)
-*************************************************************************/
+// Tail(S, 5, 19)
 static double mannwhitneyu_utbln5n19(double s, ae_state *_state)
 {
     double x;
@@ -15694,9 +15218,7 @@ static double mannwhitneyu_utbln5n19(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 20)
-*************************************************************************/
+// Tail(S, 5, 20)
 static double mannwhitneyu_utbln5n20(double s, ae_state *_state)
 {
     double x;
@@ -15729,9 +15251,7 @@ static double mannwhitneyu_utbln5n20(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 21)
-*************************************************************************/
+// Tail(S, 5, 21)
 static double mannwhitneyu_utbln5n21(double s, ae_state *_state)
 {
     double x;
@@ -15764,9 +15284,7 @@ static double mannwhitneyu_utbln5n21(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 22)
-*************************************************************************/
+// Tail(S, 5, 22)
 static double mannwhitneyu_utbln5n22(double s, ae_state *_state)
 {
     double x;
@@ -15799,9 +15317,7 @@ static double mannwhitneyu_utbln5n22(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 23)
-*************************************************************************/
+// Tail(S, 5, 23)
 static double mannwhitneyu_utbln5n23(double s, ae_state *_state)
 {
     double x;
@@ -15834,9 +15350,7 @@ static double mannwhitneyu_utbln5n23(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 24)
-*************************************************************************/
+// Tail(S, 5, 24)
 static double mannwhitneyu_utbln5n24(double s, ae_state *_state)
 {
     double x;
@@ -15869,9 +15383,7 @@ static double mannwhitneyu_utbln5n24(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 25)
-*************************************************************************/
+// Tail(S, 5, 25)
 static double mannwhitneyu_utbln5n25(double s, ae_state *_state)
 {
     double x;
@@ -15904,9 +15416,7 @@ static double mannwhitneyu_utbln5n25(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 26)
-*************************************************************************/
+// Tail(S, 5, 26)
 static double mannwhitneyu_utbln5n26(double s, ae_state *_state)
 {
     double x;
@@ -15939,9 +15449,7 @@ static double mannwhitneyu_utbln5n26(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 27)
-*************************************************************************/
+// Tail(S, 5, 27)
 static double mannwhitneyu_utbln5n27(double s, ae_state *_state)
 {
     double x;
@@ -15974,9 +15482,7 @@ static double mannwhitneyu_utbln5n27(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 28)
-*************************************************************************/
+// Tail(S, 5, 28)
 static double mannwhitneyu_utbln5n28(double s, ae_state *_state)
 {
     double x;
@@ -16009,9 +15515,7 @@ static double mannwhitneyu_utbln5n28(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 29)
-*************************************************************************/
+// Tail(S, 5, 29)
 static double mannwhitneyu_utbln5n29(double s, ae_state *_state)
 {
     double x;
@@ -16044,9 +15548,7 @@ static double mannwhitneyu_utbln5n29(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 30)
-*************************************************************************/
+// Tail(S, 5, 30)
 static double mannwhitneyu_utbln5n30(double s, ae_state *_state)
 {
     double x;
@@ -16079,9 +15581,7 @@ static double mannwhitneyu_utbln5n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 5, 100)
-*************************************************************************/
+// Tail(S, 5, 100)
 static double mannwhitneyu_utbln5n100(double s, ae_state *_state)
 {
     double x;
@@ -16114,9 +15614,7 @@ static double mannwhitneyu_utbln5n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 6)
-*************************************************************************/
+// Tail(S, 6, 6)
 static double mannwhitneyu_utbln6n6(double s, ae_state *_state)
 {
     double x;
@@ -16149,9 +15647,7 @@ static double mannwhitneyu_utbln6n6(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 7)
-*************************************************************************/
+// Tail(S, 6, 7)
 static double mannwhitneyu_utbln6n7(double s, ae_state *_state)
 {
     double x;
@@ -16184,9 +15680,7 @@ static double mannwhitneyu_utbln6n7(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 8)
-*************************************************************************/
+// Tail(S, 6, 8)
 static double mannwhitneyu_utbln6n8(double s, ae_state *_state)
 {
     double x;
@@ -16219,9 +15713,7 @@ static double mannwhitneyu_utbln6n8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 9)
-*************************************************************************/
+// Tail(S, 6, 9)
 static double mannwhitneyu_utbln6n9(double s, ae_state *_state)
 {
     double x;
@@ -16254,9 +15746,7 @@ static double mannwhitneyu_utbln6n9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 10)
-*************************************************************************/
+// Tail(S, 6, 10)
 static double mannwhitneyu_utbln6n10(double s, ae_state *_state)
 {
     double x;
@@ -16289,9 +15779,7 @@ static double mannwhitneyu_utbln6n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 11)
-*************************************************************************/
+// Tail(S, 6, 11)
 static double mannwhitneyu_utbln6n11(double s, ae_state *_state)
 {
     double x;
@@ -16324,9 +15812,7 @@ static double mannwhitneyu_utbln6n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 12)
-*************************************************************************/
+// Tail(S, 6, 12)
 static double mannwhitneyu_utbln6n12(double s, ae_state *_state)
 {
     double x;
@@ -16359,9 +15845,7 @@ static double mannwhitneyu_utbln6n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 13)
-*************************************************************************/
+// Tail(S, 6, 13)
 static double mannwhitneyu_utbln6n13(double s, ae_state *_state)
 {
     double x;
@@ -16394,9 +15878,7 @@ static double mannwhitneyu_utbln6n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 14)
-*************************************************************************/
+// Tail(S, 6, 14)
 static double mannwhitneyu_utbln6n14(double s, ae_state *_state)
 {
     double x;
@@ -16429,9 +15911,7 @@ static double mannwhitneyu_utbln6n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 15)
-*************************************************************************/
+// Tail(S, 6, 15)
 static double mannwhitneyu_utbln6n15(double s, ae_state *_state)
 {
     double x;
@@ -16464,9 +15944,7 @@ static double mannwhitneyu_utbln6n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 30)
-*************************************************************************/
+// Tail(S, 6, 30)
 static double mannwhitneyu_utbln6n30(double s, ae_state *_state)
 {
     double x;
@@ -16499,9 +15977,7 @@ static double mannwhitneyu_utbln6n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 6, 100)
-*************************************************************************/
+// Tail(S, 6, 100)
 static double mannwhitneyu_utbln6n100(double s, ae_state *_state)
 {
     double x;
@@ -16534,9 +16010,7 @@ static double mannwhitneyu_utbln6n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 7)
-*************************************************************************/
+// Tail(S, 7, 7)
 static double mannwhitneyu_utbln7n7(double s, ae_state *_state)
 {
     double x;
@@ -16569,9 +16043,7 @@ static double mannwhitneyu_utbln7n7(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 8)
-*************************************************************************/
+// Tail(S, 7, 8)
 static double mannwhitneyu_utbln7n8(double s, ae_state *_state)
 {
     double x;
@@ -16604,9 +16076,7 @@ static double mannwhitneyu_utbln7n8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 9)
-*************************************************************************/
+// Tail(S, 7, 9)
 static double mannwhitneyu_utbln7n9(double s, ae_state *_state)
 {
     double x;
@@ -16639,9 +16109,7 @@ static double mannwhitneyu_utbln7n9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 10)
-*************************************************************************/
+// Tail(S, 7, 10)
 static double mannwhitneyu_utbln7n10(double s, ae_state *_state)
 {
     double x;
@@ -16674,9 +16142,7 @@ static double mannwhitneyu_utbln7n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 11)
-*************************************************************************/
+// Tail(S, 7, 11)
 static double mannwhitneyu_utbln7n11(double s, ae_state *_state)
 {
     double x;
@@ -16709,9 +16175,7 @@ static double mannwhitneyu_utbln7n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 12)
-*************************************************************************/
+// Tail(S, 7, 12)
 static double mannwhitneyu_utbln7n12(double s, ae_state *_state)
 {
     double x;
@@ -16744,9 +16208,7 @@ static double mannwhitneyu_utbln7n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 13)
-*************************************************************************/
+// Tail(S, 7, 13)
 static double mannwhitneyu_utbln7n13(double s, ae_state *_state)
 {
     double x;
@@ -16779,9 +16241,7 @@ static double mannwhitneyu_utbln7n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 14)
-*************************************************************************/
+// Tail(S, 7, 14)
 static double mannwhitneyu_utbln7n14(double s, ae_state *_state)
 {
     double x;
@@ -16814,9 +16274,7 @@ static double mannwhitneyu_utbln7n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 15)
-*************************************************************************/
+// Tail(S, 7, 15)
 static double mannwhitneyu_utbln7n15(double s, ae_state *_state)
 {
     double x;
@@ -16849,9 +16307,7 @@ static double mannwhitneyu_utbln7n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 30)
-*************************************************************************/
+// Tail(S, 7, 30)
 static double mannwhitneyu_utbln7n30(double s, ae_state *_state)
 {
     double x;
@@ -16884,9 +16340,7 @@ static double mannwhitneyu_utbln7n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 7, 100)
-*************************************************************************/
+// Tail(S, 7, 100)
 static double mannwhitneyu_utbln7n100(double s, ae_state *_state)
 {
     double x;
@@ -16919,9 +16373,7 @@ static double mannwhitneyu_utbln7n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 8)
-*************************************************************************/
+// Tail(S, 8, 8)
 static double mannwhitneyu_utbln8n8(double s, ae_state *_state)
 {
     double x;
@@ -16954,9 +16406,7 @@ static double mannwhitneyu_utbln8n8(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 9)
-*************************************************************************/
+// Tail(S, 8, 9)
 static double mannwhitneyu_utbln8n9(double s, ae_state *_state)
 {
     double x;
@@ -16989,9 +16439,7 @@ static double mannwhitneyu_utbln8n9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 10)
-*************************************************************************/
+// Tail(S, 8, 10)
 static double mannwhitneyu_utbln8n10(double s, ae_state *_state)
 {
     double x;
@@ -17024,9 +16472,7 @@ static double mannwhitneyu_utbln8n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 11)
-*************************************************************************/
+// Tail(S, 8, 11)
 static double mannwhitneyu_utbln8n11(double s, ae_state *_state)
 {
     double x;
@@ -17059,9 +16505,7 @@ static double mannwhitneyu_utbln8n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 12)
-*************************************************************************/
+// Tail(S, 8, 12)
 static double mannwhitneyu_utbln8n12(double s, ae_state *_state)
 {
     double x;
@@ -17094,9 +16538,7 @@ static double mannwhitneyu_utbln8n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 13)
-*************************************************************************/
+// Tail(S, 8, 13)
 static double mannwhitneyu_utbln8n13(double s, ae_state *_state)
 {
     double x;
@@ -17129,9 +16571,7 @@ static double mannwhitneyu_utbln8n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 14)
-*************************************************************************/
+// Tail(S, 8, 14)
 static double mannwhitneyu_utbln8n14(double s, ae_state *_state)
 {
     double x;
@@ -17164,9 +16604,7 @@ static double mannwhitneyu_utbln8n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 15)
-*************************************************************************/
+// Tail(S, 8, 15)
 static double mannwhitneyu_utbln8n15(double s, ae_state *_state)
 {
     double x;
@@ -17199,9 +16637,7 @@ static double mannwhitneyu_utbln8n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 30)
-*************************************************************************/
+// Tail(S, 8, 30)
 static double mannwhitneyu_utbln8n30(double s, ae_state *_state)
 {
     double x;
@@ -17234,9 +16670,7 @@ static double mannwhitneyu_utbln8n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 8, 100)
-*************************************************************************/
+// Tail(S, 8, 100)
 static double mannwhitneyu_utbln8n100(double s, ae_state *_state)
 {
     double x;
@@ -17269,9 +16703,7 @@ static double mannwhitneyu_utbln8n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 9)
-*************************************************************************/
+// Tail(S, 9, 9)
 static double mannwhitneyu_utbln9n9(double s, ae_state *_state)
 {
     double x;
@@ -17304,9 +16736,7 @@ static double mannwhitneyu_utbln9n9(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 10)
-*************************************************************************/
+// Tail(S, 9, 10)
 static double mannwhitneyu_utbln9n10(double s, ae_state *_state)
 {
     double x;
@@ -17339,9 +16769,7 @@ static double mannwhitneyu_utbln9n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 11)
-*************************************************************************/
+// Tail(S, 9, 11)
 static double mannwhitneyu_utbln9n11(double s, ae_state *_state)
 {
     double x;
@@ -17374,9 +16802,7 @@ static double mannwhitneyu_utbln9n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 12)
-*************************************************************************/
+// Tail(S, 9, 12)
 static double mannwhitneyu_utbln9n12(double s, ae_state *_state)
 {
     double x;
@@ -17409,9 +16835,7 @@ static double mannwhitneyu_utbln9n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 13)
-*************************************************************************/
+// Tail(S, 9, 13)
 static double mannwhitneyu_utbln9n13(double s, ae_state *_state)
 {
     double x;
@@ -17444,9 +16868,7 @@ static double mannwhitneyu_utbln9n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 14)
-*************************************************************************/
+// Tail(S, 9, 14)
 static double mannwhitneyu_utbln9n14(double s, ae_state *_state)
 {
     double x;
@@ -17479,9 +16901,7 @@ static double mannwhitneyu_utbln9n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 15)
-*************************************************************************/
+// Tail(S, 9, 15)
 static double mannwhitneyu_utbln9n15(double s, ae_state *_state)
 {
     double x;
@@ -17514,9 +16934,7 @@ static double mannwhitneyu_utbln9n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 30)
-*************************************************************************/
+// Tail(S, 9, 30)
 static double mannwhitneyu_utbln9n30(double s, ae_state *_state)
 {
     double x;
@@ -17549,9 +16967,7 @@ static double mannwhitneyu_utbln9n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 9, 100)
-*************************************************************************/
+// Tail(S, 9, 100)
 static double mannwhitneyu_utbln9n100(double s, ae_state *_state)
 {
     double x;
@@ -17584,9 +17000,7 @@ static double mannwhitneyu_utbln9n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 10)
-*************************************************************************/
+// Tail(S, 10, 10)
 static double mannwhitneyu_utbln10n10(double s, ae_state *_state)
 {
     double x;
@@ -17619,9 +17033,7 @@ static double mannwhitneyu_utbln10n10(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 11)
-*************************************************************************/
+// Tail(S, 10, 11)
 static double mannwhitneyu_utbln10n11(double s, ae_state *_state)
 {
     double x;
@@ -17654,9 +17066,7 @@ static double mannwhitneyu_utbln10n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 12)
-*************************************************************************/
+// Tail(S, 10, 12)
 static double mannwhitneyu_utbln10n12(double s, ae_state *_state)
 {
     double x;
@@ -17689,9 +17099,7 @@ static double mannwhitneyu_utbln10n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 13)
-*************************************************************************/
+// Tail(S, 10, 13)
 static double mannwhitneyu_utbln10n13(double s, ae_state *_state)
 {
     double x;
@@ -17724,9 +17132,7 @@ static double mannwhitneyu_utbln10n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 14)
-*************************************************************************/
+// Tail(S, 10, 14)
 static double mannwhitneyu_utbln10n14(double s, ae_state *_state)
 {
     double x;
@@ -17759,9 +17165,7 @@ static double mannwhitneyu_utbln10n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 15)
-*************************************************************************/
+// Tail(S, 10, 15)
 static double mannwhitneyu_utbln10n15(double s, ae_state *_state)
 {
     double x;
@@ -17794,9 +17198,7 @@ static double mannwhitneyu_utbln10n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 30)
-*************************************************************************/
+// Tail(S, 10, 30)
 static double mannwhitneyu_utbln10n30(double s, ae_state *_state)
 {
     double x;
@@ -17829,9 +17231,7 @@ static double mannwhitneyu_utbln10n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 10, 100)
-*************************************************************************/
+// Tail(S, 10, 100)
 static double mannwhitneyu_utbln10n100(double s, ae_state *_state)
 {
     double x;
@@ -17864,9 +17264,7 @@ static double mannwhitneyu_utbln10n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 11)
-*************************************************************************/
+// Tail(S, 11, 11)
 static double mannwhitneyu_utbln11n11(double s, ae_state *_state)
 {
     double x;
@@ -17899,9 +17297,7 @@ static double mannwhitneyu_utbln11n11(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 12)
-*************************************************************************/
+// Tail(S, 11, 12)
 static double mannwhitneyu_utbln11n12(double s, ae_state *_state)
 {
     double x;
@@ -17934,9 +17330,7 @@ static double mannwhitneyu_utbln11n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 13)
-*************************************************************************/
+// Tail(S, 11, 13)
 static double mannwhitneyu_utbln11n13(double s, ae_state *_state)
 {
     double x;
@@ -17969,9 +17363,7 @@ static double mannwhitneyu_utbln11n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 14)
-*************************************************************************/
+// Tail(S, 11, 14)
 static double mannwhitneyu_utbln11n14(double s, ae_state *_state)
 {
     double x;
@@ -18004,9 +17396,7 @@ static double mannwhitneyu_utbln11n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 15)
-*************************************************************************/
+// Tail(S, 11, 15)
 static double mannwhitneyu_utbln11n15(double s, ae_state *_state)
 {
     double x;
@@ -18039,9 +17429,7 @@ static double mannwhitneyu_utbln11n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 30)
-*************************************************************************/
+// Tail(S, 11, 30)
 static double mannwhitneyu_utbln11n30(double s, ae_state *_state)
 {
     double x;
@@ -18074,9 +17462,7 @@ static double mannwhitneyu_utbln11n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 11, 100)
-*************************************************************************/
+// Tail(S, 11, 100)
 static double mannwhitneyu_utbln11n100(double s, ae_state *_state)
 {
     double x;
@@ -18109,9 +17495,7 @@ static double mannwhitneyu_utbln11n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 12)
-*************************************************************************/
+// Tail(S, 12, 12)
 static double mannwhitneyu_utbln12n12(double s, ae_state *_state)
 {
     double x;
@@ -18144,9 +17528,7 @@ static double mannwhitneyu_utbln12n12(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 13)
-*************************************************************************/
+// Tail(S, 12, 13)
 static double mannwhitneyu_utbln12n13(double s, ae_state *_state)
 {
     double x;
@@ -18179,9 +17561,7 @@ static double mannwhitneyu_utbln12n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 14)
-*************************************************************************/
+// Tail(S, 12, 14)
 static double mannwhitneyu_utbln12n14(double s, ae_state *_state)
 {
     double x;
@@ -18214,9 +17594,7 @@ static double mannwhitneyu_utbln12n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 15)
-*************************************************************************/
+// Tail(S, 12, 15)
 static double mannwhitneyu_utbln12n15(double s, ae_state *_state)
 {
     double x;
@@ -18249,9 +17627,7 @@ static double mannwhitneyu_utbln12n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 30)
-*************************************************************************/
+// Tail(S, 12, 30)
 static double mannwhitneyu_utbln12n30(double s, ae_state *_state)
 {
     double x;
@@ -18284,9 +17660,7 @@ static double mannwhitneyu_utbln12n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 12, 100)
-*************************************************************************/
+// Tail(S, 12, 100)
 static double mannwhitneyu_utbln12n100(double s, ae_state *_state)
 {
     double x;
@@ -18319,9 +17693,7 @@ static double mannwhitneyu_utbln12n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13, 13)
-*************************************************************************/
+// Tail(S, 13, 13)
 static double mannwhitneyu_utbln13n13(double s, ae_state *_state)
 {
     double x;
@@ -18354,9 +17726,7 @@ static double mannwhitneyu_utbln13n13(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13, 14)
-*************************************************************************/
+// Tail(S, 13, 14)
 static double mannwhitneyu_utbln13n14(double s, ae_state *_state)
 {
     double x;
@@ -18389,9 +17759,7 @@ static double mannwhitneyu_utbln13n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13, 15)
-*************************************************************************/
+// Tail(S, 13, 15)
 static double mannwhitneyu_utbln13n15(double s, ae_state *_state)
 {
     double x;
@@ -18424,9 +17792,7 @@ static double mannwhitneyu_utbln13n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13, 30)
-*************************************************************************/
+// Tail(S, 13, 30)
 static double mannwhitneyu_utbln13n30(double s, ae_state *_state)
 {
     double x;
@@ -18459,9 +17825,7 @@ static double mannwhitneyu_utbln13n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 13, 100)
-*************************************************************************/
+// Tail(S, 13, 100)
 static double mannwhitneyu_utbln13n100(double s, ae_state *_state)
 {
     double x;
@@ -18494,9 +17858,7 @@ static double mannwhitneyu_utbln13n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 14, 14)
-*************************************************************************/
+// Tail(S, 14, 14)
 static double mannwhitneyu_utbln14n14(double s, ae_state *_state)
 {
     double x;
@@ -18529,9 +17891,7 @@ static double mannwhitneyu_utbln14n14(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 14, 15)
-*************************************************************************/
+// Tail(S, 14, 15)
 static double mannwhitneyu_utbln14n15(double s, ae_state *_state)
 {
     double x;
@@ -18564,9 +17924,7 @@ static double mannwhitneyu_utbln14n15(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 14, 30)
-*************************************************************************/
+// Tail(S, 14, 30)
 static double mannwhitneyu_utbln14n30(double s, ae_state *_state)
 {
     double x;
@@ -18599,9 +17957,7 @@ static double mannwhitneyu_utbln14n30(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, 14, 100)
-*************************************************************************/
+// Tail(S, 14, 100)
 static double mannwhitneyu_utbln14n100(double s, ae_state *_state)
 {
     double x;
@@ -18634,9 +17990,7 @@ static double mannwhitneyu_utbln14n100(double s, ae_state *_state)
 }
 
 
-/*************************************************************************
-Tail(S, N1, N2)
-*************************************************************************/
+// Tail(S, N1, N2)
 static double mannwhitneyu_usigma(double s,
      ae_int_t n1,
      ae_int_t n2,
@@ -18657,9 +18011,7 @@ static double mannwhitneyu_usigma(double s,
 
     result = (double)(0);
 
-    /*
-     * N1=5, N2 = 5, 6, 7, ...
-     */
+    // N1=5, N2 = 5, 6, 7, ...
     if( ae_minint(n1, n2, _state)==5 )
     {
         if( ae_maxint(n1, n2, _state)==5 )
@@ -18772,9 +18124,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=6, N2 = 6, 7, 8, ...
-     */
+    // N1=6, N2 = 6, 7, 8, ...
     if( ae_minint(n1, n2, _state)==6 )
     {
         if( ae_maxint(n1, n2, _state)==6 )
@@ -18827,9 +18177,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=7, N2 = 7, 8, ...
-     */
+    // N1=7, N2 = 7, 8, ...
     if( ae_minint(n1, n2, _state)==7 )
     {
         if( ae_maxint(n1, n2, _state)==7 )
@@ -18878,9 +18226,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=8, N2 = 8, 9, 10, ...
-     */
+    // N1=8, N2 = 8, 9, 10, ...
     if( ae_minint(n1, n2, _state)==8 )
     {
         if( ae_maxint(n1, n2, _state)==8 )
@@ -18925,9 +18271,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=9, N2 = 9, 10, ...
-     */
+    // N1=9, N2 = 9, 10, ...
     if( ae_minint(n1, n2, _state)==9 )
     {
         if( ae_maxint(n1, n2, _state)==9 )
@@ -18968,9 +18312,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=10, N2 = 10, 11, ...
-     */
+    // N1=10, N2 = 10, 11, ...
     if( ae_minint(n1, n2, _state)==10 )
     {
         if( ae_maxint(n1, n2, _state)==10 )
@@ -19007,9 +18349,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=11, N2 = 11, 12, ...
-     */
+    // N1=11, N2 = 11, 12, ...
     if( ae_minint(n1, n2, _state)==11 )
     {
         if( ae_maxint(n1, n2, _state)==11 )
@@ -19042,9 +18382,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=12, N2 = 12, 13, ...
-     */
+    // N1=12, N2 = 12, 13, ...
     if( ae_minint(n1, n2, _state)==12 )
     {
         if( ae_maxint(n1, n2, _state)==12 )
@@ -19073,9 +18411,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=13, N2 = 13, 14, ...
-     */
+    // N1=13, N2 = 13, 14, ...
     if( ae_minint(n1, n2, _state)==13 )
     {
         if( ae_maxint(n1, n2, _state)==13 )
@@ -19100,9 +18436,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1=14, N2 = 14, 15, ...
-     */
+    // N1=14, N2 = 14, 15, ...
     if( ae_minint(n1, n2, _state)==14 )
     {
         if( ae_maxint(n1, n2, _state)==14 )
@@ -19123,9 +18457,7 @@ static double mannwhitneyu_usigma(double s,
         return result;
     }
 
-    /*
-     * N1 >= 15, N2 >= 15
-     */
+    // N1 >= 15, N2 >= 15
     if( ae_fp_greater(s,(double)(4)) )
     {
         s = (double)(4);
@@ -19180,46 +18512,44 @@ static double mannwhitneyu_usigma(double s,
 #if defined(AE_COMPILE_STEST) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Sign test
-
-This test checks three hypotheses about the median of  the  given  sample.
-The following tests are performed:
-    * two-tailed test (null hypothesis - the median is equal to the  given
-      value)
-    * left-tailed test (null hypothesis - the median is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis - the  median  is  less  than  or
-      equal to the given value)
-
-Requirements:
-    * the scale of measurement should be ordinal, interval or ratio  (i.e.
-      the test could not be applied to nominal variables).
-
-The test is non-parametric and doesn't require distribution X to be normal
-
-Input parameters:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of the sample.
-    Median  -   assumed median value.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-While   calculating   p-values   high-precision   binomial    distribution
-approximation is used, so significance levels have about 15 exact digits.
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Sign test
+//
+// This test checks three hypotheses about the median of  the  given  sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the  median  is  less  than  or
+//       equal to the given value)
+//
+// Requirements:
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distribution X to be normal
+//
+// Input parameters:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// While   calculating   p-values   high-precision   binomial    distribution
+// approximation is used, so significance levels have about 15 exact digits.
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void onesamplesigntest(RVector * x,
      ae_int_t n,
      double median,
@@ -19244,11 +18574,9 @@ void onesamplesigntest(RVector * x,
         return;
     }
 
-    /*
-     * Calculate:
-     * GTCnt - count of x[i]>Median
-     * NECnt - count of x[i]<>Median
-     */
+    // Calculate:
+    // GTCnt - count of x[i]>Median
+    // NECnt - count of x[i]<>Median
     gtcnt = 0;
     necnt = 0;
     for(i=0; i<=n-1; i++)
@@ -19265,10 +18593,8 @@ void onesamplesigntest(RVector * x,
     if( necnt==0 )
     {
 
-        /*
-         * all x[i] are equal to Median.
-         * So we can conclude that Median is a true median :)
-         */
+        // all x[i] are equal to Median.
+        // So we can conclude that Median is a true median :)
         *bothtails = 1.0;
         *lefttail = 1.0;
         *righttail = 1.0;
@@ -19284,48 +18610,46 @@ void onesamplesigntest(RVector * x,
 #if defined(AE_COMPILE_STUDENTTTESTS) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-One-sample t-test
-
-This test checks three hypotheses about the mean of the given sample.  The
-following tests are performed:
-    * two-tailed test (null hypothesis - the mean is equal  to  the  given
-      value)
-    * left-tailed test (null hypothesis - the  mean  is  greater  than  or
-      equal to the given value)
-    * right-tailed test (null hypothesis - the mean is less than or  equal
-      to the given value).
-
-The test is based on the assumption that  a  given  sample  has  a  normal
-distribution and  an  unknown  dispersion.  If  the  distribution  sharply
-differs from normal, the test will work incorrectly.
-
-INPUT PARAMETERS:
-    X       -   sample. Array whose index goes from 0 to N-1.
-    N       -   size of sample, N>=0
-    Mean    -   assumed value of the mean.
-
-OUTPUT PARAMETERS:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0, all p-values are set to 1.0
-      * when variance of X[] is exactly zero, p-values are set
-        to 1.0 or 0.0, depending on difference between sample mean and
-        value of mean being tested.
-
-
-  -- ALGLIB --
-     Copyright 08.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// One-sample t-test
+//
+// This test checks three hypotheses about the mean of the given sample.  The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
+//       value)
+//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the mean is less than or  equal
+//       to the given value).
+//
+// The test is based on the assumption that  a  given  sample  has  a  normal
+// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
+// differs from normal, the test will work incorrectly.
+//
+// INPUT PARAMETERS:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of sample, N>=0
+//     Mean    -   assumed value of the mean.
+//
+// OUTPUT PARAMETERS:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0, all p-values are set to 1.0
+//       * when variance of X[] is exactly zero, p-values are set
+//         to 1.0 or 0.0, depending on difference between sample mean and
+//         value of mean being tested.
+//
+//
+//   -- ALGLIB --
+//      Copyright 08.09.2006 by Bochkanov Sergey
 void studentttest1(RVector * x,
      ae_int_t n,
      double mean,
@@ -19358,9 +18682,7 @@ void studentttest1(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     xmean = (double)(0);
     x0 = x->ptr.p_double[0];
     samex = ae_true;
@@ -19379,9 +18701,7 @@ void studentttest1(RVector * x,
         xmean = xmean/n;
     }
 
-    /*
-     * Variance (using corrected two-pass algorithm)
-     */
+    // Variance (using corrected two-pass algorithm)
     xvariance = (double)(0);
     xstddev = (double)(0);
     if( n!=1&&!samex )
@@ -19433,9 +18753,7 @@ void studentttest1(RVector * x,
         return;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     stat = (xmean-mean)/(xstddev/ae_sqrt((double)(n), _state));
     s = studenttdistribution(n-1, stat, _state);
     *bothtails = 2*ae_minreal(s, 1-s, _state);
@@ -19444,47 +18762,45 @@ void studentttest1(RVector * x,
 }
 
 
-/*************************************************************************
-Two-sample pooled test
-
-This test checks three hypotheses about the mean of the given samples. The
-following tests are performed:
-    * two-tailed test (null hypothesis - the means are equal)
-    * left-tailed test (null hypothesis - the mean of the first sample  is
-      greater than or equal to the mean of the second sample)
-    * right-tailed test (null hypothesis - the mean of the first sample is
-      less than or equal to the mean of the second sample).
-
-Test is based on the following assumptions:
-    * given samples have normal distributions
-    * dispersions are equal
-    * samples are independent.
-
-Input parameters:
-    X       -   sample 1. Array whose index goes from 0 to N-1.
-    N       -   size of sample.
-    Y       -   sample 2. Array whose index goes from 0 to M-1.
-    M       -   size of sample.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0 or M=0, all p-values are set to 1.0
-      * when both samples has exactly zero variance, p-values are set
-        to 1.0 or 0.0, depending on difference between means.
-
-  -- ALGLIB --
-     Copyright 18.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample pooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * dispersions are equal
+//     * samples are independent.
+//
+// Input parameters:
+//     X       -   sample 1. Array whose index goes from 0 to N-1.
+//     N       -   size of sample.
+//     Y       -   sample 2. Array whose index goes from 0 to M-1.
+//     M       -   size of sample.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has exactly zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+//
+//   -- ALGLIB --
+//      Copyright 18.09.2006 by Bochkanov Sergey
 void studentttest2(RVector * x,
      ae_int_t n,
      RVector * y,
@@ -19518,9 +18834,7 @@ void studentttest2(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     xmean = (double)(0);
     x0 = x->ptr.p_double[0];
     samex = ae_true;
@@ -19556,9 +18870,7 @@ void studentttest2(RVector * x,
         ymean = ymean/m;
     }
 
-    /*
-     * S
-     */
+    // S
     s = (double)(0);
     if( n+m>2 )
     {
@@ -19601,9 +18913,7 @@ void studentttest2(RVector * x,
         return;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     stat = (xmean-ymean)/s;
     p = studenttdistribution(n+m-2, stat, _state);
     *bothtails = 2*ae_minreal(p, 1-p, _state);
@@ -19612,49 +18922,47 @@ void studentttest2(RVector * x,
 }
 
 
-/*************************************************************************
-Two-sample unpooled test
-
-This test checks three hypotheses about the mean of the given samples. The
-following tests are performed:
-    * two-tailed test (null hypothesis - the means are equal)
-    * left-tailed test (null hypothesis - the mean of the first sample  is
-      greater than or equal to the mean of the second sample)
-    * right-tailed test (null hypothesis - the mean of the first sample is
-      less than or equal to the mean of the second sample).
-
-Test is based on the following assumptions:
-    * given samples have normal distributions
-    * samples are independent.
-Equality of variances is NOT required.
-
-Input parameters:
-    X - sample 1. Array whose index goes from 0 to N-1.
-    N - size of the sample.
-    Y - sample 2. Array whose index goes from 0 to M-1.
-    M - size of the sample.
-
-Output parameters:
-    BothTails   -   p-value for two-tailed test.
-                    If BothTails is less than the given significance level
-                    the null hypothesis is rejected.
-    LeftTail    -   p-value for left-tailed test.
-                    If LeftTail is less than the given significance level,
-                    the null hypothesis is rejected.
-    RightTail   -   p-value for right-tailed test.
-                    If RightTail is less than the given significance level
-                    the null hypothesis is rejected.
-
-NOTE: this function correctly handles degenerate cases:
-      * when N=0 or M=0, all p-values are set to 1.0
-      * when both samples has zero variance, p-values are set
-        to 1.0 or 0.0, depending on difference between means.
-      * when only one sample has zero variance, test reduces to 1-sample
-        version.
-
-  -- ALGLIB --
-     Copyright 18.09.2006 by Bochkanov Sergey
-*************************************************************************/
+// Two-sample unpooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * samples are independent.
+// Equality of variances is NOT required.
+//
+// Input parameters:
+//     X - sample 1. Array whose index goes from 0 to N-1.
+//     N - size of the sample.
+//     Y - sample 2. Array whose index goes from 0 to M-1.
+//     M - size of the sample.
+//
+// Output parameters:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+//       * when only one sample has zero variance, test reduces to 1-sample
+//         version.
+//
+//   -- ALGLIB --
+//      Copyright 18.09.2006 by Bochkanov Sergey
 void unequalvariancettest(RVector * x,
      ae_int_t n,
      RVector * y,
@@ -19691,9 +18999,7 @@ void unequalvariancettest(RVector * x,
         return;
     }
 
-    /*
-     * Mean
-     */
+    // Mean
     xmean = (double)(0);
     x0 = x->ptr.p_double[0];
     samex = ae_true;
@@ -19729,9 +19035,7 @@ void unequalvariancettest(RVector * x,
         ymean = ymean/m;
     }
 
-    /*
-     * Variance (using corrected two-pass algorithm)
-     */
+    // Variance (using corrected two-pass algorithm)
     xvar = (double)(0);
     if( n>=2&&!samex )
     {
@@ -19751,10 +19055,8 @@ void unequalvariancettest(RVector * x,
         yvar = yvar/(m-1);
     }
 
-    /*
-     * Handle different special cases
-     * (one or both variances are zero).
-     */
+    // Handle different special cases
+    // (one or both variances are zero).
     if( ae_fp_eq(xvar,(double)(0))&&ae_fp_eq(yvar,(double)(0)) )
     {
         if( ae_fp_eq(xmean,ymean) )
@@ -19786,29 +19088,23 @@ void unequalvariancettest(RVector * x,
     if( ae_fp_eq(xvar,(double)(0)) )
     {
 
-        /*
-         * X is constant, unpooled 2-sample test reduces to 1-sample test.
-         *
-         * NOTE: right-tail and left-tail must be passed to 1-sample
-         *       t-test in reverse order because we reverse order of
-         *       of samples.
-         */
+        // X is constant, unpooled 2-sample test reduces to 1-sample test.
+        //
+        // NOTE: right-tail and left-tail must be passed to 1-sample
+        //       t-test in reverse order because we reverse order of
+        //       of samples.
         studentttest1(y, m, xmean, bothtails, righttail, lefttail, _state);
         return;
     }
     if( ae_fp_eq(yvar,(double)(0)) )
     {
 
-        /*
-         * Y is constant, unpooled 2-sample test reduces to 1-sample test.
-         */
+        // Y is constant, unpooled 2-sample test reduces to 1-sample test.
         studentttest1(x, n, ymean, bothtails, lefttail, righttail, _state);
         return;
     }
 
-    /*
-     * Statistic
-     */
+    // Statistic
     stat = (xmean-ymean)/ae_sqrt(xvar/n+yvar/m, _state);
     c = xvar/n/(xvar/n+yvar/m);
     df = rmul2((double)(n-1), (double)(m-1), _state)/((m-1)*ae_sqr(c, _state)+(n-1)*ae_sqr(1-c, _state));

@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -70,9 +68,7 @@ http://www.fsf.org/licensing/licenses
 /////////////////////////////////////////////////////////////////////////
 namespace alglib_impl
 {
-/*
- * OS-specific includes
- */
+// OS-specific includes
 #ifdef AE_USE_CPP
 }
 #endif
@@ -89,7 +85,7 @@ namespace alglib_impl
 #include <sched.h>
 #include <sys/time.h>
 #endif
-/* Debugging helpers for Windows */
+// Debugging helpers for Windows
 #ifdef AE_DEBUG4WINDOWS
 #include <windows.h>
 #include <stdio.h>
@@ -99,9 +95,7 @@ namespace alglib_impl
 {
 #endif
 
-/*
- * local definitions
- */
+// local definitions
 #define x_nb 16
 #define AE_DATA_ALIGN 64
 #define AE_PTR_ALIGN sizeof(void*)
@@ -126,7 +120,7 @@ namespace alglib_impl
 #define AE_LOCK_TESTS_BEFORE_YIELD 16
 #define AE_CRITICAL_ASSERT(x) if( !(x) ) abort()
 
-/* IDs for set_dbg_value */
+// IDs for set_dbg_value
 #define _ALGLIB_USE_ALLOC_COUNTER             0
 #define _ALGLIB_USE_DBG_COUNTERS              1
 #define _ALGLIB_USE_VENDOR_KERNELS          100
@@ -140,7 +134,7 @@ namespace alglib_impl
 #define _ALGLIB_SET_GLOBAL_THREADING       1001
 #define _ALGLIB_SET_NWORKERS               1002
 
-/* IDs for get_dbg_value */
+// IDs for get_dbg_value
 #define _ALGLIB_GET_ALLOC_COUNTER             0
 #define _ALGLIB_GET_CUMULATIVE_ALLOC_SIZE     1
 #define _ALGLIB_GET_CUMULATIVE_ALLOC_COUNT    2
@@ -149,11 +143,9 @@ namespace alglib_impl
 #define _ALGLIB_GET_GLOBAL_THREADING       1001
 #define _ALGLIB_GET_NWORKERS               1002
 
-/*************************************************************************
-Lock.
-
-This is internal structure which implements lock functionality.
-*************************************************************************/
+// Lock.
+//
+// This is internal structure which implements lock functionality.
 typedef struct
 {
 #if AE_OS==AE_WINDOWS
@@ -169,37 +161,31 @@ typedef struct
 
 
 
-/*
- * Error tracking facilities; this fields are modified every time ae_set_error_flag()
- * is called with non-zero cond. Thread unsafe access, but it does not matter actually.
- */
+// Error tracking facilities; this fields are modified every time ae_set_error_flag()
+// is called with non-zero cond. Thread unsafe access, but it does not matter actually.
 static const char * sef_file  = "";
 static int          sef_line  = 0;
 static const char * sef_xdesc = "";
 
-/*
- * Global flags, split into several char-sized variables in order
- * to avoid problem with non-atomic reads/writes (single-byte ops
- * are atomic on all modern architectures);
- *
- * Following variables are included:
- * * threading-related settings
- */
+// Global flags, split into several char-sized variables in order
+// to avoid problem with non-atomic reads/writes (single-byte ops
+// are atomic on all modern architectures);
+//
+// Following variables are included:
+// * threading-related settings
 unsigned char _alglib_global_threading_flags = _ALGLIB_FLG_THREADING_SERIAL>>_ALGLIB_FLG_THREADING_SHIFT;
 
-/*
- * DESCRIPTION: recommended number of active workers:
- *              * positive value >=1 is used to specify exact number of active workers
- *              * 0 means that ALL available cores are used
- *              * negative value means that all cores EXCEPT for cores_to_use will be used
- *                (say, -1 means that all cores except for one will be used). At least one
- *                core will be used in this case, even if you assign -9999999 to this field.
- *
- *              Default value =  0 (fully parallel execution) when AE_NWORKERS is not defined
- *                            =  0 for manually defined number of cores (AE_NWORKERS is defined)
- * PROTECTION:  not needed; runtime modification is possible, but we do not need exact
- *              synchronization.
- */
+// DESCRIPTION: recommended number of active workers:
+//              * positive value >=1 is used to specify exact number of active workers
+//              * 0 means that ALL available cores are used
+//              * negative value means that all cores EXCEPT for cores_to_use will be used
+//                (say, -1 means that all cores except for one will be used). At least one
+//                core will be used in this case, even if you assign -9999999 to this field.
+//
+//              Default value =  0 (fully parallel execution) when AE_NWORKERS is not defined
+//                            =  0 for manually defined number of cores (AE_NWORKERS is defined)
+// PROTECTION:  not needed; runtime modification is possible, but we do not need exact
+//              synchronization.
 #if defined(AE_NWORKERS) && (AE_NWORKERS<=0)
 #error AE_NWORKERS must be positive number or not defined at all.
 #endif
@@ -209,9 +195,7 @@ ae_int_t _alglib_cores_to_use = 0;
 ae_int_t _alglib_cores_to_use = 0;
 #endif
 
-/*
- * Debug counters
- */
+// Debug counters
 ae_int_t   _alloc_counter = 0;
 ae_int_t   _alloc_counter_total = 0;
 ae_bool    _use_alloc_counter = ae_false;
@@ -221,7 +205,7 @@ ae_bool    _use_dbg_counters  = ae_false;
 
 ae_bool    _use_vendor_kernels          = ae_true;
 
-ae_bool    debug_workstealing           = ae_false; /* debug workstealing environment? False by default */
+ae_bool    debug_workstealing           = ae_false; // debug workstealing environment? False by default
 ae_int_t   dbgws_pushroot_ok            = 0;
 ae_int_t   dbgws_pushroot_failed        = 0;
 
@@ -231,24 +215,20 @@ __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_spinwaits 
 __declspec(align(AE_LOCK_ALIGNMENT)) volatile ae_int64_t _ae_dbg_lock_yields = 0;
 #endif
 
-/*
- * Allocation debugging
- */
+// Allocation debugging
 ae_bool     _force_malloc_failure = ae_false;
 ae_int_t    _malloc_failure_after = 0;
 
 
-/*
- * Trace-related declarations:
- * alglib_trace_type    -   trace output type
- * alglib_trace_file    -   file descriptor (to be used by ALGLIB code which
- *                          sends messages to trace log
- * alglib_fclose_trace  -   whether we have to call fclose() when disabling or
- *                          changing trace output
- * alglib_trace_tags    -   string buffer used to store tags + two additional
- *                          characters (leading and trailing commas) + null
- *                          terminator
- */
+// Trace-related declarations:
+// alglib_trace_type    -   trace output type
+// alglib_trace_file    -   file descriptor (to be used by ALGLIB code which
+//                          sends messages to trace log
+// alglib_fclose_trace  -   whether we have to call fclose() when disabling or
+//                          changing trace output
+// alglib_trace_tags    -   string buffer used to store tags + two additional
+//                          characters (leading and trailing commas) + null
+//                          terminator
 #define ALGLIB_TRACE_NONE 0
 #define ALGLIB_TRACE_FILE 1
 #define ALGLIB_TRACE_TAGS_LEN 2048
@@ -258,9 +238,7 @@ FILE            *alglib_trace_file = NULL;
 static ae_bool   alglib_fclose_trace = ae_false;
 static char      alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
 
-/*
- * Fields for memory allocation over static array
- */
+// Fields for memory allocation over static array
 #if AE_MALLOC==AE_BASIC_STATIC_MALLOC
 #if AE_THREADING!=AE_SERIAL_UNSAFE
 #error Basis static malloc is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
@@ -271,31 +249,25 @@ static ae_int_t         *sm_page_tbl = NULL;
 static unsigned char    *sm_mem      = NULL;
 #endif
 
-/*
- * These declarations are used to ensure that
- * sizeof(ae_bool)=1, sizeof(ae_int32_t)==4, sizeof(ae_int64_t)==8, sizeof(ae_int_t)==sizeof(void*).
- * they will lead to syntax error otherwise (array size will be negative).
- *
- * you can remove them, if you want - they are not used anywhere.
- *
- */
+// These declarations are used to ensure that
+// sizeof(ae_bool)=1, sizeof(ae_int32_t)==4, sizeof(ae_int64_t)==8, sizeof(ae_int_t)==sizeof(void*).
+// they will lead to syntax error otherwise (array size will be negative).
+//
+// you can remove them, if you want - they are not used anywhere.
+//
 static char     _ae_bool_must_be_8_bits_wide [1-2*((int)(sizeof(ae_bool))-1)*((int)(sizeof(ae_bool))-1)];
 static char  _ae_int32_t_must_be_32_bits_wide[1-2*((int)(sizeof(ae_int32_t))-4)*((int)(sizeof(ae_int32_t))-4)];
 static char  _ae_int64_t_must_be_64_bits_wide[1-2*((int)(sizeof(ae_int64_t))-8)*((int)(sizeof(ae_int64_t))-8)];
 static char _ae_uint64_t_must_be_64_bits_wide[1-2*((int)(sizeof(ae_uint64_t))-8)*((int)(sizeof(ae_uint64_t))-8)];
 static char  _ae_int_t_must_be_pointer_sized [1-2*((int)(sizeof(ae_int_t))-(int)sizeof(void*))*((int)(sizeof(ae_int_t))-(int)(sizeof(void*)))];
 
-/*
- * This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
- * It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
- *
- */
+// This variable is used to prevent some tricky optimizations which may degrade multithreaded performance.
+// It is touched once in the ae_init_pool() function from smp.c in order to prevent optimizations.
+//
 static volatile ae_int_t ae_never_change_it = 1;
 
-/*************************************************************************
-This function should never  be  called.  It is  here  to  prevent spurious
-compiler warnings about unused variables (in fact: used).
-*************************************************************************/
+// This function should never  be  called.  It is  here  to  prevent spurious
+// compiler warnings about unused variables (in fact: used).
 void ae_never_call_it()
 {
     ae_touch_ptr((void*)_ae_bool_must_be_8_bits_wide);
@@ -305,9 +277,7 @@ void ae_never_call_it()
     ae_touch_ptr((void*)_ae_int_t_must_be_pointer_sized);
 }
 
-/*************************************************************************
-Standard function wrappers for better GLIBC portability
-*************************************************************************/
+// Standard function wrappers for better GLIBC portability
 #if defined(X_FOR_LINUX)
 __asm__(".symver exp,exp@GLIBC_2.2.5");
 __asm__(".symver log,log@GLIBC_2.2.5");
@@ -381,7 +351,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id)
 #endif
     }
 
-    /* workstealing counters */
+// workstealing counters
     if( id==_ALGLIB_WSDBG_NCORES )
 #if defined(AE_SMP)
         return ae_cores_count();
@@ -404,16 +374,14 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id)
     if( id==_ALGLIB_GET_NWORKERS )
         return (ae_int64_t)_alglib_cores_to_use;
 
-    /* unknown value */
+// unknown value
     return 0;
 }
 
-/************************************************************************
-This function sets default (global) threading model:
-* serial execution
-* multithreading, if cores_to_use allows it
-
-************************************************************************/
+// This function sets default (global) threading model:
+// * serial execution
+// * multithreading, if cores_to_use allows it
+//
 void ae_set_global_threading(ae_uint64_t flg_value)
 {
     flg_value = flg_value&_ALGLIB_FLG_THREADING_MASK;
@@ -421,12 +389,10 @@ void ae_set_global_threading(ae_uint64_t flg_value)
     _alglib_global_threading_flags = (unsigned char)(flg_value>>_ALGLIB_FLG_THREADING_SHIFT);
 }
 
-/************************************************************************
-This function gets default (global) threading model:
-* serial execution
-* multithreading, if cores_to_use allows it
-
-************************************************************************/
+// This function gets default (global) threading model:
+// * serial execution
+// * multithreading, if cores_to_use allows it
+//
 ae_uint64_t ae_get_global_threading()
 {
     return ((ae_uint64_t)_alglib_global_threading_flags)<<_ALGLIB_FLG_THREADING_SHIFT;
@@ -451,28 +417,22 @@ void ae_set_error_flag(ae_bool *p_flag, ae_bool cond, const char *filename, int 
     }
 }
 
-/************************************************************************
-This function returns file name for the last call of ae_set_error_flag()
-with non-zero cond parameter.
-************************************************************************/
+// This function returns file name for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
 const char * ae_get_last_error_file()
 {
     return sef_file;
 }
 
-/************************************************************************
-This function returns line number for the last call of ae_set_error_flag()
-with non-zero cond parameter.
-************************************************************************/
+// This function returns line number for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
 int ae_get_last_error_line()
 {
     return sef_line;
 }
 
-/************************************************************************
-This function returns extra description for the last call of ae_set_error_flag()
-with non-zero cond parameter.
-************************************************************************/
+// This function returns extra description for the last call of ae_set_error_flag()
+// with non-zero cond parameter.
 const char * ae_get_last_error_xdesc()
 {
     return sef_xdesc;
@@ -497,21 +457,19 @@ void* ae_align(void *ptr, size_t alignment)
     return result;
 }
 
-/************************************************************************
-This function maps nworkers  number  (which  can  be  positive,  zero  or
-negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
-to "effective", strictly positive workers count.
-
-This  function  is  intended  to  be used by debugging/testing code which
-tests different number of worker threads. It is NOT aligned  in  any  way
-with ALGLIB multithreading framework (i.e. it can return  non-zero worker
-count even for single-threaded GPLed ALGLIB).
-************************************************************************/
+// This function maps nworkers  number  (which  can  be  positive,  zero  or
+// negative with 0 meaning "all cores", -1 meaning "all cores -1" and so on)
+// to "effective", strictly positive workers count.
+//
+// This  function  is  intended  to  be used by debugging/testing code which
+// tests different number of worker threads. It is NOT aligned  in  any  way
+// with ALGLIB multithreading framework (i.e. it can return  non-zero worker
+// count even for single-threaded GPLed ALGLIB).
 ae_int_t ae_get_effective_workers(ae_int_t nworkers)
 {
     ae_int_t ncores;
 
-    /* determine cores count */
+// determine cores count
 #if defined(AE_NWORKERS)
     ncores = AE_NWORKERS;
 #elif AE_OS==AE_WINDOWS
@@ -528,34 +486,32 @@ ae_int_t ae_get_effective_workers(ae_int_t nworkers)
 #endif
     AE_CRITICAL_ASSERT(ncores>=1);
 
-    /* map nworkers to its effective value */
+// map nworkers to its effective value
     if( nworkers>=1 )
         return nworkers>ncores ? ncores : nworkers;
     return ncores+nworkers>=1 ? ncores+nworkers : 1;
 }
 
-/*************************************************************************
-This function belongs to the family of  "optional  atomics",  i.e.  atomic
-functions which either perform atomic changes - or do nothing at  all,  if
-current compiler settings do not allow us to generate atomic code.
-
-All "optional atomics" are synchronized, i.e. either all of them work - or
-no one of the works.
-
-This particular function performs atomic addition on pointer-sized  value,
-which must be pointer-size aligned.
-
-NOTE: this function is not intended to be extremely high performance  one,
-      so use it only when necessary.
-*************************************************************************/
+// This function belongs to the family of  "optional  atomics",  i.e.  atomic
+// functions which either perform atomic changes - or do nothing at  all,  if
+// current compiler settings do not allow us to generate atomic code.
+//
+// All "optional atomics" are synchronized, i.e. either all of them work - or
+// no one of the works.
+//
+// This particular function performs atomic addition on pointer-sized  value,
+// which must be pointer-size aligned.
+//
+// NOTE: this function is not intended to be extremely high performance  one,
+//       so use it only when necessary.
 void  ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v)
 {
     AE_CRITICAL_ASSERT(ae_misalignment(p,sizeof(void*))==0);
 #if AE_OS==AE_WINDOWS
     for(;;)
     {
-        /* perform conversion between ae_int_t* and void**
-           without compiler warnings about indirection levels */
+        // perform conversion between ae_int_t* and void**
+        // without compiler warnings about indirection levels
         union _u
         {
             PVOID volatile * volatile ptr;
@@ -563,10 +519,10 @@ void  ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v)
         } u;
         u.iptr = p;
 
-        /* atomic read for initial value */
+        // atomic read for initial value
         PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
 
-        /* increment cached value and store */
+        // increment cached value and store
         if( InterlockedCompareExchangePointer(u.ptr, (PVOID)(((char*)v0)+v), v0)==v0 )
             break;
     }
@@ -578,28 +534,26 @@ void  ae_optional_atomic_add_i(ae_int_t *p, ae_int_t v)
 #endif
 }
 
-/*************************************************************************
-This function belongs to the family of  "optional  atomics",  i.e.  atomic
-functions which either perform atomic changes - or do nothing at  all,  if
-current compiler settings do not allow us to generate atomic code.
-
-All "optional atomics" are synchronized, i.e. either all of them work - or
-no one of the works.
-
-This  particular  function  performs  atomic  subtraction on pointer-sized
-value, which must be pointer-size aligned.
-
-NOTE: this function is not intended to be extremely high performance  one,
-      so use it only when necessary.
-*************************************************************************/
+// This function belongs to the family of  "optional  atomics",  i.e.  atomic
+// functions which either perform atomic changes - or do nothing at  all,  if
+// current compiler settings do not allow us to generate atomic code.
+//
+// All "optional atomics" are synchronized, i.e. either all of them work - or
+// no one of the works.
+//
+// This  particular  function  performs  atomic  subtraction on pointer-sized
+// value, which must be pointer-size aligned.
+//
+// NOTE: this function is not intended to be extremely high performance  one,
+//       so use it only when necessary.
 void  ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v)
 {
     AE_CRITICAL_ASSERT(ae_misalignment(p,sizeof(void*))==0);
 #if AE_OS==AE_WINDOWS
     for(;;)
     {
-        /* perform conversion between ae_int_t* and void**
-           without compiler warnings about indirection levels */
+        // perform conversion between ae_int_t* and void**
+        // without compiler warnings about indirection levels
         union _u
         {
             PVOID volatile * volatile ptr;
@@ -607,10 +561,10 @@ void  ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v)
         } u;
         u.iptr = p;
 
-        /* atomic read for initial value, convert it to 1-byte pointer */
+        // atomic read for initial value, convert it to 1-byte pointer
         PVOID v0 = InterlockedCompareExchangePointer(u.ptr, NULL, NULL);
 
-        /* increment cached value and store */
+        // increment cached value and store
         if( InterlockedCompareExchangePointer(u.ptr, (PVOID)(((char*)v0)-v), v0)==v0 )
             break;
     }
@@ -623,13 +577,11 @@ void  ae_optional_atomic_sub_i(ae_int_t *p, ae_int_t v)
 }
 
 
-/*************************************************************************
-This function cleans up automatically managed memory before caller terminates
-ALGLIB executing by ae_break() or by simply stopping calling callback.
-
-For state!=NULL it calls thread_exception_handler() and the ae_state_clear().
-For state==NULL it does nothing.
-*************************************************************************/
+// This function cleans up automatically managed memory before caller terminates
+// ALGLIB executing by ae_break() or by simply stopping calling callback.
+//
+// For state!=NULL it calls thread_exception_handler() and the ae_state_clear().
+// For state==NULL it does nothing.
 void ae_clean_up_before_breaking(ae_state *state)
 {
     if( state!=NULL )
@@ -640,19 +592,17 @@ void ae_clean_up_before_breaking(ae_state *state)
     }
 }
 
-/*************************************************************************
-This function abnormally aborts program, using one of several ways:
-
-* for state!=NULL and state->break_jump being initialized with  call  to
-  ae_state_set_break_jump() - it performs longjmp() to return site.
-* otherwise, abort() is called
-
-In   all  cases,  for  state!=NULL  function  sets  state->last_error  and
-state->error_msg fields. It also clears state with ae_state_clear().
-
-If state is not NULL and state->thread_exception_handler  is  set,  it  is
-called prior to handling error and clearing state.
-*************************************************************************/
+// This function abnormally aborts program, using one of several ways:
+//
+// * for state!=NULL and state->break_jump being initialized with  call  to
+//   ae_state_set_break_jump() - it performs longjmp() to return site.
+// * otherwise, abort() is called
+//
+// In   all  cases,  for  state!=NULL  function  sets  state->last_error  and
+// state->error_msg fields. It also clears state with ae_state_clear().
+//
+// If state is not NULL and state->thread_exception_handler  is  set,  it  is
+// called prior to handling error and clearing state.
 void ae_break(ae_state *state, ae_error_type error_type, const char *msg)
 {
     if( state!=NULL )
@@ -674,34 +624,26 @@ void ae_break(ae_state *state, ae_error_type error_type, const char *msg)
 #if AE_MALLOC==AE_BASIC_STATIC_MALLOC
 void set_memory_pool(void *ptr, size_t size)
 {
-    /*
-     * Integrity checks
-     */
+    // Integrity checks
     AE_CRITICAL_ASSERT(sm_page_size==0);
     AE_CRITICAL_ASSERT(sm_page_cnt==0);
     AE_CRITICAL_ASSERT(sm_page_tbl==NULL);
     AE_CRITICAL_ASSERT(sm_mem==NULL);
     AE_CRITICAL_ASSERT(size>0);
 
-    /*
-     * Align pointer
-     */
+    // Align pointer
     size -= ae_misalignment(ptr, sizeof(ae_int_t));
     ptr   = ae_align(ptr, sizeof(ae_int_t));
 
-    /*
-     * Calculate page size and page count, prepare pointers to page table and memory
-     */
+    // Calculate page size and page count, prepare pointers to page table and memory
     sm_page_size = 256;
-    AE_CRITICAL_ASSERT(size>=(sm_page_size+sizeof(ae_int_t))+sm_page_size); /* we expect to have memory for at least one page + table entry + alignment */
+    AE_CRITICAL_ASSERT(size>=(sm_page_size+sizeof(ae_int_t))+sm_page_size); // we expect to have memory for at least one page + table entry + alignment
     sm_page_cnt = (size-sm_page_size)/(sm_page_size+sizeof(ae_int_t));
     AE_CRITICAL_ASSERT(sm_page_cnt>0);
     sm_page_tbl = (ae_int_t*)ptr;
     sm_mem      = (unsigned char*)ae_align(sm_page_tbl+sm_page_cnt, sm_page_size);
 
-    /*
-     * Mark all pages as free
-     */
+    // Mark all pages as free
     memset(sm_page_tbl, 0, sm_page_cnt*sizeof(ae_int_t));
 }
 
@@ -720,18 +662,18 @@ void* ae_static_malloc(size_t size, size_t alignment)
     if( _force_malloc_failure )
         return NULL;
 
-    /* check that page alignment and requested alignment match each other */
+    // check that page alignment and requested alignment match each other
     AE_CRITICAL_ASSERT(alignment<=sm_page_size);
     AE_CRITICAL_ASSERT((sm_page_size%alignment)==0);
 
-    /* search long enough sequence of pages */
+    // search long enough sequence of pages
     rq_pages = size/sm_page_size;
     if( size%sm_page_size )
         rq_pages++;
     cur_len = 0;
     for(i=0; i<sm_page_cnt;)
     {
-        /* determine length of the sequence of free pages */
+        // determine length of the sequence of free pages
         if( sm_page_tbl[i]==0 )
             cur_len++;
         else
@@ -742,10 +684,10 @@ void* ae_static_malloc(size_t size, size_t alignment)
             continue;
         }
 
-        /* found it? */
+        // found it?
         if( cur_len>=rq_pages )
         {
-            /* update counters (if flag is set) */
+            // update counters (if flag is set)
             if( _use_alloc_counter )
             {
                 ae_optional_atomic_add_i(&_alloc_counter, 1);
@@ -754,14 +696,14 @@ void* ae_static_malloc(size_t size, size_t alignment)
             if( _use_dbg_counters )
                 ae_optional_atomic_add_i(&_dbg_alloc_total, size);
 
-            /* mark pages and return */
+            // mark pages and return
             for(j=0; j<rq_pages; j++)
                 sm_page_tbl[i-j] = -1;
             sm_page_tbl[i-(rq_pages-1)] = rq_pages;
             return sm_mem+(i-(rq_pages-1))*sm_page_size;
         }
 
-        /* next element */
+        // next element
         i++;
     }
     return NULL;
@@ -782,7 +724,7 @@ void ae_static_free(void *block)
     for(i=0; i<page_cnt; i++)
         sm_page_tbl[page_idx+i] = 0;
 
-    /* update counters (if flag is set) */
+    // update counters (if flag is set)
     if( _use_alloc_counter )
         ae_optional_atomic_sub_i(&_alloc_counter, 1);
 }
@@ -796,7 +738,7 @@ void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free)
     AE_CRITICAL_ASSERT(sm_page_tbl!=NULL);
     AE_CRITICAL_ASSERT(sm_mem!=NULL);
 
-    /* scan page table */
+    // scan page table
     *bytes_used = 0;
     *bytes_free = 0;
     for(i=0; i<sm_page_cnt;)
@@ -832,10 +774,10 @@ void* aligned_malloc(size_t size, size_t alignment)
     if( _malloc_failure_after>0 && _alloc_counter_total>=_malloc_failure_after )
         return NULL;
 
-    /* allocate */
+    // allocate
     if( alignment<=1 )
     {
-        /* no alignment, just call alloc */
+        // no alignment, just call alloc
         void *block;
         void **p; ;
         block = malloc(sizeof(void*)+size);
@@ -847,19 +789,21 @@ void* aligned_malloc(size_t size, size_t alignment)
     }
     else
     {
-        /* align */
+        // align
         void *block;
         block = malloc(alignment-1+sizeof(void*)+size);
         if( block==NULL )
             return NULL;
         result = (char*)block+sizeof(void*);
-        /*if( (result-(char*)0)%alignment!=0 )
-            result += alignment - (result-(char*)0)%alignment;*/
+#if 0
+        if( (result-(char*)0)%alignment!=0 )
+            result += alignment - (result-(char*)0)%alignment;
+#endif
         result = (char*)ae_align(result, alignment);
         *((void**)(result-sizeof(void*))) = block;
     }
 
-    /* update counters (if flag is set) */
+    // update counters (if flag is set)
     if( _use_alloc_counter )
     {
         ae_optional_atomic_add_i(&_alloc_counter, 1);
@@ -868,7 +812,7 @@ void* aligned_malloc(size_t size, size_t alignment)
     if( _use_dbg_counters )
         ae_optional_atomic_add_i(&_dbg_alloc_total, (ae_int64_t)size);
 
-    /* return */
+    // return
     return (void*)result;
 #endif
 }
@@ -908,15 +852,13 @@ void* eternal_malloc(size_t size)
     return malloc(size);
 }
 
-/************************************************************************
-Allocate memory with automatic alignment.
-
-Returns NULL when zero size is specified.
-
-Error handling:
-* if state is NULL, returns NULL on allocation error
-* if state is not NULL, calls ae_break() on allocation error
-************************************************************************/
+// Allocate memory with automatic alignment.
+//
+// Returns NULL when zero size is specified.
+//
+// Error handling:
+// * if state is NULL, returns NULL on allocation error
+// * if state is not NULL, calls ae_break() on allocation error
 void* ae_malloc(size_t size, ae_state *state)
 {
     void *result;
@@ -934,15 +876,13 @@ void ae_free(void *p)
         aligned_free(p);
 }
 
-/************************************************************************
-Sets pointers to the matrix rows.
-
-* dst must be correctly initialized matrix
-* dst->data.ptr points to the beginning of memory block  allocated  for
-  row pointers.
-* dst->ptr - undefined (initialized during algorithm processing)
-* storage parameter points to the beginning of actual storage
-************************************************************************/
+// Sets pointers to the matrix rows.
+//
+// * dst must be correctly initialized matrix
+// * dst->data.ptr points to the beginning of memory block  allocated  for
+//   row pointers.
+// * dst->ptr - undefined (initialized during algorithm processing)
+// * storage parameter points to the beginning of actual storage
 void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage)
 {
     char *p_base;
@@ -960,10 +900,8 @@ void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage)
         dst->ptr.pp_void = NULL;
 }
 
-/************************************************************************
-Returns size of datatype.
-Zero for dynamic types like strings or multiple precision types.
-************************************************************************/
+// Returns size of datatype.
+// Zero for dynamic types like strings or multiple precision types.
 ae_int_t ae_sizeof(ae_datatype datatype)
 {
     switch(datatype)
@@ -976,26 +914,20 @@ ae_int_t ae_sizeof(ae_datatype datatype)
     }
 }
 
-/************************************************************************
-Checks that n bytes pointed by ptr are zero.
-
-This function is used in the constructors to check that  instance  fields
-on entry are correctly initialized by zeros.
-************************************************************************/
+// Checks that n bytes pointed by ptr are zero.
+//
+// This function is used in the constructors to check that  instance  fields
+// on entry are correctly initialized by zeros.
 ae_bool ae_check_zeros(const void *ptr, ae_int_t n)
 {
     ae_int_t nu, nr, i;
     unsigned long long c = 0x0;
 
-    /*
-     * determine leading and trailing lengths
-     */
+    // determine leading and trailing lengths
     nu = n/sizeof(unsigned long long);
     nr = n%sizeof(unsigned long long);
 
-    /*
-     * handle leading nu long long elements
-     */
+    // handle leading nu long long elements
     if( nu>0 )
     {
         const unsigned long long *p_ull;
@@ -1004,9 +936,7 @@ ae_bool ae_check_zeros(const void *ptr, ae_int_t n)
             c |= p_ull[i];
     }
 
-    /*
-     * handle trailing nr char elements
-     */
+    // handle trailing nr char elements
     if( nr>0 )
     {
         const unsigned char *p_uc;
@@ -1015,21 +945,17 @@ ae_bool ae_check_zeros(const void *ptr, ae_int_t n)
             c |= p_uc[i];
     }
 
-    /*
-     * done
-     */
+    // done
     return c==0x0;
 }
 
 
-/************************************************************************
-This  dummy  function  is  used to prevent compiler messages about unused
-locals in automatically generated code.
-
-It makes nothing - just accepts pointer, "touches" it - and that is  all.
-It performs several tricky operations without side effects which  confuse
-compiler so it does not compain about unused locals in THIS function.
-************************************************************************/
+// This  dummy  function  is  used to prevent compiler messages about unused
+// locals in automatically generated code.
+//
+// It makes nothing - just accepts pointer, "touches" it - and that is  all.
+// It performs several tricky operations without side effects which  confuse
+// compiler so it does not compain about unused locals in THIS function.
 void ae_touch_ptr(void *p)
 {
     void * volatile fake_variable0 = p;
@@ -1037,30 +963,24 @@ void ae_touch_ptr(void *p)
     fake_variable0 = fake_variable1;
 }
 
-/************************************************************************
-This function initializes ALGLIB environment state.
-
-NOTES:
-* stacks contain no frames, so ae_make_frame() must be called before
-  attaching dynamic blocks. Without it ae_leave_frame() will cycle
-  forever (which is intended behavior).
-************************************************************************/
+// This function initializes ALGLIB environment state.
+//
+// NOTES:
+// * stacks contain no frames, so ae_make_frame() must be called before
+//   attaching dynamic blocks. Without it ae_leave_frame() will cycle
+//   forever (which is intended behavior).
 void ae_state_init(ae_state *state)
 {
     ae_int32_t *vp;
 
-    /*
-     * Set flags
-     */
+    // Set flags
     state->flags = 0x0;
 
-    /*
-     * p_next points to itself because:
-     * * correct program should be able to detect end of the list
-     *   by looking at the ptr field.
-     * * NULL p_next may be used to distinguish automatic blocks
-     *   (in the list) from non-automatic (not in the list)
-     */
+    // p_next points to itself because:
+    // * correct program should be able to detect end of the list
+    //   by looking at the ptr field.
+    // * NULL p_next may be used to distinguish automatic blocks
+    //   (in the list) from non-automatic (not in the list)
     state->last_block.p_next = &(state->last_block);
     state->last_block.deallocator = NULL;
     state->last_block.ptr = DYN_BOTTOM;
@@ -1068,9 +988,7 @@ void ae_state_init(ae_state *state)
     state->break_jump = NULL;
     state->error_msg = "";
 
-    /*
-     * determine endianness and initialize precomputed IEEE special quantities.
-     */
+    // determine endianness and initialize precomputed IEEE special quantities.
     state->endianness = ae_get_endianness();
     if( state->endianness==AE_LITTLE_ENDIAN )
     {
@@ -1099,19 +1017,15 @@ void ae_state_init(ae_state *state)
     else
         abort();
 
-    /*
-     * set threading information
-     */
+    // set threading information
     state->worker_thread = NULL;
     state->parent_task = NULL;
     state->thread_exception_handler = NULL;
 }
 
 
-/************************************************************************
-This function clears ALGLIB environment state.
-All dynamic data controlled by state are freed.
-************************************************************************/
+// This function clears ALGLIB environment state.
+// All dynamic data controlled by state are freed.
 void ae_state_clear(ae_state *state)
 {
     while( state->p_top_block->ptr!=DYN_BOTTOM )
@@ -1119,37 +1033,31 @@ void ae_state_clear(ae_state *state)
 }
 
 
-/************************************************************************
-This function sets jump buffer for error handling.
-
-buf may be NULL.
-************************************************************************/
+// This function sets jump buffer for error handling.
+//
+// buf may be NULL.
 void ae_state_set_break_jump(ae_state *state, jmp_buf *buf)
 {
     state->break_jump = buf;
 }
 
 
-/************************************************************************
-This function sets flags member of the ae_state structure
-
-buf may be NULL.
-************************************************************************/
+// This function sets flags member of the ae_state structure
+//
+// buf may be NULL.
 void ae_state_set_flags(ae_state *state, ae_uint64_t flags)
 {
     state->flags = flags;
 }
 
 
-/************************************************************************
-This function makes new stack frame.
-
-This function takes two parameters: environment state and pointer to  the
-dynamic block which will be used as indicator  of  the  frame  beginning.
-This dynamic block must be initialized by caller and mustn't  be changed/
-deallocated/reused till ae_leave_frame called. It may be global or  local
-variable (local is even better).
-************************************************************************/
+// This function makes new stack frame.
+//
+// This function takes two parameters: environment state and pointer to  the
+// dynamic block which will be used as indicator  of  the  frame  beginning.
+// This dynamic block must be initialized by caller and mustn't  be changed/
+// deallocated/reused till ae_leave_frame called. It may be global or  local
+// variable (local is even better).
 void ae_frame_make(ae_state *state, ae_frame *tmp)
 {
     tmp->db_marker.p_next = state->p_top_block;
@@ -1159,10 +1067,8 @@ void ae_frame_make(ae_state *state, ae_frame *tmp)
 }
 
 
-/************************************************************************
-This function leaves current stack frame and deallocates all automatic
-dynamic blocks which were attached to this frame.
-************************************************************************/
+// This function leaves current stack frame and deallocates all automatic
+// dynamic blocks which were attached to this frame.
 void ae_frame_leave(ae_state *state)
 {
     while( state->p_top_block->ptr!=DYN_FRAME && state->p_top_block->ptr!=DYN_BOTTOM)
@@ -1175,17 +1081,15 @@ void ae_frame_leave(ae_state *state)
 }
 
 
-/************************************************************************
-This function attaches block to the dynamic block list
-
-block               block
-state               ALGLIB environment state
-
-This function does NOT generate exceptions.
-
-NOTES:
-* never call it for special blocks which marks frame boundaries!
-************************************************************************/
+// This function attaches block to the dynamic block list
+//
+// block               block
+// state               ALGLIB environment state
+//
+// This function does NOT generate exceptions.
+//
+// NOTES:
+// * never call it for special blocks which marks frame boundaries!
 void ae_db_attach(ae_dyn_block *block, ae_state *state)
 {
     block->p_next = state->p_top_block;
@@ -1193,37 +1097,33 @@ void ae_db_attach(ae_dyn_block *block, ae_state *state)
 }
 
 
-/************************************************************************
-This function initializes dynamic block:
-
-block               destination block, MUST be zero-filled on entry
-size                size (in bytes), >=0.
-state               ALGLIB environment state, non-NULL
-make_automatic      if true, vector is added to the dynamic block list
-
-block is assumed to be uninitialized, its fields are ignored. You may
-call this function with zero size in order to register block in the
-dynamic list.
-
-Error handling: calls ae_break() on allocation error. Block is left in
-valid state (empty, but valid).
-
-NOTES:
-* never call it for blocks which are already in the list; use ae_db_realloc
-  for already allocated blocks.
-
-NOTE: no memory allocation is performed for initialization with size=0
-************************************************************************/
+// This function initializes dynamic block:
+//
+// block               destination block, MUST be zero-filled on entry
+// size                size (in bytes), >=0.
+// state               ALGLIB environment state, non-NULL
+// make_automatic      if true, vector is added to the dynamic block list
+//
+// block is assumed to be uninitialized, its fields are ignored. You may
+// call this function with zero size in order to register block in the
+// dynamic list.
+//
+// Error handling: calls ae_break() on allocation error. Block is left in
+// valid state (empty, but valid).
+//
+// NOTES:
+// * never call it for blocks which are already in the list; use ae_db_realloc
+//   for already allocated blocks.
+//
+// NOTE: no memory allocation is performed for initialization with size=0
 void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, ae_bool make_automatic)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
     AE_CRITICAL_ASSERT(ae_check_zeros(block,sizeof(*block)));
 
-    /*
-     * NOTE: these strange dances around block->ptr are necessary
-     *       in order to correctly handle possible exceptions during
-     *       memory allocation.
-     */
+    // NOTE: these strange dances around block->ptr are necessary
+    //       in order to correctly handle possible exceptions during
+    //       memory allocation.
     ae_assert(size>=0, "ae_db_init(): negative size", state);
     block->ptr = NULL;
     block->valgrind_hint = NULL;
@@ -1242,34 +1142,30 @@ void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, ae_bool mak
 }
 
 
-/************************************************************************
-This function realloc's dynamic block:
-
-block               destination block (initialized)
-size                new size (in bytes)
-state               ALGLIB environment state
-
-block is assumed to be initialized.
-
-This function:
-* deletes old contents
-* preserves automatic state
-
-Error handling: calls ae_break() on allocation error. Block is left in
-valid state - empty, but valid.
-
-NOTES:
-* never call it for special blocks which mark frame boundaries!
-************************************************************************/
+// This function realloc's dynamic block:
+//
+// block               destination block (initialized)
+// size                new size (in bytes)
+// state               ALGLIB environment state
+//
+// block is assumed to be initialized.
+//
+// This function:
+// * deletes old contents
+// * preserves automatic state
+//
+// Error handling: calls ae_break() on allocation error. Block is left in
+// valid state - empty, but valid.
+//
+// NOTES:
+// * never call it for special blocks which mark frame boundaries!
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
 
-    /*
-     * NOTE: these strange dances around block->ptr are necessary
-     *       in order to correctly handle possible exceptions during
-     *       memory allocation.
-     */
+    // NOTE: these strange dances around block->ptr are necessary
+    //       in order to correctly handle possible exceptions during
+    //       memory allocation.
     ae_assert(size>=0, "ae_db_realloc(): negative size", state);
     if( block->ptr!=NULL )
     {
@@ -1283,16 +1179,14 @@ void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state)
 }
 
 
-/************************************************************************
-This function clears dynamic block (releases  all  dynamically  allocated
-memory). Dynamic block may be in automatic management list - in this case
-it will NOT be removed from list.
-
-block               destination block (initialized)
-
-NOTES:
-* never call it for special blocks which marks frame boundaries!
-************************************************************************/
+// This function clears dynamic block (releases  all  dynamically  allocated
+// memory). Dynamic block may be in automatic management list - in this case
+// it will NOT be removed from list.
+//
+// block               destination block (initialized)
+//
+// NOTES:
+// * never call it for special blocks which marks frame boundaries!
 void ae_db_free(ae_dyn_block *block)
 {
     if( block->ptr!=NULL )
@@ -1302,14 +1196,12 @@ void ae_db_free(ae_dyn_block *block)
     block->deallocator = ae_free;
 }
 
-/************************************************************************
-This function swaps contents of two dynamic blocks (pointers and
-deallocators) leaving other parameters (automatic management settings,
-etc.) unchanged.
-
-NOTES:
-* never call it for special blocks which marks frame boundaries!
-************************************************************************/
+// This function swaps contents of two dynamic blocks (pointers and
+// deallocators) leaving other parameters (automatic management settings,
+// etc.) unchanged.
+//
+// NOTES:
+// * never call it for special blocks which marks frame boundaries!
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2)
 {
     void (*deallocator)(void*) = NULL;
@@ -1329,38 +1221,34 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2)
     block2->deallocator = deallocator;
 }
 
-/*************************************************************************
-This function creates ae_vector.
-Vector size may be zero. Vector contents is uninitialized.
-
-dst                 destination vector, MUST be zero-filled (we  check  it
-                    and call abort() if *dst is non-zero; the rationale is
-                    that we can not correctly handle errors in constructors
-                    without zero-filling).
-size                vector size, may be zero
-datatype            guess what...
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-NOTE: no memory allocation is performed for initialization with size=0
-*************************************************************************/
+// This function creates ae_vector.
+// Vector size may be zero. Vector contents is uninitialized.
+//
+// dst                 destination vector, MUST be zero-filled (we  check  it
+//                     and call abort() if *dst is non-zero; the rationale is
+//                     that we can not correctly handle errors in constructors
+//                     without zero-filling).
+// size                vector size, may be zero
+// datatype            guess what...
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// NOTE: no memory allocation is performed for initialization with size=0
 void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, ae_bool make_automatic)
 {
-    /*
-     * Integrity checks
-     */
+    // Integrity checks
     AE_CRITICAL_ASSERT(state!=NULL);
     AE_CRITICAL_ASSERT(ae_check_zeros(dst,sizeof(*dst)));
     ae_assert(size>=0, "ae_vector_init(): negative size", state);
 
-    /* prepare for possible errors during allocation */
+    // prepare for possible errors during allocation
     dst->cnt = 0;
     dst->ptr.p_ptr = NULL;
 
-    /* init */
+    // init
     ae_db_init(&dst->data, size*ae_sizeof(datatype), state, make_automatic);
     dst->cnt = size;
     dst->datatype = datatype;
@@ -1369,23 +1257,21 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_stat
 }
 
 
-/************************************************************************
-This function creates copy of ae_vector. New copy of the data is created,
-which is managed and owned by newly initialized vector.
-
-dst                 destination vector, MUST be zero-filled (we  check  it
-                    and call abort() if *dst is non-zero; the rationale is
-                    that we can not correctly handle errors in constructors
-                    without zero-filling).
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function creates copy of ae_vector. New copy of the data is created,
+// which is managed and owned by newly initialized vector.
+//
+// dst                 destination vector, MUST be zero-filled (we  check  it
+//                     and call abort() if *dst is non-zero; the rationale is
+//                     that we can not correctly handle errors in constructors
+//                     without zero-filling).
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, ae_bool make_automatic)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1395,25 +1281,23 @@ void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, ae_boo
         memmove(dst->ptr.p_ptr, src->ptr.p_ptr, (size_t)(src->cnt*ae_sizeof(src->datatype)));
 }
 
-/************************************************************************
-This function initializes ae_vector using X-structure as source. New copy
-of data is created, which is owned/managed by ae_vector  structure.  Both
-structures (source and destination) remain completely  independent  after
-this call.
-
-dst                 destination vector, MUST be zero-filled (we  check  it
-                    and call abort() if *dst is non-zero; the rationale is
-                    that we can not correctly handle errors in constructors
-                    without zero-filling).
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function initializes ae_vector using X-structure as source. New copy
+// of data is created, which is owned/managed by ae_vector  structure.  Both
+// structures (source and destination) remain completely  independent  after
+// this call.
+//
+// dst                 destination vector, MUST be zero-filled (we  check  it
+//                     and call abort() if *dst is non-zero; the rationale is
+//                     that we can not correctly handle errors in constructors
+//                     without zero-filling).
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1423,30 +1307,28 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bo
         memmove(dst->ptr.p_ptr, src->x_ptr.p_ptr, (size_t)(((ae_int_t)src->cnt)*ae_sizeof((ae_datatype)src->datatype)));
 }
 
-/************************************************************************
-This function initializes ae_vector using X-structure as source.
-
-New vector is attached to source:
-* DST shares memory with SRC
-* both DST and SRC are writable - all writes to DST  change  elements  of
-  SRC and vice versa.
-* DST can be reallocated with ae_vector_set_length(), in  this  case  SRC
-  remains untouched
-* SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-
-NOTE: is_attached field is set  to  ae_true  in  order  to  indicate  that
-      vector does not own its memory.
-
-dst                 destination vector
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function initializes ae_vector using X-structure as source.
+//
+// New vector is attached to source:
+// * DST shares memory with SRC
+// * both DST and SRC are writable - all writes to DST  change  elements  of
+//   SRC and vice versa.
+// * DST can be reallocated with ae_vector_set_length(), in  this  case  SRC
+//   remains untouched
+// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
+//
+// NOTE: is_attached field is set  to  ae_true  in  order  to  indicate  that
+//       vector does not own its memory.
+//
+// dst                 destination vector
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic)
 {
     volatile ae_int_t cnt;
@@ -1456,38 +1338,36 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 
     cnt = (ae_int_t)src->cnt;
 
-    /* ensure that size is correct */
+    // ensure that size is correct
     ae_assert(cnt==src->cnt,  "ae_vector_init_attach_to_x(): 32/64 overflow", state);
     ae_assert(cnt>=0,         "ae_vector_init_attach_to_x(): negative length", state);
 
-    /* prepare for possible errors during allocation */
+    // prepare for possible errors during allocation
     dst->cnt = 0;
     dst->ptr.p_ptr = NULL;
     dst->datatype = (ae_datatype)src->datatype;
 
-    /* zero-size init in order to correctly register in the frame */
+    // zero-size init in order to correctly register in the frame
     ae_db_init(&dst->data, 0, state, make_automatic);
 
-    /* init */
+    // init
     dst->cnt = cnt;
     dst->ptr.p_ptr = src->x_ptr.p_ptr;
     dst->is_attached = ae_true;
 }
 
-/************************************************************************
-This function changes length of ae_vector.
-
-dst                 destination vector
-newsize             vector size, may be zero
-state               ALGLIB environment state, can not be NULL
-
-Error handling: calls ae_break() on allocation error
-
-NOTES:
-* vector must be initialized
-* all contents is destroyed during setlength() call
-* new size may be zero.
-************************************************************************/
+// This function changes length of ae_vector.
+//
+// dst                 destination vector
+// newsize             vector size, may be zero
+// state               ALGLIB environment state, can not be NULL
+//
+// Error handling: calls ae_break() on allocation error
+//
+// NOTES:
+// * vector must be initialized
+// * all contents is destroyed during setlength() call
+// * new size may be zero.
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1495,7 +1375,7 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state)
     if( dst->cnt==newsize )
         return;
 
-    /* realloc, being ready for exception during reallocation (cnt=ptr=0 on entry) */
+    // realloc, being ready for exception during reallocation (cnt=ptr=0 on entry)
     dst->cnt = 0;
     dst->ptr.p_ptr = NULL;
     ae_db_realloc(&dst->data, newsize*ae_sizeof(dst->datatype), state);
@@ -1503,20 +1383,18 @@ void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state)
     dst->ptr.p_ptr = dst->data.ptr;
 }
 
-/************************************************************************
-This function resized ae_vector, preserving previously existing elements.
-Values of elements added during vector growth is undefined.
-
-dst                 destination vector
-newsize             vector size, may be zero
-state               ALGLIB environment state, can not be NULL
-
-Error handling: calls ae_break() on allocation error
-
-NOTES:
-* vector must be initialized
-* new size may be zero.
-************************************************************************/
+// This function resized ae_vector, preserving previously existing elements.
+// Values of elements added during vector growth is undefined.
+//
+// dst                 destination vector
+// newsize             vector size, may be zero
+// state               ALGLIB environment state, can not be NULL
+//
+// Error handling: calls ae_break() on allocation error
+//
+// NOTES:
+// * vector must be initialized
+// * new size may be zero.
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state)
 {
     ae_vector tmp;
@@ -1532,20 +1410,18 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state)
 }
 
 
-/************************************************************************
-This  function  provides  "CLEAR"  functionality  for vector (contents is
-cleared, but structure still left in valid state).
-
-The  function clears vector contents (releases all dynamically  allocated
-memory). Vector may be in automatic management list  -  in this  case  it
-will NOT be removed from list.
-
-IMPORTANT: this function does NOT invalidates dst; it just  releases  all
-dynamically allocated storage, but dst still may be used  after  call  to
-ae_vector_set_length().
-
-dst                 destination vector
-************************************************************************/
+// This  function  provides  "CLEAR"  functionality  for vector (contents is
+// cleared, but structure still left in valid state).
+//
+// The  function clears vector contents (releases all dynamically  allocated
+// memory). Vector may be in automatic management list  -  in this  case  it
+// will NOT be removed from list.
+//
+// IMPORTANT: this function does NOT invalidates dst; it just  releases  all
+// dynamically allocated storage, but dst still may be used  after  call  to
+// ae_vector_set_length().
+//
+// dst                 destination vector
 void ae_vector_clear(ae_vector *dst)
 {
     dst->cnt = 0;
@@ -1555,23 +1431,19 @@ void ae_vector_clear(ae_vector *dst)
 }
 
 
-/************************************************************************
-This  function  provides "DESTROY"  functionality for vector (contents is
-cleared, all internal structures are destroyed). For vectors it  is  same
-as CLEAR.
-
-dst                 destination vector
-************************************************************************/
+// This  function  provides "DESTROY"  functionality for vector (contents is
+// cleared, all internal structures are destroyed). For vectors it  is  same
+// as CLEAR.
+//
+// dst                 destination vector
 void ae_vector_destroy(ae_vector *dst)
 {
     ae_vector_clear(dst);
 }
 
 
-/************************************************************************
-This function efficiently swaps contents of two vectors, leaving other
-pararemeters (automatic management, etc.) unchanged.
-************************************************************************/
+// This function efficiently swaps contents of two vectors, leaving other
+// pararemeters (automatic management, etc.) unchanged.
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2)
 {
     ae_int_t cnt;
@@ -1594,26 +1466,24 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2)
     vec2->ptr.p_ptr = p_ptr;
 }
 
-/************************************************************************
-This function creates ae_matrix.
-
-Matrix size may be zero, in such cases both rows and cols are zero.
-Matrix contents is uninitialized.
-
-dst                 destination matrix, must be zero-filled
-rows                rows count
-cols                cols count
-datatype            element type
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, matrix will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-
-NOTE: no memory allocation is performed for initialization with rows=cols=0
-************************************************************************/
+// This function creates ae_matrix.
+//
+// Matrix size may be zero, in such cases both rows and cols are zero.
+// Matrix contents is uninitialized.
+//
+// dst                 destination matrix, must be zero-filled
+// rows                rows count
+// cols                cols count
+// datatype            element type
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+//
+// NOTE: no memory allocation is performed for initialization with rows=cols=0
 void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, ae_bool make_automatic)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1621,7 +1491,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 
     ae_assert(rows>=0 && cols>=0, "ae_matrix_init(): negative length", state);
 
-    /* if one of rows/cols is zero, another MUST be too; perform quick exit */
+    // if one of rows/cols is zero, another MUST be too; perform quick exit
     if( rows==0 || cols==0 )
     {
         dst->rows = 0;
@@ -1634,7 +1504,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
         return;
     }
 
-    /* init, being ready for exception during allocation (rows=cols=ptr=NULL on entry) */
+    // init, being ready for exception during allocation (rows=cols=ptr=NULL on entry)
     dst->is_attached = ae_false;
     dst->rows = 0;
     dst->cols = 0;
@@ -1650,19 +1520,17 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 }
 
 
-/************************************************************************
-This function creates copy of ae_matrix. A new copy of the data is created.
-
-dst                 destination matrix, must be zero-filled
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, matrix will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function creates copy of ae_matrix. A new copy of the data is created.
+//
+// dst                 destination matrix, must be zero-filled
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, ae_bool make_automatic)
 {
     ae_int_t i;
@@ -1678,22 +1546,20 @@ void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, ae_boo
 }
 
 
-/************************************************************************
-This function initializes ae_matrix using X-structure as source. New copy
-of data is created, which is owned/managed by ae_matrix  structure.  Both
-structures (source and destination) remain completely  independent  after
-this call.
-
-dst                 destination matrix, must be zero-filled
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, matrix will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function initializes ae_matrix using X-structure as source. New copy
+// of data is created, which is owned/managed by ae_matrix  structure.  Both
+// structures (source and destination) remain completely  independent  after
+// this call.
+//
+// dst                 destination matrix, must be zero-filled
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic)
 {
     char *p_src_row;
@@ -1713,27 +1579,25 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bo
 }
 
 
-/************************************************************************
-This function initializes ae_matrix using X-structure as source.
-
-New matrix is attached to source:
-* DST shares memory with SRC
-* both DST and SRC are writable - all writes to DST  change  elements  of
-  SRC and vice versa.
-* DST can be reallocated with ae_matrix_set_length(), in  this  case  SRC
-  remains untouched
-* SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
-
-dst                 destination matrix, must be zero-filled
-src                 well, it is source
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, matrix will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function initializes ae_matrix using X-structure as source.
+//
+// New matrix is attached to source:
+// * DST shares memory with SRC
+// * both DST and SRC are writable - all writes to DST  change  elements  of
+//   SRC and vice versa.
+// * DST can be reallocated with ae_matrix_set_length(), in  this  case  SRC
+//   remains untouched
+// * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
+//
+// dst                 destination matrix, must be zero-filled
+// src                 well, it is source
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, matrix will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic)
 {
     ae_int_t rows, cols;
@@ -1744,22 +1608,22 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
     rows = (ae_int_t)src->rows;
     cols = (ae_int_t)src->cols;
 
-    /* check that X-source is densely packed */
+    // check that X-source is densely packed
     ae_assert(src->cols==src->stride, "ae_matrix_init_attach_to_x(): unsupported stride", state);
 
-    /* ensure that size is correct */
+    // ensure that size is correct
     ae_assert(rows==src->rows,      "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
     ae_assert(cols==src->cols,      "ae_matrix_init_attach_to_x(): 32/64 overflow", state);
     ae_assert(rows>=0 && cols>=0,   "ae_matrix_init_attach_to_x(): negative length", state);
 
-    /* if one of rows/cols is zero, another MUST be too */
+    // if one of rows/cols is zero, another MUST be too
     if( rows==0 || cols==0 )
     {
         rows = 0;
         cols = 0;
     }
 
-    /* init, being ready for allocation error */
+    // init, being ready for allocation error
     dst->is_attached = ae_true;
     dst->rows = 0;
     dst->cols = 0;
@@ -1785,24 +1649,22 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
 }
 
 
-/************************************************************************
-This function changes length of ae_matrix.
-
-dst                 destination matrix
-rows                size, may be zero
-cols                size, may be zero
-state               ALGLIB environment state
-
-Error handling:
-* if state is NULL, returns ae_false on allocation error
-* if state is not NULL, calls ae_break() on allocation error
-* returns ae_true on success
-
-NOTES:
-* matrix must be initialized
-* all contents is destroyed during setlength() call
-* new size may be zero.
-************************************************************************/
+// This function changes length of ae_matrix.
+//
+// dst                 destination matrix
+// rows                size, may be zero
+// cols                size, may be zero
+// state               ALGLIB environment state
+//
+// Error handling:
+// * if state is NULL, returns ae_false on allocation error
+// * if state is not NULL, calls ae_break() on allocation error
+// * returns ae_true on success
+//
+// NOTES:
+// * matrix must be initialized
+// * all contents is destroyed during setlength() call
+// * new size may be zero.
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state *state)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1810,12 +1672,12 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
     if( dst->rows==rows && dst->cols==cols )
         return;
 
-    /* prepare stride */
+    // prepare stride
     dst->stride = cols;
     while( dst->stride*ae_sizeof(dst->datatype)%AE_DATA_ALIGN!=0 )
         dst->stride++;
 
-    /* realloc, being ready for an exception during reallocation (rows=cols=0 on entry) */
+    // realloc, being ready for an exception during reallocation (rows=cols=0 on entry)
     dst->rows = 0;
     dst->cols = 0;
     dst->ptr.pp_void = NULL;
@@ -1823,25 +1685,23 @@ void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state
     dst->rows = rows;
     dst->cols = cols;
 
-    /* update pointers to rows */
+    // update pointers to rows
     ae_matrix_update_row_pointers(dst, ae_align((char*)dst->data.ptr+dst->rows*sizeof(void*),AE_DATA_ALIGN));
 }
 
 
-/************************************************************************
-This  function  provides  "CLEAR"  functionality  for vector (contents is
-cleared, but structure still left in valid state).
-
-The  function clears matrix contents (releases all dynamically  allocated
-memory). Matrix may be in automatic management list  -  in this  case  it
-will NOT be removed from list.
-
-IMPORTANT: this function does NOT invalidates dst; it just  releases  all
-dynamically allocated storage, but dst still may be used  after  call  to
-ae_matrix_set_length().
-
-dst                 destination matrix
-************************************************************************/
+// This  function  provides  "CLEAR"  functionality  for vector (contents is
+// cleared, but structure still left in valid state).
+//
+// The  function clears matrix contents (releases all dynamically  allocated
+// memory). Matrix may be in automatic management list  -  in this  case  it
+// will NOT be removed from list.
+//
+// IMPORTANT: this function does NOT invalidates dst; it just  releases  all
+// dynamically allocated storage, but dst still may be used  after  call  to
+// ae_matrix_set_length().
+//
+// dst                 destination matrix
 void ae_matrix_clear(ae_matrix *dst)
 {
     dst->rows = 0;
@@ -1853,24 +1713,20 @@ void ae_matrix_clear(ae_matrix *dst)
 }
 
 
-/************************************************************************
-This  function  provides  "DESTROY" functionality for matrix (contents is
-cleared, but structure still left in valid state).
-
-For matrices it is same as CLEAR.
-
-dst                 destination matrix
-************************************************************************/
+// This  function  provides  "DESTROY" functionality for matrix (contents is
+// cleared, but structure still left in valid state).
+//
+// For matrices it is same as CLEAR.
+//
+// dst                 destination matrix
 void ae_matrix_destroy(ae_matrix *dst)
 {
     ae_matrix_clear(dst);
 }
 
 
-/************************************************************************
-This function efficiently swaps contents of two vectors, leaving other
-pararemeters (automatic management, etc.) unchanged.
-************************************************************************/
+// This function efficiently swaps contents of two vectors, leaving other
+// pararemeters (automatic management, etc.) unchanged.
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2)
 {
     ae_int_t rows;
@@ -1904,25 +1760,23 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2)
 }
 
 
-/************************************************************************
-This function creates smart pointer structure.
-
-dst                 destination smart pointer, must be zero-filled
-subscriber          pointer to pointer which receives updates in the
-                    internal object stored in ae_smart_ptr. Any update to
-                    dst->ptr is translated to subscriber. Can be NULL.
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, pointer will be registered in the current frame
-                    of the state structure;
-
-Error handling:
-* on failure calls ae_break() with NULL state pointer. Usually it  results
-  in abort() call.
-
-After initialization, smart pointer stores NULL pointer.
-************************************************************************/
+// This function creates smart pointer structure.
+//
+// dst                 destination smart pointer, must be zero-filled
+// subscriber          pointer to pointer which receives updates in the
+//                     internal object stored in ae_smart_ptr. Any update to
+//                     dst->ptr is translated to subscriber. Can be NULL.
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, pointer will be registered in the current frame
+//                     of the state structure;
+//
+// Error handling:
+// * on failure calls ae_break() with NULL state pointer. Usually it  results
+//   in abort() call.
+//
+// After initialization, smart pointer stores NULL pointer.
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, ae_bool make_automatic)
 {
     AE_CRITICAL_ASSERT(state!=NULL);
@@ -1940,15 +1794,13 @@ void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, ae
 }
 
 
-/************************************************************************
-This function clears smart pointer structure.
-
-dst                 destination smart pointer.
-
-After call to this function smart pointer contains NULL reference,  which
-is  propagated  to  its  subscriber  (in  cases  non-NULL  subscruber was
-specified during pointer creation).
-************************************************************************/
+// This function clears smart pointer structure.
+//
+// dst                 destination smart pointer.
+//
+// After call to this function smart pointer contains NULL reference,  which
+// is  propagated  to  its  subscriber  (in  cases  non-NULL  subscruber was
+// specified during pointer creation).
 void ae_smart_ptr_clear(void *_dst)
 {
     ae_smart_ptr *dst = (ae_smart_ptr*)_dst;
@@ -1967,36 +1819,32 @@ void ae_smart_ptr_clear(void *_dst)
 }
 
 
-/************************************************************************
-This function dstroys smart pointer structure (same as clearing it).
-
-dst                 destination smart pointer.
-************************************************************************/
+// This function dstroys smart pointer structure (same as clearing it).
+//
+// dst                 destination smart pointer.
 void ae_smart_ptr_destroy(void *_dst)
 {
     ae_smart_ptr_clear(_dst);
 }
 
 
-/************************************************************************
-This function assigns pointer to ae_smart_ptr structure.
-
-dst                 destination smart pointer.
-new_ptr             new pointer to assign
-is_owner            whether smart pointer owns new_ptr
-is_dynamic          whether object is dynamic - clearing such object
-                    requires BOTH calling destructor function AND calling
-                    ae_free() for memory occupied by object.
-destroy             destructor function
-
-In case smart pointer already contains non-NULL value and owns this value,
-it is freed before assigning new pointer.
-
-Changes in pointer are propagated to its  subscriber  (in  case  non-NULL
-subscriber was specified during pointer creation).
-
-You can specify NULL new_ptr, in which case is_owner/destroy are ignored.
-************************************************************************/
+// This function assigns pointer to ae_smart_ptr structure.
+//
+// dst                 destination smart pointer.
+// new_ptr             new pointer to assign
+// is_owner            whether smart pointer owns new_ptr
+// is_dynamic          whether object is dynamic - clearing such object
+//                     requires BOTH calling destructor function AND calling
+//                     ae_free() for memory occupied by object.
+// destroy             destructor function
+//
+// In case smart pointer already contains non-NULL value and owns this value,
+// it is freed before assigning new pointer.
+//
+// Changes in pointer are propagated to its  subscriber  (in  case  non-NULL
+// subscriber was specified during pointer creation).
+//
+// You can specify NULL new_ptr, in which case is_owner/destroy are ignored.
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_bool is_dynamic, void (*destroy)(void*))
 {
     if( dst->is_owner && dst->ptr!=NULL )
@@ -2024,17 +1872,15 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_
 }
 
 
-/************************************************************************
-This function releases pointer owned by ae_smart_ptr structure:
-* all internal fields are set to NULL
-* destructor function for internal pointer is NOT called even when we own
-  this pointer. After this call ae_smart_ptr releases  ownership  of  its
-  pointer and passes it to caller.
-* changes in pointer are propagated to its subscriber (in  case  non-NULL
-  subscriber was specified during pointer creation).
-
-dst                 destination smart pointer.
-************************************************************************/
+// This function releases pointer owned by ae_smart_ptr structure:
+// * all internal fields are set to NULL
+// * destructor function for internal pointer is NOT called even when we own
+//   this pointer. After this call ae_smart_ptr releases  ownership  of  its
+//   pointer and passes it to caller.
+// * changes in pointer are propagated to its subscriber (in  case  non-NULL
+//   subscriber was specified during pointer creation).
+//
+// dst                 destination smart pointer.
 void ae_smart_ptr_release(ae_smart_ptr *dst)
 {
     dst->is_owner = ae_false;
@@ -2045,37 +1891,35 @@ void ae_smart_ptr_release(ae_smart_ptr *dst)
         *(dst->subscriber) = NULL;
 }
 
-/************************************************************************
-This function copies contents of ae_vector (SRC) to x_vector (DST).
-
-This function should not be called for  DST  which  is  attached  to  SRC
-(opposite situation, when SRC is attached to DST, is possible).
-
-Depending on situation, following actions are performed
-* for SRC attached to DST, this function performs no actions (no need  to
-  do anything)
-* for independent vectors of different sizes it allocates storage in  DST
-  and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-  ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
-* for  independent  vectors   of  same  sizes  it does not perform memory
-  (re)allocation.  It  just  copies  SRC  to  already   existing   place.
-  DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
-  ACT_NEW_LOCATION), DST->owner is unmodified.
-
-dst                 destination vector
-src                 source, vector in x-format
-state               ALGLIB environment state
-
-NOTES:
-* dst is assumed to be initialized. Its contents is freed before  copying
-  data  from src  (if  size / type  are  different)  or  overwritten  (if
-  possible given destination size).
-************************************************************************/
+// This function copies contents of ae_vector (SRC) to x_vector (DST).
+//
+// This function should not be called for  DST  which  is  attached  to  SRC
+// (opposite situation, when SRC is attached to DST, is possible).
+//
+// Depending on situation, following actions are performed
+// * for SRC attached to DST, this function performs no actions (no need  to
+//   do anything)
+// * for independent vectors of different sizes it allocates storage in  DST
+//   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
+//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+// * for  independent  vectors   of  same  sizes  it does not perform memory
+//   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
+//   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
+//   ACT_NEW_LOCATION), DST->owner is unmodified.
+//
+// dst                 destination vector
+// src                 source, vector in x-format
+// state               ALGLIB environment state
+//
+// NOTES:
+// * dst is assumed to be initialized. Its contents is freed before  copying
+//   data  from src  (if  size / type  are  different)  or  overwritten  (if
+//   possible given destination size).
 void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state)
 {
     if( src->ptr.p_ptr == dst->x_ptr.p_ptr )
     {
-        /* src->ptr points to the beginning of dst, attached matrices, no need to copy */
+        // src->ptr points to the beginning of dst, attached matrices, no need to copy
         return;
     }
     if( dst->cnt!=src->cnt || dst->datatype!=src->datatype )
@@ -2105,32 +1949,30 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state)
         memmove(dst->x_ptr.p_ptr, src->ptr.p_ptr, (size_t)(src->cnt*ae_sizeof(src->datatype)));
 }
 
-/************************************************************************
-This function copies contents of ae_matrix to x_matrix.
-
-This function should not be called for  DST  which  is  attached  to  SRC
-(opposite situation, when SRC is attached to DST, is possible).
-
-Depending on situation, following actions are performed
-* for SRC attached to DST, this function performs no actions (no need  to
-  do anything)
-* for independent matrices of different sizes it allocates storage in DST
-  and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
-  ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
-* for  independent  matrices  of  same  sizes  it does not perform memory
-  (re)allocation.  It  just  copies  SRC  to  already   existing   place.
-  DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
-  ACT_NEW_LOCATION), DST->owner is unmodified.
-
-dst                 destination vector
-src                 source, matrix in x-format
-state               ALGLIB environment state
-
-NOTES:
-* dst is assumed to be initialized. Its contents is freed before  copying
-  data  from src  (if  size / type  are  different)  or  overwritten  (if
-  possible given destination size).
-************************************************************************/
+// This function copies contents of ae_matrix to x_matrix.
+//
+// This function should not be called for  DST  which  is  attached  to  SRC
+// (opposite situation, when SRC is attached to DST, is possible).
+//
+// Depending on situation, following actions are performed
+// * for SRC attached to DST, this function performs no actions (no need  to
+//   do anything)
+// * for independent matrices of different sizes it allocates storage in DST
+//   and copy contents of SRC  to  DST.  DST->last_action field  is  set  to
+//   ACT_NEW_LOCATION, and DST->owner is set to OWN_AE.
+// * for  independent  matrices  of  same  sizes  it does not perform memory
+//   (re)allocation.  It  just  copies  SRC  to  already   existing   place.
+//   DST->last_action   is   set   to    ACT_SAME_LOCATION  (unless  it  was
+//   ACT_NEW_LOCATION), DST->owner is unmodified.
+//
+// dst                 destination vector
+// src                 source, matrix in x-format
+// state               ALGLIB environment state
+//
+// NOTES:
+// * dst is assumed to be initialized. Its contents is freed before  copying
+//   data  from src  (if  size / type  are  different)  or  overwritten  (if
+//   possible given destination size).
 void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state)
 {
     char *p_src_row;
@@ -2139,7 +1981,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state)
     ae_int_t row_size;
     if( src->ptr.pp_void!=NULL && src->ptr.pp_void[0] == dst->x_ptr.p_ptr )
     {
-        /* src->ptr points to the beginning of dst, attached matrices, no need to copy */
+        // src->ptr points to the beginning of dst, attached matrices, no need to copy
         return;
     }
     if( dst->rows!=src->rows || dst->cols!=src->cols || dst->datatype!=src->datatype )
@@ -2177,21 +2019,19 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state)
     }
 }
 
-/************************************************************************
-This function attaches x_vector to ae_vector's contents.
-Ownership of memory allocated is not changed (it is still managed by
-ae_matrix).
-
-dst                 destination vector
-src                 source, vector in x-format
-state               ALGLIB environment state
-
-NOTES:
-* dst is assumed to be initialized. Its contents is freed before
-  attaching to src.
-* this function doesn't need ae_state parameter because it can't fail
-  (assuming correctly initialized src)
-************************************************************************/
+// This function attaches x_vector to ae_vector's contents.
+// Ownership of memory allocated is not changed (it is still managed by
+// ae_matrix).
+//
+// dst                 destination vector
+// src                 source, vector in x-format
+// state               ALGLIB environment state
+//
+// NOTES:
+// * dst is assumed to be initialized. Its contents is freed before
+//   attaching to src.
+// * this function doesn't need ae_state parameter because it can't fail
+//   (assuming correctly initialized src)
 void ae_x_attach_to_vector(x_vector *dst, ae_vector *src)
 {
     if( dst->owner==OWN_AE )
@@ -2203,21 +2043,19 @@ void ae_x_attach_to_vector(x_vector *dst, ae_vector *src)
     dst->owner = OWN_CALLER;
 }
 
-/************************************************************************
-This function attaches x_matrix to ae_matrix's contents.
-Ownership of memory allocated is not changed (it is still managed by
-ae_matrix).
-
-dst                 destination vector
-src                 source, matrix in x-format
-state               ALGLIB environment state
-
-NOTES:
-* dst is assumed to be initialized. Its contents is freed before
-  attaching to src.
-* this function doesn't need ae_state parameter because it can't fail
-  (assuming correctly initialized src)
-************************************************************************/
+// This function attaches x_matrix to ae_matrix's contents.
+// Ownership of memory allocated is not changed (it is still managed by
+// ae_matrix).
+//
+// dst                 destination vector
+// src                 source, matrix in x-format
+// state               ALGLIB environment state
+//
+// NOTES:
+// * dst is assumed to be initialized. Its contents is freed before
+//   attaching to src.
+// * this function doesn't need ae_state parameter because it can't fail
+//   (assuming correctly initialized src)
 void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src)
 {
     if( dst->owner==OWN_AE )
@@ -2231,12 +2069,10 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src)
     dst->owner = OWN_CALLER;
 }
 
-/************************************************************************
-This function clears x_vector. It does nothing  if vector is not owned by
-ALGLIB environment.
-
-dst                 vector
-************************************************************************/
+// This function clears x_vector. It does nothing  if vector is not owned by
+// ALGLIB environment.
+//
+// dst                 vector
 void x_vector_clear(x_vector *dst)
 {
     if( dst->owner==OWN_AE )
@@ -2245,66 +2081,56 @@ void x_vector_clear(x_vector *dst)
     dst->cnt = 0;
 }
 
-/************************************************************************
-Assertion
-
-For  non-NULL  state  it  allows  to  gracefully  leave  ALGLIB  session,
-removing all frames and deallocating registered dynamic data structure.
-
-For NULL state it just abort()'s program.
-
-IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
-           replaced by macro which does nothing. So, you may place actual
-           function calls at cond, and these will always be performed.
-************************************************************************/
+// Assertion
+//
+// For  non-NULL  state  it  allows  to  gracefully  leave  ALGLIB  session,
+// removing all frames and deallocating registered dynamic data structure.
+//
+// For NULL state it just abort()'s program.
+//
+// IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
+//            replaced by macro which does nothing. So, you may place actual
+//            function calls at cond, and these will always be performed.
 void ae_assert(ae_bool cond, const char *msg, ae_state *state)
 {
     if( !cond )
         ae_break(state, ERR_ASSERTION_FAILED, msg);
 }
 
-/************************************************************************
-CPUID
-
-Returns information about features CPU and compiler support.
-
-You must tell ALGLIB what CPU family is used by defining AE_CPU symbol
-(without this hint zero will be returned).
-
-Note: results of this function depend on both CPU and compiler;
-if compiler doesn't support SSE intrinsics, function won't set
-corresponding flag.
-************************************************************************/
+// CPUID
+//
+// Returns information about features CPU and compiler support.
+//
+// You must tell ALGLIB what CPU family is used by defining AE_CPU symbol
+// (without this hint zero will be returned).
+//
+// Note: results of this function depend on both CPU and compiler;
+// if compiler doesn't support SSE intrinsics, function won't set
+// corresponding flag.
 static volatile ae_bool _ae_cpuid_initialized = ae_false;
 static volatile ae_bool _ae_cpuid_has_sse2 = ae_false;
 static volatile ae_bool _ae_cpuid_has_avx2 = ae_false;
 static volatile ae_bool _ae_cpuid_has_fma  = ae_false;
 ae_int_t ae_cpuid()
 {
-    /*
-     * to speed up CPU detection we cache results from previous attempts
-     * there is no synchronization, but it is still thread safe.
-     *
-     * thread safety is guaranteed on all modern architectures which
-     * have following property: simultaneous writes by different cores
-     * to the same location will be executed in serial manner.
-     *
-     */
+    // to speed up CPU detection we cache results from previous attempts
+    // there is no synchronization, but it is still thread safe.
+    //
+    // thread safety is guaranteed on all modern architectures which
+    // have following property: simultaneous writes by different cores
+    // to the same location will be executed in serial manner.
+    //
     ae_int_t result;
 
-    /*
-     * if not initialized, determine system properties
-     */
+    // if not initialized, determine system properties
     if( !_ae_cpuid_initialized )
     {
-        /*
-         * SSE2
-         */
+        // SSE2
 #if defined(AE_CPU)
 #if (AE_CPU==AE_INTEL)
 #if AE_COMPILER==AE_MSVC
         {
-            /* SSE2 support */
+            // SSE2 support
             #if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
             int CPUInfo[4];
             __cpuid(CPUInfo, 1);
@@ -2312,13 +2138,13 @@ ae_int_t ae_cpuid()
                 _ae_cpuid_has_sse2 = ae_true;
             #endif
 
-            /* check OS support for XSAVE XGETBV */
+            // check OS support for XSAVE XGETBV
            #if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
             __cpuid(CPUInfo, 1);
             if( (CPUInfo[2]&(0x1<<27))!=0 )
                 if( (_xgetbv(0)&0x6)==0x6 )
                 {
-                    /* AVX2 support */
+                    // AVX2 support
                     #if defined(_ALGLIB_HAS_AVX2_INTRINSICS) && (_MSC_VER>=1600)
                     if( _ae_cpuid_has_sse2 )
                     {
@@ -2328,7 +2154,7 @@ ae_int_t ae_cpuid()
                     }
                     #endif
 
-                    /* FMA support */
+                    // FMA support
                     #if defined(_ALGLIB_HAS_FMA_INTRINSICS) && (_MSC_VER>=1600)
                     if( _ae_cpuid_has_avx2 )
                     {
@@ -2344,14 +2170,14 @@ ae_int_t ae_cpuid()
         {
             ae_int_t a,b,c,d;
 
-            /* SSE2 support */
+            // SSE2 support
             #if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
             __asm__ __volatile__ ("cpuid": "=a" (a), "=b" (b), "=c" (c), "=d" (d) : "a" (1));
             if( (d&0x04000000)!=0 )
                 _ae_cpuid_has_sse2 = ae_true;
             #endif
 
-            /* check OS support for XSAVE XGETBV */
+            // check OS support for XSAVE XGETBV
            #if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
             __asm__ __volatile__ ("cpuid": "=a" (a), "=b" (b), "=c" (c), "=d" (d) : "a" (1));
             if( (c&(0x1<<27))!=0 )
@@ -2359,7 +2185,7 @@ ae_int_t ae_cpuid()
                 __asm__ volatile ("xgetbv" : "=a" (a), "=d" (d) : "c" (0));
                 if( (a&0x6)==0x6 )
                 {
-                    /* AVX2 support */
+                    // AVX2 support
                     #if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
                     if( _ae_cpuid_has_sse2 )
                     {
@@ -2369,7 +2195,7 @@ ae_int_t ae_cpuid()
                     }
                     #endif
 
-                    /* FMA support */
+                    // FMA support
                     #if defined(_ALGLIB_HAS_FMA_INTRINSICS)
                     if( _ae_cpuid_has_avx2 )
                     {
@@ -2393,9 +2219,7 @@ ae_int_t ae_cpuid()
 #endif
 #endif
 #endif
-        /*
-         * Perform one more CPUID call to generate memory fence
-         */
+        // Perform one more CPUID call to generate memory fence
 #if AE_CPU==AE_INTEL
 #if AE_COMPILER==AE_MSVC
         { int CPUInfo[4]; __cpuid(CPUInfo, 1); }
@@ -2407,15 +2231,11 @@ ae_int_t ae_cpuid()
 #endif
 #endif
 
-        /*
-         * set initialization flag
-         */
+        // set initialization flag
         _ae_cpuid_initialized = ae_true;
     }
 
-    /*
-     * return
-     */
+    // return
     result = 0;
     if( _ae_cpuid_has_sse2 )
         result = result|CPU_SSE2;
@@ -2426,19 +2246,15 @@ ae_int_t ae_cpuid()
     return result;
 }
 
-/************************************************************************
-Activates tracing to file
-
-IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
-           threads will result in undefined  behavior.  Calling  it  when
-           some thread calls ALGLIB functions  may  result  in  undefined
-           behavior.
-************************************************************************/
+// Activates tracing to file
+//
+// IMPORTANT: this function is NOT thread-safe!  Calling  it  from  multiple
+//            threads will result in undefined  behavior.  Calling  it  when
+//            some thread calls ALGLIB functions  may  result  in  undefined
+//            behavior.
 void ae_trace_file(const char *tags, const char *filename)
 {
-    /*
-     * clean up previous call
-     */
+    // clean up previous call
     if( alglib_fclose_trace )
     {
         if( alglib_trace_file!=NULL )
@@ -2447,10 +2263,8 @@ void ae_trace_file(const char *tags, const char *filename)
         alglib_fclose_trace = ae_false;
     }
 
-    /*
-     * store ",tags," to buffer. Leading and trailing commas allow us
-     * to perform checks for various tags by simply calling strstr().
-     */
+    // store ",tags," to buffer. Leading and trailing commas allow us
+    // to perform checks for various tags by simply calling strstr().
     memset(alglib_trace_tags, 0, ALGLIB_TRACE_BUFFER_LEN);
     strcat(alglib_trace_tags, ",");
     strncat(alglib_trace_tags, tags, ALGLIB_TRACE_TAGS_LEN);
@@ -2458,17 +2272,13 @@ void ae_trace_file(const char *tags, const char *filename)
     for(int i=0; alglib_trace_tags[i]!=0; i++)
         alglib_trace_tags[i] = tolower(alglib_trace_tags[i]);
 
-    /*
-     * set up trace
-     */
+    // set up trace
     alglib_trace_type = ALGLIB_TRACE_FILE;
     alglib_trace_file = fopen(filename, "ab");
     alglib_fclose_trace = ae_true;
 }
 
-/************************************************************************
-Disables tracing
-************************************************************************/
+// Disables tracing
 void ae_trace_disable()
 {
     alglib_trace_type = ALGLIB_TRACE_NONE;
@@ -2478,18 +2288,16 @@ void ae_trace_disable()
     alglib_fclose_trace = ae_false;
 }
 
-/************************************************************************
-Checks whether specific kind of tracing is enabled
-************************************************************************/
+// Checks whether specific kind of tracing is enabled
 ae_bool ae_is_trace_enabled(const char *tag)
 {
     char buf[ALGLIB_TRACE_BUFFER_LEN];
 
-    /* check global trace status */
+    // check global trace status
     if( alglib_trace_type==ALGLIB_TRACE_NONE || alglib_trace_file==NULL )
         return ae_false;
 
-    /* copy tag to buffer, lowercase it */
+    // copy tag to buffer, lowercase it
     memset(buf, 0, ALGLIB_TRACE_BUFFER_LEN);
     strcat(buf, ",");
     strncat(buf, tag, ALGLIB_TRACE_TAGS_LEN);
@@ -2497,33 +2305,33 @@ ae_bool ae_is_trace_enabled(const char *tag)
     for(int i=0; buf[i]!=0; i++)
         buf[i] = tolower(buf[i]);
 
-    /* contains tag (followed by comma, which means exact match) */
+    // contains tag (followed by comma, which means exact match)
     buf[strlen(buf)-1] = ',';
     if( strstr(alglib_trace_tags,buf)!=NULL )
         return ae_true;
 
-    /* contains tag (followed by dot, which means match with child) */
+    // contains tag (followed by dot, which means match with child)
     buf[strlen(buf)-1] = '.';
     if( strstr(alglib_trace_tags,buf)!=NULL )
         return ae_true;
 
-    /* nothing */
+    // nothing
     return ae_false;
 }
 
 void ae_trace(const char * printf_fmt, ...)
 {
-    /* check global trace status */
+    // check global trace status
     if( alglib_trace_type==ALGLIB_TRACE_FILE && alglib_trace_file!=NULL )
     {
         va_list args;
 
-        /* fprintf() */
+        // fprintf()
         va_start(args, printf_fmt);
         vfprintf(alglib_trace_file, printf_fmt, args);
         va_end(args);
 
-        /* flush output */
+        // flush output
         fflush(alglib_trace_file);
     }
 }
@@ -2541,22 +2349,22 @@ int ae_tickcount()
     v = now.tv_usec/1000;
     r = r+v;
     return r;
-    /*struct timespec now;
+#if 0
+    struct timespec now;
     if (clock_gettime(CLOCK_MONOTONIC, &now) )
         return 0;
-    return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;*/
+    return now.tv_sec * 1000.0 + now.tv_nsec / 1000000.0;
+#endif
 #else
     return 0;
 #endif
 }
 
 
-/************************************************************************
-Real math functions
-************************************************************************/
+// Real math functions
 ae_bool ae_fp_eq(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     volatile double x = v1;
     volatile double y = v2;
     return x==y;
@@ -2564,13 +2372,13 @@ ae_bool ae_fp_eq(double v1, double v2)
 
 ae_bool ae_fp_neq(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     return !ae_fp_eq(v1,v2);
 }
 
 ae_bool ae_fp_less(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     volatile double x = v1;
     volatile double y = v2;
     return x<y;
@@ -2578,7 +2386,7 @@ ae_bool ae_fp_less(double v1, double v2)
 
 ae_bool ae_fp_less_eq(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     volatile double x = v1;
     volatile double y = v2;
     return x<=y;
@@ -2586,7 +2394,7 @@ ae_bool ae_fp_less_eq(double v1, double v2)
 
 ae_bool ae_fp_greater(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     volatile double x = v1;
     volatile double y = v2;
     return x>y;
@@ -2594,7 +2402,7 @@ ae_bool ae_fp_greater(double v1, double v2)
 
 ae_bool ae_fp_greater_eq(double v1, double v2)
 {
-    /* IEEE-strict floating point comparison */
+    // IEEE-strict floating point comparison
     volatile double x = v1;
     volatile double y = v2;
     return x>=y;
@@ -2658,7 +2466,7 @@ ae_bool ae_isinf_stateless(double x,    ae_int_t endianness)
         low  = u.p[1];
     }
 
-    /* 31 least significant bits of high are compared */
+    // 31 least significant bits of high are compared
     return ((high&0x7FFFFFFF)==0x7FF00000) && (low==0);
 }
 
@@ -2682,7 +2490,7 @@ ae_bool ae_isposinf_stateless(double x, ae_int_t endianness)
         low  = u.p[1];
     }
 
-    /* all 32 bits of high are compared */
+    // all 32 bits of high are compared
     return (high==(ae_int32_t)0x7FF00000) && (low==0);
 }
 
@@ -2706,7 +2514,7 @@ ae_bool ae_isneginf_stateless(double x, ae_int_t endianness)
         low  = u.p[1];
     }
 
-    /* this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers */
+    // this code is a bit tricky to avoid comparison of high with 0xFFF00000, which may be unsafe with some buggy compilers
     return ((high&0x7FFFFFFF)==0x7FF00000) && (high!=(ae_int32_t)0x7FF00000) && (low==0);
 }
 
@@ -2718,16 +2526,14 @@ ae_int_t ae_get_endianness()
         ae_int32_t p[2];
     } u;
 
-    /*
-     * determine endianness
-     * two types are supported: big-endian and little-endian.
-     * mixed-endian hardware is NOT supported.
-     *
-     * 1983 is used as magic number because its non-periodic double
-     * representation allow us to easily distinguish between upper
-     * and lower halfs and to detect mixed endian hardware.
-     *
-     */
+    // determine endianness
+    // two types are supported: big-endian and little-endian.
+    // mixed-endian hardware is NOT supported.
+    //
+    // 1983 is used as magic number because its non-periodic double
+    // representation allow us to easily distinguish between upper
+    // and lower halfs and to detect mixed endian hardware.
+    //
     u.a = 1.0/1983.0;
     if( u.p[1]==(ae_int32_t)0x3f408642 )
         return AE_LITTLE_ENDIAN;
@@ -2907,9 +2713,7 @@ double   ae_exp(double x, ae_state *state)
     return exp(x);
 }
 
-/************************************************************************
-Symmetric/Hermitian properties: check and force
-************************************************************************/
+// Symmetric/Hermitian properties: check and force
 static void x_split_length(ae_int_t n, ae_int_t nb, ae_int_t* n1, ae_int_t* n2)
 {
     ae_int_t r;
@@ -2958,24 +2762,22 @@ static double x_safepythag2(double x, double y)
         return w*sqrt(1+t*t);
     }
 }
-/*
- * this function checks difference between offdiagonal blocks BL and BU
- * (see below). Block BL is specified by offsets (offset0,offset1)  and
- * sizes (len0,len1).
- *
- *     [ .          ]
- *     [   A0  BU   ]
- * A = [   BL  A1   ]
- *     [          . ]
- *
- *  this subroutine updates current values of:
- *  a) mx       maximum value of A[i,j] found so far
- *  b) err      componentwise difference between elements of BL and BU^T
- *
- */
+// this function checks difference between offdiagonal blocks BL and BU
+// (see below). Block BL is specified by offsets (offset0,offset1)  and
+// sizes (len0,len1).
+//
+//     [ .          ]
+//     [   A0  BU   ]
+// A = [   BL  A1   ]
+//     [          . ]
+//
+//  this subroutine updates current values of:
+//  a) mx       maximum value of A[i,j] found so far
+//  b) err      componentwise difference between elements of BL and BU^T
+//
 static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, ae_bool *nonfinite, double *mx, double *err, ae_state *_state)
 {
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len0>x_nb || len1>x_nb )
     {
         ae_int_t n1, n2;
@@ -2995,7 +2797,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
     }
     else
     {
-        /* base case */
+        // base case
         double *p1, *p2, *prow, *pcol;
         double v;
         ae_int_t i, j;
@@ -3027,27 +2829,25 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
         }
     }
 }
-/*
- * this function checks that diagonal block A0 is symmetric.
- * Block A0 is specified by its offset and size.
- *
- *     [ .          ]
- *     [   A0       ]
- * A = [       .    ]
- *     [          . ]
- *
- *  this subroutine updates current values of:
- *  a) mx       maximum value of A[i,j] found so far
- *  b) err      componentwise difference between A0 and A0^T
- *
- */
+// this function checks that diagonal block A0 is symmetric.
+// Block A0 is specified by its offset and size.
+//
+//     [ .          ]
+//     [   A0       ]
+// A = [       .    ]
+//     [          . ]
+//
+//  this subroutine updates current values of:
+//  a) mx       maximum value of A[i,j] found so far
+//  b) err      componentwise difference between A0 and A0^T
+//
 static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, ae_bool *nonfinite, double *mx, double *err, ae_state *_state)
 {
     double *p, *prow, *pcol;
     double v;
     ae_int_t i, j;
 
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len>x_nb )
     {
         ae_int_t n1, n2;
@@ -3058,7 +2858,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
         return;
     }
 
-    /* base case */
+    // base case
     p = (double*)(a->x_ptr.p_ptr)+offset*a->stride+offset;
     for(i=0; i<len; i++)
     {
@@ -3084,24 +2884,22 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
         *mx =  *mx>v ? *mx : v;
     }
 }
-/*
- * this function checks difference between offdiagonal blocks BL and BU
- * (see below). Block BL is specified by offsets (offset0,offset1)  and
- * sizes (len0,len1).
- *
- *     [ .          ]
- *     [   A0  BU   ]
- * A = [   BL  A1   ]
- *     [          . ]
- *
- *  this subroutine updates current values of:
- *  a) mx       maximum value of A[i,j] found so far
- *  b) err      componentwise difference between elements of BL and BU^H
- *
- */
+// this function checks difference between offdiagonal blocks BL and BU
+// (see below). Block BL is specified by offsets (offset0,offset1)  and
+// sizes (len0,len1).
+//
+//     [ .          ]
+//     [   A0  BU   ]
+// A = [   BL  A1   ]
+//     [          . ]
+//
+//  this subroutine updates current values of:
+//  a) mx       maximum value of A[i,j] found so far
+//  b) err      componentwise difference between elements of BL and BU^H
+//
 static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, ae_bool *nonfinite, double *mx, double *err, ae_state *_state)
 {
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len0>x_nb || len1>x_nb )
     {
         ae_int_t n1, n2;
@@ -3121,7 +2919,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
     }
     else
     {
-        /* base case */
+        // base case
         ae_complex *p1, *p2, *prow, *pcol;
         double v;
         ae_int_t i, j;
@@ -3153,27 +2951,25 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
         }
     }
 }
-/*
- * this function checks that diagonal block A0 is Hermitian.
- * Block A0 is specified by its offset and size.
- *
- *     [ .          ]
- *     [   A0       ]
- * A = [       .    ]
- *     [          . ]
- *
- *  this subroutine updates current values of:
- *  a) mx       maximum value of A[i,j] found so far
- *  b) err      componentwise difference between A0 and A0^H
- *
- */
+// this function checks that diagonal block A0 is Hermitian.
+// Block A0 is specified by its offset and size.
+//
+//     [ .          ]
+//     [   A0       ]
+// A = [       .    ]
+//     [          . ]
+//
+//  this subroutine updates current values of:
+//  a) mx       maximum value of A[i,j] found so far
+//  b) err      componentwise difference between A0 and A0^H
+//
 static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, ae_bool *nonfinite, double *mx, double *err, ae_state *_state)
 {
     ae_complex *p, *prow, *pcol;
     double v;
     ae_int_t i, j;
 
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len>x_nb )
     {
         ae_int_t n1, n2;
@@ -3184,7 +2980,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
         return;
     }
 
-    /* base case */
+    // base case
     p = (ae_complex*)(a->x_ptr.p_ptr)+offset*a->stride+offset;
     for(i=0; i<len; i++)
     {
@@ -3219,20 +3015,18 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
         }
     }
 }
-/*
- * this function copies offdiagonal block BL to its symmetric counterpart
- * BU (see below). Block BL is specified by offsets (offset0,offset1)
- * and sizes (len0,len1).
- *
- *     [ .          ]
- *     [   A0  BU   ]
- * A = [   BL  A1   ]
- *     [          . ]
- *
- */
+// this function copies offdiagonal block BL to its symmetric counterpart
+// BU (see below). Block BL is specified by offsets (offset0,offset1)
+// and sizes (len0,len1).
+//
+//     [ .          ]
+//     [   A0  BU   ]
+// A = [   BL  A1   ]
+//     [          . ]
+//
 static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1)
 {
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len0>x_nb || len1>x_nb )
     {
         ae_int_t n1, n2;
@@ -3252,7 +3046,7 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
     }
     else
     {
-        /* base case */
+        // base case
         double *p1, *p2, *prow, *pcol;
         ae_int_t i, j;
 
@@ -3271,22 +3065,20 @@ static void force_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
         }
     }
 }
-/*
- * this function copies lower part of diagonal block A0 to its upper part
- * Block is specified by offset and size.
- *
- *     [ .          ]
- *     [   A0       ]
- * A = [       .    ]
- *     [          . ]
- *
- */
+// this function copies lower part of diagonal block A0 to its upper part
+// Block is specified by offset and size.
+//
+//     [ .          ]
+//     [   A0       ]
+// A = [       .    ]
+//     [          . ]
+//
 static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len)
 {
     double *p, *prow, *pcol;
     ae_int_t i, j;
 
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len>x_nb )
     {
         ae_int_t n1, n2;
@@ -3297,7 +3089,7 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
         return;
     }
 
-    /* base case */
+    // base case
     p = (double*)(a->x_ptr.p_ptr)+offset*a->stride+offset;
     for(i=0; i<len; i++)
     {
@@ -3307,19 +3099,17 @@ static void force_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
             *pcol = *prow;
     }
 }
-/*
- * this function copies Hermitian transpose of offdiagonal block BL to
- * its symmetric counterpart BU (see below). Block BL is specified by
- * offsets (offset0,offset1) and sizes (len0,len1).
- *
- *     [ .          ]
- *     [   A0  BU   ]
- * A = [   BL  A1   ]
- *     [          . ]
- */
+// this function copies Hermitian transpose of offdiagonal block BL to
+// its symmetric counterpart BU (see below). Block BL is specified by
+// offsets (offset0,offset1) and sizes (len0,len1).
+//
+//     [ .          ]
+//     [   A0  BU   ]
+// A = [   BL  A1   ]
+//     [          . ]
 static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1)
 {
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len0>x_nb || len1>x_nb )
     {
         ae_int_t n1, n2;
@@ -3339,7 +3129,7 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
     }
     else
     {
-        /* base case */
+        // base case
         ae_complex *p1, *p2, *prow, *pcol;
         ae_int_t i, j;
 
@@ -3358,22 +3148,20 @@ static void force_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t
         }
     }
 }
-/*
- * this function copies Hermitian transpose of lower part of
- * diagonal block A0 to its upper part Block is specified by offset and size.
- *
- *     [ .          ]
- *     [   A0       ]
- * A = [       .    ]
- *     [          . ]
- *
- */
+// this function copies Hermitian transpose of lower part of
+// diagonal block A0 to its upper part Block is specified by offset and size.
+//
+//     [ .          ]
+//     [   A0       ]
+// A = [       .    ]
+//     [          . ]
+//
 static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len)
 {
     ae_complex *p, *prow, *pcol;
     ae_int_t i, j;
 
-    /* try to split problem into two smaller ones */
+    // try to split problem into two smaller ones
     if( len>x_nb )
     {
         ae_int_t n1, n2;
@@ -3384,7 +3172,7 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
         return;
     }
 
-    /* base case */
+    // base case
     p = (ae_complex*)(a->x_ptr.p_ptr)+offset*a->stride+offset;
     for(i=0; i<len; i++)
     {
@@ -3493,12 +3281,10 @@ ae_bool ae_force_hermitian(ae_matrix *a)
     return x_force_hermitian(&x);
 }
 
-/************************************************************************
-This function converts six-bit value (from 0 to 63)  to  character  (only
-digits, lowercase and uppercase letters, minus and underscore are used).
-
-If v is negative or greater than 63, this function returns '?'.
-************************************************************************/
+// This function converts six-bit value (from 0 to 63)  to  character  (only
+// digits, lowercase and uppercase letters, minus and underscore are used).
+//
+// If v is negative or greater than 63, this function returns '?'.
 static char _sixbits2char_tbl[64] = {
         '0', '1', '2', '3', '4', '5', '6', '7',
         '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
@@ -3516,8 +3302,9 @@ char ae_sixbits2char(ae_int_t v)
         return '?';
     return _sixbits2char_tbl[v];
 
-    /* v is correct, process it */
-    /*if( v<10 )
+    // v is correct, process it
+#if 0
+    if( v<10 )
         return '0'+v;
     v -= 10;
     if( v<26 )
@@ -3526,15 +3313,14 @@ char ae_sixbits2char(ae_int_t v)
     if( v<26 )
         return 'a'+v;
     v -= 26;
-    return v==0 ? '-' : '_';*/
+    return v==0 ? '-' : '_';
+#endif
 }
 
-/************************************************************************
-This function converts character to six-bit value (from 0 to 63).
-
-This function is inverse of ae_sixbits2char()
-If c is not correct character, this function returns -1.
-************************************************************************/
+// This function converts character to six-bit value (from 0 to 63).
+//
+// This function is inverse of ae_sixbits2char()
+// If c is not correct character, this function returns -1.
 static ae_int_t _ae_char2sixbits_tbl[] = {
     -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1,
@@ -3557,13 +3343,11 @@ ae_int_t ae_char2sixbits(char c)
     return (c>=0 && c<127) ? _ae_char2sixbits_tbl[(int)c] : -1;
 }
 
-/************************************************************************
-This function converts three bytes (24 bits) to four six-bit values
-(24 bits again).
-
-src     pointer to three bytes
-dst     pointer to four ints
-************************************************************************/
+// This function converts three bytes (24 bits) to four six-bit values
+// (24 bits again).
+//
+// src     pointer to three bytes
+// dst     pointer to four ints
 void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst)
 {
     dst[0] = src[0] & 0x3F;
@@ -3572,13 +3356,11 @@ void ae_threebytes2foursixbits(const unsigned char *src, ae_int_t *dst)
     dst[3] = src[2]>>2;
 }
 
-/************************************************************************
-This function converts four six-bit values (24 bits) to three bytes
-(24 bits again).
-
-src     pointer to four ints
-dst     pointer to three bytes
-************************************************************************/
+// This function converts four six-bit values (24 bits) to three bytes
+// (24 bits again).
+//
+// src     pointer to four ints
+// dst     pointer to three bytes
 void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst)
 {
     dst[0] = (unsigned char)(     src[0] | ((src[1]&0x03)<<6));
@@ -3586,14 +3368,12 @@ void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst)
     dst[2] = (unsigned char)((src[2]>>4) | (src[3]<<2));
 }
 
-/************************************************************************
-This function serializes boolean value into buffer
-
-v           boolean value to be serialized
-buf         buffer, at least 12 characters wide
-            (11 chars for value, one for trailing zero)
-state       ALGLIB environment state
-************************************************************************/
+// This function serializes boolean value into buffer
+//
+// v           boolean value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
 void ae_bool2str(ae_bool v, char *buf, ae_state *state)
 {
     char c = v ? '1' : '0';
@@ -3603,16 +3383,14 @@ void ae_bool2str(ae_bool v, char *buf, ae_state *state)
     buf[AE_SER_ENTRY_LENGTH] = 0;
 }
 
-/************************************************************************
-This function unserializes boolean value from buffer
-
-buf         buffer which contains value; leading spaces/tabs/newlines are
-            ignored, traling spaces/tabs/newlines are treated as  end  of
-            the boolean value.
-state       ALGLIB environment state
-
-This function raises an error in case unexpected symbol is found
-************************************************************************/
+// This function unserializes boolean value from buffer
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
 ae_bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend)
 {
     ae_bool was0, was1;
@@ -3646,14 +3424,12 @@ ae_bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend)
     return was1 ? ae_true : ae_false;
 }
 
-/************************************************************************
-This function serializes integer value into buffer
-
-v           integer value to be serialized
-buf         buffer, at least 12 characters wide
-            (11 chars for value, one for trailing zero)
-state       ALGLIB environment state
-************************************************************************/
+// This function serializes integer value into buffer
+//
+// v           integer value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
 void ae_int2str(ae_int_t v, char *buf, ae_state *state)
 {
     union _u
@@ -3665,22 +3441,20 @@ void ae_int2str(ae_int_t v, char *buf, ae_state *state)
     ae_int_t sixbits[12];
     unsigned char c;
 
-    /*
-     * copy v to array of chars, sign extending it and
-     * converting to little endian order
-     *
-     * because we don't want to mention size of ae_int_t explicitly,
-     * we do it as follows:
-     * 1. we fill u.bytes by zeros or ones (depending on sign of v)
-     * 2. we copy v to u.ival
-     * 3. if we run on big endian architecture, we reorder u.bytes
-     * 4. now we have signed 64-bit representation of v stored in u.bytes
-     * 5. additionally, we set 9th byte of u.bytes to zero in order to
-     *    simplify conversion to six-bit representation
-     */
+    // copy v to array of chars, sign extending it and
+    // converting to little endian order
+    //
+    // because we don't want to mention size of ae_int_t explicitly,
+    // we do it as follows:
+    // 1. we fill u.bytes by zeros or ones (depending on sign of v)
+    // 2. we copy v to u.ival
+    // 3. if we run on big endian architecture, we reorder u.bytes
+    // 4. now we have signed 64-bit representation of v stored in u.bytes
+    // 5. additionally, we set 9th byte of u.bytes to zero in order to
+    //    simplify conversion to six-bit representation
     c = v<0 ? (unsigned char)0xFF : (unsigned char)0x00;
     u.ival = v;
-    for(i=sizeof(ae_int_t); i<=8; i++) /* <=8 is preferred because it avoids unnecessary compiler warnings*/
+    for(i=sizeof(ae_int_t); i<=8; i++) // <=8 is preferred because it avoids unnecessary compiler warnings
         u.bytes[i] = c;
     u.bytes[8] = 0;
     if( state->endianness==AE_BIG_ENDIAN )
@@ -3694,11 +3468,9 @@ void ae_int2str(ae_int_t v, char *buf, ae_state *state)
         }
     }
 
-    /*
-     * convert to six-bit representation, output
-     *
-     * NOTE: last 12th element of sixbits is always zero, we do not output it
-     */
+    // convert to six-bit representation, output
+    //
+    // NOTE: last 12th element of sixbits is always zero, we do not output it
     ae_threebytes2foursixbits(u.bytes+0, sixbits+0);
     ae_threebytes2foursixbits(u.bytes+3, sixbits+4);
     ae_threebytes2foursixbits(u.bytes+6, sixbits+8);
@@ -3707,33 +3479,29 @@ void ae_int2str(ae_int_t v, char *buf, ae_state *state)
     buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
-/************************************************************************
-This function serializes 64-bit integer value into buffer
-
-v           integer value to be serialized
-buf         buffer, at least 12 characters wide
-            (11 chars for value, one for trailing zero)
-state       ALGLIB environment state
-************************************************************************/
+// This function serializes 64-bit integer value into buffer
+//
+// v           integer value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
 void ae_int642str(ae_int64_t v, char *buf, ae_state *state)
 {
     unsigned char bytes[9];
     ae_int_t i;
     ae_int_t sixbits[12];
 
-    /*
-     * copy v to array of chars, sign extending it and
-     * converting to little endian order
-     *
-     * because we don't want to mention size of ae_int_t explicitly,
-     * we do it as follows:
-     * 1. we fill bytes by zeros or ones (depending on sign of v)
-     * 2. we memmove v to bytes
-     * 3. if we run on big endian architecture, we reorder bytes
-     * 4. now we have signed 64-bit representation of v stored in bytes
-     * 5. additionally, we set 9th byte of bytes to zero in order to
-     *    simplify conversion to six-bit representation
-     */
+    // copy v to array of chars, sign extending it and
+    // converting to little endian order
+    //
+    // because we don't want to mention size of ae_int_t explicitly,
+    // we do it as follows:
+    // 1. we fill bytes by zeros or ones (depending on sign of v)
+    // 2. we memmove v to bytes
+    // 3. if we run on big endian architecture, we reorder bytes
+    // 4. now we have signed 64-bit representation of v stored in bytes
+    // 5. additionally, we set 9th byte of bytes to zero in order to
+    //    simplify conversion to six-bit representation
     memset(bytes, v<0 ? 0xFF : 0x00, 8);
     memmove(bytes, &v, 8);
     bytes[8] = 0;
@@ -3748,11 +3516,9 @@ void ae_int642str(ae_int64_t v, char *buf, ae_state *state)
         }
     }
 
-    /*
-     * convert to six-bit representation, output
-     *
-     * NOTE: last 12th element of sixbits is always zero, we do not output it
-     */
+    // convert to six-bit representation, output
+    //
+    // NOTE: last 12th element of sixbits is always zero, we do not output it
     ae_threebytes2foursixbits(bytes+0, sixbits+0);
     ae_threebytes2foursixbits(bytes+3, sixbits+4);
     ae_threebytes2foursixbits(bytes+6, sixbits+8);
@@ -3761,16 +3527,14 @@ void ae_int642str(ae_int64_t v, char *buf, ae_state *state)
     buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
-/************************************************************************
-This function unserializes integer value from string
-
-buf         buffer which contains value; leading spaces/tabs/newlines are
-            ignored, traling spaces/tabs/newlines are treated as  end  of
-            the boolean value.
-state       ALGLIB environment state
-
-This function raises an error in case unexpected symbol is found
-************************************************************************/
+// This function unserializes integer value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
 ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend)
 {
     const char *emsg = "ALGLIB: unable to read integer value from stream";
@@ -3781,13 +3545,11 @@ ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend)
         ae_int_t ival;
         unsigned char bytes[9];
     } u;
-    /*
-     * 1. skip leading spaces
-     * 2. read and decode six-bit digits
-     * 3. set trailing digits to zeros
-     * 4. convert to little endian 64-bit integer representation
-     * 5. convert to big endian representation, if needed
-     */
+    // 1. skip leading spaces
+    // 2. read and decode six-bit digits
+    // 3. set trailing digits to zeros
+    // 4. convert to little endian 64-bit integer representation
+    // 5. convert to big endian representation, if needed
     while( *buf==' ' || *buf=='\t' || *buf=='\n' || *buf=='\r' )
         buf++;
     sixbitsread = 0;
@@ -3822,16 +3584,14 @@ ae_int_t ae_str2int(const char *buf, ae_state *state, const char **pasttheend)
     return u.ival;
 }
 
-/************************************************************************
-This function unserializes 64-bit integer value from string
-
-buf         buffer which contains value; leading spaces/tabs/newlines are
-            ignored, traling spaces/tabs/newlines are treated as  end  of
-            the boolean value.
-state       ALGLIB environment state
-
-This function raises an error in case unexpected symbol is found
-************************************************************************/
+// This function unserializes 64-bit integer value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
 ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheend)
 {
     const char *emsg = "ALGLIB: unable to read integer value from stream";
@@ -3840,13 +3600,11 @@ ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheen
     unsigned char bytes[9];
     ae_int64_t result;
 
-    /*
-     * 1. skip leading spaces
-     * 2. read and decode six-bit digits
-     * 3. set trailing digits to zeros
-     * 4. convert to little endian 64-bit integer representation
-     * 5. convert to big endian representation, if needed
-     */
+    // 1. skip leading spaces
+    // 2. read and decode six-bit digits
+    // 3. set trailing digits to zeros
+    // 4. convert to little endian 64-bit integer representation
+    // 5. convert to big endian representation, if needed
     while( *buf==' ' || *buf=='\t' || *buf=='\n' || *buf=='\r' )
         buf++;
     sixbitsread = 0;
@@ -3883,14 +3641,12 @@ ae_int64_t ae_str2int64(const char *buf, ae_state *state, const char **pasttheen
 }
 
 
-/************************************************************************
-This function serializes double value into buffer
-
-v           double value to be serialized
-buf         buffer, at least 12 characters wide
-            (11 chars for value, one for trailing zero)
-state       ALGLIB environment state
-************************************************************************/
+// This function serializes double value into buffer
+//
+// v           double value to be serialized
+// buf         buffer, at least 12 characters wide
+//             (11 chars for value, one for trailing zero)
+// state       ALGLIB environment state
 void ae_double2str(double v, char *buf, ae_state *state)
 {
     union _u
@@ -3901,9 +3657,7 @@ void ae_double2str(double v, char *buf, ae_state *state)
     ae_int_t i;
     ae_int_t sixbits[12];
 
-    /*
-     * handle special quantities
-     */
+    // handle special quantities
     if( ae_isnan(v, state) )
     {
         const char *s = ".nan_______";
@@ -3923,15 +3677,13 @@ void ae_double2str(double v, char *buf, ae_state *state)
         return;
     }
 
-    /*
-     * process general case:
-     * 1. copy v to array of chars
-     * 2. set 9th byte of u.bytes to zero in order to
-     *    simplify conversion to six-bit representation
-     * 3. convert to little endian (if needed)
-     * 4. convert to six-bit representation
-     *    (last 12th element of sixbits is always zero, we do not output it)
-     */
+    // process general case:
+    // 1. copy v to array of chars
+    // 2. set 9th byte of u.bytes to zero in order to
+    //    simplify conversion to six-bit representation
+    // 3. convert to little endian (if needed)
+    // 4. convert to six-bit representation
+    //    (last 12th element of sixbits is always zero, we do not output it)
     u.dval = v;
     u.bytes[8] = 0;
     if( state->endianness==AE_BIG_ENDIAN )
@@ -3952,16 +3704,14 @@ void ae_double2str(double v, char *buf, ae_state *state)
     buf[AE_SER_ENTRY_LENGTH] = 0x00;
 }
 
-/************************************************************************
-This function unserializes double value from string
-
-buf         buffer which contains value; leading spaces/tabs/newlines are
-            ignored, traling spaces/tabs/newlines are treated as  end  of
-            the boolean value.
-state       ALGLIB environment state
-
-This function raises an error in case unexpected symbol is found
-************************************************************************/
+// This function unserializes double value from string
+//
+// buf         buffer which contains value; leading spaces/tabs/newlines are
+//             ignored, traling spaces/tabs/newlines are treated as  end  of
+//             the boolean value.
+// state       ALGLIB environment state
+//
+// This function raises an error in case unexpected symbol is found
 double ae_str2double(const char *buf, ae_state *state, const char **pasttheend)
 {
     const char *emsg = "ALGLIB: unable to read double value from stream";
@@ -3974,15 +3724,11 @@ double ae_str2double(const char *buf, ae_state *state, const char **pasttheend)
     } u;
 
 
-     /*
-      * skip leading spaces
-      */
+     // skip leading spaces
     while( *buf==' ' || *buf=='\t' || *buf=='\n' || *buf=='\r' )
         buf++;
 
-    /*
-     * Handle special cases
-     */
+    // Handle special cases
     if( *buf=='.' )
     {
         const char *s_nan =    ".nan_______";
@@ -4006,14 +3752,12 @@ double ae_str2double(const char *buf, ae_state *state, const char **pasttheend)
         ae_break(state, ERR_ASSERTION_FAILED, emsg);
     }
 
-    /*
-     * General case:
-     * 1. read and decode six-bit digits
-     * 2. check that all 11 digits were read
-     * 3. set last 12th digit to zero (needed for simplicity of conversion)
-     * 4. convert to 8 bytes
-     * 5. convert to big endian representation, if needed
-     */
+    // General case:
+    // 1. read and decode six-bit digits
+    // 2. check that all 11 digits were read
+    // 3. set last 12th digit to zero (needed for simplicity of conversion)
+    // 4. convert to 8 bytes
+    // 5. convert to big endian representation, if needed
     sixbitsread = 0;
     while( *buf!=' ' && *buf!='\t' && *buf!='\n' && *buf!='\r' && *buf!=0 )
     {
@@ -4046,35 +3790,29 @@ double ae_str2double(const char *buf, ae_state *state, const char **pasttheend)
 }
 
 
-/************************************************************************
-This function performs given number of spin-wait iterations
-************************************************************************/
+// This function performs given number of spin-wait iterations
 void ae_spin_wait(ae_int_t cnt)
 {
-    /*
-     * these strange operations with ae_never_change_it are necessary to
-     * prevent compiler optimization of the loop.
-     */
+    // these strange operations with ae_never_change_it are necessary to
+    // prevent compiler optimization of the loop.
     volatile ae_int_t i;
 
-    /* very unlikely because no one will wait for such amount of cycles */
+    // very unlikely because no one will wait for such amount of cycles
     if( cnt>0x12345678 )
         ae_never_change_it = cnt%10;
 
-    /* spin wait, test condition which will never be true */
+    // spin wait, test condition which will never be true
     for(i=0; i<cnt; i++)
         if( ae_never_change_it>0 )
             ae_never_change_it--;
 }
 
 
-/************************************************************************
-This function causes the calling thread to relinquish the CPU. The thread
-is moved to the end of the queue and some other thread gets to run.
-
-NOTE: this function should NOT be called when AE_OS is AE_UNKNOWN  -  the
-      whole program will be abnormally terminated.
-************************************************************************/
+// This function causes the calling thread to relinquish the CPU. The thread
+// is moved to the end of the queue and some other thread gets to run.
+//
+// NOTE: this function should NOT be called when AE_OS is AE_UNKNOWN  -  the
+//       whole program will be abnormally terminated.
 void ae_yield()
 {
 #if AE_OS==AE_WINDOWS
@@ -4087,14 +3825,12 @@ void ae_yield()
 #endif
 }
 
-/************************************************************************
-This function initializes _lock structure which  is  internally  used  by
-ae_lock high-level structure.
-
-_lock structure is statically allocated, no malloc() calls  is  performed
-during its allocation. However, you have to call  _ae_free_lock_raw()  in
-order to deallocate this lock properly.
-************************************************************************/
+// This function initializes _lock structure which  is  internally  used  by
+// ae_lock high-level structure.
+//
+// _lock structure is statically allocated, no malloc() calls  is  performed
+// during its allocation. However, you have to call  _ae_free_lock_raw()  in
+// order to deallocate this lock properly.
 void _ae_init_lock_raw(_lock *p)
 {
 #if AE_OS==AE_WINDOWS
@@ -4108,11 +3844,9 @@ void _ae_init_lock_raw(_lock *p)
 }
 
 
-/************************************************************************
-This function acquires _lock structure.
-
-It is low-level workhorse utilized by ae_acquire_lock().
-************************************************************************/
+// This function acquires _lock structure.
+//
+// It is low-level workhorse utilized by ae_acquire_lock().
 void _ae_acquire_lock_raw(_lock *p)
 {
 #if AE_OS==AE_WINDOWS
@@ -4156,11 +3890,9 @@ void _ae_acquire_lock_raw(_lock *p)
 }
 
 
-/************************************************************************
-This function releases _lock structure.
-
-It is low-level lock function which is used by ae_release_lock.
-************************************************************************/
+// This function releases _lock structure.
+//
+// It is low-level lock function which is used by ae_release_lock.
 void _ae_release_lock_raw(_lock *p)
 {
 #if AE_OS==AE_WINDOWS
@@ -4173,9 +3905,7 @@ void _ae_release_lock_raw(_lock *p)
 }
 
 
-/************************************************************************
-This function frees _lock structure.
-************************************************************************/
+// This function frees _lock structure.
 void _ae_free_lock_raw(_lock *p)
 {
 #if AE_OS==AE_POSIX
@@ -4184,21 +3914,19 @@ void _ae_free_lock_raw(_lock *p)
 }
 
 
-/************************************************************************
-This function initializes ae_lock structure.
-
-INPUT PARAMETERS:
-    lock                -   pointer to lock structure, must be zero-filled
-    state               -   pointer to state structure, used for exception
-                            handling and management of automatic objects.
-    make_automatic      -   if true, lock object is added to automatic
-                            memory management list.
-
-NOTE: as a special exception, this function allows you  to  specify  NULL
-      state pointer. In this case all exception arising during construction
-      are handled as critical failures, with abort() being called.
-      make_automatic must be false on such calls.
-************************************************************************/
+// This function initializes ae_lock structure.
+//
+// INPUT PARAMETERS:
+//     lock                -   pointer to lock structure, must be zero-filled
+//     state               -   pointer to state structure, used for exception
+//                             handling and management of automatic objects.
+//     make_automatic      -   if true, lock object is added to automatic
+//                             memory management list.
+//
+// NOTE: as a special exception, this function allows you  to  specify  NULL
+//       state pointer. In this case all exception arising during construction
+//       are handled as critical failures, with abort() being called.
+//       make_automatic must be false on such calls.
 void ae_init_lock(ae_lock *lock, ae_state *state, ae_bool make_automatic)
 {
     _lock *p;
@@ -4219,21 +3947,19 @@ void ae_init_lock(ae_lock *lock, ae_state *state, ae_bool make_automatic)
     _ae_init_lock_raw(p);
 }
 
-/************************************************************************
-This function initializes "eternal" ae_lock structure which  is  expected
-to persist until the end of the execution of the program.  Eternal  locks
-can not be deallocated (cleared) and  do  not  increase debug  allocation
-counters.  Errors  during  allocation  of eternal  locks  are  considered
-critical exceptions and handled by calling abort().
-
-INPUT PARAMETERS:
-    lock                -   pointer to lock structure, must be zero-filled
-    state               -   pointer to state structure, used for exception
-                            handling and management of automatic objects;
-                            non-NULL.
-    make_automatic      -   if true, lock object is added to automatic
-                            memory management list.
-************************************************************************/
+// This function initializes "eternal" ae_lock structure which  is  expected
+// to persist until the end of the execution of the program.  Eternal  locks
+// can not be deallocated (cleared) and  do  not  increase debug  allocation
+// counters.  Errors  during  allocation  of eternal  locks  are  considered
+// critical exceptions and handled by calling abort().
+//
+// INPUT PARAMETERS:
+//     lock                -   pointer to lock structure, must be zero-filled
+//     state               -   pointer to state structure, used for exception
+//                             handling and management of automatic objects;
+//                             non-NULL.
+//     make_automatic      -   if true, lock object is added to automatic
+//                             memory management list.
 void ae_init_lock_eternal(ae_lock *lock)
 {
     _lock *p;
@@ -4245,10 +3971,8 @@ void ae_init_lock_eternal(ae_lock *lock)
 }
 
 
-/************************************************************************
-This function acquires lock. In case lock is busy, we perform several
-iterations inside tight loop before trying again.
-************************************************************************/
+// This function acquires lock. In case lock is busy, we perform several
+// iterations inside tight loop before trying again.
 void ae_acquire_lock(ae_lock *lock)
 {
     _lock *p;
@@ -4257,9 +3981,7 @@ void ae_acquire_lock(ae_lock *lock)
 }
 
 
-/************************************************************************
-This function releases lock.
-************************************************************************/
+// This function releases lock.
 void ae_release_lock(ae_lock *lock)
 {
     _lock *p;
@@ -4268,9 +3990,7 @@ void ae_release_lock(ae_lock *lock)
 }
 
 
-/************************************************************************
-This function frees ae_lock structure.
-************************************************************************/
+// This function frees ae_lock structure.
 void ae_free_lock(ae_lock *lock)
 {
     _lock *p;
@@ -4282,23 +4002,21 @@ void ae_free_lock(ae_lock *lock)
 }
 
 
-/************************************************************************
-This function creates ae_shared_pool structure.
-
-dst                 destination shared pool, must be zero-filled
-                    already allocated, but not initialized.
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-Error handling:
-* on failure calls ae_break() with NULL state pointer. Usually it  results
-  in abort() call.
-
-dst is assumed to be uninitialized, its fields are ignored.
-************************************************************************/
+// This function creates ae_shared_pool structure.
+//
+// dst                 destination shared pool, must be zero-filled
+//                     already allocated, but not initialized.
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// Error handling:
+// * on failure calls ae_break() with NULL state pointer. Usually it  results
+//   in abort() call.
+//
+// dst is assumed to be uninitialized, its fields are ignored.
 void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic)
 {
     ae_shared_pool *dst;
@@ -4307,7 +4025,7 @@ void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic)
     dst = (ae_shared_pool*)_dst;
     AE_CRITICAL_ASSERT(ae_check_zeros(dst,sizeof(*dst)));
 
-    /* init */
+    // init
     dst->seed_object = NULL;
     dst->recycled_objects = NULL;
     dst->recycled_entries = NULL;
@@ -4324,17 +4042,15 @@ void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic)
 }
 
 
-/************************************************************************
-This function clears all dynamically allocated fields of the pool except
-for the lock. It does NOT try to acquire pool_lock.
-
-NOTE: this function is NOT thread-safe, it is not protected by lock.
-************************************************************************/
+// This function clears all dynamically allocated fields of the pool except
+// for the lock. It does NOT try to acquire pool_lock.
+//
+// NOTE: this function is NOT thread-safe, it is not protected by lock.
 static void ae_shared_pool_internalclear(ae_shared_pool *dst)
 {
     ae_shared_pool_entry *ptr, *tmp;
 
-    /* destroy seed */
+    // destroy seed
     if( dst->seed_object!=NULL )
     {
         dst->destroy((void*)dst->seed_object);
@@ -4342,7 +4058,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst)
         dst->seed_object = NULL;
     }
 
-    /* destroy recycled objects */
+    // destroy recycled objects
     for(ptr=dst->recycled_objects; ptr!=NULL;)
     {
         tmp = (ae_shared_pool_entry*)ptr->next_entry;
@@ -4353,7 +4069,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst)
     }
     dst->recycled_objects = NULL;
 
-    /* destroy recycled entries */
+    // destroy recycled entries
     for(ptr=dst->recycled_entries; ptr!=NULL;)
     {
         tmp = (ae_shared_pool_entry*)ptr->next_entry;
@@ -4364,41 +4080,39 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst)
 }
 
 
-/************************************************************************
-This function creates copy of ae_shared_pool.
-
-dst                 destination pool, must be zero-filled
-src                 source pool
-state               pointer to current state structure. Can not be NULL.
-                    used for exception handling (say, allocation error results
-                    in longjmp call).
-make_automatic      if true, vector will be registered in the current frame
-                    of the state structure;
-
-dst is assumed to be uninitialized, its fields are ignored.
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when lock can be used by another thread.
-************************************************************************/
+// This function creates copy of ae_shared_pool.
+//
+// dst                 destination pool, must be zero-filled
+// src                 source pool
+// state               pointer to current state structure. Can not be NULL.
+//                     used for exception handling (say, allocation error results
+//                     in longjmp call).
+// make_automatic      if true, vector will be registered in the current frame
+//                     of the state structure;
+//
+// dst is assumed to be uninitialized, its fields are ignored.
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool make_automatic)
 {
     ae_shared_pool *dst, *src;
     ae_shared_pool_entry *ptr;
 
-    /* state!=NULL, allocation errors result in exception */
-    /* AE_CRITICAL_ASSERT(state!=NULL); */
+    // state!=NULL, allocation errors result in exception
+    // AE_CRITICAL_ASSERT(state!=NULL);
 
     dst = (ae_shared_pool*)_dst;
     src = (ae_shared_pool*)_src;
     ae_shared_pool_init(dst, state, make_automatic);
 
-    /* copy non-pointer fields */
+    // copy non-pointer fields
     dst->size_of_object = src->size_of_object;
     dst->init = src->init;
     dst->init_copy = src->init_copy;
     dst->destroy = src->destroy;
 
-    /* copy seed object */
+    // copy seed object
     if( src->seed_object!=NULL )
     {
         dst->seed_object = ae_malloc(dst->size_of_object, state);
@@ -4406,51 +4120,49 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool m
         dst->init_copy(dst->seed_object, src->seed_object, state, ae_false);
     }
 
-    /* copy recycled objects */
+    // copy recycled objects
     dst->recycled_objects = NULL;
     for(ptr=src->recycled_objects; ptr!=NULL; ptr=(ae_shared_pool_entry*)ptr->next_entry)
     {
         ae_shared_pool_entry *tmp;
 
-        /* allocate entry, immediately add to the recycled list
-           (we do not want to lose it in case of future malloc failures) */
+        // allocate entry, immediately add to the recycled list
+        // (we do not want to lose it in case of future malloc failures)
         tmp = (ae_shared_pool_entry*)ae_malloc(sizeof(ae_shared_pool_entry), state);
         memset(tmp, 0, sizeof(*tmp));
         tmp->next_entry = dst->recycled_objects;
         dst->recycled_objects = tmp;
 
-        /* prepare place for object, init_copy() it */
+        // prepare place for object, init_copy() it
         tmp->obj =  ae_malloc(dst->size_of_object, state);
         memset(tmp->obj, 0, dst->size_of_object);
         dst->init_copy(tmp->obj, ptr->obj, state, ae_false);
     }
 
-    /* recycled entries are not copied because they do not store any information */
+    // recycled entries are not copied because they do not store any information
     dst->recycled_entries = NULL;
 
-    /* enumeration counter is reset on copying */
+    // enumeration counter is reset on copying
     dst->enumeration_counter = NULL;
 
-    /* initialize frame record */
+    // initialize frame record
     dst->frame_entry.deallocator = ae_shared_pool_destroy;
     dst->frame_entry.ptr = dst;
 }
 
 
-/************************************************************************
-This function performs destruction of the pool object.
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when pool can be used by another thread.
-************************************************************************/
+// This function performs destruction of the pool object.
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when pool can be used by another thread.
 void ae_shared_pool_clear(void *_dst)
 {
     ae_shared_pool *dst = (ae_shared_pool*)_dst;
 
-    /* clear seed and lists */
+    // clear seed and lists
     ae_shared_pool_internalclear(dst);
 
-    /* clear fields */
+    // clear fields
     dst->seed_object = NULL;
     dst->recycled_objects = NULL;
     dst->recycled_entries = NULL;
@@ -4469,15 +4181,13 @@ void ae_shared_pool_destroy(void *_dst)
 }
 
 
-/************************************************************************
-This function returns True, if internal seed object was set.  It  returns
-False for un-seeded pool.
-
-dst                 destination pool (initialized by constructor function)
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when lock can be used by another thread.
-************************************************************************/
+// This function returns True, if internal seed object was set.  It  returns
+// False for un-seeded pool.
+//
+// dst                 destination pool (initialized by constructor function)
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when lock can be used by another thread.
 ae_bool ae_shared_pool_is_initialized(void *_dst)
 {
     ae_shared_pool *dst = (ae_shared_pool*)_dst;
@@ -4485,21 +4195,19 @@ ae_bool ae_shared_pool_is_initialized(void *_dst)
 }
 
 
-/************************************************************************
-This function sets internal seed object. All objects owned by the pool
-(current seed object, recycled objects) are automatically freed.
-
-dst                 destination pool (initialized by constructor function)
-seed_object         new seed object
-size_of_object      sizeof(), used to allocate memory
-init                constructor function
-init_copy           copy constructor
-clear               destructor function
-state               ALGLIB environment state
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when lock can be used by another thread.
-************************************************************************/
+// This function sets internal seed object. All objects owned by the pool
+// (current seed object, recycled objects) are automatically freed.
+//
+// dst                 destination pool (initialized by constructor function)
+// seed_object         new seed object
+// size_of_object      sizeof(), used to allocate memory
+// init                constructor function
+// init_copy           copy constructor
+// clear               destructor function
+// state               ALGLIB environment state
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_set_seed(
     ae_shared_pool  *dst,
     void            *seed_object,
@@ -4509,40 +4217,38 @@ void ae_shared_pool_set_seed(
     void            (*destroy)(void* ptr),
     ae_state        *state)
 {
-    /* state!=NULL, allocation errors result in exception */
+    // state!=NULL, allocation errors result in exception
     AE_CRITICAL_ASSERT(state!=NULL);
 
-    /* destroy internal objects */
+    // destroy internal objects
     ae_shared_pool_internalclear(dst);
 
-    /* set non-pointer fields */
+    // set non-pointer fields
     dst->size_of_object = size_of_object;
     dst->init = init;
     dst->init_copy = init_copy;
     dst->destroy = destroy;
 
-    /* set seed object */
+    // set seed object
     dst->seed_object = ae_malloc(size_of_object, state);
     memset(dst->seed_object, 0, size_of_object);
     init_copy(dst->seed_object, seed_object, state, ae_false);
 }
 
 
-/************************************************************************
-This  function  retrieves  a  copy  of  the seed object from the pool and
-stores it to target smart pointer ptr.
-
-In case target pointer owns non-NULL  value,  it  is  deallocated  before
-storing value retrieved from pool. Target pointer becomes  owner  of  the
-value which was retrieved from pool.
-
-pool                pool
-pptr                pointer to ae_smart_ptr structure
-state               ALGLIB environment state
-
-NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
-      operation and can be used simultaneously from several threads.
-************************************************************************/
+// This  function  retrieves  a  copy  of  the seed object from the pool and
+// stores it to target smart pointer ptr.
+//
+// In case target pointer owns non-NULL  value,  it  is  deallocated  before
+// storing value retrieved from pool. Target pointer becomes  owner  of  the
+// value which was retrieved from pool.
+//
+// pool                pool
+// pptr                pointer to ae_smart_ptr structure
+// state               ALGLIB environment state
+//
+// NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
+//       operation and can be used simultaneously from several threads.
 void ae_shared_pool_retrieve(
     ae_shared_pool  *pool,
     ae_smart_ptr    *pptr,
@@ -4550,69 +4256,67 @@ void ae_shared_pool_retrieve(
 {
     void *new_obj;
 
-    /* state!=NULL, allocation errors are handled by throwing exception from ae_malloc() */
+    // state!=NULL, allocation errors are handled by throwing exception from ae_malloc()
     AE_CRITICAL_ASSERT(state!=NULL);
 
-    /* assert that pool was seeded */
+    // assert that pool was seeded
     ae_assert(
         pool->seed_object!=NULL,
         "ALGLIB: shared pool is not seeded, PoolRetrieve() failed",
         state);
 
-    /* acquire lock */
+    // acquire lock
     ae_acquire_lock(&pool->pool_lock);
 
-    /* try to reuse recycled objects */
+    // try to reuse recycled objects
     if( pool->recycled_objects!=NULL )
     {
         ae_shared_pool_entry *result;
 
-        /* retrieve entry/object from list of recycled objects */
+        // retrieve entry/object from list of recycled objects
         result = pool->recycled_objects;
         pool->recycled_objects = (ae_shared_pool_entry*)pool->recycled_objects->next_entry;
         new_obj = result->obj;
         result->obj = NULL;
 
-        /* move entry to list of recycled entries */
+        // move entry to list of recycled entries
         result->next_entry = pool->recycled_entries;
         pool->recycled_entries = result;
 
-        /* release lock */
+        // release lock
         ae_release_lock(&pool->pool_lock);
 
-        /* assign object to smart pointer */
+        // assign object to smart pointer
         ae_smart_ptr_assign(pptr, new_obj, ae_true, ae_true, pool->destroy);
         return;
     }
 
-    /* release lock; we do not need it anymore because copy constructor does not modify source variable */
+    // release lock; we do not need it anymore because copy constructor does not modify source variable
     ae_release_lock(&pool->pool_lock);
 
-    /* create new object from seed, immediately assign object to smart pointer
-      (do not want to lose it in case of future failures) */
+    // create new object from seed, immediately assign object to smart pointer
+    // (do not want to lose it in case of future failures)
     new_obj = ae_malloc(pool->size_of_object, state);
     memset(new_obj, 0, pool->size_of_object);
     ae_smart_ptr_assign(pptr, new_obj, ae_true, ae_true, pool->destroy);
 
-    /* perform actual copying; before this line smartptr points to zero-filled instance */
+    // perform actual copying; before this line smartptr points to zero-filled instance
     pool->init_copy(new_obj, pool->seed_object, state, ae_false);
 }
 
 
-/************************************************************************
-This function recycles object owned by smart  pointer  by  moving  it  to
-internal storage of the shared pool.
-
-Source pointer must own the object. After function is over, it owns NULL
-pointer.
-
-pool                pool
-pptr                pointer to ae_smart_ptr structure
-state               ALGLIB environment state
-
-NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
-      operation and can be used simultaneously from several threads.
-************************************************************************/
+// This function recycles object owned by smart  pointer  by  moving  it  to
+// internal storage of the shared pool.
+//
+// Source pointer must own the object. After function is over, it owns NULL
+// pointer.
+//
+// pool                pool
+// pptr                pointer to ae_smart_ptr structure
+// state               ALGLIB environment state
+//
+// NOTE: this function IS thread-safe.  It  acquires  pool  lock  during its
+//       operation and can be used simultaneously from several threads.
 void ae_shared_pool_recycle(
     ae_shared_pool  *pool,
     ae_smart_ptr    *pptr,
@@ -4620,72 +4324,68 @@ void ae_shared_pool_recycle(
 {
     ae_shared_pool_entry *new_entry;
 
-    /* state!=NULL, allocation errors are handled by throwing exception from ae_malloc() */
+    // state!=NULL, allocation errors are handled by throwing exception from ae_malloc()
     AE_CRITICAL_ASSERT(state!=NULL);
 
-    /* assert that pool was seeded */
+    // assert that pool was seeded
     ae_assert(
         pool->seed_object!=NULL,
         "ALGLIB: shared pool is not seeded, PoolRecycle() failed",
         state);
 
-    /* assert that pointer non-null and owns the object */
+    // assert that pointer non-null and owns the object
     ae_assert(pptr->is_owner,  "ALGLIB: pptr in ae_shared_pool_recycle() does not own its pointer", state);
     ae_assert(pptr->ptr!=NULL, "ALGLIB: pptr in ae_shared_pool_recycle() is NULL", state);
 
-    /* acquire lock */
+    // acquire lock
     ae_acquire_lock(&pool->pool_lock);
 
-    /* acquire shared pool entry (reuse one from recycled_entries or allocate new one) */
+    // acquire shared pool entry (reuse one from recycled_entries or allocate new one)
     if( pool->recycled_entries!=NULL )
     {
-        /* reuse previously allocated entry */
+        // reuse previously allocated entry
         new_entry = pool->recycled_entries;
         pool->recycled_entries = (ae_shared_pool_entry*)new_entry->next_entry;
     }
     else
     {
-        /*
-         * Allocate memory for new entry.
-         *
-         * NOTE: we release pool lock during allocation because ae_malloc() may raise
-         *       exception and we do not want our pool to be left in the locked state.
-         */
+        // Allocate memory for new entry.
+        //
+        // NOTE: we release pool lock during allocation because ae_malloc() may raise
+        //       exception and we do not want our pool to be left in the locked state.
         ae_release_lock(&pool->pool_lock);
         new_entry =  (ae_shared_pool_entry*)ae_malloc(sizeof(ae_shared_pool_entry), state);
         ae_acquire_lock(&pool->pool_lock);
     }
 
-    /* add object to the list of recycled objects */
+    // add object to the list of recycled objects
     new_entry->obj = pptr->ptr;
     new_entry->next_entry = pool->recycled_objects;
     pool->recycled_objects = new_entry;
 
-    /* release lock object */
+    // release lock object
     ae_release_lock(&pool->pool_lock);
 
-    /* release source pointer */
+    // release source pointer
     ae_smart_ptr_release(pptr);
 }
 
 
-/************************************************************************
-This function clears internal list of  recycled  objects,  but  does  not
-change seed object managed by the pool.
-
-pool                pool
-state               ALGLIB environment state
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when lock can be used by another thread.
-************************************************************************/
+// This function clears internal list of  recycled  objects,  but  does  not
+// change seed object managed by the pool.
+//
+// pool                pool
+// state               ALGLIB environment state
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_clear_recycled(
     ae_shared_pool  *pool,
     ae_state        *state)
 {
     ae_shared_pool_entry *ptr, *tmp;
 
-    /* clear recycled objects */
+    // clear recycled objects
     for(ptr=pool->recycled_objects; ptr!=NULL;)
     {
         tmp = (ae_shared_pool_entry*)ptr->next_entry;
@@ -4698,110 +4398,104 @@ void ae_shared_pool_clear_recycled(
 }
 
 
-/************************************************************************
-This function allows to enumerate recycled elements of the  shared  pool.
-It stores pointer to the first recycled object in the smart pointer.
-
-IMPORTANT:
-* in case target pointer owns non-NULL  value,  it  is deallocated before
-  storing value retrieved from pool.
-* recycled object IS NOT removed from pool
-* target pointer DOES NOT become owner of the new value
-* this function IS NOT thread-safe
-* you SHOULD NOT modify shared pool during enumeration (although you  can
-  modify state of the objects retrieved from pool)
-* in case there is no recycled objects in the pool, NULL is stored to pptr
-* in case pool is not seeded, NULL is stored to pptr
-
-pool                pool
-pptr                pointer to ae_smart_ptr structure
-state               ALGLIB environment state
-************************************************************************/
+// This function allows to enumerate recycled elements of the  shared  pool.
+// It stores pointer to the first recycled object in the smart pointer.
+//
+// IMPORTANT:
+// * in case target pointer owns non-NULL  value,  it  is deallocated before
+//   storing value retrieved from pool.
+// * recycled object IS NOT removed from pool
+// * target pointer DOES NOT become owner of the new value
+// * this function IS NOT thread-safe
+// * you SHOULD NOT modify shared pool during enumeration (although you  can
+//   modify state of the objects retrieved from pool)
+// * in case there is no recycled objects in the pool, NULL is stored to pptr
+// * in case pool is not seeded, NULL is stored to pptr
+//
+// pool                pool
+// pptr                pointer to ae_smart_ptr structure
+// state               ALGLIB environment state
 void ae_shared_pool_first_recycled(
     ae_shared_pool  *pool,
     ae_smart_ptr    *pptr,
     ae_state        *state)
 {
-    /* modify internal enumeration counter */
+    // modify internal enumeration counter
     pool->enumeration_counter = pool->recycled_objects;
 
-    /* exit on empty list */
+    // exit on empty list
     if( pool->enumeration_counter==NULL )
     {
         ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
         return;
     }
 
-    /* assign object to smart pointer */
+    // assign object to smart pointer
     ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, ae_false, ae_false, pool->destroy);
 }
 
 
-/************************************************************************
-This function allows to enumerate recycled elements of the  shared  pool.
-It stores pointer to the next recycled object in the smart pointer.
-
-IMPORTANT:
-* in case target pointer owns non-NULL  value,  it  is deallocated before
-  storing value retrieved from pool.
-* recycled object IS NOT removed from pool
-* target pointer DOES NOT become owner of the new value
-* this function IS NOT thread-safe
-* you SHOULD NOT modify shared pool during enumeration (although you  can
-  modify state of the objects retrieved from pool)
-* in case there is no recycled objects left in the pool, NULL is stored.
-* in case pool is not seeded, NULL is stored.
-
-pool                pool
-pptr                pointer to ae_smart_ptr structure
-state               ALGLIB environment state
-************************************************************************/
+// This function allows to enumerate recycled elements of the  shared  pool.
+// It stores pointer to the next recycled object in the smart pointer.
+//
+// IMPORTANT:
+// * in case target pointer owns non-NULL  value,  it  is deallocated before
+//   storing value retrieved from pool.
+// * recycled object IS NOT removed from pool
+// * target pointer DOES NOT become owner of the new value
+// * this function IS NOT thread-safe
+// * you SHOULD NOT modify shared pool during enumeration (although you  can
+//   modify state of the objects retrieved from pool)
+// * in case there is no recycled objects left in the pool, NULL is stored.
+// * in case pool is not seeded, NULL is stored.
+//
+// pool                pool
+// pptr                pointer to ae_smart_ptr structure
+// state               ALGLIB environment state
 void ae_shared_pool_next_recycled(
     ae_shared_pool  *pool,
     ae_smart_ptr    *pptr,
     ae_state        *state)
 {
-    /* exit on end of list */
+    // exit on end of list
     if( pool->enumeration_counter==NULL )
     {
         ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
         return;
     }
 
-    /* modify internal enumeration counter */
+    // modify internal enumeration counter
     pool->enumeration_counter = (ae_shared_pool_entry*)pool->enumeration_counter->next_entry;
 
-    /* exit on empty list */
+    // exit on empty list
     if( pool->enumeration_counter==NULL )
     {
         ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
         return;
     }
 
-    /* assign object to smart pointer */
+    // assign object to smart pointer
     ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, ae_false, ae_false, pool->destroy);
 }
 
 
 
-/************************************************************************
-This function clears internal list of recycled objects and  seed  object.
-However, pool still can be used (after initialization with another seed).
-
-pool                pool
-state               ALGLIB environment state
-
-NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
-      you should NOT call it when lock can be used by another thread.
-************************************************************************/
+// This function clears internal list of recycled objects and  seed  object.
+// However, pool still can be used (after initialization with another seed).
+//
+// pool                pool
+// state               ALGLIB environment state
+//
+// NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
+//       you should NOT call it when lock can be used by another thread.
 void ae_shared_pool_reset(
     ae_shared_pool  *pool,
     ae_state        *state)
 {
-    /* clear seed and lists */
+    // clear seed and lists
     ae_shared_pool_internalclear(pool);
 
-    /* clear fields */
+    // clear fields
     pool->seed_object = NULL;
     pool->recycled_objects = NULL;
     pool->recycled_entries = NULL;
@@ -4813,9 +4507,7 @@ void ae_shared_pool_reset(
 }
 
 
-/************************************************************************
-This function initializes serializer
-************************************************************************/
+// This function initializes serializer
 void ae_serializer_init(ae_serializer *serializer)
 {
     serializer->mode = AE_SM_DEFAULT;
@@ -4847,25 +4539,23 @@ void ae_serializer_alloc_byte_array(ae_serializer *serializer, ae_vector *bytes)
     serializer->entries_needed += 1+n;
 }
 
-/************************************************************************
-After allocation phase is done, this function returns  required  size  of
-the output string buffer (including trailing zero symbol). Actual size of
-the data being stored can be a few characters smaller than requested.
-************************************************************************/
+// After allocation phase is done, this function returns  required  size  of
+// the output string buffer (including trailing zero symbol). Actual size of
+// the data being stored can be a few characters smaller than requested.
 ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer)
 {
     ae_int_t rows, lastrowsize, result;
 
     serializer->mode = AE_SM_READY2S;
 
-    /* if no entries needes (degenerate case) */
+    // if no entries needes (degenerate case)
     if( serializer->entries_needed==0 )
     {
-        serializer->bytes_asked = 4; /* a pair of chars for \r\n, one for dot, one for trailing zero */
+        serializer->bytes_asked = 4; // a pair of chars for \r\n, one for dot, one for trailing zero
         return serializer->bytes_asked;
     }
 
-    /* non-degenerate case */
+    // non-degenerate case
     rows = serializer->entries_needed/AE_SER_ENTRIES_PER_ROW;
     lastrowsize = AE_SER_ENTRIES_PER_ROW;
     if( serializer->entries_needed%AE_SER_ENTRIES_PER_ROW )
@@ -4874,12 +4564,12 @@ ae_int_t ae_serializer_get_alloc_size(ae_serializer *serializer)
         rows++;
     }
 
-    /* calculate result size */
-    result  = ((rows-1)*AE_SER_ENTRIES_PER_ROW+lastrowsize)*AE_SER_ENTRY_LENGTH;    /* data size */
-    result +=  (rows-1)*(AE_SER_ENTRIES_PER_ROW-1)+(lastrowsize-1);                 /* space symbols */
-    result += rows*2;                                                               /* newline symbols */
-    result += 1;                                                                    /* trailing dot */
-    result += 1;                                                                    /* trailing zero */
+    // calculate result size
+    result  = ((rows-1)*AE_SER_ENTRIES_PER_ROW+lastrowsize)*AE_SER_ENTRY_LENGTH;    // data size
+    result +=  (rows-1)*(AE_SER_ENTRIES_PER_ROW-1)+(lastrowsize-1);                 // space symbols
+    result += rows*2;                                                               // newline symbols
+    result += 1;                                                                    // trailing dot
+    result += 1;                                                                    // trailing zero
     serializer->bytes_asked = result;
     return result;
 }
@@ -4911,12 +4601,12 @@ static char cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf)
     std::istream *stream = reinterpret_cast<std::istream*>(aux);
     int c;
     if( cnt<=0 )
-        return 1; /* unexpected cnt */
+        return 1; // unexpected cnt
     for(;;)
     {
         c = stream->get();
         if( c<0 || c>255 )
-            return 1; /* failure! */
+            return 1; // failure!
         if( c!=' ' && c!='\t' && c!='\n' && c!='\r' )
             break;
     }
@@ -4925,11 +4615,11 @@ static char cpp_reader(ae_int_t aux, ae_int_t cnt, char *p_buf)
     {
         c = stream->get();
         if( c<0 || c>255 || c==' ' || c=='\t' || c=='\n' || c=='\r' )
-            return 1; /* failure! */
+            return 1; // failure!
         p_buf[k] = (char)c;
     }
     p_buf[cnt] = 0;
-    return 0; /* success */
+    return 0; // success
 }
 
 void ae_serializer_sstart_stream(ae_serializer *serializer, std::ostream *stream)
@@ -4986,7 +4676,7 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, ae_bool v, ae_state
     const char *emsg = "ALGLIB: serialization integrity error";
     ae_int_t bytes_appended;
 
-    /* prepare serialization, check consistency */
+    // prepare serialization, check consistency
     ae_bool2str(v, buf, state);
     serializer->entries_saved++;
     if( serializer->entries_saved%AE_SER_ENTRIES_PER_ROW )
@@ -4994,10 +4684,10 @@ void ae_serializer_serialize_bool(ae_serializer *serializer, ae_bool v, ae_state
     else
         strcat(buf, "\r\n");
     bytes_appended = (ae_int_t)strlen(buf);
-    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
+    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
     serializer->bytes_written += bytes_appended;
 
-    /* append to buffer */
+    // append to buffer
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5025,7 +4715,7 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state
     const char *emsg = "ALGLIB: serialization integrity error";
     ae_int_t bytes_appended;
 
-    /* prepare serialization, check consistency */
+    // prepare serialization, check consistency
     ae_int2str(v, buf, state);
     serializer->entries_saved++;
     if( serializer->entries_saved%AE_SER_ENTRIES_PER_ROW )
@@ -5033,10 +4723,10 @@ void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state
     else
         strcat(buf, "\r\n");
     bytes_appended = (ae_int_t)strlen(buf);
-    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
+    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
     serializer->bytes_written += bytes_appended;
 
-    /* append to buffer */
+    // append to buffer
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5064,7 +4754,7 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_s
     const char *emsg = "ALGLIB: serialization integrity error";
     ae_int_t bytes_appended;
 
-    /* prepare serialization, check consistency */
+    // prepare serialization, check consistency
     ae_int642str(v, buf, state);
     serializer->entries_saved++;
     if( serializer->entries_saved%AE_SER_ENTRIES_PER_ROW )
@@ -5072,10 +4762,10 @@ void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_s
     else
         strcat(buf, "\r\n");
     bytes_appended = (ae_int_t)strlen(buf);
-    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
+    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
     serializer->bytes_written += bytes_appended;
 
-    /* append to buffer */
+    // append to buffer
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5103,7 +4793,7 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_stat
     const char *emsg = "ALGLIB: serialization integrity error";
     ae_int_t bytes_appended;
 
-    /* prepare serialization, check consistency */
+    // prepare serialization, check consistency
     ae_double2str(v, buf, state);
     serializer->entries_saved++;
     if( serializer->entries_saved%AE_SER_ENTRIES_PER_ROW )
@@ -5111,10 +4801,10 @@ void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_stat
     else
         strcat(buf, "\r\n");
     bytes_appended = (ae_int_t)strlen(buf);
-    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); /* strict "less" because we need space for trailing zero */
+    ae_assert(serializer->bytes_written+bytes_appended<serializer->bytes_asked, emsg, state); // strict "less" because we need space for trailing zero
     serializer->bytes_written += bytes_appended;
 
-    /* append to buffer */
+    // append to buffer
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
@@ -5142,10 +4832,10 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
 
     chunk_size = 8;
 
-    /* save array length */
+    // save array length
     ae_serializer_serialize_int(serializer, bytes->cnt, state);
 
-    /* determine entries count */
+    // determine entries count
     entries_count = bytes->cnt/chunk_size + (bytes->cnt%chunk_size>0 ? 1 : 0);
     for(ae_int_t eidx=0; eidx<entries_count; eidx++)
     {
@@ -5237,11 +4927,11 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 
     chunk_size = 8;
 
-    /* read array length, allocate output */
+    // read array length, allocate output
     ae_serializer_unserialize_int(serializer, &n, state);
     ae_vector_set_length(bytes, n, state);
 
-    /* determine entries count, read entries */
+    // determine entries count, read entries
     entries_count = n/chunk_size + (n%chunk_size>0 ? 1 : 0);
     for(ae_int_t eidx=0; eidx<entries_count; eidx++)
     {
@@ -5260,7 +4950,7 @@ void ae_serializer_stop(ae_serializer *serializer, ae_state *state)
 #ifdef AE_USE_CPP_SERIALIZATION
     if( serializer->mode==AE_SM_TO_CPPSTRING )
     {
-        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state);/* strict "less" because we need space for trailing zero */
+        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state);// strict "less" because we need space for trailing zero
         serializer->bytes_written++;
         *(serializer->out_cppstr) += ".";
         return;
@@ -5268,7 +4958,7 @@ void ae_serializer_stop(ae_serializer *serializer, ae_state *state)
 #endif
     if( serializer->mode==AE_SM_TO_STRING )
     {
-        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state); /* strict "less" because we need space for trailing zero */
+        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
         serializer->bytes_written++;
         strcat(serializer->out_str, ".");
         serializer->out_str += 1;
@@ -5276,26 +4966,22 @@ void ae_serializer_stop(ae_serializer *serializer, ae_state *state)
     }
     if( serializer->mode==AE_SM_TO_STREAM )
     {
-        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state); /* strict "less" because we need space for trailing zero */
+        ae_assert(serializer->bytes_written+1<serializer->bytes_asked, "ae_serializer: integrity check failed", state); // strict "less" because we need space for trailing zero
         serializer->bytes_written++;
         ae_assert(serializer->stream_writer(".", serializer->stream_aux)==0, "ae_serializer: error writing to stream", state);
         return;
     }
     if( serializer->mode==AE_SM_FROM_STRING )
     {
-        /*
-         * because input string may be from pre-3.11 serializer,
-         * which does not include trailing dot, we do not test
-         * string for presence of "." symbol. Anyway, because string
-         * is not stream, we do not have to read ALL trailing symbols.
-         */
+        // because input string may be from pre-3.11 serializer,
+        // which does not include trailing dot, we do not test
+        // string for presence of "." symbol. Anyway, because string
+        // is not stream, we do not have to read ALL trailing symbols.
         return;
     }
     if( serializer->mode==AE_SM_FROM_STREAM )
     {
-        /*
-         * Read trailing dot, perform integrity check
-         */
+        // Read trailing dot, perform integrity check
         char buf[2];
         ae_assert(serializer->stream_reader(serializer->stream_aux, 1, buf)==0, "ae_serializer: error reading from stream", state);
         ae_assert(buf[0]=='.', "ae_serializer: trailing . is not found in the stream", state);
@@ -5305,9 +4991,7 @@ void ae_serializer_stop(ae_serializer *serializer, ae_state *state)
 }
 
 
-/************************************************************************
-Complex math functions
-************************************************************************/
+// Complex math functions
 ae_complex ae_complex_from_i(ae_int_t v)
 {
     ae_complex r;
@@ -5513,9 +5197,7 @@ ae_complex ae_c_d_div(double lhs,   ae_complex rhs)
 }
 
 
-/************************************************************************
-Complex BLAS operations
-************************************************************************/
+// Complex BLAS operations
 ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n)
 {
     double rx = 0, ry = 0;
@@ -5586,9 +5268,7 @@ void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, a
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5605,9 +5285,7 @@ void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, a
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5630,9 +5308,7 @@ void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5652,9 +5328,7 @@ void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5680,9 +5354,7 @@ void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, 
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5702,9 +5374,7 @@ void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, 
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5730,9 +5400,7 @@ void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, 
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             double ax = alpha.x, ay = alpha.y;
@@ -5754,9 +5422,7 @@ void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, 
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         if( bconj )
         {
             double ax = alpha.x, ay = alpha.y;
@@ -5784,9 +5450,7 @@ void ae_v_cadd(ae_complex *vdst,     ae_int_t stride_dst, const ae_complex *vsrc
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5806,9 +5470,7 @@ void ae_v_cadd(ae_complex *vdst,     ae_int_t stride_dst, const ae_complex *vsrc
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5834,9 +5496,7 @@ void ae_v_caddd(ae_complex *vdst,    ae_int_t stride_dst, const ae_complex *vsrc
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5856,9 +5516,7 @@ void ae_v_caddd(ae_complex *vdst,    ae_int_t stride_dst, const ae_complex *vsrc
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5884,9 +5542,7 @@ void ae_v_caddc(ae_complex *vdst,    ae_int_t stride_dst, const ae_complex *vsrc
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         double ax = alpha.x, ay = alpha.y;
         if( bconj )
         {
@@ -5907,9 +5563,7 @@ void ae_v_caddc(ae_complex *vdst,    ae_int_t stride_dst, const ae_complex *vsrc
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         double ax = alpha.x, ay = alpha.y;
         if( bconj )
         {
@@ -5936,9 +5590,7 @@ void ae_v_csub(ae_complex *vdst,     ae_int_t stride_dst, const ae_complex *vsrc
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
@@ -5958,9 +5610,7 @@ void ae_v_csub(ae_complex *vdst,     ae_int_t stride_dst, const ae_complex *vsrc
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         if( bconj )
         {
             for(i=0; i<n; i++, vdst++, vsrc++)
@@ -5997,9 +5647,7 @@ void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha)
     ae_int_t i;
     if( stride_dst!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst)
         {
             vdst->x *= alpha;
@@ -6008,9 +5656,7 @@ void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha)
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         for(i=0; i<n; i++, vdst++)
         {
             vdst->x *= alpha;
@@ -6024,9 +5670,7 @@ void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex al
     ae_int_t i;
     if( stride_dst!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         double ax = alpha.x, ay = alpha.y;
         for(i=0; i<n; i++, vdst+=stride_dst)
         {
@@ -6037,9 +5681,7 @@ void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex al
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         double ax = alpha.x, ay = alpha.y;
         for(i=0; i<n; i++, vdst++)
         {
@@ -6050,26 +5692,20 @@ void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex al
     }
 }
 
-/************************************************************************
-Real BLAS operations
-************************************************************************/
+// Real BLAS operations
 double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n)
 {
     double result = 0;
     ae_int_t i;
     if( stride0!=1 || stride1!=1 )
     {
-        /*
-         * slow general code
-         */
+        // slow general code
         for(i=0; i<n; i++, v0+=stride0, v1+=stride1)
             result += (*v0)*(*v1);
     }
     else
     {
-        /*
-         * optimized code for stride=1
-         */
+        // optimized code for stride=1
         ae_int_t n4 = n/4;
         ae_int_t nleft = n%4;
         for(i=0; i<n4; i++, v0+=4, v1+=4)
@@ -6085,17 +5721,13 @@ void ae_v_move(double *vdst,  ae_int_t stride_dst, const double* vsrc,  ae_int_t
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst = *vsrc;
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6112,17 +5744,13 @@ void ae_v_moveneg(double *vdst,  ae_int_t stride_dst, const double* vsrc,  ae_in
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst = -*vsrc;
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6139,17 +5767,13 @@ void ae_v_moved(double *vdst,  ae_int_t stride_dst, const double* vsrc,  ae_int_
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst = alpha*(*vsrc);
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6166,17 +5790,13 @@ void ae_v_add(double *vdst,     ae_int_t stride_dst, const double *vsrc,  ae_int
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst += *vsrc;
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6193,17 +5813,13 @@ void ae_v_addd(double *vdst,    ae_int_t stride_dst, const double *vsrc,  ae_int
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst += alpha*(*vsrc);
     }
     else
     {
-        /*
-         * optimized case
-         */
+        // optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6220,17 +5836,13 @@ void ae_v_sub(double *vdst,     ae_int_t stride_dst, const double *vsrc,  ae_int
     ae_int_t i;
     if( stride_dst!=1 || stride_src!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst, vsrc+=stride_src)
             *vdst -= *vsrc;
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         ae_int_t n2 = n/2;
         for(i=0; i<n2; i++, vdst+=2, vsrc+=2)
         {
@@ -6252,42 +5864,34 @@ void ae_v_muld(double *vdst,  ae_int_t stride_dst, ae_int_t n, double alpha)
     ae_int_t i;
     if( stride_dst!=1 )
     {
-        /*
-         * general unoptimized case
-         */
+        // general unoptimized case
         for(i=0; i<n; i++, vdst+=stride_dst)
             *vdst *= alpha;
     }
     else
     {
-        /*
-         * highly optimized case
-         */
+        // highly optimized case
         for(i=0; i<n; i++, vdst++)
             *vdst *= alpha;
     }
 }
 
-/************************************************************************
-Other functions
-************************************************************************/
+// Other functions
 ae_int_t ae_v_len(ae_int_t a, ae_int_t b)
 {
     return b-a+1;
 }
 
-/************************************************************************
-RComm functions
-************************************************************************/
+// RComm functions
 void _rcommstate_init(rcommstate* p, ae_state *_state, ae_bool make_automatic)
 {
-    /* initial zero-filling */
+    // initial zero-filling
     memset(&p->ba, 0, sizeof(p->ba));
     memset(&p->ia, 0, sizeof(p->ia));
     memset(&p->ra, 0, sizeof(p->ra));
     memset(&p->ca, 0, sizeof(p->ca));
 
-    /* initialization */
+    // initialization
     ae_vector_init(&p->ba, 0, DT_BOOL,    _state, make_automatic);
     ae_vector_init(&p->ia, 0, DT_INT,     _state, make_automatic);
     ae_vector_init(&p->ra, 0, DT_REAL,    _state, make_automatic);
@@ -6296,13 +5900,13 @@ void _rcommstate_init(rcommstate* p, ae_state *_state, ae_bool make_automatic)
 
 void _rcommstate_init_copy(rcommstate* dst, rcommstate* src, ae_state *_state, ae_bool make_automatic)
 {
-    /* initial zero-filling */
+    // initial zero-filling
     memset(&dst->ba, 0, sizeof(dst->ba));
     memset(&dst->ia, 0, sizeof(dst->ia));
     memset(&dst->ra, 0, sizeof(dst->ra));
     memset(&dst->ca, 0, sizeof(dst->ca));
 
-    /* initialization */
+    // initialization
     ae_vector_init_copy(&dst->ba, &src->ba, _state, make_automatic);
     ae_vector_init_copy(&dst->ia, &src->ia, _state, make_automatic);
     ae_vector_init_copy(&dst->ra, &src->ra, _state, make_automatic);
@@ -6331,9 +5935,7 @@ void _rcommstate_destroy(rcommstate* p)
 // THIS SECTION CONTAINS C++ RELATED FUNCTIONALITY
 //
 /////////////////////////////////////////////////////////////////////////
-/********************************************************************
-Internal forwards
-********************************************************************/
+// Internal forwards
 namespace alglib
 {
     double get_aenv_nan();
@@ -6356,9 +5958,7 @@ namespace alglib
     std::string arraytostring(const alglib::complex *ptr, ae_int_t n, int dps);
 }
 
-/********************************************************************
-Global and local constants/variables
-********************************************************************/
+// Global and local constants/variables
 const double alglib::machineepsilon = 5E-16;
 const double alglib::maxrealnumber  = 1E300;
 const double alglib::minrealnumber  = 1E-300;
@@ -6378,9 +5978,7 @@ const alglib::xparams &alglib::parallel = *((const alglib::xparams *)(&_i64_xpar
 
 
 
-/********************************************************************
-Exception handling
-********************************************************************/
+// Exception handling
 #if !defined(AE_NO_EXCEPTIONS)
 alglib::ap_error::ap_error()
 {
@@ -6425,9 +6023,7 @@ void alglib::clear_error_flag()
 }
 #endif
 
-/********************************************************************
-Complex number with double precision.
-********************************************************************/
+// Complex number with double precision.
 alglib::complex::complex():x(0.0),y(0.0)
 {
 }
@@ -6746,9 +6342,7 @@ alglib_impl::ae_uint64_t alglib::_ae_get_global_threading()
 }
 
 
-/********************************************************************
-Level 1 BLAS functions
-********************************************************************/
+// Level 1 BLAS functions
 double alglib::vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n)
 {
     double result = 0;
@@ -7608,9 +7202,7 @@ alglib::ae_int_t alglib::vlen(ae_int_t n1, ae_int_t n2)
 }
 
 
-/********************************************************************
-Matrices and vectors
-********************************************************************/
+// Matrices and vectors
 alglib::ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype)
 {
     if( e_ptr==NULL || e_ptr->datatype!=datatype )
@@ -8742,9 +8334,7 @@ std::string alglib::complex_2d_array::tostring(int dps) const
 }
 #endif
 
-/********************************************************************
-Internal functions
-********************************************************************/
+// Internal functions
 double alglib::get_aenv_nan()
 {
     double r;
@@ -9201,9 +8791,7 @@ std::string alglib::arraytostring(const alglib::complex *ptr, ae_int_t n, int dp
 #endif
 
 
-/********************************************************************
-standard functions
-********************************************************************/
+// standard functions
 int alglib::sign(double x)
 {
     if( x>0 ) return  1;
@@ -9335,9 +8923,7 @@ bool alglib::fp_isfinite(double x)
     return alglib_impl::ae_isfinite_stateless(x,endianness);
 }
 
-/********************************************************************
-CSV functions
-********************************************************************/
+// CSV functions
 #if !defined(AE_NO_EXCEPTIONS)
 void alglib::read_csv(const char *filename, char separator, int flags, alglib::real_2d_array &out)
 {
@@ -9469,9 +9055,7 @@ void alglib::read_csv(const char *filename, char separator, int flags, alglib::r
 
 
 
-/********************************************************************
-Trace functions
-********************************************************************/
+// Trace functions
 void alglib::trace_file(std::string tags, std::string filename)
 {
     alglib_impl::ae_trace_file(tags.c_str(), filename.c_str());
@@ -9514,20 +9098,18 @@ namespace alglib_impl
 
 
 
-/********************************************************************
-This subroutine calculates fast 32x32 real matrix-vector product:
-
-    y := beta*y + alpha*A*x
-
-using either generic C code or native optimizations (if available)
-
-IMPORTANT:
-* A must be stored in row-major order,
-  stride is alglib_r_block,
-  aligned on alglib_simd_alignment boundary
-* X must be aligned on alglib_simd_alignment boundary
-* Y may be non-aligned
-********************************************************************/
+// This subroutine calculates fast 32x32 real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using either generic C code or native optimizations (if available)
+//
+// IMPORTANT:
+// * A must be stored in row-major order,
+//   stride is alglib_r_block,
+//   aligned on alglib_simd_alignment boundary
+// * X must be aligned on alglib_simd_alignment boundary
+// * Y may be non-aligned
 void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta)
 {
     ae_int_t i, k;
@@ -9564,11 +9146,9 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
         y[0] = beta*y[0]+alpha*v0;
         y[stride] = beta*y[stride]+alpha*v1;
 
-        /*
-         * now we've processed rows I and I+1,
-         * pa0 and pa1 are pointing to rows I+1 and I+2.
-         * move to I+2 and I+3.
-         */
+        // now we've processed rows I and I+1,
+        // pa0 and pa1 are pointing to rows I+1 and I+2.
+        // move to I+2 and I+3.
         pa0 += alglib_r_block;
         pa1 += alglib_r_block;
         pb = x;
@@ -9577,30 +9157,26 @@ void _ialglib_mv_32(const double *a, const double *x, double *y, ae_int_t stride
 }
 
 
-/*************************************************************************
-This function calculates MxN real matrix-vector product:
-
-    y := beta*y + alpha*A*x
-
-using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-
-If beta is zero, we do not use previous values of y (they are  overwritten
-by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-product is calculated (only beta is updated); however, this update  is not
-efficient  and  this  function  should  NOT  be used for multiplication of
-vector and scalar.
-
-IMPORTANT:
-* 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
-* A must be stored in row-major order with stride equal to alglib_r_block
-*************************************************************************/
+// This function calculates MxN real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
+// product is calculated (only beta is updated); however, this update  is not
+// efficient  and  this  function  should  NOT  be used for multiplication of
+// vector and scalar.
+//
+// IMPORTANT:
+// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * A must be stored in row-major order with stride equal to alglib_r_block
 void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta)
 {
-    /*
-     * Handle special cases:
-     * - alpha is zero or n is zero
-     * - m is zero
-     */
+    // Handle special cases:
+    // - alpha is zero or n is zero
+    // - m is zero
     if( m==0 )
         return;
     if( alpha==0.0 || n==0 )
@@ -9625,15 +9201,11 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
         return;
     }
 
-    /*
-     * Handle general case: nonzero alpha, n and m
-     *
-     */
+    // Handle general case: nonzero alpha, n and m
+    //
     if( m==32 && n==32 )
     {
-        /*
-         * 32x32, may be we have something better than general implementation
-         */
+        // 32x32, may be we have something better than general implementation
         _ialglib_mv_32(a, x, y, stride, alpha, beta);
     }
     else
@@ -9641,10 +9213,8 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
         ae_int_t i, k, m2, n8, n2, ntrail2;
         const double *pa0, *pa1, *pb;
 
-        /*
-         * First M/2 rows of A are processed in pairs.
-         * optimized code is used.
-         */
+        // First M/2 rows of A are processed in pairs.
+        // optimized code is used.
         m2 = m/2;
         n8 = n/8;
         ntrail2 = (n-8*n8)/2;
@@ -9652,18 +9222,14 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
         {
             double v0 = 0, v1 = 0;
 
-            /*
-             * 'a' points to the part of the matrix which
-             * is not processed yet
-             */
+            // 'a' points to the part of the matrix which
+            // is not processed yet
             pb = x;
             pa0 = a;
             pa1 = a+alglib_r_block;
             a += alglib_twice_r_block;
 
-            /*
-             * 8 elements per iteration
-             */
+            // 8 elements per iteration
             for(k=0; k<n8; k++)
             {
                 v0 += pa0[0]*pb[0];
@@ -9687,9 +9253,7 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
                 pb  += 8;
             }
 
-            /*
-             * 2 elements per iteration
-             */
+            // 2 elements per iteration
             for(k=0; k<ntrail2; k++)
             {
                 v0 += pa0[0]*pb[0];
@@ -9701,18 +9265,14 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
                 pb  += 2;
             }
 
-            /*
-             * last element, if needed
-             */
+            // last element, if needed
             if( n%2!=0 )
             {
                 v0 += pa0[0]*pb[0];
                 v1 += pa1[0]*pb[0];
             }
 
-            /*
-             * final update
-             */
+            // final update
             if( beta!=0 )
             {
                 y[0] = beta*y[0]+alpha*v0;
@@ -9724,30 +9284,22 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
                 y[stride] = alpha*v1;
             }
 
-            /*
-             * move to the next pair of elements
-             */
+            // move to the next pair of elements
             y+=2*stride;
         }
 
 
-        /*
-         * Last (odd) row is processed with less optimized code.
-         */
+        // Last (odd) row is processed with less optimized code.
         if( m%2!=0 )
         {
             double v0 = 0;
 
-            /*
-             * 'a' points to the part of the matrix which
-             * is not processed yet
-             */
+            // 'a' points to the part of the matrix which
+            // is not processed yet
             pb = x;
             pa0 = a;
 
-            /*
-             * 2 elements per iteration
-             */
+            // 2 elements per iteration
             n2 = n/2;
             for(k=0; k<n2; k++)
             {
@@ -9756,15 +9308,11 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
                 pb  += 2;
             }
 
-            /*
-             * last element, if needed
-             */
+            // last element, if needed
             if( n%2!=0 )
                 v0 += pa0[0]*pb[0];
 
-            /*
-             * final update
-             */
+            // final update
             if( beta!=0 )
                 y[0] = beta*y[0]+alpha*v0;
             else
@@ -9774,39 +9322,37 @@ void _ialglib_rmv(ae_int_t m, ae_int_t n, const double *a, const double *x, doub
 }
 
 
-/*************************************************************************
-This function calculates MxN real matrix-vector product:
-
-    y := beta*y + alpha*A*x
-
-using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
-
-If beta is zero, we do not use previous values of y (they are  overwritten
-by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
-product is calculated (only beta is updated); however, this update  is not
-efficient  and  this  function  should  NOT  be used for multiplication of
-vector and scalar.
-
-IMPORTANT:
-* 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
-* A must be stored in row-major order with stride equal to alglib_r_block
-* y may be non-aligned
-* both A and x must have same offset with respect to 16-byte boundary:
-  either both are aligned, or both are aligned with offset 8. Function
-  will crash your system if you try to call it with misaligned or
-  incorrectly aligned data.
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If (1) is failed, this function will be undefined. If (2) is failed,  call
-to this function will probably crash your system.
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-*************************************************************************/
+// This function calculates MxN real matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code. It calls _ialglib_mv_32 if both M=32 and N=32.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read).  If alpha is zero, no matrix-vector
+// product is calculated (only beta is updated); however, this update  is not
+// efficient  and  this  function  should  NOT  be used for multiplication of
+// vector and scalar.
+//
+// IMPORTANT:
+// * 0<=M<=alglib_r_block, 0<=N<=alglib_r_block
+// * A must be stored in row-major order with stride equal to alglib_r_block
+// * y may be non-aligned
+// * both A and x must have same offset with respect to 16-byte boundary:
+//   either both are aligned, or both are aligned with offset 8. Function
+//   will crash your system if you try to call it with misaligned or
+//   incorrectly aligned data.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, double *y, ae_int_t stride, double alpha, double beta)
 {
@@ -9815,11 +9361,9 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
     const double *pa0, *pa1, *pa2, *pb;
     __m128d v0, v1, v2, va0, va1, va2, vx, vtmp;
 
-    /*
-     * Handle special cases:
-     * - alpha is zero or n is zero
-     * - m is zero
-     */
+    // Handle special cases:
+    // - alpha is zero or n is zero
+    // - m is zero
     if( m==0 )
         return;
     if( alpha==0.0 || n==0 )
@@ -9843,22 +9387,20 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
         return;
     }
 
-    /*
-     * Handle general case: nonzero alpha, n and m
-     *
-     * We divide problem as follows...
-     *
-     * Rows M are divided into:
-     * - mb3 blocks, each 3xN
-     * - mtail blocks, each 1xN
-     *
-     * Within a row, elements are divided  into:
-     * - nhead 1x1 blocks (used to align the rest, either 0 or 1)
-     * - nb8 1x8 blocks, aligned to 16-byte boundary
-     * - nb2 1x2 blocks, aligned to 16-byte boundary
-     * - ntail 1x1 blocks, aligned too (altough we don't rely on it)
-     *
-     */
+    // Handle general case: nonzero alpha, n and m
+    //
+    // We divide problem as follows...
+    //
+    // Rows M are divided into:
+    // - mb3 blocks, each 3xN
+    // - mtail blocks, each 1xN
+    //
+    // Within a row, elements are divided  into:
+    // - nhead 1x1 blocks (used to align the rest, either 0 or 1)
+    // - nb8 1x8 blocks, aligned to 16-byte boundary
+    // - nb2 1x2 blocks, aligned to 16-byte boundary
+    // - ntail 1x1 blocks, aligned too (altough we don't rely on it)
+    //
     n2 = n/2;
     mb3 = m/3;
     mtail = m%3;
@@ -9901,10 +9443,8 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
         }
         for(k=0; k<nb8; k++)
         {
-            /*
-             * this code is a shuffle of simultaneous dot product.
-             * see below for commented unshuffled original version.
-             */
+            // this code is a shuffle of simultaneous dot product.
+            // see below for commented unshuffled original version.
             vx  = _mm_load_pd(pb);
             va0 = _mm_load_pd(pa0);
             va1 = _mm_load_pd(pa1);
@@ -9951,8 +9491,8 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
             pa2 += 8;
             pb += 8;
 
-            /*
-            this is unshuffled version of code above
+#if 0
+            // this is unshuffled version of code above
 
             vx  = _mm_load_pd(pb);
             va0 = _mm_load_pd(pa0);
@@ -10005,7 +9545,7 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
             v0 = _mm_add_pd(va0,v0);
             v1 = _mm_add_pd(va1,v1);
             v2 = _mm_add_pd(va2,v2);
-            */
+#endif
         }
         for(k=0; k<nb2; k++)
         {
@@ -10084,29 +9624,27 @@ void _ialglib_rmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
 #endif
 
 
-/*************************************************************************
-This subroutine calculates fast MxN complex matrix-vector product:
-
-    y := beta*y + alpha*A*x
-
-using generic C code, where A, x, y, alpha and beta are complex.
-
-If beta is zero, we do not use previous values of y (they are  overwritten
-by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-important when A or x contain infinities/NANs).
-
-IMPORTANT:
-* 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
-* A must be stored in row-major order, as sequence of double precision
-  pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-  in doubles).
-* Y may be referenced by cy (pointer to ae_complex) or
-  dy (pointer to array of double precision pair) depending on what type of
-  output you wish. Pass pointer to Y as one of these parameters,
-  AND SET OTHER PARAMETER TO NULL.
-* both A and x must be aligned; y may be non-aligned.
-*************************************************************************/
+// This subroutine calculates fast MxN complex matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code, where A, x, y, alpha and beta are complex.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
+// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
+// important when A or x contain infinities/NANs).
+//
+// IMPORTANT:
+// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * A must be stored in row-major order, as sequence of double precision
+//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
+//   in doubles).
+// * Y may be referenced by cy (pointer to ae_complex) or
+//   dy (pointer to array of double precision pair) depending on what type of
+//   output you wish. Pass pointer to Y as one of these parameters,
+//   AND SET OTHER PARAMETER TO NULL.
+// * both A and x must be aligned; y may be non-aligned.
 void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta)
 {
     ae_int_t i, j;
@@ -10149,40 +9687,38 @@ void _ialglib_cmv(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_c
 }
 
 
-/*************************************************************************
-This subroutine calculates fast MxN complex matrix-vector product:
-
-    y := beta*y + alpha*A*x
-
-using generic C code, where A, x, y, alpha and beta are complex.
-
-If beta is zero, we do not use previous values of y (they are  overwritten
-by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
-still calculate A*x and  multiply  it  by  alpha  (this distinction can be
-important when A or x contain infinities/NANs).
-
-IMPORTANT:
-* 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
-* A must be stored in row-major order, as sequence of double precision
-  pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
-  in doubles).
-* Y may be referenced by cy (pointer to ae_complex) or
-  dy (pointer to array of double precision pair) depending on what type of
-  output you wish. Pass pointer to Y as one of these parameters,
-  AND SET OTHER PARAMETER TO NULL.
-* both A and x must be aligned; y may be non-aligned.
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If (1) is failed, this function will be undefined. If (2) is failed,  call
-to this function will probably crash your system.
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-*************************************************************************/
+// This subroutine calculates fast MxN complex matrix-vector product:
+//
+//     y := beta*y + alpha*A*x
+//
+// using generic C code, where A, x, y, alpha and beta are complex.
+//
+// If beta is zero, we do not use previous values of y (they are  overwritten
+// by alpha*A*x without ever being read). However, when  alpha  is  zero,  we
+// still calculate A*x and  multiply  it  by  alpha  (this distinction can be
+// important when A or x contain infinities/NANs).
+//
+// IMPORTANT:
+// * 0<=M<=alglib_c_block, 0<=N<=alglib_c_block
+// * A must be stored in row-major order, as sequence of double precision
+//   pairs. Stride is alglib_c_block (it is measured in pairs of doubles, not
+//   in doubles).
+// * Y may be referenced by cy (pointer to ae_complex) or
+//   dy (pointer to array of double precision pair) depending on what type of
+//   output you wish. Pass pointer to Y as one of these parameters,
+//   AND SET OTHER PARAMETER TO NULL.
+// * both A and x must be aligned; y may be non-aligned.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x, ae_complex *cy, double *dy, ae_int_t stride, ae_complex alpha, ae_complex beta)
 {
@@ -10295,9 +9831,7 @@ void _ialglib_cmv_sse2(ae_int_t m, ae_int_t n, const double *a, const double *x,
 }
 #endif
 
-/********************************************************************
-This subroutine sets vector to zero
-********************************************************************/
+// This subroutine sets vector to zero
 void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride)
 {
     ae_int_t i;
@@ -10313,9 +9847,7 @@ void _ialglib_vzero(ae_int_t n, double *p, ae_int_t stride)
     }
 }
 
-/********************************************************************
-This subroutine sets vector to zero
-********************************************************************/
+// This subroutine sets vector to zero
 void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride)
 {
     ae_int_t i;
@@ -10338,9 +9870,7 @@ void _ialglib_vzero_complex(ae_int_t n, ae_complex *p, ae_int_t stride)
 }
 
 
-/********************************************************************
-This subroutine copies unaligned real vector
-********************************************************************/
+// This subroutine copies unaligned real vector
 void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb)
 {
     ae_int_t i, n2;
@@ -10363,20 +9893,16 @@ void _ialglib_vcopy(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae
 }
 
 
-/********************************************************************
-This subroutine copies unaligned complex vector
-(passed as ae_complex*)
-
-1. strideb is stride measured in complex numbers, not doubles
-2. conj may be "N" (no conj.) or "C" (conj.)
-********************************************************************/
+// This subroutine copies unaligned complex vector
+// (passed as ae_complex*)
+//
+// 1. strideb is stride measured in complex numbers, not doubles
+// 2. conj may be "N" (no conj.) or "C" (conj.)
 void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj)
 {
     ae_int_t i;
 
-    /*
-     * more general case
-     */
+    // more general case
     if( conj[0]=='N' || conj[0]=='n' )
     {
         for(i=0; i<n; i++,a+=stridea,b+=2*strideb)
@@ -10396,19 +9922,15 @@ void _ialglib_vcopy_complex(ae_int_t n, const ae_complex *a, ae_int_t stridea, d
 }
 
 
-/********************************************************************
-This subroutine copies unaligned complex vector (passed as double*)
-
-1. strideb is stride measured in complex numbers, not doubles
-2. conj may be "N" (no conj.) or "C" (conj.)
-********************************************************************/
+// This subroutine copies unaligned complex vector (passed as double*)
+//
+// 1. strideb is stride measured in complex numbers, not doubles
+// 2. conj may be "N" (no conj.) or "C" (conj.)
 void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, double *b, ae_int_t strideb, const char *conj)
 {
     ae_int_t i;
 
-    /*
-     * more general case
-     */
+    // more general case
     if( conj[0]=='N' || conj[0]=='n' )
     {
         for(i=0; i<n; i++,a+=2*stridea,b+=2*strideb)
@@ -10428,25 +9950,23 @@ void _ialglib_vcopy_dcomplex(ae_int_t n, const double *a, ae_int_t stridea, doub
 }
 
 
-/********************************************************************
-This subroutine copies matrix from  non-aligned non-contigous storage
-to aligned contigous storage
-
-A:
-* MxN
-* non-aligned
-* non-contigous
-* may be transformed during copying (as prescribed by op)
-
-B:
-* alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-* aligned
-* stride is alglib_r_block
-
-Transformation types:
-* 0 - no transform
-* 1 - transposition
-********************************************************************/
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_r_block
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
 void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b)
 {
     ae_int_t i, j, n2;
@@ -10483,36 +10003,34 @@ void _ialglib_mcopyblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, a
 }
 
 
-/********************************************************************
-This subroutine copies matrix from  non-aligned non-contigous storage
-to aligned contigous storage
-
-A:
-* MxN
-* non-aligned
-* non-contigous
-* may be transformed during copying (as prescribed by op)
-
-B:
-* alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-* aligned
-* stride is alglib_r_block
-
-Transformation types:
-* 0 - no transform
-* 1 - transposition
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If (1) is failed, this function will be undefined. If (2) is failed,  call
-to this function will probably crash your system.
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-********************************************************************/
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_r_block
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will be undefined. If (2) is failed,  call
+// to this function will probably crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_int_t stride, double *b)
 {
@@ -10616,25 +10134,23 @@ void _ialglib_mcopyblock_sse2(ae_int_t m, ae_int_t n, const double *a, ae_int_t 
 #endif
 
 
-/********************************************************************
-This subroutine copies matrix from  aligned contigous storage to non-
-aligned non-contigous storage
-
-A:
-* MxN
-* aligned
-* contigous
-* stride is alglib_r_block
-* may be transformed during copying (as prescribed by op)
-
-B:
-* alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
-* non-aligned, non-contigous
-
-Transformation types:
-* 0 - no transform
-* 1 - transposition
-********************************************************************/
+// This subroutine copies matrix from  aligned contigous storage to non-
+// aligned non-contigous storage
+//
+// A:
+// * MxN
+// * aligned
+// * contigous
+// * stride is alglib_r_block
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * alglib_r_block*alglib_r_block (only MxN/NxM submatrix is used)
+// * non-aligned, non-contigous
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
 void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, double *b, ae_int_t stride)
 {
     ae_int_t i, j, n2;
@@ -10671,29 +10187,27 @@ void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op,
 }
 
 
-/********************************************************************
-This subroutine copies matrix from  non-aligned non-contigous storage
-to aligned contigous storage
-
-A:
-* MxN
-* non-aligned
-* non-contigous
-* may be transformed during copying (as prescribed by op)
-* pointer to ae_complex is passed
-
-B:
-* 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
-* aligned
-* stride is alglib_c_block
-* pointer to double is passed
-
-Transformation types:
-* 0 - no transform
-* 1 - transposition
-* 2 - conjugate transposition
-* 3 - conjugate, but no  transposition
-********************************************************************/
+// This subroutine copies matrix from  non-aligned non-contigous storage
+// to aligned contigous storage
+//
+// A:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * may be transformed during copying (as prescribed by op)
+// * pointer to ae_complex is passed
+//
+// B:
+// * 2*alglib_c_block*alglib_c_block doubles (only MxN/NxM submatrix is used)
+// * aligned
+// * stride is alglib_c_block
+// * pointer to double is passed
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+// * 2 - conjugate transposition
+// * 3 - conjugate, but no  transposition
 void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b)
 {
     ae_int_t i, j;
@@ -10738,29 +10252,27 @@ void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae
 }
 
 
-/********************************************************************
-This subroutine copies matrix from aligned contigous storage to
-non-aligned non-contigous storage
-
-A:
-* 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
-* aligned
-* stride is alglib_c_block
-* pointer to double is passed
-* may be transformed during copying (as prescribed by op)
-
-B:
-* MxN
-* non-aligned
-* non-contigous
-* pointer to ae_complex is passed
-
-Transformation types:
-* 0 - no transform
-* 1 - transposition
-* 2 - conjugate transposition
-* 3 - conjugate, but no  transposition
-********************************************************************/
+// This subroutine copies matrix from aligned contigous storage to
+// non-aligned non-contigous storage
+//
+// A:
+// * 2*alglib_c_block*alglib_c_block doubles (only MxN submatrix is used)
+// * aligned
+// * stride is alglib_c_block
+// * pointer to double is passed
+// * may be transformed during copying (as prescribed by op)
+//
+// B:
+// * MxN
+// * non-aligned
+// * non-contigous
+// * pointer to ae_complex is passed
+//
+// Transformation types:
+// * 0 - no transform
+// * 1 - transposition
+// * 2 - conjugate transposition
+// * 3 - conjugate, but no  transposition
 void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex* b, ae_int_t stride)
 {
     ae_int_t i, j;
@@ -10805,9 +10317,7 @@ void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_i
 }
 
 
-/********************************************************************
-Real GEMM kernel
-********************************************************************/
+// Real GEMM kernel
 ae_bool _ialglib_rmatrixgemm(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -10834,9 +10344,7 @@ ae_bool _ialglib_rmatrixgemm(ae_int_t m,
     if( m>alglib_r_block || n>alglib_r_block || k>alglib_r_block || m<=0 || n<=0 || k<=0 || alpha==0.0 )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -10845,18 +10353,14 @@ ae_bool _ialglib_rmatrixgemm(ae_int_t m,
     }
 #endif
 
-    /*
-     * copy b
-     */
+    // copy b
     if( optypeb==0 )
         mcopyblock(k, n, _b, 1, _b_stride, b);
     else
         mcopyblock(n, k, _b, 0, _b_stride, b);
 
-    /*
-     * multiply B by A (from the right, by rows)
-     * and store result in C
-     */
+    // multiply B by A (from the right, by rows)
+    // and store result in C
     crow  = _c;
     if( optypea==0 )
     {
@@ -10888,9 +10392,7 @@ ae_bool _ialglib_rmatrixgemm(ae_int_t m,
 }
 
 
-/********************************************************************
-Complex GEMM kernel
-********************************************************************/
+// Complex GEMM kernel
 ae_bool _ialglib_cmatrixgemm(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -10919,9 +10421,7 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m,
     if( m>alglib_c_block || n>alglib_c_block || k>alglib_c_block )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -10929,9 +10429,7 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m,
     }
 #endif
 
-    /*
-     * copy b
-     */
+    // copy b
     brows = optypeb==0 ? k : n;
     bcols = optypeb==0 ? n : k;
     if( optypeb==0 )
@@ -10941,10 +10439,8 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m,
     if( optypeb==2 )
         _ialglib_mcopyblock_complex(brows, bcols, _b, 3, _b_stride, b);
 
-    /*
-     * multiply B by A (from the right, by rows)
-     * and store result in C
-     */
+    // multiply B by A (from the right, by rows)
+    // and store result in C
     arow  = _a;
     crow  = _c;
     for(i=0; i<m; i++)
@@ -10973,9 +10469,7 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m,
 }
 
 
-/********************************************************************
-complex TRSM kernel
-********************************************************************/
+// complex TRSM kernel
 ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
      ae_int_t n,
      ae_complex *_a,
@@ -10986,9 +10480,7 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
      ae_complex *_x,
      ae_int_t _x_stride)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *pdiag;
     ae_int_t i;
     double _loc_abuf[2*alglib_c_block*alglib_c_block+alglib_simd_alignment];
@@ -11003,9 +10495,7 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
     if( m>alglib_c_block || n>alglib_c_block )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -11013,9 +10503,7 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
     }
 #endif
 
-    /*
-     * Prepare
-     */
+    // Prepare
     _ialglib_mcopyblock_complex(n, n, _a, optype, _a_stride, abuf);
     _ialglib_mcopyblock_complex(m, n, _x, 0, _x_stride, xbuf);
     if( isunit )
@@ -11029,9 +10517,7 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
     else
         uppera = !isupper;
 
-    /*
-     * Solve Y*A^-1=X where A is upper or lower triangular
-     */
+    // Solve Y*A^-1=X where A is upper or lower triangular
     if( uppera )
     {
         for(i=0,pdiag=abuf; i<n; i++,pdiag+=2*(alglib_c_block+1))
@@ -11070,9 +10556,7 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m,
 }
 
 
-/********************************************************************
-real TRSM kernel
-********************************************************************/
+// real TRSM kernel
 ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
      ae_int_t n,
      double *_a,
@@ -11083,9 +10567,7 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
      double *_x,
      ae_int_t _x_stride)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *pdiag;
     ae_int_t i;
     double _loc_abuf[alglib_r_block*alglib_r_block+alglib_simd_alignment];
@@ -11101,9 +10583,7 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
     if( m>alglib_r_block || n>alglib_r_block )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -11112,9 +10592,7 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
     }
 #endif
 
-    /*
-     * Prepare
-     */
+    // Prepare
     mcopyblock(n, n, _a, optype, _a_stride, abuf);
     mcopyblock(m, n, _x, 0, _x_stride, xbuf);
     if( isunit )
@@ -11125,9 +10603,7 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
     else
         uppera = !isupper;
 
-    /*
-     * Solve Y*A^-1=X where A is upper or lower triangular
-     */
+    // Solve Y*A^-1=X where A is upper or lower triangular
     if( uppera )
     {
         for(i=0,pdiag=abuf; i<n; i++,pdiag+=alglib_r_block+1)
@@ -11154,9 +10630,7 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m,
 }
 
 
-/********************************************************************
-complex TRSM kernel
-********************************************************************/
+// complex TRSM kernel
 ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
      ae_int_t n,
      ae_complex *_a,
@@ -11167,9 +10641,7 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
      ae_complex *_x,
      ae_int_t _x_stride)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *pdiag, *arow;
     ae_int_t i;
     double _loc_abuf[2*alglib_c_block*alglib_c_block+alglib_simd_alignment];
@@ -11184,9 +10656,7 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
     if( m>alglib_c_block || n>alglib_c_block )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -11194,10 +10664,8 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
     }
 #endif
 
-    /*
-     * Prepare
-     * Transpose X (so we may use mv, which calculates A*x, but not x*A)
-     */
+    // Prepare
+    // Transpose X (so we may use mv, which calculates A*x, but not x*A)
     _ialglib_mcopyblock_complex(m, m, _a, optype, _a_stride, abuf);
     _ialglib_mcopyblock_complex(m, n, _x, 1, _x_stride, xbuf);
     if( isunit )
@@ -11211,9 +10679,7 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
     else
         uppera = !isupper;
 
-    /*
-     * Solve A^-1*Y^T=X^T where A is upper or lower triangular
-     */
+    // Solve A^-1*Y^T=X^T where A is upper or lower triangular
     if( uppera )
     {
         for(i=m-1,pdiag=abuf+2*((m-1)*alglib_c_block+(m-1)); i>=0; i--,pdiag-=2*(alglib_c_block+1))
@@ -11251,9 +10717,7 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m,
 }
 
 
-/********************************************************************
-real TRSM kernel
-********************************************************************/
+// real TRSM kernel
 ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
      ae_int_t n,
      double *_a,
@@ -11264,9 +10728,7 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
      double *_x,
      ae_int_t _x_stride)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *pdiag, *arow;
     ae_int_t i;
     double _loc_abuf[alglib_r_block*alglib_r_block+alglib_simd_alignment];
@@ -11282,9 +10744,7 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
     if( m>alglib_r_block || n>alglib_r_block )
         return ae_false;
 
-    /*
-     * Check for SSE2 support
-     */
+    // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
     if( ae_cpuid() & CPU_SSE2 )
     {
@@ -11293,10 +10753,8 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
     }
 #endif
 
-    /*
-     * Prepare
-     * Transpose X (so we may use mv, which calculates A*x, but not x*A)
-     */
+    // Prepare
+    // Transpose X (so we may use mv, which calculates A*x, but not x*A)
     mcopyblock(m, m, _a, optype, _a_stride, abuf);
     mcopyblock(m, n, _x, 1, _x_stride, xbuf);
     if( isunit )
@@ -11307,9 +10765,7 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
     else
         uppera = !isupper;
 
-    /*
-     * Solve A^-1*Y^T=X^T where A is upper or lower triangular
-     */
+    // Solve A^-1*Y^T=X^T where A is upper or lower triangular
     if( uppera )
     {
         for(i=m-1,pdiag=abuf+(m-1)*alglib_r_block+(m-1); i>=0; i--,pdiag-=alglib_r_block+1)
@@ -11335,9 +10791,7 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m,
 }
 
 
-/********************************************************************
-complex SYRK kernel
-********************************************************************/
+// complex SYRK kernel
 ae_bool _ialglib_cmatrixherk(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -11349,9 +10803,7 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n,
      ae_int_t _c_stride,
      ae_bool isupper)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *arow, *crow;
     ae_complex c_alpha, c_beta;
     ae_int_t i;
@@ -11367,12 +10819,10 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n,
     if( n==0 )
         return ae_true;
 
-    /*
-     * copy A and C, task is transformed to "A*A^H"-form.
-     * if beta==0, then C is filled by zeros (and not referenced)
-     *
-     * alpha==0 or k==0 are correctly processed (A is not referenced)
-     */
+    // copy A and C, task is transformed to "A*A^H"-form.
+    // if beta==0, then C is filled by zeros (and not referenced)
+    //
+    // alpha==0 or k==0 are correctly processed (A is not referenced)
     c_alpha.x = alpha;
     c_alpha.y = 0;
     c_beta.x = beta;
@@ -11397,9 +10847,7 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n,
     }
 
 
-    /*
-     * update C
-     */
+    // update C
     if( isupper )
     {
         for(i=0,arow=abuf,crow=cbuf; i<n; i++,arow+=2*alglib_c_block,crow+=2*alglib_c_block)
@@ -11417,18 +10865,14 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n,
         }
     }
 
-    /*
-     * copy back
-     */
+    // copy back
     _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
 
     return ae_true;
 }
 
 
-/********************************************************************
-real SYRK kernel
-********************************************************************/
+// real SYRK kernel
 ae_bool _ialglib_rmatrixsyrk(ae_int_t n,
      ae_int_t k,
      double alpha,
@@ -11440,9 +10884,7 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n,
      ae_int_t _c_stride,
      ae_bool isupper)
 {
-    /*
-     * local buffers
-     */
+    // local buffers
     double *arow, *crow;
     ae_int_t i;
     double _loc_abuf[alglib_r_block*alglib_r_block+alglib_simd_alignment];
@@ -11455,12 +10897,10 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n,
     if( n==0 )
         return ae_true;
 
-    /*
-     * copy A and C, task is transformed to "A*A^T"-form.
-     * if beta==0, then C is filled by zeros (and not referenced)
-     *
-     * alpha==0 or k==0 are correctly processed (A is not referenced)
-     */
+    // copy A and C, task is transformed to "A*A^T"-form.
+    // if beta==0, then C is filled by zeros (and not referenced)
+    //
+    // alpha==0 or k==0 are correctly processed (A is not referenced)
     if( alpha==0 )
         k = 0;
     if( k>0 )
@@ -11481,9 +10921,7 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n,
     }
 
 
-    /*
-     * update C
-     */
+    // update C
     if( isupper )
     {
         for(i=0,arow=abuf,crow=cbuf; i<n; i++,arow+=alglib_r_block,crow+=alglib_r_block)
@@ -11499,18 +10937,14 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n,
         }
     }
 
-    /*
-     * copy back
-     */
+    // copy back
     _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
 
     return ae_true;
 }
 
 
-/********************************************************************
-complex rank-1 kernel
-********************************************************************/
+// complex rank-1 kernel
 ae_bool _ialglib_cmatrixrank1(ae_int_t m,
      ae_int_t n,
      ae_complex *_a,
@@ -11518,31 +10952,23 @@ ae_bool _ialglib_cmatrixrank1(ae_int_t m,
      ae_complex *_u,
      ae_complex *_v)
 {
-    /*
-     * Locals
-     */
+    // Locals
     ae_complex *arow, *pu, *pv, *vtmp, *dst;
     ae_int_t n2 = n/2;
     ae_int_t i, j;
 
-    /*
-     * Quick exit
-     */
+    // Quick exit
     if( m<=0 || n<=0 )
         return ae_false;
 
 
-    /*
-     * update pairs of rows
-     */
+    // update pairs of rows
     arow  = _a;
     pu    = _u;
     vtmp  = _v;
     for(i=0; i<m; i++, arow+=_a_stride, pu++)
     {
-        /*
-         * update by two
-         */
+        // update by two
         for(j=0,pv=vtmp, dst=arow; j<n2; j++, dst+=2, pv+=2)
         {
             double ux  = pu[0].x;
@@ -11557,9 +10983,7 @@ ae_bool _ialglib_cmatrixrank1(ae_int_t m,
             dst[1].y += ux*v1y+uy*v1x;
         }
 
-        /*
-         * final update
-         */
+        // final update
         if( n%2!=0 )
         {
             double ux = pu[0].x;
@@ -11574,10 +10998,8 @@ ae_bool _ialglib_cmatrixrank1(ae_int_t m,
 }
 
 
-/********************************************************************
-real rank-1 kernel
-deprecated version
-********************************************************************/
+// real rank-1 kernel
+// deprecated version
 ae_bool _ialglib_rmatrixrank1(ae_int_t m,
      ae_int_t n,
      double *_a,
@@ -11585,9 +11007,7 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m,
      double *_u,
      double *_v)
 {
-    /*
-     * Locals
-     */
+    // Locals
     double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
     ae_int_t m2 = m/2;
     ae_int_t n2 = n/2;
@@ -11595,24 +11015,18 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m,
     ae_int_t stride2 = 2*_a_stride;
     ae_int_t i, j;
 
-    /*
-     * Quick exit
-     */
+    // Quick exit
     if( m<=0 || n<=0 )
         return ae_false;
 
-    /*
-     * update pairs of rows
-     */
+    // update pairs of rows
     arow0 = _a;
     arow1 = arow0+stride;
     pu    = _u;
     vtmp  = _v;
     for(i=0; i<m2; i++,arow0+=stride2,arow1+=stride2,pu+=2)
     {
-        /*
-         * update by two
-         */
+        // update by two
         for(j=0,pv=vtmp, dst0=arow0, dst1=arow1; j<n2; j++, dst0+=2, dst1+=2, pv+=2)
         {
             dst0[0] += pu[0]*pv[0];
@@ -11621,9 +11035,7 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m,
             dst1[1] += pu[1]*pv[1];
         }
 
-        /*
-         * final update
-         */
+        // final update
         if( n%2!=0 )
         {
             dst0[0] += pu[0]*pv[0];
@@ -11631,23 +11043,17 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m,
         }
     }
 
-    /*
-     * update last row
-     */
+    // update last row
     if( m%2!=0 )
     {
-        /*
-         * update by two
-         */
+        // update by two
         for(j=0,pv=vtmp, dst0=arow0; j<n2; j++, dst0+=2, pv+=2)
         {
             dst0[0] += pu[0]*pv[0];
             dst0[1] += pu[0]*pv[1];
         }
 
-        /*
-         * final update
-         */
+        // final update
         if( n%2!=0 )
             dst0[0] += pu[0]*pv[0];
     }
@@ -11656,10 +11062,8 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m,
 
 
 
-/********************************************************************
-real rank-1 kernel
-deprecated version
-********************************************************************/
+// real rank-1 kernel
+// deprecated version
 ae_bool _ialglib_rmatrixger(ae_int_t m,
      ae_int_t n,
      double *_a,
@@ -11668,9 +11072,7 @@ ae_bool _ialglib_rmatrixger(ae_int_t m,
      double *_u,
      double *_v)
 {
-    /*
-     * Locals
-     */
+    // Locals
     double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
     ae_int_t m2 = m/2;
     ae_int_t n2 = n/2;
@@ -11678,15 +11080,11 @@ ae_bool _ialglib_rmatrixger(ae_int_t m,
     ae_int_t stride2 = 2*_a_stride;
     ae_int_t i, j;
 
-    /*
-     * Quick exit
-     */
+    // Quick exit
     if( m<=0 || n<=0 || alpha==0.0 )
         return ae_false;
 
-    /*
-     * update pairs of rows
-     */
+    // update pairs of rows
     arow0 = _a;
     arow1 = arow0+stride;
     pu    = _u;
@@ -11696,9 +11094,7 @@ ae_bool _ialglib_rmatrixger(ae_int_t m,
         double au0 = alpha*pu[0];
         double au1 = alpha*pu[1];
 
-        /*
-         * update by two
-         */
+        // update by two
         for(j=0,pv=vtmp, dst0=arow0, dst1=arow1; j<n2; j++, dst0+=2, dst1+=2, pv+=2)
         {
             dst0[0] += au0*pv[0];
@@ -11707,9 +11103,7 @@ ae_bool _ialglib_rmatrixger(ae_int_t m,
             dst1[1] += au1*pv[1];
         }
 
-        /*
-         * final update
-         */
+        // final update
         if( n%2!=0 )
         {
             dst0[0] += au0*pv[0];
@@ -11717,34 +11111,26 @@ ae_bool _ialglib_rmatrixger(ae_int_t m,
         }
     }
 
-    /*
-     * update last row
-     */
+    // update last row
     if( m%2!=0 )
     {
         double au0 = alpha*pu[0];
 
-        /*
-         * update by two
-         */
+        // update by two
         for(j=0,pv=vtmp, dst0=arow0; j<n2; j++, dst0+=2, pv+=2)
         {
             dst0[0] += au0*pv[0];
             dst0[1] += au0*pv[1];
         }
 
-        /*
-         * final update
-         */
+        // final update
         if( n%2!=0 )
             dst0[0] += au0*pv[0];
     }
     return ae_true;
 }
 
-/********************************************************************
-Interface functions for efficient kernels
-********************************************************************/
+// Interface functions for efficient kernels
 ae_bool _ialglib_i_rmatrixgemmf(ae_int_t m,
      ae_int_t n,
      ae_int_t k,
@@ -11762,11 +11148,11 @@ ae_bool _ialglib_i_rmatrixgemmf(ae_int_t m,
      ae_int_t ic,
      ae_int_t jc)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( alpha==0.0 || k==0 || n==0 || m==0)
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_rmatrixgemm(m, n, k, alpha, _a->ptr.pp_double[ia]+ja, _a->stride, optypea, _b->ptr.pp_double[ib]+jb, _b->stride, optypeb, beta, _c->ptr.pp_double[ic]+jc, _c->stride);
 }
 
@@ -11787,11 +11173,11 @@ ae_bool _ialglib_i_cmatrixgemmf(ae_int_t m,
      ae_int_t ic,
      ae_int_t jc)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( (alpha.x==0.0 && alpha.y==0) || k==0 || n==0 || m==0 )
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_cmatrixgemm(m, n, k, alpha, _a->ptr.pp_complex[ia]+ja, _a->stride, optypea, _b->ptr.pp_complex[ib]+jb, _b->stride, optypeb, beta, _c->ptr.pp_complex[ic]+jc, _c->stride);
 }
 
@@ -11807,11 +11193,11 @@ ae_bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m,
      ae_int_t i2,
      ae_int_t j2)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( m==0 || n==0)
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_cmatrixrighttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
 }
 
@@ -11827,11 +11213,11 @@ ae_bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m,
      ae_int_t i2,
      ae_int_t j2)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( m==0 || n==0)
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_rmatrixrighttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
 }
 
@@ -11847,11 +11233,11 @@ ae_bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m,
      ae_int_t i2,
      ae_int_t j2)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( m==0 || n==0)
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_cmatrixlefttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
 }
 
@@ -11867,11 +11253,11 @@ ae_bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m,
      ae_int_t i2,
      ae_int_t j2)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( m==0 || n==0)
         return ae_false;
 
-    /* handle with optimized ALGLIB kernel */
+    // handle with optimized ALGLIB kernel
     return _ialglib_rmatrixlefttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
 }
 
@@ -11888,11 +11274,11 @@ ae_bool _ialglib_i_cmatrixherkf(ae_int_t n,
      ae_int_t jc,
      ae_bool isupper)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( alpha==0.0 || k==0 || n==0)
         return ae_false;
 
-    /* ALGLIB kernel */
+    // ALGLIB kernel
     return _ialglib_cmatrixherk(n, k, alpha, &a->ptr.pp_complex[ia][ja], a->stride, optypea, beta, &c->ptr.pp_complex[ic][jc], c->stride, isupper);
 }
 
@@ -11909,11 +11295,11 @@ ae_bool _ialglib_i_rmatrixsyrkf(ae_int_t n,
      ae_int_t jc,
      ae_bool isupper)
 {
-    /* handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel */
+    // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
     if( alpha==0.0 || k==0 || n==0)
         return ae_false;
 
-    /* ALGLIB kernel */
+    // ALGLIB kernel
     return _ialglib_rmatrixsyrk(n, k, alpha, &a->ptr.pp_double[ia][ja], a->stride, optypea, beta, &c->ptr.pp_double[ic][jc], c->stride, isupper);
 }
 
@@ -11960,14 +11346,12 @@ ae_bool _ialglib_i_rmatrixgerf(ae_int_t m,
 
 
 
-/********************************************************************
-This function reads rectangular matrix A given by two column pointers
-col0 and col1 and stride src_stride and moves it into contiguous row-
-by-row storage given by dst.
-
-It can handle following special cases:
-* col1==NULL    in this case second column of A is filled by zeros
-********************************************************************/
+// This function reads rectangular matrix A given by two column pointers
+// col0 and col1 and stride src_stride and moves it into contiguous row-
+// by-row storage given by dst.
+//
+// It can handle following special cases:
+// * col1==NULL    in this case second column of A is filled by zeros
 void _ialglib_pack_n2(
     double *col0,
     double *col1,
@@ -11977,9 +11361,7 @@ void _ialglib_pack_n2(
 {
     ae_int_t n2, j, stride2;
 
-    /*
-     * handle special case
-     */
+    // handle special case
     if( col1==NULL )
     {
         for(j=0; j<n; j++)
@@ -11992,9 +11374,7 @@ void _ialglib_pack_n2(
         return;
     }
 
-    /*
-     * handle general case
-     */
+    // handle general case
     n2 = n/2;
     stride2 = src_stride*2;
     for(j=0; j<n2; j++)
@@ -12014,26 +11394,24 @@ void _ialglib_pack_n2(
     }
 }
 
-/*************************************************************************
-This function reads rectangular matrix A given by two column pointers col0
-and  col1  and  stride src_stride and moves it into  contiguous row-by-row
-storage given by dst.
-
-dst must be aligned, col0 and col1 may be non-aligned.
-
-It can handle following special cases:
-* col1==NULL        in this case second column of A is filled by zeros
-* src_stride==1     efficient SSE-based code is used
-* col1-col0==1      efficient SSE-based code is used
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-*************************************************************************/
+// This function reads rectangular matrix A given by two column pointers col0
+// and  col1  and  stride src_stride and moves it into  contiguous row-by-row
+// storage given by dst.
+//
+// dst must be aligned, col0 and col1 may be non-aligned.
+//
+// It can handle following special cases:
+// * col1==NULL        in this case second column of A is filled by zeros
+// * src_stride==1     efficient SSE-based code is used
+// * col1-col0==1      efficient SSE-based code is used
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_pack_n2_sse2(
     double *col0,
@@ -12044,9 +11422,7 @@ void _ialglib_pack_n2_sse2(
 {
     ae_int_t n2, j, stride2;
 
-    /*
-     * handle special case: col1==NULL
-     */
+    // handle special case: col1==NULL
     if( col1==NULL )
     {
         for(j=0; j<n; j++)
@@ -12059,9 +11435,7 @@ void _ialglib_pack_n2_sse2(
         return;
     }
 
-    /*
-     * handle unit stride
-     */
+    // handle unit stride
     if( src_stride==1 )
     {
         __m128d v0, v1;
@@ -12084,9 +11458,7 @@ void _ialglib_pack_n2_sse2(
         return;
     }
 
-    /*
-     * handle col1-col0==1
-     */
+    // handle col1-col0==1
     if( col1-col0==1 )
     {
         __m128d v0, v1;
@@ -12109,9 +11481,7 @@ void _ialglib_pack_n2_sse2(
         return;
     }
 
-    /*
-     * handle general case
-     */
+    // handle general case
     n2 = n/2;
     stride2 = src_stride*2;
     for(j=0; j<n2; j++)
@@ -12133,25 +11503,23 @@ void _ialglib_pack_n2_sse2(
 #endif
 
 
-/********************************************************************
-This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-stored in non-contiguous row-by-row storage.
-
-A and B must be aligned; R may be non-aligned.
-
-If beta is zero, contents of R is ignored (not  multiplied  by zero -
-just ignored).
-
-However, when alpha is zero, we still calculate A'*B, which is
-multiplied by zero afterwards.
-
-Function accepts additional parameter store_mode:
-* if 0, full R is stored
-* if 1, only first row of R is stored
-* if 2, only first column of R is stored
-* if 3, only top left element of R is stored
-********************************************************************/
+// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
+// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A and B must be aligned; R may be non-aligned.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero -
+// just ignored).
+//
+// However, when alpha is zero, we still calculate A'*B, which is
+// multiplied by zero afterwards.
+//
+// Function accepts additional parameter store_mode:
+// * if 0, full R is stored
+// * if 1, only first row of R is stored
+// * if 2, only first column of R is stored
+// * if 3, only top left element of R is stored
 void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode)
 {
     double v00, v01, v10, v11;
@@ -12230,55 +11598,49 @@ void _ialglib_mm22(double alpha, const double *a, const double *b, ae_int_t k, d
 }
 
 
-/********************************************************************
-This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
-matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
-stored in non-contiguous row-by-row storage.
-
-A and B must be aligned; R may be non-aligned.
-
-If beta is zero, contents of R is ignored (not  multiplied  by zero -
-just ignored).
-
-However, when alpha is zero, we still calculate A'*B, which is
-multiplied by zero afterwards.
-
-Function accepts additional parameter store_mode:
-* if 0, full R is stored
-* if 1, only first row of R is stored
-* if 2, only first column of R is stored
-* if 3, only top left element of R is stored
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If (1) is failed, this function will still be defined and callable, but it
-will do nothing.  If (2)  is  failed , call to this function will probably
-crash your system.
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-********************************************************************/
+// This function calculates R := alpha*A'*B+beta*R where A and B are Kx2
+// matrices stored in contiguous row-by-row storage,  R  is  2x2  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A and B must be aligned; R may be non-aligned.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero -
+// just ignored).
+//
+// However, when alpha is zero, we still calculate A'*B, which is
+// multiplied by zero afterwards.
+//
+// Function accepts additional parameter store_mode:
+// * if 0, full R is stored
+// * if 1, only first row of R is stored
+// * if 2, only first column of R is stored
+// * if 3, only top left element of R is stored
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will still be defined and callable, but it
+// will do nothing.  If (2)  is  failed , call to this function will probably
+// crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t k, double beta, double *r, ae_int_t stride, ae_int_t store_mode)
 {
-    /*
-     * We calculate product of two Kx2 matrices (result is 2x2).
-     * VA and VB store result as follows:
-     *
-     *        [ VD[0]  VE[0] ]
-     * A'*B = [              ]
-     *        [ VE[1]  VD[1] ]
-     *
-     */
+    // We calculate product of two Kx2 matrices (result is 2x2).
+    // VA and VB store result as follows:
+    //
+    //        [ VD[0]  VE[0] ]
+    // A'*B = [              ]
+    //        [ VE[1]  VD[1] ]
+    //
     __m128d va, vb, vd, ve, vt, r0, r1, valpha, vbeta;
     ae_int_t t, k2;
 
-    /*
-     * calculate product
-     */
+    // calculate product
     k2 = k/2;
     vd = _mm_setzero_pd();
     ve = _mm_setzero_pd();
@@ -12312,16 +11674,12 @@ void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t
         ve = _mm_add_pd(_mm_mul_pd(va,vt),ve);
     }
 
-    /*
-     * r0 is first row of alpha*A'*B, r1 is second row
-     */
+    // r0 is first row of alpha*A'*B, r1 is second row
     valpha = _mm_load1_pd(&alpha);
     r0 = _mm_mul_pd(_mm_unpacklo_pd(vd,ve),valpha);
     r1 = _mm_mul_pd(_mm_unpackhi_pd(ve,vd),valpha);
 
-    /*
-     * store
-     */
+    // store
     if( store_mode==0 )
     {
         if( beta==0 )
@@ -12376,79 +11734,73 @@ void _ialglib_mm22_sse2(double alpha, const double *a, const double *b, ae_int_t
 #endif
 
 
-/*************************************************************************
-This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-stored in non-contiguous row-by-row storage.
-
-A, B0 and B1 must be aligned; R may be non-aligned.
-
-Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-locations.
-
-If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-ignored).
-
-However,  when  alpha  is  zero , we still calculate MM product,  which is
-multiplied by zero afterwards.
-
-Unlike mm22 functions, this function does NOT support partial  output of R
-- we always store full 2x4 matrix.
-*************************************************************************/
+// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
+// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A, B0 and B1 must be aligned; R may be non-aligned.
+//
+// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
+// locations.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
+// ignored).
+//
+// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// multiplied by zero afterwards.
+//
+// Unlike mm22 functions, this function does NOT support partial  output of R
+// - we always store full 2x4 matrix.
 void _ialglib_mm22x2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride)
 {
     _ialglib_mm22(alpha, a, b0, k, beta, r, stride, 0);
     _ialglib_mm22(alpha, a, b1, k, beta, r+2, stride, 0);
 }
 
-/*************************************************************************
-This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
-are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
-stored in non-contiguous row-by-row storage.
-
-A, B0 and B1 must be aligned; R may be non-aligned.
-
-Note  that  B0  and  B1  are  two  separate  matrices  stored in different
-locations.
-
-If beta is zero, contents of R is ignored (not  multiplied  by zero - just
-ignored).
-
-However,  when  alpha  is  zero , we still calculate MM product,  which is
-multiplied by zero afterwards.
-
-Unlike mm22 functions, this function does NOT support partial  output of R
-- we always store full 2x4 matrix.
-
-This function supports SSE2; it can be used when:
-1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
-2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
-
-If (1) is failed, this function will still be defined and callable, but it
-will do nothing.  If (2)  is  failed , call to this function will probably
-crash your system.
-
-If  you  want  to  know  whether  it  is safe to call it, you should check
-results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
-and will do its work.
-*************************************************************************/
+// This function calculates R := alpha*A'*(B0|B1)+beta*R where A, B0  and  B1
+// are Kx2 matrices stored in contiguous row-by-row storage, R is 2x4  matrix
+// stored in non-contiguous row-by-row storage.
+//
+// A, B0 and B1 must be aligned; R may be non-aligned.
+//
+// Note  that  B0  and  B1  are  two  separate  matrices  stored in different
+// locations.
+//
+// If beta is zero, contents of R is ignored (not  multiplied  by zero - just
+// ignored).
+//
+// However,  when  alpha  is  zero , we still calculate MM product,  which is
+// multiplied by zero afterwards.
+//
+// Unlike mm22 functions, this function does NOT support partial  output of R
+// - we always store full 2x4 matrix.
+//
+// This function supports SSE2; it can be used when:
+// 1. AE_HAS_SSE2_INTRINSICS was defined (checked at compile-time)
+// 2. ae_cpuid() result contains CPU_SSE2 (checked at run-time)
+//
+// If (1) is failed, this function will still be defined and callable, but it
+// will do nothing.  If (2)  is  failed , call to this function will probably
+// crash your system.
+//
+// If  you  want  to  know  whether  it  is safe to call it, you should check
+// results  of  ae_cpuid(). If CPU_SSE2 bit is set, this function is callable
+// and will do its work.
 #if defined(AE_HAS_SSE2_INTRINSICS)
 void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const double *b1, ae_int_t k, double beta, double *r, ae_int_t stride)
 {
-    /*
-     * We calculate product of two Kx2 matrices (result is 2x2).
-     * V0, V1, V2, V3 store result as follows:
-     *
-     *     [ V0[0]  V1[1] V2[0]  V3[1] ]
-     * R = [                           ]
-     *     [ V1[0]  V0[1] V3[0]  V2[1] ]
-     *
-     * VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
-     * VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
-     * (both vars store same data - either B0 or B1). Results from multiplication
-     * by VA0/VA1 are stored in VB0/VB1 too.
-     *
-     */
+    // We calculate product of two Kx2 matrices (result is 2x2).
+    // V0, V1, V2, V3 store result as follows:
+    //
+    //     [ V0[0]  V1[1] V2[0]  V3[1] ]
+    // R = [                           ]
+    //     [ V1[0]  V0[1] V3[0]  V2[1] ]
+    //
+    // VA0 stores current 1x2 block of A, VA1 stores shuffle of VA0,
+    // VB0 and VB1 are used to store two copies of 1x2 block of B0 or B1
+    // (both vars store same data - either B0 or B1). Results from multiplication
+    // by VA0/VA1 are stored in VB0/VB1 too.
+    //
     __m128d v0, v1, v2, v3, va0, va1, vb0, vb1;
     __m128d r00, r01, r10, r11, valpha, vbeta;
     ae_int_t t;
@@ -12481,19 +11833,17 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
         b1+=2;
     }
 
-    /*
-     * shuffle V1 and V3 (conversion to more convenient storage format):
-     *
-     *     [ V0[0]  V1[0] V2[0]  V3[0] ]
-     * R = [                           ]
-     *     [ V1[1]  V0[1] V3[1]  V2[1] ]
-     *
-     * unpack results to
-     *
-     * [ r00 r01 ]
-     * [ r10 r11 ]
-     *
-     */
+    // shuffle V1 and V3 (conversion to more convenient storage format):
+    //
+    //     [ V0[0]  V1[0] V2[0]  V3[0] ]
+    // R = [                           ]
+    //     [ V1[1]  V0[1] V3[1]  V2[1] ]
+    //
+    // unpack results to
+    //
+    // [ r00 r01 ]
+    // [ r10 r11 ]
+    //
     valpha = _mm_load1_pd(&alpha);
     v1 = _mm_shuffle_pd(v1, v1, 1);
     v3 = _mm_shuffle_pd(v3, v3, 1);
@@ -12502,9 +11852,7 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
     r01 = _mm_mul_pd(_mm_unpacklo_pd(v2,v3),valpha);
     r11 = _mm_mul_pd(_mm_unpackhi_pd(v3,v2),valpha);
 
-    /*
-     * store
-     */
+    // store
     if( beta==0 )
     {
         _mm_storeu_pd(r,r00);
@@ -12525,20 +11873,18 @@ void _ialglib_mm22x2_sse2(double alpha, const double *a, const double *b0, const
 
 #if !defined(ALGLIB_NO_FAST_KERNELS)
 
-/*************************************************************************
-Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    Y       -   array[N], vector to process
-
-RESULT:
-    (X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,Y) for elements [0,N) of X[] and Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     Y       -   array[N], vector to process
+//
+// RESULT:
+//     (X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -12547,16 +11893,12 @@ double rdotv(ae_int_t n,
     ae_int_t i;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
-        _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv,(n,x->ptr.p_double,y->ptr.p_double,_state)) /* use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result */
+        _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv,(n,x->ptr.p_double,y->ptr.p_double,_state)) // use _ALGLIB_KERNEL_VOID_ for a kernel that does not return result
 
-    /*
-     * Original generic C implementation
-     */
+    // Original generic C implementation
     result = (double)(0);
     for(i=0; i<=n-1; i++)
     {
@@ -12567,21 +11909,19 @@ double rdotv(ae_int_t n,
 
 
 
-/*************************************************************************
-Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    A       -   array[?,N], matrix to process
-    I       -   row index
-
-RESULT:
-    (X,Ai)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,A[i]) for elements [0,N) of vector X[] and row A[i,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotvr(ae_int_t n,
      RVector * x,
      RMatrix * a,
@@ -12591,10 +11931,8 @@ double rdotvr(ae_int_t n,
     ae_int_t j;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv,(n,x->ptr.p_double,a->ptr.pp_double[i],_state))
 
@@ -12607,21 +11945,19 @@ double rdotvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    A       -   array[?,N], matrix to process
-    I       -   row index
-
-RESULT:
-    (X,Ai)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,A[i]) for rows A[ia,*] and B[ib,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     A       -   array[?,N], matrix to process
+//     I       -   row index
+//
+// RESULT:
+//     (X,Ai)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotrr(ae_int_t n,
      RMatrix * a,
      ae_int_t ia,
@@ -12632,10 +11968,8 @@ double rdotrr(ae_int_t n,
     ae_int_t j;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv,(n,a->ptr.pp_double[ia],b->ptr.pp_double[ib],_state))
 
@@ -12648,29 +11982,25 @@ double rdotrr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Computes dot product (X,X) for elements [0,N) of X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-RESULT:
-    (X,X)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Computes dot product (X,X) for elements [0,N) of X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     (X,X)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rdotv2(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(rdotv2,(n,x->ptr.p_double,_state))
 
@@ -12684,23 +12014,21 @@ double rdotv2(ae_int_t n, RVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -12708,10 +12036,8 @@ void rcopyv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv,
             (n,x->ptr.p_double,y->ptr.p_double,_state))
@@ -12723,21 +12049,19 @@ void rcopyv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Copies vector X[] to row I of A[,]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    A       -   preallocated 2D array large enough to store result
-    I       -   destination row index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of I-th row are replaced by X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to row I of A[,]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     A       -   preallocated 2D array large enough to store result
+//     I       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyvr(ae_int_t n,
      RVector * x,
      RMatrix * a,
@@ -12746,10 +12070,8 @@ void rcopyvr(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv,
             (n, x->ptr.p_double, a->ptr.pp_double[i], _state))
@@ -12761,21 +12083,19 @@ void rcopyvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Copies row I of A[,] to vector X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    A       -   2D array, source
-    I       -   source row index
-    X       -   preallocated destination
-
-OUTPUT PARAMETERS:
-    X       -   array[N], destination
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies row I of A[,] to vector X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     X       -   preallocated destination
+//
+// OUTPUT PARAMETERS:
+//     X       -   array[N], destination
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyrv(ae_int_t n,
      RMatrix * a,
      ae_int_t i,
@@ -12784,10 +12104,8 @@ void rcopyrv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv,
             (n, a->ptr.pp_double[i], x->ptr.p_double, _state))
@@ -12799,24 +12117,22 @@ void rcopyrv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Copies row I of A[,] to row K of B[,].
-
-A[i,...] and B[k,...] may overlap.
-
-INPUT PARAMETERS:
-    N       -   vector length
-    A       -   2D array, source
-    I       -   source row index
-    B       -   preallocated destination
-    K       -   destination row index
-
-OUTPUT PARAMETERS:
-    B       -   row K overwritten
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies row I of A[,] to row K of B[,].
+//
+// A[i,...] and B[k,...] may overlap.
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     A       -   2D array, source
+//     I       -   source row index
+//     B       -   preallocated destination
+//     K       -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     B       -   row K overwritten
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyrr(ae_int_t n,
      RMatrix * a,
      ae_int_t i,
@@ -12826,10 +12142,8 @@ void rcopyrr(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyv,
             (n, a->ptr.pp_double[i], b->ptr.pp_double[k], _state))
@@ -12840,21 +12154,19 @@ void rcopyrr(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Performs copying with multiplication of V*X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   multiplier
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   array[N], Y = V*X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs copying with multiplication of V*X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   array[N], Y = V*X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopymulv(ae_int_t n,
      double v,
      RVector * x,
@@ -12863,10 +12175,8 @@ void rcopymulv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv,
             (n,v,x->ptr.p_double,y->ptr.p_double,_state))
@@ -12878,22 +12188,20 @@ void rcopymulv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs copying with multiplication of V*X[] to Y[I,*]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   multiplier
-    X       -   array[N], source
-    Y       -   preallocated array[?,N]
-    RIdx    -   destination row index
-
-OUTPUT PARAMETERS:
-    Y       -   Y[RIdx,...] = V*X
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs copying with multiplication of V*X[] to Y[I,*]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   multiplier
+//     X       -   array[N], source
+//     Y       -   preallocated array[?,N]
+//     RIdx    -   destination row index
+//
+// OUTPUT PARAMETERS:
+//     Y       -   Y[RIdx,...] = V*X
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopymulvr(ae_int_t n,
      double v,
      RVector * x,
@@ -12903,10 +12211,8 @@ void rcopymulvr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopymulv,
             (n,v,x->ptr.p_double,y->ptr.pp_double[ridx],_state))
@@ -12917,20 +12223,18 @@ void rcopymulvr(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   X copied to Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   X copied to Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void icopyv(ae_int_t n,
      ZVector * x,
      ZVector * y,
@@ -12938,10 +12242,8 @@ void icopyv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyv,
             (n, x->ptr.p_int, y->ptr.p_int, _state))
@@ -12952,23 +12254,21 @@ void icopyv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Copies vector X[] to Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], source
-    Y       -   preallocated array[N]
-
-OUTPUT PARAMETERS:
-    Y       -   leading N elements are replaced by X
-
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], source
+//     Y       -   preallocated array[N]
+//
+// OUTPUT PARAMETERS:
+//     Y       -   leading N elements are replaced by X
+//
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bcopyv(ae_int_t n,
      BVector * x,
      BVector * y,
@@ -12976,10 +12276,8 @@ void bcopyv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1*8 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(bcopyv,
             (n, x->ptr.p_bool, y->ptr.p_bool, _state))
@@ -12991,20 +12289,18 @@ void bcopyv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetv(ae_int_t n,
      double v,
      RVector * x,
@@ -13012,10 +12308,8 @@ void rsetv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv,
             (n, v, x->ptr.p_double, _state))
@@ -13026,21 +12320,19 @@ void rsetv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Sets row I of A[,] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    A       -   array[N,N] or larger
-    I       -   row index
-
-OUTPUT PARAMETERS:
-    A       -   leading N elements of I-th row are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets row I of A[,] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     A       -   array[N,N] or larger
+//     I       -   row index
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading N elements of I-th row are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetr(ae_int_t n,
      double v,
      RMatrix * a,
@@ -13049,10 +12341,8 @@ void rsetr(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv,
             (n, v, a->ptr.pp_double[i], _state))
@@ -13064,20 +12354,18 @@ void rsetr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Sets X[OffsX:OffsX+N-1] to V
-
-INPUT PARAMETERS:
-    N       -   subvector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   X[OffsX:OffsX+N-1] is replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets X[OffsX:OffsX+N-1] to V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   X[OffsX:OffsX+N-1] is replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rsetvx(ae_int_t n,
      double v,
      RVector * x,
@@ -13086,10 +12374,8 @@ void rsetvx(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetvx,
             (n, v, x->ptr.p_double+offsx, _state))
@@ -13101,20 +12387,18 @@ void rsetvx(ae_int_t n,
 }
 
 
-/*************************************************************************
-Sets matrix A[] to V
-
-INPUT PARAMETERS:
-    M, N    -   rows/cols count
-    V       -   value to set
-    A       -   array[M,N]
-
-OUTPUT PARAMETERS:
-    A       -   leading M rows, N cols are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets matrix A[] to V
+//
+// INPUT PARAMETERS:
+//     M, N    -   rows/cols count
+//     V       -   value to set
+//     A       -   array[M,N]
+//
+// OUTPUT PARAMETERS:
+//     A       -   leading M rows, N cols are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state *_state)
 {
     _ALGLIB_KERNEL_VOID_SSE2_AVX2(rsetv, (n, v, pDest, _state));
@@ -13134,10 +12418,8 @@ void rsetm(ae_int_t m,
     ae_int_t i;
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n >=_ABLASF_KERNEL_SIZE1 ) {
         for(i=0; i<m; i++) {
             rsetm_simd(n, v, a->ptr.pp_double[i], _state);
@@ -13155,20 +12437,18 @@ void rsetm(ae_int_t m,
 }
 
 
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void isetv(ae_int_t n,
      ae_int_t v,
      ZVector * x,
@@ -13176,10 +12456,8 @@ void isetv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(isetv,
             (n, v, x->ptr.p_int, _state))
@@ -13190,20 +12468,18 @@ void isetv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Sets vector X[] to V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    V       -   value to set
-    X       -   array[N]
-
-OUTPUT PARAMETERS:
-    X       -   leading N elements are replaced by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Sets vector X[] to V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     V       -   value to set
+//     X       -   array[N]
+//
+// OUTPUT PARAMETERS:
+//     X       -   leading N elements are replaced by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void bsetv(ae_int_t n,
      ae_bool v,
      BVector * x,
@@ -13211,10 +12487,8 @@ void bsetv(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1*8 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(bsetv,
             (n, v, x->ptr.p_bool, _state))
@@ -13226,20 +12500,18 @@ void bsetv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace multiplication of X[] by V
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements 0...N-1 multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulv(ae_int_t n,
      double v,
      RVector * x,
@@ -13247,10 +12519,8 @@ void rmulv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv,
             (n,v,x->ptr.p_double,_state))
@@ -13262,20 +12532,18 @@ void rmulv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace multiplication of X[] by V
-
-INPUT PARAMETERS:
-    N       -   row length
-    X       -   array[?,N], row to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements 0...N-1 of row RowIdx are multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[] by V
+//
+// INPUT PARAMETERS:
+//     N       -   row length
+//     X       -   array[?,N], row to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements 0...N-1 of row RowIdx are multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulr(ae_int_t n,
      double v,
      RMatrix * x,
@@ -13284,10 +12552,8 @@ void rmulr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulv,
             (n, v, x->ptr.pp_double[rowidx], _state))
@@ -13299,20 +12565,18 @@ void rmulr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
-
-INPUT PARAMETERS:
-    N       -   subvector length
-    X       -   vector to process
-    V       -   multiplier
-
-OUTPUT PARAMETERS:
-    X       -   elements OffsX:OffsX+N-1 multiplied by V
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace multiplication of X[OffsX:OffsX+N-1] by V
+//
+// INPUT PARAMETERS:
+//     N       -   subvector length
+//     X       -   vector to process
+//     V       -   multiplier
+//
+// OUTPUT PARAMETERS:
+//     X       -   elements OffsX:OffsX+N-1 multiplied by V
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmulvx(ae_int_t n,
      double v,
      RVector * x,
@@ -13321,10 +12585,8 @@ void rmulvx(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmulvx,
             (n, v, x->ptr.p_double+offsx, _state))
@@ -13336,21 +12598,19 @@ void rmulvx(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace addition of Y[] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[N], vector to process
-    X       -   array[N], vector to process
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[N], vector to process
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddv(ae_int_t n,
      double alpha,
      RVector * y,
@@ -13359,10 +12619,8 @@ void raddv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv,
             (n,alpha,y->ptr.p_double,x->ptr.p_double,_state))
@@ -13375,21 +12633,19 @@ void raddv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace addition of vector Y[] to row X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   vector to add
-    X       -   target row RowIdx
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of vector Y[] to row X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   vector to add
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddvr(ae_int_t n,
      double alpha,
      RVector * y,
@@ -13399,10 +12655,8 @@ void raddvr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv,
             (n,alpha,y->ptr.p_double,x->ptr.pp_double[rowidx],_state))
@@ -13415,22 +12669,20 @@ void raddvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace addition of Y[RIdx,...] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[?,N], matrix whose RIdx-th row is added
-    RIdx    -   row index
-    X       -   array[N], vector to process
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[RIdx,...] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdx-th row is added
+//     RIdx    -   row index
+//     X       -   array[N], vector to process
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddrv(ae_int_t n,
      double alpha,
      RMatrix * y,
@@ -13440,10 +12692,8 @@ void raddrv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv,
             (n,alpha,y->ptr.pp_double[ridx],x->ptr.p_double,_state))
@@ -13455,23 +12705,21 @@ void raddrv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   array[?,N], matrix whose RIdxSrc-th row is added
-    RIdxSrc -   source row index
-    X       -   array[?,N], matrix whose RIdxDst-th row is target
-    RIdxDst -   destination row index
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[RIdx,...] to X[RIdxDst]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   array[?,N], matrix whose RIdxSrc-th row is added
+//     RIdxSrc -   source row index
+//     X       -   array[?,N], matrix whose RIdxDst-th row is target
+//     RIdxDst -   destination row index
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddrr(ae_int_t n,
      double alpha,
      RMatrix * y,
@@ -13482,10 +12730,8 @@ void raddrr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddv,
             (n,alpha,y->ptr.pp_double[ridxsrc],x->ptr.pp_double[ridxdst],_state))
@@ -13497,23 +12743,21 @@ void raddrr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs inplace addition of Y[] to X[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Alpha   -   multiplier
-    Y       -   source vector
-    OffsY   -   source offset
-    X       -   destination vector
-    OffsX   -   destination offset
-
-RESULT:
-    X := X + alpha*Y
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs inplace addition of Y[] to X[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Alpha   -   multiplier
+//     Y       -   source vector
+//     OffsY   -   source offset
+//     X       -   destination vector
+//     OffsX   -   destination offset
+//
+// RESULT:
+//     X := X + alpha*Y
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void raddvx(ae_int_t n,
      double alpha,
      RVector * y,
@@ -13524,10 +12768,8 @@ void raddvx(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(raddvx,
             (n, alpha, y->ptr.p_double+offsy, x->ptr.p_double+offsx, _state))
@@ -13539,20 +12781,18 @@ void raddvx(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise multiplication of vector X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target vector
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of vector X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -13560,10 +12800,8 @@ void rmergemulv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv,
             (n,y->ptr.p_double,x->ptr.p_double,_state))
@@ -13576,20 +12814,18 @@ void rmergemulv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise multiplication of row X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -13598,10 +12834,8 @@ void rmergemulvr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv,
             (n,y->ptr.p_double,x->ptr.pp_double[rowidx],_state))
@@ -13614,20 +12848,18 @@ void rmergemulvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise multiplication of row X[] by vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise(X*Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise multiplication of row X[] by vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise(X*Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemulrv(ae_int_t n,
      RMatrix * y,
      ae_int_t rowidx,
@@ -13636,10 +12868,8 @@ void rmergemulrv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemulv,
             (n,y->ptr.pp_double[rowidx],x->ptr.p_double,_state))
@@ -13650,20 +12880,18 @@ void rmergemulrv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Performs componentwise max of vector X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target vector
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -13671,10 +12899,8 @@ void rmergemaxv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv,
             (n,y->ptr.p_double,x->ptr.p_double,_state))
@@ -13686,20 +12912,18 @@ void rmergemaxv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise max of row X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -13708,10 +12932,8 @@ void rmergemaxvr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv,
             (n,y->ptr.p_double,x->ptr.pp_double[rowidx],_state))
@@ -13723,20 +12945,18 @@ void rmergemaxvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise max of row X[I] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix, I-th row is source
-    rowidx  -   target row RowIdx
-
-RESULT:
-    Y := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     rowidx  -   target row RowIdx
+//
+// RESULT:
+//     Y := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergemaxrv(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -13745,10 +12965,8 @@ void rmergemaxrv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergemaxv,
             (n,x->ptr.pp_double[rowidx],y->ptr.p_double,_state))
@@ -13759,20 +12977,18 @@ void rmergemaxrv(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Performs componentwise min of vector X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   source vector
-    X       -   target vector
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise min of vector X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   source vector
+//     X       -   target vector
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminv(ae_int_t n,
      RVector * y,
      RVector * x,
@@ -13780,10 +12996,8 @@ void rmergeminv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv,
             (n,y->ptr.p_double,x->ptr.p_double,_state))
@@ -13795,20 +13009,18 @@ void rmergeminv(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise max of row X[] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    Y       -   vector to multiply by
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     Y       -   vector to multiply by
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminvr(ae_int_t n,
      RVector * y,
      RMatrix * x,
@@ -13817,10 +13029,8 @@ void rmergeminvr(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv,
             (n,y->ptr.p_double,x->ptr.pp_double[rowidx],_state))
@@ -13832,20 +13042,18 @@ void rmergeminvr(ae_int_t n,
 }
 
 
-/*************************************************************************
-Performs componentwise max of row X[I] and vector Y[]
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix, I-th row is source
-    X       -   target row RowIdx
-
-RESULT:
-    X := componentwise_max(X,Y)
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Performs componentwise max of row X[I] and vector Y[]
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix, I-th row is source
+//     X       -   target row RowIdx
+//
+// RESULT:
+//     X := componentwise_max(X,Y)
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rmergeminrv(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -13854,10 +13062,8 @@ void rmergeminrv(ae_int_t n,
 {
     ae_int_t i;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rmergeminv,
             (n,x->ptr.pp_double[rowidx],y->ptr.p_double,_state))
@@ -13867,30 +13073,26 @@ void rmergeminrv(ae_int_t n,
         y->ptr.p_double[i] = ae_minreal(y->ptr.p_double[i], x->ptr.pp_double[rowidx][i], _state);
     }
 }
-/*************************************************************************
-Returns maximum X
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-OUTPUT PARAMETERS:
-    max(X[i])
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(X[i])
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv, (n, x->ptr.p_double, _state));
 
@@ -13908,20 +13110,18 @@ double rmaxv(ae_int_t n, RVector * x, ae_state *_state)
     return result;
 }
 
-/*************************************************************************
-Returns maximum X
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix to process, RowIdx-th row is processed
-
-OUTPUT PARAMETERS:
-    max(X[RowIdx,i])
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum X
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(X[RowIdx,i])
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxr(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -13931,10 +13131,8 @@ double rmaxr(ae_int_t n,
     double v;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxv,(n, x->ptr.pp_double[rowidx], _state))
 
@@ -13952,30 +13150,26 @@ double rmaxr(ae_int_t n,
     return result;
 }
 
-/*************************************************************************
-Returns maximum |X|
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   array[N], vector to process
-
-OUTPUT PARAMETERS:
-    max(|X[i]|)
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   array[N], vector to process
+//
+// OUTPUT PARAMETERS:
+//     max(|X[i]|)
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxabsv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv, (n, x->ptr.p_double, _state))
 
@@ -13992,20 +13186,18 @@ double rmaxabsv(ae_int_t n, RVector * x, ae_state *_state)
 }
 
 
-/*************************************************************************
-Returns maximum |X|
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   matrix to process, RowIdx-th row is processed
-
-OUTPUT PARAMETERS:
-    max(|X[RowIdx,i]|)
-    zero for N=0
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Returns maximum |X|
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   matrix to process, RowIdx-th row is processed
+//
+// OUTPUT PARAMETERS:
+//     max(|X[RowIdx,i]|)
+//     zero for N=0
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 double rmaxabsr(ae_int_t n,
      RMatrix * x,
      ae_int_t rowidx,
@@ -14015,10 +13207,8 @@ double rmaxabsr(ae_int_t n,
     double v;
     double result;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_RETURN_SSE2_AVX2(rmaxabsv,(n, x->ptr.pp_double[rowidx], _state))
 
@@ -14034,24 +13224,22 @@ double rmaxabsr(ae_int_t n,
     return result;
 }
 
-/*************************************************************************
-Copies vector X[] to Y[], extended version
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    OffsX   -   source offset
-    Y       -   preallocated array[N]
-    OffsY   -   destination offset
-
-OUTPUT PARAMETERS:
-    Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void rcopyvx(ae_int_t n,
      RVector * x,
      ae_int_t offsx,
@@ -14061,10 +13249,8 @@ void rcopyvx(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(rcopyvx,(n, x->ptr.p_double+offsx, y->ptr.p_double+offsy, _state))
 
@@ -14074,24 +13260,22 @@ void rcopyvx(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Copies vector X[] to Y[], extended version
-
-INPUT PARAMETERS:
-    N       -   vector length
-    X       -   source array
-    OffsX   -   source offset
-    Y       -   preallocated array[N]
-    OffsY   -   destination offset
-
-OUTPUT PARAMETERS:
-    Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
-
-NOTE: destination and source should NOT overlap
-
-  -- ALGLIB --
-     Copyright 20.01.2020 by Bochkanov Sergey
-*************************************************************************/
+// Copies vector X[] to Y[], extended version
+//
+// INPUT PARAMETERS:
+//     N       -   vector length
+//     X       -   source array
+//     OffsX   -   source offset
+//     Y       -   preallocated array[N]
+//     OffsY   -   destination offset
+//
+// OUTPUT PARAMETERS:
+//     Y       -   N elements starting from OffsY are replaced by X[OffsX:OffsX+N-1]
+//
+// NOTE: destination and source should NOT overlap
+//
+//   -- ALGLIB --
+//      Copyright 20.01.2020 by Bochkanov Sergey
 void icopyvx(ae_int_t n,
      ZVector * x,
      ae_int_t offsx,
@@ -14101,10 +13285,8 @@ void icopyvx(ae_int_t n,
 {
     ae_int_t j;
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     if( n>=_ABLASF_KERNEL_SIZE1 )
         _ALGLIB_KERNEL_VOID_SSE2_AVX2(icopyvx,(n, x->ptr.p_int+offsx, y->ptr.p_int+offsy, _state))
 
@@ -14114,45 +13296,43 @@ void icopyvx(ae_int_t n,
     }
 }
 
-/*************************************************************************
-Matrix-vector product: y := alpha*op(A)*x + beta*y
-
-NOTE: this  function  expects  Y  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, x, y.
-
-INPUT PARAMETERS:
-    M   -   number of rows of op(A)
-    N   -   number of columns of op(A)
-    Alpha-  coefficient
-    A   -   source matrix
-    OpA -   operation type:
-            * OpA=0     =>  op(A) = A
-            * OpA=1     =>  op(A) = A^T
-    X   -   input vector, has at least N elements
-    Beta-   coefficient
-    Y   -   preallocated output array, has at least M elements
-
-OUTPUT PARAMETERS:
-    Y   -   vector which stores result
-
-HANDLING OF SPECIAL CASES:
-    * if M=0, then subroutine does nothing. It does not even touch arrays.
-    * if N=0 or Alpha=0.0, then:
-      * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-        at all. Initial values of Y are ignored (we do not  multiply  Y by
-        zero, we just rewrite it by zeros)
-      * if Beta<>0, then Y is replaced by Beta*Y
-    * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-       initial state of Y is ignored (rewritten by  A*x,  without  initial
-       multiplication by zeros).
-
-
-  -- ALGLIB routine --
-
-     01.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N elements
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M elements
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+//
+//
+//   -- ALGLIB routine --
+//
+//      01.09.2021
+//      Bochkanov Sergey
 void rgemv(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -14169,12 +13349,10 @@ void rgemv(ae_int_t m,
 
 
 
-    /*
-     * Properly premultiply Y by Beta.
-     *
-     * Quick exit for M=0, N=0 or Alpha=0.
-     * After this block we have M>0, N>0, Alpha<>0.
-     */
+    // Properly premultiply Y by Beta.
+    //
+    // Quick exit for M=0, N=0 or Alpha=0.
+    // After this block we have M>0, N>0, Alpha<>0.
     if( m<=0 )
     {
         return;
@@ -14192,21 +13370,15 @@ void rgemv(ae_int_t m,
         return;
     }
 
-    /*
-     * Straight or transposed?
-     */
+    // Straight or transposed?
     if( opa==0 )
     {
-        /*
-         * Try SIMD code
-         */
+        // Try SIMD code
         if( n>=_ABLASF_KERNEL_SIZE2 )
             _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_straight, (m, n, alpha, a,
                 x->ptr.p_double, y->ptr.p_double, _state))
 
-        /*
-         * Generic C version: y += A*x
-         */
+        // Generic C version: y += A*x
         for(i=0; i<=m-1; i++)
         {
             v = (double)(0);
@@ -14220,17 +13392,13 @@ void rgemv(ae_int_t m,
     }
     if( opa==1 )
     {
-        /*
-         * Try SIMD code
-         */
+        // Try SIMD code
         if( m>=_ABLASF_KERNEL_SIZE2 )
             _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemv_transposed, (m, n, alpha, a,
                 x->ptr.p_double, y->ptr.p_double, _state))
 
 
-        /*
-         * Generic C version: y += A^T*x
-         */
+        // Generic C version: y += A^T*x
         for(i=0; i<=n-1; i++)
         {
             v = alpha*x->ptr.p_double[i];
@@ -14244,51 +13412,49 @@ void rgemv(ae_int_t m,
 }
 
 
-/*************************************************************************
-Matrix-vector product: y := alpha*op(A)*x + beta*y
-
-Here x, y, A are subvectors/submatrices of larger vectors/matrices.
-
-NOTE: this  function  expects  Y  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, x, y.
-
-INPUT PARAMETERS:
-    M   -   number of rows of op(A)
-    N   -   number of columns of op(A)
-    Alpha-  coefficient
-    A   -   source matrix
-    IA  -   submatrix offset (row index)
-    JA  -   submatrix offset (column index)
-    OpA -   operation type:
-            * OpA=0     =>  op(A) = A
-            * OpA=1     =>  op(A) = A^T
-    X   -   input vector, has at least N+IX elements
-    IX  -   subvector offset
-    Beta-   coefficient
-    Y   -   preallocated output array, has at least M+IY elements
-    IY  -   subvector offset
-
-OUTPUT PARAMETERS:
-    Y   -   vector which stores result
-
-HANDLING OF SPECIAL CASES:
-    * if M=0, then subroutine does nothing. It does not even touch arrays.
-    * if N=0 or Alpha=0.0, then:
-      * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
-        at all. Initial values of Y are ignored (we do not  multiply  Y by
-        zero, we just rewrite it by zeros)
-      * if Beta<>0, then Y is replaced by Beta*Y
-    * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
-       initial state of Y is ignored (rewritten by  A*x,  without  initial
-       multiplication by zeros).
-
-
-  -- ALGLIB routine --
-
-     01.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Matrix-vector product: y := alpha*op(A)*x + beta*y
+//
+// Here x, y, A are subvectors/submatrices of larger vectors/matrices.
+//
+// NOTE: this  function  expects  Y  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, x, y.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows of op(A)
+//     N   -   number of columns of op(A)
+//     Alpha-  coefficient
+//     A   -   source matrix
+//     IA  -   submatrix offset (row index)
+//     JA  -   submatrix offset (column index)
+//     OpA -   operation type:
+//             * OpA=0     =>  op(A) = A
+//             * OpA=1     =>  op(A) = A^T
+//     X   -   input vector, has at least N+IX elements
+//     IX  -   subvector offset
+//     Beta-   coefficient
+//     Y   -   preallocated output array, has at least M+IY elements
+//     IY  -   subvector offset
+//
+// OUTPUT PARAMETERS:
+//     Y   -   vector which stores result
+//
+// HANDLING OF SPECIAL CASES:
+//     * if M=0, then subroutine does nothing. It does not even touch arrays.
+//     * if N=0 or Alpha=0.0, then:
+//       * if Beta=0, then Y is filled by zeros. A and X are  not  referenced
+//         at all. Initial values of Y are ignored (we do not  multiply  Y by
+//         zero, we just rewrite it by zeros)
+//       * if Beta<>0, then Y is replaced by Beta*Y
+//     * if M>0, N>0, Alpha<>0, but  Beta=0,  then  Y  is  replaced  by  A*x;
+//        initial state of Y is ignored (rewritten by  A*x,  without  initial
+//        multiplication by zeros).
+//
+//
+//   -- ALGLIB routine --
+//
+//      01.09.2021
+//      Bochkanov Sergey
 void rgemvx(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -14309,12 +13475,10 @@ void rgemvx(ae_int_t m,
 
 
 
-    /*
-     * Properly premultiply Y by Beta.
-     *
-     * Quick exit for M=0, N=0 or Alpha=0.
-     * After this block we have M>0, N>0, Alpha<>0.
-     */
+    // Properly premultiply Y by Beta.
+    //
+    // Quick exit for M=0, N=0 or Alpha=0.
+    // After this block we have M>0, N>0, Alpha<>0.
     if( m<=0 )
     {
         return;
@@ -14332,22 +13496,16 @@ void rgemvx(ae_int_t m,
         return;
     }
 
-    /*
-     * Straight or transposed?
-     */
+    // Straight or transposed?
     if( opa==0 )
     {
-        /*
-         * Try SIMD code
-         */
+        // Try SIMD code
         if( n>=_ABLASF_KERNEL_SIZE2 )
             _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_straight, (m, n, alpha, a, ia, ja,
                 x->ptr.p_double + ix, y->ptr.p_double + iy, _state))
 
 
-        /*
-         * Generic C code: y += A*x
-         */
+        // Generic C code: y += A*x
         for(i=0; i<=m-1; i++)
         {
             v = (double)(0);
@@ -14361,16 +13519,12 @@ void rgemvx(ae_int_t m,
     }
     if( opa==1 )
     {
-        /*
-         * Try SIMD code
-         */
+        // Try SIMD code
         if( m>=_ABLASF_KERNEL_SIZE2 )
             _ALGLIB_KERNEL_VOID_AVX2_FMA(rgemvx_transposed, (m, n, alpha, a, ia, ja,
                 x->ptr.p_double+ix, y->ptr.p_double+iy, _state))
 
-        /*
-         * Generic C code: y += A^T*x
-         */
+        // Generic C code: y += A^T*x
         for(i=0; i<=n-1; i++)
         {
             v = alpha*x->ptr.p_double[ix+i];
@@ -14384,26 +13538,24 @@ void rgemvx(ae_int_t m,
 }
 
 
-/*************************************************************************
-Rank-1 correction: A := A + alpha*u*v'
-
-NOTE: this  function  expects  A  to  be  large enough to store result. No
-      automatic preallocation happens for  smaller  arrays.  No  integrity
-      checks is performed for sizes of A, u, v.
-
-INPUT PARAMETERS:
-    M   -   number of rows
-    N   -   number of columns
-    A   -   target MxN matrix
-    Alpha-  coefficient
-    U   -   vector #1
-    V   -   vector #2
-
-
-  -- ALGLIB routine --
-     07.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Rank-1 correction: A := A + alpha*u*v'
+//
+// NOTE: this  function  expects  A  to  be  large enough to store result. No
+//       automatic preallocation happens for  smaller  arrays.  No  integrity
+//       checks is performed for sizes of A, u, v.
+//
+// INPUT PARAMETERS:
+//     M   -   number of rows
+//     N   -   number of columns
+//     A   -   target MxN matrix
+//     Alpha-  coefficient
+//     U   -   vector #1
+//     V   -   vector #2
+//
+//
+//   -- ALGLIB routine --
+//      07.09.2021
+//      Bochkanov Sergey
 void rger(ae_int_t m,
      ae_int_t n,
      double alpha,
@@ -14432,37 +13584,35 @@ void rger(ae_int_t m,
 }
 
 
-/*************************************************************************
-This subroutine solves linear system op(A)*x=b where:
-* A is NxN upper/lower triangular/unitriangular matrix
-* X and B are Nx1 vectors
-* "op" may be identity transformation or transposition
-
-Solution replaces X.
-
-IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
-           * no integrity checks for operand sizes, out-of-bounds accesses
-             and so on is performed
-
-INPUT PARAMETERS
-    N   -   matrix size, N>=0
-    A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
-    IA      -   submatrix offset
-    JA      -   submatrix offset
-    IsUpper -   whether matrix is upper triangular
-    IsUnit  -   whether matrix is unitriangular
-    OpType  -   transformation type:
-                * 0 - no transformation
-                * 1 - transposition
-    X       -   right part, actual vector is stored in X[IX:IX+N-1]
-    IX      -   offset
-
-OUTPUT PARAMETERS
-    X       -   solution replaces elements X[IX:IX+N-1]
-
-  -- ALGLIB routine --
-     (c) 07.09.2021 Bochkanov Sergey
-*************************************************************************/
+// This subroutine solves linear system op(A)*x=b where:
+// * A is NxN upper/lower triangular/unitriangular matrix
+// * X and B are Nx1 vectors
+// * "op" may be identity transformation or transposition
+//
+// Solution replaces X.
+//
+// IMPORTANT: * no overflow/underflow/denegeracy tests is performed.
+//            * no integrity checks for operand sizes, out-of-bounds accesses
+//              and so on is performed
+//
+// INPUT PARAMETERS
+//     N   -   matrix size, N>=0
+//     A       -   matrix, actial matrix is stored in A[IA:IA+N-1,JA:JA+N-1]
+//     IA      -   submatrix offset
+//     JA      -   submatrix offset
+//     IsUpper -   whether matrix is upper triangular
+//     IsUnit  -   whether matrix is unitriangular
+//     OpType  -   transformation type:
+//                 * 0 - no transformation
+//                 * 1 - transposition
+//     X       -   right part, actual vector is stored in X[IX:IX+N-1]
+//     IX      -   offset
+//
+// OUTPUT PARAMETERS
+//     X       -   solution replaces elements X[IX:IX+N-1]
+//
+//   -- ALGLIB routine --
+//      (c) 07.09.2021 Bochkanov Sergey
 void rtrsvx(ae_int_t n,
      RMatrix * a,
      ae_int_t ia,
@@ -14562,13 +13712,11 @@ void rtrsvx(ae_int_t n,
     ae_assert(ae_false, "rTRSVX: unexpected operation type", _state);
 }
 
-/*************************************************************************
-Fast rGEMM kernel with AVX2/FMA support
-
-  -- ALGLIB routine --
-     19.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Fast rGEMM kernel with AVX2/FMA support
+//
+//   -- ALGLIB routine --
+//      19.09.2021
+//      Bochkanov Sergey
 ae_bool ablasf_rgemm32basecase(
      ae_int_t m,
      ae_int_t n,
@@ -14601,9 +13749,7 @@ ae_bool ablasf_rgemm32basecase(
     void     (*ablasf_dotblk)(const double *, const double *, ae_int_t, ae_int_t, ae_int_t, double *, ae_int_t)    = ablasf_dotblkh_avx2;
     void     (*ablasf_daxpby)(ae_int_t, double, const double *, double, double*) = ablasf_daxpby_avx2;
 
-    /*
-     * Determine CPU and kernel support
-     */
+    // Determine CPU and kernel support
     if( m>block_size || n>block_size || k>block_size || m==0 || n==0 || !(cpu_id&CPU_AVX2) )
         return ae_false;
 #if defined(_ALGLIB_HAS_FMA_INTRINSICS)
@@ -14611,20 +13757,14 @@ ae_bool ablasf_rgemm32basecase(
         ablasf_dotblk  = ablasf_dotblkh_fma;
 #endif
 
-    /*
-     * Prepare C
-     */
+    // Prepare C
     c = _c->ptr.pp_double[ic]+jc;
     stride_c = _c->stride;
 
-    /*
-     * Do we have alpha*A*B ?
-     */
+    // Do we have alpha*A*B ?
     if( alpha!=0 && k>0 )
     {
-        /*
-         * Prepare structures
-         */
+        // Prepare structures
         ae_int_t base0, base1, offs0;
         double *a = _a->ptr.pp_double[ia]+ja;
         double *b = _b->ptr.pp_double[ib]+jb;
@@ -14637,9 +13777,7 @@ ae_bool ablasf_rgemm32basecase(
         double *storageb_long = (double*)ae_align(_blkb_long,_ALGLIB_SIMD_ALIGNMENT_BYTES);
         double *blkc          = (double*)ae_align(_blkc,     _ALGLIB_SIMD_ALIGNMENT_BYTES);
 
-        /*
-         * Pack transform(B) into precomputed block form
-         */
+        // Pack transform(B) into precomputed block form
         for(base1=0; base1<n; base1+=micro_size)
         {
             const ae_int_t lim1 = n-base1<micro_size ? n-base1 : micro_size;
@@ -14649,37 +13787,27 @@ ae_bool ablasf_rgemm32basecase(
                 curb, block_size, micro_size);
         }
 
-        /*
-         * Output
-         */
+        // Output
         for(base0=0; base0<m; base0+=micro_size)
         {
-            /*
-             * Load block row of transform(A)
-             */
+            // Load block row of transform(A)
             const ae_int_t lim0    = m-base0<micro_size ? m-base0 : micro_size;
             const ae_int_t round_k = ablasf_packblk(
                 a + (optypea==0 ? base0*stride_a : base0), stride_a, optypea, k, lim0,
                 blka, block_size, micro_size);
 
-            /*
-             * Compute block(A)'*entire(B)
-             */
+            // Compute block(A)'*entire(B)
             for(base1=0; base1<n; base1+=micro_size)
                 ablasf_dotblk(blka, storageb_long+base1*block_size, round_k, block_size, micro_size, blkc+base1, block_size);
 
-            /*
-             * Output block row of block(A)'*entire(B)
-             */
+            // Output block row of block(A)'*entire(B)
             for(offs0=0; offs0<lim0; offs0++)
                 ablasf_daxpby(n, alpha, blkc+offs0*block_size, beta, c+(base0+offs0)*stride_c);
         }
     }
     else
     {
-        /*
-         * No A*B, just beta*C (degenerate case, not optimized)
-         */
+        // No A*B, just beta*C (degenerate case, not optimized)
         if( beta==0 )
         {
             for(out0=0; out0<m; out0++)
@@ -14698,9 +13826,7 @@ ae_bool ablasf_rgemm32basecase(
 }
 
 
-/*************************************************************************
-Returns recommended width of the SIMD-friendly buffer
-*************************************************************************/
+// Returns recommended width of the SIMD-friendly buffer
 ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state)
 {
 #if AE_CPU==AE_INTEL
@@ -14710,20 +13836,18 @@ ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state)
 #endif
 }
 
-/*************************************************************************
-Solving linear system: propagating computed supernode.
-
-Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
-RHS storage format.
-
-INPUT PARAMETERS:
-
-OUTPUT PARAMETERS:
-
-  -- ALGLIB routine --
-     08.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Solving linear system: propagating computed supernode.
+//
+// Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
+// RHS storage format.
+//
+// INPUT PARAMETERS:
+//
+// OUTPUT PARAMETERS:
+//
+//   -- ALGLIB routine --
+//      08.09.2021
+//      Bochkanov Sergey
 void spchol_propagatefwd(RVector * x,
      ae_int_t cols0,
      ae_int_t blocksize,
@@ -14743,9 +13867,7 @@ void spchol_propagatefwd(RVector * x,
     ae_int_t baseoffs;
     double v;
 
-    /*
-     * Try SIMD kernels
-     */
+    // Try SIMD kernels
 #if defined(_ALGLIB_HAS_FMA_INTRINSICS)
     if( sstride==4 || (blocksize==2 && sstride==2) )
         if( ae_cpuid()&CPU_FMA )
@@ -14755,14 +13877,10 @@ void spchol_propagatefwd(RVector * x,
         }
 #endif
 
-    /*
-     * Propagate rank-1 node (can not be accelerated with SIMD)
-     */
+    // Propagate rank-1 node (can not be accelerated with SIMD)
     if( blocksize==1 && sstride==1 )
     {
-        /*
-         * blocksize is 1, stride is 1
-         */
+        // blocksize is 1, stride is 1
         double vx = x->ptr.p_double[cols0];
         double *p_mat_row  = rowstorage->ptr.p_double+offss+1*1;
         double *p_simd_buf = simdbuf->ptr.p_double;
@@ -14780,9 +13898,7 @@ void spchol_propagatefwd(RVector * x,
         return;
     }
 
-    /*
-     * Generic C code for generic propagate
-     */
+    // Generic C code for generic propagate
     for(k=0; k<=offdiagsize-1; k++)
     {
         i = superrowidx->ptr.p_int[rbase+k];
@@ -14797,32 +13913,30 @@ void spchol_propagatefwd(RVector * x,
 }
 
 
-/*************************************************************************
-Fast kernels for small supernodal updates: special 4x4x4x4 function.
-
-! See comments on UpdateSupernode() for information  on generic supernodal
-! updates, including notation used below.
-
-The generic update has following form:
-
-    S := S - scatter(U*D*Uc')
-
-This specialized function performs AxBxCx4 update, i.e.:
-* S is a tHeight*A matrix with row stride equal to 4 (usually it means that
-  it has 3 or 4 columns)
-* U is a uHeight*B matrix
-* Uc' is a B*C matrix, with C<=A
-* scatter() scatters rows and columns of U*Uc'
-
-Return value:
-* True if update was applied
-* False if kernel refused to perform an update (quick exit for unsupported
-  combinations of input sizes)
-
-  -- ALGLIB routine --
-     20.09.2020
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs AxBxCx4 update, i.e.:
+// * S is a tHeight*A matrix with row stride equal to 4 (usually it means that
+//   it has 3 or 4 columns)
+// * U is a uHeight*B matrix
+// * Uc' is a B*C matrix, with C<=A
+// * scatter() scatters rows and columns of U*Uc'
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update (quick exit for unsupported
+//   combinations of input sizes)
+//
+//   -- ALGLIB routine --
+//      20.09.2020
+//      Bochkanov Sergey
 ae_bool spchol_updatekernelabc4(RVector * rowstorage,
      ae_int_t offss,
      ae_int_t twidth,
@@ -14838,15 +13952,11 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
      ae_int_t urbase,
      ae_state *_state)
 {
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4,(rowstorage->ptr.p_double, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
 
-    /*
-     * Generic code
-     */
+    // Generic code
     ae_int_t k;
     ae_int_t targetrow;
     ae_int_t targetcol;
@@ -14883,9 +13993,7 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
 
 
 
-    /*
-     * Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
-     */
+    // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
     result = ae_false;
     if( twidth<3||twidth>4 )
     {
@@ -14900,10 +14008,8 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
         return result;
     }
 
-    /*
-     * Determine source columns for target columns, -1 if target column
-     * is not updated.
-     */
+    // Determine source columns for target columns, -1 if target column
+    // is not updated.
     srccol0 = -1;
     srccol1 = -1;
     srccol2 = -1;
@@ -14929,9 +14035,7 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
         }
     }
 
-    /*
-     * Load update matrix into aligned/rearranged 4x4 storage
-     */
+    // Load update matrix into aligned/rearranged 4x4 storage
     d0 = (double)(0);
     d1 = (double)(0);
     d2 = (double)(0);
@@ -15045,9 +14149,7 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
         }
     }
 
-    /*
-     * Run update
-     */
+    // Run update
     if( urank==1 )
     {
         for(k=0; k<=uheight-1; k++)
@@ -15111,31 +14213,29 @@ ae_bool spchol_updatekernelabc4(RVector * rowstorage,
 }
 
 
-/*************************************************************************
-Fast kernels for small supernodal updates: special 4x4x4x4 function.
-
-! See comments on UpdateSupernode() for information  on generic supernodal
-! updates, including notation used below.
-
-The generic update has following form:
-
-    S := S - scatter(U*D*Uc')
-
-This specialized function performs 4x4x4x4 update, i.e.:
-* S is a tHeight*4 matrix
-* U is a uHeight*4 matrix
-* Uc' is a 4*4 matrix
-* scatter() scatters rows of U*Uc', but does not scatter columns (they are
-  densely packed).
-
-Return value:
-* True if update was applied
-* False if kernel refused to perform an update.
-
-  -- ALGLIB routine --
-     20.09.2020
-     Bochkanov Sergey
-*************************************************************************/
+// Fast kernels for small supernodal updates: special 4x4x4x4 function.
+//
+// ! See comments on UpdateSupernode() for information  on generic supernodal
+// ! updates, including notation used below.
+//
+// The generic update has following form:
+//
+//     S := S - scatter(U*D*Uc')
+//
+// This specialized function performs 4x4x4x4 update, i.e.:
+// * S is a tHeight*4 matrix
+// * U is a uHeight*4 matrix
+// * Uc' is a 4*4 matrix
+// * scatter() scatters rows of U*Uc', but does not scatter columns (they are
+//   densely packed).
+//
+// Return value:
+// * True if update was applied
+// * False if kernel refused to perform an update.
+//
+//   -- ALGLIB routine --
+//      20.09.2020
+//      Bochkanov Sergey
 ae_bool spchol_updatekernel4444(RVector * rowstorage,
      ae_int_t offss,
      ae_int_t sheight,
@@ -15178,15 +14278,11 @@ ae_bool spchol_updatekernel4444(RVector * rowstorage,
     ae_bool result;
 
 
-    /*
-     * Try fast kernels.
-     * On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
-     */
+    // Try fast kernels.
+    // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
     _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernel4444,(rowstorage->ptr.p_double, offss, sheight, offsu, uheight, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
 
-    /*
-     * Generic C fallback code
-     */
+    // Generic C fallback code
     d0 = diagd->ptr.p_double[offsd+0];
     d1 = diagd->ptr.p_double[offsd+1];
     d2 = diagd->ptr.p_double[offsd+2];
@@ -15209,9 +14305,7 @@ ae_bool spchol_updatekernel4444(RVector * rowstorage,
     u33 = d3*rowstorage->ptr.p_double[offsu+3*4+3];
     if( sheight==uheight )
     {
-        /*
-         * No row scatter, the most efficient code
-         */
+        // No row scatter, the most efficient code
         for(k=0; k<=uheight-1; k++)
         {
             targetrow = offss+k*4;
@@ -15228,9 +14322,7 @@ ae_bool spchol_updatekernel4444(RVector * rowstorage,
     }
     else
     {
-        /*
-         * Row scatter is performed, less efficient code using double mapping to determine target row index
-         */
+        // Row scatter is performed, less efficient code using double mapping to determine target row index
         for(k=0; k<=uheight-1; k++)
         {
             targetrow = offss+raw2smap->ptr.p_int[superrowidx->ptr.p_int[urbase+k]]*4;
@@ -15249,7 +14341,7 @@ ae_bool spchol_updatekernel4444(RVector * rowstorage,
     return result;
 }
 
-/* ALGLIB_NO_FAST_KERNELS */
+// ALGLIB_NO_FAST_KERNELS
 #endif
 
 

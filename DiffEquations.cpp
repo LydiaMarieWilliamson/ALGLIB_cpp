@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -45,9 +43,7 @@ namespace alglib
 #endif
 
 #if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-
-*************************************************************************/
+//
 _odesolverstate_owner::_odesolverstate_owner()
 {
     jmp_buf _break_jump;
@@ -173,9 +169,7 @@ odesolverstate::~odesolverstate()
 }
 
 
-/*************************************************************************
-
-*************************************************************************/
+//
 _odesolverreport_owner::_odesolverreport_owner()
 {
     jmp_buf _break_jump;
@@ -300,53 +294,51 @@ odesolverreport::~odesolverreport()
 {
 }
 
-/*************************************************************************
-Cash-Karp adaptive ODE solver.
-
-This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-(here Y may be single variable or vector of N variables).
-
-INPUT PARAMETERS:
-    Y       -   initial conditions, array[0..N-1].
-                contains values of Y[] at X[0]
-    N       -   system size
-    X       -   points at which Y should be tabulated, array[0..M-1]
-                integrations starts at X[0], ends at X[M-1],  intermediate
-                values at X[i] are returned too.
-                SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-    M       -   number of intermediate points + first point + last point:
-                * M>2 means that you need both Y(X[M-1]) and M-2 values at
-                  intermediate points
-                * M=2 means that you want just to integrate from  X[0]  to
-                  X[1] and don't interested in intermediate values.
-                * M=1 means that you don't want to integrate :)
-                  it is degenerate case, but it will be handled correctly.
-                * M<1 means error
-    Eps     -   tolerance (absolute/relative error on each  step  will  be
-                less than Eps). When passing:
-                * Eps>0, it means desired ABSOLUTE error
-                * Eps<0, it means desired RELATIVE error.  Relative errors
-                  are calculated with respect to maximum values of  Y seen
-                  so far. Be careful to use this criterion  when  starting
-                  from Y[] that are close to zero.
-    H       -   initial  step  lenth,  it  will  be adjusted automatically
-                after the first  step.  If  H=0,  step  will  be  selected
-                automatically  (usualy  it  will  be  equal  to  0.001  of
-                min(x[i]-x[j])).
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state between  subsequent
-                calls of OdeSolverIteration. Used for reverse communication.
-                This structure should be passed  to the OdeSolverIteration
-                subroutine.
-
-SEE ALSO
-    AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+// Cash-Karp adaptive ODE solver.
+//
+// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
+// (here Y may be single variable or vector of N variables).
+//
+// INPUT PARAMETERS:
+//     Y       -   initial conditions, array[0..N-1].
+//                 contains values of Y[] at X[0]
+//     N       -   system size
+//     X       -   points at which Y should be tabulated, array[0..M-1]
+//                 integrations starts at X[0], ends at X[M-1],  intermediate
+//                 values at X[i] are returned too.
+//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
+//     M       -   number of intermediate points + first point + last point:
+//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                   intermediate points
+//                 * M=2 means that you want just to integrate from  X[0]  to
+//                   X[1] and don't interested in intermediate values.
+//                 * M=1 means that you don't want to integrate :)
+//                   it is degenerate case, but it will be handled correctly.
+//                 * M<1 means error
+//     Eps     -   tolerance (absolute/relative error on each  step  will  be
+//                 less than Eps). When passing:
+//                 * Eps>0, it means desired ABSOLUTE error
+//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                   are calculated with respect to maximum values of  Y seen
+//                   so far. Be careful to use this criterion  when  starting
+//                   from Y[] that are close to zero.
+//     H       -   initial  step  lenth,  it  will  be adjusted automatically
+//                 after the first  step.  If  H=0,  step  will  be  selected
+//                 automatically  (usualy  it  will  be  equal  to  0.001  of
+//                 min(x[i]-x[j])).
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state between  subsequent
+//                 calls of OdeSolverIteration. Used for reverse communication.
+//                 This structure should be passed  to the OdeSolverIteration
+//                 subroutine.
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -369,53 +361,51 @@ void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array
     return;
 }
 
-/*************************************************************************
-Cash-Karp adaptive ODE solver.
-
-This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-(here Y may be single variable or vector of N variables).
-
-INPUT PARAMETERS:
-    Y       -   initial conditions, array[0..N-1].
-                contains values of Y[] at X[0]
-    N       -   system size
-    X       -   points at which Y should be tabulated, array[0..M-1]
-                integrations starts at X[0], ends at X[M-1],  intermediate
-                values at X[i] are returned too.
-                SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-    M       -   number of intermediate points + first point + last point:
-                * M>2 means that you need both Y(X[M-1]) and M-2 values at
-                  intermediate points
-                * M=2 means that you want just to integrate from  X[0]  to
-                  X[1] and don't interested in intermediate values.
-                * M=1 means that you don't want to integrate :)
-                  it is degenerate case, but it will be handled correctly.
-                * M<1 means error
-    Eps     -   tolerance (absolute/relative error on each  step  will  be
-                less than Eps). When passing:
-                * Eps>0, it means desired ABSOLUTE error
-                * Eps<0, it means desired RELATIVE error.  Relative errors
-                  are calculated with respect to maximum values of  Y seen
-                  so far. Be careful to use this criterion  when  starting
-                  from Y[] that are close to zero.
-    H       -   initial  step  lenth,  it  will  be adjusted automatically
-                after the first  step.  If  H=0,  step  will  be  selected
-                automatically  (usualy  it  will  be  equal  to  0.001  of
-                min(x[i]-x[j])).
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state between  subsequent
-                calls of OdeSolverIteration. Used for reverse communication.
-                This structure should be passed  to the OdeSolverIteration
-                subroutine.
-
-SEE ALSO
-    AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+// Cash-Karp adaptive ODE solver.
+//
+// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
+// (here Y may be single variable or vector of N variables).
+//
+// INPUT PARAMETERS:
+//     Y       -   initial conditions, array[0..N-1].
+//                 contains values of Y[] at X[0]
+//     N       -   system size
+//     X       -   points at which Y should be tabulated, array[0..M-1]
+//                 integrations starts at X[0], ends at X[M-1],  intermediate
+//                 values at X[i] are returned too.
+//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
+//     M       -   number of intermediate points + first point + last point:
+//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                   intermediate points
+//                 * M=2 means that you want just to integrate from  X[0]  to
+//                   X[1] and don't interested in intermediate values.
+//                 * M=1 means that you don't want to integrate :)
+//                   it is degenerate case, but it will be handled correctly.
+//                 * M<1 means error
+//     Eps     -   tolerance (absolute/relative error on each  step  will  be
+//                 less than Eps). When passing:
+//                 * Eps>0, it means desired ABSOLUTE error
+//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                   are calculated with respect to maximum values of  Y seen
+//                   so far. Be careful to use this criterion  when  starting
+//                   from Y[] that are close to zero.
+//     H       -   initial  step  lenth,  it  will  be adjusted automatically
+//                 after the first  step.  If  H=0,  step  will  be  selected
+//                 automatically  (usualy  it  will  be  equal  to  0.001  of
+//                 min(x[i]-x[j])).
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state between  subsequent
+//                 calls of OdeSolverIteration. Used for reverse communication.
+//                 This structure should be passed  to the OdeSolverIteration
+//                 subroutine.
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams)
 {
@@ -439,11 +429,9 @@ void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double 
 }
 #endif
 
-/*************************************************************************
-This function provides reverse communication interface
-Reverse communication interface is not documented or recommended to use.
-See below for functions which provide better documented API
-*************************************************************************/
+// This function provides reverse communication interface
+// Reverse communication interface is not documented or recommended to use.
+// See below for functions which provide better documented API
 bool odesolveriteration(const odesolverstate &state, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -504,29 +492,27 @@ void odesolversolve(odesolverstate &state,
 
 
 
-/*************************************************************************
-ODE solver results
-
-Called after OdeSolverIteration returned False.
-
-INPUT PARAMETERS:
-    State   -   algorithm state (used by OdeSolverIteration).
-
-OUTPUT PARAMETERS:
-    M       -   number of tabulated values, M>=1
-    XTbl    -   array[0..M-1], values of X
-    YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
-    Rep     -   solver report:
-                * Rep.TerminationType completetion code:
-                    * -2    X is not ordered  by  ascending/descending  or
-                            there are non-distinct X[],  i.e.  X[i]=X[i+1]
-                    * -1    incorrect parameters were specified
-                    *  1    task has been solved
-                * Rep.NFEV contains number of function calculations
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+// ODE solver results
+//
+// Called after OdeSolverIteration returned False.
+//
+// INPUT PARAMETERS:
+//     State   -   algorithm state (used by OdeSolverIteration).
+//
+// OUTPUT PARAMETERS:
+//     M       -   number of tabulated values, M>=1
+//     XTbl    -   array[0..M-1], values of X
+//     YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
+//     Rep     -   solver report:
+//                 * Rep.TerminationType completetion code:
+//                     * -2    X is not ordered  by  ascending/descending  or
+//                             there are non-distinct X[],  i.e.  X[i]=X[i+1]
+//                     * -1    incorrect parameters were specified
+//                     *  1    task has been solved
+//                 * Rep.NFEV contains number of function calculations
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -578,53 +564,51 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
 #if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-Cash-Karp adaptive ODE solver.
-
-This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
-(here Y may be single variable or vector of N variables).
-
-INPUT PARAMETERS:
-    Y       -   initial conditions, array[0..N-1].
-                contains values of Y[] at X[0]
-    N       -   system size
-    X       -   points at which Y should be tabulated, array[0..M-1]
-                integrations starts at X[0], ends at X[M-1],  intermediate
-                values at X[i] are returned too.
-                SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
-    M       -   number of intermediate points + first point + last point:
-                * M>2 means that you need both Y(X[M-1]) and M-2 values at
-                  intermediate points
-                * M=2 means that you want just to integrate from  X[0]  to
-                  X[1] and don't interested in intermediate values.
-                * M=1 means that you don't want to integrate :)
-                  it is degenerate case, but it will be handled correctly.
-                * M<1 means error
-    Eps     -   tolerance (absolute/relative error on each  step  will  be
-                less than Eps). When passing:
-                * Eps>0, it means desired ABSOLUTE error
-                * Eps<0, it means desired RELATIVE error.  Relative errors
-                  are calculated with respect to maximum values of  Y seen
-                  so far. Be careful to use this criterion  when  starting
-                  from Y[] that are close to zero.
-    H       -   initial  step  lenth,  it  will  be adjusted automatically
-                after the first  step.  If  H=0,  step  will  be  selected
-                automatically  (usualy  it  will  be  equal  to  0.001  of
-                min(x[i]-x[j])).
-
-OUTPUT PARAMETERS
-    State   -   structure which stores algorithm state between  subsequent
-                calls of OdeSolverIteration. Used for reverse communication.
-                This structure should be passed  to the OdeSolverIteration
-                subroutine.
-
-SEE ALSO
-    AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
-
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+// Cash-Karp adaptive ODE solver.
+//
+// This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
+// (here Y may be single variable or vector of N variables).
+//
+// INPUT PARAMETERS:
+//     Y       -   initial conditions, array[0..N-1].
+//                 contains values of Y[] at X[0]
+//     N       -   system size
+//     X       -   points at which Y should be tabulated, array[0..M-1]
+//                 integrations starts at X[0], ends at X[M-1],  intermediate
+//                 values at X[i] are returned too.
+//                 SHOULD BE ORDERED BY ASCENDING OR BY DESCENDING!
+//     M       -   number of intermediate points + first point + last point:
+//                 * M>2 means that you need both Y(X[M-1]) and M-2 values at
+//                   intermediate points
+//                 * M=2 means that you want just to integrate from  X[0]  to
+//                   X[1] and don't interested in intermediate values.
+//                 * M=1 means that you don't want to integrate :)
+//                   it is degenerate case, but it will be handled correctly.
+//                 * M<1 means error
+//     Eps     -   tolerance (absolute/relative error on each  step  will  be
+//                 less than Eps). When passing:
+//                 * Eps>0, it means desired ABSOLUTE error
+//                 * Eps<0, it means desired RELATIVE error.  Relative errors
+//                   are calculated with respect to maximum values of  Y seen
+//                   so far. Be careful to use this criterion  when  starting
+//                   from Y[] that are close to zero.
+//     H       -   initial  step  lenth,  it  will  be adjusted automatically
+//                 after the first  step.  If  H=0,  step  will  be  selected
+//                 automatically  (usualy  it  will  be  equal  to  0.001  of
+//                 min(x[i]-x[j])).
+//
+// OUTPUT PARAMETERS
+//     State   -   structure which stores algorithm state between  subsequent
+//                 calls of OdeSolverIteration. Used for reverse communication.
+//                 This structure should be passed  to the OdeSolverIteration
+//                 subroutine.
+//
+// SEE ALSO
+//     AutoGKSmoothW, AutoGKSingular, AutoGKIteration, AutoGKResults.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverrkck(RVector * y,
      ae_int_t n,
      RVector * x,
@@ -650,11 +634,9 @@ void odesolverrkck(RVector * y,
 }
 
 
-/*************************************************************************
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 ae_bool odesolveriteration(odesolverstate* state, ae_state *_state)
 {
     ae_int_t n;
@@ -674,16 +656,14 @@ ae_bool odesolveriteration(odesolverstate* state, ae_state *_state)
 
 
 
-    /*
-     * Reverse communication preparations
-     * I know it looks ugly, but it works the same way
-     * anywhere from C++ to Python.
-     *
-     * This code initializes locals by:
-     * * random values determined during code
-     *   generation - on first subroutine call
-     * * values from previous call - on subsequent calls
-     */
+    // Reverse communication preparations
+    // I know it looks ugly, but it works the same way
+    // anywhere from C++ to Python.
+    //
+    // This code initializes locals by:
+    // * random values determined during code
+    //   generation - on first subroutine call
+    // * values from previous call - on subsequent calls
     if( state->rstate.stage>=0 )
     {
         n = state->rstate.ia.ptr.p_int[0];
@@ -721,13 +701,9 @@ ae_bool odesolveriteration(odesolverstate* state, ae_state *_state)
         goto lbl_0;
     }
 
-    /*
-     * Routine body
-     */
+    // Routine body
 
-    /*
-     * prepare
-     */
+    // prepare
     if( state->repterminationtype!=0 )
     {
         result = ae_false;
@@ -739,26 +715,20 @@ ae_bool odesolveriteration(odesolverstate* state, ae_state *_state)
     maxgrowpow = ae_pow(odesolver_odesolvermaxgrow, (double)(5), _state);
     state->repnfev = 0;
 
-    /*
-     * some preliminary checks for internal errors
-     * after this we assume that H>0 and M>1
-     */
+    // some preliminary checks for internal errors
+    // after this we assume that H>0 and M>1
     ae_assert(ae_fp_greater(state->h,(double)(0)), "ODESolver: internal error", _state);
     ae_assert(m>1, "ODESolverIteration: internal error", _state);
 
-    /*
-     * choose solver
-     */
+    // choose solver
     if( state->solvertype!=0 )
     {
         goto lbl_1;
     }
 
-    /*
-     * Cask-Karp solver
-     * Prepare coefficients table.
-     * Check it for errors
-     */
+    // Cask-Karp solver
+    // Prepare coefficients table.
+    // Check it for errors
     ae_vector_set_length(&state->rka, 6, _state);
     state->rka.ptr.p_double[0] = (double)(0);
     state->rka.ptr.p_double[1] = (double)1/(double)5;
@@ -798,11 +768,9 @@ ae_bool odesolveriteration(odesolverstate* state, ae_state *_state)
     state->rkcs.ptr.p_double[5] = (double)1/(double)4;
     ae_matrix_set_length(&state->rkk, 6, n, _state);
 
-    /*
-     * Main cycle consists of two iterations:
-     * * outer where we travel from X[i-1] to X[i]
-     * * inner where we travel inside [X[i-1],X[i]]
-     */
+    // Main cycle consists of two iterations:
+    // * outer where we travel from X[i-1] to X[i]
+    // * inner where we travel inside [X[i-1],X[i]]
     ae_matrix_set_length(&state->ytbl, m, n, _state);
     ae_vector_set_length(&state->escale, n, _state);
     ae_vector_set_length(&state->yn, n, _state);
@@ -820,19 +788,15 @@ lbl_3:
         goto lbl_5;
     }
 
-    /*
-     * begin inner iteration
-     */
+    // begin inner iteration
 lbl_6:
     if( ae_false )
     {
         goto lbl_7;
     }
 
-    /*
-     * truncate step if needed (beyond right boundary).
-     * determine should we store X or not
-     */
+    // truncate step if needed (beyond right boundary).
+    // determine should we store X or not
     if( ae_fp_greater_eq(xc+h,state->xg.ptr.p_double[i]) )
     {
         h = state->xg.ptr.p_double[i]-xc;
@@ -843,28 +807,24 @@ lbl_6:
         gridpoint = ae_false;
     }
 
-    /*
-     * Update error scale maximums
-     *
-     * These maximums are initialized by zeros,
-     * then updated every iterations.
-     */
+    // Update error scale maximums
+    //
+    // These maximums are initialized by zeros,
+    // then updated every iterations.
     for(j=0; j<=n-1; j++)
     {
         state->escale.ptr.p_double[j] = ae_maxreal(state->escale.ptr.p_double[j], ae_fabs(state->yc.ptr.p_double[j], _state), _state);
     }
 
-    /*
-     * make one step:
-     * 1. calculate all info needed to do step
-     * 2. update errors scale maximums using values/derivatives
-     *    obtained during (1)
-     *
-     * Take into account that we use scaling of X to reduce task
-     * to the form where x[0] < x[1] < ... < x[n-1]. So X is
-     * replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
-     * by dy/dt=xscale*f(y,xscale*t).
-     */
+    // make one step:
+    // 1. calculate all info needed to do step
+    // 2. update errors scale maximums using values/derivatives
+    //    obtained during (1)
+    //
+    // Take into account that we use scaling of X to reduce task
+    // to the form where x[0] < x[1] < ... < x[n-1]. So X is
+    // replaced by x=xscale*t, and dy/dx=f(y,x) is replaced
+    // by dy/dt=xscale*f(y,xscale*t).
     ae_v_move(&state->yn.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0,n-1));
     ae_v_move(&state->yns.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0,n-1));
     k = 0;
@@ -874,9 +834,7 @@ lbl_8:
         goto lbl_10;
     }
 
-    /*
-     * prepare data for the next update of YN/YNS
-     */
+    // prepare data for the next update of YN/YNS
     state->x = state->xscale*(xc+state->rka.ptr.p_double[k]*h);
     ae_v_move(&state->y.ptr.p_double[0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0,n-1));
     for(j=0; j<=k-1; j++)
@@ -893,9 +851,7 @@ lbl_0:
     v = h*state->xscale;
     ae_v_moved(&state->rkk.ptr.pp_double[k][0], 1, &state->dy.ptr.p_double[0], 1, ae_v_len(0,n-1), v);
 
-    /*
-     * update YN/YNS
-     */
+    // update YN/YNS
     v = state->rkc.ptr.p_double[k];
     ae_v_addd(&state->yn.ptr.p_double[0], 1, &state->rkk.ptr.pp_double[k][0], 1, ae_v_len(0,n-1), v);
     v = state->rkcs.ptr.p_double[k];
@@ -904,26 +860,20 @@ lbl_0:
     goto lbl_8;
 lbl_10:
 
-    /*
-     * estimate error
-     */
+    // estimate error
     err = (double)(0);
     for(j=0; j<=n-1; j++)
     {
         if( !state->fraceps )
         {
 
-            /*
-             * absolute error is estimated
-             */
+            // absolute error is estimated
             err = ae_maxreal(err, ae_fabs(state->yn.ptr.p_double[j]-state->yns.ptr.p_double[j], _state), _state);
         }
         else
         {
 
-            /*
-             * Relative error is estimated
-             */
+            // Relative error is estimated
             v = state->escale.ptr.p_double[j];
             if( ae_fp_eq(v,(double)(0)) )
             {
@@ -933,9 +883,7 @@ lbl_10:
         }
     }
 
-    /*
-     * calculate new step, restart if necessary
-     */
+    // calculate new step, restart if necessary
     if( ae_fp_less_eq(maxgrowpow*err,state->eps) )
     {
         h2 = odesolver_odesolvermaxgrow*h;
@@ -954,20 +902,14 @@ lbl_10:
         goto lbl_6;
     }
 
-    /*
-     * advance position
-     */
+    // advance position
     xc = xc+h;
     ae_v_move(&state->yc.ptr.p_double[0], 1, &state->yn.ptr.p_double[0], 1, ae_v_len(0,n-1));
 
-    /*
-     * update H
-     */
+    // update H
     h = h2;
 
-    /*
-     * break on grid point
-     */
+    // break on grid point
     if( gridpoint )
     {
         goto lbl_7;
@@ -975,9 +917,7 @@ lbl_10:
     goto lbl_6;
 lbl_7:
 
-    /*
-     * save result
-     */
+    // save result
     ae_v_move(&state->ytbl.ptr.pp_double[i][0], 1, &state->yc.ptr.p_double[0], 1, ae_v_len(0,n-1));
     i = i+1;
     goto lbl_3;
@@ -989,9 +929,7 @@ lbl_1:
     result = ae_false;
     return result;
 
-    /*
-     * Saving state
-     */
+    // Saving state
 lbl_rcomm:
     result = ae_true;
     state->rstate.ia.ptr.p_int[0] = n;
@@ -1011,29 +949,27 @@ lbl_rcomm:
 }
 
 
-/*************************************************************************
-ODE solver results
-
-Called after OdeSolverIteration returned False.
-
-INPUT PARAMETERS:
-    State   -   algorithm state (used by OdeSolverIteration).
-
-OUTPUT PARAMETERS:
-    M       -   number of tabulated values, M>=1
-    XTbl    -   array[0..M-1], values of X
-    YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
-    Rep     -   solver report:
-                * Rep.TerminationType completetion code:
-                    * -2    X is not ordered  by  ascending/descending  or
-                            there are non-distinct X[],  i.e.  X[i]=X[i+1]
-                    * -1    incorrect parameters were specified
-                    *  1    task has been solved
-                * Rep.NFEV contains number of function calculations
-
-  -- ALGLIB --
-     Copyright 01.09.2009 by Bochkanov Sergey
-*************************************************************************/
+// ODE solver results
+//
+// Called after OdeSolverIteration returned False.
+//
+// INPUT PARAMETERS:
+//     State   -   algorithm state (used by OdeSolverIteration).
+//
+// OUTPUT PARAMETERS:
+//     M       -   number of tabulated values, M>=1
+//     XTbl    -   array[0..M-1], values of X
+//     YTbl    -   array[0..M-1,0..N-1], values of Y in X[i]
+//     Rep     -   solver report:
+//                 * Rep.TerminationType completetion code:
+//                     * -2    X is not ordered  by  ascending/descending  or
+//                             there are non-distinct X[],  i.e.  X[i]=X[i+1]
+//                     * -1    incorrect parameters were specified
+//                     *  1    task has been solved
+//                 * Rep.NFEV contains number of function calculations
+//
+//   -- ALGLIB --
+//      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverresults(odesolverstate* state,
      ae_int_t* m,
      RVector * xtbl,
@@ -1070,9 +1006,7 @@ void odesolverresults(odesolverstate* state,
 }
 
 
-/*************************************************************************
-Internal initialization subroutine
-*************************************************************************/
+// Internal initialization subroutine
 static void odesolver_odesolverinit(ae_int_t solvertype,
      RVector * y,
      ae_int_t n,
@@ -1089,18 +1023,14 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
     _odesolverstate_clear(state);
 
 
-    /*
-     * Prepare RComm
-     */
+    // Prepare RComm
     ae_vector_set_length(&state->rstate.ia, 5+1, _state);
     ae_vector_set_length(&state->rstate.ba, 0+1, _state);
     ae_vector_set_length(&state->rstate.ra, 5+1, _state);
     state->rstate.stage = -1;
     state->needdy = ae_false;
 
-    /*
-     * check parameters.
-     */
+    // check parameters.
     if( (n<=0||m<1)||ae_fp_eq(eps,(double)(0)) )
     {
         state->repterminationtype = -1;
@@ -1111,10 +1041,8 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
         h = -h;
     }
 
-    /*
-     * quick exit if necessary.
-     * after this block we assume that M>1
-     */
+    // quick exit if necessary.
+    // after this block we assume that M>1
     if( m==1 )
     {
         state->repnfev = 0;
@@ -1126,9 +1054,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
         return;
     }
 
-    /*
-     * check again: correct order of X[]
-     */
+    // check again: correct order of X[]
     if( ae_fp_eq(x->ptr.p_double[1],x->ptr.p_double[0]) )
     {
         state->repterminationtype = -2;
@@ -1143,9 +1069,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
         }
     }
 
-    /*
-     * auto-select H if necessary
-     */
+    // auto-select H if necessary
     if( ae_fp_eq(h,(double)(0)) )
     {
         v = ae_fabs(x->ptr.p_double[1]-x->ptr.p_double[0], _state);
@@ -1156,9 +1080,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
         h = 0.001*v;
     }
 
-    /*
-     * store parameters
-     */
+    // store parameters
     state->n = n;
     state->m = m;
     state->h = h;
@@ -1180,9 +1102,7 @@ static void odesolver_odesolverinit(ae_int_t solvertype,
     state->solvertype = solvertype;
     state->repterminationtype = 0;
 
-    /*
-     * Allocate arrays
-     */
+    // Allocate arrays
     ae_vector_set_length(&state->y, n, _state);
     ae_vector_set_length(&state->dy, n, _state);
 }

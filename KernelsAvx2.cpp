@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -391,7 +389,7 @@ void bsetv_avx2(const ae_int_t n, const ae_bool v, ae_bool* __restrict x,
     for(i=0; i<nVec; i++) {
         pDest[i] = avx2v;
     }
-    /* _mm256_extracti128_si256() has a too high latency on latest processors (Skylake+) */
+    // _mm256_extracti128_si256() has a too high latency on latest processors (Skylake+)
     memset(x+even, v, tail);
 }
 
@@ -1218,36 +1216,34 @@ void rgemvx_transposed_avx2(const ae_int_t m, const ae_int_t n,
     rgemvx_transposed_avx2_yaligned(m-shift, n, alpha, a, ia, ja+shift, x, y+shift, _state);
 }
 
-/*************************************************************************
-Block packing function for fast rGEMM. Loads long  WIDTH*LENGTH  submatrix
-with LENGTH<=BLOCK_SIZE and WIDTH<=MICRO_SIZE into contiguous  MICRO_SIZE*
-BLOCK_SIZE row-wise 'horizontal' storage (hence H in the function name).
-
-The matrix occupies first ROUND_LENGTH cols of the  storage  (with  LENGTH
-being rounded up to nearest SIMD granularity).  ROUND_LENGTH  is  returned
-as result. It is guaranteed that ROUND_LENGTH depends only on LENGTH,  and
-that it will be same for all function calls.
-
-Unused rows and columns in [LENGTH,ROUND_LENGTH) range are filled by zeros;
-unused cols in [ROUND_LENGTH,BLOCK_SIZE) range are ignored.
-
-* op=0 means that source is an WIDTH*LENGTH matrix stored with  src_stride
-  stride. The matrix is NOT transposed on load.
-* op=1 means that source is an LENGTH*WIDTH matrix  stored with src_stride
-  that is loaded with transposition
-* present version of the function supports only MICRO_SIZE=2, the behavior
-  is undefined for other micro sizes.
-* the target is properly aligned; the source can be unaligned.
-
-Requires AVX2, does NOT check its presense.
-
-The function is present in two versions, one  with  variable  opsrc_length
-and another one with opsrc_length==block_size==32.
-
-  -- ALGLIB routine --
-     19.07.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Block packing function for fast rGEMM. Loads long  WIDTH*LENGTH  submatrix
+// with LENGTH<=BLOCK_SIZE and WIDTH<=MICRO_SIZE into contiguous  MICRO_SIZE*
+// BLOCK_SIZE row-wise 'horizontal' storage (hence H in the function name).
+//
+// The matrix occupies first ROUND_LENGTH cols of the  storage  (with  LENGTH
+// being rounded up to nearest SIMD granularity).  ROUND_LENGTH  is  returned
+// as result. It is guaranteed that ROUND_LENGTH depends only on LENGTH,  and
+// that it will be same for all function calls.
+//
+// Unused rows and columns in [LENGTH,ROUND_LENGTH) range are filled by zeros;
+// unused cols in [ROUND_LENGTH,BLOCK_SIZE) range are ignored.
+//
+// * op=0 means that source is an WIDTH*LENGTH matrix stored with  src_stride
+//   stride. The matrix is NOT transposed on load.
+// * op=1 means that source is an LENGTH*WIDTH matrix  stored with src_stride
+//   that is loaded with transposition
+// * present version of the function supports only MICRO_SIZE=2, the behavior
+//   is undefined for other micro sizes.
+// * the target is properly aligned; the source can be unaligned.
+//
+// Requires AVX2, does NOT check its presense.
+//
+// The function is present in two versions, one  with  variable  opsrc_length
+// and another one with opsrc_length==block_size==32.
+//
+//   -- ALGLIB routine --
+//      19.07.2021
+//      Bochkanov Sergey
 ae_int_t ablasf_packblkh_avx2(
     const double *src,
     ae_int_t src_stride,
@@ -1260,22 +1256,16 @@ ae_int_t ablasf_packblkh_avx2(
 {
     ae_int_t i;
 
-    /*
-     * Write to the storage
-     */
+    // Write to the storage
     if( op==0 )
     {
-        /*
-         * Copy without transposition
-         */
+        // Copy without transposition
         const ae_int_t len8=(opsrc_length>>3)<<3;
         const double *src1 = src+src_stride;
         double       *dst1 = dst+block_size;
         if( opsrc_width==2 )
         {
-            /*
-             * Width=2
-             */
+            // Width=2
             for(i=0; i<len8; i+=8)
             {
                 _mm256_store_pd(dst+i,    _mm256_loadu_pd(src+i));
@@ -1291,9 +1281,7 @@ ae_int_t ablasf_packblkh_avx2(
         }
         else
         {
-            /*
-             * Width=1, pad by zeros
-             */
+            // Width=1, pad by zeros
             __m256d vz = _mm256_setzero_pd();
             for(i=0; i<len8; i+=8)
             {
@@ -1311,9 +1299,7 @@ ae_int_t ablasf_packblkh_avx2(
     }
     else
     {
-        /*
-         * Copy with transposition
-         */
+        // Copy with transposition
         const ae_int_t stride2 = src_stride<<1;
         const ae_int_t stride3 = src_stride+stride2;
         const ae_int_t stride4 = src_stride<<2;
@@ -1322,9 +1308,7 @@ ae_int_t ablasf_packblkh_avx2(
         double       *dst1 = dst+block_size;
         if( opsrc_width==2 )
         {
-            /*
-             * Width=2
-             */
+            // Width=2
             for(i=0; i<len4; i+=4)
             {
                 __m128d s0 = _mm_loadu_pd(srci), s1 = _mm_loadu_pd(srci+src_stride);
@@ -1344,9 +1328,7 @@ ae_int_t ablasf_packblkh_avx2(
         }
         else
         {
-            /*
-             * Width=1, pad by zeros
-             */
+            // Width=1, pad by zeros
             __m128d vz = _mm_setzero_pd();
             for(i=0; i<len4; i+=4)
             {
@@ -1367,9 +1349,7 @@ ae_int_t ablasf_packblkh_avx2(
         }
     }
 
-    /*
-     * Pad by zeros, if needed
-     */
+    // Pad by zeros, if needed
     ae_int_t round_length = ((opsrc_length+3)>>2)<<2;
     for(i=opsrc_length; i<round_length; i++)
     {
@@ -1391,21 +1371,15 @@ ae_int_t ablasf_packblkh32_avx2(
 {
     ae_int_t i;
 
-    /*
-     * Write to the storage
-     */
+    // Write to the storage
     if( op==0 )
     {
-        /*
-         * Copy without transposition
-         */
+        // Copy without transposition
         const double *src1 = src+src_stride;
         double       *dst1 = dst+32;
         if( opsrc_width==2 )
         {
-            /*
-             * Width=2
-             */
+            // Width=2
             for(i=0; i<32; i+=8)
             {
                 _mm256_store_pd(dst+i,    _mm256_loadu_pd(src+i));
@@ -1416,9 +1390,7 @@ ae_int_t ablasf_packblkh32_avx2(
         }
         else
         {
-            /*
-             * Width=1, pad by zeros
-             */
+            // Width=1, pad by zeros
             __m256d vz = _mm256_setzero_pd();
             for(i=0; i<32; i+=8)
             {
@@ -1431,9 +1403,7 @@ ae_int_t ablasf_packblkh32_avx2(
     }
     else
     {
-        /*
-         * Copy with transposition
-         */
+        // Copy with transposition
         const ae_int_t stride2 = src_stride<<1;
         const ae_int_t stride3 = src_stride+stride2;
         const ae_int_t stride4 = src_stride<<2;
@@ -1441,9 +1411,7 @@ ae_int_t ablasf_packblkh32_avx2(
         double       *dst1 = dst+32;
         if( opsrc_width==2 )
         {
-            /*
-             * Width=2
-             */
+            // Width=2
             for(i=0; i<32; i+=4)
             {
                 __m128d s0 = _mm_loadu_pd(srci), s1 = _mm_loadu_pd(srci+src_stride);
@@ -1457,9 +1425,7 @@ ae_int_t ablasf_packblkh32_avx2(
         }
         else
         {
-            /*
-             * Width=1, pad by zeros
-             */
+            // Width=1, pad by zeros
             __m128d vz = _mm_setzero_pd();
             for(i=0; i<32; i+=4)
             {
@@ -1476,23 +1442,21 @@ ae_int_t ablasf_packblkh32_avx2(
     return 32;
 }
 
-/*************************************************************************
-Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
-'horizontal' matrices, stored with stride=block_size, and writes it to the
-row-wise matrix C.
-
-ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
-by ablasf_packblkh_avx2().
-
-Present version of the function supports only MICRO_SIZE=2,  the  behavior
-is undefined for other micro sizes.
-
-Requires AVX2, does NOT check its presense.
-
-  -- ALGLIB routine --
-     19.07.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
+// 'horizontal' matrices, stored with stride=block_size, and writes it to the
+// row-wise matrix C.
+//
+// ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
+// by ablasf_packblkh_avx2().
+//
+// Present version of the function supports only MICRO_SIZE=2,  the  behavior
+// is undefined for other micro sizes.
+//
+// Requires AVX2, does NOT check its presense.
+//
+//   -- ALGLIB routine --
+//      19.07.2021
+//      Bochkanov Sergey
 void ablasf_dotblkh_avx2(
     const double *src_a,
     const double *src_b,
@@ -1506,9 +1470,7 @@ void ablasf_dotblkh_avx2(
     __m256d r00 = _mm256_setzero_pd(), r01 = _mm256_setzero_pd(), r10 = _mm256_setzero_pd(), r11 = _mm256_setzero_pd();
     if( round_length&0x7 )
     {
-        /*
-         * round_length is multiple of 4, but not multiple of 8
-         */
+        // round_length is multiple of 4, but not multiple of 8
         for(z=0; z<round_length; z+=4, src_a+=4, src_b+=4)
         {
             __m256d a0 = _mm256_load_pd(src_a);
@@ -1523,9 +1485,7 @@ void ablasf_dotblkh_avx2(
     }
     else
     {
-        /*
-         * round_length is multiple of 8
-         */
+        // round_length is multiple of 8
         for(z=0; z<round_length; z+=8, src_a+=8, src_b+=8)
         {
             __m256d a0 = _mm256_load_pd(src_a);
@@ -1548,15 +1508,13 @@ void ablasf_dotblkh_avx2(
     _mm_store_pd(dst+dst_stride, _mm_add_pd(_mm256_castpd256_pd128(sum1), _mm256_extractf128_pd(sum1,1)));
 }
 
-/*************************************************************************
-Y := alpha*X + beta*Y
-
-Requires AVX2, does NOT check its presense.
-
-  -- ALGLIB routine --
-     19.07.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Y := alpha*X + beta*Y
+//
+// Requires AVX2, does NOT check its presense.
+//
+//   -- ALGLIB routine --
+//      19.07.2021
+//      Bochkanov Sergey
 void ablasf_daxpby_avx2(
     ae_int_t     n,
     double       alpha,
@@ -1566,13 +1524,11 @@ void ablasf_daxpby_avx2(
 {
     if( beta==1.0 )
     {
-        /*
-         * The most optimized case: DST := alpha*SRC + DST
-         *
-         * First, we process leading elements with generic C code until DST is aligned.
-         * Then, we process central part, assuming that DST is properly aligned.
-         * Finally, we process tail.
-         */
+        // The most optimized case: DST := alpha*SRC + DST
+        //
+        // First, we process leading elements with generic C code until DST is aligned.
+        // Then, we process central part, assuming that DST is properly aligned.
+        // Finally, we process tail.
         ae_int_t i, n4;
         __m256d avx_alpha = _mm256_set1_pd(alpha);
         while( n>0 && (((ptrdiff_t)dst)&31) )
@@ -1593,9 +1549,7 @@ void ablasf_daxpby_avx2(
     }
     else if( beta!=0.0 )
     {
-        /*
-         * Well optimized: DST := alpha*SRC + beta*DST
-         */
+        // Well optimized: DST := alpha*SRC + beta*DST
         ae_int_t i, n4;
         __m256d avx_alpha = _mm256_set1_pd(alpha);
         __m256d avx_beta  = _mm256_set1_pd(beta);
@@ -1619,9 +1573,7 @@ void ablasf_daxpby_avx2(
     }
     else
     {
-        /*
-         * Easy case: DST := alpha*SRC
-         */
+        // Easy case: DST := alpha*SRC
         ae_int_t i;
         for(i=0; i<n; i++)
             dst[i] = alpha*src[i];
@@ -1647,9 +1599,7 @@ ae_bool spchol_updatekernelabc4_avx2(double* rowstorage,
     ae_int_t targetrow;
     ae_int_t targetcol;
 
-    /*
-     * Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
-     */
+    // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
     if( twidth<3||twidth>4 )
     {
         return ae_false;
@@ -1663,18 +1613,14 @@ ae_bool spchol_updatekernelabc4_avx2(double* rowstorage,
         return ae_false;
     }
 
-    /*
-     * Shift input arrays to the beginning of the working area.
-     * Prepare SIMD masks
-     */
+    // Shift input arrays to the beginning of the working area.
+    // Prepare SIMD masks
     __m256i v_rankmask = _mm256_cmpgt_epi64(_mm256_set_epi64x(urank, urank, urank, urank), _mm256_set_epi64x(3, 2, 1, 0));
     double *update_storage = rowstorage+offsu;
     double *target_storage = rowstorage+offss;
     superrowidx += urbase;
 
-    /*
-     * Load head of the update matrix
-     */
+    // Load head of the update matrix
     __m256d v_d0123 = _mm256_maskload_pd(diagd+offsd, v_rankmask);
     __m256d u_0_0123 = _mm256_setzero_pd();
     __m256d u_1_0123 = _mm256_setzero_pd();
@@ -1693,9 +1639,7 @@ ae_bool spchol_updatekernelabc4_avx2(double* rowstorage,
             u_3_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage+k*urowstride, v_rankmask));
     }
 
-    /*
-     * Transpose head
-     */
+    // Transpose head
     __m256d u01_lo = _mm256_unpacklo_pd(u_0_0123,u_1_0123);
     __m256d u01_hi = _mm256_unpackhi_pd(u_0_0123,u_1_0123);
     __m256d u23_lo = _mm256_unpacklo_pd(u_2_0123,u_3_0123);
@@ -1705,9 +1649,7 @@ ae_bool spchol_updatekernelabc4_avx2(double* rowstorage,
     __m256d u_0123_2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
     __m256d u_0123_3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 
-    /*
-     * Run update
-     */
+    // Run update
     if( urank==1 )
     {
         for(k=0; k<=uheight-1; k++)
@@ -1780,9 +1722,7 @@ ae_bool spchol_updatekernel4444_avx2(
     __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
     __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
 
-    /*
-     * Compute W = -D*transpose(U[0:3])
-     */
+    // Compute W = -D*transpose(U[0:3])
     v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd+offsd),_mm256_set1_pd(-1.0));
     v_negd_u0   = _mm256_mul_pd(_mm256_load_pd(rowstorage+offsu+0*4),v_negd);
     v_negd_u1   = _mm256_mul_pd(_mm256_load_pd(rowstorage+offsu+1*4),v_negd);
@@ -1802,9 +1742,7 @@ ae_bool spchol_updatekernel4444_avx2(
     //
     if( sheight==uheight )
     {
-        /*
-         * No row scatter, the most efficient code
-         */
+        // No row scatter, the most efficient code
         for(k=0; k<=uheight-1; k++)
         {
             __m256d target;
@@ -1822,9 +1760,7 @@ ae_bool spchol_updatekernel4444_avx2(
     }
     else
     {
-        /*
-         * Row scatter is performed, less efficient code using double mapping to determine target row index
-         */
+        // Row scatter is performed, less efficient code using double mapping to determine target row index
         for(k=0; k<=uheight-1; k++)
         {
             __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
@@ -1848,7 +1784,7 @@ ae_bool spchol_updatekernel4444_avx2(
 }
 
 
-/* ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS */
+// ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 #endif
 
 

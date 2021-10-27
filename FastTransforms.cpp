@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -57,35 +55,33 @@ namespace alglib
 #endif
 
 #if defined(AE_COMPILE_FFT) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-1-dimensional complex FFT.
-
-Array size N may be arbitrary number (composite or prime).  Composite  N's
-are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
-Small prime-factors are transformed using hard coded  codelets (similar to
-FFTW codelets, but without low-level  optimization),  large  prime-factors
-are handled with Bluestein's algorithm.
-
-Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
-most fast for powers of 2. When N have prime factors  larger  than  these,
-but orders of magnitude smaller than N, computations will be about 4 times
-slower than for nearby highly composite N's. When N itself is prime, speed
-will be 6 times lower.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Composite  N's
+// are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
+// Small prime-factors are transformed using hard coded  codelets (similar to
+// FFTW codelets, but without low-level  optimization),  large  prime-factors
+// are handled with Bluestein's algorithm.
+//
+// Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
+// most fast for powers of 2. When N have prime factors  larger  than  these,
+// but orders of magnitude smaller than N, computations will be about 4 times
+// slower than for nearby highly composite N's. When N itself is prime, speed
+// will be 6 times lower.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -108,35 +104,33 @@ void fftc1d(complex_1d_array &a, const ae_int_t n, const xparams _xparams)
     return;
 }
 
-/*************************************************************************
-1-dimensional complex FFT.
-
-Array size N may be arbitrary number (composite or prime).  Composite  N's
-are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
-Small prime-factors are transformed using hard coded  codelets (similar to
-FFTW codelets, but without low-level  optimization),  large  prime-factors
-are handled with Bluestein's algorithm.
-
-Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
-most fast for powers of 2. When N have prime factors  larger  than  these,
-but orders of magnitude smaller than N, computations will be about 4 times
-slower than for nearby highly composite N's. When N itself is prime, speed
-will be 6 times lower.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Composite  N's
+// are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
+// Small prime-factors are transformed using hard coded  codelets (similar to
+// FFTW codelets, but without low-level  optimization),  large  prime-factors
+// are handled with Bluestein's algorithm.
+//
+// Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
+// most fast for powers of 2. When N have prime factors  larger  than  these,
+// but orders of magnitude smaller than N, computations will be about 4 times
+// slower than for nearby highly composite N's. When N itself is prime, speed
+// will be 6 times lower.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void fftc1d(complex_1d_array &a, const xparams _xparams)
 {
@@ -158,26 +152,24 @@ void fftc1d(complex_1d_array &a, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-1-dimensional complex inverse FFT.
-
-Array size N may be arbitrary number (composite or prime).  Algorithm  has
-O(N*logN) complexity for any N (composite or prime).
-
-See FFTC1D() description for more information about algorithm performance.
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex array to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex inverse FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Algorithm  has
+// O(N*logN) complexity for any N (composite or prime).
+//
+// See FFTC1D() description for more information about algorithm performance.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex array to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -200,26 +192,24 @@ void fftc1dinv(complex_1d_array &a, const ae_int_t n, const xparams _xparams)
     return;
 }
 
-/*************************************************************************
-1-dimensional complex inverse FFT.
-
-Array size N may be arbitrary number (composite or prime).  Algorithm  has
-O(N*logN) complexity for any N (composite or prime).
-
-See FFTC1D() description for more information about algorithm performance.
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex array to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex inverse FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Algorithm  has
+// O(N*logN) complexity for any N (composite or prime).
+//
+// See FFTC1D() description for more information about algorithm performance.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex array to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void fftc1dinv(complex_1d_array &a, const xparams _xparams)
 {
@@ -241,29 +231,27 @@ void fftc1dinv(complex_1d_array &a, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-1-dimensional real FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    F   -   DFT of a input array, array[0..N-1]
-            F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-NOTE:
-    F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-of  array  is  usually needed. But for convinience subroutine returns full
-complex array (with frequencies above N/2), so its result may be  used  by
-other FFT-related subroutines.
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     F   -   DFT of a input array, array[0..N-1]
+//             F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+// NOTE:
+//     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
+// of  array  is  usually needed. But for convinience subroutine returns full
+// complex array (with frequencies above N/2), so its result may be  used  by
+// other FFT-related subroutines.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -286,29 +274,27 @@ void fftr1d(const real_1d_array &a, const ae_int_t n, complex_1d_array &f, const
     return;
 }
 
-/*************************************************************************
-1-dimensional real FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    F   -   DFT of a input array, array[0..N-1]
-            F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-NOTE:
-    F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-of  array  is  usually needed. But for convinience subroutine returns full
-complex array (with frequencies above N/2), so its result may be  used  by
-other FFT-related subroutines.
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     F   -   DFT of a input array, array[0..N-1]
+//             F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+// NOTE:
+//     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
+// of  array  is  usually needed. But for convinience subroutine returns full
+// complex array (with frequencies above N/2), so its result may be  used  by
+// other FFT-related subroutines.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams)
 {
@@ -330,41 +316,39 @@ void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams)
 }
 #endif
 
-/*************************************************************************
-1-dimensional real inverse FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    F   -   array[0..floor(N/2)] - frequencies from forward real FFT
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-
-NOTE:
-    F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
-half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
-is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
-F[floor(N/2)] has no special properties.
-
-Relying on properties noted above, FFTR1DInv subroutine uses only elements
-from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
-N is even it ignores imaginary part of F[floor(N/2)] too.
-
-When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
-- you can pass either either frequencies array with N elements or  reduced
-array with roughly N/2 elements - subroutine will  successfully  transform
-both.
-
-If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
-- you must pass FULL array with N elements (although higher  N/2 are still
-not used) because array size is used to automatically determine FFT length
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real inverse FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     F   -   array[0..floor(N/2)] - frequencies from forward real FFT
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//
+// NOTE:
+//     F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
+// half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
+// is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
+// F[floor(N/2)] has no special properties.
+//
+// Relying on properties noted above, FFTR1DInv subroutine uses only elements
+// from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
+// N is even it ignores imaginary part of F[floor(N/2)] too.
+//
+// When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
+// - you can pass either either frequencies array with N elements or  reduced
+// array with roughly N/2 elements - subroutine will  successfully  transform
+// both.
+//
+// If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
+// - you must pass FULL array with N elements (although higher  N/2 are still
+// not used) because array size is used to automatically determine FFT length
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -387,41 +371,39 @@ void fftr1dinv(const complex_1d_array &f, const ae_int_t n, real_1d_array &a, co
     return;
 }
 
-/*************************************************************************
-1-dimensional real inverse FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    F   -   array[0..floor(N/2)] - frequencies from forward real FFT
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-
-NOTE:
-    F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
-half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
-is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
-F[floor(N/2)] has no special properties.
-
-Relying on properties noted above, FFTR1DInv subroutine uses only elements
-from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
-N is even it ignores imaginary part of F[floor(N/2)] too.
-
-When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
-- you can pass either either frequencies array with N elements or  reduced
-array with roughly N/2 elements - subroutine will  successfully  transform
-both.
-
-If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
-- you must pass FULL array with N elements (although higher  N/2 are still
-not used) because array size is used to automatically determine FFT length
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real inverse FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     F   -   array[0..floor(N/2)] - frequencies from forward real FFT
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//
+// NOTE:
+//     F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
+// half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
+// is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
+// F[floor(N/2)] has no special properties.
+//
+// Relying on properties noted above, FFTR1DInv subroutine uses only elements
+// from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
+// N is even it ignores imaginary part of F[floor(N/2)] too.
+//
+// When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
+// - you can pass either either frequencies array with N elements or  reduced
+// array with roughly N/2 elements - subroutine will  successfully  transform
+// both.
+//
+// If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
+// - you must pass FULL array with N elements (although higher  N/2 are still
+// not used) because array size is used to automatically determine FFT length
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
 void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams)
 {
@@ -445,23 +427,21 @@ void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xpara
 #endif
 
 #if defined(AE_COMPILE_FHT) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-1-dimensional Fast Hartley Transform.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   FHT of a input array, array[0..N-1],
-            A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 04.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional Fast Hartley Transform.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   FHT of a input array, array[0..N-1],
+//             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 04.06.2009 by Bochkanov Sergey
 void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -484,22 +464,20 @@ void fhtr1d(real_1d_array &a, const ae_int_t n, const xparams _xparams)
     return;
 }
 
-/*************************************************************************
-1-dimensional inverse FHT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex array to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse FHT of a input array, array[0..N-1]
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional inverse FHT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex array to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse FHT of a input array, array[0..N-1]
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -524,35 +502,33 @@ void fhtr1dinv(real_1d_array &a, const ae_int_t n, const xparams _xparams)
 #endif
 
 #if defined(AE_COMPILE_CONV) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-1-dimensional complex convolution.
-
-For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
-choose between three implementations: straightforward O(M*N)  formula  for
-very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
-significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
-general FFT-based formula for cases where two previois algorithms are  too
-slow.
-
-Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - complex function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-2].
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex convolution.
+//
+// For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
+// choose between three implementations: straightforward O(M*N)  formula  for
+// very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
+// significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
+// general FFT-based formula for cases where two previois algorithms are  too
+// slow.
+//
+// Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - complex function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -575,32 +551,30 @@ void convc1d(const complex_1d_array &a, const ae_int_t m, const complex_1d_array
     return;
 }
 
-/*************************************************************************
-1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length, N<=M
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N<=M
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -623,34 +597,32 @@ void convc1dinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_ar
     return;
 }
 
-/*************************************************************************
-1-dimensional circular complex convolution.
-
-For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
-complexity for any M/N.
-
-IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
-conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
-signal,  periodic function, and another - R - is a response,  non-periodic
-function with limited length.
-
-INPUT PARAMETERS
-    S   -   array[0..M-1] - complex periodic signal
-    M   -   problem size
-    B   -   array[0..N-1] - complex non-periodic response
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex convolution.
+//
+// For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
+// complexity for any M/N.
+//
+// IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
+// conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
+// signal,  periodic function, and another - R - is a response,  non-periodic
+// function with limited length.
+//
+// INPUT PARAMETERS
+//     S   -   array[0..M-1] - complex periodic signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex non-periodic response
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_1d_array &r, const ae_int_t n, complex_1d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -673,32 +645,30 @@ void convc1dcircular(const complex_1d_array &s, const ae_int_t m, const complex_
     return;
 }
 
-/*************************************************************************
-1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - non-periodic response
-    N   -   response length
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-1].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - non-periodic response
+//     N   -   response length
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-1].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const complex_1d_array &b, const ae_int_t n, complex_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -721,28 +691,26 @@ void convc1dcircularinv(const complex_1d_array &a, const ae_int_t m, const compl
     return;
 }
 
-/*************************************************************************
-1-dimensional real convolution.
-
-Analogous to ConvC1D(), see ConvC1D() comments for more details.
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - real function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-2].
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real convolution.
+//
+// Analogous to ConvC1D(), see ConvC1D() comments for more details.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - real function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -765,32 +733,30 @@ void convr1d(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, c
     return;
 }
 
-/*************************************************************************
-1-dimensional real deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length, N<=M
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N<=M
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -813,28 +779,26 @@ void convr1dinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b
     return;
 }
 
-/*************************************************************************
-1-dimensional circular real convolution.
-
-Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
-
-INPUT PARAMETERS
-    S   -   array[0..M-1] - real signal
-    M   -   problem size
-    B   -   array[0..N-1] - real response
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular real convolution.
+//
+// Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
+//
+// INPUT PARAMETERS
+//     S   -   array[0..M-1] - real signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - real response
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_array &r, const ae_int_t n, real_1d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -857,32 +821,30 @@ void convr1dcircular(const real_1d_array &s, const ae_int_t m, const real_1d_arr
     return;
 }
 
-/*************************************************************************
-1-dimensional complex deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_array &b, const ae_int_t n, real_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -907,42 +869,40 @@ void convr1dcircularinv(const real_1d_array &a, const ae_int_t m, const real_1d_
 #endif
 
 #if defined(AE_COMPILE_CORR) || !defined(AE_PARTIAL_BUILD)
-/*************************************************************************
-1-dimensional complex cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
-
-Correlation is calculated using reduction to  convolution.  Algorithm with
-max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
-about performance).
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order: CorrC1D(Signal, Pattern) = Pattern x Signal (using  traditional
-    definition of cross-correlation, denoting cross-correlation as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - complex function to be transformed,
-                signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - complex function to be transformed,
-                pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R       -   cross-correlation, array[0..N+M-2]:
-                * positive lags are stored in R[0..N-1],
-                  R[i] = sum(conj(pattern[j])*signal[i+j]
-                * negative lags are stored in R[N..N+M-2],
-                  R[N+M-1-i] = sum(conj(pattern[j])*signal[-i+j]
-
-NOTE:
-    It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
-on [-K..M-1],  you can still use this subroutine, just shift result by K.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
+//
+// Correlation is calculated using reduction to  convolution.  Algorithm with
+// max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
+// about performance).
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order: CorrC1D(Signal, Pattern) = Pattern x Signal (using  traditional
+//     definition of cross-correlation, denoting cross-correlation as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - complex function to be transformed,
+//                 signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - complex function to be transformed,
+//                 pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R       -   cross-correlation, array[0..N+M-2]:
+//                 * positive lags are stored in R[0..N-1],
+//                   R[i] = sum(conj(pattern[j])*signal[i+j]
+//                 * negative lags are stored in R[N..N+M-2],
+//                   R[N+M-1-i] = sum(conj(pattern[j])*signal[-i+j]
+//
+// NOTE:
+//     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
+// on [-K..M-1],  you can still use this subroutine, just shift result by K.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_array &pattern, const ae_int_t m, complex_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -965,33 +925,31 @@ void corrc1d(const complex_1d_array &signal, const ae_int_t n, const complex_1d_
     return;
 }
 
-/*************************************************************************
-1-dimensional circular complex cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (circular).
-Algorithm has linearithmic complexity for any M/N.
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order:   CorrC1DCircular(Signal, Pattern) = Pattern x Signal    (using
-    traditional definition of cross-correlation, denoting cross-correlation
-    as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - complex function to be transformed,
-                periodic signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - complex function to be transformed,
-                non-periodic pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (circular).
+// Algorithm has linearithmic complexity for any M/N.
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order:   CorrC1DCircular(Signal, Pattern) = Pattern x Signal    (using
+//     traditional definition of cross-correlation, denoting cross-correlation
+//     as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - complex function to be transformed,
+//                 periodic signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - complex function to be transformed,
+//                 non-periodic pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const complex_1d_array &pattern, const ae_int_t n, complex_1d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1014,42 +972,40 @@ void corrc1dcircular(const complex_1d_array &signal, const ae_int_t m, const com
     return;
 }
 
-/*************************************************************************
-1-dimensional real cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
-
-Correlation is calculated using reduction to  convolution.  Algorithm with
-max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
-about performance).
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order: CorrR1D(Signal, Pattern) = Pattern x Signal (using  traditional
-    definition of cross-correlation, denoting cross-correlation as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - real function to be transformed,
-                signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - real function to be transformed,
-                pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R       -   cross-correlation, array[0..N+M-2]:
-                * positive lags are stored in R[0..N-1],
-                  R[i] = sum(pattern[j]*signal[i+j]
-                * negative lags are stored in R[N..N+M-2],
-                  R[N+M-1-i] = sum(pattern[j]*signal[-i+j]
-
-NOTE:
-    It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
-on [-K..M-1],  you can still use this subroutine, just shift result by K.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
+//
+// Correlation is calculated using reduction to  convolution.  Algorithm with
+// max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
+// about performance).
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order: CorrR1D(Signal, Pattern) = Pattern x Signal (using  traditional
+//     definition of cross-correlation, denoting cross-correlation as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - real function to be transformed,
+//                 signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - real function to be transformed,
+//                 pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R       -   cross-correlation, array[0..N+M-2]:
+//                 * positive lags are stored in R[0..N-1],
+//                   R[i] = sum(pattern[j]*signal[i+j]
+//                 * negative lags are stored in R[N..N+M-2],
+//                   R[N+M-1-i] = sum(pattern[j]*signal[-i+j]
+//
+// NOTE:
+//     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
+// on [-K..M-1],  you can still use this subroutine, just shift result by K.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array &pattern, const ae_int_t m, real_1d_array &r, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1072,33 +1028,31 @@ void corrr1d(const real_1d_array &signal, const ae_int_t n, const real_1d_array 
     return;
 }
 
-/*************************************************************************
-1-dimensional circular real cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (circular).
-Algorithm has linearithmic complexity for any M/N.
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order:   CorrR1DCircular(Signal, Pattern) = Pattern x Signal    (using
-    traditional definition of cross-correlation, denoting cross-correlation
-    as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - real function to be transformed,
-                periodic signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - real function to be transformed,
-                non-periodic pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular real cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (circular).
+// Algorithm has linearithmic complexity for any M/N.
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order:   CorrR1DCircular(Signal, Pattern) = Pattern x Signal    (using
+//     traditional definition of cross-correlation, denoting cross-correlation
+//     as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - real function to be transformed,
+//                 periodic signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - real function to be transformed,
+//                 non-periodic pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrr1dcircular(const real_1d_array &signal, const ae_int_t m, const real_1d_array &pattern, const ae_int_t n, real_1d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
@@ -1150,35 +1104,33 @@ namespace alglib_impl
 #if defined(AE_COMPILE_FFT) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-1-dimensional complex FFT.
-
-Array size N may be arbitrary number (composite or prime).  Composite  N's
-are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
-Small prime-factors are transformed using hard coded  codelets (similar to
-FFTW codelets, but without low-level  optimization),  large  prime-factors
-are handled with Bluestein's algorithm.
-
-Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
-most fast for powers of 2. When N have prime factors  larger  than  these,
-but orders of magnitude smaller than N, computations will be about 4 times
-slower than for nearby highly composite N's. When N itself is prime, speed
-will be 6 times lower.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Composite  N's
+// are handled with cache-oblivious variation of  a  Cooley-Tukey  algorithm.
+// Small prime-factors are transformed using hard coded  codelets (similar to
+// FFTW codelets, but without low-level  optimization),  large  prime-factors
+// are handled with Bluestein's algorithm.
+//
+// Fastests transforms are for smooth N's (prime factors are 2, 3,  5  only),
+// most fast for powers of 2. When N have prime factors  larger  than  these,
+// but orders of magnitude smaller than N, computations will be about 4 times
+// slower than for nearby highly composite N's. When N itself is prime, speed
+// will be 6 times lower.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fftc1d(CVector * a, ae_int_t n, ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1196,19 +1148,15 @@ void fftc1d(CVector * a, ae_int_t n, ae_state *_state)
     ae_assert(a->cnt>=n, "FFTC1D: Length(A)<N!", _state);
     ae_assert(isfinitecvector(a, n, _state), "FFTC1D: A contains infinite or NAN values!", _state);
 
-    /*
-     * Special case: N=1, FFT is just identity transform.
-     * After this block we assume that N is strictly greater than 1.
-     */
+    // Special case: N=1, FFT is just identity transform.
+    // After this block we assume that N is strictly greater than 1.
     if( n==1 )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * convert input array to the more convinient format
-     */
+    // convert input array to the more convinient format
     ae_vector_set_length(&buf, 2*n, _state);
     for(i=0; i<=n-1; i++)
     {
@@ -1216,19 +1164,15 @@ void fftc1d(CVector * a, ae_int_t n, ae_state *_state)
         buf.ptr.p_double[2*i+1] = a->ptr.p_complex[i].y;
     }
 
-    /*
-     * Generate plan and execute it.
-     *
-     * Plan is a combination of a successive factorizations of N and
-     * precomputed data. It is much like a FFTW plan, but is not stored
-     * between subroutine calls and is much simpler.
-     */
+    // Generate plan and execute it.
+    //
+    // Plan is a combination of a successive factorizations of N and
+    // precomputed data. It is much like a FFTW plan, but is not stored
+    // between subroutine calls and is much simpler.
     ftcomplexfftplan(n, 1, &plan, _state);
     ftapplyplan(&plan, &buf, 0, 1, _state);
 
-    /*
-     * result
-     */
+    // result
     for(i=0; i<=n-1; i++)
     {
         a->ptr.p_complex[i].x = buf.ptr.p_double[2*i+0];
@@ -1238,26 +1182,24 @@ void fftc1d(CVector * a, ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-1-dimensional complex inverse FFT.
-
-Array size N may be arbitrary number (composite or prime).  Algorithm  has
-O(N*logN) complexity for any N (composite or prime).
-
-See FFTC1D() description for more information about algorithm performance.
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex array to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-            A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex inverse FFT.
+//
+// Array size N may be arbitrary number (composite or prime).  Algorithm  has
+// O(N*logN) complexity for any N (composite or prime).
+//
+// See FFTC1D() description for more information about algorithm performance.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex array to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//             A_out[j] = SUM(A_in[k]/N*exp(+2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fftc1dinv(CVector * a, ae_int_t n, ae_state *_state)
 {
     ae_int_t i;
@@ -1267,13 +1209,11 @@ void fftc1dinv(CVector * a, ae_int_t n, ae_state *_state)
     ae_assert(a->cnt>=n, "FFTC1DInv: Length(A)<N!", _state);
     ae_assert(isfinitecvector(a, n, _state), "FFTC1DInv: A contains infinite or NAN values!", _state);
 
-    /*
-     * Inverse DFT can be expressed in terms of the DFT as
-     *
-     *     invfft(x) = fft(x')'/N
-     *
-     * here x' means conj(x).
-     */
+    // Inverse DFT can be expressed in terms of the DFT as
+    //
+    //     invfft(x) = fft(x')'/N
+    //
+    // here x' means conj(x).
     for(i=0; i<=n-1; i++)
     {
         a->ptr.p_complex[i].y = -a->ptr.p_complex[i].y;
@@ -1287,29 +1227,27 @@ void fftc1dinv(CVector * a, ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-1-dimensional real FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    F   -   DFT of a input array, array[0..N-1]
-            F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
-
-NOTE:
-    F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
-of  array  is  usually needed. But for convinience subroutine returns full
-complex array (with frequencies above N/2), so its result may be  used  by
-other FFT-related subroutines.
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     F   -   DFT of a input array, array[0..N-1]
+//             F[j] = SUM(A[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
+//
+// NOTE:
+//     F[] satisfies symmetry property F[k] = conj(F[N-k]),  so just one half
+// of  array  is  usually needed. But for convinience subroutine returns full
+// complex array (with frequencies above N/2), so its result may be  used  by
+// other FFT-related subroutines.
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1d(RVector * a,
      ae_int_t n,
      CVector * f,
@@ -1336,13 +1274,11 @@ void fftr1d(RVector * a,
     ae_assert(a->cnt>=n, "FFTR1D: Length(A)<N!", _state);
     ae_assert(isfinitevector(a, n, _state), "FFTR1D: A contains infinite or NAN values!", _state);
 
-    /*
-     * Special cases:
-     * * N=1, FFT is just identity transform.
-     * * N=2, FFT is simple too
-     *
-     * After this block we assume that N is strictly greater than 2
-     */
+    // Special cases:
+    // * N=1, FFT is just identity transform.
+    // * N=2, FFT is simple too
+    //
+    // After this block we assume that N is strictly greater than 2
     if( n==1 )
     {
         ae_vector_set_length(f, 1, _state);
@@ -1361,15 +1297,11 @@ void fftr1d(RVector * a,
         return;
     }
 
-    /*
-     * Choose between odd-size and even-size FFTs
-     */
+    // Choose between odd-size and even-size FFTs
     if( n%2==0 )
     {
 
-        /*
-         * even-size real FFT, use reduction to the complex task
-         */
+        // even-size real FFT, use reduction to the complex task
         n2 = n/2;
         ae_vector_set_length(&buf, n, _state);
         ae_v_move(&buf.ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,n-1));
@@ -1398,9 +1330,7 @@ void fftr1d(RVector * a,
     else
     {
 
-        /*
-         * use complex FFT
-         */
+        // use complex FFT
         ae_vector_set_length(f, n, _state);
         for(i=0; i<=n-1; i++)
         {
@@ -1412,41 +1342,39 @@ void fftr1d(RVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional real inverse FFT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    F   -   array[0..floor(N/2)] - frequencies from forward real FFT
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse DFT of a input array, array[0..N-1]
-
-NOTE:
-    F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
-half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
-is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
-F[floor(N/2)] has no special properties.
-
-Relying on properties noted above, FFTR1DInv subroutine uses only elements
-from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
-N is even it ignores imaginary part of F[floor(N/2)] too.
-
-When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
-- you can pass either either frequencies array with N elements or  reduced
-array with roughly N/2 elements - subroutine will  successfully  transform
-both.
-
-If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
-- you must pass FULL array with N elements (although higher  N/2 are still
-not used) because array size is used to automatically determine FFT length
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real inverse FFT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     F   -   array[0..floor(N/2)] - frequencies from forward real FFT
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse DFT of a input array, array[0..N-1]
+//
+// NOTE:
+//     F[] should satisfy symmetry property F[k] = conj(F[N-k]), so just  one
+// half of frequencies array is needed - elements from 0 to floor(N/2).  F[0]
+// is ALWAYS real. If N is even F[floor(N/2)] is real too. If N is odd,  then
+// F[floor(N/2)] has no special properties.
+//
+// Relying on properties noted above, FFTR1DInv subroutine uses only elements
+// from 0th to floor(N/2)-th. It ignores imaginary part of F[0],  and in case
+// N is even it ignores imaginary part of F[floor(N/2)] too.
+//
+// When you call this function using full arguments list - "FFTR1DInv(F,N,A)"
+// - you can pass either either frequencies array with N elements or  reduced
+// array with roughly N/2 elements - subroutine will  successfully  transform
+// both.
+//
+// If you call this function using reduced arguments list -  "FFTR1DInv(F,A)"
+// - you must pass FULL array with N elements (although higher  N/2 are still
+// not used) because array size is used to automatically determine FFT length
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1dinv(CVector * f,
      ae_int_t n,
      RVector * a,
@@ -1477,10 +1405,8 @@ void fftr1dinv(CVector * f,
         ae_assert(ae_isfinite(f->ptr.p_complex[ae_ifloor((double)n/(double)2, _state)].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
     }
 
-    /*
-     * Special case: N=1, FFT is just identity transform.
-     * After this block we assume that N is strictly greater than 1.
-     */
+    // Special case: N=1, FFT is just identity transform.
+    // After this block we assume that N is strictly greater than 1.
     if( n==1 )
     {
         ae_vector_set_length(a, 1, _state);
@@ -1489,13 +1415,11 @@ void fftr1dinv(CVector * f,
         return;
     }
 
-    /*
-     * inverse real FFT is reduced to the inverse real FHT,
-     * which is reduced to the forward real FHT,
-     * which is reduced to the forward real FFT.
-     *
-     * Don't worry, it is really compact and efficient reduction :)
-     */
+    // inverse real FFT is reduced to the inverse real FHT,
+    // which is reduced to the forward real FHT,
+    // which is reduced to the forward real FFT.
+    //
+    // Don't worry, it is really compact and efficient reduction :)
     ae_vector_set_length(&h, n, _state);
     ae_vector_set_length(a, n, _state);
     h.ptr.p_double[0] = f->ptr.p_complex[0].x;
@@ -1522,13 +1446,11 @@ void fftr1dinv(CVector * f,
 }
 
 
-/*************************************************************************
-Internal subroutine. Never call it directly!
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// Internal subroutine. Never call it directly!
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1dinternaleven(RVector * a,
      ae_int_t n,
      RVector * buf,
@@ -1547,12 +1469,10 @@ void fftr1dinternaleven(RVector * a,
 
     ae_assert(n>0&&n%2==0, "FFTR1DEvenInplace: incorrect N!", _state);
 
-    /*
-     * Special cases:
-     * * N=2
-     *
-     * After this block we assume that N is strictly greater than 2
-     */
+    // Special cases:
+    // * N=2
+    //
+    // After this block we assume that N is strictly greater than 2
     if( n==2 )
     {
         x = a->ptr.p_double[0]+a->ptr.p_double[1];
@@ -1562,9 +1482,7 @@ void fftr1dinternaleven(RVector * a,
         return;
     }
 
-    /*
-     * even-size real FFT, use reduction to the complex task
-     */
+    // even-size real FFT, use reduction to the complex task
     n2 = n/2;
     ae_v_move(&buf->ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,n-1));
     ftapplyplan(plan, buf, 0, 1, _state);
@@ -1587,13 +1505,11 @@ void fftr1dinternaleven(RVector * a,
 }
 
 
-/*************************************************************************
-Internal subroutine. Never call it directly!
-
-
-  -- ALGLIB --
-     Copyright 01.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// Internal subroutine. Never call it directly!
+//
+//
+//   -- ALGLIB --
+//      Copyright 01.06.2009 by Bochkanov Sergey
 void fftr1dinvinternaleven(RVector * a,
      ae_int_t n,
      RVector * buf,
@@ -1609,12 +1525,10 @@ void fftr1dinvinternaleven(RVector * a,
 
     ae_assert(n>0&&n%2==0, "FFTR1DInvInternalEven: incorrect N!", _state);
 
-    /*
-     * Special cases:
-     * * N=2
-     *
-     * After this block we assume that N is strictly greater than 2
-     */
+    // Special cases:
+    // * N=2
+    //
+    // After this block we assume that N is strictly greater than 2
     if( n==2 )
     {
         x = 0.5*(a->ptr.p_double[0]+a->ptr.p_double[1]);
@@ -1624,13 +1538,11 @@ void fftr1dinvinternaleven(RVector * a,
         return;
     }
 
-    /*
-     * inverse real FFT is reduced to the inverse real FHT,
-     * which is reduced to the forward real FHT,
-     * which is reduced to the forward real FFT.
-     *
-     * Don't worry, it is really compact and efficient reduction :)
-     */
+    // inverse real FFT is reduced to the inverse real FHT,
+    // which is reduced to the forward real FHT,
+    // which is reduced to the forward real FFT.
+    //
+    // Don't worry, it is really compact and efficient reduction :)
     n2 = n/2;
     buf->ptr.p_double[0] = a->ptr.p_double[0];
     for(i=1; i<=n2-1; i++)
@@ -1659,23 +1571,21 @@ void fftr1dinvinternaleven(RVector * a,
 #if defined(AE_COMPILE_FHT) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-1-dimensional Fast Hartley Transform.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   FHT of a input array, array[0..N-1],
-            A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
-
-
-  -- ALGLIB --
-     Copyright 04.06.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional Fast Hartley Transform.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   FHT of a input array, array[0..N-1],
+//             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
+//
+//
+//   -- ALGLIB --
+//      Copyright 04.06.2009 by Bochkanov Sergey
 void fhtr1d(RVector * a, ae_int_t n, ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1688,19 +1598,15 @@ void fhtr1d(RVector * a, ae_int_t n, ae_state *_state)
 
     ae_assert(n>0, "FHTR1D: incorrect N!", _state);
 
-    /*
-     * Special case: N=1, FHT is just identity transform.
-     * After this block we assume that N is strictly greater than 1.
-     */
+    // Special case: N=1, FHT is just identity transform.
+    // After this block we assume that N is strictly greater than 1.
     if( n==1 )
     {
         ae_frame_leave(_state);
         return;
     }
 
-    /*
-     * Reduce FHt to real FFT
-     */
+    // Reduce FHt to real FFT
     fftr1d(a, n, &fa, _state);
     for(i=0; i<=n-1; i++)
     {
@@ -1710,22 +1616,20 @@ void fhtr1d(RVector * a, ae_int_t n, ae_state *_state)
 }
 
 
-/*************************************************************************
-1-dimensional inverse FHT.
-
-Algorithm has O(N*logN) complexity for any N (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..N-1] - complex array to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    A   -   inverse FHT of a input array, array[0..N-1]
-
-
-  -- ALGLIB --
-     Copyright 29.05.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional inverse FHT.
+//
+// Algorithm has O(N*logN) complexity for any N (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..N-1] - complex array to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     A   -   inverse FHT of a input array, array[0..N-1]
+//
+//
+//   -- ALGLIB --
+//      Copyright 29.05.2009 by Bochkanov Sergey
 void fhtr1dinv(RVector * a, ae_int_t n, ae_state *_state)
 {
     ae_int_t i;
@@ -1733,20 +1637,16 @@ void fhtr1dinv(RVector * a, ae_int_t n, ae_state *_state)
 
     ae_assert(n>0, "FHTR1DInv: incorrect N!", _state);
 
-    /*
-     * Special case: N=1, iFHT is just identity transform.
-     * After this block we assume that N is strictly greater than 1.
-     */
+    // Special case: N=1, iFHT is just identity transform.
+    // After this block we assume that N is strictly greater than 1.
     if( n==1 )
     {
         return;
     }
 
-    /*
-     * Inverse FHT can be expressed in terms of the FHT as
-     *
-     *     invfht(x) = fht(x)/N
-     */
+    // Inverse FHT can be expressed in terms of the FHT as
+    //
+    //     invfht(x) = fht(x)/N
     fhtr1d(a, n, _state);
     for(i=0; i<=n-1; i++)
     {
@@ -1759,35 +1659,33 @@ void fhtr1dinv(RVector * a, ae_int_t n, ae_state *_state)
 #if defined(AE_COMPILE_CONV) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-1-dimensional complex convolution.
-
-For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
-choose between three implementations: straightforward O(M*N)  formula  for
-very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
-significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
-general FFT-based formula for cases where two previois algorithms are  too
-slow.
-
-Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - complex function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-2].
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex convolution.
+//
+// For given A/B returns conv(A,B) (non-circular). Subroutine can automatically
+// choose between three implementations: straightforward O(M*N)  formula  for
+// very small N (or M), overlap-add algorithm for  cases  where  max(M,N)  is
+// significantly larger than min(M,N), but O(M*N) algorithm is too slow,  and
+// general FFT-based formula for cases where two previois algorithms are  too
+// slow.
+//
+// Algorithm has max(M,N)*log(max(M,N)) complexity for any M/N.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - complex function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1d(CVector * a,
      ae_int_t m,
      CVector * b,
@@ -1800,10 +1698,8 @@ void convc1d(CVector * a,
 
     ae_assert(n>0&&m>0, "ConvC1D: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer that B.
     if( m<n )
     {
         convc1d(b, n, a, m, r, _state);
@@ -1813,32 +1709,30 @@ void convc1d(CVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length, N<=M
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N<=M
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dinv(CVector * a,
      ae_int_t m,
      CVector * b,
@@ -1915,34 +1809,32 @@ void convc1dinv(CVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional circular complex convolution.
-
-For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
-complexity for any M/N.
-
-IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
-conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
-signal,  periodic function, and another - R - is a response,  non-periodic
-function with limited length.
-
-INPUT PARAMETERS
-    S   -   array[0..M-1] - complex periodic signal
-    M   -   problem size
-    B   -   array[0..N-1] - complex non-periodic response
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex convolution.
+//
+// For given S/R returns conv(S,R) (circular). Algorithm has linearithmic
+// complexity for any M/N.
+//
+// IMPORTANT:  normal convolution is commutative,  i.e.   it  is symmetric  -
+// conv(A,B)=conv(B,A).  Cyclic convolution IS NOT.  One function - S - is  a
+// signal,  periodic function, and another - R - is a response,  non-periodic
+// function with limited length.
+//
+// INPUT PARAMETERS
+//     S   -   array[0..M-1] - complex periodic signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex non-periodic response
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dcircular(CVector * s,
      ae_int_t m,
      CVector * r,
@@ -1963,10 +1855,8 @@ void convc1dcircular(CVector * s,
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&buf, m, _state);
@@ -1991,32 +1881,30 @@ void convc1dcircular(CVector * s,
 }
 
 
-/*************************************************************************
-1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - non-periodic response
-    N   -   response length
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-1].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex deconvolution (inverse of ConvC1DCircular()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved periodic signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - non-periodic response
+//     N   -   response length
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-1].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dcircularinv(CVector * a,
      ae_int_t m,
      CVector * b,
@@ -2051,10 +1939,8 @@ void convc1dcircularinv(CVector * a,
 
     ae_assert(n>0&&m>0, "ConvC1DCircularInv: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&cbuf, m, _state);
@@ -2075,9 +1961,7 @@ void convc1dcircularinv(CVector * a,
         return;
     }
 
-    /*
-     * Task is normalized
-     */
+    // Task is normalized
     ftcomplexfftplan(m, 1, &plan, _state);
     ae_vector_set_length(&buf, 2*m, _state);
     for(i=0; i<=m-1; i++)
@@ -2120,28 +2004,26 @@ void convc1dcircularinv(CVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional real convolution.
-
-Analogous to ConvC1D(), see ConvC1D() comments for more details.
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - real function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - real function to be transformed
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-2].
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real convolution.
+//
+// Analogous to ConvC1D(), see ConvC1D() comments for more details.
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - real function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - real function to be transformed
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-2].
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1d(RVector * a,
      ae_int_t m,
      RVector * b,
@@ -2154,10 +2036,8 @@ void convr1d(RVector * a,
 
     ae_assert(n>0&&m>0, "ConvR1D: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer that B.
     if( m<n )
     {
         convr1d(b, n, a, m, r, _state);
@@ -2167,32 +2047,30 @@ void convr1d(RVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional real deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length, N<=M
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
-functions have non-zero values at negative T's, you  can  still  use  this
-subroutine - just shift its result correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length, N<=M
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that A is zero at T<0, B is zero too.  If  one  or  both
+// functions have non-zero values at negative T's, you  can  still  use  this
+// subroutine - just shift its result correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dinv(RVector * a,
      ae_int_t m,
      RVector * b,
@@ -2259,28 +2137,26 @@ void convr1dinv(RVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional circular real convolution.
-
-Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
-
-INPUT PARAMETERS
-    S   -   array[0..M-1] - real signal
-    M   -   problem size
-    B   -   array[0..N-1] - real response
-    N   -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular real convolution.
+//
+// Analogous to ConvC1DCircular(), see ConvC1DCircular() comments for more details.
+//
+// INPUT PARAMETERS
+//     S   -   array[0..M-1] - real signal
+//     M   -   problem size
+//     B   -   array[0..N-1] - real response
+//     N   -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dcircular(RVector * s,
      ae_int_t m,
      RVector * r,
@@ -2301,10 +2177,8 @@ void convr1dcircular(RVector * s,
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&buf, m, _state);
@@ -2325,40 +2199,36 @@ void convr1dcircular(RVector * s,
         return;
     }
 
-    /*
-     * reduce to usual convolution
-     */
+    // reduce to usual convolution
     convr1dx(s, m, r, n, ae_true, -1, 0, c, _state);
     ae_frame_leave(_state);
 }
 
 
-/*************************************************************************
-1-dimensional complex deconvolution (inverse of ConvC1D()).
-
-Algorithm has M*log(M)) complexity for any M (composite or prime).
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - convolved signal, A = conv(R, B)
-    M   -   convolved signal length
-    B   -   array[0..N-1] - response
-    N   -   response length
-
-OUTPUT PARAMETERS
-    R   -   deconvolved signal. array[0..M-N].
-
-NOTE:
-    deconvolution is unstable process and may result in division  by  zero
-(if your response function is degenerate, i.e. has zero Fourier coefficient).
-
-NOTE:
-    It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
-negative T's, you can still use this subroutine - just  shift  its  result
-correspondingly.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex deconvolution (inverse of ConvC1D()).
+//
+// Algorithm has M*log(M)) complexity for any M (composite or prime).
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - convolved signal, A = conv(R, B)
+//     M   -   convolved signal length
+//     B   -   array[0..N-1] - response
+//     N   -   response length
+//
+// OUTPUT PARAMETERS
+//     R   -   deconvolved signal. array[0..M-N].
+//
+// NOTE:
+//     deconvolution is unstable process and may result in division  by  zero
+// (if your response function is degenerate, i.e. has zero Fourier coefficient).
+//
+// NOTE:
+//     It is assumed that B is zero at T<0. If  it  has  non-zero  values  at
+// negative T's, you can still use this subroutine - just  shift  its  result
+// correspondingly.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dcircularinv(RVector * a,
      ae_int_t m,
      RVector * b,
@@ -2398,10 +2268,8 @@ void convr1dcircularinv(RVector * a,
 
     ae_assert(n>0&&m>0, "ConvR1DCircularInv: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&buf, m, _state);
@@ -2422,15 +2290,11 @@ void convr1dcircularinv(RVector * a,
         return;
     }
 
-    /*
-     * Task is normalized
-     */
+    // Task is normalized
     if( m%2==0 )
     {
 
-        /*
-         * size is even, use fast even-size FFT
-         */
+        // size is even, use fast even-size FFT
         ae_vector_set_length(&buf, m, _state);
         ae_v_move(&buf.ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,m-1));
         ae_vector_set_length(&buf2, m, _state);
@@ -2462,9 +2326,7 @@ void convr1dcircularinv(RVector * a,
     else
     {
 
-        /*
-         * odd-size, use general real FFT
-         */
+        // odd-size, use general real FFT
         fftr1d(a, m, &cbuf, _state);
         ae_vector_set_length(&buf2, m, _state);
         ae_v_move(&buf2.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0,n-1));
@@ -2483,31 +2345,29 @@ void convr1dcircularinv(RVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional complex convolution.
-
-Extended subroutine which allows to choose convolution algorithm.
-Intended for internal use, ALGLIB users should call ConvC1D()/ConvC1DCircular().
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - complex function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size, N<=M
-    Alg -   algorithm type:
-            *-2     auto-select Q for overlap-add
-            *-1     auto-select algorithm and parameters
-            * 0     straightforward formula for small N's
-            * 1     general FFT-based code
-            * 2     overlap-add with length Q
-    Q   -   length for overlap-add
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-1].
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex convolution.
+//
+// Extended subroutine which allows to choose convolution algorithm.
+// Intended for internal use, ALGLIB users should call ConvC1D()/ConvC1DCircular().
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - complex function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size, N<=M
+//     Alg -   algorithm type:
+//             *-2     auto-select Q for overlap-add
+//             *-1     auto-select algorithm and parameters
+//             * 0     straightforward formula for small N's
+//             * 1     general FFT-based code
+//             * 2     overlap-add with length Q
+//     Q   -   length for overlap-add
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-1].
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convc1dx(CVector * a,
      ae_int_t m,
      CVector * b,
@@ -2557,19 +2417,15 @@ void convc1dx(CVector * a,
     ae_assert(n>0&&m>0, "ConvC1DX: incorrect N or M!", _state);
     ae_assert(n<=m, "ConvC1DX: N<M assumption is false!", _state);
 
-    /*
-     * Auto-select
-     */
+    // Auto-select
     if( alg==-1||alg==-2 )
     {
 
-        /*
-         * Initial candidate: straightforward implementation.
-         *
-         * If we want to use auto-fitted overlap-add,
-         * flop count is initialized by large real number - to force
-         * another algorithm selection
-         */
+        // Initial candidate: straightforward implementation.
+        //
+        // If we want to use auto-fitted overlap-add,
+        // flop count is initialized by large real number - to force
+        // another algorithm selection
         algbest = 0;
         if( alg==-1 )
         {
@@ -2580,17 +2436,13 @@ void convc1dx(CVector * a,
             flopbest = ae_maxrealnumber;
         }
 
-        /*
-         * Another candidate - generic FFT code
-         */
+        // Another candidate - generic FFT code
         if( alg==-1 )
         {
             if( circular&&ftbaseissmooth(m, _state) )
             {
 
-                /*
-                 * special code for circular convolution of a sequence with a smooth length
-                 */
+                // special code for circular convolution of a sequence with a smooth length
                 flopcand = 3*ftbasegetflopestimate(m, _state)+6*m;
                 if( ae_fp_less(flopcand,flopbest) )
                 {
@@ -2601,9 +2453,7 @@ void convc1dx(CVector * a,
             else
             {
 
-                /*
-                 * general cyclic/non-cyclic convolution
-                 */
+                // general cyclic/non-cyclic convolution
                 p = ftbasefindsmooth(m+n-1, _state);
                 flopcand = 3*ftbasegetflopestimate(p, _state)+6*p;
                 if( ae_fp_less(flopcand,flopbest) )
@@ -2614,9 +2464,7 @@ void convc1dx(CVector * a,
             }
         }
 
-        /*
-         * Another candidate - overlap-add
-         */
+        // Another candidate - overlap-add
         q = 1;
         ptotal = 1;
         while(ptotal<n)
@@ -2641,18 +2489,14 @@ void convc1dx(CVector * a,
         return;
     }
 
-    /*
-     * straightforward formula for
-     * circular and non-circular convolutions.
-     *
-     * Very simple code, no further comments needed.
-     */
+    // straightforward formula for
+    // circular and non-circular convolutions.
+    //
+    // Very simple code, no further comments needed.
     if( alg==0 )
     {
 
-        /*
-         * Special case: N=1
-         */
+        // Special case: N=1
         if( n==1 )
         {
             ae_vector_set_length(r, m, _state);
@@ -2662,15 +2506,11 @@ void convc1dx(CVector * a,
             return;
         }
 
-        /*
-         * use straightforward formula
-         */
+        // use straightforward formula
         if( circular )
         {
 
-            /*
-             * circular convolution
-             */
+            // circular convolution
             ae_vector_set_length(r, m, _state);
             v = b->ptr.p_complex[0];
             ae_v_cmovec(&r->ptr.p_complex[0], 1, &a->ptr.p_complex[0], 1, "N", ae_v_len(0,m-1), v);
@@ -2692,9 +2532,7 @@ void convc1dx(CVector * a,
         else
         {
 
-            /*
-             * non-circular convolution
-             */
+            // non-circular convolution
             ae_vector_set_length(r, m+n-1, _state);
             for(i=0; i<=m+n-2; i++)
             {
@@ -2710,24 +2548,20 @@ void convc1dx(CVector * a,
         return;
     }
 
-    /*
-     * general FFT-based code for
-     * circular and non-circular convolutions.
-     *
-     * First, if convolution is circular, we test whether M is smooth or not.
-     * If it is smooth, we just use M-length FFT to calculate convolution.
-     * If it is not, we calculate non-circular convolution and wrap it arount.
-     *
-     * IF convolution is non-circular, we use zero-padding + FFT.
-     */
+    // general FFT-based code for
+    // circular and non-circular convolutions.
+    //
+    // First, if convolution is circular, we test whether M is smooth or not.
+    // If it is smooth, we just use M-length FFT to calculate convolution.
+    // If it is not, we calculate non-circular convolution and wrap it arount.
+    //
+    // IF convolution is non-circular, we use zero-padding + FFT.
     if( alg==1 )
     {
         if( circular&&ftbaseissmooth(m, _state) )
         {
 
-            /*
-             * special code for circular convolution with smooth M
-             */
+            // special code for circular convolution with smooth M
             ftcomplexfftplan(m, 1, &plan, _state);
             ae_vector_set_length(&buf, 2*m, _state);
             for(i=0; i<=m-1; i++)
@@ -2771,14 +2605,12 @@ void convc1dx(CVector * a,
         else
         {
 
-            /*
-             * M is non-smooth, general code (circular/non-circular):
-             * * first part is the same for circular and non-circular
-             *   convolutions. zero padding, FFTs, inverse FFTs
-             * * second part differs:
-             *   * for non-circular convolution we just copy array
-             *   * for circular convolution we add array tail to its head
-             */
+            // M is non-smooth, general code (circular/non-circular):
+            // * first part is the same for circular and non-circular
+            //   convolutions. zero padding, FFTs, inverse FFTs
+            // * second part differs:
+            //   * for non-circular convolution we just copy array
+            //   * for circular convolution we add array tail to its head
             p = ftbasefindsmooth(m+n-1, _state);
             ftcomplexfftplan(p, 1, &plan, _state);
             ae_vector_set_length(&buf, 2*p, _state);
@@ -2821,9 +2653,7 @@ void convc1dx(CVector * a,
             if( circular )
             {
 
-                /*
-                 * circular, add tail to head
-                 */
+                // circular, add tail to head
                 ae_vector_set_length(r, m, _state);
                 for(i=0; i<=m-1; i++)
                 {
@@ -2839,9 +2669,7 @@ void convc1dx(CVector * a,
             else
             {
 
-                /*
-                 * non-circular, just copy
-                 */
+                // non-circular, just copy
                 ae_vector_set_length(r, m+n-1, _state);
                 for(i=0; i<=m+n-2; i++)
                 {
@@ -2854,23 +2682,19 @@ void convc1dx(CVector * a,
         return;
     }
 
-    /*
-     * overlap-add method for
-     * circular and non-circular convolutions.
-     *
-     * First part of code (separate FFTs of input blocks) is the same
-     * for all types of convolution. Second part (overlapping outputs)
-     * differs for different types of convolution. We just copy output
-     * when convolution is non-circular. We wrap it around, if it is
-     * circular.
-     */
+    // overlap-add method for
+    // circular and non-circular convolutions.
+    //
+    // First part of code (separate FFTs of input blocks) is the same
+    // for all types of convolution. Second part (overlapping outputs)
+    // differs for different types of convolution. We just copy output
+    // when convolution is non-circular. We wrap it around, if it is
+    // circular.
     if( alg==2 )
     {
         ae_vector_set_length(&buf, 2*(q+n-1), _state);
 
-        /*
-         * prepare R
-         */
+        // prepare R
         if( circular )
         {
             ae_vector_set_length(r, m, _state);
@@ -2888,9 +2712,7 @@ void convc1dx(CVector * a,
             }
         }
 
-        /*
-         * pre-calculated FFT(B)
-         */
+        // pre-calculated FFT(B)
         ae_vector_set_length(&bbuf, q+n-1, _state);
         ae_v_cmove(&bbuf.ptr.p_complex[0], 1, &b->ptr.p_complex[0], 1, "N", ae_v_len(0,n-1));
         for(j=n; j<=q+n-2; j++)
@@ -2899,14 +2721,10 @@ void convc1dx(CVector * a,
         }
         fftc1d(&bbuf, q+n-1, _state);
 
-        /*
-         * prepare FFT plan for chunks of A
-         */
+        // prepare FFT plan for chunks of A
         ftcomplexfftplan(q+n-1, 1, &plan, _state);
 
-        /*
-         * main overlap-add cycle
-         */
+        // main overlap-add cycle
         i = 0;
         while(i<=m-1)
         {
@@ -2964,31 +2782,29 @@ void convc1dx(CVector * a,
 }
 
 
-/*************************************************************************
-1-dimensional real convolution.
-
-Extended subroutine which allows to choose convolution algorithm.
-Intended for internal use, ALGLIB users should call ConvR1D().
-
-INPUT PARAMETERS
-    A   -   array[0..M-1] - complex function to be transformed
-    M   -   problem size
-    B   -   array[0..N-1] - complex function to be transformed
-    N   -   problem size, N<=M
-    Alg -   algorithm type:
-            *-2     auto-select Q for overlap-add
-            *-1     auto-select algorithm and parameters
-            * 0     straightforward formula for small N's
-            * 1     general FFT-based code
-            * 2     overlap-add with length Q
-    Q   -   length for overlap-add
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..N+M-1].
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real convolution.
+//
+// Extended subroutine which allows to choose convolution algorithm.
+// Intended for internal use, ALGLIB users should call ConvR1D().
+//
+// INPUT PARAMETERS
+//     A   -   array[0..M-1] - complex function to be transformed
+//     M   -   problem size
+//     B   -   array[0..N-1] - complex function to be transformed
+//     N   -   problem size, N<=M
+//     Alg -   algorithm type:
+//             *-2     auto-select Q for overlap-add
+//             *-1     auto-select algorithm and parameters
+//             * 0     straightforward formula for small N's
+//             * 1     general FFT-based code
+//             * 2     overlap-add with length Q
+//     Q   -   length for overlap-add
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..N+M-1].
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void convr1dx(RVector * a,
      ae_int_t m,
      RVector * b,
@@ -3037,27 +2853,21 @@ void convr1dx(RVector * a,
     ae_assert(n>0&&m>0, "ConvC1DX: incorrect N or M!", _state);
     ae_assert(n<=m, "ConvC1DX: N<M assumption is false!", _state);
 
-    /*
-     * handle special cases
-     */
+    // handle special cases
     if( ae_minint(m, n, _state)<=2 )
     {
         alg = 0;
     }
 
-    /*
-     * Auto-select
-     */
+    // Auto-select
     if( alg<0 )
     {
 
-        /*
-         * Initial candidate: straightforward implementation.
-         *
-         * If we want to use auto-fitted overlap-add,
-         * flop count is initialized by large real number - to force
-         * another algorithm selection
-         */
+        // Initial candidate: straightforward implementation.
+        //
+        // If we want to use auto-fitted overlap-add,
+        // flop count is initialized by large real number - to force
+        // another algorithm selection
         algbest = 0;
         if( alg==-1 )
         {
@@ -3068,17 +2878,13 @@ void convr1dx(RVector * a,
             flopbest = ae_maxrealnumber;
         }
 
-        /*
-         * Another candidate - generic FFT code
-         */
+        // Another candidate - generic FFT code
         if( alg==-1 )
         {
             if( (circular&&ftbaseissmooth(m, _state))&&m%2==0 )
             {
 
-                /*
-                 * special code for circular convolution of a sequence with a smooth length
-                 */
+                // special code for circular convolution of a sequence with a smooth length
                 flopcand = 3*ftbasegetflopestimate(m/2, _state)+(double)(6*m)/(double)2;
                 if( ae_fp_less(flopcand,flopbest) )
                 {
@@ -3089,9 +2895,7 @@ void convr1dx(RVector * a,
             else
             {
 
-                /*
-                 * general cyclic/non-cyclic convolution
-                 */
+                // general cyclic/non-cyclic convolution
                 p = ftbasefindsmootheven(m+n-1, _state);
                 flopcand = 3*ftbasegetflopestimate(p/2, _state)+(double)(6*p)/(double)2;
                 if( ae_fp_less(flopcand,flopbest) )
@@ -3102,9 +2906,7 @@ void convr1dx(RVector * a,
             }
         }
 
-        /*
-         * Another candidate - overlap-add
-         */
+        // Another candidate - overlap-add
         q = 1;
         ptotal = 1;
         while(ptotal<n)
@@ -3129,18 +2931,14 @@ void convr1dx(RVector * a,
         return;
     }
 
-    /*
-     * straightforward formula for
-     * circular and non-circular convolutions.
-     *
-     * Very simple code, no further comments needed.
-     */
+    // straightforward formula for
+    // circular and non-circular convolutions.
+    //
+    // Very simple code, no further comments needed.
     if( alg==0 )
     {
 
-        /*
-         * Special case: N=1
-         */
+        // Special case: N=1
         if( n==1 )
         {
             ae_vector_set_length(r, m, _state);
@@ -3150,15 +2948,11 @@ void convr1dx(RVector * a,
             return;
         }
 
-        /*
-         * use straightforward formula
-         */
+        // use straightforward formula
         if( circular )
         {
 
-            /*
-             * circular convolution
-             */
+            // circular convolution
             ae_vector_set_length(r, m, _state);
             v = b->ptr.p_double[0];
             ae_v_moved(&r->ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,m-1), v);
@@ -3180,9 +2974,7 @@ void convr1dx(RVector * a,
         else
         {
 
-            /*
-             * non-circular convolution
-             */
+            // non-circular convolution
             ae_vector_set_length(r, m+n-1, _state);
             for(i=0; i<=m+n-2; i++)
             {
@@ -3198,27 +2990,23 @@ void convr1dx(RVector * a,
         return;
     }
 
-    /*
-     * general FFT-based code for
-     * circular and non-circular convolutions.
-     *
-     * First, if convolution is circular, we test whether M is smooth or not.
-     * If it is smooth, we just use M-length FFT to calculate convolution.
-     * If it is not, we calculate non-circular convolution and wrap it arount.
-     *
-     * If convolution is non-circular, we use zero-padding + FFT.
-     *
-     * We assume that M+N-1>2 - we should call small case code otherwise
-     */
+    // general FFT-based code for
+    // circular and non-circular convolutions.
+    //
+    // First, if convolution is circular, we test whether M is smooth or not.
+    // If it is smooth, we just use M-length FFT to calculate convolution.
+    // If it is not, we calculate non-circular convolution and wrap it arount.
+    //
+    // If convolution is non-circular, we use zero-padding + FFT.
+    //
+    // We assume that M+N-1>2 - we should call small case code otherwise
     if( alg==1 )
     {
         ae_assert(m+n-1>2, "ConvR1DX: internal error!", _state);
         if( (circular&&ftbaseissmooth(m, _state))&&m%2==0 )
         {
 
-            /*
-             * special code for circular convolution with smooth even M
-             */
+            // special code for circular convolution with smooth even M
             ae_vector_set_length(&buf, m, _state);
             ae_v_move(&buf.ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,m-1));
             ae_vector_set_length(&buf2, m, _state);
@@ -3251,14 +3039,12 @@ void convr1dx(RVector * a,
         else
         {
 
-            /*
-             * M is non-smooth or non-even, general code (circular/non-circular):
-             * * first part is the same for circular and non-circular
-             *   convolutions. zero padding, FFTs, inverse FFTs
-             * * second part differs:
-             *   * for non-circular convolution we just copy array
-             *   * for circular convolution we add array tail to its head
-             */
+            // M is non-smooth or non-even, general code (circular/non-circular):
+            // * first part is the same for circular and non-circular
+            //   convolutions. zero padding, FFTs, inverse FFTs
+            // * second part differs:
+            //   * for non-circular convolution we just copy array
+            //   * for circular convolution we add array tail to its head
             p = ftbasefindsmootheven(m+n-1, _state);
             ae_vector_set_length(&buf, p, _state);
             ae_v_move(&buf.ptr.p_double[0], 1, &a->ptr.p_double[0], 1, ae_v_len(0,m-1));
@@ -3293,9 +3079,7 @@ void convr1dx(RVector * a,
             if( circular )
             {
 
-                /*
-                 * circular, add tail to head
-                 */
+                // circular, add tail to head
                 ae_vector_set_length(r, m, _state);
                 ae_v_move(&r->ptr.p_double[0], 1, &buf.ptr.p_double[0], 1, ae_v_len(0,m-1));
                 if( n>=2 )
@@ -3306,9 +3090,7 @@ void convr1dx(RVector * a,
             else
             {
 
-                /*
-                 * non-circular, just copy
-                 */
+                // non-circular, just copy
                 ae_vector_set_length(r, m+n-1, _state);
                 ae_v_move(&r->ptr.p_double[0], 1, &buf.ptr.p_double[0], 1, ae_v_len(0,m+n-2));
             }
@@ -3317,9 +3099,7 @@ void convr1dx(RVector * a,
         return;
     }
 
-    /*
-     * overlap-add method
-     */
+    // overlap-add method
     if( alg==2 )
     {
         ae_assert((q+n-1)%2==0, "ConvR1DX: internal error!", _state);
@@ -3328,9 +3108,7 @@ void convr1dx(RVector * a,
         ae_vector_set_length(&buf3, q+n-1, _state);
         ftcomplexfftplan((q+n-1)/2, 1, &plan, _state);
 
-        /*
-         * prepare R
-         */
+        // prepare R
         if( circular )
         {
             ae_vector_set_length(r, m, _state);
@@ -3348,9 +3126,7 @@ void convr1dx(RVector * a,
             }
         }
 
-        /*
-         * pre-calculated FFT(B)
-         */
+        // pre-calculated FFT(B)
         ae_v_move(&buf2.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0,n-1));
         for(j=n; j<=q+n-2; j++)
         {
@@ -3358,9 +3134,7 @@ void convr1dx(RVector * a,
         }
         fftr1dinternaleven(&buf2, q+n-1, &buf3, &plan, _state);
 
-        /*
-         * main overlap-add cycle
-         */
+        // main overlap-add cycle
         i = 0;
         while(i<=m-1)
         {
@@ -3413,42 +3187,40 @@ void convr1dx(RVector * a,
 #if defined(AE_COMPILE_CORR) || !defined(AE_PARTIAL_BUILD)
 
 
-/*************************************************************************
-1-dimensional complex cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
-
-Correlation is calculated using reduction to  convolution.  Algorithm with
-max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
-about performance).
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order: CorrC1D(Signal, Pattern) = Pattern x Signal (using  traditional
-    definition of cross-correlation, denoting cross-correlation as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - complex function to be transformed,
-                signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - complex function to be transformed,
-                pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R       -   cross-correlation, array[0..N+M-2]:
-                * positive lags are stored in R[0..N-1],
-                  R[i] = sum(conj(pattern[j])*signal[i+j]
-                * negative lags are stored in R[N..N+M-2],
-                  R[N+M-1-i] = sum(conj(pattern[j])*signal[-i+j]
-
-NOTE:
-    It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
-on [-K..M-1],  you can still use this subroutine, just shift result by K.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional complex cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
+//
+// Correlation is calculated using reduction to  convolution.  Algorithm with
+// max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
+// about performance).
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order: CorrC1D(Signal, Pattern) = Pattern x Signal (using  traditional
+//     definition of cross-correlation, denoting cross-correlation as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - complex function to be transformed,
+//                 signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - complex function to be transformed,
+//                 pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R       -   cross-correlation, array[0..N+M-2]:
+//                 * positive lags are stored in R[0..N-1],
+//                   R[i] = sum(conj(pattern[j])*signal[i+j]
+//                 * negative lags are stored in R[N..N+M-2],
+//                   R[N+M-1-i] = sum(conj(pattern[j])*signal[-i+j]
+//
+// NOTE:
+//     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
+// on [-K..M-1],  you can still use this subroutine, just shift result by K.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrc1d(CVector * signal,
      ae_int_t n,
      CVector * pattern,
@@ -3485,33 +3257,31 @@ void corrc1d(CVector * signal,
 }
 
 
-/*************************************************************************
-1-dimensional circular complex cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (circular).
-Algorithm has linearithmic complexity for any M/N.
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order:   CorrC1DCircular(Signal, Pattern) = Pattern x Signal    (using
-    traditional definition of cross-correlation, denoting cross-correlation
-    as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - complex function to be transformed,
-                periodic signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - complex function to be transformed,
-                non-periodic pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular complex cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (circular).
+// Algorithm has linearithmic complexity for any M/N.
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order:   CorrC1DCircular(Signal, Pattern) = Pattern x Signal    (using
+//     traditional definition of cross-correlation, denoting cross-correlation
+//     as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - complex function to be transformed,
+//                 periodic signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - complex function to be transformed,
+//                 non-periodic pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrc1dcircular(CVector * signal,
      ae_int_t m,
      CVector * pattern,
@@ -3536,10 +3306,8 @@ void corrc1dcircular(CVector * signal,
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&b, m, _state);
@@ -3560,9 +3328,7 @@ void corrc1dcircular(CVector * signal,
         return;
     }
 
-    /*
-     * Task is normalized
-     */
+    // Task is normalized
     ae_vector_set_length(&p, n, _state);
     for(i=0; i<=n-1; i++)
     {
@@ -3579,42 +3345,40 @@ void corrc1dcircular(CVector * signal,
 }
 
 
-/*************************************************************************
-1-dimensional real cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
-
-Correlation is calculated using reduction to  convolution.  Algorithm with
-max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
-about performance).
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order: CorrR1D(Signal, Pattern) = Pattern x Signal (using  traditional
-    definition of cross-correlation, denoting cross-correlation as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - real function to be transformed,
-                signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - real function to be transformed,
-                pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R       -   cross-correlation, array[0..N+M-2]:
-                * positive lags are stored in R[0..N-1],
-                  R[i] = sum(pattern[j]*signal[i+j]
-                * negative lags are stored in R[N..N+M-2],
-                  R[N+M-1-i] = sum(pattern[j]*signal[-i+j]
-
-NOTE:
-    It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
-on [-K..M-1],  you can still use this subroutine, just shift result by K.
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional real cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (non-circular).
+//
+// Correlation is calculated using reduction to  convolution.  Algorithm with
+// max(N,N)*log(max(N,N)) complexity is used (see  ConvC1D()  for  more  info
+// about performance).
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order: CorrR1D(Signal, Pattern) = Pattern x Signal (using  traditional
+//     definition of cross-correlation, denoting cross-correlation as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - real function to be transformed,
+//                 signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - real function to be transformed,
+//                 pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R       -   cross-correlation, array[0..N+M-2]:
+//                 * positive lags are stored in R[0..N-1],
+//                   R[i] = sum(pattern[j]*signal[i+j]
+//                 * negative lags are stored in R[N..N+M-2],
+//                   R[N+M-1-i] = sum(pattern[j]*signal[-i+j]
+//
+// NOTE:
+//     It is assumed that pattern domain is [0..M-1].  If Pattern is non-zero
+// on [-K..M-1],  you can still use this subroutine, just shift result by K.
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrr1d(RVector * signal,
      ae_int_t n,
      RVector * pattern,
@@ -3651,33 +3415,31 @@ void corrr1d(RVector * signal,
 }
 
 
-/*************************************************************************
-1-dimensional circular real cross-correlation.
-
-For given Pattern/Signal returns corr(Pattern,Signal) (circular).
-Algorithm has linearithmic complexity for any M/N.
-
-IMPORTANT:
-    for  historical reasons subroutine accepts its parameters in  reversed
-    order:   CorrR1DCircular(Signal, Pattern) = Pattern x Signal    (using
-    traditional definition of cross-correlation, denoting cross-correlation
-    as "x").
-
-INPUT PARAMETERS
-    Signal  -   array[0..N-1] - real function to be transformed,
-                periodic signal containing pattern
-    N       -   problem size
-    Pattern -   array[0..M-1] - real function to be transformed,
-                non-periodic pattern to search withing signal
-    M       -   problem size
-
-OUTPUT PARAMETERS
-    R   -   convolution: A*B. array[0..M-1].
-
-
-  -- ALGLIB --
-     Copyright 21.07.2009 by Bochkanov Sergey
-*************************************************************************/
+// 1-dimensional circular real cross-correlation.
+//
+// For given Pattern/Signal returns corr(Pattern,Signal) (circular).
+// Algorithm has linearithmic complexity for any M/N.
+//
+// IMPORTANT:
+//     for  historical reasons subroutine accepts its parameters in  reversed
+//     order:   CorrR1DCircular(Signal, Pattern) = Pattern x Signal    (using
+//     traditional definition of cross-correlation, denoting cross-correlation
+//     as "x").
+//
+// INPUT PARAMETERS
+//     Signal  -   array[0..N-1] - real function to be transformed,
+//                 periodic signal containing pattern
+//     N       -   problem size
+//     Pattern -   array[0..M-1] - real function to be transformed,
+//                 non-periodic pattern to search withing signal
+//     M       -   problem size
+//
+// OUTPUT PARAMETERS
+//     R   -   convolution: A*B. array[0..M-1].
+//
+//
+//   -- ALGLIB --
+//      Copyright 21.07.2009 by Bochkanov Sergey
 void corrr1dcircular(RVector * signal,
      ae_int_t m,
      RVector * pattern,
@@ -3702,10 +3464,8 @@ void corrr1dcircular(RVector * signal,
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
 
-    /*
-     * normalize task: make M>=N,
-     * so A will be longer (at least - not shorter) that B.
-     */
+    // normalize task: make M>=N,
+    // so A will be longer (at least - not shorter) that B.
     if( m<n )
     {
         ae_vector_set_length(&b, m, _state);
@@ -3726,9 +3486,7 @@ void corrr1dcircular(RVector * signal,
         return;
     }
 
-    /*
-     * Task is normalized
-     */
+    // Task is normalized
     ae_vector_set_length(&p, n, _state);
     for(i=0; i<=n-1; i++)
     {

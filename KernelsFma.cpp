@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -613,23 +611,21 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n,
     rgemvx_transposed_fma_yaligned(m-shift, n, alpha, a, ia, ja+shift, x, y+shift, _state);
 }
 
-/*************************************************************************
-Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
-'horizontal' matrices, stored with stride=block_size, and writes it to the
-row-wise matrix C.
-
-ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
-by ablasf_packblkh_avx2().
-
-Present version of the function supports only MICRO_SIZE=2,  the  behavior
-is undefined for other micro sizes.
-
-Requires AVX2, does NOT check its presense.
-
-  -- ALGLIB routine --
-     19.07.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
+// 'horizontal' matrices, stored with stride=block_size, and writes it to the
+// row-wise matrix C.
+//
+// ROUND_LENGTH is expected to be properly SIMD-rounded length,  as  returned
+// by ablasf_packblkh_avx2().
+//
+// Present version of the function supports only MICRO_SIZE=2,  the  behavior
+// is undefined for other micro sizes.
+//
+// Requires AVX2, does NOT check its presense.
+//
+//   -- ALGLIB routine --
+//      19.07.2021
+//      Bochkanov Sergey
 void ablasf_dotblkh_fma(
     const double *src_a,
     const double *src_b,
@@ -643,9 +639,7 @@ void ablasf_dotblkh_fma(
     __m256d r00 = _mm256_setzero_pd(), r01 = _mm256_setzero_pd(), r10 = _mm256_setzero_pd(), r11 = _mm256_setzero_pd();
     if( round_length&0x7 )
     {
-        /*
-         * round_length is multiple of 4, but not multiple of 8
-         */
+        // round_length is multiple of 4, but not multiple of 8
         for(z=0; z<round_length; z+=4, src_a+=4, src_b+=4)
         {
             __m256d a0 = _mm256_load_pd(src_a);
@@ -660,9 +654,7 @@ void ablasf_dotblkh_fma(
     }
     else
     {
-        /*
-         * round_length is multiple of 8
-         */
+        // round_length is multiple of 8
         for(z=0; z<round_length; z+=8, src_a+=8, src_b+=8)
         {
             __m256d a0 = _mm256_load_pd(src_a);
@@ -686,20 +678,18 @@ void ablasf_dotblkh_fma(
 }
 
 
-/*************************************************************************
-Solving linear system: propagating computed supernode.
-
-Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
-RHS storage format.
-
-INPUT PARAMETERS:
-
-OUTPUT PARAMETERS:
-
-  -- ALGLIB routine --
-     08.09.2021
-     Bochkanov Sergey
-*************************************************************************/
+// Solving linear system: propagating computed supernode.
+//
+// Propagates computed supernode to the rest of the RHS  using  SIMD-friendly
+// RHS storage format.
+//
+// INPUT PARAMETERS:
+//
+// OUTPUT PARAMETERS:
+//
+//   -- ALGLIB routine --
+//      08.09.2021
+//      Bochkanov Sergey
 void spchol_propagatefwd_fma(RVector * x,
      ae_int_t cols0,
      ae_int_t blocksize,
@@ -718,9 +708,7 @@ void spchol_propagatefwd_fma(RVector * x,
     ae_assert(simdwidth==4, "SPCHOL: unexpected stride in propagatefwd()", _state);
     if( sstride==4 )
     {
-        /*
-         * blocksize is either 3 or 4
-         */
+        // blocksize is either 3 or 4
         ae_int_t supported = ae_cpuid();
         if( supported&CPU_FMA )
         {
@@ -750,9 +738,7 @@ void spchol_propagatefwd_fma(RVector * x,
     }
     if( blocksize==2 && sstride==2 )
     {
-        /*
-         * blocksize is 2, stride is 2
-         */
+        // blocksize is 2, stride is 2
         ae_int_t supported = ae_cpuid();
         if( supported&CPU_FMA )
         {
@@ -791,9 +777,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     ae_int_t targetrow;
     ae_int_t targetcol;
 
-    /*
-     * Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
-     */
+    // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
     if( twidth<3||twidth>4 )
     {
         return ae_false;
@@ -807,18 +791,14 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
         return ae_false;
     }
 
-    /*
-     * Shift input arrays to the beginning of the working area.
-     * Prepare SIMD masks
-     */
+    // Shift input arrays to the beginning of the working area.
+    // Prepare SIMD masks
     __m256i v_rankmask = _mm256_cmpgt_epi64(_mm256_set_epi64x(urank, urank, urank, urank), _mm256_set_epi64x(3, 2, 1, 0));
     double *update_storage = rowstorage+offsu;
     double *target_storage = rowstorage+offss;
     superrowidx += urbase;
 
-    /*
-     * Load head of the update matrix
-     */
+    // Load head of the update matrix
     __m256d v_d0123 = _mm256_maskload_pd(diagd+offsd, v_rankmask);
     __m256d u_0_0123 = _mm256_setzero_pd();
     __m256d u_1_0123 = _mm256_setzero_pd();
@@ -837,9 +817,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
             u_3_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage+k*urowstride, v_rankmask));
     }
 
-    /*
-     * Transpose head
-     */
+    // Transpose head
     __m256d u01_lo = _mm256_unpacklo_pd(u_0_0123,u_1_0123);
     __m256d u01_hi = _mm256_unpackhi_pd(u_0_0123,u_1_0123);
     __m256d u23_lo = _mm256_unpacklo_pd(u_2_0123,u_3_0123);
@@ -849,9 +827,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     __m256d u_0123_2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
     __m256d u_0123_3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
 
-    /*
-     * Run update
-     */
+    // Run update
     if( urank==1 )
     {
         for(k=0; k<=uheight-1; k++)
@@ -924,9 +900,7 @@ ae_bool spchol_updatekernel4444_fma(
     __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
     __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
 
-    /*
-     * Compute W = -D*transpose(U[0:3])
-     */
+    // Compute W = -D*transpose(U[0:3])
     v_negd = _mm256_mul_pd(_mm256_loadu_pd(diagd+offsd),_mm256_set1_pd(-1.0));
     v_negd_u0   = _mm256_mul_pd(_mm256_load_pd(rowstorage+offsu+0*4),v_negd);
     v_negd_u1   = _mm256_mul_pd(_mm256_load_pd(rowstorage+offsu+1*4),v_negd);
@@ -946,9 +920,7 @@ ae_bool spchol_updatekernel4444_fma(
     //
     if( sheight==uheight )
     {
-        /*
-         * No row scatter, the most efficient code
-         */
+        // No row scatter, the most efficient code
         for(k=0; k<uheight; k++)
         {
             __m256d target;
@@ -966,9 +938,7 @@ ae_bool spchol_updatekernel4444_fma(
     }
     else
     {
-        /*
-         * Row scatter is performed, less efficient code using double mapping to determine target row index
-         */
+        // Row scatter is performed, less efficient code using double mapping to determine target row index
         for(k=0; k<=uheight-1; k++)
         {
             __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
@@ -991,7 +961,7 @@ ae_bool spchol_updatekernel4444_fma(
     return ae_true;
 }
 
-/* ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS */
+// ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS
 #endif
 
 

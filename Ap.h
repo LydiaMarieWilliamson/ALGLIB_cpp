@@ -1,22 +1,20 @@
-/*************************************************************************
-ALGLIB 3.18.0 (source code generated 2021-10-25)
-Copyright (c) Sergey Bochkanov (ALGLIB project).
-
->>> SOURCE LICENSE >>>
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.fsf.org/licensing/licenses
->>> END OF LICENSE >>>
-*************************************************************************/
+// ALGLIB 3.18.0 (source code generated 2021-10-25)
+// Copyright (c) Sergey Bochkanov (ALGLIB project).
+//
+// >>> SOURCE LICENSE >>>
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation (www.fsf.org); either version 2 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License is available at
+// http://www.fsf.org/licensing/licenses
+// >>> END OF LICENSE >>>
 #ifndef _ap_h
 #define _ap_h
 
@@ -40,12 +38,12 @@ http://www.fsf.org/licensing/licenses
 #endif
 
 #define AE_USE_CPP
-/* Definitions */
+// Definitions
 #define AE_UNKNOWN 0
 #define AE_INTEL 1
 #define AE_SPARC 2
 
-/* OS definitions */
+// OS definitions
 #define AE_WINDOWS                    1
 #define AE_POSIX                      2
 #define AE_LINUX                    304
@@ -58,7 +56,7 @@ http://www.fsf.org/licensing/licenses
 #define _ALGLIB_USE_LINUX_EXTENSIONS
 #endif
 
-/* threading models for AE_THREADING */
+// threading models for AE_THREADING
 #define AE_PARALLEL                 100
 #define AE_SERIAL                   101
 #define AE_SERIAL_UNSAFE            102
@@ -66,7 +64,7 @@ http://www.fsf.org/licensing/licenses
 #define AE_THREADING AE_PARALLEL
 #endif
 
-/* malloc types for AE_MALLOC */
+// malloc types for AE_MALLOC
 #define AE_STDLIB_MALLOC            200
 #define AE_BASIC_STATIC_MALLOC      201
 #if !defined(AE_MALLOC)
@@ -75,7 +73,7 @@ http://www.fsf.org/licensing/licenses
 
 #define AE_LOCK_ALIGNMENT 16
 
-/* automatically determine compiler */
+// automatically determine compiler
 #define AE_MSVC 1
 #define AE_GNUC 2
 #define AE_SUNC 3
@@ -93,7 +91,7 @@ http://www.fsf.org/licensing/licenses
 #define AE_COMPILER AE_MSVC
 #endif
 
-/* compiler-specific definitions */
+// compiler-specific definitions
 #if AE_COMPILER==AE_MSVC
 #define ALIGNED __declspec(align(8))
 #elif AE_COMPILER==AE_GNUC
@@ -102,7 +100,7 @@ http://www.fsf.org/licensing/licenses
 #define ALIGNED
 #endif
 
-/* state flags */
+// state flags
 #define _ALGLIB_FLG_THREADING_MASK          0x7
 #define _ALGLIB_FLG_THREADING_SHIFT         0
 #define _ALGLIB_FLG_THREADING_USE_GLOBAL    0x0
@@ -110,7 +108,7 @@ http://www.fsf.org/licensing/licenses
 #define _ALGLIB_FLG_THREADING_PARALLEL      0x2
 
 
-/* now we are ready to include headers */
+// now we are ready to include headers
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -124,34 +122,28 @@ http://www.fsf.org/licensing/licenses
 #include <stdint.h>
 #endif
 
-/*
- * Intel SIMD intrinsics
- *
- * Preprocessor directives below:
- * - include headers for SSE2/AVX2/AVX2+FMA3 intrinsics
- * - defines _ALGLIB_HAS_SSE2_INTRINSICS, _ALGLIB_HAS_AVX2_INTRINSICS and _ALGLIB_HAS_FMA_INTRINSICS definitions
- *
- * These actions are performed when we have:
- * - x86 architecture definition (AE_CPU==AE_INTEL)
- * - compiler which supports intrinsics
- *
- * Presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU
- * actually supports these intrinsics - such things should be determined
- * at runtime with ae_cpuid() call. It means that we are working under
- * Intel and out compiler can issue SIMD-capable code.
- *
- */
+// Intel SIMD intrinsics
+//
+// Preprocessor directives below:
+// - include headers for SSE2/AVX2/AVX2+FMA3 intrinsics
+// - defines _ALGLIB_HAS_SSE2_INTRINSICS, _ALGLIB_HAS_AVX2_INTRINSICS and _ALGLIB_HAS_FMA_INTRINSICS definitions
+//
+// These actions are performed when we have:
+// - x86 architecture definition (AE_CPU==AE_INTEL)
+// - compiler which supports intrinsics
+//
+// Presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU
+// actually supports these intrinsics - such things should be determined
+// at runtime with ae_cpuid() call. It means that we are working under
+// Intel and out compiler can issue SIMD-capable code.
+//
 #if defined(AE_CPU)
 #if AE_CPU==AE_INTEL
-    /*
-     * Intel definitions
-     */
+    // Intel definitions
     #if AE_COMPILER==AE_MSVC
-        /*
-         * MSVC is detected.
-         * We assume that compiler supports all instruction sets
-         * unless something is explicitly turned off.
-         */
+        // MSVC is detected.
+        // We assume that compiler supports all instruction sets
+        // unless something is explicitly turned off.
         #if !defined(AE_NO_SSE2)
             #include <emmintrin.h>
             #define AE_HAS_SSE2_INTRINSICS
@@ -165,11 +157,9 @@ http://www.fsf.org/licensing/licenses
             #endif
         #endif
     #elif AE_COMPILER==AE_GNUC
-        /*
-         * GCC/CLANG/ICC is detected.
-         * We assume that compiler supports all instruction sets
-         * unless something is explicitly turned off.
-         */
+        // GCC/CLANG/ICC is detected.
+        // We assume that compiler supports all instruction sets
+        // unless something is explicitly turned off.
         #if !defined(AE_NO_SSE2)
             #include <xmmintrin.h>
             #define AE_HAS_SSE2_INTRINSICS
@@ -183,9 +173,7 @@ http://www.fsf.org/licensing/licenses
             #endif
         #endif
     #elif AE_COMPILER==AE_SUNC
-        /*
-         * Sun studio
-         */
+        // Sun studio
         #include <xmmintrin.h>
         #include <emmintrin.h>
         #define AE_HAS_SSE2_INTRINSICS
@@ -194,9 +182,7 @@ http://www.fsf.org/licensing/licenses
         #define _ALGLIB_HAS_AVX2_INTRINSICS
         #define _ALGLIB_HAS_FMA_INTRINSICS
     #else
-        /*
-         * Unknown compiler
-         */
+        // Unknown compiler
         #if !defined(AE_NO_SSE2)
             #include <immintrin.h>
             #define AE_HAS_SSE2_INTRINSICS
@@ -210,9 +196,7 @@ http://www.fsf.org/licensing/licenses
         #endif
     #endif
 
-    /*
-     * Intel integrity checks
-     */
+    // Intel integrity checks
     #if defined(_ALGLIB_INTEGRITY_CHECKS_ONCE)
         #if defined(_ALGLIB_FAIL_WITHOUT_FMA_INTRINSICS) && !defined(_ALGLIB_HAS_FMA_INTRINSICS)
 #error ALGLIB was requested to fail without FMA intrinsics
@@ -233,16 +217,14 @@ http://www.fsf.org/licensing/licenses
 namespace alglib_impl
 {
 
-/* if we work under C++ environment, define several conditions */
+// if we work under C++ environment, define several conditions
 #ifdef AE_USE_CPP
 #define AE_USE_CPP_BOOL
 #define AE_USE_CPP_SERIALIZATION
 #include <iostream>
 #endif
 
-/*
- * define ae_int32_t, ae_int64_t, ae_int_t, ae_bool, ae_complex, ae_error_type and ae_datatype
- */
+// define ae_int32_t, ae_int64_t, ae_int_t, ae_bool, ae_complex, ae_error_type and ae_datatype
 
 #if defined(AE_INT32_T)
 typedef AE_INT32_T ae_int32_t;
@@ -317,30 +299,26 @@ typedef enum
 
 typedef ae_int_t ae_datatype;
 
-/*
- * other definitions
- */
+// other definitions
 enum { OWN_CALLER=1, OWN_AE=2 };
 enum { ACT_UNCHANGED=1, ACT_SAME_LOCATION=2, ACT_NEW_LOCATION=3 };
 enum { DT_BOOL=1, DT_BYTE=1, DT_INT=2, DT_REAL=3, DT_COMPLEX=4 };
 enum { CPU_SSE2=0x1, CPU_AVX2=0x2, CPU_FMA=0x4 };
 
-/************************************************************************
-x-string (zero-terminated):
-    owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-                If vector is owned by caller, X-interface  will  just set
-                ptr to NULL before realloc(). If it is  owned  by  X,  it
-                will call ae_free/x_free/aligned_free family functions.
-
-    last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-                contents is either: unchanged, stored at the same location,
-                stored at the new location.
-                this field is set on return from X.
-
-    ptr         pointer to the actual data
-
-Members of this structure are ae_int64_t to avoid alignment problems.
-************************************************************************/
+// x-string (zero-terminated):
+//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
+//                 If vector is owned by caller, X-interface  will  just set
+//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
+//                 will call ae_free/x_free/aligned_free family functions.
+//
+//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
+//                 contents is either: unchanged, stored at the same location,
+//                 stored at the new location.
+//                 this field is set on return from X.
+//
+//     ptr         pointer to the actual data
+//
+// Members of this structure are ae_int64_t to avoid alignment problems.
 typedef struct
 {
     ALIGNED ae_int64_t     owner;
@@ -348,29 +326,27 @@ typedef struct
     ALIGNED char *ptr;
 } x_string;
 
-/************************************************************************
-x-vector:
-    cnt         number of elements
-
-    datatype    one of the DT_XXXX values
-
-    owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-                If vector is owned by caller, X-interface  will  just set
-                ptr to NULL before realloc(). If it is  owned  by  X,  it
-                will call ae_free/x_free/aligned_free family functions.
-
-    last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-                contents is either: unchanged, stored at the same location,
-                stored at the new location.
-                this field is set on return from X interface and may be
-                used by caller as hint when deciding what to do with data
-                (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
-                reallocation or copying is required).
-
-    ptr         pointer to the actual data
-
-Members of this structure are ae_int64_t to avoid alignment problems.
-************************************************************************/
+// x-vector:
+//     cnt         number of elements
+//
+//     datatype    one of the DT_XXXX values
+//
+//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
+//                 If vector is owned by caller, X-interface  will  just set
+//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
+//                 will call ae_free/x_free/aligned_free family functions.
+//
+//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
+//                 contents is either: unchanged, stored at the same location,
+//                 stored at the new location.
+//                 this field is set on return from X interface and may be
+//                 used by caller as hint when deciding what to do with data
+//                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
+//                 reallocation or copying is required).
+//
+//     ptr         pointer to the actual data
+//
+// Members of this structure are ae_int64_t to avoid alignment problems.
 typedef struct
 {
     ae_int64_t     cnt;
@@ -385,33 +361,31 @@ typedef struct
 } x_vector;
 
 
-/************************************************************************
-x-matrix:
-    rows        number of rows. may be zero only when cols is zero too.
-
-    cols        number of columns. may be zero only when rows is zero too.
-
-    stride      stride, i.e. distance between first elements of rows (in bytes)
-
-    datatype    one of the DT_XXXX values
-
-    owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
-                If vector is owned by caller, X-interface  will  just set
-                ptr to NULL before realloc(). If it is  owned  by  X,  it
-                will call ae_free/x_free/aligned_free family functions.
-
-    last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
-                contents is either: unchanged, stored at the same location,
-                stored at the new location.
-                this field is set on return from X interface and may be
-                used by caller as hint when deciding what to do with data
-                (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
-                reallocation or copying is required).
-
-    ptr         pointer to the actual data, stored rowwise
-
-Members of this structure are ae_int64_t to avoid alignment problems.
-************************************************************************/
+// x-matrix:
+//     rows        number of rows. may be zero only when cols is zero too.
+//
+//     cols        number of columns. may be zero only when rows is zero too.
+//
+//     stride      stride, i.e. distance between first elements of rows (in bytes)
+//
+//     datatype    one of the DT_XXXX values
+//
+//     owner       OWN_CALLER or OWN_AE. Determines what to do on realloc().
+//                 If vector is owned by caller, X-interface  will  just set
+//                 ptr to NULL before realloc(). If it is  owned  by  X,  it
+//                 will call ae_free/x_free/aligned_free family functions.
+//
+//     last_action ACT_UNCHANGED, ACT_SAME_LOCATION, ACT_NEW_LOCATION
+//                 contents is either: unchanged, stored at the same location,
+//                 stored at the new location.
+//                 this field is set on return from X interface and may be
+//                 used by caller as hint when deciding what to do with data
+//                 (if it was ACT_UNCHANGED or ACT_SAME_LOCATION, no array
+//                 reallocation or copying is required).
+//
+//     ptr         pointer to the actual data, stored rowwise
+//
+// Members of this structure are ae_int64_t to avoid alignment problems.
 typedef struct
 {
     ae_int64_t     rows;
@@ -428,34 +402,34 @@ typedef struct
 } x_matrix;
 
 
-/************************************************************************
-dynamic block which may be automatically deallocated during stack unwinding
-
-p_next          next block in the stack unwinding list.
-                NULL means that this block is not in the list
-deallocator     deallocator function which should be used to deallocate block.
-                NULL for "special" blocks (frame/stack boundaries)
-ptr             pointer which should be passed to the deallocator.
-                may be null (for zero-size block), DYN_BOTTOM or DYN_FRAME
-                for "special" blocks (frame/stack boundaries).
-
-valgrind_hint   is a special field which stores a special hint pointer for
-                Valgrind and other similar memory checking tools.  ALGLIB
-                manually aligns pointers obtained via malloc, so ptr usually
-                points to location past the beginning  of  the  actuallly
-                allocated memory. In such cases memory testing tools  may
-                report "(possibly) lost" memory.
-
-                This "hint" field stores  pointer  actually  returned  by
-                malloc (or NULL, if for some reason  we  do  not  support
-                this feature). This field is used merely as  a  hint  for
-                Valgrind - it should NOT be used for anything else.
-
-************************************************************************/
+// dynamic block which may be automatically deallocated during stack unwinding
+//
+// p_next          next block in the stack unwinding list.
+//                 NULL means that this block is not in the list
+// deallocator     deallocator function which should be used to deallocate block.
+//                 NULL for "special" blocks (frame/stack boundaries)
+// ptr             pointer which should be passed to the deallocator.
+//                 may be null (for zero-size block), DYN_BOTTOM or DYN_FRAME
+//                 for "special" blocks (frame/stack boundaries).
+//
+// valgrind_hint   is a special field which stores a special hint pointer for
+//                 Valgrind and other similar memory checking tools.  ALGLIB
+//                 manually aligns pointers obtained via malloc, so ptr usually
+//                 points to location past the beginning  of  the  actuallly
+//                 allocated memory. In such cases memory testing tools  may
+//                 report "(possibly) lost" memory.
+//
+//                 This "hint" field stores  pointer  actually  returned  by
+//                 malloc (or NULL, if for some reason  we  do  not  support
+//                 this feature). This field is used merely as  a  hint  for
+//                 Valgrind - it should NOT be used for anything else.
+//
 typedef struct ae_dyn_block
 {
     struct ae_dyn_block * volatile p_next;
-    /* void *deallocator; */
+#if 0
+    void *deallocator;
+#endif
     void (*deallocator)(void*);
     void * volatile ptr;
     void* valgrind_hint;
@@ -463,120 +437,94 @@ typedef struct ae_dyn_block
 
 typedef void(*ae_deallocator)(void*);
 
-/************************************************************************
-frame marker
-************************************************************************/
+// frame marker
 typedef struct ae_frame
 {
     ae_dyn_block db_marker;
 } ae_frame;
 
-/************************************************************************
-ALGLIB environment state
-************************************************************************/
+// ALGLIB environment state
 typedef struct ae_state
 {
-    /*
-     * endianness type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
-     */
+    // endianness type: AE_LITTLE_ENDIAN or AE_BIG_ENDIAN
     ae_int_t endianness;
 
-    /*
-     * double value for NAN
-     */
+    // double value for NAN
     double v_nan;
 
-    /*
-     * double value for +INF
-     */
+    // double value for +INF
     double v_posinf;
 
-    /*
-     * double value for -INF
-     */
+    // double value for -INF
     double v_neginf;
 
-    /*
-     * pointer to the top block in a stack of frames
-     * which hold dynamically allocated objects
-     */
+    // pointer to the top block in a stack of frames
+    // which hold dynamically allocated objects
     ae_dyn_block * volatile p_top_block;
     ae_dyn_block last_block;
 
-    /*
-     * jmp_buf pointer for internal C-style exception handling
-     */
+    // jmp_buf pointer for internal C-style exception handling
     jmp_buf * volatile break_jump;
 
-    /*
-     * ae_error_type of the last error (filled when exception is thrown)
-     */
+    // ae_error_type of the last error (filled when exception is thrown)
     ae_error_type volatile last_error;
 
-    /*
-     * human-readable message (filled when exception is thrown)
-     */
+    // human-readable message (filled when exception is thrown)
     const char* volatile error_msg;
 
-    /*
-     * Flags: call-local settings for ALGLIB
-     */
+    // Flags: call-local settings for ALGLIB
     ae_uint64_t flags;
 
-    /*
-     * threading information:
-     * a) current thread pool
-     * b) current worker thread
-     * c) parent task (one we are solving right now)
-     * d) thread exception handler (function which must be called
-     *    by ae_assert before raising exception).
-     *
-     * NOTE: we use void* to store pointers in order to avoid explicit dependency on smp.h
-     */
+    // threading information:
+    // a) current thread pool
+    // b) current worker thread
+    // c) parent task (one we are solving right now)
+    // d) thread exception handler (function which must be called
+    //    by ae_assert before raising exception).
+    //
+    // NOTE: we use void* to store pointers in order to avoid explicit dependency on smp.h
     void *worker_thread;
     void *parent_task;
     void (*thread_exception_handler)(void*);
 
 } ae_state;
 
-/************************************************************************
-Serializer:
-
-* ae_stream_writer type is a function pointer for stream  writer  method;
-  this pointer is used by X-core for out-of-core serialization  (say,  to
-  serialize ALGLIB structure directly to managed C# stream).
-
-  This function accepts two parameters: pointer to  ANSI  (7-bit)  string
-  and pointer-sized integer passed to serializer  during  initialization.
-  String being passed is a part of the data stream; aux paramerer may  be
-  arbitrary value intended to be used by actual implementation of  stream
-  writer. String parameter may include spaces and  linefeed  symbols,  it
-  should be written to stream as is.
-
-  Return value must be zero for success or non-zero for failure.
-
-* ae_stream_reader type is a function pointer for stream  reader  method;
-  this pointer is used by X-core for out-of-core unserialization (say, to
-  unserialize ALGLIB structure directly from managed C# stream).
-
-  This function accepts three parameters: pointer-sized integer passed to
-  serializer  during  initialization; number  of  symbols  to  read  from
-  stream; pointer to buffer used to store next  token  read  from  stream
-  (ANSI encoding is used, buffer is large enough to store all symbols and
-  trailing zero symbol).
-
-  Number of symbols to read is always positive.
-
-  After being called by X-core, this function must:
-  * skip all space and linefeed characters from the current  position  at
-    the stream and until first non-space non-linefeed character is found
-  * read exactly cnt symbols  from  stream  to  buffer;  check  that  all
-    symbols being read are non-space non-linefeed ones
-  * append trailing zero symbol to buffer
-  * return value must be zero on success, non-zero if  even  one  of  the
-    conditions above fails. When reader returns non-zero value,  contents
-    of buf is not used.
-************************************************************************/
+// Serializer:
+//
+// * ae_stream_writer type is a function pointer for stream  writer  method;
+//   this pointer is used by X-core for out-of-core serialization  (say,  to
+//   serialize ALGLIB structure directly to managed C# stream).
+//
+//   This function accepts two parameters: pointer to  ANSI  (7-bit)  string
+//   and pointer-sized integer passed to serializer  during  initialization.
+//   String being passed is a part of the data stream; aux paramerer may  be
+//   arbitrary value intended to be used by actual implementation of  stream
+//   writer. String parameter may include spaces and  linefeed  symbols,  it
+//   should be written to stream as is.
+//
+//   Return value must be zero for success or non-zero for failure.
+//
+// * ae_stream_reader type is a function pointer for stream  reader  method;
+//   this pointer is used by X-core for out-of-core unserialization (say, to
+//   unserialize ALGLIB structure directly from managed C# stream).
+//
+//   This function accepts three parameters: pointer-sized integer passed to
+//   serializer  during  initialization; number  of  symbols  to  read  from
+//   stream; pointer to buffer used to store next  token  read  from  stream
+//   (ANSI encoding is used, buffer is large enough to store all symbols and
+//   trailing zero symbol).
+//
+//   Number of symbols to read is always positive.
+//
+//   After being called by X-core, this function must:
+//   * skip all space and linefeed characters from the current  position  at
+//     the stream and until first non-space non-linefeed character is found
+//   * read exactly cnt symbols  from  stream  to  buffer;  check  that  all
+//     symbols being read are non-space non-linefeed ones
+//   * append trailing zero symbol to buffer
+//   * return value must be zero on success, non-zero if  even  one  of  the
+//     conditions above fails. When reader returns non-zero value,  contents
+//     of buf is not used.
 typedef char(*ae_stream_writer)(const char *p_string, ae_int_t aux);
 typedef char(*ae_stream_reader)(ae_int_t aux, ae_int_t cnt, char *p_buf);
 
@@ -591,8 +539,9 @@ typedef struct
 #ifdef AE_USE_CPP_SERIALIZATION
     std::string     *out_cppstr;
 #endif
-    char            *out_str; /* pointer to the current position at the output buffer; advanced with each write operation */
-    const char      *in_str;  /* pointer to the current position at the input  buffer; advanced with each read  operation */
+// Pointers respectively to the current position at the output/input buffers; advanced with each write/read operation.
+    char            *out_str;
+    const char      *in_str;
     ae_int_t         stream_aux;
     ae_stream_writer stream_writer;
     ae_stream_reader stream_reader;
@@ -601,34 +550,24 @@ typedef struct
 
 typedef struct ae_vector
 {
-    /*
-     * Number of elements in array, cnt>=0
-     */
+    // Number of elements in array, cnt>=0
     ae_int_t cnt;
 
-    /*
-     * Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
-     */
+    // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
     ae_datatype datatype;
 
-    /*
-     * If ptr points to memory owned and managed by ae_vector itself,
-     * this field is ae_false. If vector was attached to x_vector structure
-     * with ae_vector_init_attach_to_x(), this field is ae_true.
-     */
+    // If ptr points to memory owned and managed by ae_vector itself,
+    // this field is ae_false. If vector was attached to x_vector structure
+    // with ae_vector_init_attach_to_x(), this field is ae_true.
     ae_bool is_attached;
 
-    /*
-     * ae_dyn_block structure which manages data in ptr. This structure
-     * is responsible for automatic deletion of object when its frame
-     * is destroyed.
-     */
+    // ae_dyn_block structure which manages data in ptr. This structure
+    // is responsible for automatic deletion of object when its frame
+    // is destroyed.
     ae_dyn_block data;
 
-    /*
-     * Pointer to data.
-     * User usually works with this field.
-     */
+    // Pointer to data.
+    // User usually works with this field.
     union
     {
         void *p_ptr;
@@ -647,11 +586,9 @@ typedef struct ae_matrix
     ae_int_t stride;
     ae_datatype datatype;
 
-    /*
-     * If ptr points to memory owned and managed by ae_vector itself,
-     * this field is ae_false. If vector was attached to x_vector structure
-     * with ae_vector_init_attach_to_x(), this field is ae_true.
-     */
+    // If ptr points to memory owned and managed by ae_vector itself,
+    // this field is ae_false. If vector was attached to x_vector structure
+    // with ae_vector_init_attach_to_x(), this field is ae_true.
     ae_bool is_attached;
 
     ae_dyn_block data;
@@ -672,69 +609,59 @@ typedef ae_matrix BMatrix, ZMatrix, RMatrix, CMatrix;
 
 typedef struct ae_smart_ptr
 {
-    /* pointer to subscriber; all changes in ptr are translated to subscriber */
+// pointer to subscriber; all changes in ptr are translated to subscriber
     void **subscriber;
 
-    /* pointer to object */
+// pointer to object
     void *ptr;
 
-    /* whether smart pointer owns ptr */
+// whether smart pointer owns ptr
     ae_bool is_owner;
 
-    /* whether object pointed by ptr is dynamic - clearing such object requires BOTH
-       calling destructor function AND calling ae_free for memory occupied by object. */
+// whether object pointed by ptr is dynamic - clearing such object requires BOTH
+// calling destructor function AND calling ae_free for memory occupied by object.
     ae_bool is_dynamic;
 
-    /* destructor function for pointer; clears all dynamically allocated memory */
+// destructor function for pointer; clears all dynamically allocated memory
     void (*destroy)(void*);
 
-    /* frame entry; used to ensure automatic deallocation of smart pointer in case of exception/exit */
+// frame entry; used to ensure automatic deallocation of smart pointer in case of exception/exit
     ae_dyn_block frame_entry;
 } ae_smart_ptr;
 
 
-/*************************************************************************
-Lock.
-
-This structure provides OS-independent non-reentrant lock:
-* under Windows/Posix systems it uses system-provided locks
-* under Boost it uses OS-independent lock provided by Boost package
-* when no OS is defined, it uses "fake lock" (just stub which is not thread-safe):
-  a) "fake lock" can be in locked or free mode
-  b) "fake lock" can be used only from one thread - one which created lock
-  c) when thread acquires free lock, it immediately returns
-  d) when thread acquires busy lock, program is terminated
-     (because lock is already acquired and no one else can free it)
-*************************************************************************/
+// Lock.
+//
+// This structure provides OS-independent non-reentrant lock:
+// * under Windows/Posix systems it uses system-provided locks
+// * under Boost it uses OS-independent lock provided by Boost package
+// * when no OS is defined, it uses "fake lock" (just stub which is not thread-safe):
+//   a) "fake lock" can be in locked or free mode
+//   b) "fake lock" can be used only from one thread - one which created lock
+//   c) when thread acquires free lock, it immediately returns
+//   d) when thread acquires busy lock, program is terminated
+//      (because lock is already acquired and no one else can free it)
 typedef struct
 {
-    /*
-     * Pointer to _lock structure. This pointer has type void* in order to
-     * make header file OS-independent (lock declaration depends on OS).
-     */
+    // Pointer to _lock structure. This pointer has type void* in order to
+    // make header file OS-independent (lock declaration depends on OS).
     void *lock_ptr;
 
-    /*
-     * For eternal=false this field manages pointer to _lock structure.
-     *
-     * ae_dyn_block structure is responsible for automatic deletion of
-     * the memory allocated for the pointer when its frame is destroyed.
-     */
+    // For eternal=false this field manages pointer to _lock structure.
+    //
+    // ae_dyn_block structure is responsible for automatic deletion of
+    // the memory allocated for the pointer when its frame is destroyed.
     ae_dyn_block db;
 
-    /*
-     * Whether we have eternal lock object (used by thread pool) or
-     * transient lock. Eternal locks are allocated without using ae_dyn_block
-     * structure and do not allow deallocation.
-     */
+    // Whether we have eternal lock object (used by thread pool) or
+    // transient lock. Eternal locks are allocated without using ae_dyn_block
+    // structure and do not allow deallocation.
     ae_bool eternal;
 } ae_lock;
 
 
-/*************************************************************************
-Shared pool: data structure used to provide thread-safe access to pool  of
-temporary variables.
-*************************************************************************/
+// Shared pool: data structure used to provide thread-safe access to pool  of
+// temporary variables.
 typedef struct ae_shared_pool_entry
 {
     void * volatile obj;
@@ -743,45 +670,41 @@ typedef struct ae_shared_pool_entry
 
 typedef struct ae_shared_pool
 {
-    /* lock object which protects pool */
+// lock object which protects pool
     ae_lock pool_lock;
 
-    /* seed object (used to create new instances of temporaries) */
+// seed object (used to create new instances of temporaries)
     void                    * volatile seed_object;
 
-    /*
-     * list of recycled OBJECTS:
-     * 1. entries in this list store pointers to recycled objects
-     * 2. every time we retrieve object, we retrieve first entry from this list,
-     *    move it to recycled_entries and return its obj field to caller/
-     */
+    // list of recycled OBJECTS:
+    // 1. entries in this list store pointers to recycled objects
+    // 2. every time we retrieve object, we retrieve first entry from this list,
+    //    move it to recycled_entries and return its obj field to caller/
     ae_shared_pool_entry    * volatile recycled_objects;
 
-    /*
-     * list of recycled ENTRIES:
-     * 1. this list holds entries which are not used to store recycled objects;
-     *    every time recycled object is retrieved, its entry is moved to this list.
-     * 2. every time object is recycled, we try to fetch entry for him from this list
-     *    before allocating it with malloc()
-     */
+    // list of recycled ENTRIES:
+    // 1. this list holds entries which are not used to store recycled objects;
+    //    every time recycled object is retrieved, its entry is moved to this list.
+    // 2. every time object is recycled, we try to fetch entry for him from this list
+    //    before allocating it with malloc()
     ae_shared_pool_entry    * volatile recycled_entries;
 
-    /* enumeration pointer, points to current recycled object*/
+// enumeration pointer, points to current recycled object
     ae_shared_pool_entry    * volatile enumeration_counter;
 
-    /* size of object; this field is used when we call malloc() for new objects */
+// size of object; this field is used when we call malloc() for new objects
     ae_int_t                size_of_object;
 
-    /* initializer function; accepts pointer to malloc'ed object, initializes its fields */
+// initializer function; accepts pointer to malloc'ed object, initializes its fields
     void (*init)(void* dst, ae_state* state, ae_bool make_automatic);
 
-    /* copy constructor; accepts pointer to malloc'ed, but not initialized object */
+// copy constructor; accepts pointer to malloc'ed, but not initialized object
     void (*init_copy)(void* dst, void* src, ae_state* state, ae_bool make_automatic);
 
-    /* destructor function; */
+// destructor function;
     void (*destroy)(void* ptr);
 
-    /* frame entry; contains pointer to the pool object itself */
+// frame entry; contains pointer to the pool object itself
     ae_dyn_block frame_entry;
 } ae_shared_pool;
 
@@ -791,9 +714,7 @@ ae_int64_t ae_get_dbg_value(ae_int64_t id);
 void ae_set_global_threading(ae_uint64_t flg_value);
 ae_uint64_t ae_get_global_threading();
 
-/************************************************************************
-Debugging and tracing functions
-************************************************************************/
+// Debugging and tracing functions
 void ae_set_error_flag(ae_bool *p_flag, ae_bool cond, const char *filename, int lineno, const char *xdesc);
 const char * ae_get_last_error_file();
 int          ae_get_last_error_line();
@@ -807,9 +728,7 @@ void ae_trace(const char * printf_fmt, ...);
 int ae_tickcount();
 
 
-/************************************************************************
-...
-************************************************************************/
+// ...
 ae_int_t ae_misalignment(const void *ptr, size_t alignment);
 void* ae_align(void *ptr, size_t alignment);
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);
@@ -867,7 +786,7 @@ void ae_matrix_destroy(ae_matrix *dst);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 
 void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, ae_bool make_automatic);
-void ae_smart_ptr_clear(void *_dst); /* accepts ae_smart_ptr* */
+void ae_smart_ptr_clear(void *_dst); // accepts ae_smart_ptr*
 void ae_smart_ptr_destroy(void *_dst);
 void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_bool is_dynamic, void (*destroy)(void*));
 void ae_smart_ptr_release(ae_smart_ptr *dst);
@@ -963,17 +882,13 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 
 void ae_serializer_stop(ae_serializer *serializer, ae_state *state);
 
-/************************************************************************
-Service functions
-************************************************************************/
+// Service functions
 void ae_assert(ae_bool cond, const char *msg, ae_state *state);
 ae_int_t ae_cpuid();
 
-/************************************************************************
-Real math functions:
-* IEEE-compliant floating point comparisons
-* standard functions
-************************************************************************/
+// Real math functions:
+// * IEEE-compliant floating point comparisons
+// * standard functions
 ae_bool ae_fp_eq(double v1, double v2);
 ae_bool ae_fp_neq(double v1, double v2);
 ae_bool ae_fp_less(double v1, double v2);
@@ -1028,11 +943,9 @@ double   ae_log(double x, ae_state *state);
 double   ae_pow(double x, double y, ae_state *state);
 double   ae_exp(double x, ae_state *state);
 
-/************************************************************************
-Complex math functions:
-* basic arithmetic operations
-* standard functions
-************************************************************************/
+// Complex math functions:
+// * basic arithmetic operations
+// * standard functions
 ae_complex ae_complex_from_i(ae_int_t v);
 ae_complex ae_complex_from_d(double v);
 
@@ -1056,9 +969,7 @@ ae_complex ae_c_conj(ae_complex lhs, ae_state *state);
 ae_complex ae_c_sqr(ae_complex lhs, ae_state *state);
 double     ae_c_abs(ae_complex z, ae_state *state);
 
-/************************************************************************
-Complex BLAS operations
-************************************************************************/
+// Complex BLAS operations
 ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n);
 void ae_v_cmove(ae_complex *vdst,    ae_int_t stride_dst, const ae_complex* vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
 void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex* vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n);
@@ -1073,9 +984,7 @@ void ae_v_csubc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 void ae_v_cmuld(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, double alpha);
 void ae_v_cmulc(ae_complex *vdst, ae_int_t stride_dst, ae_int_t n, ae_complex alpha);
 
-/************************************************************************
-Real BLAS operations
-************************************************************************/
+// Real BLAS operations
 double ae_v_dotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n);
 void ae_v_move(double *vdst,    ae_int_t stride_dst, const double* vsrc,  ae_int_t stride_src, ae_int_t n);
 void ae_v_moveneg(double *vdst, ae_int_t stride_dst, const double* vsrc,  ae_int_t stride_src, ae_int_t n);
@@ -1086,26 +995,22 @@ void ae_v_sub(double *vdst,     ae_int_t stride_dst, const double *vsrc,  ae_int
 void ae_v_subd(double *vdst,    ae_int_t stride_dst, const double *vsrc,  ae_int_t stride_src, ae_int_t n, double alpha);
 void ae_v_muld(double *vdst,  ae_int_t stride_dst, ae_int_t n, double alpha);
 
-/************************************************************************
-Other functions
-************************************************************************/
+// Other functions
 ae_int_t ae_v_len(ae_int_t a, ae_int_t b);
 
-/*
+#if 0
 extern const double ae_machineepsilon;
 extern const double ae_maxrealnumber;
 extern const double ae_minrealnumber;
 extern const double ae_pi;
-*/
+#endif
 #define ae_machineepsilon 5E-16
 #define ae_maxrealnumber  1E300
 #define ae_minrealnumber  1E-300
 #define ae_pi 3.1415926535897932384626433832795
 
 
-/************************************************************************
-RComm functions
-************************************************************************/
+// RComm functions
 typedef struct rcommstate
 {
     int stage;
@@ -1120,47 +1025,39 @@ void _rcommstate_clear(rcommstate* p);
 void _rcommstate_destroy(rcommstate* p);
 
 
-/************************************************************************
-Allocation counters, inactive by default.
-Turned on when needed for debugging purposes.
-
-_alloc_counter is incremented by 1 on malloc(), decremented on free().
-_alloc_counter_total is only incremented by 1.
-************************************************************************/
+// Allocation counters, inactive by default.
+// Turned on when needed for debugging purposes.
+//
+// _alloc_counter is incremented by 1 on malloc(), decremented on free().
+// _alloc_counter_total is only incremented by 1.
 extern ae_int_t   _alloc_counter;
 extern ae_int_t   _alloc_counter_total;
 extern ae_bool    _use_alloc_counter;
 
 
-/************************************************************************
-Malloc debugging:
-
-* _force_malloc_failure - set this flag to ae_true in  order  to  enforce
-  failure of ALGLIB malloc(). Useful to debug handling of  errors  during
-  memory allocation. As long as this flag is set, ALGLIB malloc will fail.
-* _malloc_failure_after - set it to non-zero value in  order  to  enforce
-  malloc failure as soon as _alloc_counter_total increases above value of
-  this variable. This value has no effect if  _use_alloc_counter  is  not
-  set.
-************************************************************************/
+// Malloc debugging:
+//
+// * _force_malloc_failure - set this flag to ae_true in  order  to  enforce
+//   failure of ALGLIB malloc(). Useful to debug handling of  errors  during
+//   memory allocation. As long as this flag is set, ALGLIB malloc will fail.
+// * _malloc_failure_after - set it to non-zero value in  order  to  enforce
+//   malloc failure as soon as _alloc_counter_total increases above value of
+//   this variable. This value has no effect if  _use_alloc_counter  is  not
+//   set.
 extern ae_bool    _force_malloc_failure;
 extern ae_int_t   _malloc_failure_after;
 
 
-/************************************************************************
-Trace file descriptor (to be used by ALGLIB code which sends messages  to
-trace log)
-************************************************************************/
+// Trace file descriptor (to be used by ALGLIB code which sends messages  to
+// trace log)
 extern FILE       *alglib_trace_file;
 
 
-/************************************************************************
-debug functions (must be turned on by preprocessor definitions):
-* flushconsole(), fluches console
-* ae_debugrng(), returns random number generated with high-quality random numbers generator
-* ae_set_seed(), sets seed of the debug RNG (NON-THREAD-SAFE!!!)
-* ae_get_seed(), returns two seed values of the debug RNG (NON-THREAD-SAFE!!!)
-************************************************************************/
+// debug functions (must be turned on by preprocessor definitions):
+// * flushconsole(), fluches console
+// * ae_debugrng(), returns random number generated with high-quality random numbers generator
+// * ae_set_seed(), sets seed of the debug RNG (NON-THREAD-SAFE!!!)
+// * ae_get_seed(), returns two seed values of the debug RNG (NON-THREAD-SAFE!!!)
 #ifdef AE_DEBUG4WINDOWS
 #define flushconsole(s) fflush(stdout)
 #endif
@@ -1168,16 +1065,12 @@ debug functions (must be turned on by preprocessor definitions):
 #define flushconsole(s) fflush(stdout)
 #endif
 
-/************************************************************************
-Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
-inclusion of this header file
-************************************************************************/
+// Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
+// inclusion of this header file
 #if defined(_ALGLIB_IMPL_DEFINES)
     #define _ALGLIB_SIMD_ALIGNMENT_DOUBLES 8
     #define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
-    /*
-     * SIMD kernel dispatchers
-     */
+    // SIMD kernel dispatchers
     #if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
         #define _ALGLIB_KKK_VOID_SSE2(fname,params)   if( cached_cpuid&CPU_SSE2 ) { fname##_sse2 params; return; }
         #define _ALGLIB_KKK_RETURN_SSE2(fname,params) if( cached_cpuid&CPU_SSE2 ) { return fname##_sse2 params; }
@@ -1295,16 +1188,12 @@ namespace alglib
 
 typedef alglib_impl::ae_int_t ae_int_t;
 
-/********************************************************************
-Class forwards
-********************************************************************/
+// Class forwards
 class complex;
 
 ae_int_t vlen(ae_int_t n1, ae_int_t n2);
 
-/********************************************************************
-Exception class.
-********************************************************************/
+// Exception class.
 #if !defined(AE_NO_EXCEPTIONS)
 class ap_error
 {
@@ -1319,9 +1208,7 @@ private:
 };
 #endif
 
-/********************************************************************
-Complex number with double precision.
-********************************************************************/
+// Complex number with double precision.
 class complex
 {
 public:
@@ -1373,19 +1260,17 @@ double abscomplex(const alglib::complex &z);
 alglib::complex conj(const alglib::complex &z);
 alglib::complex csqr(const alglib::complex &z);
 
-/********************************************************************
-Level 1 BLAS functions
-
-NOTES:
-* destination and source should NOT overlap
-* stride is assumed to be positive, but it is not
-  assert'ed within function
-* conj_src parameter specifies whether complex source is conjugated
-  before processing or not. Pass string which starts with 'N' or 'n'
-  ("No conj", for example) to use unmodified parameter. All other
-  values will result in conjugation of input, but it is recommended
-  to use "Conj" in such cases.
-********************************************************************/
+// Level 1 BLAS functions
+//
+// NOTES:
+// * destination and source should NOT overlap
+// * stride is assumed to be positive, but it is not
+//   assert'ed within function
+// * conj_src parameter specifies whether complex source is conjugated
+//   before processing or not. Pass string which starts with 'N' or 'n'
+//   ("No conj", for example) to use unmodified parameter. All other
+//   values will result in conjugation of input, but it is recommended
+//   to use "Conj" in such cases.
 double vdotproduct(const double *v0, ae_int_t stride0, const double *v1, ae_int_t stride1, ae_int_t n);
 double vdotproduct(const double *v1, const double *v2, ae_int_t N);
 
@@ -1453,9 +1338,7 @@ void vmul(alglib::complex *vdst, ae_int_t stride_dst, ae_int_t n, alglib::comple
 void vmul(alglib::complex *vdst, ae_int_t N, alglib::complex alpha);
 
 
-/********************************************************************
-xparams type and several predefined constants
-********************************************************************/
+// xparams type and several predefined constants
 struct xparams
 {
     alglib_impl::ae_uint64_t flags;
@@ -1465,9 +1348,7 @@ extern const xparams &xdefault;
 extern const xparams &serial;
 extern const xparams &parallel;
 
-/********************************************************************
-Threading functions
-********************************************************************/
+// Threading functions
 // nworkers can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
 void setnworkers(alglib::ae_int_t nworkers);
 
@@ -1477,17 +1358,13 @@ void setglobalthreading(const xparams settings);
 // nworkers can be 1, 2, ... ; or 0 for auto; or -1/-2/... for all except for one/two/...
 alglib::ae_int_t getnworkers();
 
-/********************************************************************
-internal functions used by TestX.cpp, interfaces for functions present
-in commercial ALGLIB but lacking in free edition.
-********************************************************************/
+// internal functions used by TestX.cpp, interfaces for functions present
+// in commercial ALGLIB but lacking in free edition.
 ae_int_t _ae_cores_count();
 void _ae_set_global_threading(alglib_impl::ae_uint64_t flg_value);
 alglib_impl::ae_uint64_t _ae_get_global_threading();
 
-/********************************************************************
-1- and 2-dimensional arrays
-********************************************************************/
+// 1- and 2-dimensional arrays
 class ae_vector_wrapper
 {
 public:
@@ -2012,88 +1889,80 @@ public:
 #endif
 };
 
-/********************************************************************
-CSV operations: reading CSV file to real matrix.
-
-This function reads CSV  file  and  stores  its  contents  to  double
-precision 2D array. Format of the data file must conform to RFC  4180
-specification, with additional notes:
-* file size should be less than 2GB
-* ASCI encoding, UTF-8 without BOM (in header names) are supported
-* any character (comma/tab/space) may be used as field separator,  as
-  long as it is distinct from one used for decimal point
-* multiple subsequent field separators (say, two  spaces) are treated
-  as MULTIPLE separators, not one big separator
-* both comma and full stop may be used as decimal point. Parser  will
-  automatically determine specific character being used.  Both  fixed
-  and exponential number formats are  allowed.   Thousand  separators
-  are NOT allowed.
-* line may end with \n (Unix style) or \r\n (Windows  style),  parser
-  will automatically adapt to chosen convention
-* escaped fields (ones in double quotes) are not supported
-
-INPUT PARAMETERS:
-    filename        relative/absolute path
-    separator       character used to separate fields.  May  be  ' ',
-                    ',', '\t'. Other separators are possible too.
-    flags           several values combined with bitwise OR:
-                    * alglib::CSV_SKIP_HEADERS -  if present, first row
-                      contains headers  and  will  be  skipped.   Its
-                      contents is used to determine fields count, and
-                      that's all.
-                    If no flags are specified, default value 0x0  (or
-                    alglib::CSV_DEFAULT, which is same) should be used.
-
-OUTPUT PARAMETERS:
-    out             2D matrix, CSV file parsed with atof()
-
-HANDLING OF SPECIAL CASES:
-* file does not exist - alglib::ap_error exception is thrown
-* empty file - empty array is returned (no exception)
-* skip_first_row=true, only one row in file - empty array is returned
-* field contents is not recognized by atof() - field value is replaced
-  by 0.0
-********************************************************************/
+// CSV operations: reading CSV file to real matrix.
+//
+// This function reads CSV  file  and  stores  its  contents  to  double
+// precision 2D array. Format of the data file must conform to RFC  4180
+// specification, with additional notes:
+// * file size should be less than 2GB
+// * ASCI encoding, UTF-8 without BOM (in header names) are supported
+// * any character (comma/tab/space) may be used as field separator,  as
+//   long as it is distinct from one used for decimal point
+// * multiple subsequent field separators (say, two  spaces) are treated
+//   as MULTIPLE separators, not one big separator
+// * both comma and full stop may be used as decimal point. Parser  will
+//   automatically determine specific character being used.  Both  fixed
+//   and exponential number formats are  allowed.   Thousand  separators
+//   are NOT allowed.
+// * line may end with \n (Unix style) or \r\n (Windows  style),  parser
+//   will automatically adapt to chosen convention
+// * escaped fields (ones in double quotes) are not supported
+//
+// INPUT PARAMETERS:
+//     filename        relative/absolute path
+//     separator       character used to separate fields.  May  be  ' ',
+//                     ',', '\t'. Other separators are possible too.
+//     flags           several values combined with bitwise OR:
+//                     * alglib::CSV_SKIP_HEADERS -  if present, first row
+//                       contains headers  and  will  be  skipped.   Its
+//                       contents is used to determine fields count, and
+//                       that's all.
+//                     If no flags are specified, default value 0x0  (or
+//                     alglib::CSV_DEFAULT, which is same) should be used.
+//
+// OUTPUT PARAMETERS:
+//     out             2D matrix, CSV file parsed with atof()
+//
+// HANDLING OF SPECIAL CASES:
+// * file does not exist - alglib::ap_error exception is thrown
+// * empty file - empty array is returned (no exception)
+// * skip_first_row=true, only one row in file - empty array is returned
+// * field contents is not recognized by atof() - field value is replaced
+//   by 0.0
 #if !defined(AE_NO_EXCEPTIONS)
 void read_csv(const char *filename, char separator, int flags, alglib::real_2d_array &out);
 #endif
 
 
-/********************************************************************
-This function activates trace output, with trace log being  saved  to
-file (appended to the end).
-
-Tracing allows us to study behavior of ALGLIB solvers  and  to  debug
-their failures:
-* tracing is  limited  by one/several ALGLIB parts specified by means
-  of trace tags, like "SLP" (for SLP solver) or "OPTGUARD"  (OptGuard
-  integrity checker).
-* some ALGLIB solvers support hierarchies of trace tags which activate
-  different kinds of tracing. Say, "SLP" defines some basic  tracing,
-  but "SLP.PROBING" defines more detailed and costly tracing.
-* generally, "TRACETAG.SUBTAG"   also  implicitly  activates  logging
-  which is activated by "TRACETAG"
-* you may define multiple trace tags by separating them with  commas,
-  like "SLP,OPTGUARD,SLP.PROBING"
-* trace tags are case-insensitive
-* spaces/tabs are NOT allowed in the tags string
-
-Trace log is saved to file "filename", which is opened in the  append
-mode. If no file with such name  can  be  opened,  tracing  won't  be
-performed (but no exception will be generated).
-********************************************************************/
+// This function activates trace output, with trace log being  saved  to
+// file (appended to the end).
+//
+// Tracing allows us to study behavior of ALGLIB solvers  and  to  debug
+// their failures:
+// * tracing is  limited  by one/several ALGLIB parts specified by means
+//   of trace tags, like "SLP" (for SLP solver) or "OPTGUARD"  (OptGuard
+//   integrity checker).
+// * some ALGLIB solvers support hierarchies of trace tags which activate
+//   different kinds of tracing. Say, "SLP" defines some basic  tracing,
+//   but "SLP.PROBING" defines more detailed and costly tracing.
+// * generally, "TRACETAG.SUBTAG"   also  implicitly  activates  logging
+//   which is activated by "TRACETAG"
+// * you may define multiple trace tags by separating them with  commas,
+//   like "SLP,OPTGUARD,SLP.PROBING"
+// * trace tags are case-insensitive
+// * spaces/tabs are NOT allowed in the tags string
+//
+// Trace log is saved to file "filename", which is opened in the  append
+// mode. If no file with such name  can  be  opened,  tracing  won't  be
+// performed (but no exception will be generated).
 void trace_file(std::string tags, std::string filename);
 
 
-/********************************************************************
-This function disables tracing.
-********************************************************************/
+// This function disables tracing.
 void trace_disable();
 
 
-/********************************************************************
-Constants and functions introduced for compatibility with AlgoPascal
-********************************************************************/
+// Constants and functions introduced for compatibility with AlgoPascal
 extern const double machineepsilon;
 extern const double maxrealnumber;
 extern const double minrealnumber;
@@ -2131,9 +2000,7 @@ bool fp_isneginf(double x);
 bool fp_isinf(double x);
 bool fp_isfinite(double x);
 
-/********************************************************************
-Exception handling macros
-********************************************************************/
+// Exception handling macros
 #if !defined(AE_NO_EXCEPTIONS)
 ///////////////////////////////////////
 // exception-based code
@@ -2328,9 +2195,7 @@ ae_bool _ialglib_i_rmatrixgerf(ae_int_t m,
 #if !defined(ALGLIB_NO_FAST_KERNELS)
 
 #if defined(_ALGLIB_IMPL_DEFINES)
-    /*
-     * Arrays shorter than that will be processed with generic C implementation
-     */
+    // Arrays shorter than that will be processed with generic C implementation
     #if !defined(_ABLASF_KERNEL_SIZE1)
     #define _ABLASF_KERNEL_SIZE1 16
     #endif
@@ -2344,9 +2209,7 @@ ae_bool _ialglib_i_rmatrixgerf(ae_int_t m,
     #endif
 #endif
 
-/*
- * ABLASF kernels
- */
+// ABLASF kernels
 double rdotv(ae_int_t n,
      RVector * x,
      RVector * y,
@@ -2604,9 +2467,7 @@ ae_bool ablasf_rgemm32basecase(
      ae_int_t jc,
      ae_state *_state);
 
-/*
- * Sparse supernodal Cholesky kernels
- */
+// Sparse supernodal Cholesky kernels
 ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
 void spchol_propagatefwd(RVector * x,
      ae_int_t cols0,
@@ -2646,7 +2507,7 @@ ae_bool spchol_updatekernel4444(RVector * rowstorage,
      ae_int_t urbase,
      ae_state *_state);
 
-/* ALGLIB_NO_FAST_KERNELS */
+// ALGLIB_NO_FAST_KERNELS
 #endif
 
 }
