@@ -2633,7 +2633,7 @@ void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1
 namespace alglib_impl
 {
 #if defined(AE_COMPILE_BASESTAT) || !defined(AE_PARTIAL_BUILD)
-static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
+static void basestat_rankdatarec(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t nfeatures,
@@ -2641,14 +2641,14 @@ static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
      ae_shared_pool* pool,
      ae_int_t basecasecost,
      ae_state *_state);
-ae_bool _trypexec_basestat_rankdatarec(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_basestat_rankdatarec(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t nfeatures,
     ae_bool iscentered,
     ae_shared_pool* pool,
     ae_int_t basecasecost, ae_state *_state);
-static void basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
+static void basestat_rankdatabasecase(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t nfeatures,
@@ -2656,7 +2656,7 @@ static void basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
      apbuffers* buf0,
      apbuffers* buf1,
      ae_state *_state);
-ae_bool _trypexec_basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_basestat_rankdatabasecase(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t nfeatures,
@@ -2679,7 +2679,7 @@ static double correlationtests_spearmantail(double t,
 
 #endif
 #if defined(AE_COMPILE_JARQUEBERA) || !defined(AE_PARTIAL_BUILD)
-static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
+static void jarquebera_jarqueberastatistic(RVector * x,
      ae_int_t n,
      double* s,
      ae_state *_state);
@@ -2940,7 +2940,7 @@ NOTE: variance is calculated by dividing sum of squares by N-1, not N.
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void samplemoments(/* Real    */ ae_vector* x,
+void samplemoments(RVector * x,
      ae_int_t n,
      double* mean,
      double* variance,
@@ -3045,7 +3045,7 @@ and stored at 'Mean' variable.
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-double samplemean(/* Real    */ ae_vector* x,
+double samplemean(RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3080,7 +3080,7 @@ and stored at 'Variance' variable.
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-double samplevariance(/* Real    */ ae_vector* x,
+double samplevariance(RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3115,7 +3115,7 @@ and stored at 'Skewness' variable.
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-double sampleskewness(/* Real    */ ae_vector* x,
+double sampleskewness(RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3150,7 +3150,7 @@ and stored at 'Kurtosis' variable.
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-double samplekurtosis(/* Real    */ ae_vector* x,
+double samplekurtosis(RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3182,7 +3182,7 @@ Output parameters:
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void sampleadev(/* Real    */ ae_vector* x,
+void sampleadev(RVector * x,
      ae_int_t n,
      double* adev,
      ae_state *_state)
@@ -3241,7 +3241,7 @@ Output parameters:
   -- ALGLIB --
      Copyright 06.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void samplemedian(/* Real    */ ae_vector* x,
+void samplemedian(RVector * x,
      ae_int_t n,
      double* median,
      ae_state *_state)
@@ -3410,7 +3410,7 @@ Output parameters:
   -- ALGLIB --
      Copyright 01.03.2008 by Bochkanov Sergey
 *************************************************************************/
-void samplepercentile(/* Real    */ ae_vector* x,
+void samplepercentile(RVector * x,
      ae_int_t n,
      double p,
      double* v,
@@ -3472,8 +3472,8 @@ Result:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-double cov2(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+double cov2(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3568,8 +3568,8 @@ Result:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-double pearsoncorr2(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+double pearsoncorr2(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3681,8 +3681,8 @@ Result:
   -- ALGLIB --
      Copyright 09.04.2007 by Bochkanov Sergey
 *************************************************************************/
-double spearmancorr2(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+double spearmancorr2(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -3758,10 +3758,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void covm(/* Real    */ ae_matrix* x,
+void covm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3889,10 +3889,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void pearsoncorrm(/* Real    */ ae_matrix* x,
+void pearsoncorrm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3969,10 +3969,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void spearmancorrm(/* Real    */ ae_matrix* x,
+void spearmancorrm(RMatrix * x,
      ae_int_t n,
      ae_int_t m,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -4158,12 +4158,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void covm2(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+void covm2(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t m1,
      ae_int_t m2,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -4345,12 +4345,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void pearsoncorrm2(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+void pearsoncorrm2(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t m1,
      ae_int_t m2,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -4587,12 +4587,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 28.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void spearmancorrm2(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+void spearmancorrm2(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t m1,
      ae_int_t m2,
-     /* Real    */ ae_matrix* c,
+     RMatrix * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -4819,7 +4819,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.04.2013 by Bochkanov Sergey
 *************************************************************************/
-void rankdata(/* Real    */ ae_matrix* xy,
+void rankdata(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
      ae_state *_state)
@@ -4874,7 +4874,7 @@ void rankdata(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_rankdata(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_rankdata(RMatrix * xy,
     ae_int_t npoints,
     ae_int_t nfeatures,
     ae_state *_state)
@@ -4916,7 +4916,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.04.2013 by Bochkanov Sergey
 *************************************************************************/
-void rankdatacentered(/* Real    */ ae_matrix* xy,
+void rankdatacentered(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
      ae_state *_state)
@@ -4971,7 +4971,7 @@ void rankdatacentered(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_rankdatacentered(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_rankdatacentered(RMatrix * xy,
     ae_int_t npoints,
     ae_int_t nfeatures,
     ae_state *_state)
@@ -4986,8 +4986,8 @@ Obsolete function, we recommend to use PearsonCorr2().
   -- ALGLIB --
      Copyright 09.04.2007 by Bochkanov Sergey
 *************************************************************************/
-double pearsoncorrelation(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+double pearsoncorrelation(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -5005,8 +5005,8 @@ Obsolete function, we recommend to use SpearmanCorr2().
     -- ALGLIB --
     Copyright 09.04.2007 by Bochkanov Sergey
 *************************************************************************/
-double spearmanrankcorrelation(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+double spearmanrankcorrelation(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -5043,7 +5043,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.04.2013 by Bochkanov Sergey
 *************************************************************************/
-static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
+static void basestat_rankdatarec(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t nfeatures,
@@ -5108,7 +5108,7 @@ static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_basestat_rankdatarec(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_basestat_rankdatarec(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t nfeatures,
@@ -5147,7 +5147,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.04.2013 by Bochkanov Sergey
 *************************************************************************/
-static void basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
+static void basestat_rankdatabasecase(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t nfeatures,
@@ -5176,7 +5176,7 @@ static void basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_basestat_rankdatabasecase(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_basestat_rankdatabasecase(RMatrix * xy,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t nfeatures,
@@ -5928,7 +5928,7 @@ from table values.
   -- ALGLIB --
      Copyright 09.04.2007 by Bochkanov Sergey
 *************************************************************************/
-void jarqueberatest(/* Real    */ ae_vector* x,
+void jarqueberatest(RVector * x,
      ae_int_t n,
      double* p,
      ae_state *_state)
@@ -5955,7 +5955,7 @@ void jarqueberatest(/* Real    */ ae_vector* x,
 }
 
 
-static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
+static void jarquebera_jarqueberastatistic(RVector * x,
      ae_int_t n,
      double* s,
      ae_state *_state)
@@ -8196,9 +8196,9 @@ Output parameters:
   -- ALGLIB --
      Copyright 19.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void ftest(/* Real    */ ae_vector* x,
+void ftest(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
      double* bothtails,
      double* lefttail,
@@ -8311,7 +8311,7 @@ Output parameters:
   -- ALGLIB --
      Copyright 19.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void onesamplevariancetest(/* Real    */ ae_vector* x,
+void onesamplevariancetest(RVector * x,
      ae_int_t n,
      double variance,
      double* bothtails,
@@ -8428,7 +8428,7 @@ the significance level outlies this interval, the test returns 0.0001.
   -- ALGLIB --
      Copyright 08.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
+void wilcoxonsignedranktest(RVector * x,
      ae_int_t n,
      double e,
      double* bothtails,
@@ -14743,9 +14743,9 @@ NOTE: P-value approximation was  optimized  for  0.0001<=p<=0.2500.  Thus,
   -- ALGLIB --
      Copyright 09.04.2007 by Bochkanov Sergey
 *************************************************************************/
-void mannwhitneyutest(/* Real    */ ae_vector* x,
+void mannwhitneyutest(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
      double* bothtails,
      double* lefttail,
@@ -19220,7 +19220,7 @@ approximation is used, so significance levels have about 15 exact digits.
   -- ALGLIB --
      Copyright 08.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void onesamplesigntest(/* Real    */ ae_vector* x,
+void onesamplesigntest(RVector * x,
      ae_int_t n,
      double median,
      double* bothtails,
@@ -19326,7 +19326,7 @@ NOTE: this function correctly handles degenerate cases:
   -- ALGLIB --
      Copyright 08.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void studentttest1(/* Real    */ ae_vector* x,
+void studentttest1(RVector * x,
      ae_int_t n,
      double mean,
      double* bothtails,
@@ -19485,9 +19485,9 @@ NOTE: this function correctly handles degenerate cases:
   -- ALGLIB --
      Copyright 18.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void studentttest2(/* Real    */ ae_vector* x,
+void studentttest2(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
      double* bothtails,
      double* lefttail,
@@ -19655,9 +19655,9 @@ NOTE: this function correctly handles degenerate cases:
   -- ALGLIB --
      Copyright 18.09.2006 by Bochkanov Sergey
 *************************************************************************/
-void unequalvariancettest(/* Real    */ ae_vector* x,
+void unequalvariancettest(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
      double* bothtails,
      double* lefttail,

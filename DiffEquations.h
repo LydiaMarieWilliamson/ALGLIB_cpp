@@ -246,9 +246,9 @@ void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &x
 namespace alglib_impl
 {
 #if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
-void odesolverrkck(/* Real    */ ae_vector* y,
+void odesolverrkck(RVector * y,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t m,
      double eps,
      double h,
@@ -257,8 +257,8 @@ void odesolverrkck(/* Real    */ ae_vector* y,
 ae_bool odesolveriteration(odesolverstate* state, ae_state *_state);
 void odesolverresults(odesolverstate* state,
      ae_int_t* m,
-     /* Real    */ ae_vector* xtbl,
-     /* Real    */ ae_matrix* ytbl,
+     RVector * xtbl,
+     RMatrix * ytbl,
      odesolverreport* rep,
      ae_state *_state);
 void _odesolverstate_init(void* _p, ae_state *_state, ae_bool make_automatic);

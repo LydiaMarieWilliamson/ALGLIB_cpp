@@ -47,8 +47,8 @@ namespace alglib_impl
 #if !defined(ALGLIB_NO_FAST_KERNELS) && defined(_ALGLIB_HAS_AVX2_INTRINSICS)
 
 double rdotv_avx2(const ae_int_t n,
-    /* Real    */ const double* __restrict x,
-    /* Real    */ const double* __restrict y,
+    const Real* __restrict x,
+    const Real* __restrict y,
     const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -118,7 +118,7 @@ double rdotv_avx2(const ae_int_t n,
 }
 
 double rdotv2_avx2(const ae_int_t n,
-    /* Real    */ const double* __restrict x,
+    const Real* __restrict x,
     const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -188,8 +188,8 @@ double rdotv2_avx2(const ae_int_t n,
 }
 
 void rcopyv_avx2(ae_int_t n,
-     /* Real    */ const double* __restrict x,
-     /* Real    */ double* __restrict y,
+     const Real* __restrict x,
+     Real* __restrict y,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -217,8 +217,8 @@ void rcopyv_avx2(ae_int_t n,
 
 void rcopymulv_avx2(const ae_int_t n,
      const double v,
-     /* Real    */ const double* __restrict x,
-     /* Real    */ double* __restrict y,
+     const Real* __restrict x,
+     Real* __restrict y,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -308,7 +308,7 @@ void bcopyv_avx2(const ae_int_t n, const ae_bool* __restrict x,
 
 void rsetv_avx2(const ae_int_t n,
      const double v,
-     /* Real    */ double* __restrict x,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -451,8 +451,8 @@ void rmulvx_avx2(const ae_int_t n, const double v, double* __restrict x,
 
 void raddv_avx2(const ae_int_t n,
      const double alpha,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -541,8 +541,8 @@ void raddvx_avx2(const ae_int_t n, const double alpha, const double* __restrict 
 }
 
 void rmergemulv_avx2(ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -572,8 +572,8 @@ void rmergemulv_avx2(ae_int_t n,
 }
 
 void rmergemaxv_avx2(ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -604,8 +604,8 @@ void rmergemaxv_avx2(ae_int_t n,
 }
 
 void rmergeminv_avx2(ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -636,7 +636,7 @@ void rmergeminv_avx2(ae_int_t n,
     }
 }
 
-double rmaxv_avx2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state* __restrict _state)
+double rmaxv_avx2(ae_int_t n, const Real* __restrict x, ae_state* __restrict _state)
 {
     ae_int_t i;
     const ae_int_t avx2len = n>>2;
@@ -686,7 +686,7 @@ double rmaxv_avx2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state
     return dMax;
 }
 
-double rmaxabsv_avx2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state* __restrict _state)
+double rmaxabsv_avx2(ae_int_t n, const Real* __restrict x, ae_state* __restrict _state)
 {
     const __m256d signMask = _mm256_set1_pd(-0.); // -0. = 1 << 63
     const ae_int_t avx2len = n>>2;

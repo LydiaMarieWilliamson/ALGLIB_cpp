@@ -1179,7 +1179,7 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 29.05.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftc1d(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
+void fftc1d(CVector * a, ae_int_t n, ae_state *_state)
 {
     ae_frame _frame_block;
     fasttransformplan plan;
@@ -1258,7 +1258,7 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 29.05.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftc1dinv(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
+void fftc1dinv(CVector * a, ae_int_t n, ae_state *_state)
 {
     ae_int_t i;
 
@@ -1310,9 +1310,9 @@ other FFT-related subroutines.
   -- ALGLIB --
      Copyright 01.06.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftr1d(/* Real    */ ae_vector* a,
+void fftr1d(RVector * a,
      ae_int_t n,
-     /* Complex */ ae_vector* f,
+     CVector * f,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1447,9 +1447,9 @@ not used) because array size is used to automatically determine FFT length
   -- ALGLIB --
      Copyright 01.06.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftr1dinv(/* Complex */ ae_vector* f,
+void fftr1dinv(CVector * f,
      ae_int_t n,
-     /* Real    */ ae_vector* a,
+     RVector * a,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1529,9 +1529,9 @@ Internal subroutine. Never call it directly!
   -- ALGLIB --
      Copyright 01.06.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftr1dinternaleven(/* Real    */ ae_vector* a,
+void fftr1dinternaleven(RVector * a,
      ae_int_t n,
-     /* Real    */ ae_vector* buf,
+     RVector * buf,
      fasttransformplan* plan,
      ae_state *_state)
 {
@@ -1594,9 +1594,9 @@ Internal subroutine. Never call it directly!
   -- ALGLIB --
      Copyright 01.06.2009 by Bochkanov Sergey
 *************************************************************************/
-void fftr1dinvinternaleven(/* Real    */ ae_vector* a,
+void fftr1dinvinternaleven(RVector * a,
      ae_int_t n,
-     /* Real    */ ae_vector* buf,
+     RVector * buf,
      fasttransformplan* plan,
      ae_state *_state)
 {
@@ -1676,7 +1676,7 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 04.06.2009 by Bochkanov Sergey
 *************************************************************************/
-void fhtr1d(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
+void fhtr1d(RVector * a, ae_int_t n, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -1726,7 +1726,7 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 29.05.2009 by Bochkanov Sergey
 *************************************************************************/
-void fhtr1dinv(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
+void fhtr1dinv(RVector * a, ae_int_t n, ae_state *_state)
 {
     ae_int_t i;
 
@@ -1788,11 +1788,11 @@ subroutine - just shift its result correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convc1d(/* Complex */ ae_vector* a,
+void convc1d(CVector * a,
      ae_int_t m,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t n,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_state *_state)
 {
 
@@ -1839,11 +1839,11 @@ subroutine - just shift its result correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convc1dinv(/* Complex */ ae_vector* a,
+void convc1dinv(CVector * a,
      ae_int_t m,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t n,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1943,11 +1943,11 @@ correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convc1dcircular(/* Complex */ ae_vector* s,
+void convc1dcircular(CVector * s,
      ae_int_t m,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_int_t n,
-     /* Complex */ ae_vector* c,
+     CVector * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2017,11 +2017,11 @@ correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convc1dcircularinv(/* Complex */ ae_vector* a,
+void convc1dcircularinv(CVector * a,
      ae_int_t m,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t n,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2142,11 +2142,11 @@ subroutine - just shift its result correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convr1d(/* Real    */ ae_vector* a,
+void convr1d(RVector * a,
      ae_int_t m,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t n,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
 
@@ -2193,11 +2193,11 @@ subroutine - just shift its result correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convr1dinv(/* Real    */ ae_vector* a,
+void convr1dinv(RVector * a,
      ae_int_t m,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t n,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2281,11 +2281,11 @@ correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convr1dcircular(/* Real    */ ae_vector* s,
+void convr1dcircular(RVector * s,
      ae_int_t m,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2359,11 +2359,11 @@ correspondingly.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convr1dcircularinv(/* Real    */ ae_vector* a,
+void convr1dcircularinv(RVector * a,
      ae_int_t m,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t n,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2508,14 +2508,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convc1dx(/* Complex */ ae_vector* a,
+void convc1dx(CVector * a,
      ae_int_t m,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t n,
      ae_bool circular,
      ae_int_t alg,
      ae_int_t q,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2989,14 +2989,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void convr1dx(/* Real    */ ae_vector* a,
+void convr1dx(RVector * a,
      ae_int_t m,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t n,
      ae_bool circular,
      ae_int_t alg,
      ae_int_t q,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3449,11 +3449,11 @@ on [-K..M-1],  you can still use this subroutine, just shift result by K.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void corrc1d(/* Complex */ ae_vector* signal,
+void corrc1d(CVector * signal,
      ae_int_t n,
-     /* Complex */ ae_vector* pattern,
+     CVector * pattern,
      ae_int_t m,
-     /* Complex */ ae_vector* r,
+     CVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3512,11 +3512,11 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void corrc1dcircular(/* Complex */ ae_vector* signal,
+void corrc1dcircular(CVector * signal,
      ae_int_t m,
-     /* Complex */ ae_vector* pattern,
+     CVector * pattern,
      ae_int_t n,
-     /* Complex */ ae_vector* c,
+     CVector * c,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3615,11 +3615,11 @@ on [-K..M-1],  you can still use this subroutine, just shift result by K.
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void corrr1d(/* Real    */ ae_vector* signal,
+void corrr1d(RVector * signal,
      ae_int_t n,
-     /* Real    */ ae_vector* pattern,
+     RVector * pattern,
      ae_int_t m,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -3678,11 +3678,11 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 21.07.2009 by Bochkanov Sergey
 *************************************************************************/
-void corrr1dcircular(/* Real    */ ae_vector* signal,
+void corrr1dcircular(RVector * signal,
      ae_int_t m,
-     /* Real    */ ae_vector* pattern,
+     RVector * pattern,
      ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_frame _frame_block;

@@ -47,8 +47,8 @@ namespace alglib_impl
 #if !defined(ALGLIB_NO_FAST_KERNELS) && defined(_ALGLIB_HAS_SSE2_INTRINSICS)
 
 double rdotv_sse2(ae_int_t n,
-     /* Real    */ const double* x,
-     /* Real    */ const double* y,
+     const Real* x,
+     const Real* y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -158,7 +158,7 @@ double rdotv_sse2(ae_int_t n,
 }
 
 double rdotv2_sse2(ae_int_t n,
-     /* Real    */ const double* x,
+     const Real* x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -267,8 +267,8 @@ double rdotv2_sse2(ae_int_t n,
 }
 
 void rcopyv_sse2(const ae_int_t n,
-     /* Real    */ const double* __restrict x,
-     /* Real    */ double* __restrict y,
+     const Real* __restrict x,
+     Real* __restrict y,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -285,8 +285,8 @@ void rcopyv_sse2(const ae_int_t n,
 
 void rcopymulv_sse2(const ae_int_t n,
      const double v,
-     /* Real    */ const double* __restrict x,
-     /* Real    */ double* __restrict y,
+     const Real* __restrict x,
+     Real* __restrict y,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -360,7 +360,7 @@ void bcopyv_sse2(const ae_int_t n, const ae_bool* __restrict x,
 
 void rsetv_sse2(const ae_int_t n,
      const double v,
-     /* Real    */ double* __restrict x,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -379,7 +379,7 @@ void rsetv_sse2(const ae_int_t n,
 
 void rsetvx_sse2(const ae_int_t n,
      const double v,
-     /* Real    */ double* __restrict x,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     if( n<=4 )
@@ -468,8 +468,8 @@ void rmulvx_sse2(const ae_int_t n, const double v, double* __restrict x,
 
 void raddv_sse2(const ae_int_t n,
      const double alpha,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -525,8 +525,8 @@ void raddvx_sse2(const ae_int_t n, const double alpha,
 }
 
 void rmergemulv_sse2(const ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -545,8 +545,8 @@ void rmergemulv_sse2(const ae_int_t n,
 }
 
 void rmergemaxv_sse2(const ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -565,8 +565,8 @@ void rmergemaxv_sse2(const ae_int_t n,
 }
 
 void rmergeminv_sse2(const ae_int_t n,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -584,7 +584,7 @@ void rmergeminv_sse2(const ae_int_t n,
     }
 }
 
-double rmaxv_sse2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state* __restrict _state)
+double rmaxv_sse2(ae_int_t n, const Real* __restrict x, ae_state* __restrict _state)
 {
     ae_int_t i;
 
@@ -620,7 +620,7 @@ double rmaxv_sse2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state
     }
 }
 
-double rmaxabsv_sse2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state* __restrict _state)
+double rmaxabsv_sse2(ae_int_t n, const Real* __restrict x, ae_state* __restrict _state)
 {
     const __m128d signMask = _mm_set1_pd(-0.); // -0. = 1 << 63
     const ae_int_t sse2len = n>>1;

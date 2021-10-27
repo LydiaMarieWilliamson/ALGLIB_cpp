@@ -17302,42 +17302,42 @@ static void idw_errormetricsviacalc(idwbuilder* state,
 #if defined(AE_COMPILE_SPLINE1D) || !defined(AE_PARTIAL_BUILD)
 static double spline1d_lambdareg = 1.0e-9;
 static double spline1d_cholreg = 1.0e-12;
-static void spline1d_spline1dgriddiffcubicinternal(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline1d_spline1dgriddiffcubicinternal(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* d,
-     /* Real    */ ae_vector* a1,
-     /* Real    */ ae_vector* a2,
-     /* Real    */ ae_vector* a3,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* dt,
+     RVector * d,
+     RVector * a1,
+     RVector * a2,
+     RVector * a3,
+     RVector * b,
+     RVector * dt,
      ae_state *_state);
-static void spline1d_heapsortpoints(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline1d_heapsortpoints(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state);
-static void spline1d_heapsortppoints(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Integer */ ae_vector* p,
+static void spline1d_heapsortppoints(RVector * x,
+     RVector * y,
+     ZVector * p,
      ae_int_t n,
      ae_state *_state);
-static void spline1d_solvetridiagonal(/* Real    */ ae_vector* a,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* c,
-     /* Real    */ ae_vector* d,
+static void spline1d_solvetridiagonal(RVector * a,
+     RVector * b,
+     RVector * c,
+     RVector * d,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state);
-static void spline1d_solvecyclictridiagonal(/* Real    */ ae_vector* a,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* c,
-     /* Real    */ ae_vector* d,
+static void spline1d_solvecyclictridiagonal(RVector * a,
+     RVector * b,
+     RVector * c,
+     RVector * d,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state);
 static double spline1d_diffthreepoint(double t,
      double x0,
@@ -17365,34 +17365,34 @@ static double spline1d_rescaleval(double a0,
 
 #endif
 #if defined(AE_COMPILE_LSFIT) || !defined(AE_PARTIAL_BUILD)
-static void lsfit_rdpanalyzesection(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_rdpanalyzesection(RVector * x,
+     RVector * y,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t* worstidx,
      double* worsterror,
      ae_state *_state);
-static void lsfit_rdprecursive(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_rdprecursive(RVector * x,
+     RVector * y,
      ae_int_t i0,
      ae_int_t i1,
      double eps,
-     /* Real    */ ae_vector* xout,
-     /* Real    */ ae_vector* yout,
+     RVector * xout,
+     RVector * yout,
      ae_int_t* nout,
      ae_state *_state);
-static void lsfit_logisticfitinternal(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_logisticfitinternal(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_bool is4pl,
      double lambdav,
      minlmstate* state,
      minlmreport* replm,
-     /* Real    */ ae_vector* p1,
+     RVector * p1,
      double* flast,
      ae_state *_state);
-static void lsfit_logisticfit45errors(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_logisticfit45errors(RVector * x,
+     RVector * y,
      ae_int_t n,
      double a,
      double b,
@@ -17402,54 +17402,54 @@ static void lsfit_logisticfit45errors(/* Real    */ ae_vector* x,
      lsfitreport* rep,
      ae_state *_state);
 static void lsfit_spline1dfitinternal(ae_int_t st,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
      spline1dinterpolant* s,
      spline1dfitreport* rep,
      ae_state *_state);
-static void lsfit_lsfitlinearinternal(/* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_matrix* fmatrix,
+static void lsfit_lsfitlinearinternal(RVector * y,
+     RVector * w,
+     RMatrix * fmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state);
 static void lsfit_lsfitclearrequestfields(lsfitstate* state,
      ae_state *_state);
 static void lsfit_barycentriccalcbasis(barycentricinterpolant* b,
      double t,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state);
-static void lsfit_internalchebyshevfit(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+static void lsfit_internalchebyshevfit(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state);
-static void lsfit_barycentricfitwcfixedd(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+static void lsfit_barycentricfitwcfixedd(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t d,
@@ -17458,16 +17458,16 @@ static void lsfit_barycentricfitwcfixedd(/* Real    */ ae_vector* x,
      barycentricfitreport* rep,
      ae_state *_state);
 static void lsfit_clearreport(lsfitreport* rep, ae_state *_state);
-static void lsfit_estimateerrors(/* Real    */ ae_matrix* f1,
-     /* Real    */ ae_vector* f0,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* s,
+static void lsfit_estimateerrors(RMatrix * f1,
+     RVector * f0,
+     RVector * y,
+     RVector * w,
+     RVector * x,
+     RVector * s,
      ae_int_t n,
      ae_int_t k,
      lsfitreport* rep,
-     /* Real    */ ae_matrix* z,
+     RMatrix * z,
      ae_int_t zkind,
      ae_state *_state);
 
@@ -17478,17 +17478,17 @@ static void lsfit_estimateerrors(/* Real    */ ae_matrix* f1,
 
 #endif
 #if defined(AE_COMPILE_PARAMETRIC) || !defined(AE_PARTIAL_BUILD)
-static void parametric_pspline2par(/* Real    */ ae_matrix* xy,
+static void parametric_pspline2par(RMatrix * xy,
      ae_int_t n,
      ae_int_t pt,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_state *_state);
-static void parametric_pspline3par(/* Real    */ ae_matrix* xy,
+static void parametric_pspline3par(RMatrix * xy,
      ae_int_t n,
      ae_int_t pt,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_state *_state);
-static void parametric_rdpanalyzesectionpar(/* Real    */ ae_matrix* xy,
+static void parametric_rdpanalyzesectionpar(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t d,
@@ -17504,17 +17504,17 @@ static double rbfv1_rbffarradius = 6;
 static double rbfv1_rbfnearradius = 2.1;
 static double rbfv1_rbfmlradius = 3;
 static double rbfv1_minbasecasecost = 100000;
-static ae_bool rbfv1_rbfv1buildlinearmodel(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+static ae_bool rbfv1_rbfv1buildlinearmodel(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t ny,
      ae_int_t modeltype,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state);
-static void rbfv1_buildrbfmodellsqr(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
-     /* Real    */ ae_matrix* xc,
-     /* Real    */ ae_vector* r,
+static void rbfv1_buildrbfmodellsqr(RMatrix * x,
+     RMatrix * y,
+     RMatrix * xc,
+     RVector * r,
      ae_int_t n,
      ae_int_t nc,
      ae_int_t ny,
@@ -17525,16 +17525,16 @@ static void rbfv1_buildrbfmodellsqr(/* Real    */ ae_matrix* x,
      ae_int_t maxits,
      ae_int_t* gnnz,
      ae_int_t* snnz,
-     /* Real    */ ae_matrix* w,
+     RMatrix * w,
      ae_int_t* info,
      ae_int_t* iterationscount,
      ae_int_t* nmv,
      ae_state *_state);
-static void rbfv1_buildrbfmlayersmodellsqr(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
-     /* Real    */ ae_matrix* xc,
+static void rbfv1_buildrbfmlayersmodellsqr(RMatrix * x,
+     RMatrix * y,
+     RMatrix * xc,
      double rval,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_int_t n,
      ae_int_t* nc,
      ae_int_t ny,
@@ -17545,7 +17545,7 @@ static void rbfv1_buildrbfmlayersmodellsqr(/* Real    */ ae_matrix* x,
      ae_int_t maxits,
      double lambdav,
      ae_int_t* annz,
-     /* Real    */ ae_matrix* w,
+     RMatrix * w,
      ae_int_t* info,
      ae_int_t* iterationscount,
      ae_int_t* nmv,
@@ -17558,16 +17558,16 @@ static double spline2d_cholreg = 1.0E-12;
 static double spline2d_lambdaregblocklls = 1.0E-6;
 static double spline2d_lambdaregfastddm = 1.0E-4;
 static double spline2d_lambdadecay = 0.5;
-static void spline2d_bicubiccalcderivatives(/* Real    */ ae_matrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline2d_bicubiccalcderivatives(RMatrix * a,
+     RVector * x,
+     RVector * y,
      ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* dx,
-     /* Real    */ ae_matrix* dy,
-     /* Real    */ ae_matrix* dxy,
+     RMatrix * dx,
+     RMatrix * dy,
+     RMatrix * dxy,
      ae_state *_state);
-static void spline2d_generatedesignmatrix(/* Real    */ ae_vector* xy,
+static void spline2d_generatedesignmatrix(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t kx,
@@ -17579,18 +17579,18 @@ static void spline2d_generatedesignmatrix(/* Real    */ ae_vector* xy,
      sparsematrix* ah,
      ae_int_t* arows,
      ae_state *_state);
-static void spline2d_updatesplinetable(/* Real    */ ae_vector* z,
+static void spline2d_updatesplinetable(RVector * z,
      ae_int_t kx,
      ae_int_t ky,
      ae_int_t d,
      spline1dinterpolant* basis1,
      ae_int_t bfrad,
-     /* Real    */ ae_vector* ftbl,
+     RVector * ftbl,
      ae_int_t m,
      ae_int_t n,
      ae_int_t scalexy,
      ae_state *_state);
-static void spline2d_fastddmfit(/* Real    */ ae_vector* xy,
+static void spline2d_fastddmfit(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t kx,
@@ -17607,10 +17607,10 @@ static void spline2d_fastddmfit(/* Real    */ ae_vector* xy,
      spline2dfitreport* rep,
      double tss,
      ae_state *_state);
-static void spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
+static void spline2d_fastddmfitlayer(RVector * xy,
      ae_int_t d,
      ae_int_t scalexy,
-     /* Integer */ ae_vector* xyindex,
+     ZVector * xyindex,
      ae_int_t basecasex,
      ae_int_t tilex0,
      ae_int_t tilex1,
@@ -17627,10 +17627,10 @@ static void spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
      ae_shared_pool* pool,
      spline2dinterpolant* spline,
      ae_state *_state);
-ae_bool _trypexec_spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_fastddmfitlayer(RVector * xy,
     ae_int_t d,
     ae_int_t scalexy,
-    /* Integer */ ae_vector* xyindex,
+    ZVector * xyindex,
     ae_int_t basecasex,
     ae_int_t tilex0,
     ae_int_t tilex1,
@@ -17648,7 +17648,7 @@ ae_bool _trypexec_spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
     spline2dinterpolant* spline, ae_state *_state);
 static void spline2d_blockllsfit(spline2dxdesignmatrix* xdesign,
      ae_int_t lsqrcnt,
-     /* Real    */ ae_vector* z,
+     RVector * z,
      spline2dfitreport* rep,
      double tss,
      spline2dblockllsbuf* buf,
@@ -17656,13 +17656,13 @@ static void spline2d_blockllsfit(spline2dxdesignmatrix* xdesign,
 static void spline2d_naivellsfit(sparsematrix* av,
      sparsematrix* ah,
      ae_int_t arows,
-     /* Real    */ ae_vector* xy,
+     RVector * xy,
      ae_int_t kx,
      ae_int_t ky,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t lsqrcnt,
-     /* Real    */ ae_vector* z,
+     RVector * z,
      spline2dfitreport* rep,
      double tss,
      ae_state *_state);
@@ -17675,17 +17675,17 @@ static ae_int_t spline2d_getcelloffset(ae_int_t kx,
 static void spline2d_copycellto(ae_int_t kx,
      ae_int_t ky,
      ae_int_t blockbandwidth,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      ae_int_t i,
      ae_int_t j,
-     /* Real    */ ae_matrix* dst,
+     RMatrix * dst,
      ae_int_t dst0,
      ae_int_t dst1,
      ae_state *_state);
 static void spline2d_flushtozerocell(ae_int_t kx,
      ae_int_t ky,
      ae_int_t blockbandwidth,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      ae_int_t i,
      ae_int_t j,
      double eps,
@@ -17695,7 +17695,7 @@ static void spline2d_blockllsgenerateata(sparsematrix* ah,
      ae_int_t ky1,
      ae_int_t kx,
      ae_int_t ky,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      sreal* mxata,
      ae_state *_state);
 ae_bool _trypexec_spline2d_blockllsgenerateata(sparsematrix* ah,
@@ -17703,36 +17703,36 @@ ae_bool _trypexec_spline2d_blockllsgenerateata(sparsematrix* ah,
     ae_int_t ky1,
     ae_int_t kx,
     ae_int_t ky,
-    /* Real    */ ae_matrix* blockata,
+    RMatrix * blockata,
     sreal* mxata, ae_state *_state);
-static ae_bool spline2d_blockllscholesky(/* Real    */ ae_matrix* blockata,
+static ae_bool spline2d_blockllscholesky(RMatrix * blockata,
      ae_int_t kx,
      ae_int_t ky,
-     /* Real    */ ae_matrix* trsmbuf2,
-     /* Real    */ ae_matrix* cholbuf2,
-     /* Real    */ ae_vector* cholbuf1,
+     RMatrix * trsmbuf2,
+     RMatrix * cholbuf2,
+     RVector * cholbuf1,
      ae_state *_state);
-static void spline2d_blockllstrsv(/* Real    */ ae_matrix* blockata,
+static void spline2d_blockllstrsv(RMatrix * blockata,
      ae_int_t kx,
      ae_int_t ky,
      ae_bool transu,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state);
-static void spline2d_computeresidualsfromscratch(/* Real    */ ae_vector* xy,
-     /* Real    */ ae_vector* yraw,
+static void spline2d_computeresidualsfromscratch(RVector * xy,
+     RVector * yraw,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t scalexy,
      spline2dinterpolant* spline,
      ae_state *_state);
-ae_bool _trypexec_spline2d_computeresidualsfromscratch(/* Real    */ ae_vector* xy,
-    /* Real    */ ae_vector* yraw,
+ae_bool _trypexec_spline2d_computeresidualsfromscratch(RVector * xy,
+    RVector * yraw,
     ae_int_t npoints,
     ae_int_t d,
     ae_int_t scalexy,
     spline2dinterpolant* spline, ae_state *_state);
-static void spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
-     /* Real    */ ae_vector* yraw,
+static void spline2d_computeresidualsfromscratchrec(RVector * xy,
+     RVector * yraw,
      ae_int_t pt0,
      ae_int_t pt1,
      ae_int_t chunksize,
@@ -17741,8 +17741,8 @@ static void spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
      spline2dinterpolant* spline,
      ae_shared_pool* pool,
      ae_state *_state);
-ae_bool _trypexec_spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
-    /* Real    */ ae_vector* yraw,
+ae_bool _trypexec_spline2d_computeresidualsfromscratchrec(RVector * xy,
+    RVector * yraw,
     ae_int_t pt0,
     ae_int_t pt1,
     ae_int_t chunksize,
@@ -17750,80 +17750,80 @@ ae_bool _trypexec_spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vecto
     ae_int_t scalexy,
     spline2dinterpolant* spline,
     ae_shared_pool* pool, ae_state *_state);
-static void spline2d_reorderdatasetandbuildindex(/* Real    */ ae_vector* xy,
+static void spline2d_reorderdatasetandbuildindex(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
      ae_int_t kx,
      ae_int_t ky,
-     /* Integer */ ae_vector* xyindex,
-     /* Integer */ ae_vector* bufi,
+     ZVector * xyindex,
+     ZVector * bufi,
      ae_state *_state);
-static void spline2d_rescaledatasetandrefineindex(/* Real    */ ae_vector* xy,
+static void spline2d_rescaledatasetandrefineindex(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
      ae_int_t kx,
      ae_int_t ky,
-     /* Integer */ ae_vector* xyindex,
-     /* Integer */ ae_vector* bufi,
+     ZVector * xyindex,
+     ZVector * bufi,
      ae_state *_state);
-static void spline2d_expandindexrows(/* Real    */ ae_vector* xy,
+static void spline2d_expandindexrows(RVector * xy,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
-     /* Integer */ ae_vector* cidx,
+     ZVector * cidx,
      ae_int_t pt0,
      ae_int_t pt1,
-     /* Integer */ ae_vector* xyindexprev,
+     ZVector * xyindexprev,
      ae_int_t row0,
      ae_int_t row1,
-     /* Integer */ ae_vector* xyindexnew,
+     ZVector * xyindexnew,
      ae_int_t kxnew,
      ae_int_t kynew,
      ae_bool rootcall,
      ae_state *_state);
-ae_bool _trypexec_spline2d_expandindexrows(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_expandindexrows(RVector * xy,
     ae_int_t d,
-    /* Real    */ ae_vector* shadow,
+    RVector * shadow,
     ae_int_t ns,
-    /* Integer */ ae_vector* cidx,
+    ZVector * cidx,
     ae_int_t pt0,
     ae_int_t pt1,
-    /* Integer */ ae_vector* xyindexprev,
+    ZVector * xyindexprev,
     ae_int_t row0,
     ae_int_t row1,
-    /* Integer */ ae_vector* xyindexnew,
+    ZVector * xyindexnew,
     ae_int_t kxnew,
     ae_int_t kynew,
     ae_bool rootcall, ae_state *_state);
-static void spline2d_reorderdatasetandbuildindexrec(/* Real    */ ae_vector* xy,
+static void spline2d_reorderdatasetandbuildindexrec(RVector * xy,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
-     /* Integer */ ae_vector* cidx,
+     ZVector * cidx,
      ae_int_t pt0,
      ae_int_t pt1,
-     /* Integer */ ae_vector* xyindex,
+     ZVector * xyindex,
      ae_int_t idx0,
      ae_int_t idx1,
      ae_bool rootcall,
      ae_state *_state);
-ae_bool _trypexec_spline2d_reorderdatasetandbuildindexrec(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_reorderdatasetandbuildindexrec(RVector * xy,
     ae_int_t d,
-    /* Real    */ ae_vector* shadow,
+    RVector * shadow,
     ae_int_t ns,
-    /* Integer */ ae_vector* cidx,
+    ZVector * cidx,
     ae_int_t pt0,
     ae_int_t pt1,
-    /* Integer */ ae_vector* xyindex,
+    ZVector * xyindex,
     ae_int_t idx0,
     ae_int_t idx1,
     ae_bool rootcall, ae_state *_state);
-static void spline2d_xdesigngenerate(/* Real    */ ae_vector* xy,
-     /* Integer */ ae_vector* xyindex,
+static void spline2d_xdesigngenerate(RVector * xy,
+     ZVector * xyindex,
      ae_int_t kx0,
      ae_int_t kx1,
      ae_int_t kxtotal,
@@ -17837,15 +17837,15 @@ static void spline2d_xdesigngenerate(/* Real    */ ae_vector* xy,
      spline2dxdesignmatrix* a,
      ae_state *_state);
 static void spline2d_xdesignmv(spline2dxdesignmatrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state);
 static void spline2d_xdesignmtv(spline2dxdesignmatrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state);
 static void spline2d_xdesignblockata(spline2dxdesignmatrix* a,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      double* mxata,
      ae_state *_state);
 
@@ -17858,13 +17858,13 @@ static ae_int_t rbfv2_defaultmaxits = 400;
 static ae_int_t rbfv2_defaultbf = 1;
 static ae_int_t rbfv2_maxnodesize = 6;
 static double rbfv2_complexitymultiplier = 100.0;
-static ae_bool rbfv2_rbfv2buildlinearmodel(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+static ae_bool rbfv2_rbfv2buildlinearmodel(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t modeltype,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state);
 static void rbfv2_allocatecalcbuffer(rbfv2model* s,
      rbfv2calcbuffer* buf,
@@ -17873,9 +17873,9 @@ static void rbfv2_convertandappendtree(kdtree* curtree,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
-     /* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+     ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_state *_state);
 static void rbfv2_converttreerec(kdtree* curtree,
      ae_int_t n,
@@ -17885,21 +17885,21 @@ static void rbfv2_converttreerec(kdtree* curtree,
      ae_int_t nodesbase,
      ae_int_t splitsbase,
      ae_int_t cwbase,
-     /* Integer */ ae_vector* localnodes,
+     ZVector * localnodes,
      ae_int_t* localnodessize,
-     /* Real    */ ae_vector* localsplits,
+     RVector * localsplits,
      ae_int_t* localsplitssize,
-     /* Real    */ ae_vector* localcw,
+     RVector * localcw,
      ae_int_t* localcwsize,
-     /* Real    */ ae_matrix* xybuf,
+     RMatrix * xybuf,
      ae_state *_state);
 static void rbfv2_partialcalcrec(rbfv2model* s,
      rbfv2calcbuffer* buf,
      ae_int_t rootidx,
      double invr2,
      double queryr2,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state);
 static void rbfv2_partialrowcalcrec(rbfv2model* s,
      rbfv2calcbuffer* buf,
@@ -17907,76 +17907,76 @@ static void rbfv2_partialrowcalcrec(rbfv2model* s,
      double invr2,
      double rquery2,
      double rfar2,
-     /* Real    */ ae_vector* cx,
-     /* Real    */ ae_vector* rx,
-     /* Boolean */ ae_vector* rf,
+     RVector * cx,
+     RVector * rx,
+     BVector * rf,
      ae_int_t rowsize,
-     /* Real    */ ae_vector* ry,
+     RVector * ry,
      ae_state *_state);
-static void rbfv2_preparepartialquery(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
+static void rbfv2_preparepartialquery(RVector * x,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
      ae_int_t nx,
      rbfv2calcbuffer* buf,
      ae_int_t* cnt,
      ae_state *_state);
-static void rbfv2_partialqueryrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+static void rbfv2_partialqueryrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_int_t nx,
      ae_int_t ny,
      rbfv2calcbuffer* buf,
      ae_int_t rootidx,
      double queryr2,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* r2,
-     /* Integer */ ae_vector* offs,
+     RVector * x,
+     RVector * r2,
+     ZVector * offs,
      ae_int_t* k,
      ae_state *_state);
-static ae_int_t rbfv2_partialcountrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+static ae_int_t rbfv2_partialcountrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_int_t nx,
      ae_int_t ny,
      rbfv2calcbuffer* buf,
      ae_int_t rootidx,
      double queryr2,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state);
-static void rbfv2_partialunpackrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* s,
+static void rbfv2_partialunpackrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * s,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t rootidx,
      double r,
-     /* Real    */ ae_matrix* xwr,
+     RMatrix * xwr,
      ae_int_t* k,
      ae_state *_state);
-static ae_int_t rbfv2_designmatrixrowsize(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* ri,
-     /* Integer */ ae_vector* kdroots,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
+static ae_int_t rbfv2_designmatrixrowsize(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * ri,
+     ZVector * kdroots,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t nh,
      ae_int_t level,
      double rcoeff,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      rbfv2calcbuffer* calcbuf,
      ae_state *_state);
-static void rbfv2_designmatrixgeneraterow(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* ri,
-     /* Integer */ ae_vector* kdroots,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
-     /* Integer */ ae_vector* cwrange,
+static void rbfv2_designmatrixgeneraterow(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * ri,
+     ZVector * kdroots,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
+     ZVector * cwrange,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t nh,
@@ -17985,12 +17985,12 @@ static void rbfv2_designmatrixgeneraterow(/* Integer */ ae_vector* kdnodes,
      double rcoeff,
      ae_int_t rowsperpoint,
      double penalty,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      rbfv2calcbuffer* calcbuf,
-     /* Real    */ ae_vector* tmpr2,
-     /* Integer */ ae_vector* tmpoffs,
-     /* Integer */ ae_vector* rowidx,
-     /* Real    */ ae_vector* rowval,
+     RVector * tmpr2,
+     ZVector * tmpoffs,
+     ZVector * rowidx,
+     RVector * rowval,
      ae_int_t* rowsize,
      ae_state *_state);
 static void rbfv2_zerofill(rbfv2model* s,
@@ -18549,9 +18549,9 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void barycentricunpack(barycentricinterpolant* b,
      ae_int_t* n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * y,
+     RVector * w,
      ae_state *_state)
 {
     double v;
@@ -18589,9 +18589,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void barycentricbuildxyw(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void barycentricbuildxyw(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
      barycentricinterpolant* b,
      ae_state *_state)
@@ -18646,8 +18646,8 @@ Note:
   -- ALGLIB PROJECT --
      Copyright 17.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void barycentricbuildfloaterhormann(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void barycentricbuildfloaterhormann(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t d,
      barycentricinterpolant* b,
@@ -19098,7 +19098,7 @@ INPUT PARAMETERS:
      Copyright 22.10.2018 by Bochkanov Sergey
 *************************************************************************/
 void idwbuildersetpoints(idwbuilder* state,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t n,
      ae_state *_state)
 {
@@ -19501,8 +19501,8 @@ OUTPUT PARAMETERS:
      Copyright 22.10.2018 by Bochkanov Sergey
 *************************************************************************/
 void idwcalc(idwmodel* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -19537,8 +19537,8 @@ OUTPUT PARAMETERS:
      Copyright 22.10.2018 by Bochkanov Sergey
 *************************************************************************/
 void idwcalcbuf(idwmodel* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -19573,8 +19573,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void idwtscalcbuf(idwmodel* s,
      idwcalcbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -20731,20 +20731,20 @@ Transformations performed:
   -- ALGLIB PROJECT --
      Copyright 08.09.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitscalexy(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void lsfitscalexy(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      double* xa,
      double* xb,
      double* sa,
      double* sb,
-     /* Real    */ ae_vector* xoriginal,
-     /* Real    */ ae_vector* yoriginal,
+     RVector * xoriginal,
+     RVector * yoriginal,
      ae_state *_state)
 {
     double xmin;
@@ -20858,13 +20858,13 @@ void lsfitscalexy(/* Real    */ ae_vector* x,
 }
 
 
-void buildpriorterm(/* Real    */ ae_matrix* xy,
+void buildpriorterm(RMatrix * xy,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t modeltype,
      double priorval,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -21078,13 +21078,13 @@ void buildpriorterm(/* Real    */ ae_matrix* xy,
 }
 
 
-void buildpriorterm1(/* Real    */ ae_vector* xy1,
+void buildpriorterm1(RVector * xy1,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t modeltype,
      double priorval,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -21331,7 +21331,7 @@ NOTES:
 void polynomialbar2cheb(barycentricinterpolant* p,
      double a,
      double b,
-     /* Real    */ ae_vector* t,
+     RVector * t,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -21444,7 +21444,7 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 30.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void polynomialcheb2bar(/* Real    */ ae_vector* t,
+void polynomialcheb2bar(RVector * t,
      ae_int_t n,
      double a,
      double b,
@@ -21548,7 +21548,7 @@ NOTES:
 void polynomialbar2pow(barycentricinterpolant* p,
      double c,
      double s,
-     /* Real    */ ae_vector* a,
+     RVector * a,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -21843,7 +21843,7 @@ NOTES:
   -- ALGLIB --
      Copyright 30.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void polynomialpow2bar(/* Real    */ ae_vector* a,
+void polynomialpow2bar(RVector * a,
      ae_int_t n,
      double c,
      double s,
@@ -21916,8 +21916,8 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 02.12.2009 by Bochkanov Sergey
 *************************************************************************/
-void polynomialbuild(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void polynomialbuild(RVector * x,
+     RVector * y,
      ae_int_t n,
      barycentricinterpolant* p,
      ae_state *_state)
@@ -22025,7 +22025,7 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void polynomialbuildeqdist(double a,
      double b,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t n,
      barycentricinterpolant* p,
      ae_state *_state)
@@ -22105,7 +22105,7 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void polynomialbuildcheb1(double a,
      double b,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t n,
      barycentricinterpolant* p,
      ae_state *_state)
@@ -22185,7 +22185,7 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void polynomialbuildcheb2(double a,
      double b,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t n,
      barycentricinterpolant* p,
      ae_state *_state)
@@ -22274,7 +22274,7 @@ IMPORTANT
 *************************************************************************/
 double polynomialcalceqdist(double a,
      double b,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t n,
      double t,
      ae_state *_state)
@@ -22406,7 +22406,7 @@ IMPORTANT
 *************************************************************************/
 double polynomialcalccheb1(double a,
      double b,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t n,
      double t,
      ae_state *_state)
@@ -22603,7 +22603,7 @@ IMPORTANT
 *************************************************************************/
 double polynomialcalccheb2(double a,
      double b,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t n,
      double t,
      ae_state *_state)
@@ -22806,8 +22806,8 @@ Subroutine automatically sorts points, so caller may pass unsorted array.
   -- ALGLIB PROJECT --
      Copyright 24.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildlinear(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dbuildlinear(RVector * x,
+     RVector * y,
      ae_int_t n,
      spline1dinterpolant* c,
      ae_state *_state)
@@ -22917,8 +22917,8 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 23.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildcubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dbuildcubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
@@ -23076,14 +23076,14 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dgriddiffcubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dgriddiffcubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* d,
+     RVector * d,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23240,15 +23240,15 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dgriddiff2cubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dgriddiff2cubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* d1,
-     /* Real    */ ae_vector* d2,
+     RVector * d1,
+     RVector * d2,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23448,16 +23448,16 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dconvcubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dconvcubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* y2,
+     RVector * y2,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23657,17 +23657,17 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dconvdiffcubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dconvdiffcubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* y2,
-     /* Real    */ ae_vector* d2,
+     RVector * y2,
+     RVector * d2,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23872,18 +23872,18 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dconvdiff2cubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dconvdiff2cubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* y2,
-     /* Real    */ ae_vector* d2,
-     /* Real    */ ae_vector* dd2,
+     RVector * y2,
+     RVector * d2,
+     RVector * dd2,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -24062,8 +24062,8 @@ i.e. to make Y[first_point]=Y[last_point].
   -- ALGLIB PROJECT --
      Copyright 23.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildcatmullrom(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dbuildcatmullrom(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundtype,
      double tension,
@@ -24199,9 +24199,9 @@ Subroutine automatically sorts points, so caller may pass unsorted array.
   -- ALGLIB PROJECT --
      Copyright 23.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildhermite(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* d,
+void spline1dbuildhermite(RVector * x,
+     RVector * y,
+     RVector * d,
      ae_int_t n,
      spline1dinterpolant* c,
      ae_state *_state)
@@ -24293,8 +24293,8 @@ Subroutine automatically sorts points, so caller may pass unsorted array.
   -- ALGLIB PROJECT --
      Copyright 24.06.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildakima(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dbuildakima(RVector * x,
+     RVector * y,
      ae_int_t n,
      spline1dinterpolant* c,
      ae_state *_state)
@@ -24600,7 +24600,7 @@ NOTE:
 *************************************************************************/
 void spline1dunpack(spline1dinterpolant* c,
      ae_int_t* n,
-     /* Real    */ ae_matrix* tbl,
+     RMatrix * tbl,
      ae_state *_state)
 {
     ae_int_t i;
@@ -24925,8 +24925,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB PROJECT --
      Copyright 27.08.2019 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfit(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dfit(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      double lambdans,
@@ -25381,17 +25381,17 @@ OUTPUT ARRAYS:
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dconvdiffinternal(/* Real    */ ae_vector* xold,
-     /* Real    */ ae_vector* yold,
-     /* Real    */ ae_vector* dold,
+void spline1dconvdiffinternal(RVector * xold,
+     RVector * yold,
+     RVector * dold,
      ae_int_t n,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_bool needy,
-     /* Real    */ ae_vector* d1,
+     RVector * d1,
      ae_bool needd1,
-     /* Real    */ ae_vector* d2,
+     RVector * d2,
      ae_bool needd2,
      ae_state *_state)
 {
@@ -25558,11 +25558,11 @@ NOTES:
      Copyright 26.09.2011 by Bochkanov Sergey
 *************************************************************************/
 void spline1drootsandextrema(spline1dinterpolant* c,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_int_t* nr,
      ae_bool* dr,
-     /* Real    */ ae_vector* e,
-     /* Integer */ ae_vector* et,
+     RVector * e,
+     ZVector * et,
      ae_int_t* ne,
      ae_bool* de,
      ae_state *_state)
@@ -26167,9 +26167,9 @@ void spline1drootsandextrema(spline1dinterpolant* c,
 /*************************************************************************
 Internal subroutine. Heap sort.
 *************************************************************************/
-void heapsortdpoints(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* d,
+void heapsortdpoints(RVector * x,
+     RVector * y,
+     RVector * d,
      ae_int_t n,
      ae_state *_state)
 {
@@ -26554,7 +26554,7 @@ void solvecubicpolinom(double pa,
      double* ex1,
      ae_int_t* nr,
      ae_int_t* ne,
-     /* Real    */ ae_vector* tempdata,
+     RVector * tempdata,
      ae_state *_state)
 {
     ae_int_t i;
@@ -27017,8 +27017,8 @@ OUTPUT PARAMETERS:
  -- ALGLIB PROJECT --
      Copyright 21.06.2012 by Bochkanov Sergey
 *************************************************************************/
-void spline1dbuildmonotone(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dbuildmonotone(RVector * x,
+     RVector * y,
      ae_int_t n,
      spline1dinterpolant* c,
      ae_state *_state)
@@ -27195,19 +27195,19 @@ be equal to the first one (if periodic boundary conditions are specified).
   -- ALGLIB PROJECT --
      Copyright 03.09.2010 by Bochkanov Sergey
 *************************************************************************/
-static void spline1d_spline1dgriddiffcubicinternal(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline1d_spline1dgriddiffcubicinternal(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t boundltype,
      double boundl,
      ae_int_t boundrtype,
      double boundr,
-     /* Real    */ ae_vector* d,
-     /* Real    */ ae_vector* a1,
-     /* Real    */ ae_vector* a2,
-     /* Real    */ ae_vector* a3,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* dt,
+     RVector * d,
+     RVector * a1,
+     RVector * a2,
+     RVector * a3,
+     RVector * b,
+     RVector * dt,
      ae_state *_state)
 {
     ae_int_t i;
@@ -27376,8 +27376,8 @@ static void spline1d_spline1dgriddiffcubicinternal(/* Real    */ ae_vector* x,
 /*************************************************************************
 Internal subroutine. Heap sort.
 *************************************************************************/
-static void spline1d_heapsortpoints(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline1d_heapsortpoints(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_state *_state)
 {
@@ -27408,9 +27408,9 @@ Returns:
     P       -   array of permutations; I-th position of output
                 arrays X/Y contains (X[P[I]],Y[P[I]])
 *************************************************************************/
-static void spline1d_heapsortppoints(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Integer */ ae_vector* p,
+static void spline1d_heapsortppoints(RVector * x,
+     RVector * y,
+     ZVector * p,
      ae_int_t n,
      ae_state *_state)
 {
@@ -27456,12 +27456,12 @@ Internal subroutine. Tridiagonal solver. Solves
 (                  A[N-1] B[N-1] )
 
 *************************************************************************/
-static void spline1d_solvetridiagonal(/* Real    */ ae_vector* a,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* c,
-     /* Real    */ ae_vector* d,
+static void spline1d_solvetridiagonal(RVector * a,
+     RVector * b,
+     RVector * c,
+     RVector * d,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -27508,12 +27508,12 @@ Internal subroutine. Cyclic tridiagonal solver. Solves
 (           A[N-2] B[N-2] C[N-2] )
 ( C[N-1]           A[N-1] B[N-1] )
 *************************************************************************/
-static void spline1d_solvecyclictridiagonal(/* Real    */ ae_vector* a,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* c,
-     /* Real    */ ae_vector* d,
+static void spline1d_solvecyclictridiagonal(RVector * a,
+     RVector * b,
+     RVector * c,
+     RVector * d,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -27818,12 +27818,12 @@ NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
   -- ALGLIB --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-void lstfitpiecewiselinearrdpfixed(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void lstfitpiecewiselinearrdpfixed(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
-     /* Real    */ ae_vector* x2,
-     /* Real    */ ae_vector* y2,
+     RVector * x2,
+     RVector * y2,
      ae_int_t* nsections,
      ae_state *_state)
 {
@@ -28052,12 +28052,12 @@ NOTE: X2/Y2 are ordered arrays, i.e. (X2[0],Y2[0]) is  a  first  point  of
   -- ALGLIB --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-void lstfitpiecewiselinearrdp(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void lstfitpiecewiselinearrdp(RVector * x,
+     RVector * y,
      ae_int_t n,
      double eps,
-     /* Real    */ ae_vector* x2,
-     /* Real    */ ae_vector* y2,
+     RVector * x2,
+     RVector * y2,
      ae_int_t* nsections,
      ae_state *_state)
 {
@@ -28234,8 +28234,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB PROJECT --
      Copyright 10.12.2009 by Bochkanov Sergey
 *************************************************************************/
-void polynomialfit(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void polynomialfit(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
@@ -28382,13 +28382,13 @@ above is not guaranteed and may result in inconsistency.
   -- ALGLIB PROJECT --
      Copyright 10.12.2009 by Bochkanov Sergey
 *************************************************************************/
-void polynomialfitwc(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void polynomialfitwc(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
@@ -28825,8 +28825,8 @@ NOTE: step is automatically scaled according to scale of parameters  being
   -- ALGLIB PROJECT --
      Copyright 14.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void logisticfit4(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void logisticfit4(RVector * x,
+     RVector * y,
      ae_int_t n,
      double* a,
      double* b,
@@ -28962,8 +28962,8 @@ D. That's because 4PL model is normalized in such way that B>=0.
   -- ALGLIB PROJECT --
      Copyright 14.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void logisticfit4ec(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void logisticfit4ec(RVector * x,
+     RVector * y,
      ae_int_t n,
      double cnstrleft,
      double cnstrright,
@@ -29078,8 +29078,8 @@ NOTE: step is automatically scaled according to scale of parameters  being
   -- ALGLIB PROJECT --
      Copyright 14.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void logisticfit5(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void logisticfit5(RVector * x,
+     RVector * y,
      ae_int_t n,
      double* a,
      double* b,
@@ -29226,8 +29226,8 @@ question highlighted above is important when you interpret fitting results.
   -- ALGLIB PROJECT --
      Copyright 14.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void logisticfit5ec(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void logisticfit5ec(RVector * x,
+     RVector * y,
      ae_int_t n,
      double cnstrleft,
      double cnstrright,
@@ -29369,8 +29369,8 @@ question highlighted above is important when you interpret fitting results.
   -- ALGLIB PROJECT --
      Copyright 14.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void logisticfit45x(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void logisticfit45x(RVector * x,
+     RVector * y,
      ae_int_t n,
      double cnstrleft,
      double cnstrright,
@@ -30008,13 +30008,13 @@ above is not guaranteed and may result in inconsistency.
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void barycentricfitfloaterhormannwc(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void barycentricfitfloaterhormannwc(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
@@ -30170,8 +30170,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void barycentricfitfloaterhormann(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void barycentricfitfloaterhormann(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
@@ -30337,13 +30337,13 @@ above is not guaranteed and may result in inconsistency.
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfitcubicwc(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void spline1dfitcubicwc(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
@@ -30508,13 +30508,13 @@ above is not guaranteed and may result in inconsistency.
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfithermitewc(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void spline1dfithermitewc(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
@@ -30586,8 +30586,8 @@ about subroutine parameters (we don't duplicate it here because of length)
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfitcubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dfitcubic(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
@@ -30666,8 +30666,8 @@ because of length).
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfithermite(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dfithermite(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
@@ -30816,13 +30816,13 @@ NOTE:       covariance matrix is estimated using  correction  for  degrees
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitlinearw(/* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_matrix* fmatrix,
+void lsfitlinearw(RVector * y,
+     RVector * w,
+     RMatrix * fmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -30964,15 +30964,15 @@ NOTE:       covariance matrix is estimated using  correction  for  degrees
   -- ALGLIB --
      Copyright 07.09.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitlinearwc(/* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_matrix* fmatrix,
-     /* Real    */ ae_matrix* cmatrix,
+void lsfitlinearwc(RVector * y,
+     RVector * w,
+     RMatrix * fmatrix,
+     RMatrix * cmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -31215,12 +31215,12 @@ NOTE:       covariance matrix is estimated using  correction  for  degrees
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitlinear(/* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* fmatrix,
+void lsfitlinear(RVector * y,
+     RMatrix * fmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -31368,14 +31368,14 @@ NOTE:       covariance matrix is estimated using  correction  for  degrees
   -- ALGLIB --
      Copyright 07.09.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitlinearc(/* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* fmatrix,
-     /* Real    */ ae_matrix* cmatrix,
+void lsfitlinearc(RVector * y,
+     RMatrix * fmatrix,
+     RMatrix * cmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -31453,10 +31453,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.10.2008 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatewf(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* c,
+void lsfitcreatewf(RMatrix * x,
+     RVector * y,
+     RVector * w,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -31566,9 +31566,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.10.2008 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatef(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* c,
+void lsfitcreatef(RMatrix * x,
+     RVector * y,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -31684,10 +31684,10 @@ See also:
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatewfg(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* c,
+void lsfitcreatewfg(RMatrix * x,
+     RVector * y,
+     RVector * w,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -31804,9 +31804,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatefg(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* c,
+void lsfitcreatefg(RMatrix * x,
+     RVector * y,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -31914,10 +31914,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatewfgh(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* c,
+void lsfitcreatewfgh(RMatrix * x,
+     RVector * y,
+     RVector * w,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -32020,9 +32020,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 17.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void lsfitcreatefgh(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* c,
+void lsfitcreatefgh(RMatrix * x,
+     RVector * y,
+     RVector * c,
      ae_int_t n,
      ae_int_t m,
      ae_int_t k,
@@ -32211,7 +32211,7 @@ INPUT PARAMETERS:
      Copyright 14.01.2011 by Bochkanov Sergey
 *************************************************************************/
 void lsfitsetscale(lsfitstate* state,
-     /* Real    */ ae_vector* s,
+     RVector * s,
      ae_state *_state)
 {
     ae_int_t i;
@@ -32256,8 +32256,8 @@ following useful properties:
      Copyright 14.01.2011 by Bochkanov Sergey
 *************************************************************************/
 void lsfitsetbc(lsfitstate* state,
-     /* Real    */ ae_vector* bndl,
-     /* Real    */ ae_vector* bndu,
+     RVector * bndl,
+     RVector * bndu,
      ae_state *_state)
 {
     ae_int_t i;
@@ -32324,8 +32324,8 @@ NOTE: general linear constraints  add  significant  overhead  to  solution
      Copyright 29.04.2017 by Bochkanov Sergey
 *************************************************************************/
 void lsfitsetlc(lsfitstate* state,
-     /* Real    */ ae_matrix* c,
-     /* Integer */ ae_vector* ct,
+     RMatrix * c,
+     ZVector * ct,
      ae_int_t k,
      ae_state *_state)
 {
@@ -33174,7 +33174,7 @@ NOTE:       covariance matrix is estimated using  correction  for  degrees
 *************************************************************************/
 void lsfitresults(lsfitstate* state,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -33304,8 +33304,8 @@ NOTE: this function guarantees that it returns exactly zero for a section
   -- ALGLIB PROJECT --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-static void lsfit_rdpanalyzesection(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_rdpanalyzesection(RVector * x,
+     RVector * y,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t* worstidx,
@@ -33368,13 +33368,13 @@ OUTPUT PARAMETERS:
   -- ALGLIB PROJECT --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-static void lsfit_rdprecursive(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_rdprecursive(RVector * x,
+     RVector * y,
      ae_int_t i0,
      ae_int_t i1,
      double eps,
-     /* Real    */ ae_vector* xout,
-     /* Real    */ ae_vector* yout,
+     RVector * xout,
+     RVector * yout,
      ae_int_t* nout,
      ae_state *_state)
 {
@@ -33411,14 +33411,14 @@ Accepts X, Y and already initialized and prepared MinLMState structure.
 On input P1 contains initial guess, on output it contains solution.  FLast
 stores function value at P1.
 *************************************************************************/
-static void lsfit_logisticfitinternal(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_logisticfitinternal(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_bool is4pl,
      double lambdav,
      minlmstate* state,
      minlmreport* replm,
-     /* Real    */ ae_vector* p1,
+     RVector * p1,
      double* flast,
      ae_state *_state)
 {
@@ -33598,8 +33598,8 @@ it with ClearRep() call.
   -- ALGLIB PROJECT --
      Copyright 28.04.2017 by Bochkanov Sergey
 *************************************************************************/
-static void lsfit_logisticfit45errors(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void lsfit_logisticfit45errors(RVector * x,
+     RVector * y,
      ae_int_t n,
      double a,
      double b,
@@ -33699,13 +33699,13 @@ Internal spline fitting subroutine
      Copyright 08.09.2009 by Bochkanov Sergey
 *************************************************************************/
 static void lsfit_spline1dfitinternal(ae_int_t st,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
@@ -34094,13 +34094,13 @@ static void lsfit_spline1dfitinternal(ae_int_t st,
 /*************************************************************************
 Internal fitting subroutine
 *************************************************************************/
-static void lsfit_lsfitlinearinternal(/* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_matrix* fmatrix,
+static void lsfit_lsfitlinearinternal(RVector * y,
+     RVector * w,
+     RMatrix * fmatrix,
      ae_int_t n,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -34409,7 +34409,7 @@ Used for efficient simultaneous calculation of N basis functions.
 *************************************************************************/
 static void lsfit_barycentriccalcbasis(barycentricinterpolant* b,
      double t,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     double s2;
@@ -34518,17 +34518,17 @@ IMPORTANT:
   -- ALGLIB PROJECT --
      Copyright 10.12.2009 by Bochkanov Sergey
 *************************************************************************/
-static void lsfit_internalchebyshevfit(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+static void lsfit_internalchebyshevfit(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t* info,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      lsfitreport* rep,
      ae_state *_state)
 {
@@ -34743,13 +34743,13 @@ static void lsfit_internalchebyshevfit(/* Real    */ ae_vector* x,
 /*************************************************************************
 Internal Floater-Hormann fitting subroutine for fixed D
 *************************************************************************/
-static void lsfit_barycentricfitwcfixedd(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+static void lsfit_barycentricfitwcfixedd(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
-     /* Real    */ ae_vector* xc,
-     /* Real    */ ae_vector* yc,
-     /* Integer */ ae_vector* dc,
+     RVector * xc,
+     RVector * yc,
+     ZVector * dc,
      ae_int_t k,
      ae_int_t m,
      ae_int_t d,
@@ -35125,16 +35125,16 @@ NOTE:       we apply small amount of regularization when we invert squared
   -- ALGLIB PROJECT --
      Copyright 10.12.2009 by Bochkanov Sergey
 *************************************************************************/
-static void lsfit_estimateerrors(/* Real    */ ae_matrix* f1,
-     /* Real    */ ae_vector* f0,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* s,
+static void lsfit_estimateerrors(RMatrix * f1,
+     RVector * f0,
+     RVector * y,
+     RVector * w,
+     RVector * x,
+     RVector * s,
      ae_int_t n,
      ae_int_t k,
      lsfitreport* rep,
-     /* Real    */ ae_matrix* z,
+     RMatrix * z,
      ae_int_t zkind,
      ae_state *_state)
 {
@@ -35747,10 +35747,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 07.05.2018 by Bochkanov Sergey
 *************************************************************************/
-void fitspherels(/* Real    */ ae_matrix* xy,
+void fitspherels(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* r,
      ae_state *_state)
 {
@@ -35792,10 +35792,10 @@ NOTE: this function is an easy-to-use wrapper around more powerful "expert"
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void fitspheremc(/* Real    */ ae_matrix* xy,
+void fitspheremc(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rhi,
      ae_state *_state)
 {
@@ -35837,10 +35837,10 @@ NOTE: this function is an easy-to-use wrapper around more powerful "expert"
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void fitspheremi(/* Real    */ ae_matrix* xy,
+void fitspheremi(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      ae_state *_state)
 {
@@ -35883,10 +35883,10 @@ NOTE: this function is an easy-to-use wrapper around more powerful "expert"
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void fitspheremz(/* Real    */ ae_matrix* xy,
+void fitspheremz(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      double* rhi,
      ae_state *_state)
@@ -36051,14 +36051,14 @@ include it in ALGLIB.
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void fitspherex(/* Real    */ ae_matrix* xy,
+void fitspherex(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
      ae_int_t problemtype,
      double epsx,
      ae_int_t aulits,
      double penalty,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      double* rhi,
      ae_state *_state)
@@ -36151,7 +36151,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void fitsphereinternal(/* Real    */ ae_matrix* xy,
+void fitsphereinternal(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
      ae_int_t problemtype,
@@ -36159,7 +36159,7 @@ void fitsphereinternal(/* Real    */ ae_matrix* xy,
      double epsx,
      ae_int_t aulits,
      double penalty,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      double* rhi,
      fitsphereinternalreport* rep,
@@ -36795,7 +36795,7 @@ NOTES:
   -- ALGLIB PROJECT --
      Copyright 28.05.2010 by Bochkanov Sergey
 *************************************************************************/
-void pspline2build(/* Real    */ ae_matrix* xy,
+void pspline2build(RMatrix * xy,
      ae_int_t n,
      ae_int_t st,
      ae_int_t pt,
@@ -36876,7 +36876,7 @@ description here.
   -- ALGLIB PROJECT --
      Copyright 28.05.2010 by Bochkanov Sergey
 *************************************************************************/
-void pspline3build(/* Real    */ ae_matrix* xy,
+void pspline3build(RMatrix * xy,
      ae_int_t n,
      ae_int_t st,
      ae_int_t pt,
@@ -36987,7 +36987,7 @@ NOTES:
   -- ALGLIB PROJECT --
      Copyright 28.05.2010 by Bochkanov Sergey
 *************************************************************************/
-void pspline2buildperiodic(/* Real    */ ae_matrix* xy,
+void pspline2buildperiodic(RMatrix * xy,
      ae_int_t n,
      ae_int_t st,
      ae_int_t pt,
@@ -37062,7 +37062,7 @@ description here.
   -- ALGLIB PROJECT --
      Copyright 28.05.2010 by Bochkanov Sergey
 *************************************************************************/
-void pspline3buildperiodic(/* Real    */ ae_matrix* xy,
+void pspline3buildperiodic(RMatrix * xy,
      ae_int_t n,
      ae_int_t st,
      ae_int_t pt,
@@ -37158,7 +37158,7 @@ NOTES:
 *************************************************************************/
 void pspline2parametervalues(pspline2interpolant* p,
      ae_int_t* n,
-     /* Real    */ ae_vector* t,
+     RVector * t,
      ae_state *_state)
 {
 
@@ -37187,7 +37187,7 @@ Same as PSpline2ParameterValues(), but for 3D.
 *************************************************************************/
 void pspline3parametervalues(pspline3interpolant* p,
      ae_int_t* n,
-     /* Real    */ ae_vector* t,
+     RVector * t,
      ae_state *_state)
 {
 
@@ -37781,13 +37781,13 @@ NOTE: algorithm stops after:
   -- ALGLIB --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-void parametricrdpfixed(/* Real    */ ae_matrix* x,
+void parametricrdpfixed(RMatrix * x,
      ae_int_t n,
      ae_int_t d,
      ae_int_t stopm,
      double stopeps,
-     /* Real    */ ae_matrix* x2,
-     /* Integer */ ae_vector* idx2,
+     RMatrix * x2,
+     ZVector * idx2,
      ae_int_t* nsections,
      ae_state *_state)
 {
@@ -37964,10 +37964,10 @@ void parametricrdpfixed(/* Real    */ ae_matrix* x,
 /*************************************************************************
 Builds non-periodic parameterization for 2-dimensional spline
 *************************************************************************/
-static void parametric_pspline2par(/* Real    */ ae_matrix* xy,
+static void parametric_pspline2par(RMatrix * xy,
      ae_int_t n,
      ae_int_t pt,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_state *_state)
 {
     double v;
@@ -38014,10 +38014,10 @@ static void parametric_pspline2par(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Builds non-periodic parameterization for 3-dimensional spline
 *************************************************************************/
-static void parametric_pspline3par(/* Real    */ ae_matrix* xy,
+static void parametric_pspline3par(RMatrix * xy,
      ae_int_t n,
      ae_int_t pt,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_state *_state)
 {
     double v;
@@ -38082,7 +38082,7 @@ NOTE: this function guarantees that it returns exactly zero for a section
   -- ALGLIB PROJECT --
      Copyright 02.10.2014 by Bochkanov Sergey
 *************************************************************************/
-static void parametric_rdpanalyzesectionpar(/* Real    */ ae_matrix* xy,
+static void parametric_rdpanalyzesectionpar(RMatrix * xy,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t d,
@@ -38407,8 +38407,8 @@ unchanged.
   -- ALGLIB --
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
-void rbfv1buildmodel(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+void rbfv1buildmodel(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t aterm,
      ae_int_t algorithmtype,
@@ -39013,8 +39013,8 @@ OUTPUT PARAMETERS:
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfv1calcbuf(rbfv1model* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -39102,8 +39102,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rbfv1tscalcbuf(rbfv1model* s,
      rbfv1calcbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -39193,11 +39193,11 @@ NOTE: as a special exception, this function supports unordered  arrays  X0
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfv1gridcalc2(rbfv1model* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -39324,27 +39324,27 @@ void rbfv1gridcalc2(rbfv1model* s,
 
 
 void rbfv1gridcalc3vrec(rbfv1model* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Integer */ ae_vector* blocks0,
+     ZVector * blocks0,
      ae_int_t block0a,
      ae_int_t block0b,
-     /* Integer */ ae_vector* blocks1,
+     ZVector * blocks1,
      ae_int_t block1a,
      ae_int_t block1b,
-     /* Integer */ ae_vector* blocks2,
+     ZVector * blocks2,
      ae_int_t block2a,
      ae_int_t block2b,
-     /* Boolean */ ae_vector* flagy,
+     BVector * flagy,
      ae_bool sparsey,
      double searchradius,
      double avgfuncpernode,
      ae_shared_pool* bufpool,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -39743,27 +39743,27 @@ void rbfv1gridcalc3vrec(rbfv1model* s,
 Serial stub for GPL edition.
 *************************************************************************/
 ae_bool _trypexec_rbfv1gridcalc3vrec(rbfv1model* s,
-    /* Real    */ ae_vector* x0,
+    RVector * x0,
     ae_int_t n0,
-    /* Real    */ ae_vector* x1,
+    RVector * x1,
     ae_int_t n1,
-    /* Real    */ ae_vector* x2,
+    RVector * x2,
     ae_int_t n2,
-    /* Integer */ ae_vector* blocks0,
+    ZVector * blocks0,
     ae_int_t block0a,
     ae_int_t block0b,
-    /* Integer */ ae_vector* blocks1,
+    ZVector * blocks1,
     ae_int_t block1a,
     ae_int_t block1b,
-    /* Integer */ ae_vector* blocks2,
+    ZVector * blocks2,
     ae_int_t block2a,
     ae_int_t block2b,
-    /* Boolean */ ae_vector* flagy,
+    BVector * flagy,
     ae_bool sparsey,
     double searchradius,
     double avgfuncpernode,
     ae_shared_pool* bufpool,
-    /* Real    */ ae_vector* y,
+    RVector * y,
     ae_state *_state)
 {
     return ae_false;
@@ -39798,9 +39798,9 @@ OUTPUT PARAMETERS:
 void rbfv1unpack(rbfv1model* s,
      ae_int_t* nx,
      ae_int_t* ny,
-     /* Real    */ ae_matrix* xwr,
+     RMatrix * xwr,
      ae_int_t* nc,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_int_t i;
@@ -39848,12 +39848,12 @@ void rbfv1unpack(rbfv1model* s,
 }
 
 
-static ae_bool rbfv1_rbfv1buildlinearmodel(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+static ae_bool rbfv1_rbfv1buildlinearmodel(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t ny,
      ae_int_t modeltype,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -40042,10 +40042,10 @@ static ae_bool rbfv1_rbfv1buildlinearmodel(/* Real    */ ae_matrix* x,
 }
 
 
-static void rbfv1_buildrbfmodellsqr(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
-     /* Real    */ ae_matrix* xc,
-     /* Real    */ ae_vector* r,
+static void rbfv1_buildrbfmodellsqr(RMatrix * x,
+     RMatrix * y,
+     RMatrix * xc,
+     RVector * r,
      ae_int_t n,
      ae_int_t nc,
      ae_int_t ny,
@@ -40056,7 +40056,7 @@ static void rbfv1_buildrbfmodellsqr(/* Real    */ ae_matrix* x,
      ae_int_t maxits,
      ae_int_t* gnnz,
      ae_int_t* snnz,
-     /* Real    */ ae_matrix* w,
+     RMatrix * w,
      ae_int_t* info,
      ae_int_t* iterationscount,
      ae_int_t* nmv,
@@ -40455,11 +40455,11 @@ static void rbfv1_buildrbfmodellsqr(/* Real    */ ae_matrix* x,
 }
 
 
-static void rbfv1_buildrbfmlayersmodellsqr(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
-     /* Real    */ ae_matrix* xc,
+static void rbfv1_buildrbfmlayersmodellsqr(RMatrix * x,
+     RMatrix * y,
+     RMatrix * xc,
      double rval,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_int_t n,
      ae_int_t* nc,
      ae_int_t ny,
@@ -40470,7 +40470,7 @@ static void rbfv1_buildrbfmlayersmodellsqr(/* Real    */ ae_matrix* x,
      ae_int_t maxits,
      double lambdav,
      ae_int_t* annz,
-     /* Real    */ ae_matrix* w,
+     RMatrix * w,
      ae_int_t* info,
      ae_int_t* iterationscount,
      ae_int_t* nmv,
@@ -41319,7 +41319,7 @@ OUTPUT PARAMETERS:
 void spline2dcalcvbuf(spline2dinterpolant* c,
      double x,
      double y,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_state *_state)
 {
     ae_int_t ix;
@@ -41660,7 +41660,7 @@ OUTPUT PARAMETERS:
 void spline2dcalcv(spline2dinterpolant* c,
      double x,
      double y,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_state *_state)
 {
 
@@ -42167,10 +42167,10 @@ Output parameters:
      15 May, 2007
      Copyright by Bochkanov Sergey
 *************************************************************************/
-void spline2dresamplebicubic(/* Real    */ ae_matrix* a,
+void spline2dresamplebicubic(RMatrix * a,
      ae_int_t oldheight,
      ae_int_t oldwidth,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t newheight,
      ae_int_t newwidth,
      ae_state *_state)
@@ -42281,10 +42281,10 @@ Output parameters:
      09.07.2007
      Copyright by Bochkanov Sergey
 *************************************************************************/
-void spline2dresamplebilinear(/* Real    */ ae_matrix* a,
+void spline2dresamplebilinear(RMatrix * a,
      ae_int_t oldheight,
      ae_int_t oldwidth,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t newheight,
      ae_int_t newwidth,
      ae_state *_state)
@@ -42343,11 +42343,11 @@ Output parameters:
   -- ALGLIB PROJECT --
      Copyright 16.04.2012 by Bochkanov Sergey
 *************************************************************************/
-void spline2dbuildbilinearv(/* Real    */ ae_vector* x,
+void spline2dbuildbilinearv(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t d,
      spline2dinterpolant* c,
      ae_state *_state)
@@ -42470,11 +42470,11 @@ Output parameters:
   -- ALGLIB PROJECT --
      Copyright 16.04.2012 by Bochkanov Sergey
 *************************************************************************/
-void spline2dbuildbicubicv(/* Real    */ ae_vector* x,
+void spline2dbuildbicubicv(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t d,
      spline2dinterpolant* c,
      ae_state *_state)
@@ -42666,7 +42666,7 @@ void spline2dunpackv(spline2dinterpolant* c,
      ae_int_t* m,
      ae_int_t* n,
      ae_int_t* d,
-     /* Real    */ ae_matrix* tbl,
+     RMatrix * tbl,
      ae_state *_state)
 {
     ae_int_t k;
@@ -42788,9 +42788,9 @@ flexible and accepts its arguments in more convenient order.
   -- ALGLIB PROJECT --
      Copyright 05.07.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline2dbuildbilinear(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* f,
+void spline2dbuildbilinear(RVector * x,
+     RVector * y,
+     RMatrix * f,
      ae_int_t m,
      ae_int_t n,
      spline2dinterpolant* c,
@@ -42897,9 +42897,9 @@ flexible and accepts its arguments in more convenient order.
   -- ALGLIB PROJECT --
      Copyright 05.07.2007 by Bochkanov Sergey
 *************************************************************************/
-void spline2dbuildbicubic(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* f,
+void spline2dbuildbicubic(RVector * x,
+     RVector * y,
+     RMatrix * f,
      ae_int_t m,
      ae_int_t n,
      spline2dinterpolant* c,
@@ -43044,7 +43044,7 @@ and accepts its arguments in more convenient order.
 void spline2dunpack(spline2dinterpolant* c,
      ae_int_t* m,
      ae_int_t* n,
-     /* Real    */ ae_matrix* tbl,
+     RMatrix * tbl,
      ae_state *_state)
 {
     ae_int_t k;
@@ -43356,7 +43356,7 @@ INPUT PARAMETERS:
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
 void spline2dbuildersetpoints(spline2dbuilder* state,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t n,
      ae_state *_state)
 {
@@ -44336,14 +44336,14 @@ void spline2dunserialize(ae_serializer* s,
 Internal subroutine.
 Calculation of the first derivatives and the cross-derivative.
 *************************************************************************/
-static void spline2d_bicubiccalcderivatives(/* Real    */ ae_matrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+static void spline2d_bicubiccalcderivatives(RMatrix * a,
+     RVector * x,
+     RVector * y,
      ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* dx,
-     /* Real    */ ae_matrix* dy,
-     /* Real    */ ae_matrix* dxy,
+     RMatrix * dx,
+     RMatrix * dy,
+     RMatrix * dxy,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -44456,7 +44456,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_generatedesignmatrix(/* Real    */ ae_vector* xy,
+static void spline2d_generatedesignmatrix(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t kx,
@@ -44677,13 +44677,13 @@ for a layer of basis functions.
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_updatesplinetable(/* Real    */ ae_vector* z,
+static void spline2d_updatesplinetable(RVector * z,
      ae_int_t kx,
      ae_int_t ky,
      ae_int_t d,
      spline1dinterpolant* basis1,
      ae_int_t bfrad,
-     /* Real    */ ae_vector* ftbl,
+     RVector * ftbl,
      ae_int_t m,
      ae_int_t n,
      ae_int_t scalexy,
@@ -44788,7 +44788,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_fastddmfit(/* Real    */ ae_vector* xy,
+static void spline2d_fastddmfit(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t kx,
@@ -45002,10 +45002,10 @@ is processed with BlockLLS solver.
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
+static void spline2d_fastddmfitlayer(RVector * xy,
      ae_int_t d,
      ae_int_t scalexy,
-     /* Integer */ ae_vector* xyindex,
+     ZVector * xyindex,
      ae_int_t basecasex,
      ae_int_t tilex0,
      ae_int_t tilex1,
@@ -45233,10 +45233,10 @@ static void spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_spline2d_fastddmfitlayer(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_fastddmfitlayer(RVector * xy,
     ae_int_t d,
     ae_int_t scalexy,
-    /* Integer */ ae_vector* xyindex,
+    ZVector * xyindex,
     ae_int_t basecasex,
     ae_int_t tilex0,
     ae_int_t tilex1,
@@ -45308,7 +45308,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 static void spline2d_blockllsfit(spline2dxdesignmatrix* xdesign,
      ae_int_t lsqrcnt,
-     /* Real    */ ae_vector* z,
+     RVector * z,
      spline2dfitreport* rep,
      double tss,
      spline2dblockllsbuf* buf,
@@ -45558,13 +45558,13 @@ OUTPUT PARAMETERS:
 static void spline2d_naivellsfit(sparsematrix* av,
      sparsematrix* ah,
      ae_int_t arows,
-     /* Real    */ ae_vector* xy,
+     RVector * xy,
      ae_int_t kx,
      ae_int_t ky,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t lsqrcnt,
-     /* Real    */ ae_vector* z,
+     RVector * z,
      spline2dfitreport* rep,
      double tss,
      ae_state *_state)
@@ -45921,10 +45921,10 @@ position.
 static void spline2d_copycellto(ae_int_t kx,
      ae_int_t ky,
      ae_int_t blockbandwidth,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      ae_int_t i,
      ae_int_t j,
-     /* Real    */ ae_matrix* dst,
+     RMatrix * dst,
      ae_int_t dst0,
      ae_int_t dst1,
      ae_state *_state)
@@ -45955,7 +45955,7 @@ truncates all elements of  cell (I,J) which are less than Eps in magnitude.
 static void spline2d_flushtozerocell(ae_int_t kx,
      ae_int_t ky,
      ae_int_t blockbandwidth,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      ae_int_t i,
      ae_int_t j,
      double eps,
@@ -46017,7 +46017,7 @@ static void spline2d_blockllsgenerateata(sparsematrix* ah,
      ae_int_t ky1,
      ae_int_t kx,
      ae_int_t ky,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      sreal* mxata,
      ae_state *_state)
 {
@@ -46160,7 +46160,7 @@ ae_bool _trypexec_spline2d_blockllsgenerateata(sparsematrix* ah,
     ae_int_t ky1,
     ae_int_t kx,
     ae_int_t ky,
-    /* Real    */ ae_matrix* blockata,
+    RMatrix * blockata,
     sreal* mxata,
     ae_state *_state)
 {
@@ -46190,12 +46190,12 @@ Result:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static ae_bool spline2d_blockllscholesky(/* Real    */ ae_matrix* blockata,
+static ae_bool spline2d_blockllscholesky(RMatrix * blockata,
      ae_int_t kx,
      ae_int_t ky,
-     /* Real    */ ae_matrix* trsmbuf2,
-     /* Real    */ ae_matrix* cholbuf2,
-     /* Real    */ ae_vector* cholbuf1,
+     RMatrix * trsmbuf2,
+     RMatrix * cholbuf2,
+     RVector * cholbuf1,
      ae_state *_state)
 {
     ae_int_t blockbandwidth;
@@ -46286,11 +46286,11 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_blockllstrsv(/* Real    */ ae_matrix* blockata,
+static void spline2d_blockllstrsv(RMatrix * blockata,
      ae_int_t kx,
      ae_int_t ky,
      ae_bool transu,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t blockbandwidth;
@@ -46346,8 +46346,8 @@ Processing is performed in parallel manner.
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_computeresidualsfromscratch(/* Real    */ ae_vector* xy,
-     /* Real    */ ae_vector* yraw,
+static void spline2d_computeresidualsfromscratch(RVector * xy,
+     RVector * yraw,
      ae_int_t npoints,
      ae_int_t d,
      ae_int_t scalexy,
@@ -46393,8 +46393,8 @@ static void spline2d_computeresidualsfromscratch(/* Real    */ ae_vector* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_spline2d_computeresidualsfromscratch(/* Real    */ ae_vector* xy,
-    /* Real    */ ae_vector* yraw,
+ae_bool _trypexec_spline2d_computeresidualsfromscratch(RVector * xy,
+    RVector * yraw,
     ae_int_t npoints,
     ae_int_t d,
     ae_int_t scalexy,
@@ -46411,8 +46411,8 @@ Recursive workhorse for ComputeResidualsFromScratch.
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
-     /* Real    */ ae_vector* yraw,
+static void spline2d_computeresidualsfromscratchrec(RVector * xy,
+     RVector * yraw,
      ae_int_t pt0,
      ae_int_t pt1,
      ae_int_t chunksize,
@@ -46467,8 +46467,8 @@ static void spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_spline2d_computeresidualsfromscratchrec(/* Real    */ ae_vector* xy,
-    /* Real    */ ae_vector* yraw,
+ae_bool _trypexec_spline2d_computeresidualsfromscratchrec(RVector * xy,
+    RVector * yraw,
     ae_int_t pt0,
     ae_int_t pt1,
     ae_int_t chunksize,
@@ -46507,15 +46507,15 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_reorderdatasetandbuildindex(/* Real    */ ae_vector* xy,
+static void spline2d_reorderdatasetandbuildindex(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
      ae_int_t kx,
      ae_int_t ky,
-     /* Integer */ ae_vector* xyindex,
-     /* Integer */ ae_vector* bufi,
+     ZVector * xyindex,
+     ZVector * bufi,
      ae_state *_state)
 {
     ae_int_t i;
@@ -46570,15 +46570,15 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_rescaledatasetandrefineindex(/* Real    */ ae_vector* xy,
+static void spline2d_rescaledatasetandrefineindex(RVector * xy,
      ae_int_t npoints,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
      ae_int_t kx,
      ae_int_t ky,
-     /* Integer */ ae_vector* xyindex,
-     /* Integer */ ae_vector* bufi,
+     ZVector * xyindex,
+     ZVector * bufi,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -46619,17 +46619,17 @@ Recurrent divide-and-conquer indexing function
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_expandindexrows(/* Real    */ ae_vector* xy,
+static void spline2d_expandindexrows(RVector * xy,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
-     /* Integer */ ae_vector* cidx,
+     ZVector * cidx,
      ae_int_t pt0,
      ae_int_t pt1,
-     /* Integer */ ae_vector* xyindexprev,
+     ZVector * xyindexprev,
      ae_int_t row0,
      ae_int_t row1,
-     /* Integer */ ae_vector* xyindexnew,
+     ZVector * xyindexnew,
      ae_int_t kxnew,
      ae_int_t kynew,
      ae_bool rootcall,
@@ -46696,17 +46696,17 @@ static void spline2d_expandindexrows(/* Real    */ ae_vector* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_spline2d_expandindexrows(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_expandindexrows(RVector * xy,
     ae_int_t d,
-    /* Real    */ ae_vector* shadow,
+    RVector * shadow,
     ae_int_t ns,
-    /* Integer */ ae_vector* cidx,
+    ZVector * cidx,
     ae_int_t pt0,
     ae_int_t pt1,
-    /* Integer */ ae_vector* xyindexprev,
+    ZVector * xyindexprev,
     ae_int_t row0,
     ae_int_t row1,
-    /* Integer */ ae_vector* xyindexnew,
+    ZVector * xyindexnew,
     ae_int_t kxnew,
     ae_int_t kynew,
     ae_bool rootcall,
@@ -46722,14 +46722,14 @@ Recurrent divide-and-conquer indexing function
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_reorderdatasetandbuildindexrec(/* Real    */ ae_vector* xy,
+static void spline2d_reorderdatasetandbuildindexrec(RVector * xy,
      ae_int_t d,
-     /* Real    */ ae_vector* shadow,
+     RVector * shadow,
      ae_int_t ns,
-     /* Integer */ ae_vector* cidx,
+     ZVector * cidx,
      ae_int_t pt0,
      ae_int_t pt1,
-     /* Integer */ ae_vector* xyindex,
+     ZVector * xyindex,
      ae_int_t idx0,
      ae_int_t idx1,
      ae_bool rootcall,
@@ -46820,14 +46820,14 @@ static void spline2d_reorderdatasetandbuildindexrec(/* Real    */ ae_vector* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_spline2d_reorderdatasetandbuildindexrec(/* Real    */ ae_vector* xy,
+ae_bool _trypexec_spline2d_reorderdatasetandbuildindexrec(RVector * xy,
     ae_int_t d,
-    /* Real    */ ae_vector* shadow,
+    RVector * shadow,
     ae_int_t ns,
-    /* Integer */ ae_vector* cidx,
+    ZVector * cidx,
     ae_int_t pt0,
     ae_int_t pt1,
-    /* Integer */ ae_vector* xyindex,
+    ZVector * xyindex,
     ae_int_t idx0,
     ae_int_t idx1,
     ae_bool rootcall,
@@ -46863,8 +46863,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
-static void spline2d_xdesigngenerate(/* Real    */ ae_vector* xy,
-     /* Integer */ ae_vector* xyindex,
+static void spline2d_xdesigngenerate(RVector * xy,
+     ZVector * xyindex,
      ae_int_t kx0,
      ae_int_t kx1,
      ae_int_t kxtotal,
@@ -47135,8 +47135,8 @@ OUTPUT PARAMETERS:
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
 static void spline2d_xdesignmv(spline2dxdesignmatrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t bidx;
@@ -47227,8 +47227,8 @@ OUTPUT PARAMETERS:
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
 static void spline2d_xdesignmtv(spline2dxdesignmatrix* a,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t bidx;
@@ -47328,7 +47328,7 @@ OUTPUT PARAMETERS:
      Copyright 05.02.2018 by Bochkanov Sergey
 *************************************************************************/
 static void spline2d_xdesignblockata(spline2dxdesignmatrix* a,
-     /* Real    */ ae_matrix* blockata,
+     RMatrix * blockata,
      double* mxata,
      ae_state *_state)
 {
@@ -47929,10 +47929,10 @@ unchanged.
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
-void rbfv2buildhierarchical(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+void rbfv2buildhierarchical(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
-     /* Real    */ ae_vector* scalevec,
+     RVector * scalevec,
      ae_int_t aterm,
      ae_int_t nh,
      double rbase,
@@ -49010,8 +49010,8 @@ OUTPUT PARAMETERS:
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfv2calcbuf(rbfv2model* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -49047,8 +49047,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rbfv2tscalcbuf(rbfv2model* s,
      rbfv2calcbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -49158,11 +49158,11 @@ NOTE: as a special exception, this function supports unordered  arrays  X0
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfv2gridcalc2(rbfv2model* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -49263,17 +49263,17 @@ NOTE: array Y should be preallocated by caller.
      Copyright 12.07.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfv2gridcalcvx(rbfv2model* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* x3,
+     RVector * x3,
      ae_int_t n3,
-     /* Boolean */ ae_vector* flagy,
+     BVector * flagy,
      ae_bool sparsey,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -49522,32 +49522,32 @@ void rbfv2gridcalcvx(rbfv2model* s,
 
 
 void rbfv2partialgridcalcrec(rbfv2model* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* x3,
+     RVector * x3,
      ae_int_t n3,
-     /* Integer */ ae_vector* blocks0,
+     ZVector * blocks0,
      ae_int_t block0a,
      ae_int_t block0b,
-     /* Integer */ ae_vector* blocks1,
+     ZVector * blocks1,
      ae_int_t block1a,
      ae_int_t block1b,
-     /* Integer */ ae_vector* blocks2,
+     ZVector * blocks2,
      ae_int_t block2a,
      ae_int_t block2b,
-     /* Integer */ ae_vector* blocks3,
+     ZVector * blocks3,
      ae_int_t block3a,
      ae_int_t block3b,
-     /* Boolean */ ae_vector* flagy,
+     BVector * flagy,
      ae_bool sparsey,
      ae_int_t levelidx,
      double avgfuncpernode,
      ae_shared_pool* bufpool,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -49861,32 +49861,32 @@ void rbfv2partialgridcalcrec(rbfv2model* s,
 Serial stub for GPL edition.
 *************************************************************************/
 ae_bool _trypexec_rbfv2partialgridcalcrec(rbfv2model* s,
-    /* Real    */ ae_vector* x0,
+    RVector * x0,
     ae_int_t n0,
-    /* Real    */ ae_vector* x1,
+    RVector * x1,
     ae_int_t n1,
-    /* Real    */ ae_vector* x2,
+    RVector * x2,
     ae_int_t n2,
-    /* Real    */ ae_vector* x3,
+    RVector * x3,
     ae_int_t n3,
-    /* Integer */ ae_vector* blocks0,
+    ZVector * blocks0,
     ae_int_t block0a,
     ae_int_t block0b,
-    /* Integer */ ae_vector* blocks1,
+    ZVector * blocks1,
     ae_int_t block1a,
     ae_int_t block1b,
-    /* Integer */ ae_vector* blocks2,
+    ZVector * blocks2,
     ae_int_t block2a,
     ae_int_t block2b,
-    /* Integer */ ae_vector* blocks3,
+    ZVector * blocks3,
     ae_int_t block3a,
     ae_int_t block3b,
-    /* Boolean */ ae_vector* flagy,
+    BVector * flagy,
     ae_bool sparsey,
     ae_int_t levelidx,
     double avgfuncpernode,
     ae_shared_pool* bufpool,
-    /* Real    */ ae_vector* y,
+    RVector * y,
     ae_state *_state)
 {
     return ae_false;
@@ -49920,9 +49920,9 @@ OUTPUT PARAMETERS:
 void rbfv2unpack(rbfv2model* s,
      ae_int_t* nx,
      ae_int_t* ny,
-     /* Real    */ ae_matrix* xwr,
+     RMatrix * xwr,
      ae_int_t* nc,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_int_t i;
@@ -49965,13 +49965,13 @@ void rbfv2unpack(rbfv2model* s,
 }
 
 
-static ae_bool rbfv2_rbfv2buildlinearmodel(/* Real    */ ae_matrix* x,
-     /* Real    */ ae_matrix* y,
+static ae_bool rbfv2_rbfv2buildlinearmodel(RMatrix * x,
+     RMatrix * y,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t modeltype,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -50209,9 +50209,9 @@ static void rbfv2_convertandappendtree(kdtree* curtree,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
-     /* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+     ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -50299,13 +50299,13 @@ static void rbfv2_converttreerec(kdtree* curtree,
      ae_int_t nodesbase,
      ae_int_t splitsbase,
      ae_int_t cwbase,
-     /* Integer */ ae_vector* localnodes,
+     ZVector * localnodes,
      ae_int_t* localnodessize,
-     /* Real    */ ae_vector* localsplits,
+     RVector * localsplits,
      ae_int_t* localsplitssize,
-     /* Real    */ ae_vector* localcw,
+     RVector * localcw,
      ae_int_t* localcwsize,
-     /* Real    */ ae_matrix* xybuf,
+     RMatrix * xybuf,
      ae_state *_state)
 {
     ae_int_t i;
@@ -50403,8 +50403,8 @@ static void rbfv2_partialcalcrec(rbfv2model* s,
      ae_int_t rootidx,
      double invr2,
      double queryr2,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -50647,11 +50647,11 @@ static void rbfv2_partialrowcalcrec(rbfv2model* s,
      double invr2,
      double rquery2,
      double rfar2,
-     /* Real    */ ae_vector* cx,
-     /* Real    */ ae_vector* rx,
-     /* Boolean */ ae_vector* rf,
+     RVector * cx,
+     RVector * rx,
+     BVector * rf,
      ae_int_t rowsize,
-     /* Real    */ ae_vector* ry,
+     RVector * ry,
      ae_state *_state)
 {
     ae_int_t i;
@@ -50870,9 +50870,9 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
-static void rbfv2_preparepartialquery(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
+static void rbfv2_preparepartialquery(RVector * x,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
      ae_int_t nx,
      rbfv2calcbuffer* buf,
      ae_int_t* cnt,
@@ -50935,17 +50935,17 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
-static void rbfv2_partialqueryrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+static void rbfv2_partialqueryrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_int_t nx,
      ae_int_t ny,
      rbfv2calcbuffer* buf,
      ae_int_t rootidx,
      double queryr2,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* r2,
-     /* Integer */ ae_vector* offs,
+     RVector * x,
+     RVector * r2,
+     ZVector * offs,
      ae_int_t* k,
      ae_state *_state)
 {
@@ -51128,15 +51128,15 @@ RESULT:
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
-static ae_int_t rbfv2_partialcountrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
+static ae_int_t rbfv2_partialcountrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
      ae_int_t nx,
      ae_int_t ny,
      rbfv2calcbuffer* buf,
      ae_int_t rootidx,
      double queryr2,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -51312,15 +51312,15 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
-static void rbfv2_partialunpackrec(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* s,
+static void rbfv2_partialunpackrec(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * s,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t rootidx,
      double r,
-     /* Real    */ ae_matrix* xwr,
+     RMatrix * xwr,
      ae_int_t* k,
      ae_state *_state)
 {
@@ -51411,19 +51411,19 @@ RESULT:
   -- ALGLIB --
      Copyright 28.09.2016 by Bochkanov Sergey
 *************************************************************************/
-static ae_int_t rbfv2_designmatrixrowsize(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* ri,
-     /* Integer */ ae_vector* kdroots,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
+static ae_int_t rbfv2_designmatrixrowsize(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * ri,
+     ZVector * kdroots,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t nh,
      ae_int_t level,
      double rcoeff,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      rbfv2calcbuffer* calcbuf,
      ae_state *_state)
 {
@@ -51507,14 +51507,14 @@ RESULT:
   -- ALGLIB --
      Copyright 28.09.2016 by Bochkanov Sergey
 *************************************************************************/
-static void rbfv2_designmatrixgeneraterow(/* Integer */ ae_vector* kdnodes,
-     /* Real    */ ae_vector* kdsplits,
-     /* Real    */ ae_vector* cw,
-     /* Real    */ ae_vector* ri,
-     /* Integer */ ae_vector* kdroots,
-     /* Real    */ ae_vector* kdboxmin,
-     /* Real    */ ae_vector* kdboxmax,
-     /* Integer */ ae_vector* cwrange,
+static void rbfv2_designmatrixgeneraterow(ZVector * kdnodes,
+     RVector * kdsplits,
+     RVector * cw,
+     RVector * ri,
+     ZVector * kdroots,
+     RVector * kdboxmin,
+     RVector * kdboxmax,
+     ZVector * cwrange,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t nh,
@@ -51523,12 +51523,12 @@ static void rbfv2_designmatrixgeneraterow(/* Integer */ ae_vector* kdnodes,
      double rcoeff,
      ae_int_t rowsperpoint,
      double penalty,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      rbfv2calcbuffer* calcbuf,
-     /* Real    */ ae_vector* tmpr2,
-     /* Integer */ ae_vector* tmpoffs,
-     /* Integer */ ae_vector* rowidx,
-     /* Real    */ ae_vector* rowval,
+     RVector * tmpr2,
+     ZVector * tmpoffs,
+     ZVector * rowidx,
+     RVector * rowval,
      ae_int_t* rowsize,
      ae_state *_state)
 {
@@ -52277,14 +52277,14 @@ OUTPUT PARAMETERS:
      26.04.2012
      Copyright by Bochkanov Sergey
 *************************************************************************/
-void spline3dresampletrilinear(/* Real    */ ae_vector* a,
+void spline3dresampletrilinear(RVector * a,
      ae_int_t oldzcount,
      ae_int_t oldycount,
      ae_int_t oldxcount,
      ae_int_t newzcount,
      ae_int_t newycount,
      ae_int_t newxcount,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     double xd;
@@ -52376,13 +52376,13 @@ OUTPUT PARAMETERS:
   -- ALGLIB PROJECT --
      Copyright 26.04.2012 by Bochkanov Sergey
 *************************************************************************/
-void spline3dbuildtrilinearv(/* Real    */ ae_vector* x,
+void spline3dbuildtrilinearv(RVector * x,
      ae_int_t n,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t m,
-     /* Real    */ ae_vector* z,
+     RVector * z,
      ae_int_t l,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_int_t d,
      spline3dinterpolant* c,
      ae_state *_state)
@@ -52555,7 +52555,7 @@ void spline3dcalcvbuf(spline3dinterpolant* c,
      double x,
      double y,
      double z,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_state *_state)
 {
     double xd;
@@ -52680,7 +52680,7 @@ void spline3dcalcv(spline3dinterpolant* c,
      double x,
      double y,
      double z,
-     /* Real    */ ae_vector* f,
+     RVector * f,
      ae_state *_state)
 {
 
@@ -52748,7 +52748,7 @@ void spline3dunpackv(spline3dinterpolant* c,
      ae_int_t* l,
      ae_int_t* d,
      ae_int_t* stype,
-     /* Real    */ ae_matrix* tbl,
+     RMatrix * tbl,
      ae_state *_state)
 {
     ae_int_t p;
@@ -53040,10 +53040,10 @@ Use fitspheremc() instead.
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void nsfitspheremcc(/* Real    */ ae_matrix* xy,
+void nsfitspheremcc(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rhi,
      ae_state *_state)
 {
@@ -53063,10 +53063,10 @@ Use fitspheremi() instead.
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void nsfitspheremic(/* Real    */ ae_matrix* xy,
+void nsfitspheremic(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      ae_state *_state)
 {
@@ -53086,10 +53086,10 @@ Use fitspheremz() instead.
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void nsfitspheremzc(/* Real    */ ae_matrix* xy,
+void nsfitspheremzc(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      double* rhi,
      ae_state *_state)
@@ -53110,14 +53110,14 @@ Use fitspherex() instead.
   -- ALGLIB --
      Copyright 14.04.2017 by Bochkanov Sergey
 *************************************************************************/
-void nsfitspherex(/* Real    */ ae_matrix* xy,
+void nsfitspherex(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nx,
      ae_int_t problemtype,
      double epsx,
      ae_int_t aulits,
      double penalty,
-     /* Real    */ ae_vector* cx,
+     RVector * cx,
      double* rlo,
      double* rhi,
      ae_state *_state)
@@ -53143,8 +53143,8 @@ Do NOT use this function in the new code!
   -- ALGLIB PROJECT --
      Copyright 18.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfitpenalized(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void spline1dfitpenalized(RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t m,
      double rho,
@@ -53201,9 +53201,9 @@ Do NOT use this function in the new code!
   -- ALGLIB PROJECT --
      Copyright 19.10.2010 by Bochkanov Sergey
 *************************************************************************/
-void spline1dfitpenalizedw(/* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* w,
+void spline1dfitpenalizedw(RVector * x,
+     RVector * y,
+     RVector * w,
      ae_int_t n,
      ae_int_t m,
      double rho,
@@ -53765,7 +53765,7 @@ NOTE: dataset added by this function is not saved during model serialization.
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfsetpoints(rbfmodel* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t n,
      ae_state *_state)
 {
@@ -53846,9 +53846,9 @@ NOTE: dataset added by this function is not saved during model serialization.
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfsetpointsandscales(rbfmodel* r,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t n,
-     /* Real    */ ae_vector* s,
+     RVector * s,
      ae_state *_state)
 {
     ae_int_t i;
@@ -54821,8 +54821,8 @@ OUTPUT PARAMETERS:
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfcalc(rbfmodel* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -54858,8 +54858,8 @@ OUTPUT PARAMETERS:
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfcalcbuf(rbfmodel* s,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -54916,8 +54916,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rbftscalcbuf(rbfmodel* s,
      rbfcalcbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -54957,11 +54957,11 @@ It is superseded by rbfgridcalc2v() and  rbfgridcalc2vsubset()  functions.
      Copyright 13.12.2011 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc2(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -55073,11 +55073,11 @@ NOTE: if you need function values on some subset  of  regular  grid, which
      Copyright 27.01.2017 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc2v(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -55184,12 +55184,12 @@ NOTE: this  function  is  re-entrant,  i.e.  you  may  use  same  rbfmodel
      Copyright 04.03.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc2vsubset(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Boolean */ ae_vector* flagy,
-     /* Real    */ ae_vector* y,
+     BVector * flagy,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -55287,13 +55287,13 @@ NOTE: if you need function values on some subset  of  regular  grid, which
      Copyright 04.03.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc3v(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -55412,14 +55412,14 @@ NOTE: this  function  is  re-entrant,  i.e.  you  may  use  same  rbfmodel
      Copyright 04.03.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc3vsubset(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Boolean */ ae_vector* flagy,
-     /* Real    */ ae_vector* y,
+     BVector * flagy,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -55461,13 +55461,13 @@ functions for more information
      Copyright 04.03.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc2vx(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Boolean */ ae_vector* flagy,
+     BVector * flagy,
      ae_bool sparsey,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -55602,15 +55602,15 @@ functions for more information
      Copyright 04.03.2016 by Bochkanov Sergey
 *************************************************************************/
 void rbfgridcalc3vx(rbfmodel* s,
-     /* Real    */ ae_vector* x0,
+     RVector * x0,
      ae_int_t n0,
-     /* Real    */ ae_vector* x1,
+     RVector * x1,
      ae_int_t n1,
-     /* Real    */ ae_vector* x2,
+     RVector * x2,
      ae_int_t n2,
-     /* Boolean */ ae_vector* flagy,
+     BVector * flagy,
      ae_bool sparsey,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -55848,9 +55848,9 @@ OUTPUT PARAMETERS:
 void rbfunpack(rbfmodel* s,
      ae_int_t* nx,
      ae_int_t* ny,
-     /* Real    */ ae_matrix* xwr,
+     RMatrix * xwr,
      ae_int_t* nc,
-     /* Real    */ ae_matrix* v,
+     RMatrix * v,
      ae_int_t* modelversion,
      ae_state *_state)
 {

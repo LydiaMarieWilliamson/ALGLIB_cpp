@@ -1802,12 +1802,12 @@ ae_int_t hqrnduniformi(hqrndstate* state, ae_int_t n, ae_state *_state);
 double hqrndnormal(hqrndstate* state, ae_state *_state);
 void hqrndnormalv(hqrndstate* state,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state);
 void hqrndnormalm(hqrndstate* state,
      ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
 void hqrndunit2(hqrndstate* state, double* x, double* y, ae_state *_state);
 void hqrndnormal2(hqrndstate* state,
@@ -1818,11 +1818,11 @@ double hqrndexponential(hqrndstate* state,
      double lambdav,
      ae_state *_state);
 double hqrnddiscrete(hqrndstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t n,
      ae_state *_state);
 double hqrndcontinuous(hqrndstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t n,
      ae_state *_state);
 void _hqrndstate_init(void* _p, ae_state *_state, ae_bool make_automatic);
@@ -1832,63 +1832,63 @@ void _hqrndstate_destroy(void* _p);
 #endif
 #if defined(AE_COMPILE_XDEBUG) || !defined(AE_PARTIAL_BUILD)
 void xdebuginitrecord1(xdebugrecord1* rec1, ae_state *_state);
-ae_int_t xdebugb1count(/* Boolean */ ae_vector* a, ae_state *_state);
-void xdebugb1not(/* Boolean */ ae_vector* a, ae_state *_state);
-void xdebugb1appendcopy(/* Boolean */ ae_vector* a, ae_state *_state);
+ae_int_t xdebugb1count(BVector * a, ae_state *_state);
+void xdebugb1not(BVector * a, ae_state *_state);
+void xdebugb1appendcopy(BVector * a, ae_state *_state);
 void xdebugb1outeven(ae_int_t n,
-     /* Boolean */ ae_vector* a,
+     BVector * a,
      ae_state *_state);
-ae_int_t xdebugi1sum(/* Integer */ ae_vector* a, ae_state *_state);
-void xdebugi1neg(/* Integer */ ae_vector* a, ae_state *_state);
-void xdebugi1appendcopy(/* Integer */ ae_vector* a, ae_state *_state);
+ae_int_t xdebugi1sum(ZVector * a, ae_state *_state);
+void xdebugi1neg(ZVector * a, ae_state *_state);
+void xdebugi1appendcopy(ZVector * a, ae_state *_state);
 void xdebugi1outeven(ae_int_t n,
-     /* Integer */ ae_vector* a,
+     ZVector * a,
      ae_state *_state);
-double xdebugr1sum(/* Real    */ ae_vector* a, ae_state *_state);
-void xdebugr1neg(/* Real    */ ae_vector* a, ae_state *_state);
-void xdebugr1appendcopy(/* Real    */ ae_vector* a, ae_state *_state);
+double xdebugr1sum(RVector * a, ae_state *_state);
+void xdebugr1neg(RVector * a, ae_state *_state);
+void xdebugr1appendcopy(RVector * a, ae_state *_state);
 void xdebugr1outeven(ae_int_t n,
-     /* Real    */ ae_vector* a,
+     RVector * a,
      ae_state *_state);
-ae_complex xdebugc1sum(/* Complex */ ae_vector* a, ae_state *_state);
-void xdebugc1neg(/* Complex */ ae_vector* a, ae_state *_state);
-void xdebugc1appendcopy(/* Complex */ ae_vector* a, ae_state *_state);
+ae_complex xdebugc1sum(CVector * a, ae_state *_state);
+void xdebugc1neg(CVector * a, ae_state *_state);
+void xdebugc1appendcopy(CVector * a, ae_state *_state);
 void xdebugc1outeven(ae_int_t n,
-     /* Complex */ ae_vector* a,
+     CVector * a,
      ae_state *_state);
-ae_int_t xdebugb2count(/* Boolean */ ae_matrix* a, ae_state *_state);
-void xdebugb2not(/* Boolean */ ae_matrix* a, ae_state *_state);
-void xdebugb2transpose(/* Boolean */ ae_matrix* a, ae_state *_state);
+ae_int_t xdebugb2count(BMatrix * a, ae_state *_state);
+void xdebugb2not(BMatrix * a, ae_state *_state);
+void xdebugb2transpose(BMatrix * a, ae_state *_state);
 void xdebugb2outsin(ae_int_t m,
      ae_int_t n,
-     /* Boolean */ ae_matrix* a,
+     BMatrix * a,
      ae_state *_state);
-ae_int_t xdebugi2sum(/* Integer */ ae_matrix* a, ae_state *_state);
-void xdebugi2neg(/* Integer */ ae_matrix* a, ae_state *_state);
-void xdebugi2transpose(/* Integer */ ae_matrix* a, ae_state *_state);
+ae_int_t xdebugi2sum(ZMatrix * a, ae_state *_state);
+void xdebugi2neg(ZMatrix * a, ae_state *_state);
+void xdebugi2transpose(ZMatrix * a, ae_state *_state);
 void xdebugi2outsin(ae_int_t m,
      ae_int_t n,
-     /* Integer */ ae_matrix* a,
+     ZMatrix * a,
      ae_state *_state);
-double xdebugr2sum(/* Real    */ ae_matrix* a, ae_state *_state);
-void xdebugr2neg(/* Real    */ ae_matrix* a, ae_state *_state);
-void xdebugr2transpose(/* Real    */ ae_matrix* a, ae_state *_state);
+double xdebugr2sum(RMatrix * a, ae_state *_state);
+void xdebugr2neg(RMatrix * a, ae_state *_state);
+void xdebugr2transpose(RMatrix * a, ae_state *_state);
 void xdebugr2outsin(ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_state *_state);
-ae_complex xdebugc2sum(/* Complex */ ae_matrix* a, ae_state *_state);
-void xdebugc2neg(/* Complex */ ae_matrix* a, ae_state *_state);
-void xdebugc2transpose(/* Complex */ ae_matrix* a, ae_state *_state);
+ae_complex xdebugc2sum(CMatrix * a, ae_state *_state);
+void xdebugc2neg(CMatrix * a, ae_state *_state);
+void xdebugc2transpose(CMatrix * a, ae_state *_state);
 void xdebugc2outsincos(ae_int_t m,
      ae_int_t n,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_state *_state);
 double xdebugmaskedbiasedproductsum(ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
-     /* Real    */ ae_matrix* b,
-     /* Boolean */ ae_matrix* c,
+     RMatrix * a,
+     RMatrix * b,
+     BMatrix * c,
      ae_state *_state);
 void _xdebugrecord1_init(void* _p, ae_state *_state, ae_bool make_automatic);
 void _xdebugrecord1_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
@@ -1896,15 +1896,15 @@ void _xdebugrecord1_clear(void* _p);
 void _xdebugrecord1_destroy(void* _p);
 #endif
 #if defined(AE_COMPILE_NEARESTNEIGHBOR) || !defined(AE_PARTIAL_BUILD)
-void kdtreebuild(/* Real    */ ae_matrix* xy,
+void kdtreebuild(RMatrix * xy,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
      ae_int_t normtype,
      kdtree* kdt,
      ae_state *_state);
-void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
-     /* Integer */ ae_vector* tags,
+void kdtreebuildtagged(RMatrix * xy,
+     ZVector * tags,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
@@ -1915,103 +1915,103 @@ void kdtreecreaterequestbuffer(kdtree* kdt,
      kdtreerequestbuffer* buf,
      ae_state *_state);
 ae_int_t kdtreequeryknn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreetsqueryknn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreequeryrnn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreequeryrnnu(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreetsqueryrnn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreetsqueryrnnu(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state);
 ae_int_t kdtreequeryaknn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      double eps,
      ae_state *_state);
 ae_int_t kdtreetsqueryaknn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      double eps,
      ae_state *_state);
 ae_int_t kdtreequerybox(kdtree* kdt,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state);
 ae_int_t kdtreetsquerybox(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state);
 void kdtreequeryresultsx(kdtree* kdt,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
 void kdtreequeryresultsxy(kdtree* kdt,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state);
 void kdtreequeryresultstags(kdtree* kdt,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state);
 void kdtreequeryresultsdistances(kdtree* kdt,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state);
 void kdtreetsqueryresultsx(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
 void kdtreetsqueryresultsxy(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state);
 void kdtreetsqueryresultstags(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state);
 void kdtreetsqueryresultsdistances(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state);
 void kdtreequeryresultsxi(kdtree* kdt,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
 void kdtreequeryresultsxyi(kdtree* kdt,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state);
 void kdtreequeryresultstagsi(kdtree* kdt,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state);
 void kdtreequeryresultsdistancesi(kdtree* kdt,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state);
 void kdtreeexplorebox(kdtree* kdt,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state);
 void kdtreeexplorenodetype(kdtree* kdt,
      ae_int_t node,
@@ -2019,7 +2019,7 @@ void kdtreeexplorenodetype(kdtree* kdt,
      ae_state *_state);
 void kdtreeexploreleaf(kdtree* kdt,
      ae_int_t node,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t* k,
      ae_state *_state);
 void kdtreeexploresplit(kdtree* kdt,

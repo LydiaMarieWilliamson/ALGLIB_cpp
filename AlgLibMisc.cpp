@@ -4224,7 +4224,7 @@ static ae_int_t nearestneighbor_splitnodesize = 6;
 static ae_int_t nearestneighbor_kdtreefirstversion = 0;
 static ae_int_t nearestneighbor_tsqueryrnn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_bool orderedbydist,
@@ -4252,7 +4252,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
      ae_int_t offs,
      ae_state *_state);
 static void nearestneighbor_kdtreeinitbox(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      kdtreerequestbuffer* buf,
      ae_state *_state);
 static void nearestneighbor_kdtreeallocdatasetindependent(kdtree* kdt,
@@ -4506,7 +4506,7 @@ State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 *************************************************************************/
 void hqrndnormalv(hqrndstate* state,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -4545,7 +4545,7 @@ State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
 void hqrndnormalm(hqrndstate* state,
      ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -4687,7 +4687,7 @@ RESULT
      Copyright 08.11.2011 by Bochkanov Sergey
 *************************************************************************/
 double hqrnddiscrete(hqrndstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -4721,7 +4721,7 @@ RESULT
      Copyright 08.11.2011 by Bochkanov Sergey
 *************************************************************************/
 double hqrndcontinuous(hqrndstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -4862,7 +4862,7 @@ Counts number of True values in the boolean 1D array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_int_t xdebugb1count(/* Boolean */ ae_vector* a, ae_state *_state)
+ae_int_t xdebugb1count(BVector * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t result;
@@ -4890,7 +4890,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugb1not(/* Boolean */ ae_vector* a, ae_state *_state)
+void xdebugb1not(BVector * a, ae_state *_state)
 {
     ae_int_t i;
 
@@ -4912,7 +4912,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugb1appendcopy(/* Boolean */ ae_vector* a, ae_state *_state)
+void xdebugb1appendcopy(BVector * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -4947,7 +4947,7 @@ Array is passed using "out" convention.
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
 void xdebugb1outeven(ae_int_t n,
-     /* Boolean */ ae_vector* a,
+     BVector * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -4971,7 +4971,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_int_t xdebugi1sum(/* Integer */ ae_vector* a, ae_state *_state)
+ae_int_t xdebugi1sum(ZVector * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t result;
@@ -4996,7 +4996,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugi1neg(/* Integer */ ae_vector* a, ae_state *_state)
+void xdebugi1neg(ZVector * a, ae_state *_state)
 {
     ae_int_t i;
 
@@ -5018,7 +5018,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugi1appendcopy(/* Integer */ ae_vector* a, ae_state *_state)
+void xdebugi1appendcopy(ZVector * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5055,7 +5055,7 @@ Array is passed using "out" convention.
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
 void xdebugi1outeven(ae_int_t n,
-     /* Integer */ ae_vector* a,
+     ZVector * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5086,7 +5086,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-double xdebugr1sum(/* Real    */ ae_vector* a, ae_state *_state)
+double xdebugr1sum(RVector * a, ae_state *_state)
 {
     ae_int_t i;
     double result;
@@ -5111,7 +5111,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugr1neg(/* Real    */ ae_vector* a, ae_state *_state)
+void xdebugr1neg(RVector * a, ae_state *_state)
 {
     ae_int_t i;
 
@@ -5133,7 +5133,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugr1appendcopy(/* Real    */ ae_vector* a, ae_state *_state)
+void xdebugr1appendcopy(RVector * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5170,7 +5170,7 @@ Array is passed using "out" convention.
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
 void xdebugr1outeven(ae_int_t n,
-     /* Real    */ ae_vector* a,
+     RVector * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5201,7 +5201,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_complex xdebugc1sum(/* Complex */ ae_vector* a, ae_state *_state)
+ae_complex xdebugc1sum(CVector * a, ae_state *_state)
 {
     ae_int_t i;
     ae_complex result;
@@ -5226,7 +5226,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugc1neg(/* Complex */ ae_vector* a, ae_state *_state)
+void xdebugc1neg(CVector * a, ae_state *_state)
 {
     ae_int_t i;
 
@@ -5248,7 +5248,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugc1appendcopy(/* Complex */ ae_vector* a, ae_state *_state)
+void xdebugc1appendcopy(CVector * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5285,7 +5285,7 @@ Array is passed using "out" convention.
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
 void xdebugc1outeven(ae_int_t n,
-     /* Complex */ ae_vector* a,
+     CVector * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5317,7 +5317,7 @@ Counts number of True values in the boolean 2D array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_int_t xdebugb2count(/* Boolean */ ae_matrix* a, ae_state *_state)
+ae_int_t xdebugb2count(BMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5349,7 +5349,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugb2not(/* Boolean */ ae_matrix* a, ae_state *_state)
+void xdebugb2not(BMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5375,7 +5375,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugb2transpose(/* Boolean */ ae_matrix* a, ae_state *_state)
+void xdebugb2transpose(BMatrix * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5418,7 +5418,7 @@ Array is passed using "out" convention.
 *************************************************************************/
 void xdebugb2outsin(ae_int_t m,
      ae_int_t n,
-     /* Boolean */ ae_matrix* a,
+     BMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5446,7 +5446,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_int_t xdebugi2sum(/* Integer */ ae_matrix* a, ae_state *_state)
+ae_int_t xdebugi2sum(ZMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5475,7 +5475,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugi2neg(/* Integer */ ae_matrix* a, ae_state *_state)
+void xdebugi2neg(ZMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5501,7 +5501,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugi2transpose(/* Integer */ ae_matrix* a, ae_state *_state)
+void xdebugi2transpose(ZMatrix * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5544,7 +5544,7 @@ Array is passed using "out" convention.
 *************************************************************************/
 void xdebugi2outsin(ae_int_t m,
      ae_int_t n,
-     /* Integer */ ae_matrix* a,
+     ZMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5572,7 +5572,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-double xdebugr2sum(/* Real    */ ae_matrix* a, ae_state *_state)
+double xdebugr2sum(RMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5601,7 +5601,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugr2neg(/* Real    */ ae_matrix* a, ae_state *_state)
+void xdebugr2neg(RMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5627,7 +5627,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugr2transpose(/* Real    */ ae_matrix* a, ae_state *_state)
+void xdebugr2transpose(RMatrix * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5670,7 +5670,7 @@ Array is passed using "out" convention.
 *************************************************************************/
 void xdebugr2outsin(ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5698,7 +5698,7 @@ Returns sum of elements in the array.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-ae_complex xdebugc2sum(/* Complex */ ae_matrix* a, ae_state *_state)
+ae_complex xdebugc2sum(CMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5727,7 +5727,7 @@ Array is passed using "shared" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugc2neg(/* Complex */ ae_matrix* a, ae_state *_state)
+void xdebugc2neg(CMatrix * a, ae_state *_state)
 {
     ae_int_t i;
     ae_int_t j;
@@ -5753,7 +5753,7 @@ Array is passed using "var" convention.
   -- ALGLIB --
      Copyright 11.10.2013 by Bochkanov Sergey
 *************************************************************************/
-void xdebugc2transpose(/* Complex */ ae_matrix* a, ae_state *_state)
+void xdebugc2transpose(CMatrix * a, ae_state *_state)
 {
     ae_frame _frame_block;
     ae_int_t i;
@@ -5796,7 +5796,7 @@ Array is passed using "out" convention.
 *************************************************************************/
 void xdebugc2outsincos(ae_int_t m,
      ae_int_t n,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5827,9 +5827,9 @@ Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
 *************************************************************************/
 double xdebugmaskedbiasedproductsum(ae_int_t m,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
-     /* Real    */ ae_matrix* b,
-     /* Boolean */ ae_matrix* c,
+     RMatrix * a,
+     RMatrix * b,
+     BMatrix * c,
      ae_state *_state)
 {
     ae_int_t i;
@@ -5931,7 +5931,7 @@ NOTES
   -- ALGLIB --
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
-void kdtreebuild(/* Real    */ ae_matrix* xy,
+void kdtreebuild(RMatrix * xy,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
@@ -6005,8 +6005,8 @@ NOTES
   -- ALGLIB --
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
-void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
-     /* Integer */ ae_vector* tags,
+void kdtreebuildtagged(RMatrix * xy,
+     ZVector * tags,
      ae_int_t n,
      ae_int_t nx,
      ae_int_t ny,
@@ -6171,7 +6171,7 @@ these results:
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t kdtreequeryknn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6230,7 +6230,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 ae_int_t kdtreetsqueryknn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6286,7 +6286,7 @@ actual results:
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t kdtreequeryrnn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6341,7 +6341,7 @@ As indicated by "U" suffix, this function returns unordered results.
      Copyright 01.11.2018 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t kdtreequeryrnnu(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6405,7 +6405,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 ae_int_t kdtreetsqueryrnn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6468,7 +6468,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 ae_int_t kdtreetsqueryrnnu(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_state *_state)
@@ -6526,7 +6526,7 @@ these results:
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t kdtreequeryaknn(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      double eps,
@@ -6590,7 +6590,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 ae_int_t kdtreetsqueryaknn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t k,
      ae_bool selfmatch,
      double eps,
@@ -6700,8 +6700,8 @@ NOTE: this particular query returns unordered results, because there is no
      Copyright 14.05.2016 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t kdtreequerybox(kdtree* kdt,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state)
 {
     ae_int_t result;
@@ -6754,8 +6754,8 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 ae_int_t kdtreetsquerybox(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state)
 {
     ae_int_t j;
@@ -6841,7 +6841,7 @@ SEE ALSO
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsx(kdtree* kdt,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
 
@@ -6886,7 +6886,7 @@ SEE ALSO
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsxy(kdtree* kdt,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state)
 {
 
@@ -6931,7 +6931,7 @@ SEE ALSO
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultstags(kdtree* kdt,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state)
 {
 
@@ -6975,7 +6975,7 @@ SEE ALSO
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsdistances(kdtree* kdt,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
 
@@ -7017,7 +7017,7 @@ SEE ALSO
 *************************************************************************/
 void kdtreetsqueryresultsx(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7074,7 +7074,7 @@ SEE ALSO
 *************************************************************************/
 void kdtreetsqueryresultsxy(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7136,7 +7136,7 @@ SEE ALSO
 *************************************************************************/
 void kdtreetsqueryresultstags(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7197,7 +7197,7 @@ SEE ALSO
 *************************************************************************/
 void kdtreetsqueryresultsdistances(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7257,7 +7257,7 @@ when you call it from command line.
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsxi(kdtree* kdt,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
 
@@ -7280,7 +7280,7 @@ when you call it from command line.
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsxyi(kdtree* kdt,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_state *_state)
 {
 
@@ -7303,7 +7303,7 @@ when you call it from command line.
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultstagsi(kdtree* kdt,
-     /* Integer */ ae_vector* tags,
+     ZVector * tags,
      ae_state *_state)
 {
 
@@ -7326,7 +7326,7 @@ when you call it from command line.
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void kdtreequeryresultsdistancesi(kdtree* kdt,
-     /* Real    */ ae_vector* r,
+     RVector * r,
      ae_state *_state)
 {
 
@@ -7347,8 +7347,8 @@ This function assumes that output buffers are preallocated by caller.
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
 void kdtreeexplorebox(kdtree* kdt,
-     /* Real    */ ae_vector* boxmin,
-     /* Real    */ ae_vector* boxmax,
+     RVector * boxmin,
+     RVector * boxmax,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7434,7 +7434,7 @@ OUTPUT VALUES:
 *************************************************************************/
 void kdtreeexploreleaf(kdtree* kdt,
      ae_int_t node,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t* k,
      ae_state *_state)
 {
@@ -7668,7 +7668,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 *************************************************************************/
 static ae_int_t nearestneighbor_tsqueryrnn(kdtree* kdt,
      kdtreerequestbuffer* buf,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double r,
      ae_bool selfmatch,
      ae_bool orderedbydist,
@@ -8466,7 +8466,7 @@ Initializes Buf.CurBox[].
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 static void nearestneighbor_kdtreeinitbox(kdtree* kdt,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      kdtreerequestbuffer* buf,
      ae_state *_state)
 {

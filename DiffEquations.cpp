@@ -563,9 +563,9 @@ static double odesolver_odesolvermaxgrow = 3.0;
 static double odesolver_odesolvermaxshrink = 10.0;
 static double odesolver_odesolverguaranteeddecay = 0.9;
 static void odesolver_odesolverinit(ae_int_t solvertype,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t m,
      double eps,
      double h,
@@ -625,9 +625,9 @@ SEE ALSO
   -- ALGLIB --
      Copyright 01.09.2009 by Bochkanov Sergey
 *************************************************************************/
-void odesolverrkck(/* Real    */ ae_vector* y,
+void odesolverrkck(RVector * y,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t m,
      double eps,
      double h,
@@ -1036,8 +1036,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void odesolverresults(odesolverstate* state,
      ae_int_t* m,
-     /* Real    */ ae_vector* xtbl,
-     /* Real    */ ae_matrix* ytbl,
+     RVector * xtbl,
+     RMatrix * ytbl,
      odesolverreport* rep,
      ae_state *_state)
 {
@@ -1074,9 +1074,9 @@ void odesolverresults(odesolverstate* state,
 Internal initialization subroutine
 *************************************************************************/
 static void odesolver_odesolverinit(ae_int_t solvertype,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t m,
      double eps,
      double h,

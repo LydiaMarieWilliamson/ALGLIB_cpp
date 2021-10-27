@@ -16615,20 +16615,20 @@ namespace alglib_impl
 #endif
 #if defined(AE_COMPILE_BDSS) || !defined(AE_PARTIAL_BUILD)
 static double bdss_xlny(double x, double y, ae_state *_state);
-static double bdss_getcv(/* Integer */ ae_vector* cnt,
+static double bdss_getcv(ZVector * cnt,
      ae_int_t nc,
      ae_state *_state);
-static void bdss_tieaddc(/* Integer */ ae_vector* c,
-     /* Integer */ ae_vector* ties,
+static void bdss_tieaddc(ZVector * c,
+     ZVector * ties,
      ae_int_t ntie,
      ae_int_t nc,
-     /* Integer */ ae_vector* cnt,
+     ZVector * cnt,
      ae_state *_state);
-static void bdss_tiesubc(/* Integer */ ae_vector* c,
-     /* Integer */ ae_vector* ties,
+static void bdss_tiesubc(ZVector * c,
+     ZVector * ties,
      ae_int_t ntie,
      ae_int_t nc,
-     /* Integer */ ae_vector* cnt,
+     ZVector * cnt,
      ae_state *_state);
 
 
@@ -16642,30 +16642,30 @@ static ae_int_t mlpbase_hlnfieldwidth = 4;
 static ae_int_t mlpbase_gradbasecasecost = 50000;
 static ae_int_t mlpbase_microbatchsize = 64;
 static void mlpbase_addinputlayer(ae_int_t ncount,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state);
 static void mlpbase_addbiasedsummatorlayer(ae_int_t ncount,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state);
 static void mlpbase_addactivationlayer(ae_int_t functype,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state);
-static void mlpbase_addzerolayer(/* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+static void mlpbase_addzerolayer(ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state);
 static void mlpbase_hladdinputlayer(multilayerperceptron* network,
@@ -16704,44 +16704,44 @@ static void mlpbase_fillhighlevelinformation(multilayerperceptron* network,
      ae_state *_state);
 static void mlpbase_mlpcreate(ae_int_t nin,
      ae_int_t nout,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t layerscount,
      ae_bool isclsnet,
      multilayerperceptron* network,
      ae_state *_state);
 static void mlpbase_mlphessianbatchinternal(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      ae_bool naturalerr,
      double* e,
-     /* Real    */ ae_vector* grad,
-     /* Real    */ ae_matrix* h,
+     RVector * grad,
+     RMatrix * h,
      ae_state *_state);
 static void mlpbase_mlpinternalcalculategradient(multilayerperceptron* network,
-     /* Real    */ ae_vector* neurons,
-     /* Real    */ ae_vector* weights,
-     /* Real    */ ae_vector* derror,
-     /* Real    */ ae_vector* grad,
+     RVector * neurons,
+     RVector * weights,
+     RVector * derror,
+     RVector * grad,
      ae_bool naturalerrorfunc,
      ae_state *_state);
 static void mlpbase_mlpchunkedgradient(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t cstart,
      ae_int_t csize,
-     /* Real    */ ae_vector* batch4buf,
-     /* Real    */ ae_vector* hpcbuf,
+     RVector * batch4buf,
+     RVector * hpcbuf,
      double* e,
      ae_bool naturalerrorfunc,
      ae_state *_state);
 static void mlpbase_mlpchunkedprocess(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t cstart,
      ae_int_t csize,
-     /* Real    */ ae_vector* batch4buf,
-     /* Real    */ ae_vector* hpcbuf,
+     RVector * batch4buf,
+     RVector * hpcbuf,
      ae_state *_state);
 static double mlpbase_safecrossentropy(double t,
      double z,
@@ -16763,41 +16763,41 @@ static ae_int_t clustering_kmeansblocksize = 32;
 static ae_int_t clustering_kmeansparalleldim = 8;
 static ae_int_t clustering_kmeansparallelk = 4;
 static double clustering_complexitymultiplier = 1.0;
-static void clustering_selectinitialcenters(/* Real    */ ae_matrix* xy,
+static void clustering_selectinitialcenters(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t initalgo,
      hqrndstate* rs,
      ae_int_t k,
-     /* Real    */ ae_matrix* ct,
+     RMatrix * ct,
      apbuffers* initbuf,
      ae_shared_pool* updatepool,
      ae_state *_state);
-static ae_bool clustering_fixcenters(/* Real    */ ae_matrix* xy,
+static ae_bool clustering_fixcenters(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
-     /* Real    */ ae_matrix* ct,
+     RMatrix * ct,
      ae_int_t k,
      apbuffers* initbuf,
      ae_shared_pool* updatepool,
      ae_state *_state);
 static void clustering_clusterizerrunahcinternal(clusterizerstate* s,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ahcreport* rep,
      ae_state *_state);
-static void clustering_evaluatedistancematrixrec(/* Real    */ ae_matrix* xy,
+static void clustering_evaluatedistancematrixrec(RMatrix * xy,
      ae_int_t nfeatures,
      ae_int_t disttype,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t j0,
      ae_int_t j1,
      ae_state *_state);
-ae_bool _trypexec_clustering_evaluatedistancematrixrec(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_clustering_evaluatedistancematrixrec(RMatrix * xy,
     ae_int_t nfeatures,
     ae_int_t disttype,
-    /* Real    */ ae_matrix* d,
+    RMatrix * d,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t j0,
@@ -16827,7 +16827,7 @@ static void dforest_buildrandomtreerec(decisionforestbuilder* s,
      dfworkbuf* workbuf,
      ae_int_t workingset,
      ae_int_t varstoselect,
-     /* Real    */ ae_vector* treebuf,
+     RVector * treebuf,
      dfvotebuf* votebuf,
      hqrndstate* rs,
      ae_int_t idx0,
@@ -16866,15 +16866,15 @@ static void dforest_cleanreport(decisionforestbuilder* s,
      dfreport* rep,
      ae_state *_state);
 static double dforest_meannrms2(ae_int_t nclasses,
-     /* Integer */ ae_vector* trnlabelsi,
-     /* Real    */ ae_vector* trnlabelsr,
+     ZVector * trnlabelsi,
+     RVector * trnlabelsr,
      ae_int_t trnidx0,
      ae_int_t trnidx1,
-     /* Integer */ ae_vector* tstlabelsi,
-     /* Real    */ ae_vector* tstlabelsr,
+     ZVector * tstlabelsi,
+     RVector * tstlabelsr,
      ae_int_t tstidx0,
      ae_int_t tstidx1,
-     /* Integer */ ae_vector* tmpi,
+     ZVector * tmpi,
      ae_state *_state);
 static void dforest_choosecurrentsplitdense(decisionforestbuilder* s,
      dfworkbuf* workbuf,
@@ -16898,26 +16898,26 @@ static void dforest_evaluatedensesplit(decisionforestbuilder* s,
      ae_state *_state);
 static void dforest_classifiersplit(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* x,
-     /* Integer */ ae_vector* c,
+     RVector * x,
+     ZVector * c,
      ae_int_t n,
      hqrndstate* rs,
      ae_int_t* info,
      double* threshold,
      double* e,
-     /* Real    */ ae_vector* sortrbuf,
-     /* Integer */ ae_vector* sortibuf,
+     RVector * sortrbuf,
+     ZVector * sortibuf,
      ae_state *_state);
 static void dforest_regressionsplit(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t* info,
      double* threshold,
      double* e,
-     /* Real    */ ae_vector* sortrbuf,
-     /* Real    */ ae_vector* sortrbuf2,
+     RVector * sortrbuf,
+     RVector * sortrbuf2,
      ae_state *_state);
 static double dforest_getsplit(decisionforestbuilder* s,
      double a,
@@ -16926,7 +16926,7 @@ static double dforest_getsplit(decisionforestbuilder* s,
      ae_state *_state);
 static void dforest_outputleaf(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* treebuf,
+     RVector * treebuf,
      dfvotebuf* votebuf,
      ae_int_t idx0,
      ae_int_t idx1,
@@ -16952,14 +16952,14 @@ static ae_int_t dforest_computecompressedsizerec(decisionforest* df,
      ae_bool usemantissa8,
      ae_int_t treeroot,
      ae_int_t treepos,
-     /* Integer */ ae_vector* compressedsizes,
+     ZVector * compressedsizes,
      ae_bool savecompressedsizes,
      ae_state *_state);
 static void dforest_compressrec(decisionforest* df,
      ae_bool usemantissa8,
      ae_int_t treeroot,
      ae_int_t treepos,
-     /* Integer */ ae_vector* compressedsizes,
+     ZVector * compressedsizes,
      ae_vector* buf,
      ae_int_t* dstoffs,
      ae_state *_state);
@@ -16982,19 +16982,19 @@ static double dforest_unstreamfloat(ae_vector* buf,
      ae_int_t* offs,
      ae_state *_state);
 static ae_int_t dforest_dfclserror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state);
 static void dforest_dfprocessinternaluncompressed(decisionforest* df,
      ae_int_t subtreeroot,
      ae_int_t nodeoffs,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state);
 static void dforest_dfprocessinternalcompressed(decisionforest* df,
      ae_int_t offs,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state);
 static double dforest_xfastpow(double r, ae_int_t n, ae_state *_state);
 
@@ -17002,8 +17002,8 @@ static double dforest_xfastpow(double r, ae_int_t n, ae_state *_state);
 #endif
 #if defined(AE_COMPILE_LINREG) || !defined(AE_PARTIAL_BUILD)
 static ae_int_t linreg_lrvnum = 5;
-static void linreg_lrinternal(/* Real    */ ae_matrix* xy,
-     /* Real    */ ae_vector* s,
+static void linreg_lrinternal(RMatrix * xy,
+     RVector * s,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -17027,21 +17027,21 @@ static void ssa_updatebasis(ssamodel* s,
      double updateits,
      ae_state *_state);
 static void ssa_analyzesequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t i0,
      ae_int_t i1,
-     /* Real    */ ae_vector* trend,
-     /* Real    */ ae_vector* noise,
+     RVector * trend,
+     RVector * noise,
      ae_int_t offs,
      ae_state *_state);
 static void ssa_forecastavgsequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t m,
      ae_int_t forecastlen,
      ae_bool smooth,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_int_t offs,
      ae_state *_state);
 static void ssa_realtimedequeue(ssamodel* s,
@@ -17054,12 +17054,12 @@ static void ssa_updatexxtprepare(ssamodel* s,
      ae_int_t memorylimit,
      ae_state *_state);
 static void ssa_updatexxtsend(ssamodel* s,
-     /* Real    */ ae_vector* u,
+     RVector * u,
      ae_int_t i0,
-     /* Real    */ ae_matrix* xxt,
+     RMatrix * xxt,
      ae_state *_state);
 static void ssa_updatexxtfinalize(ssamodel* s,
-     /* Real    */ ae_matrix* xxt,
+     RMatrix * xxt,
      ae_state *_state);
 
 
@@ -17086,11 +17086,11 @@ static ae_int_t logit_maxfev = 20;
 static double logit_stpmin = 1.0E-2;
 static double logit_stpmax = 1.0E5;
 static ae_int_t logit_logitvnum = 6;
-static void logit_mnliexp(/* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* x,
+static void logit_mnliexp(RVector * w,
+     RVector * x,
      ae_state *_state);
 static void logit_mnlallerrors(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double* relcls,
      double* avgce,
@@ -17099,14 +17099,14 @@ static void logit_mnlallerrors(logitmodel* lm,
      double* avgrel,
      ae_state *_state);
 static void logit_mnlmcsrch(ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double* f,
-     /* Real    */ ae_vector* g,
-     /* Real    */ ae_vector* s,
+     RVector * g,
+     RVector * s,
      double* stp,
      ae_int_t* info,
      ae_int_t* nfev,
-     /* Real    */ ae_vector* wa,
+     RVector * wa,
      logitmcstate* state,
      ae_int_t* stage,
      ae_state *_state);
@@ -17140,7 +17140,7 @@ static void knn_processinternal(knnmodel* model,
 static double mlptrain_mindecay = 0.001;
 static ae_int_t mlptrain_defaultlbfgsfactor = 6;
 static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron* n,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -17152,38 +17152,38 @@ static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron* n,
      mlpreport* rep,
      mlpcvreport* cvrep,
      ae_state *_state);
-static void mlptrain_mlpkfoldsplit(/* Real    */ ae_matrix* xy,
+static void mlptrain_mlpkfoldsplit(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nclasses,
      ae_int_t foldscount,
      ae_bool stratifiedsplits,
-     /* Integer */ ae_vector* folds,
+     ZVector * folds,
      ae_state *_state);
 static void mlptrain_mthreadcv(mlptrainer* s,
      ae_int_t rowsize,
      ae_int_t nrestarts,
-     /* Integer */ ae_vector* folds,
+     ZVector * folds,
      ae_int_t fold,
      ae_int_t dfold,
-     /* Real    */ ae_matrix* cvy,
+     RMatrix * cvy,
      ae_shared_pool* pooldatacv,
      ae_int_t wcount,
      ae_state *_state);
 ae_bool _trypexec_mlptrain_mthreadcv(mlptrainer* s,
     ae_int_t rowsize,
     ae_int_t nrestarts,
-    /* Integer */ ae_vector* folds,
+    ZVector * folds,
     ae_int_t fold,
     ae_int_t dfold,
-    /* Real    */ ae_matrix* cvy,
+    RMatrix * cvy,
     ae_shared_pool* pooldatacv,
     ae_int_t wcount, ae_state *_state);
 static void mlptrain_mlptrainnetworkx(mlptrainer* s,
      ae_int_t nrestarts,
      ae_int_t algokind,
-     /* Integer */ ae_vector* trnsubset,
+     ZVector * trnsubset,
      ae_int_t trnsubsetsize,
-     /* Integer */ ae_vector* valsubset,
+     ZVector * valsubset,
      ae_int_t valsubsetsize,
      multilayerperceptron* network,
      mlpreport* rep,
@@ -17193,9 +17193,9 @@ static void mlptrain_mlptrainnetworkx(mlptrainer* s,
 ae_bool _trypexec_mlptrain_mlptrainnetworkx(mlptrainer* s,
     ae_int_t nrestarts,
     ae_int_t algokind,
-    /* Integer */ ae_vector* trnsubset,
+    ZVector * trnsubset,
     ae_int_t trnsubsetsize,
-    /* Integer */ ae_vector* valsubset,
+    ZVector * valsubset,
     ae_int_t valsubsetsize,
     multilayerperceptron* network,
     mlpreport* rep,
@@ -17223,18 +17223,18 @@ ae_bool _trypexec_mlptrain_mlptrainensemblex(mlptrainer* s,
 static void mlptrain_mlpstarttrainingx(mlptrainer* s,
      ae_bool randomstart,
      ae_int_t algokind,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      smlptrnsession* session,
      ae_state *_state);
 static ae_bool mlptrain_mlpcontinuetrainingx(mlptrainer* s,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      ae_int_t* ngradbatch,
      smlptrnsession* session,
      ae_state *_state);
 static void mlptrain_mlpebagginginternal(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -17333,12 +17333,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 25.08.2008 by Bochkanov Sergey
 *************************************************************************/
-void pcabuildbasis(/* Real    */ ae_matrix* x,
+void pcabuildbasis(RMatrix * x,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
-     /* Real    */ ae_vector* s2,
-     /* Real    */ ae_matrix* v,
+     RVector * s2,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -17526,14 +17526,14 @@ stopping condition. Exact value of automatically selected eps is  version-
   -- ALGLIB --
      Copyright 10.01.2017 by Bochkanov Sergey
 *************************************************************************/
-void pcatruncatedsubspace(/* Real    */ ae_matrix* x,
+void pcatruncatedsubspace(RMatrix * x,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nneeded,
      double eps,
      ae_int_t maxits,
-     /* Real    */ ae_vector* s2,
-     /* Real    */ ae_matrix* v,
+     RVector * s2,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -17727,8 +17727,8 @@ void pcatruncatedsubspacesparse(sparsematrix* x,
      ae_int_t nneeded,
      double eps,
      ae_int_t maxits,
-     /* Real    */ ae_vector* s2,
-     /* Real    */ ae_matrix* v,
+     RVector * s2,
+     RMatrix * v,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -17921,7 +17921,7 @@ NOTES(2):
      Copyright 11.01.2009 by Bochkanov Sergey
 *************************************************************************/
 void dserrallocate(ae_int_t nclasses,
-     /* Real    */ ae_vector* buf,
+     RVector * buf,
      ae_state *_state)
 {
 
@@ -17945,9 +17945,9 @@ See DSErrAllocate for comments on this routine.
   -- ALGLIB --
      Copyright 11.01.2009 by Bochkanov Sergey
 *************************************************************************/
-void dserraccumulate(/* Real    */ ae_vector* buf,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* desiredy,
+void dserraccumulate(RVector * buf,
+     RVector * y,
+     RVector * desiredy,
      ae_state *_state)
 {
     ae_int_t nclasses;
@@ -18060,7 +18060,7 @@ See DSErrAllocate for comments on this routine.
   -- ALGLIB --
      Copyright 11.01.2009 by Bochkanov Sergey
 *************************************************************************/
-void dserrfinish(/* Real    */ ae_vector* buf, ae_state *_state)
+void dserrfinish(RVector * buf, ae_state *_state)
 {
     ae_int_t nout;
     ae_int_t offs;
@@ -18087,12 +18087,12 @@ void dserrfinish(/* Real    */ ae_vector* buf, ae_state *_state)
   -- ALGLIB --
      Copyright 19.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dsnormalize(/* Real    */ ae_matrix* xy,
+void dsnormalize(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
-     /* Real    */ ae_vector* means,
-     /* Real    */ ae_vector* sigmas,
+     RVector * means,
+     RVector * sigmas,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -18153,12 +18153,12 @@ void dsnormalize(/* Real    */ ae_matrix* xy,
   -- ALGLIB --
      Copyright 19.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dsnormalizec(/* Real    */ ae_matrix* xy,
+void dsnormalizec(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
-     /* Real    */ ae_vector* means,
-     /* Real    */ ae_vector* sigmas,
+     RVector * means,
+     RVector * sigmas,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -18214,7 +18214,7 @@ void dsnormalizec(/* Real    */ ae_matrix* xy,
   -- ALGLIB --
      Copyright 19.05.2008 by Bochkanov Sergey
 *************************************************************************/
-double dsgetmeanmindistance(/* Real    */ ae_matrix* xy,
+double dsgetmeanmindistance(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_state *_state)
@@ -18280,12 +18280,12 @@ double dsgetmeanmindistance(/* Real    */ ae_matrix* xy,
   -- ALGLIB --
      Copyright 19.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dstie(/* Real    */ ae_vector* a,
+void dstie(RVector * a,
      ae_int_t n,
-     /* Integer */ ae_vector* ties,
+     ZVector * ties,
      ae_int_t* tiecount,
-     /* Integer */ ae_vector* p1,
-     /* Integer */ ae_vector* p2,
+     ZVector * p1,
+     ZVector * p2,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -18349,13 +18349,13 @@ void dstie(/* Real    */ ae_vector* a,
   -- ALGLIB --
      Copyright 11.12.2008 by Bochkanov Sergey
 *************************************************************************/
-void dstiefasti(/* Real    */ ae_vector* a,
-     /* Integer */ ae_vector* b,
+void dstiefasti(RVector * a,
+     ZVector * b,
      ae_int_t n,
-     /* Integer */ ae_vector* ties,
+     ZVector * ties,
      ae_int_t* tiecount,
-     /* Real    */ ae_vector* bufr,
-     /* Integer */ ae_vector* bufi,
+     RVector * bufr,
+     ZVector * bufi,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -18430,8 +18430,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 22.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dsoptimalsplit2(/* Real    */ ae_vector* a,
-     /* Integer */ ae_vector* c,
+void dsoptimalsplit2(RVector * a,
+     ZVector * c,
      ae_int_t n,
      ae_int_t* info,
      double* threshold,
@@ -18663,12 +18663,12 @@ Note:
   -- ALGLIB --
      Copyright 11.12.2008 by Bochkanov Sergey
 *************************************************************************/
-void dsoptimalsplit2fast(/* Real    */ ae_vector* a,
-     /* Integer */ ae_vector* c,
-     /* Integer */ ae_vector* tiesbuf,
-     /* Integer */ ae_vector* cntbuf,
-     /* Real    */ ae_vector* bufr,
-     /* Integer */ ae_vector* bufi,
+void dsoptimalsplit2fast(RVector * a,
+     ZVector * c,
+     ZVector * tiesbuf,
+     ZVector * cntbuf,
+     RVector * bufr,
+     ZVector * bufi,
      ae_int_t n,
      ae_int_t nc,
      double alpha,
@@ -18844,13 +18844,13 @@ Automatic non-optimal discretization, internal subroutine.
   -- ALGLIB --
      Copyright 22.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dssplitk(/* Real    */ ae_vector* a,
-     /* Integer */ ae_vector* c,
+void dssplitk(RVector * a,
+     ZVector * c,
      ae_int_t n,
      ae_int_t nc,
      ae_int_t kmax,
      ae_int_t* info,
-     /* Real    */ ae_vector* thresholds,
+     RVector * thresholds,
      ae_int_t* ni,
      double* cve,
      ae_state *_state)
@@ -19108,13 +19108,13 @@ Automatic optimal discretization, internal subroutine.
   -- ALGLIB --
      Copyright 22.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void dsoptimalsplitk(/* Real    */ ae_vector* a,
-     /* Integer */ ae_vector* c,
+void dsoptimalsplitk(RVector * a,
+     ZVector * c,
      ae_int_t n,
      ae_int_t nc,
      ae_int_t kmax,
      ae_int_t* info,
-     /* Real    */ ae_vector* thresholds,
+     RVector * thresholds,
      ae_int_t* ni,
      double* cve,
      ae_state *_state)
@@ -19388,7 +19388,7 @@ static double bdss_xlny(double x, double y, ae_state *_state)
 Internal function,
 returns number of samples of class I in Cnt[I]
 *************************************************************************/
-static double bdss_getcv(/* Integer */ ae_vector* cnt,
+static double bdss_getcv(ZVector * cnt,
      ae_int_t nc,
      ae_state *_state)
 {
@@ -19414,11 +19414,11 @@ static double bdss_getcv(/* Integer */ ae_vector* cnt,
 /*************************************************************************
 Internal function, adds number of samples of class I in tie NTie to Cnt[I]
 *************************************************************************/
-static void bdss_tieaddc(/* Integer */ ae_vector* c,
-     /* Integer */ ae_vector* ties,
+static void bdss_tieaddc(ZVector * c,
+     ZVector * ties,
      ae_int_t ntie,
      ae_int_t nc,
-     /* Integer */ ae_vector* cnt,
+     ZVector * cnt,
      ae_state *_state)
 {
     ae_int_t i;
@@ -19434,11 +19434,11 @@ static void bdss_tieaddc(/* Integer */ ae_vector* c,
 /*************************************************************************
 Internal function, subtracts number of samples of class I in tie NTie to Cnt[I]
 *************************************************************************/
-static void bdss_tiesubc(/* Integer */ ae_vector* c,
-     /* Integer */ ae_vector* ties,
+static void bdss_tiesubc(ZVector * c,
+     ZVector * ties,
      ae_int_t ntie,
      ae_int_t nc,
-     /* Integer */ ae_vector* cnt,
+     ZVector * cnt,
      ae_state *_state)
 {
     ae_int_t i;
@@ -20550,7 +20550,7 @@ OUTPUT PARAMETERS:
      Copyright 20.06.2013 by Bochkanov Sergey
 *************************************************************************/
 void mlpexporttunableparameters(multilayerperceptron* network,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_int_t* pcount,
      ae_state *_state)
 {
@@ -20619,7 +20619,7 @@ INPUT PARAMETERS:
      Copyright 20.06.2013 by Bochkanov Sergey
 *************************************************************************/
 void mlpimporttunableparameters(multilayerperceptron* network,
-     /* Real    */ ae_vector* p,
+     RVector * p,
      ae_state *_state)
 {
     ae_int_t i;
@@ -20681,7 +20681,7 @@ OUTPUT PARAMETERS:
      Copyright 29.03.2008 by Bochkanov Sergey
 *************************************************************************/
 void mlpserializeold(multilayerperceptron* network,
-     /* Real    */ ae_vector* ra,
+     RVector * ra,
      ae_int_t* rlen,
      ae_state *_state)
 {
@@ -20756,7 +20756,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 29.03.2008 by Bochkanov Sergey
 *************************************************************************/
-void mlpunserializeold(/* Real    */ ae_vector* ra,
+void mlpunserializeold(RVector * ra,
      multilayerperceptron* network,
      ae_state *_state)
 {
@@ -21109,7 +21109,7 @@ Internal subroutine.
      Copyright 30.03.2008 by Bochkanov Sergey
 *************************************************************************/
 void mlpinitpreprocessor(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      ae_state *_state)
 {
@@ -21422,9 +21422,9 @@ NOTE: when  SubsetSize<0 is used full dataset by call MLPInitPreprocessor
      Copyright 23.08.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpinitpreprocessorsubset(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subsetsize,
      ae_state *_state)
 {
@@ -21605,7 +21605,7 @@ NOTE: when SubsetSize<0 is used full dataset by call
 void mlpinitpreprocessorsparsesubset(multilayerperceptron* network,
      sparsematrix* xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subsetsize,
      ae_state *_state)
 {
@@ -22461,8 +22461,8 @@ See also MLPProcessI
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpprocess(multilayerperceptron* network,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -22488,8 +22488,8 @@ when you call it from command line.
      Copyright 21.09.2010 by Bochkanov Sergey
 *************************************************************************/
 void mlpprocessi(multilayerperceptron* network,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -22544,7 +22544,7 @@ dataset format is used:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 double mlperror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -22654,7 +22654,7 @@ receives no speed-up from being executed in SMP mode.
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 double mlperrorn(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      ae_state *_state)
 {
@@ -22753,7 +22753,7 @@ dataset format is used:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t mlpclserror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -22824,7 +22824,7 @@ dataset format is used:
      Copyright 25.12.2008 by Bochkanov Sergey
 *************************************************************************/
 double mlprelclserror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -22974,7 +22974,7 @@ dataset format is used:
      Copyright 08.01.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlpavgce(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -23123,7 +23123,7 @@ dataset format is used:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 double mlprmserror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -23271,7 +23271,7 @@ dataset format is used:
      Copyright 11.03.2008 by Bochkanov Sergey
 *************************************************************************/
 double mlpavgerror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -23419,7 +23419,7 @@ dataset format is used:
      Copyright 11.03.2008 by Bochkanov Sergey
 *************************************************************************/
 double mlpavgrelerror(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -23541,10 +23541,10 @@ OUTPUT PARAMETERS:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpgrad(multilayerperceptron* network,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* desiredy,
+     RVector * x,
+     RVector * desiredy,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_int_t i;
@@ -23604,10 +23604,10 @@ OUTPUT PARAMETERS:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpgradn(multilayerperceptron* network,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* desiredy,
+     RVector * x,
+     RVector * desiredy,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     double s;
@@ -23707,10 +23707,10 @@ OUTPUT PARAMETERS:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpgradbatch(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23806,7 +23806,7 @@ void mlpgradbatchsparse(multilayerperceptron* network,
      sparsematrix* xy,
      ae_int_t ssize,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -23912,12 +23912,12 @@ OUTPUT PARAMETERS:
      Copyright 26.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpgradbatchsubset(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subsetsize,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -24046,10 +24046,10 @@ NOTE: when  SubsetSize<0 is used full dataset by call MLPGradBatchSparse
 void mlpgradbatchsparsesubset(multilayerperceptron* network,
      sparsematrix* xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subsetsize,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -24132,11 +24132,11 @@ THIS FUNCTION IS NOT INTENDED TO BE USED BY ALGLIB USERS!
      Copyright 26.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpgradbatchx(multilayerperceptron* network,
-     /* Real    */ ae_matrix* densexy,
+     RMatrix * densexy,
      sparsematrix* sparsexy,
      ae_int_t datasetsize,
      ae_int_t datasettype,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subset0,
      ae_int_t subset1,
      ae_int_t subsettype,
@@ -24275,11 +24275,11 @@ void mlpgradbatchx(multilayerperceptron* network,
 Serial stub for GPL edition.
 *************************************************************************/
 ae_bool _trypexec_mlpgradbatchx(multilayerperceptron* network,
-    /* Real    */ ae_matrix* densexy,
+    RMatrix * densexy,
     sparsematrix* sparsexy,
     ae_int_t datasetsize,
     ae_int_t datasettype,
-    /* Integer */ ae_vector* idx,
+    ZVector * idx,
     ae_int_t subset0,
     ae_int_t subset1,
     ae_int_t subsettype,
@@ -24315,10 +24315,10 @@ OUTPUT PARAMETERS:
      Copyright 04.11.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpgradnbatch(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      double* e,
-     /* Real    */ ae_vector* grad,
+     RVector * grad,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -24372,11 +24372,11 @@ Internal subroutine.
      Neural Computation, 1994.
 *************************************************************************/
 void mlphessiannbatch(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      double* e,
-     /* Real    */ ae_vector* grad,
-     /* Real    */ ae_matrix* h,
+     RVector * grad,
+     RMatrix * h,
      ae_state *_state)
 {
 
@@ -24399,11 +24399,11 @@ Internal subroutine.
      Neural Computation, 1994.
 *************************************************************************/
 void mlphessianbatch(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      double* e,
-     /* Real    */ ae_vector* grad,
-     /* Real    */ ae_matrix* h,
+     RVector * grad,
+     RMatrix * h,
      ae_state *_state)
 {
 
@@ -24416,14 +24416,14 @@ void mlphessianbatch(multilayerperceptron* network,
 /*************************************************************************
 Internal subroutine, shouldn't be called by user.
 *************************************************************************/
-void mlpinternalprocessvector(/* Integer */ ae_vector* structinfo,
-     /* Real    */ ae_vector* weights,
-     /* Real    */ ae_vector* columnmeans,
-     /* Real    */ ae_vector* columnsigmas,
-     /* Real    */ ae_vector* neurons,
-     /* Real    */ ae_vector* dfdnet,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+void mlpinternalprocessvector(ZVector * structinfo,
+     RVector * weights,
+     RVector * columnmeans,
+     RVector * columnsigmas,
+     RVector * neurons,
+     RVector * dfdnet,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -24843,9 +24843,9 @@ OUTPUT PARAMETERS:
      Copyright 04.09.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpallerrorssubset(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      modelerrors* rep,
      ae_state *_state)
@@ -24923,7 +24923,7 @@ OUTPUT PARAMETERS:
 void mlpallerrorssparsesubset(multilayerperceptron* network,
      sparsematrix* xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      modelerrors* rep,
      ae_state *_state)
@@ -25015,9 +25015,9 @@ dataset format is used:
      Copyright 04.09.2012 by Bochkanov Sergey
 *************************************************************************/
 double mlperrorsubset(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      ae_state *_state)
 {
@@ -25116,7 +25116,7 @@ dataset format is used:
 double mlperrorsparsesubset(multilayerperceptron* network,
      sparsematrix* xy,
      ae_int_t setsize,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      ae_state *_state)
 {
@@ -25167,11 +25167,11 @@ THIS INTERNAL FUNCTION IS NOT INTENDED TO BE USED BY ALGLIB USERS!
      Copyright 26.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpallerrorsx(multilayerperceptron* network,
-     /* Real    */ ae_matrix* densexy,
+     RMatrix * densexy,
      sparsematrix* sparsexy,
      ae_int_t datasetsize,
      ae_int_t datasettype,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subset0,
      ae_int_t subset1,
      ae_int_t subsettype,
@@ -25350,11 +25350,11 @@ void mlpallerrorsx(multilayerperceptron* network,
 Serial stub for GPL edition.
 *************************************************************************/
 ae_bool _trypexec_mlpallerrorsx(multilayerperceptron* network,
-    /* Real    */ ae_matrix* densexy,
+    RMatrix * densexy,
     sparsematrix* sparsexy,
     ae_int_t datasetsize,
     ae_int_t datasettype,
-    /* Integer */ ae_vector* idx,
+    ZVector * idx,
     ae_int_t subset0,
     ae_int_t subset1,
     ae_int_t subsettype,
@@ -25370,10 +25370,10 @@ ae_bool _trypexec_mlpallerrorsx(multilayerperceptron* network,
 Internal subroutine: adding new input layer to network
 *************************************************************************/
 static void mlpbase_addinputlayer(ae_int_t ncount,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state)
 {
@@ -25391,10 +25391,10 @@ static void mlpbase_addinputlayer(ae_int_t ncount,
 Internal subroutine: adding new summator layer to network
 *************************************************************************/
 static void mlpbase_addbiasedsummatorlayer(ae_int_t ncount,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state)
 {
@@ -25416,10 +25416,10 @@ static void mlpbase_addbiasedsummatorlayer(ae_int_t ncount,
 Internal subroutine: adding new summator layer to network
 *************************************************************************/
 static void mlpbase_addactivationlayer(ae_int_t functype,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state)
 {
@@ -25437,10 +25437,10 @@ static void mlpbase_addactivationlayer(ae_int_t functype,
 /*************************************************************************
 Internal subroutine: adding new zero layer to network
 *************************************************************************/
-static void mlpbase_addzerolayer(/* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+static void mlpbase_addzerolayer(ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t* lastproc,
      ae_state *_state)
 {
@@ -25816,10 +25816,10 @@ Internal subroutine.
 *************************************************************************/
 static void mlpbase_mlpcreate(ae_int_t nin,
      ae_int_t nout,
-     /* Integer */ ae_vector* lsizes,
-     /* Integer */ ae_vector* ltypes,
-     /* Integer */ ae_vector* lconnfirst,
-     /* Integer */ ae_vector* lconnlast,
+     ZVector * lsizes,
+     ZVector * ltypes,
+     ZVector * lconnfirst,
+     ZVector * lconnlast,
      ae_int_t layerscount,
      ae_bool isclsnet,
      multilayerperceptron* network,
@@ -26043,12 +26043,12 @@ Internal subroutine for Hessian calculation.
 WARNING! Unspeakable math far beyong human capabilities :)
 *************************************************************************/
 static void mlpbase_mlphessianbatchinternal(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      ae_bool naturalerr,
      double* e,
-     /* Real    */ ae_vector* grad,
-     /* Real    */ ae_matrix* h,
+     RVector * grad,
+     RMatrix * h,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -26523,10 +26523,10 @@ Internal subroutine
 Network must be processed by MLPProcess on X
 *************************************************************************/
 static void mlpbase_mlpinternalcalculategradient(multilayerperceptron* network,
-     /* Real    */ ae_vector* neurons,
-     /* Real    */ ae_vector* weights,
-     /* Real    */ ae_vector* derror,
-     /* Real    */ ae_vector* grad,
+     RVector * neurons,
+     RVector * weights,
+     RVector * derror,
+     RVector * grad,
      ae_bool naturalerrorfunc,
      ae_state *_state)
 {
@@ -26665,11 +26665,11 @@ static void mlpbase_mlpinternalcalculategradient(multilayerperceptron* network,
 
 
 static void mlpbase_mlpchunkedgradient(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t cstart,
      ae_int_t csize,
-     /* Real    */ ae_vector* batch4buf,
-     /* Real    */ ae_vector* hpcbuf,
+     RVector * batch4buf,
+     RVector * hpcbuf,
      double* e,
      ae_bool naturalerrorfunc,
      ae_state *_state)
@@ -27196,11 +27196,11 @@ static void mlpbase_mlpchunkedgradient(multilayerperceptron* network,
 
 
 static void mlpbase_mlpchunkedprocess(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t cstart,
      ae_int_t csize,
-     /* Real    */ ae_vector* batch4buf,
-     /* Real    */ ae_vector* hpcbuf,
+     RVector * batch4buf,
+     RVector * hpcbuf,
      ae_state *_state)
 {
     ae_int_t i;
@@ -28394,8 +28394,8 @@ OUTPUT PARAMETERS:
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpeprocess(mlpensemble* ensemble,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -28450,8 +28450,8 @@ when you call it from command line.
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpeprocessi(mlpensemble* ensemble,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -28468,11 +28468,11 @@ Calculation of all types of errors
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpeallerrorsx(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* densexy,
+     RMatrix * densexy,
      sparsematrix* sparsexy,
      ae_int_t datasetsize,
      ae_int_t datasettype,
-     /* Integer */ ae_vector* idx,
+     ZVector * idx,
      ae_int_t subset0,
      ae_int_t subset1,
      ae_int_t subsettype,
@@ -28675,7 +28675,7 @@ are used as classifiers.
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlperelclserror(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -28710,7 +28710,7 @@ RESULT:
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlpeavgce(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -28746,7 +28746,7 @@ RMS error means error when estimating posterior probabilities.
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlpermserror(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -28781,7 +28781,7 @@ it means average error when estimating posterior probabilities.
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlpeavgerror(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -28816,7 +28816,7 @@ it means average relative error when estimating posterior probabilities.
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double mlpeavgrelerror(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -29049,7 +29049,7 @@ NOTE 2: different clustering algorithms have different limitations:
      Copyright 10.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void clusterizersetpoints(clusterizerstate* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
      ae_int_t disttype,
@@ -29105,7 +29105,7 @@ NOTE 1: different clustering algorithms have different limitations:
      Copyright 10.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void clusterizersetdistances(clusterizerstate* s,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ae_int_t npoints,
      ae_bool isupper,
      ae_state *_state)
@@ -29611,11 +29611,11 @@ NOTE:  different distance functions have different performance penalty:
   -- ALGLIB --
      Copyright 10.07.2012 by Bochkanov Sergey
 *************************************************************************/
-void clusterizergetdistances(/* Real    */ ae_matrix* xy,
+void clusterizergetdistances(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
      ae_int_t disttype,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -29645,11 +29645,11 @@ allocated space.
      Copyright 29.05.2015 by Bochkanov Sergey
 *************************************************************************/
 void clusterizergetdistancesbuf(apbuffers* buf,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nfeatures,
      ae_int_t disttype,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ae_state *_state)
 {
     ae_int_t i;
@@ -29921,8 +29921,8 @@ NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
 *************************************************************************/
 void clusterizergetkclusters(ahcreport* rep,
      ae_int_t k,
-     /* Integer */ ae_vector* cidx,
-     /* Integer */ ae_vector* cz,
+     ZVector * cidx,
+     ZVector * cz,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -30103,8 +30103,8 @@ NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
 void clusterizerseparatedbydist(ahcreport* rep,
      double r,
      ae_int_t* k,
-     /* Integer */ ae_vector* cidx,
-     /* Integer */ ae_vector* cz,
+     ZVector * cidx,
+     ZVector * cz,
      ae_state *_state)
 {
 
@@ -30174,8 +30174,8 @@ NOTE: this subroutine is optimized for moderate values of K. Say, for  K=5
 void clusterizerseparatedbycorr(ahcreport* rep,
      double r,
      ae_int_t* k,
-     /* Integer */ ae_vector* cidx,
-     /* Integer */ ae_vector* cz,
+     ZVector * cidx,
+     ZVector * cz,
      ae_state *_state)
 {
 
@@ -30272,7 +30272,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 21.03.2009 by Bochkanov Sergey
 *************************************************************************/
-void kmeansgenerateinternal(/* Real    */ ae_matrix* xy,
+void kmeansgenerateinternal(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t k,
@@ -30283,11 +30283,11 @@ void kmeansgenerateinternal(/* Real    */ ae_matrix* xy,
      ae_bool kmeansdbgnoits,
      ae_int_t* info,
      ae_int_t* iterationscount,
-     /* Real    */ ae_matrix* ccol,
+     RMatrix * ccol,
      ae_bool needccol,
-     /* Real    */ ae_matrix* crow,
+     RMatrix * crow,
      ae_bool needcrow,
-     /* Integer */ ae_vector* xyc,
+     ZVector * xyc,
      double* energy,
      kmeansbuffers* buf,
      ae_state *_state)
@@ -30569,15 +30569,15 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 21.01.2015 by Bochkanov Sergey
 *************************************************************************/
-void kmeansupdatedistances(/* Real    */ ae_matrix* xy,
+void kmeansupdatedistances(RMatrix * xy,
      ae_int_t idx0,
      ae_int_t idx1,
      ae_int_t nvars,
-     /* Real    */ ae_matrix* ct,
+     RMatrix * ct,
      ae_int_t cidx0,
      ae_int_t cidx1,
-     /* Integer */ ae_vector* xyc,
-     /* Real    */ ae_vector* xydist2,
+     ZVector * xyc,
+     RVector * xydist2,
      ae_shared_pool* bufferpool,
      ae_state *_state)
 {
@@ -30868,15 +30868,15 @@ void kmeansupdatedistances(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_kmeansupdatedistances(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_kmeansupdatedistances(RMatrix * xy,
     ae_int_t idx0,
     ae_int_t idx1,
     ae_int_t nvars,
-    /* Real    */ ae_matrix* ct,
+    RMatrix * ct,
     ae_int_t cidx0,
     ae_int_t cidx1,
-    /* Integer */ ae_vector* xyc,
-    /* Real    */ ae_vector* xydist2,
+    ZVector * xyc,
+    RVector * xydist2,
     ae_shared_pool* bufferpool,
     ae_state *_state)
 {
@@ -30927,13 +30927,13 @@ RESULT:
   -- ALGLIB --
      Copyright 21.01.2015 by Bochkanov Sergey
 *************************************************************************/
-static void clustering_selectinitialcenters(/* Real    */ ae_matrix* xy,
+static void clustering_selectinitialcenters(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t initalgo,
      hqrndstate* rs,
      ae_int_t k,
-     /* Real    */ ae_matrix* ct,
+     RMatrix * ct,
      apbuffers* initbuf,
      ae_shared_pool* updatepool,
      ae_state *_state)
@@ -31262,10 +31262,10 @@ RESULT:
   -- ALGLIB --
      Copyright 21.01.2015 by Bochkanov Sergey
 *************************************************************************/
-static ae_bool clustering_fixcenters(/* Real    */ ae_matrix* xy,
+static ae_bool clustering_fixcenters(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
-     /* Real    */ ae_matrix* ct,
+     RMatrix * ct,
      ae_int_t k,
      apbuffers* initbuf,
      ae_shared_pool* updatepool,
@@ -31392,7 +31392,7 @@ OUTPUT PARAMETERS:
      Copyright 10.07.2012 by Bochkanov Sergey
 *************************************************************************/
 static void clustering_clusterizerrunahcinternal(clusterizerstate* s,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ahcreport* rep,
      ae_state *_state)
 {
@@ -31793,10 +31793,10 @@ NOTE: intersection of [I0,I1) and [J0,J1)  may  completely  lie  in  upper
   -- ALGLIB --
      Copyright 07.04.2013 by Bochkanov Sergey
 *************************************************************************/
-static void clustering_evaluatedistancematrixrec(/* Real    */ ae_matrix* xy,
+static void clustering_evaluatedistancematrixrec(RMatrix * xy,
      ae_int_t nfeatures,
      ae_int_t disttype,
-     /* Real    */ ae_matrix* d,
+     RMatrix * d,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t j0,
@@ -31916,10 +31916,10 @@ static void clustering_evaluatedistancematrixrec(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Serial stub for GPL edition.
 *************************************************************************/
-ae_bool _trypexec_clustering_evaluatedistancematrixrec(/* Real    */ ae_matrix* xy,
+ae_bool _trypexec_clustering_evaluatedistancematrixrec(RMatrix * xy,
     ae_int_t nfeatures,
     ae_int_t disttype,
-    /* Real    */ ae_matrix* d,
+    RMatrix * d,
     ae_int_t i0,
     ae_int_t i1,
     ae_int_t j0,
@@ -32273,7 +32273,7 @@ OUTPUT PARAMETERS:
      Copyright 21.05.2018 by Bochkanov Sergey
 *************************************************************************/
 void dfbuildersetdataset(decisionforestbuilder* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -33160,8 +33160,8 @@ See also DFProcessI.
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void dfprocess(decisionforest* df,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t offs;
@@ -33244,8 +33244,8 @@ IMPORTANT: this  function  is  thread-unsafe  and  may   modify   internal
      Copyright 28.02.2010 by Bochkanov Sergey
 *************************************************************************/
 void dfprocessi(decisionforest* df,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -33288,7 +33288,7 @@ RESULT:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double dfprocess0(decisionforest* model,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -33333,7 +33333,7 @@ RESULT:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t dfclassify(decisionforest* model,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -33394,8 +33394,8 @@ See also DFProcessI.
 *************************************************************************/
 void dftsprocess(decisionforest* df,
      decisionforestbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -33428,7 +33428,7 @@ RESULT:
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double dfrelclserror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -33456,7 +33456,7 @@ RESULT:
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double dfavgce(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -33531,7 +33531,7 @@ RESULT:
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double dfrmserror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -33616,7 +33616,7 @@ RESULT:
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double dfavgerror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -33692,7 +33692,7 @@ RESULT:
      Copyright 16.02.2009 by Bochkanov Sergey
 *************************************************************************/
 double dfavgrelerror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -33955,7 +33955,7 @@ This subroutine builds random decision forest.
   -- ALGLIB --
      Copyright 19.02.2009 by Bochkanov Sergey
 *************************************************************************/
-void dfbuildrandomdecisionforest(/* Real    */ ae_matrix* xy,
+void dfbuildrandomdecisionforest(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -33990,7 +33990,7 @@ This subroutine builds random decision forest.
   -- ALGLIB --
      Copyright 19.02.2009 by Bochkanov Sergey
 *************************************************************************/
-void dfbuildrandomdecisionforestx1(/* Real    */ ae_matrix* xy,
+void dfbuildrandomdecisionforestx1(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -34023,7 +34023,7 @@ void dfbuildrandomdecisionforestx1(/* Real    */ ae_matrix* xy,
 }
 
 
-void dfbuildinternal(/* Real    */ ae_matrix* xy,
+void dfbuildinternal(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -34306,7 +34306,7 @@ static void dforest_buildrandomtreerec(decisionforestbuilder* s,
      dfworkbuf* workbuf,
      ae_int_t workingset,
      ae_int_t varstoselect,
-     /* Real    */ ae_vector* treebuf,
+     RVector * treebuf,
      dfvotebuf* votebuf,
      hqrndstate* rs,
      ae_int_t idx0,
@@ -35124,15 +35124,15 @@ Following fields of WorkBuf are used as temporaries:
      Copyright 21.05.2018 by Bochkanov Sergey
 *************************************************************************/
 static double dforest_meannrms2(ae_int_t nclasses,
-     /* Integer */ ae_vector* trnlabelsi,
-     /* Real    */ ae_vector* trnlabelsr,
+     ZVector * trnlabelsi,
+     RVector * trnlabelsr,
      ae_int_t trnidx0,
      ae_int_t trnidx1,
-     /* Integer */ ae_vector* tstlabelsi,
-     /* Real    */ ae_vector* tstlabelsr,
+     ZVector * tstlabelsi,
+     RVector * tstlabelsr,
      ae_int_t tstidx0,
      ae_int_t tstidx1,
-     /* Integer */ ae_vector* tmpi,
+     ZVector * tmpi,
      ae_state *_state)
 {
     ae_int_t i;
@@ -35489,15 +35489,15 @@ Classifier split
 *************************************************************************/
 static void dforest_classifiersplit(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* x,
-     /* Integer */ ae_vector* c,
+     RVector * x,
+     ZVector * c,
      ae_int_t n,
      hqrndstate* rs,
      ae_int_t* info,
      double* threshold,
      double* e,
-     /* Real    */ ae_vector* sortrbuf,
-     /* Integer */ ae_vector* sortibuf,
+     RVector * sortrbuf,
+     ZVector * sortibuf,
      ae_state *_state)
 {
     ae_int_t i;
@@ -35746,14 +35746,14 @@ Regression model split
 *************************************************************************/
 static void dforest_regressionsplit(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_int_t n,
      ae_int_t* info,
      double* threshold,
      double* e,
-     /* Real    */ ae_vector* sortrbuf,
-     /* Real    */ ae_vector* sortrbuf2,
+     RVector * sortrbuf,
+     RVector * sortrbuf2,
      ae_state *_state)
 {
     ae_int_t i;
@@ -36008,7 +36008,7 @@ Following items of TRN and OOB sets are updated in the voting buffer:
 *************************************************************************/
 static void dforest_outputleaf(decisionforestbuilder* s,
      dfworkbuf* workbuf,
-     /* Real    */ ae_vector* treebuf,
+     RVector * treebuf,
      dfvotebuf* votebuf,
      ae_int_t idx0,
      ae_int_t idx1,
@@ -36638,7 +36638,7 @@ static ae_int_t dforest_computecompressedsizerec(decisionforest* df,
      ae_bool usemantissa8,
      ae_int_t treeroot,
      ae_int_t treepos,
-     /* Integer */ ae_vector* compressedsizes,
+     ZVector * compressedsizes,
      ae_bool savecompressedsizes,
      ae_state *_state)
 {
@@ -36746,7 +36746,7 @@ static void dforest_compressrec(decisionforest* df,
      ae_bool usemantissa8,
      ae_int_t treeroot,
      ae_int_t treepos,
-     /* Integer */ ae_vector* compressedsizes,
+     ZVector * compressedsizes,
      ae_vector* buf,
      ae_int_t* dstoffs,
      ae_state *_state)
@@ -37147,7 +37147,7 @@ static double dforest_unstreamfloat(ae_vector* buf,
 Classification error
 *************************************************************************/
 static ae_int_t dforest_dfclserror(decisionforest* df,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -37206,8 +37206,8 @@ not its first node). First node being processed is located at NodeOffs.
 static void dforest_dfprocessinternaluncompressed(decisionforest* df,
      ae_int_t subtreeroot,
      ae_int_t nodeoffs,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t idx;
@@ -37252,8 +37252,8 @@ right past the header field).
 *************************************************************************/
 static void dforest_dfprocessinternalcompressed(decisionforest* df,
      ae_int_t offs,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t leafindicator;
@@ -37967,7 +37967,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 02.08.2008 by Bochkanov Sergey
 *************************************************************************/
-void lrbuild(/* Real    */ ae_matrix* xy,
+void lrbuild(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -38043,8 +38043,8 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 02.08.2008 by Bochkanov Sergey
 *************************************************************************/
-void lrbuilds(/* Real    */ ae_matrix* xy,
-     /* Real    */ ae_vector* s,
+void lrbuilds(RMatrix * xy,
+     RVector * s,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -38171,8 +38171,8 @@ i.e. with zero constant term.
   -- ALGLIB --
      Copyright 30.10.2008 by Bochkanov Sergey
 *************************************************************************/
-void lrbuildzs(/* Real    */ ae_matrix* xy,
-     /* Real    */ ae_vector* s,
+void lrbuildzs(RMatrix * xy,
+     RVector * s,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -38301,7 +38301,7 @@ i.e. with zero constant term.
   -- ALGLIB --
      Copyright 30.10.2008 by Bochkanov Sergey
 *************************************************************************/
-void lrbuildz(/* Real    */ ae_matrix* xy,
+void lrbuildz(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -38363,7 +38363,7 @@ OUTPUT PARAMETERS:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 void lrunpack(linearmodel* lm,
-     /* Real    */ ae_vector* v,
+     RVector * v,
      ae_int_t* nvars,
      ae_state *_state)
 {
@@ -38394,7 +38394,7 @@ OUTPUT PAREMETERS:
   -- ALGLIB --
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
-void lrpack(/* Real    */ ae_vector* v,
+void lrpack(RVector * v,
      ae_int_t nvars,
      linearmodel* lm,
      ae_state *_state)
@@ -38427,7 +38427,7 @@ Result:
      Copyright 03.09.2008 by Bochkanov Sergey
 *************************************************************************/
 double lrprocess(linearmodel* lm,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     double v;
@@ -38460,7 +38460,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double lrrmserror(linearmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -38501,7 +38501,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double lravgerror(linearmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -38542,7 +38542,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double lravgrelerror(linearmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -38601,8 +38601,8 @@ void lrcopy(linearmodel* lm1, linearmodel* lm2, ae_state *_state)
 }
 
 
-void lrlines(/* Real    */ ae_matrix* xy,
-     /* Real    */ ae_vector* s,
+void lrlines(RMatrix * xy,
+     RVector * s,
      ae_int_t n,
      ae_int_t* info,
      double* a,
@@ -38719,7 +38719,7 @@ void lrlines(/* Real    */ ae_matrix* xy,
 }
 
 
-void lrline(/* Real    */ ae_matrix* xy,
+void lrline(RMatrix * xy,
      ae_int_t n,
      ae_int_t* info,
      double* a,
@@ -38761,8 +38761,8 @@ void lrline(/* Real    */ ae_matrix* xy,
 /*************************************************************************
 Internal linear regression subroutine
 *************************************************************************/
-static void linreg_lrinternal(/* Real    */ ae_matrix* xy,
-     /* Real    */ ae_vector* s,
+static void linreg_lrinternal(RMatrix * xy,
+     RVector * s,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t* info,
@@ -39279,7 +39279,7 @@ NOTE 3: this  is  unsymmetric version of the algorithm,  which  does  NOT
   -- ALGLIB --
      Copyright 25.10.2011 by Bochkanov Sergey
 *************************************************************************/
-void filtersma(/* Real    */ ae_vector* x,
+void filtersma(RVector * x,
      ae_int_t n,
      ae_int_t k,
      ae_state *_state)
@@ -39418,7 +39418,7 @@ NOTE 3: technical analytis users quite often work  with  EMA  coefficient
   -- ALGLIB --
      Copyright 25.10.2011 by Bochkanov Sergey
 *************************************************************************/
-void filterema(/* Real    */ ae_vector* x,
+void filterema(RVector * x,
      ae_int_t n,
      double alpha,
      ae_state *_state)
@@ -39489,7 +39489,7 @@ NOTE 3: this  is  unsymmetric version of the algorithm,  which  does  NOT
   -- ALGLIB --
      Copyright 25.10.2011 by Bochkanov Sergey
 *************************************************************************/
-void filterlrma(/* Real    */ ae_vector* x,
+void filterlrma(RVector * x,
      ae_int_t n,
      ae_int_t k,
      ae_state *_state)
@@ -39808,7 +39808,7 @@ NOTE: you can clear dataset with ssacleardata()
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaaddsequence(ssamodel* s,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t n,
      ae_state *_state)
 {
@@ -40003,7 +40003,7 @@ NOTE: this function uses internal  RNG  to  handle  fractional  values  of
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaappendsequenceandupdate(ssamodel* s,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t nticks,
      double updateits,
      ae_state *_state)
@@ -40095,7 +40095,7 @@ NOTE: calling this function invalidates basis in all cases.
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssasetalgoprecomputed(ssamodel* s,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t windowwidth,
      ae_int_t nbasis,
      ae_state *_state)
@@ -40306,8 +40306,8 @@ just one zero vector.
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssagetbasis(ssamodel* s,
-     /* Real    */ ae_matrix* a,
-     /* Real    */ ae_vector* sv,
+     RMatrix * a,
+     RVector * sv,
      ae_int_t* windowwidth,
      ae_int_t* nbasis,
      ae_state *_state)
@@ -40401,7 +40401,7 @@ shorter than window size; no algorithm is specified) returns zeros.
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssagetlrr(ssamodel* s,
-     /* Real    */ ae_vector* a,
+     RVector * a,
      ae_int_t* windowwidth,
      ae_state *_state)
 {
@@ -40520,8 +40520,8 @@ values, no basis is constructed).
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaanalyzelastwindow(ssamodel* s,
-     /* Real    */ ae_vector* trend,
-     /* Real    */ ae_vector* noise,
+     RVector * trend,
+     RVector * noise,
      ae_int_t* nticks,
      ae_state *_state)
 {
@@ -40679,8 +40679,8 @@ values, no basis is constructed).
 *************************************************************************/
 void ssaanalyzelast(ssamodel* s,
      ae_int_t nticks,
-     /* Real    */ ae_vector* trend,
-     /* Real    */ ae_vector* noise,
+     RVector * trend,
+     RVector * noise,
      ae_state *_state)
 {
     ae_int_t i;
@@ -40837,10 +40837,10 @@ values, no basis is constructed).
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaanalyzesequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t nticks,
-     /* Real    */ ae_vector* trend,
-     /* Real    */ ae_vector* noise,
+     RVector * trend,
+     RVector * noise,
      ae_state *_state)
 {
     ae_int_t i;
@@ -40961,7 +40961,7 @@ values, no basis is ever constructed).
 *************************************************************************/
 void ssaforecastlast(ssamodel* s,
      ae_int_t nticks,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_state *_state)
 {
     ae_int_t i;
@@ -41141,11 +41141,11 @@ values, no basis is ever constructed).
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaforecastsequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t datalen,
      ae_int_t forecastlen,
      ae_bool applysmoothing,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_state *_state)
 {
     ae_int_t i;
@@ -41329,7 +41329,7 @@ values, no basis is ever constructed).
 void ssaforecastavglast(ssamodel* s,
      ae_int_t m,
      ae_int_t nticks,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_state *_state)
 {
     ae_int_t i;
@@ -41491,12 +41491,12 @@ values, no basis is ever constructed).
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 void ssaforecastavgsequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t datalen,
      ae_int_t m,
      ae_int_t forecastlen,
      ae_bool applysmoothing,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_state *_state)
 {
     ae_int_t i;
@@ -42113,11 +42113,11 @@ OUTPUT PARAMETERS:
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 static void ssa_analyzesequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t i0,
      ae_int_t i1,
-     /* Real    */ ae_vector* trend,
-     /* Real    */ ae_vector* noise,
+     RVector * trend,
+     RVector * noise,
      ae_int_t offs,
      ae_state *_state)
 {
@@ -42260,13 +42260,13 @@ OUTPUT PARAMETERS:
      Copyright 30.10.2017 by Bochkanov Sergey
 *************************************************************************/
 static void ssa_forecastavgsequence(ssamodel* s,
-     /* Real    */ ae_vector* data,
+     RVector * data,
      ae_int_t i0,
      ae_int_t i1,
      ae_int_t m,
      ae_int_t forecastlen,
      ae_bool smooth,
-     /* Real    */ ae_vector* trend,
+     RVector * trend,
      ae_int_t offs,
      ae_state *_state)
 {
@@ -42489,9 +42489,9 @@ OUTPUT PARAMETERS:
      Copyright 20.12.2017 by Bochkanov Sergey
 *************************************************************************/
 static void ssa_updatexxtsend(ssamodel* s,
-     /* Real    */ ae_vector* u,
+     RVector * u,
      ae_int_t i0,
-     /* Real    */ ae_matrix* xxt,
+     RMatrix * xxt,
      ae_state *_state)
 {
 
@@ -42534,7 +42534,7 @@ OUTPUT PARAMETERS:
      Copyright 20.12.2017 by Bochkanov Sergey
 *************************************************************************/
 static void ssa_updatexxtfinalize(ssamodel* s,
-     /* Real    */ ae_matrix* xxt,
+     RMatrix * xxt,
      ae_state *_state)
 {
 
@@ -42749,12 +42749,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 31.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void fisherlda(/* Real    */ ae_matrix* xy,
+void fisherlda(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
      ae_int_t* info,
-     /* Real    */ ae_vector* w,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -42835,12 +42835,12 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 31.05.2008 by Bochkanov Sergey
 *************************************************************************/
-void fisherldan(/* Real    */ ae_matrix* xy,
+void fisherldan(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
      ae_int_t* info,
-     /* Real    */ ae_matrix* w,
+     RMatrix * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -43489,7 +43489,7 @@ NOTES:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdaddtrack(mcpdstate* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t k,
      ae_state *_state)
 {
@@ -43619,7 +43619,7 @@ call to MCPDSolve().
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdsetec(mcpdstate* s,
-     /* Real    */ ae_matrix* ec,
+     RMatrix * ec,
      ae_state *_state)
 {
     ae_int_t i;
@@ -43759,8 +43759,8 @@ INPUT PARAMETERS:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdsetbc(mcpdstate* s,
-     /* Real    */ ae_matrix* bndl,
-     /* Real    */ ae_matrix* bndu,
+     RMatrix * bndl,
+     RMatrix * bndu,
      ae_state *_state)
 {
     ae_int_t i;
@@ -43896,8 +43896,8 @@ INPUT PARAMETERS:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdsetlc(mcpdstate* s,
-     /* Real    */ ae_matrix* c,
-     /* Integer */ ae_vector* ct,
+     RMatrix * c,
+     ZVector * ct,
      ae_int_t k,
      ae_state *_state)
 {
@@ -43978,7 +43978,7 @@ INPUT PARAMETERS:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdsetprior(mcpdstate* s,
-     /* Real    */ ae_matrix* pp,
+     RMatrix * pp,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -44034,7 +44034,7 @@ INPUT PARAMETERS:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdsetpredictionweights(mcpdstate* s,
-     /* Real    */ ae_vector* pw,
+     RVector * pw,
      ae_state *_state)
 {
     ae_int_t i;
@@ -44340,7 +44340,7 @@ OUTPUT PARAMETERS:
      Copyright 23.05.2010 by Bochkanov Sergey
 *************************************************************************/
 void mcpdresults(mcpdstate* s,
-     /* Real    */ ae_matrix* p,
+     RMatrix * p,
      mcpdreport* rep,
      ae_state *_state)
 {
@@ -44610,7 +44610,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
-void mnltrainh(/* Real    */ ae_matrix* xy,
+void mnltrainh(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -44931,8 +44931,8 @@ OUTPUT PARAMETERS:
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 void mnlprocess(logitmodel* lm,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t nvars;
@@ -44978,8 +44978,8 @@ when you call it from command line.
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 void mnlprocessi(logitmodel* lm,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -45008,7 +45008,7 @@ OUTPUT PARAMETERS:
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 void mnlunpack(logitmodel* lm,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t* nvars,
      ae_int_t* nclasses,
      ae_state *_state)
@@ -45047,7 +45047,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
-void mnlpack(/* Real    */ ae_matrix* a,
+void mnlpack(RMatrix * a,
      ae_int_t nvars,
      ae_int_t nclasses,
      logitmodel* lm,
@@ -45113,7 +45113,7 @@ RESULT:
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 double mnlavgce(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -45176,7 +45176,7 @@ RESULT:
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 double mnlrelclserror(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -45203,7 +45203,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double mnlrmserror(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -45237,7 +45237,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double mnlavgerror(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -45271,7 +45271,7 @@ RESULT:
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 double mnlavgrelerror(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t ssize,
      ae_state *_state)
 {
@@ -45297,7 +45297,7 @@ Classification error on test set = MNLRelClsError*NPoints
      Copyright 10.09.2008 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t mnlclserror(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -45361,8 +45361,8 @@ ae_int_t mnlclserror(logitmodel* lm,
 Internal subroutine. Places exponents of the anti-overflow shifted
 internal linear outputs into the service part of the W array.
 *************************************************************************/
-static void logit_mnliexp(/* Real    */ ae_vector* w,
-     /* Real    */ ae_vector* x,
+static void logit_mnliexp(RVector * w,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t nvars;
@@ -45404,7 +45404,7 @@ Calculation of all types of errors
      Copyright 30.08.2008 by Bochkanov Sergey
 *************************************************************************/
 static void logit_mnlallerrors(logitmodel* lm,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double* relcls,
      double* avgce,
@@ -45549,14 +45549,14 @@ ARGONNE NATIONAL LABORATORY. MINPACK PROJECT. JUNE 1983
 JORGE J. MORE', DAVID J. THUENTE
 *************************************************************************/
 static void logit_mnlmcsrch(ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double* f,
-     /* Real    */ ae_vector* g,
-     /* Real    */ ae_vector* s,
+     RVector * g,
+     RVector * s,
      double* stp,
      ae_int_t* info,
      ae_int_t* nfev,
-     /* Real    */ ae_vector* wa,
+     RVector * wa,
      logitmcstate* state,
      ae_int_t* stage,
      ae_state *_state)
@@ -46333,7 +46333,7 @@ OUTPUT PARAMETERS:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 void knnbuildersetdatasetreg(knnbuilder* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nout,
@@ -46407,7 +46407,7 @@ OUTPUT PARAMETERS:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 void knnbuildersetdatasetcls(knnbuilder* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t nclasses,
@@ -46694,8 +46694,8 @@ OUTPUT PARAMETERS:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 void knnprocess(knnmodel* model,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -46737,7 +46737,7 @@ RESULT:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnprocess0(knnmodel* model,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -46782,7 +46782,7 @@ RESULT:
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 ae_int_t knnclassify(knnmodel* model,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -46835,8 +46835,8 @@ IMPORTANT: this  function  is  thread-unsafe  and  may   modify   internal
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 void knnprocessi(knnmodel* model,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
 
@@ -46869,8 +46869,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void knntsprocess(knnmodel* model,
      knnbuffer* buf,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -46916,7 +46916,7 @@ NOTE: if  you  need several different kinds of error metrics, it is better
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnrelclserror(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -46959,7 +46959,7 @@ NOTE: if  you  need several different kinds of error metrics, it is better
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnavgce(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -47000,7 +47000,7 @@ NOTE: if  you  need several different kinds of error metrics, it is better
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnrmserror(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -47041,7 +47041,7 @@ NOTE: if  you  need several different kinds of error metrics, it is better
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnavgerror(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -47082,7 +47082,7 @@ NOTE: if  you  need several different kinds of error metrics, it is better
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 double knnavgrelerror(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -47135,7 +47135,7 @@ NOTE: the cross-entropy metric is too unstable when used to  evaluate  KNN
      Copyright 15.02.2019 by Bochkanov Sergey
 *************************************************************************/
 void knnallerrors(knnmodel* model,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      knnreport* rep,
      ae_state *_state)
@@ -47640,7 +47640,7 @@ OUTPUT PARAMETERS:
      Copyright 10.03.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlptrainlm(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -48031,7 +48031,7 @@ OUTPUT PARAMETERS:
      Copyright 09.12.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlptrainlbfgs(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -48206,9 +48206,9 @@ minimum of validation set error.
      Copyright 10.03.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlptraines(multilayerperceptron* network,
-     /* Real    */ ae_matrix* trnxy,
+     RMatrix * trnxy,
      ae_int_t trnsize,
-     /* Real    */ ae_matrix* valxy,
+     RMatrix * valxy,
      ae_int_t valsize,
      double decay,
      ae_int_t restarts,
@@ -48418,7 +48418,7 @@ OUTPUT PARAMETERS:
      Copyright 09.12.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpkfoldcvlbfgs(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -48467,7 +48467,7 @@ OUTPUT PARAMETERS:
      Copyright 09.12.2007 by Bochkanov Sergey
 *************************************************************************/
 void mlpkfoldcvlm(multilayerperceptron* network,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -48842,7 +48842,7 @@ datasetformat is used:
      Copyright 23.07.2012 by Bochkanov Sergey
 *************************************************************************/
 void mlpsetdataset(mlptrainer* s,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      ae_state *_state)
 {
@@ -49427,7 +49427,7 @@ OUTPUT PARAMETERS:
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpebagginglm(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -49474,7 +49474,7 @@ OUTPUT PARAMETERS:
      Copyright 17.02.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpebagginglbfgs(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -49519,7 +49519,7 @@ OUTPUT PARAMETERS:
      Copyright 10.03.2009 by Bochkanov Sergey
 *************************************************************************/
 void mlpetraines(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -49809,7 +49809,7 @@ void mlptrainensemblees(mlptrainer* s,
 Internal cross-validation subroutine
 *************************************************************************/
 static void mlptrain_mlpkfoldcvgeneral(multilayerperceptron* n,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -50031,12 +50031,12 @@ NOTES:
     "NClasses>0" means that we have classification task.
     "NClasses<0" means regression task with -NClasses real outputs.
 *************************************************************************/
-static void mlptrain_mlpkfoldsplit(/* Real    */ ae_matrix* xy,
+static void mlptrain_mlpkfoldsplit(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nclasses,
      ae_int_t foldscount,
      ae_bool stratifiedsplits,
-     /* Integer */ ae_vector* folds,
+     ZVector * folds,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -50108,10 +50108,10 @@ NOTE: There are no checks on the parameters correctness.
 static void mlptrain_mthreadcv(mlptrainer* s,
      ae_int_t rowsize,
      ae_int_t nrestarts,
-     /* Integer */ ae_vector* folds,
+     ZVector * folds,
      ae_int_t fold,
      ae_int_t dfold,
-     /* Real    */ ae_matrix* cvy,
+     RMatrix * cvy,
      ae_shared_pool* pooldatacv,
      ae_int_t wcount,
      ae_state *_state)
@@ -50202,10 +50202,10 @@ Serial stub for GPL edition.
 ae_bool _trypexec_mlptrain_mthreadcv(mlptrainer* s,
     ae_int_t rowsize,
     ae_int_t nrestarts,
-    /* Integer */ ae_vector* folds,
+    ZVector * folds,
     ae_int_t fold,
     ae_int_t dfold,
-    /* Real    */ ae_matrix* cvy,
+    RMatrix * cvy,
     ae_shared_pool* pooldatacv,
     ae_int_t wcount,
     ae_state *_state)
@@ -50236,9 +50236,9 @@ settings:
 static void mlptrain_mlptrainnetworkx(mlptrainer* s,
      ae_int_t nrestarts,
      ae_int_t algokind,
-     /* Integer */ ae_vector* trnsubset,
+     ZVector * trnsubset,
      ae_int_t trnsubsetsize,
-     /* Integer */ ae_vector* valsubset,
+     ZVector * valsubset,
      ae_int_t valsubsetsize,
      multilayerperceptron* network,
      mlpreport* rep,
@@ -50512,9 +50512,9 @@ Serial stub for GPL edition.
 ae_bool _trypexec_mlptrain_mlptrainnetworkx(mlptrainer* s,
     ae_int_t nrestarts,
     ae_int_t algokind,
-    /* Integer */ ae_vector* trnsubset,
+    ZVector * trnsubset,
     ae_int_t trnsubsetsize,
-    /* Integer */ ae_vector* valsubset,
+    ZVector * valsubset,
     ae_int_t valsubsetsize,
     multilayerperceptron* network,
     mlpreport* rep,
@@ -50788,7 +50788,7 @@ will advance traing progress one iteration further.
 static void mlptrain_mlpstarttrainingx(mlptrainer* s,
      ae_bool randomstart,
      ae_int_t algokind,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      smlptrnsession* session,
      ae_state *_state)
@@ -50898,7 +50898,7 @@ EXAMPLE:
      Copyright 13.08.2012 by Bochkanov Sergey
 *************************************************************************/
 static ae_bool mlptrain_mlpcontinuetrainingx(mlptrainer* s,
-     /* Integer */ ae_vector* subset,
+     ZVector * subset,
      ae_int_t subsetsize,
      ae_int_t* ngradbatch,
      smlptrnsession* session,
@@ -51109,7 +51109,7 @@ Internal bagging subroutine.
      Copyright 19.02.2009 by Bochkanov Sergey
 *************************************************************************/
 static void mlptrain_mlpebagginginternal(mlpensemble* ensemble,
-     /* Real    */ ae_matrix* xy,
+     RMatrix * xy,
      ae_int_t npoints,
      double decay,
      ae_int_t restarts,
@@ -51844,14 +51844,14 @@ as better replacement.
   -- ALGLIB --
      Copyright 21.03.2009 by Bochkanov Sergey
 *************************************************************************/
-void kmeansgenerate(/* Real    */ ae_matrix* xy,
+void kmeansgenerate(RMatrix * xy,
      ae_int_t npoints,
      ae_int_t nvars,
      ae_int_t k,
      ae_int_t restarts,
      ae_int_t* info,
-     /* Real    */ ae_matrix* c,
-     /* Integer */ ae_vector* xyc,
+     RMatrix * c,
+     ZVector * xyc,
      ae_state *_state)
 {
     ae_frame _frame_block;

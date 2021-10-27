@@ -6924,49 +6924,49 @@ namespace alglib_impl
 
 #endif
 #if defined(AE_COMPILE_DIRECTDENSESOLVERS) || !defined(AE_PARTIAL_BUILD)
-static void directdensesolvers_rmatrixlusolveinternal(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_rmatrixlusolveinternal(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_bool havea,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
-static void directdensesolvers_spdmatrixcholeskysolveinternal(/* Real    */ ae_matrix* cha,
+static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_bool havea,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state);
-static void directdensesolvers_cmatrixlusolveinternal(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_cmatrixlusolveinternal(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_bool havea,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state);
-static void directdensesolvers_hpdmatrixcholeskysolveinternal(/* Complex */ ae_matrix* cha,
+static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_bool havea,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state);
 static ae_int_t directdensesolvers_densesolverrfsmax(ae_int_t n,
      double r1,
@@ -6975,25 +6975,25 @@ static ae_int_t directdensesolvers_densesolverrfsmax(ae_int_t n,
 static ae_int_t directdensesolvers_densesolverrfsmaxv2(ae_int_t n,
      double r2,
      ae_state *_state);
-static void directdensesolvers_rbasiclusolve(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_rbasiclusolve(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_vector* xb,
+     RVector * xb,
      ae_state *_state);
-static void directdensesolvers_spdbasiccholeskysolve(/* Real    */ ae_matrix* cha,
+static void directdensesolvers_spdbasiccholeskysolve(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* xb,
+     RVector * xb,
      ae_state *_state);
-static void directdensesolvers_cbasiclusolve(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_cbasiclusolve(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_vector* xb,
+     CVector * xb,
      ae_state *_state);
-static void directdensesolvers_hpdbasiccholeskysolve(/* Complex */ ae_matrix* cha,
+static void directdensesolvers_hpdbasiccholeskysolve(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* xb,
+     CVector * xb,
      ae_state *_state);
 
 
@@ -7083,9 +7083,9 @@ NOTE:   roots are not "polished" and  no  matrix  balancing  is  performed
   -- ALGLIB --
      Copyright 24.02.2014 by Bochkanov Sergey
 *************************************************************************/
-void polynomialsolve(/* Real    */ ae_vector* a,
+void polynomialsolve(RVector * a,
      ae_int_t n,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      polynomialsolverreport* rep,
      ae_state *_state)
 {
@@ -7309,12 +7309,12 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixsolve(/* Real    */ ae_matrix* a,
+void rmatrixsolve(RMatrix * a,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -7402,9 +7402,9 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 16.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixsolvefast(/* Real    */ ae_matrix* a,
+void rmatrixsolvefast(RMatrix * a,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -7530,14 +7530,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixsolvem(/* Real    */ ae_matrix* a,
+void rmatrixsolvem(RMatrix * a,
      ae_int_t n,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_bool rfs,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -7654,9 +7654,9 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixsolvemfast(/* Real    */ ae_matrix* a,
+void rmatrixsolvemfast(RMatrix * a,
      ae_int_t n,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -7781,13 +7781,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixlusolve(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixlusolve(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -7850,10 +7850,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 18.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixlusolvefast(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixlusolvefast(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -7964,14 +7964,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixlusolvem(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixlusolvem(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -8060,10 +8060,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixlusolvemfast(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixlusolvemfast(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -8157,14 +8157,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixmixedsolve(/* Real    */ ae_matrix* a,
-     /* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixmixedsolve(RMatrix * a,
+     RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -8231,15 +8231,15 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixmixedsolvem(/* Real    */ ae_matrix* a,
-     /* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void rmatrixmixedsolvem(RMatrix * a,
+     RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
 
@@ -8344,14 +8344,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixsolvem(/* Complex */ ae_matrix* a,
+void cmatrixsolvem(CMatrix * a,
      ae_int_t n,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_bool rfs,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -8456,9 +8456,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 16.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixsolvemfast(/* Complex */ ae_matrix* a,
+void cmatrixsolvemfast(CMatrix * a,
      ae_int_t n,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -8600,12 +8600,12 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixsolve(/* Complex */ ae_matrix* a,
+void cmatrixsolve(CMatrix * a,
      ae_int_t n,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -8686,9 +8686,9 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixsolvefast(/* Complex */ ae_matrix* a,
+void cmatrixsolvefast(CMatrix * a,
      ae_int_t n,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -8807,14 +8807,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixlusolvem(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixlusolvem(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -8899,10 +8899,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixlusolvemfast(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixlusolvemfast(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -9012,13 +9012,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixlusolve(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixlusolve(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -9084,10 +9084,10 @@ NOTE: unlike  CMatrixLUSolve(),  this   function   does   NOT   check  for
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixlusolvefast(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixlusolvefast(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -9151,15 +9151,15 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixmixedsolvem(/* Complex */ ae_matrix* a,
-     /* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixmixedsolvem(CMatrix * a,
+     CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
 
@@ -9216,14 +9216,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void cmatrixmixedsolve(/* Complex */ ae_matrix* a,
-     /* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+void cmatrixmixedsolve(CMatrix * a,
+     CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -9331,14 +9331,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixsolvem(/* Real    */ ae_matrix* a,
+void spdmatrixsolvem(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -9459,10 +9459,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 17.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixsolvemfast(/* Real    */ ae_matrix* a,
+void spdmatrixsolvemfast(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -9589,13 +9589,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixsolve(/* Real    */ ae_matrix* a,
+void spdmatrixsolve(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -9678,10 +9678,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 17.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixsolvefast(/* Real    */ ae_matrix* a,
+void spdmatrixsolvefast(RMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -9774,14 +9774,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixcholeskysolvem(/* Real    */ ae_matrix* cha,
+void spdmatrixcholeskysolvem(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -9845,10 +9845,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 18.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixcholeskysolvemfast(/* Real    */ ae_matrix* cha,
+void spdmatrixcholeskysolvemfast(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -9947,13 +9947,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixcholeskysolve(/* Real    */ ae_matrix* cha,
+void spdmatrixcholeskysolve(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -10014,10 +10014,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void spdmatrixcholeskysolvefast(/* Real    */ ae_matrix* cha,
+void spdmatrixcholeskysolvefast(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -10118,14 +10118,14 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixsolvem(/* Complex */ ae_matrix* a,
+void hpdmatrixsolvem(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -10246,10 +10246,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 17.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixsolvemfast(/* Complex */ ae_matrix* a,
+void hpdmatrixsolvemfast(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -10369,13 +10369,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixsolve(/* Complex */ ae_matrix* a,
+void hpdmatrixsolve(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -10460,10 +10460,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 17.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixsolvefast(/* Complex */ ae_matrix* a,
+void hpdmatrixsolvefast(CMatrix * a,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -10557,14 +10557,14 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixcholeskysolvem(/* Complex */ ae_matrix* cha,
+void hpdmatrixcholeskysolvem(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -10629,10 +10629,10 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 18.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixcholeskysolvemfast(/* Complex */ ae_matrix* cha,
+void hpdmatrixcholeskysolvemfast(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      ae_state *_state)
@@ -10731,13 +10731,13 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixcholeskysolve(/* Complex */ ae_matrix* cha,
+void hpdmatrixcholeskysolve(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_vector* x,
+     CVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -10798,10 +10798,10 @@ OUTPUT PARAMETERS
   -- ALGLIB --
      Copyright 18.03.2015 by Bochkanov Sergey
 *************************************************************************/
-void hpdmatrixcholeskysolvefast(/* Complex */ ae_matrix* cha,
+void hpdmatrixcholeskysolvefast(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* b,
+     CVector * b,
      ae_int_t* info,
      ae_state *_state)
 {
@@ -10901,14 +10901,14 @@ Subroutine sets following fields of the Rep structure:
   -- ALGLIB --
      Copyright 24.08.2009 by Bochkanov Sergey
 *************************************************************************/
-void rmatrixsolvels(/* Real    */ ae_matrix* a,
+void rmatrixsolvels(RMatrix * a,
      ae_int_t nrows,
      ae_int_t ncols,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      double threshold,
      ae_int_t* info,
      densesolverlsreport* rep,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -11156,16 +11156,16 @@ Internal LU solver
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_rmatrixlusolveinternal(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_rmatrixlusolveinternal(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_bool havea,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -11333,16 +11333,16 @@ Internal Cholesky solver
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_spdmatrixcholeskysolveinternal(/* Real    */ ae_matrix* cha,
+static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_bool havea,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -11413,16 +11413,16 @@ Internal LU solver
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_cmatrixlusolveinternal(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_cmatrixlusolveinternal(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_bool havea,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -11609,16 +11609,16 @@ Internal Cholesky solver
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_hpdmatrixcholeskysolveinternal(/* Complex */ ae_matrix* cha,
+static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_matrix* a,
+     CMatrix * a,
      ae_bool havea,
-     /* Complex */ ae_matrix* b,
+     CMatrix * b,
      ae_int_t m,
      ae_int_t* info,
      densesolverreport* rep,
-     /* Complex */ ae_matrix* x,
+     CMatrix * x,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -11766,10 +11766,10 @@ This subroutine assumes that:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_rbasiclusolve(/* Real    */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_rbasiclusolve(RMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Real    */ ae_vector* xb,
+     RVector * xb,
      ae_state *_state)
 {
     ae_int_t i;
@@ -11809,10 +11809,10 @@ This subroutine assumes that:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_spdbasiccholeskysolve(/* Real    */ ae_matrix* cha,
+static void directdensesolvers_spdbasiccholeskysolve(RMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Real    */ ae_vector* xb,
+     RVector * xb,
      ae_state *_state)
 {
     ae_int_t i;
@@ -11894,10 +11894,10 @@ This subroutine assumes that:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_cbasiclusolve(/* Complex */ ae_matrix* lua,
-     /* Integer */ ae_vector* p,
+static void directdensesolvers_cbasiclusolve(CMatrix * lua,
+     ZVector * p,
      ae_int_t n,
-     /* Complex */ ae_vector* xb,
+     CVector * xb,
      ae_state *_state)
 {
     ae_int_t i;
@@ -11937,10 +11937,10 @@ This subroutine assumes that:
   -- ALGLIB --
      Copyright 27.01.2010 by Bochkanov Sergey
 *************************************************************************/
-static void directdensesolvers_hpdbasiccholeskysolve(/* Complex */ ae_matrix* cha,
+static void directdensesolvers_hpdbasiccholeskysolve(CMatrix * cha,
      ae_int_t n,
      ae_bool isupper,
-     /* Complex */ ae_vector* xb,
+     CVector * xb,
      ae_state *_state)
 {
     ae_int_t i;
@@ -12108,8 +12108,8 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void sparsespdsolvesks(sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* x,
+     RVector * b,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12189,8 +12189,8 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void sparsespdsolve(sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* x,
+     RVector * b,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12282,8 +12282,8 @@ OUTPUT PARAMETERS
 *************************************************************************/
 void sparsespdcholeskysolve(sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* x,
+     RVector * b,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12356,8 +12356,8 @@ OUTPUT PARAMETERS
      Copyright 26.12.2017 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolve(sparsematrix* a,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* x,
+     RVector * b,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12451,10 +12451,10 @@ OUTPUT PARAMETERS
      Copyright 26.12.2017 by Bochkanov Sergey
 *************************************************************************/
 void sparselusolve(sparsematrix* a,
-     /* Integer */ ae_vector* p,
-     /* Integer */ ae_vector* q,
-     /* Real    */ ae_vector* b,
-     /* Real    */ ae_vector* x,
+     ZVector * p,
+     ZVector * q,
+     RVector * b,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12630,11 +12630,11 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void sparsesolvesymmetricgmres(sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t k,
      double epsf,
      ae_int_t maxits,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12741,11 +12741,11 @@ OUTPUT PARAMETERS:
      Copyright 25.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolvegmres(sparsematrix* a,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_int_t k,
      double epsf,
      ae_int_t maxits,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -12942,7 +12942,7 @@ OUTPUT PARAMETERS:
      Copyright 24.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolversetstartingpoint(sparsesolverstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
 
@@ -13032,7 +13032,7 @@ RESULT:
 void sparsesolversolvesymmetric(sparsesolverstate* state,
      sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t n;
@@ -13107,7 +13107,7 @@ RESULT:
 *************************************************************************/
 void sparsesolversolve(sparsesolverstate* state,
      sparsematrix* a,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t n;
@@ -13185,7 +13185,7 @@ s
      Copyright 14.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolverresults(sparsesolverstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -13252,7 +13252,7 @@ INPUT PARAMETERS:
      Copyright 24.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolveroocstart(sparsesolverstate* state,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
 
@@ -13379,7 +13379,7 @@ OUTPUT PARAMETERS:
      Copyright 24.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolveroocgetrequestdata(sparsesolverstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
 
@@ -13442,7 +13442,7 @@ INPUT PARAMETERS:
      Copyright 24.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolveroocsendresult(sparsesolverstate* state,
-     /* Real    */ ae_vector* ax,
+     RVector * ax,
      ae_state *_state)
 {
 
@@ -13494,7 +13494,7 @@ OUTPUT PARAMETERS:
      Copyright 24.09.2021 by Bochkanov Sergey
 *************************************************************************/
 void sparsesolveroocstop(sparsesolverstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      sparsesolverreport* rep,
      ae_state *_state)
 {
@@ -14001,7 +14001,7 @@ OUTPUT PARAMETERS:
      Copyright 14.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void lincgsetstartingpoint(lincgstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
 
@@ -14026,7 +14026,7 @@ OUTPUT PARAMETERS:
      Copyright 14.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void lincgsetb(lincgstate* state,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
 
@@ -14617,7 +14617,7 @@ NOTE: this function uses lightweight preconditioning -  multiplication  by
 void lincgsolvesparse(lincgstate* state,
      sparsematrix* a,
      ae_bool isupper,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t n;
@@ -14728,7 +14728,7 @@ OUTPUT PARAMETERS:
      Copyright 14.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void lincgresults(lincgstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      lincgreport* rep,
      ae_state *_state)
 {
@@ -15132,7 +15132,7 @@ OUTPUT PARAMETERS:
      Copyright 30.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void linlsqrsetb(linlsqrstate* state,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t i;
@@ -15713,7 +15713,7 @@ NOTE: this function uses lightweight preconditioning -  multiplication  by
 *************************************************************************/
 void linlsqrsolvesparse(linlsqrstate* state,
      sparsematrix* a,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t n;
@@ -15886,7 +15886,7 @@ OUTPUT PARAMETERS:
      Copyright 30.11.2011 by Bochkanov Sergey
 *************************************************************************/
 void linlsqrresults(linlsqrstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      linlsqrreport* rep,
      ae_state *_state)
 {
@@ -16257,7 +16257,7 @@ NOTES:
 *************************************************************************/
 void nleqcreatelm(ae_int_t n,
      ae_int_t m,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      nleqstate* state,
      ae_state *_state)
 {
@@ -16732,7 +16732,7 @@ OUTPUT PARAMETERS:
      Copyright 20.08.2009 by Bochkanov Sergey
 *************************************************************************/
 void nleqresults(nleqstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      nleqreport* rep,
      ae_state *_state)
 {
@@ -16756,7 +16756,7 @@ where array reallocation penalty is too large to be ignored.
      Copyright 20.08.2009 by Bochkanov Sergey
 *************************************************************************/
 void nleqresultsbuf(nleqstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      nleqreport* rep,
      ae_state *_state)
 {
@@ -16792,7 +16792,7 @@ INPUT PARAMETERS:
      Copyright 30.07.2010 by Bochkanov Sergey
 *************************************************************************/
 void nleqrestartfrom(nleqstate* state,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
 

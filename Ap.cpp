@@ -12540,8 +12540,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 double rdotv(ae_int_t n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -12583,8 +12583,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 double rdotvr(ae_int_t n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_matrix* a,
+     RVector * x,
+     RMatrix * a,
      ae_int_t i,
      ae_state *_state)
 {
@@ -12623,9 +12623,9 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 double rdotrr(ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t ia,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t ib,
      ae_state *_state)
 {
@@ -12661,7 +12661,7 @@ RESULT:
   -- ALGLIB --
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
-double rdotv2(ae_int_t n, /* Real    */ ae_vector* x, ae_state *_state)
+double rdotv2(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
@@ -12702,8 +12702,8 @@ NOTE: destination and source should NOT overlap
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rcopyv(ae_int_t n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t j;
@@ -12739,8 +12739,8 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rcopyvr(ae_int_t n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_matrix* a,
+     RVector * x,
+     RMatrix * a,
      ae_int_t i,
      ae_state *_state)
 {
@@ -12777,9 +12777,9 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rcopyrv(ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t i,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t j;
@@ -12818,9 +12818,9 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rcopyrr(ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t i,
-     /* Real    */ ae_matrix* b,
+     RMatrix * b,
      ae_int_t k,
      ae_state *_state)
 {
@@ -12857,8 +12857,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rcopymulv(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* y,
+     RVector * x,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -12896,8 +12896,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rcopymulvr(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_matrix* y,
+     RVector * x,
+     RMatrix * y,
      ae_int_t ridx,
      ae_state *_state)
 {
@@ -12932,8 +12932,8 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void icopyv(ae_int_t n,
-     /* Integer */ ae_vector* x,
-     /* Integer */ ae_vector* y,
+     ZVector * x,
+     ZVector * y,
      ae_state *_state)
 {
     ae_int_t j;
@@ -12970,8 +12970,8 @@ NOTE: destination and source should NOT overlap
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void bcopyv(ae_int_t n,
-     /* Boolean */ ae_vector* x,
-     /* Boolean */ ae_vector* y,
+     BVector * x,
+     BVector * y,
      ae_state *_state)
 {
     ae_int_t j;
@@ -13007,7 +13007,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rsetv(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t j;
@@ -13043,7 +13043,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rsetr(ae_int_t n,
      double v,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t i,
      ae_state *_state)
 {
@@ -13080,7 +13080,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rsetvx(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t offsx,
      ae_state *_state)
 {
@@ -13128,7 +13128,7 @@ static void rsetm_simd(const ae_int_t n, const double v, double *pDest, ae_state
 void rsetm(ae_int_t m,
      ae_int_t n,
      double v,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13171,7 +13171,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void isetv(ae_int_t n,
      ae_int_t v,
-     /* Integer */ ae_vector* x,
+     ZVector * x,
      ae_state *_state)
 {
     ae_int_t j;
@@ -13206,7 +13206,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void bsetv(ae_int_t n,
      ae_bool v,
-     /* Boolean */ ae_vector* x,
+     BVector * x,
      ae_state *_state)
 {
     ae_int_t j;
@@ -13242,7 +13242,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rmulv(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13278,7 +13278,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rmulr(ae_int_t n,
      double v,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13315,7 +13315,7 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void rmulvx(ae_int_t n,
      double v,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t offsx,
      ae_state *_state)
 {
@@ -13353,8 +13353,8 @@ RESULT:
 *************************************************************************/
 void raddv(ae_int_t n,
      double alpha,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* x,
+     RVector * y,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13392,8 +13392,8 @@ RESULT:
 *************************************************************************/
 void raddvr(ae_int_t n,
      double alpha,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* x,
+     RVector * y,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13433,9 +13433,9 @@ RESULT:
 *************************************************************************/
 void raddrv(ae_int_t n,
      double alpha,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_int_t ridx,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13474,9 +13474,9 @@ RESULT:
 *************************************************************************/
 void raddrr(ae_int_t n,
      double alpha,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_int_t ridxsrc,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t ridxdst,
      ae_state *_state)
 {
@@ -13516,9 +13516,9 @@ RESULT:
 *************************************************************************/
 void raddvx(ae_int_t n,
      double alpha,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t offsy,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t offsx,
      ae_state *_state)
 {
@@ -13554,8 +13554,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemulv(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* x,
+     RVector * y,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13591,8 +13591,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemulvr(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* x,
+     RVector * y,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13629,9 +13629,9 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemulrv(ae_int_t n,
-     /* Real    */ ae_matrix* y,
+     RMatrix * y,
      ae_int_t rowidx,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13665,8 +13665,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemaxv(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* x,
+     RVector * y,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13701,8 +13701,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemaxvr(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* x,
+     RVector * y,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13738,9 +13738,9 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergemaxrv(ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t rowidx,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13774,8 +13774,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergeminv(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_vector* x,
+     RVector * y,
+     RVector * x,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13810,8 +13810,8 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergeminvr(ae_int_t n,
-     /* Real    */ ae_vector* y,
-     /* Real    */ ae_matrix* x,
+     RVector * y,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13847,9 +13847,9 @@ RESULT:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rmergeminrv(ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t rowidx,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -13881,7 +13881,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
-double rmaxv(ae_int_t n, /* Real    */ ae_vector* x, ae_state *_state)
+double rmaxv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
@@ -13923,7 +13923,7 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 double rmaxr(ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -13966,7 +13966,7 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
-double rmaxabsv(ae_int_t n, /* Real    */ ae_vector* x, ae_state *_state)
+double rmaxabsv(ae_int_t n, RVector * x, ae_state *_state)
 {
     ae_int_t i;
     double v;
@@ -14007,7 +14007,7 @@ OUTPUT PARAMETERS:
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 double rmaxabsr(ae_int_t n,
-     /* Real    */ ae_matrix* x,
+     RMatrix * x,
      ae_int_t rowidx,
      ae_state *_state)
 {
@@ -14053,9 +14053,9 @@ NOTE: destination and source should NOT overlap
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void rcopyvx(ae_int_t n,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t offsx,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t offsy,
      ae_state *_state)
 {
@@ -14093,9 +14093,9 @@ NOTE: destination and source should NOT overlap
      Copyright 20.01.2020 by Bochkanov Sergey
 *************************************************************************/
 void icopyvx(ae_int_t n,
-     /* Integer */ ae_vector* x,
+     ZVector * x,
      ae_int_t offsx,
-     /* Integer */ ae_vector* y,
+     ZVector * y,
      ae_int_t offsy,
      ae_state *_state)
 {
@@ -14156,11 +14156,11 @@ HANDLING OF SPECIAL CASES:
 void rgemv(ae_int_t m,
      ae_int_t n,
      double alpha,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t opa,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      double beta,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_state *_state)
 {
     ae_int_t i;
@@ -14292,14 +14292,14 @@ HANDLING OF SPECIAL CASES:
 void rgemvx(ae_int_t m,
      ae_int_t n,
      double alpha,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t ia,
      ae_int_t ja,
      ae_int_t opa,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t ix,
      double beta,
-     /* Real    */ ae_vector* y,
+     RVector * y,
      ae_int_t iy,
      ae_state *_state)
 {
@@ -14407,9 +14407,9 @@ INPUT PARAMETERS:
 void rger(ae_int_t m,
      ae_int_t n,
      double alpha,
-     /* Real    */ ae_vector* u,
-     /* Real    */ ae_vector* v,
-     /* Real    */ ae_matrix* a,
+     RVector * u,
+     RVector * v,
+     RMatrix * a,
      ae_state *_state)
 {
     ae_int_t i;
@@ -14464,13 +14464,13 @@ OUTPUT PARAMETERS
      (c) 07.09.2021 Bochkanov Sergey
 *************************************************************************/
 void rtrsvx(ae_int_t n,
-     /* Real    */ ae_matrix* a,
+     RMatrix * a,
      ae_int_t ia,
      ae_int_t ja,
      ae_bool isupper,
      ae_bool isunit,
      ae_int_t optype,
-     /* Real    */ ae_vector* x,
+     RVector * x,
      ae_int_t ix,
      ae_state *_state)
 {
@@ -14574,16 +14574,16 @@ ae_bool ablasf_rgemm32basecase(
      ae_int_t n,
      ae_int_t k,
      double alpha,
-     /* Real    */ ae_matrix* _a,
+     RMatrix * _a,
      ae_int_t ia,
      ae_int_t ja,
      ae_int_t optypea,
-     /* Real    */ ae_matrix* _b,
+     RMatrix * _b,
      ae_int_t ib,
      ae_int_t jb,
      ae_int_t optypeb,
      double beta,
-     /* Real    */ ae_matrix* _c,
+     RMatrix * _c,
      ae_int_t ic,
      ae_int_t jc,
      ae_state *_state)
@@ -14724,16 +14724,16 @@ OUTPUT PARAMETERS:
      08.09.2021
      Bochkanov Sergey
 *************************************************************************/
-void spchol_propagatefwd(/* Real    */ ae_vector* x,
+void spchol_propagatefwd(RVector * x,
      ae_int_t cols0,
      ae_int_t blocksize,
-     /* Integer */ ae_vector* superrowidx,
+     ZVector * superrowidx,
      ae_int_t rbase,
      ae_int_t offdiagsize,
-     /* Real    */ ae_vector* rowstorage,
+     RVector * rowstorage,
      ae_int_t offss,
      ae_int_t sstride,
-     /* Real    */ ae_vector* simdbuf,
+     RVector * simdbuf,
      ae_int_t simdwidth,
      ae_state *_state)
 {
@@ -14823,7 +14823,7 @@ Return value:
      20.09.2020
      Bochkanov Sergey
 *************************************************************************/
-ae_bool spchol_updatekernelabc4(/* Real    */ ae_vector* rowstorage,
+ae_bool spchol_updatekernelabc4(RVector * rowstorage,
      ae_int_t offss,
      ae_int_t twidth,
      ae_int_t offsu,
@@ -14831,10 +14831,10 @@ ae_bool spchol_updatekernelabc4(/* Real    */ ae_vector* rowstorage,
      ae_int_t urank,
      ae_int_t urowstride,
      ae_int_t uwidth,
-     /* Real    */ ae_vector* diagd,
+     RVector * diagd,
      ae_int_t offsd,
-     /* Integer */ ae_vector* raw2smap,
-     /* Integer */ ae_vector* superrowidx,
+     ZVector * raw2smap,
+     ZVector * superrowidx,
      ae_int_t urbase,
      ae_state *_state)
 {
@@ -15136,15 +15136,15 @@ Return value:
      20.09.2020
      Bochkanov Sergey
 *************************************************************************/
-ae_bool spchol_updatekernel4444(/* Real    */ ae_vector* rowstorage,
+ae_bool spchol_updatekernel4444(RVector * rowstorage,
      ae_int_t offss,
      ae_int_t sheight,
      ae_int_t offsu,
      ae_int_t uheight,
-     /* Real    */ ae_vector* diagd,
+     RVector * diagd,
      ae_int_t offsd,
-     /* Integer */ ae_vector* raw2smap,
-     /* Integer */ ae_vector* superrowidx,
+     ZVector * raw2smap,
+     ZVector * superrowidx,
      ae_int_t urbase,
      ae_state *_state)
 {

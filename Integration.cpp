@@ -1239,15 +1239,15 @@ static void autogk_autogkinternalprepare(double a,
      ae_state *_state);
 static ae_bool autogk_autogkinternaliteration(autogkinternalstate* state,
      ae_state *_state);
-static void autogk_mheappop(/* Real    */ ae_matrix* heap,
+static void autogk_mheappop(RMatrix * heap,
      ae_int_t heapsize,
      ae_int_t heapwidth,
      ae_state *_state);
-static void autogk_mheappush(/* Real    */ ae_matrix* heap,
+static void autogk_mheappush(RMatrix * heap,
      ae_int_t heapsize,
      ae_int_t heapwidth,
      ae_state *_state);
-static void autogk_mheapresize(/* Real    */ ae_matrix* heap,
+static void autogk_mheapresize(RMatrix * heap,
      ae_int_t* heapsize,
      ae_int_t newheapsize,
      ae_int_t heapwidth,
@@ -1295,13 +1295,13 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 2005-2009 by Bochkanov Sergey
 *************************************************************************/
-void gqgeneraterec(/* Real    */ ae_vector* alpha,
-     /* Real    */ ae_vector* beta,
+void gqgeneraterec(RVector * alpha,
+     RVector * beta,
      double mu0,
      ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1410,15 +1410,15 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 2005-2009 by Bochkanov Sergey
 *************************************************************************/
-void gqgenerategausslobattorec(/* Real    */ ae_vector* alpha,
-     /* Real    */ ae_vector* beta,
+void gqgenerategausslobattorec(RVector * alpha,
+     RVector * beta,
      double mu0,
      double a,
      double b,
      ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1609,14 +1609,14 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 2005-2009 by Bochkanov Sergey
 *************************************************************************/
-void gqgenerategaussradaurec(/* Real    */ ae_vector* alpha,
-     /* Real    */ ae_vector* beta,
+void gqgenerategaussradaurec(RVector * alpha,
+     RVector * beta,
      double mu0,
      double a,
      ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1737,8 +1737,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void gqgenerategausslegendre(ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1826,8 +1826,8 @@ void gqgenerategaussjacobi(ae_int_t n,
      double alpha,
      double beta,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -1931,8 +1931,8 @@ OUTPUT PARAMETERS:
 void gqgenerategausslaguerre(ae_int_t n,
      double alpha,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2024,8 +2024,8 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void gqgenerategausshermite(ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* w,
+     RVector * x,
+     RVector * w,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2131,14 +2131,14 @@ OUTPUT PARAMETERS:
   -- ALGLIB --
      Copyright 08.05.2009 by Bochkanov Sergey
 *************************************************************************/
-void gkqgeneraterec(/* Real    */ ae_vector* alpha,
-     /* Real    */ ae_vector* beta,
+void gkqgeneraterec(RVector * alpha,
+     RVector * beta,
      double mu0,
      ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* wkronrod,
-     /* Real    */ ae_vector* wgauss,
+     RVector * x,
+     RVector * wkronrod,
+     RVector * wgauss,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2365,9 +2365,9 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void gkqgenerategausslegendre(ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* wkronrod,
-     /* Real    */ ae_vector* wgauss,
+     RVector * x,
+     RVector * wkronrod,
+     RVector * wgauss,
      ae_state *_state)
 {
     double eps;
@@ -2429,9 +2429,9 @@ void gkqgenerategaussjacobi(ae_int_t n,
      double alpha,
      double beta,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* wkronrod,
-     /* Real    */ ae_vector* wgauss,
+     RVector * x,
+     RVector * wkronrod,
+     RVector * wgauss,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2547,9 +2547,9 @@ OUTPUT PARAMETERS:
 *************************************************************************/
 void gkqlegendrecalc(ae_int_t n,
      ae_int_t* info,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* wkronrod,
-     /* Real    */ ae_vector* wgauss,
+     RVector * x,
+     RVector * wkronrod,
+     RVector * wgauss,
      ae_state *_state)
 {
     ae_frame _frame_block;
@@ -2637,9 +2637,9 @@ OUTPUT PARAMETERS:
      Copyright 12.05.2009 by Bochkanov Sergey
 *************************************************************************/
 void gkqlegendretbl(ae_int_t n,
-     /* Real    */ ae_vector* x,
-     /* Real    */ ae_vector* wkronrod,
-     /* Real    */ ae_vector* wgauss,
+     RVector * x,
+     RVector * wkronrod,
+     RVector * wgauss,
      double* eps,
      ae_state *_state)
 {
@@ -3970,7 +3970,7 @@ lbl_rcomm:
 }
 
 
-static void autogk_mheappop(/* Real    */ ae_matrix* heap,
+static void autogk_mheappop(RMatrix * heap,
      ae_int_t heapsize,
      ae_int_t heapwidth,
      ae_state *_state)
@@ -4020,7 +4020,7 @@ static void autogk_mheappop(/* Real    */ ae_matrix* heap,
 }
 
 
-static void autogk_mheappush(/* Real    */ ae_matrix* heap,
+static void autogk_mheappush(RMatrix * heap,
      ae_int_t heapsize,
      ae_int_t heapwidth,
      ae_state *_state)
@@ -4057,7 +4057,7 @@ static void autogk_mheappush(/* Real    */ ae_matrix* heap,
 }
 
 
-static void autogk_mheapresize(/* Real    */ ae_matrix* heap,
+static void autogk_mheapresize(RMatrix * heap,
      ae_int_t* heapsize,
      ae_int_t newheapsize,
      ae_int_t heapwidth,

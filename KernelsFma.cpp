@@ -46,8 +46,8 @@ namespace alglib_impl
 
 #if !defined(ALGLIB_NO_FAST_KERNELS) && defined(_ALGLIB_HAS_FMA_INTRINSICS)
 double rdotv_fma(const ae_int_t n,
-    /* Real    */ const double* __restrict x,
-    /* Real    */ const double* __restrict y,
+    const Real* __restrict x,
+    const Real* __restrict y,
     const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -117,7 +117,7 @@ double rdotv_fma(const ae_int_t n,
 }
 
 double rdotv2_fma(const ae_int_t n,
-    /* Real    */ const double* __restrict x,
+    const Real* __restrict x,
     const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -188,8 +188,8 @@ double rdotv2_fma(const ae_int_t n,
 
 void raddv_fma(const ae_int_t n,
      const double alpha,
-     /* Real    */ const double* __restrict y,
-     /* Real    */ double* __restrict x,
+     const Real* __restrict y,
+     Real* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
@@ -700,16 +700,16 @@ OUTPUT PARAMETERS:
      08.09.2021
      Bochkanov Sergey
 *************************************************************************/
-void spchol_propagatefwd_fma(/* Real    */ ae_vector* x,
+void spchol_propagatefwd_fma(RVector * x,
      ae_int_t cols0,
      ae_int_t blocksize,
-     /* Integer */ ae_vector* superrowidx,
+     ZVector * superrowidx,
      ae_int_t rbase,
      ae_int_t offdiagsize,
-     /* Real    */ ae_vector* rowstorage,
+     RVector * rowstorage,
      ae_int_t offss,
      ae_int_t sstride,
-     /* Real    */ ae_vector* simdbuf,
+     RVector * simdbuf,
      ae_int_t simdwidth,
      ae_state *_state)
 {

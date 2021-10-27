@@ -7647,7 +7647,7 @@ Parameters:
 Result:
     the value of the Chebyshev polynomial at x
 *************************************************************************/
-double chebyshevsum(/* Real    */ ae_vector* c,
+double chebyshevsum(RVector * c,
      ae_int_t r,
      ae_int_t n,
      double x,
@@ -7689,7 +7689,7 @@ Output parameters:
     C   -   coefficients
 *************************************************************************/
 void chebyshevcoefficients(ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_int_t i;
@@ -7729,9 +7729,9 @@ Input parameters:
 Output parameters
     B   -   power series coefficients
 *************************************************************************/
-void fromchebyshev(/* Real    */ ae_vector* a,
+void fromchebyshev(RVector * a,
      ae_int_t n,
-     /* Real    */ ae_vector* b,
+     RVector * b,
      ae_state *_state)
 {
     ae_int_t i;
@@ -8812,7 +8812,7 @@ Parameters:
 Result:
     the value of the Hermite polynomial at x
 *************************************************************************/
-double hermitesum(/* Real    */ ae_vector* c,
+double hermitesum(RVector * c,
      ae_int_t n,
      double x,
      ae_state *_state)
@@ -8846,7 +8846,7 @@ Output parameters:
     C   -   coefficients
 *************************************************************************/
 void hermitecoefficients(ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_int_t i;
@@ -8924,7 +8924,7 @@ Parameters:
 Result:
     the value of the Legendre polynomial at x
 *************************************************************************/
-double legendresum(/* Real    */ ae_vector* c,
+double legendresum(RVector * c,
      ae_int_t n,
      double x,
      ae_state *_state)
@@ -8958,7 +8958,7 @@ Output parameters:
     C   -   coefficients
 *************************************************************************/
 void legendrecoefficients(ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_int_t i;
@@ -10244,7 +10244,7 @@ Parameters:
 Result:
     the value of the Laguerre polynomial at x
 *************************************************************************/
-double laguerresum(/* Real    */ ae_vector* c,
+double laguerresum(RVector * c,
      ae_int_t n,
      double x,
      ae_state *_state)
@@ -10278,7 +10278,7 @@ Output parameters:
     C   -   coefficients
 *************************************************************************/
 void laguerrecoefficients(ae_int_t n,
-     /* Real    */ ae_vector* c,
+     RVector * c,
      ae_state *_state)
 {
     ae_int_t i;
