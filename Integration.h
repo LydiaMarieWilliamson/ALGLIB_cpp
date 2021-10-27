@@ -19,11 +19,11 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _integration_pkg_h
 #define _integration_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "alglibmisc.h"
-#include "linalg.h"
-#include "specialfunctions.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "AlgLibMisc.h"
+#include "LinAlg.h"
+#include "SpecialFunctions.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

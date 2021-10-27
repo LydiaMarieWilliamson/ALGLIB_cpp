@@ -21,7 +21,7 @@ http://www.fsf.org/licensing/licenses
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include "stdafx.h"
-#include "interpolation.h"
+#include "Interpolation.h"
 
 // disable some irrelevant warnings
 #if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)

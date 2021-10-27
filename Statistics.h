@@ -19,11 +19,11 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _statistics_pkg_h
 #define _statistics_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "linalg.h"
-#include "specialfunctions.h"
-#include "alglibmisc.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "LinAlg.h"
+#include "SpecialFunctions.h"
+#include "AlgLibMisc.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

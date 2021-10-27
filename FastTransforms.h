@@ -19,8 +19,8 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _fasttransforms_pkg_h
 #define _fasttransforms_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

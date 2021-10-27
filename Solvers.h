@@ -19,10 +19,10 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _solvers_pkg_h
 #define _solvers_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "alglibmisc.h"
-#include "linalg.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "AlgLibMisc.h"
+#include "LinAlg.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

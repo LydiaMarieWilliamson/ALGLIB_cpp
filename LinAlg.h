@@ -19,9 +19,9 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _linalg_pkg_h
 #define _linalg_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "alglibmisc.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "AlgLibMisc.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

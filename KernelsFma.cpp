@@ -28,7 +28,7 @@ http://www.fsf.org/licensing/licenses
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 
-#include "kernels_fma.h"
+#include "KernelsFma.h"
 
 // disable some irrelevant warnings
 #if (AE_COMPILER==AE_MSVC) && !defined(AE_ALL_WARNINGS)

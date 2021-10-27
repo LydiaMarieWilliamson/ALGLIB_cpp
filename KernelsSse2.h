@@ -20,7 +20,7 @@ http://www.fsf.org/licensing/licenses
 #ifndef _kernels_sse2_h
 #define _kernels_sse2_h
 
-#include "ap.h"
+#include "Ap.h"
 
 #define AE_USE_CPP
 

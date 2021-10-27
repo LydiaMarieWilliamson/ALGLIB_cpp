@@ -2,18 +2,18 @@
 #include <sstream>
 #include <math.h>
 
-#include "alglibmisc.h"
-#include "alglibinternal.h"
-#include "linalg.h"
-#include "statistics.h"
-#include "dataanalysis.h"
-#include "specialfunctions.h"
-#include "solvers.h"
-#include "optimization.h"
-#include "diffequations.h"
-#include "fasttransforms.h"
-#include "integration.h"
-#include "interpolation.h"
+#include "AlgLibMisc.h"
+#include "AlgLibInternal.h"
+#include "LinAlg.h"
+#include "Statistics.h"
+#include "DataAnalysis.h"
+#include "SpecialFunctions.h"
+#include "Solvers.h"
+#include "Optimization.h"
+#include "DiffEquations.h"
+#include "FastTransforms.h"
+#include "Integration.h"
+#include "Interpolation.h"
 
 #if AE_OS==AE_WINDOWS
 #include <windows.h>

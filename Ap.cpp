@@ -23,7 +23,7 @@ http://www.fsf.org/licensing/licenses
 #include "stdafx.h"
 
 //
-// if AE_OS==AE_LINUX (will be redefined to AE_POSIX in ap.h),
+// if AE_OS==AE_LINUX (will be redefined to AE_POSIX in Ap.h),
 // set _GNU_SOURCE flag BEFORE any #includes to get affinity
 // management functions
 //
@@ -32,12 +32,12 @@ http://www.fsf.org/licensing/licenses
 #endif
 
 //
-// Must be defined before we include ap.h
+// Must be defined before we include Ap.h
 //
 #define _ALGLIB_IMPL_DEFINES
 #define _ALGLIB_INTEGRITY_CHECKS_ONCE
 
-#include "ap.h"
+#include "Ap.h"
 #include <limits>
 #include <locale.h>
 #include <ctype.h>
@@ -9491,13 +9491,13 @@ void alglib::trace_disable()
 //
 /////////////////////////////////////////////////////////////////////////
 #if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
-#include "kernels_sse2.h"
+#include "KernelsSse2.h"
 #endif
 #if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
-#include "kernels_avx2.h"
+#include "KernelsAvx2.h"
 #endif
 #if defined(_ALGLIB_HAS_FMA_INTRINSICS)
-#include "kernels_fma.h"
+#include "KernelsFma.h"
 #endif
 namespace alglib_impl
 {

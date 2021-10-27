@@ -19,14 +19,14 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _dataanalysis_pkg_h
 #define _dataanalysis_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "alglibmisc.h"
-#include "linalg.h"
-#include "statistics.h"
-#include "specialfunctions.h"
-#include "optimization.h"
-#include "solvers.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "AlgLibMisc.h"
+#include "LinAlg.h"
+#include "Statistics.h"
+#include "SpecialFunctions.h"
+#include "Optimization.h"
+#include "Solvers.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

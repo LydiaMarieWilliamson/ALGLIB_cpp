@@ -255,17 +255,17 @@ The packages are:
 </p>
 
 <ul>
-<li><b>alglibmisc.cpp</b>&nbsp;-&nbsp;contains different algorithms which are hard to classify</li>
-<li><b>dataanalysis.cpp</b>&nbsp;-&nbsp;contains data mining algorithms</li>
-<li><b>diffequations.cpp</b>&nbsp;-&nbsp;contains differential equation solvers</li>
-<li><b>fasttransforms.cpp</b>&nbsp;-&nbsp;contains FFT and other related algorithms</li>
-<li><b>integration.cpp</b>&nbsp;-&nbsp;contains numerical integration algorithms</li>
-<li><b>interpolation.cpp</b>&nbsp;-&nbsp;contains interpolation algorithms</li>
-<li><b>linalg.cpp</b>&nbsp;-&nbsp;contains linear algebra algorithms</li>
-<li><b>optimization.cpp</b>&nbsp;-&nbsp;contains optimization algorithms</li>
-<li><b>solvers.cpp</b>&nbsp;-&nbsp;contains linear and nonlinear solvers</li>
-<li><b>specialfunctions.cpp</b>&nbsp;-&nbsp;contains special functions</li>
-<li><b>statistics.cpp</b>&nbsp;-&nbsp;statistics</li>
+<li><b>AlgLibMisc.cpp</b>&nbsp;-&nbsp;contains different algorithms which are hard to classify</li>
+<li><b>DataAnalysis.cpp</b>&nbsp;-&nbsp;contains data mining algorithms</li>
+<li><b>DiffEquations.cpp</b>&nbsp;-&nbsp;contains differential equation solvers</li>
+<li><b>FastTransforms.cpp</b>&nbsp;-&nbsp;contains FFT and other related algorithms</li>
+<li><b>Integration.cpp</b>&nbsp;-&nbsp;contains numerical integration algorithms</li>
+<li><b>Interpolation.cpp</b>&nbsp;-&nbsp;contains interpolation algorithms</li>
+<li><b>LinAlg.cpp</b>&nbsp;-&nbsp;contains linear algebra algorithms</li>
+<li><b>Optimization.cpp</b>&nbsp;-&nbsp;contains optimization algorithms</li>
+<li><b>Solvers.cpp</b>&nbsp;-&nbsp;contains linear and nonlinear solvers</li>
+<li><b>SpecialFunctions.cpp</b>&nbsp;-&nbsp;contains special functions</li>
+<li><b>Statistics.cpp</b>&nbsp;-&nbsp;statistics</li>
 </ul>
 
 <p>
@@ -273,18 +273,18 @@ The support units are:
 </p>
 
 <ul>
-<li><b>alglibinternal.cpp</b>&nbsp;-&nbsp;contains internal functions which are used by other packages, but not exposed to the external world</li>
-<li><b>ap.cpp</b>&nbsp;-&nbsp;contains publicly accessible vector/matrix classes, most important and general functions and other "basic" functionality</li>
-<li><b>kernels_sse2.cpp</b>&nbsp;-&nbsp;contains SSE2-accelerated implementations of performance-critical functions</li>
-<li><b>kernels_avx2.cpp</b>&nbsp;-&nbsp;contains AVX2-accelerated implementations of performance-critical functions</li>
-<li><b>kernels_fma.cpp</b>&nbsp;-&nbsp;contains FMA-accelerated implementations of performance-critical functions</li>
+<li><b>AlgLibInternal.cpp</b>&nbsp;-&nbsp;contains internal functions which are used by other packages, but not exposed to the external world</li>
+<li><b>Ap.cpp</b>&nbsp;-&nbsp;contains publicly accessible vector/matrix classes, most important and general functions and other "basic" functionality</li>
+<li><b>KernelsSse2.cpp</b>&nbsp;-&nbsp;contains SSE2-accelerated implementations of performance-critical functions</li>
+<li><b>KernelsAvx2.cpp</b>&nbsp;-&nbsp;contains AVX2-accelerated implementations of performance-critical functions</li>
+<li><b>KernelsFma.cpp</b>&nbsp;-&nbsp;contains FMA-accelerated implementations of performance-critical functions</li>
 </ul>
 
 <p>
 One package may rely on other ones, but we have tried to reduce number of dependencies.
-Every package relies on <code>ap.cpp</code> and many packages rely on <code>alglibinternal.cpp</code> and kernels.
+Every package relies on <code>Ap.cpp</code> and many packages rely on <code>AlgLibInternal.cpp</code> and kernels.
 But many packages require only these five to work, and many other packages need significantly less than 13 packages.
-For example, <code>statistics.cpp</code> requires five files mentioned above and only one additional package - <code>specialfunctions.cpp</code>.
+For example, <code>Statistics.cpp</code> requires five files mentioned above and only one additional package - <code>SpecialFunctions.cpp</code>.
 </p>
 
 <a name='gs_subpackages' class='sheader'></a><h2>2.2 Subpackages</h2>
@@ -292,10 +292,10 @@ For example, <code>statistics.cpp</code> requires five files mentioned above and
 <p>
 There is one more concept to learn - <i>subpackages</i>.
 If you look at the <a href='#alglib_main'>list of ALGLIB packages</a>, you will see that each package includes several subpackages.
-For example, <code>linalg.cpp</code> includes <code>trfac</code>, <code>svd</code>, <code>evd</code> and other subpackages.
+For example, <code>LinAlg.cpp</code> includes <code>trfac</code>, <code>svd</code>, <code>evd</code> and other subpackages.
 These subpackages do no exist as separate files, namespaces or other entities.
 They are just subsets of one large unit which provide significantly different functionality.
-They have separate documentation sections, but if you want to use <code>svd</code> subpackage, you have to include <code>linalg.h</code>, not <code>svd.h</code>.
+They have separate documentation sections, but if you want to use <code>svd</code> subpackage, you have to include <code>LinAlg.h</code>, not <code>svd.h</code>.
 </p>
 
 
@@ -493,7 +493,7 @@ You may define all or just one/two types (those which are not detected automatic
 
 <p>
 ALGLIB has two-layered structure: some set of basic performance-critical primitives is implemented using optimized code
-(<code>kernels_sse2.cpp</code>, <code>kernels_avx2.cpp</code> and <code>kernels_fma.cpp</code>),
+(<code>KernelsSse2.cpp</code>, <code>KernelsAvx2.cpp</code> and <code>KernelsFma.cpp</code>),
 and the rest of the library is built on top of these primitives.
 By default, ALGLIB uses generic C code to implement these primitives (matrix multiplication, decompositions, etc.).
 This code works on any CPU architecture that has IEEE-754 floating point support (including exotic DSPs).
@@ -551,8 +551,8 @@ Depending on the compiler being used, the latter step can be done as follows:
 <p>
 The downside of this approach is that your entire application becomes less portable.
 Of course, ALGLIB includes a CPU dispatcher which checks at runtime which SIMD instruction sets are available at your CPU.
-If your CPU lacks FMA, ALGLIB won't call functions from <code>kernels_fma.cpp</code>.
-Similarly, if you don't have AVX2, <code>kernels_avx2.cpp</code> will be ignored.
+If your CPU lacks FMA, ALGLIB won't call functions from <code>KernelsFma.cpp</code>.
+Similarly, if you don't have AVX2, <code>KernelsAvx2.cpp</code> will be ignored.
 The problem is that because <i>entire ALGLIB</i> was compiled with SIMD support,
 a compiler may insert SIMD instructions on its own to accelerate even generic C parts.
 </p>
@@ -573,15 +573,15 @@ If one needs a SIMD-capable application with portability guarantees, one has to:
 
 <ul>
 <li>#define <code>AE_CPU=AE_INTEL</code> preprocessor symbol at the global level</li>
-<li>compile <code>kernels_fma.cpp</code> with SSE2/AVX2/FMA support enabled at the compiler level</li>
-<li>compile <code>kernels_avx2.cpp</code> with SSE2/AVX2 support enabled</li>
-<li>compile <code>kernels_sse2.cpp</code> with SSE2 support enabled</li>
+<li>compile <code>KernelsFma.cpp</code> with SSE2/AVX2/FMA support enabled at the compiler level</li>
+<li>compile <code>KernelsAvx2.cpp</code> with SSE2/AVX2 support enabled</li>
+<li>compile <code>KernelsSse2.cpp</code> with SSE2 support enabled</li>
 <li>compile the rest of the library using no special compiler settings</li>
 </ul>
 
 <p>
-ALGLIB guarantees that it won't call functions from <code>kernels_fma.cpp</code> without checking for FMA support first,
-won't access <code>kernels_avx2.cpp</code> without checking for AVX2 and so on.
+ALGLIB guarantees that it won't call functions from <code>KernelsFma.cpp</code> without checking for FMA support first,
+won't access <code>KernelsAvx2.cpp</code> without checking for AVX2 and so on.
 Thus, when the library is compiled this way, it will have guaranteed portability across x86/x64 systems.
 </p>
 
@@ -1034,7 +1034,7 @@ and it is too easy to crash your system or cause memory leak if you use it direc
 <a name='gs_datatypes' class='sheader'></a><h2>5.3 Datatypes</h2>
 
 <p>
-ALGLIB (<code>ap.h</code> header) defines several "basic" datatypes (types which are used by all packages) and many package-specific datatypes. "Basic" datatypes are:
+ALGLIB (<code>Ap.h</code> header) defines several "basic" datatypes (types which are used by all packages) and many package-specific datatypes. "Basic" datatypes are:
 </p>
 
 <ul>
@@ -1063,7 +1063,7 @@ Package-specific datatypes are classes which can be divided into two distinct gr
 <a name='gs_constants' class='sheader'></a><h2>5.4 Constants</h2>
 
 <p>
-The most important constants (defined in the <code>ap.h</code> header) from ALGLIB namespace are:
+The most important constants (defined in the <code>Ap.h</code> header) from ALGLIB namespace are:
 </p>
 
 <ul>
@@ -1079,7 +1079,7 @@ but when PA-RISC CPU is in its default state, it is silently converted to the qu
 <a name='gs_stdfunctions' class='sheader'></a><h2>5.5 Functions</h2>
 
 <p>
-The most important "basic" functions from ALGLIB namespace (<code>ap.h</code> header) are:
+The most important "basic" functions from ALGLIB namespace (<code>Ap.h</code> header) are:
 </p>
 
 <ul>
@@ -1102,7 +1102,7 @@ If numbers are represented with greater precision than specified by IEEE 754 (as
 <a name='gs_vecmat' class='sheader'></a><h2>5.6 Working with vectors and matrices</h2>
 
 <p>
-ALGLIB (<code>ap.h</code> header) supports matrixes and vectors (one-dimensional and two-dimensional arrays) of variable size, with numeration starting from zero.
+ALGLIB (<code>Ap.h</code> header) supports matrixes and vectors (one-dimensional and two-dimensional arrays) of variable size, with numeration starting from zero.
 </p>
 
 <p>
@@ -1278,7 +1278,7 @@ Here are several examples of 'friendly' and 'expert' interfaces:
 </p>
 
 <pre class='p_example'>
-<span class='s_preprocessor'>#include "interpolation.h"</span>
+<span class='s_preprocessor'>#include "Interpolation.h"</span>
 
 <span style='color: gray;'>...</span>
 
@@ -1302,7 +1302,7 @@ alglib::spline1dbuildlinear(x, y2, s);    <span class='s_comment'>// it won't wo
 </p>
 
 <pre class='p_example'>
-<span class='s_preprocessor'>#include "linalg.h"</span>
+<span class='s_preprocessor'>#include "LinAlg.h"</span>
 
 <span style='color: gray;'>...</span>
 
@@ -1333,7 +1333,7 @@ Same function but with 'expert' interface:
 </p>
 
 <pre class='p_example'>
-<span class='s_preprocessor'>#include "linalg.h"</span>
+<span class='s_preprocessor'>#include "LinAlg.h"</span>
 
 <span style='color: gray;'>...</span>
 
@@ -1408,7 +1408,7 @@ infinities/NAN's in the inputs, inconsistent inputs, etc.
 <a name='gs_blas' class='sheader'></a><h2>5.9 Working with Level 1 BLAS functions</h2>
 
 <p>
-ALGLIB (<code>ap.h</code> header) includes following Level 1 BLAS functions:
+ALGLIB (<code>Ap.h</code> header) includes following Level 1 BLAS functions:
 </p>
 
 <ul>
@@ -1720,7 +1720,7 @@ alglib::complex vdotproduct(
 <a name='gs_csv' class='sheader'></a><h2>5.10 Reading data from CSV files</h2>
 
 <p>
-ALGLIB (<code>ap.h</code> header) has <code>alglib::read_csv()</code> function
+ALGLIB (<code>Ap.h</code> header) has <code>alglib::read_csv()</code> function
 which allows to read data from CSV file.
 Entire file is loaded into memory as double precision 2D array (<code>alglib::real_2d_array</code> object).
 This function provides following features:
@@ -2177,20 +2177,20 @@ Subpackage names can be found in the <a href='#alglib_main'>list of ALGLIB packa
 
 <p>
 There are three test suites in ALGLIB: computational tests, interface tests, extended tests.
-Computational tests are located in <code>/tests/test_c.cpp</code>.
+Computational tests are located in <code>/tests/TestC.cpp</code>.
 They are focused on numerical properties of algorithms, stress testing and "deep" tests (large automatically generated problems).
 They require significant amount of time to finish (tens of minutes).
 </p>
 
 <p>
-Interface tests are located in <code>/tests/test_i.cpp</code>.
+Interface tests are located in <code>/tests/TestI.cpp</code>.
 These tests are focused on ability to correctly pass data between computational core and caller, ability to detect simple problems in inputs,
 and on ability to at least compile ALGLIB with your compiler.
 They are very fast (about a minute to finish including compilation time).
 </p>
 
 <p>
-Extended tests are located in <code>/tests/test_x.cpp</code>.
+Extended tests are located in <code>/tests/TestX.cpp</code>.
 These tests are focused on testing some special properties
 (say, testing that cloning object indeed results in 100% independent copy being created)
 and performance of several chosen algorithms.
@@ -2201,14 +2201,14 @@ Running test suite is easy - just
 </p>
 
 <ol>
-<li>compile one of these files (<code>test_c.cpp</code>, <code>test_i.cpp</code> or <code>test_x.cpp</code>)
+<li>compile one of these files (<code>TestC.cpp</code>, <code>TestI.cpp</code> or <code>TestX.cpp</code>)
 along with the rest of the library</li>
 <li>launch executable you will get. It may take from several seconds (interface tests) to several minutes (computational tests) to get final results</li>
 </ol>
 
 <p>
 If you want to be sure that ALGLIB will work with some sophisticated optimization settings, set corresponding flags during compile time.
-If your compiler/system are not in the list of supported ones, we recommend you to run both test suites. But if you are running out of time, run at least <code>test_i.cpp</code>.
+If your compiler/system are not in the list of supported ones, we recommend you to run both test suites. But if you are running out of time, run at least <code>TestI.cpp</code>.
 </p>
 
 
@@ -3527,7 +3527,7 @@ Input parameters:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -3602,7 +3602,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -3921,7 +3921,7 @@ SEE ALSO
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;integration.h&quot;</b></font>
+#include <font color=blue><b>&quot;Integration.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> int_function_1_func(<b>double</b> x, <b>double</b> xminusa, <b>double</b> bminusx, <b>double</b> &amp;y, <b>void</b> *ptr) 
@@ -4761,7 +4761,7 @@ Obsolete function, we recommend to use SpearmanCorr2().
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;statistics.h&quot;</b></font>
+#include <font color=blue><b>&quot;Statistics.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -4811,7 +4811,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;statistics.h&quot;</b></font>
+#include <font color=blue><b>&quot;Statistics.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -4847,7 +4847,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;statistics.h&quot;</b></font>
+#include <font color=blue><b>&quot;Statistics.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -4887,7 +4887,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;statistics.h&quot;</b></font>
+#include <font color=blue><b>&quot;Statistics.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -6728,7 +6728,7 @@ INPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -6847,7 +6847,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -6912,7 +6912,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -6966,7 +6966,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -7036,7 +7036,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -8991,7 +8991,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -9077,7 +9077,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -11935,7 +11935,7 @@ OUTPUT PARAMETERS
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;solvers.h&quot;</b></font>
+#include <font color=blue><b>&quot;Solvers.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -13758,7 +13758,7 @@ not used) because array size is used to automatically determine FFT length
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;fasttransforms.h&quot;</b></font>
+#include <font color=blue><b>&quot;FastTransforms.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -13789,7 +13789,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;fasttransforms.h&quot;</b></font>
+#include <font color=blue><b>&quot;FastTransforms.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -13819,7 +13819,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;fasttransforms.h&quot;</b></font>
+#include <font color=blue><b>&quot;FastTransforms.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -13852,7 +13852,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;fasttransforms.h&quot;</b></font>
+#include <font color=blue><b>&quot;FastTransforms.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -14120,7 +14120,7 @@ NOTE 3: this  is  unsymmetric version of the algorithm,  which  does  NOT
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -14148,7 +14148,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -14176,7 +14176,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -16325,7 +16325,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -16401,7 +16401,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -18490,7 +18490,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -18572,7 +18572,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -19233,7 +19233,7 @@ NOTE: this function uses lightweight preconditioning -  multiplication  by
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;solvers.h&quot;</b></font>
+#include <font color=blue><b>&quot;Solvers.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -19669,7 +19669,7 @@ NOTE: this function uses lightweight preconditioning -  multiplication  by
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;solvers.h&quot;</b></font>
+#include <font color=blue><b>&quot;Solvers.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -20090,7 +20090,7 @@ OUTPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -23547,7 +23547,7 @@ above is not guaranteed and may result in inconsistency.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -23593,7 +23593,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -23652,7 +23652,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
@@ -23714,7 +23714,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
@@ -23768,7 +23768,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
@@ -23833,7 +23833,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
@@ -23907,7 +23907,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function_debt_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
@@ -23977,7 +23977,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24045,7 +24045,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24098,7 +24098,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24162,7 +24162,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24203,7 +24203,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24545,7 +24545,7 @@ Result:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24566,7 +24566,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24587,7 +24587,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24608,7 +24608,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -24629,7 +24629,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -25766,7 +25766,7 @@ Output parameters:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -25791,7 +25791,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -25814,7 +25814,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -25839,7 +25839,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -26653,7 +26653,7 @@ and completion code.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -26723,7 +26723,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -27759,7 +27759,7 @@ provided to MinBCOptimize().
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -27862,7 +27862,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_func(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
@@ -29010,7 +29010,7 @@ provided to MinBLEICOptimize().
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -29114,7 +29114,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -29220,7 +29220,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_func(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
@@ -30285,7 +30285,7 @@ INPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -30378,7 +30378,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -30460,7 +30460,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_func(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
@@ -31768,7 +31768,7 @@ provided to MinLBFGSOptimize().
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -31861,7 +31861,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
@@ -31943,7 +31943,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_func(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
@@ -32944,7 +32944,7 @@ iterations are reported.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> function1_func(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
@@ -33016,7 +33016,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  function1_fvec(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr)
@@ -33088,7 +33088,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  function1_fvec(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr)
@@ -33159,7 +33159,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  function1_fvec(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr)
@@ -33239,7 +33239,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  function1_fvec(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr)
@@ -34087,7 +34087,7 @@ INPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -35869,7 +35869,7 @@ NOTE: algorithm passes two parameters to rep() callback  -  current  point
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nlcfunc1_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -36042,7 +36042,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nlcfunc1_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -36218,7 +36218,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nlcfunc2_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -37195,7 +37195,7 @@ provided to minnsoptimize().
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nsfunc1_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -37331,7 +37331,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nsfunc1_fvec(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, <b>void</b> *ptr)
@@ -37417,7 +37417,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nsfunc2_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -37573,7 +37573,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b>  nsfunc1_jac(<b>const</b> real_1d_array &amp;x, real_1d_array &amp;fi, real_2d_array &amp;jac, <b>void</b> *ptr)
@@ -39278,7 +39278,7 @@ INPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -39385,7 +39385,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -39483,7 +39483,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -39596,7 +39596,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -39700,7 +39700,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;optimization.h&quot;</b></font>
+#include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43517,7 +43517,7 @@ NOTE: this method uses sum-of-squares error function for training.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43632,7 +43632,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43730,7 +43730,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43799,7 +43799,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43847,7 +43847,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -43940,7 +43940,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -44003,7 +44003,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -44068,7 +44068,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -45404,7 +45404,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;alglibmisc.h&quot;</b></font>
+#include <font color=blue><b>&quot;AlgLibMisc.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -45435,7 +45435,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;alglibmisc.h&quot;</b></font>
+#include <font color=blue><b>&quot;AlgLibMisc.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -46349,7 +46349,7 @@ It accepts following parameters:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;diffequations.h&quot;</b></font>
+#include <font color=blue><b>&quot;DiffEquations.h&quot;</b></font>
 
 using namespace alglib;
 <b>void</b> ode_function_1_diff(<b>const</b> real_1d_array &amp;y, <b>double</b> x, real_1d_array &amp;dy, <b>void</b> *ptr) 
@@ -48816,7 +48816,7 @@ NOTE:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -49714,7 +49714,7 @@ NOTES:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -49763,7 +49763,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -49806,7 +49806,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -51837,7 +51837,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -51928,7 +51928,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -52034,7 +52034,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -52125,7 +52125,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -54862,7 +54862,7 @@ this function.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -54936,7 +54936,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;linalg.h&quot;</b></font>
+#include <font color=blue><b>&quot;LinAlg.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -56165,7 +56165,7 @@ NOTE:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -56231,7 +56231,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -56282,7 +56282,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -56334,7 +56334,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -56367,7 +56367,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57483,7 +57483,7 @@ This function unserializes data structure from string.
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57527,7 +57527,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57562,7 +57562,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57622,7 +57622,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57692,7 +57692,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -57728,7 +57728,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -58082,7 +58082,7 @@ Result:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -58130,7 +58130,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;interpolation.h&quot;</b></font>
+#include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -59497,7 +59497,7 @@ OUTPUT PARAMETERS:
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -59551,7 +59551,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 
@@ -59611,7 +59611,7 @@ using namespace alglib;
 #include &lt;stdlib.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
-#include <font color=blue><b>&quot;dataanalysis.h&quot;</b></font>
+#include <font color=blue><b>&quot;DataAnalysis.h&quot;</b></font>
 
 using namespace alglib;
 

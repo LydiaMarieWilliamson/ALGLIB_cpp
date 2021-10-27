@@ -1472,7 +1472,7 @@ void setglobalthreading(const xparams settings);
 alglib::ae_int_t getnworkers();
 
 /********************************************************************
-internal functions used by test_x.cpp, interfaces for functions present
+internal functions used by TestX.cpp, interfaces for functions present
 in commercial ALGLIB but lacking in free edition.
 ********************************************************************/
 ae_int_t _ae_cores_count();

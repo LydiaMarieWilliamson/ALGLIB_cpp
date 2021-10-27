@@ -19,9 +19,9 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _specialfunctions_pkg_h
 #define _specialfunctions_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "alglibmisc.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "AlgLibMisc.h"
 
 /////////////////////////////////////////////////////////////////////////
 //

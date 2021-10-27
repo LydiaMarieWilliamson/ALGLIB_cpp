@@ -19,7 +19,7 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _alglibinternal_pkg_h
 #define _alglibinternal_pkg_h
-#include "ap.h"
+#include "Ap.h"
 
 
 /////////////////////////////////////////////////////////////////////////

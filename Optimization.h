@@ -19,11 +19,11 @@ http://www.fsf.org/licensing/licenses
 *************************************************************************/
 #ifndef _optimization_pkg_h
 #define _optimization_pkg_h
-#include "ap.h"
-#include "alglibinternal.h"
-#include "linalg.h"
-#include "alglibmisc.h"
-#include "solvers.h"
+#include "Ap.h"
+#include "AlgLibInternal.h"
+#include "LinAlg.h"
+#include "AlgLibMisc.h"
+#include "Solvers.h"
 
 /////////////////////////////////////////////////////////////////////////
 //
