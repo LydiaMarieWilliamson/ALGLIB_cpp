@@ -2141,9 +2141,9 @@ Exception handling macros
 ///////////////////////////////////////
 // Exception-free version
 //////////////////////////////
-#if AE_OS!=AE_UNKNOWN
-#error Exception-free mode can not be combined with AE_OS definition
-#endif
+// #if AE_OS!=AE_UNKNOWN
+// #error Exception-free mode can not be combined with AE_OS definition
+// #endif
 #if AE_THREADING!=AE_SERIAL_UNSAFE
 #error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
 #endif

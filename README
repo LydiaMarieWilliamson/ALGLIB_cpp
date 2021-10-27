@@ -5,3 +5,5 @@ This time, the conversion process is going to be logged from start to finish.
 The final result will be merged into ALGLIB_cpp, as it is also updated.
 It will made operational throughout the process.
 The new multi-threading code, recently devised, may also be added in, as well.
+
+The first operational version has passed its tests with timestamp 1635369021 (0x6179c03d).
