@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -614,7 +614,7 @@ void rgemvx_transposed_fma(const ae_int_t m, const ae_int_t n,
 }
 
 /*************************************************************************
-Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise 
+Computes  product   A*transpose(B)  of two MICRO_SIZE*ROUND_LENGTH rowwise
 'horizontal' matrices, stored with stride=block_size, and writes it to the
 row-wise matrix C.
 
@@ -790,7 +790,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     ae_int_t k;
     ae_int_t targetrow;
     ae_int_t targetcol;
-    
+
     /*
      * Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
      */
@@ -806,7 +806,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     {
         return ae_false;
     }
-    
+
     /*
      * Shift input arrays to the beginning of the working area.
      * Prepare SIMD masks
@@ -815,7 +815,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     double *update_storage = rowstorage+offsu;
     double *target_storage = rowstorage+offss;
     superrowidx += urbase;
-    
+
     /*
      * Load head of the update matrix
      */
@@ -836,7 +836,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
         if( targetcol==3 )
             u_3_0123 = _mm256_mul_pd(v_d0123, _mm256_maskload_pd(update_storage+k*urowstride, v_rankmask));
     }
-    
+
     /*
      * Transpose head
      */
@@ -848,7 +848,7 @@ ae_bool spchol_updatekernelabc4_fma(double* rowstorage,
     __m256d u_0123_1 = _mm256_permute2f128_pd(u01_hi, u23_hi, 0x20);
     __m256d u_0123_2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
     __m256d u_0123_3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
-    
+
     /*
      * Run update
      */
@@ -923,7 +923,7 @@ ae_bool spchol_updatekernel4444_fma(
     ae_int_t offsk;
     __m256d v_negd_u0, v_negd_u1, v_negd_u2, v_negd_u3, v_negd;
     __m256d v_w0, v_w1, v_w2, v_w3, u01_lo, u01_hi, u23_lo, u23_hi;
-    
+
     /*
      * Compute W = -D*transpose(U[0:3])
      */
@@ -940,7 +940,7 @@ ae_bool spchol_updatekernel4444_fma(
     v_w1 = _mm256_permute2f128_pd(u01_hi, u23_hi, 0x20);
     v_w2 = _mm256_permute2f128_pd(u23_lo, u01_lo, 0x13);
     v_w3 = _mm256_permute2f128_pd(u23_hi, u01_hi, 0x13);
-    
+
     //
     // Compute update S:= S + row_scatter(U*W)
     //
@@ -952,10 +952,10 @@ ae_bool spchol_updatekernel4444_fma(
         for(k=0; k<uheight; k++)
         {
             __m256d target;
-            
+
             targetrow = offss+k*4;
             offsk = offsu+k*4;
-            
+
             target = _mm256_load_pd(rowstorage+targetrow);
             target = _mm256_fmadd_pd(_mm256_broadcast_sd(rowstorage+offsk+0),v_w0,target);
             target = _mm256_fmadd_pd(_mm256_broadcast_sd(rowstorage+offsk+1),v_w1,target);
@@ -972,10 +972,10 @@ ae_bool spchol_updatekernel4444_fma(
         for(k=0; k<=uheight-1; k++)
         {
             __m256d v_uk0, v_uk1, v_uk2, v_uk3, target;
-            
+
             targetrow = offss+raw2smap[superrowidx[urbase+k]]*4;
             offsk = offsu+k*4;
-            
+
             target = _mm256_load_pd(rowstorage+targetrow);
             v_uk0 = _mm256_broadcast_sd(rowstorage+offsk+0);
             v_uk1 = _mm256_broadcast_sd(rowstorage+offsk+1);

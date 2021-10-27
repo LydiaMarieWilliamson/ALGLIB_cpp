@@ -133,7 +133,7 @@ void _seedrec_destroy(void* _p)
 void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr)
 {
     double x0 = *((double*)ptr);
-    
+
     //
     // This block assigns zero vector to gradient. Because gradient is a proxy vector
     // (vector which uses another object as storage), sizes of gradient and vector being
@@ -146,7 +146,7 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
     real_1d_array z = "[0]";
     grad = "[0]";
     grad = z;
-    
+
     //
     // This block tries to perform operations which are forbidden for proxy vector:
     // * assign vector of non-matching size
@@ -179,7 +179,7 @@ void func505_grad(const real_1d_array &x, double &func, real_1d_array &grad, voi
         issue505_passed = false;
     }
     catch(...) {}
-    
+
     //
     // This block actually calculates function/gradient
     //
@@ -197,7 +197,7 @@ void  func505_vec(const real_1d_array &x, real_1d_array &fi, void *ptr)
 void  func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr)
 {
     double x0 = *((double*)ptr);
-    
+
     //
     // This block assigns zero matrix to Jacobian. Because Jacobian is a proxy matrix
     // (matrix which uses another object as storage), sizes of Jacobian and matrix being
@@ -210,7 +210,7 @@ void  func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac,
     real_2d_array z = "[[0],[0]]";
     jac = "[[0],[0]]";
     jac = z;
-    
+
     //
     // This block tries to perform operations which are forbidden for proxy vector:
     // * assign vector of non-matching size
@@ -249,7 +249,7 @@ void  func505_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac,
         issue505_passed = false;
     }
     catch(...) {}
-    
+
     //
     // This block actually calculates function/gradient
     //
@@ -351,7 +351,7 @@ int main()
 #else
     printf("No alloc counter.\nSome tests are skipped.\n");
 #endif
-    
+
     //
     // Testing basic functionality
     //
@@ -396,7 +396,7 @@ int main()
             passed = passed && !arr_2[0] && arr_3[0] && arr_4[0];
             arr_5.setlength(99);
             passed = passed && (arr_5.length()==99);
-            
+
             // setcontent/getcontent
             bool a0[] = {true, false, true, false, false};
             bool a0_mod  = false;
@@ -411,7 +411,7 @@ int main()
             a0[0] = a0_mod;
             passed = passed && (arr_6[0]!=a0[0]);
             a0[0] = a0_orig;
-            
+
             // operations on constant arrays
             {
                 const alglib::boolean_1d_array &ac = arr_6;
@@ -420,7 +420,7 @@ int main()
                 const bool *p = ac.getcontent();
                 passed = passed && (p[0]==a0[0]) && (p[1]==a0[1]) && (p[2]==a0[2]) && (p[3]==a0[3]) && (p[4]==a0[4]);
             }
-            
+
             //
             // Operations with proxy arrays:
             // * changes in target are propagated to proxy and vice versa
@@ -437,12 +437,12 @@ int main()
             passed = passed &&  targt[0] && !targt[1] && !targt[2] &&  targt[3];
             passed = passed &&  proxy[0] && !proxy[1] && !proxy[2] &&  proxy[3];
             passed = passed &&  acopy[0] && !acopy[1] && !acopy[2] &&  acopy[3];
-            
+
             targt[0] = false;
             passed = passed && !targt[0] && !proxy[0] && acopy[0];
             proxy[0] = true;
             passed = passed &&  targt[0] &&  proxy[0] && acopy[0];
-            
+
             acopy = "[false,true,true,true]";
             proxy = acopy;
             passed = passed && !targt[0] &&  targt[1] &&  targt[2] &&  targt[3];
@@ -450,7 +450,7 @@ int main()
             proxy = "[true,false,true,true]";
             passed = passed &&  targt[0] && !targt[1] &&  targt[2] &&  targt[3];
             passed = passed &&  proxy[0] && !proxy[1] &&  proxy[2] &&  proxy[3];
-            
+
             try
             {
                 acopy = "[false,true,true]";
@@ -461,7 +461,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy = "[true,true,true]";
@@ -471,7 +471,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(100);
@@ -481,7 +481,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(proxy.length());
@@ -517,7 +517,7 @@ int main()
             int v30 =  6, v31 =  7, v32 =  3, v33 = -4, v30_mod = -6;
             int v40 =  9, v41 =  5, v42 =-12, v43 = 0;
             int v50 =  1, v51 =  7, v52 =  2, v53 = 1;
-            
+
             alglib::integer_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
             arr_4 = arr_2;
             arr_5 = s2;
@@ -538,7 +538,7 @@ int main()
             passed = passed && (arr_2[0]==v10_mod) && (arr_3[0]==v10) && (arr_4[0]==v10);
             arr_5.setlength(99);
             passed = passed && (arr_5.length()==99);
-            
+
             // setcontent/getcontent
             alglib::ae_int_t a0[] =   {2, 3, 1, 9, 2};
             alglib::ae_int_t a0_mod  = 7;
@@ -553,7 +553,7 @@ int main()
             a0[0] = a0_mod;
             passed = passed && (arr_6[0]!=a0[0]);
             a0[0] = a0_orig;
-            
+
             // operations on constant arrays
             {
                 const alglib::integer_1d_array &ac = arr_6;
@@ -562,7 +562,7 @@ int main()
                 const alglib::ae_int_t *p = ac.getcontent();
                 passed = passed && (p[0]==a0[0]) && (p[1]==a0[1]) && (p[2]==a0[2]) && (p[3]==a0[3]) && (p[4]==a0[4]);
             }
-            
+
             //
             // Operations with proxy arrays:
             // * changes in target are propagated to proxy and vice versa
@@ -579,12 +579,12 @@ int main()
             passed = passed && (targt[0]==v30) && (targt[1]==v31) && (targt[2]==v32) && (targt[3]==v33);
             passed = passed && (proxy[0]==v30) && (proxy[1]==v31) && (proxy[2]==v32) && (proxy[3]==v33);
             passed = passed && (acopy[0]==v30) && (acopy[1]==v31) && (acopy[2]==v32) && (acopy[3]==v33);
-            
+
             targt[0] = v30_mod;
             passed = passed && (targt[0]==v30_mod) && (proxy[0]==v30_mod) && (acopy[0]==v30);
             proxy[0] = v30;
             passed = passed && (targt[0]==v30)     && (proxy[0]==v30)     && (acopy[0]==v30);
-            
+
             acopy = s4;
             proxy = acopy;
             passed = passed && (targt[0]==v40) && (targt[1]==v41) && (targt[2]==v42) && (targt[3]==v43);
@@ -592,7 +592,7 @@ int main()
             proxy = s5;
             passed = passed && (targt[0]==v50) && (targt[1]==v51) && (targt[2]==v52) && (targt[3]==v53);
             passed = passed && (proxy[0]==v50) && (proxy[1]==v51) && (proxy[2]==v52) && (proxy[3]==v53);
-            
+
             try
             {
                 acopy = s6;
@@ -603,7 +603,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy = s6;
@@ -613,7 +613,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(100);
@@ -623,7 +623,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(proxy.length());
@@ -662,7 +662,7 @@ int main()
             const double v30 =  6, v31 =  7, v32 =  3, v33 = -400, v30_mod = -6;
             const double v40 =  9, v41 =  5, v42 =-12, v43 = -0.01;
             const double v50 =  1, v51 =  7, v52 =  2, v53 = 1;
-            
+
             alglib::real_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
             arr_4 = arr_2;
             arr_5 = s2;
@@ -683,7 +683,7 @@ int main()
             passed = passed && (arr_2[0]==v10_mod) && (arr_3[0]==v10) && (arr_4[0]==v10);
             arr_5.setlength(99);
             passed = passed && (arr_5.length()==99);
-            
+
             // setcontent/getcontent
             double a0[] =   {2, 3.5, 1, 9.125, 2};
             double a0_mod  = 7;
@@ -698,7 +698,7 @@ int main()
             a0[0] = a0_mod;
             passed = passed && (arr_6[0]!=a0[0]);
             a0[0] = a0_orig;
-            
+
             // operations on constant arrays
             {
                 const alglib::real_1d_array &ac = arr_6;
@@ -707,7 +707,7 @@ int main()
                 const double *p = ac.getcontent();
                 passed = passed && (p[0]==a0[0]) && (p[1]==a0[1]) && (p[2]==a0[2]) && (p[3]==a0[3]) && (p[4]==a0[4]);
             }
-            
+
             //
             // Operations with proxy arrays attached via attach_to(ae_vector*):
             // * changes in target are propagated to proxy and vice versa
@@ -725,12 +725,12 @@ int main()
                 passed = passed && (targt[0]==v30) && (targt[1]==v31) && (targt[2]==v32) && (targt[3]==v33);
                 passed = passed && (proxy[0]==v30) && (proxy[1]==v31) && (proxy[2]==v32) && (proxy[3]==v33);
                 passed = passed && (acopy[0]==v30) && (acopy[1]==v31) && (acopy[2]==v32) && (acopy[3]==v33);
-                
+
                 targt[0] = v30_mod;
                 passed = passed && (targt[0]==v30_mod) && (proxy[0]==v30_mod) && (acopy[0]==v30);
                 proxy[0] = v30;
                 passed = passed && (targt[0]==v30)     && (proxy[0]==v30)     && (acopy[0]==v30);
-                
+
                 acopy = s4;
                 proxy = acopy;
                 passed = passed && (targt[0]==v40) && (targt[1]==v41) && (targt[2]==v42) && (targt[3]==v43);
@@ -738,7 +738,7 @@ int main()
                 proxy = s5;
                 passed = passed && (targt[0]==v50) && (targt[1]==v51) && (targt[2]==v52) && (targt[3]==v53);
                 passed = passed && (proxy[0]==v50) && (proxy[1]==v51) && (proxy[2]==v52) && (proxy[3]==v53);
-                
+
                 try
                 {
                     acopy = s6;
@@ -749,7 +749,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy = s6;
@@ -759,7 +759,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy.setlength(100);
@@ -769,7 +769,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy.setlength(proxy.length());
@@ -780,7 +780,7 @@ int main()
                 catch(...)
                 { passed = false; }
             }
-            
+
             //
             // >>> Unique for real_1d_array >>>
             //
@@ -800,12 +800,12 @@ int main()
                 passed = passed && (targt[0]==v30) && (targt[1]==v31) && (targt[2]==v32) && (targt[3]==v33);
                 passed = passed && (proxy[0]==v30) && (proxy[1]==v31) && (proxy[2]==v32) && (proxy[3]==v33);
                 passed = passed && (acopy[0]==v30) && (acopy[1]==v31) && (acopy[2]==v32) && (acopy[3]==v33);
-                
+
                 targt[0] = v30_mod;
                 passed = passed && (targt[0]==v30_mod) && (proxy[0]==v30_mod) && (acopy[0]==v30);
                 proxy[0] = v30;
                 passed = passed && (targt[0]==v30)     && (proxy[0]==v30)     && (acopy[0]==v30);
-                
+
                 acopy = s4;
                 proxy = acopy;
                 passed = passed && (targt[0]==v40) && (targt[1]==v41) && (targt[2]==v42) && (targt[3]==v43);
@@ -813,7 +813,7 @@ int main()
                 proxy = s5;
                 passed = passed && (targt[0]==v50) && (targt[1]==v51) && (targt[2]==v52) && (targt[3]==v53);
                 passed = passed && (proxy[0]==v50) && (proxy[1]==v51) && (proxy[2]==v52) && (proxy[3]==v53);
-                
+
                 try
                 {
                     acopy = s6;
@@ -824,7 +824,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy = s6;
@@ -834,7 +834,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy.setlength(100);
@@ -844,7 +844,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 try
                 {
                     proxy.setlength(proxy.length());
@@ -884,7 +884,7 @@ int main()
             alglib::complex v30 =  6, v31 =  7, v32 =  3, v33 = -400, v30_mod = -6;
             alglib::complex v40 =  9, v41 =  5, v42 =-12, v43 = -0.01;
             alglib::complex v50 =  1, v51 =  7, v52 =  2, v53 = 1;
-            
+
             alglib::complex_1d_array arr_0, arr_1("[]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
             arr_4 = arr_2;
             arr_5 = s2;
@@ -905,7 +905,7 @@ int main()
             passed = passed && (arr_2[0]==v10_mod) && (arr_3[0]==v10) && (arr_4[0]==v10);
             arr_5.setlength(99);
             passed = passed && (arr_5.length()==99);
-            
+
             // setcontent/getcontent
             alglib::complex a0[] =   {2, 3.5, 1, 9.125, 2};
             alglib::complex a0_mod  = 7;
@@ -920,7 +920,7 @@ int main()
             a0[0] = a0_mod;
             passed = passed && (arr_6[0]!=a0[0]);
             a0[0] = a0_orig;
-            
+
             // operations on constant arrays
             {
                 const alglib::complex_1d_array &ac = arr_6;
@@ -929,7 +929,7 @@ int main()
                 const alglib::complex *p = ac.getcontent();
                 passed = passed && (p[0]==a0[0]) && (p[1]==a0[1]) && (p[2]==a0[2]) && (p[3]==a0[3]) && (p[4]==a0[4]);
             }
-            
+
             //
             // Operations with proxy arrays:
             // * changes in target are propagated to proxy and vice versa
@@ -946,12 +946,12 @@ int main()
             passed = passed && (targt[0]==v30) && (targt[1]==v31) && (targt[2]==v32) && (targt[3]==v33);
             passed = passed && (proxy[0]==v30) && (proxy[1]==v31) && (proxy[2]==v32) && (proxy[3]==v33);
             passed = passed && (acopy[0]==v30) && (acopy[1]==v31) && (acopy[2]==v32) && (acopy[3]==v33);
-            
+
             targt[0] = v30_mod;
             passed = passed && (targt[0]==v30_mod) && (proxy[0]==v30_mod) && (acopy[0]==v30);
             proxy[0] = v30;
             passed = passed && (targt[0]==v30)     && (proxy[0]==v30)     && (acopy[0]==v30);
-            
+
             acopy = s4;
             proxy = acopy;
             passed = passed && (targt[0]==v40) && (targt[1]==v41) && (targt[2]==v42) && (targt[3]==v43);
@@ -959,7 +959,7 @@ int main()
             proxy = s5;
             passed = passed && (targt[0]==v50) && (targt[1]==v51) && (targt[2]==v52) && (targt[3]==v53);
             passed = passed && (proxy[0]==v50) && (proxy[1]==v51) && (proxy[2]==v52) && (proxy[3]==v53);
-            
+
             try
             {
                 acopy = s6;
@@ -970,7 +970,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy = s6;
@@ -980,7 +980,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(100);
@@ -990,7 +990,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             try
             {
                 proxy.setlength(proxy.length());
@@ -1003,7 +1003,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         //
         // Report
         //
@@ -1012,7 +1012,7 @@ int main()
         if( !passed )
             return 1;
     }
-    
+
     {
         //
         // Testing 2D array functionality
@@ -1046,7 +1046,7 @@ int main()
             /*double v40 =  9, v41 =  5, v42 =-12, v43 = -0.01;
             double v50 =  1, v51 =  7, v52 =  2, v53 = 1;*/
             double r;
-            
+
             alglib::real_2d_array arr_0, arr_1("[[]]"), arr_2(s1), arr_3(arr_2), arr_4, arr_5;
             arr_4 = arr_2;
             arr_5 = s2;
@@ -1073,7 +1073,7 @@ int main()
             passed = passed && (arr_2[0][0]==v10_mod) && (arr_3[0][0]==v10) && (arr_4[0][0]==v10);
             arr_5.setlength(99,97);
             passed = passed && (arr_5.rows()==99) && (arr_5.cols()==97);
-            
+
             //
             // setcontent/elementwise access/constant arrays
             //
@@ -1083,7 +1083,7 @@ int main()
                 {
                     alglib::real_2d_array arr_6;
                     double a0[100];
-                    
+
                     // fill array by random values, test setcontent(0
                     for(i=0; i<m*n; i++)
                         a0[i] = alglib::randomreal();
@@ -1094,13 +1094,13 @@ int main()
                             passed = passed && (arr_6[i][j]==a0[i*n+j]);
                             passed = passed && (arr_6(i,j)==a0[i*n+j]);
                         }
-                    
+
                     // test that setcontent() actually copies data instead of creating just reference
                     r = a0[0];
                     a0[0] = a0[0]+1;
                     passed = passed && (arr_6[0][0]!=a0[0]);
                     a0[0] = r;
-            
+
                     // operations on constant arrays
                     {
                         const alglib::real_2d_array &ac = arr_6;
@@ -1112,8 +1112,8 @@ int main()
                             }
                     }
                 }
-                
-            
+
+
             //
             // Operations with proxy arrays:
             // * changes in target are propagated to proxy and vice versa
@@ -1140,7 +1140,7 @@ int main()
                 passed = passed && (targt[0][0]!=r) && (proxy[0][0]!=r) && (acopy[0][0]==r);
                 proxy[0][0] = r;
                 passed = passed && (targt[0][0]==r) && (proxy[0][0]==r) && (acopy[0][0]==r);
-                
+
                 // subtest 1
                 acopy = s4;
                 proxy = acopy;
@@ -1155,7 +1155,7 @@ int main()
                 passed = passed && (targt[0][0]!=r) && (proxy[0][0]!=r) && (acopy[0][0]==r);
                 proxy[0][0] = r;
                 passed = passed && (targt[0][0]==r) && (proxy[0][0]==r) && (acopy[0][0]==r);
-                
+
                 // subtest 2
                 acopy2 = s5;
                 proxy = s5;
@@ -1165,7 +1165,7 @@ int main()
                         passed = passed && (proxy[i][j]==acopy2[i][j]);
                         passed = passed && (targt[i][j]==acopy2[i][j]);
                     }
-                
+
                 // error handling test 0
                 try
                 {
@@ -1177,7 +1177,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 1
                 try
                 {
@@ -1189,7 +1189,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 2
                 try
                 {
@@ -1200,7 +1200,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 3
                 try
                 {
@@ -1211,7 +1211,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 4
                 try
                 {
@@ -1222,7 +1222,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 5
                 try
                 {
@@ -1252,7 +1252,7 @@ int main()
                 passed = passed && (targt[0*NCOLS+0]!=r) && (proxy[0][0]!=r) && (acopy[0][0]==r);
                 proxy[0][0] = r;
                 passed = passed && (targt[0*NCOLS+0]==r) && (proxy[0][0]==r) && (acopy[0][0]==r);
-                
+
                 // subtest 1
                 acopy = s4;
                 proxy = acopy;
@@ -1267,7 +1267,7 @@ int main()
                 passed = passed && (targt[0*NCOLS+0]!=r) && (proxy[0][0]!=r) && (acopy[0][0]==r);
                 proxy[0][0] = r;
                 passed = passed && (targt[0*NCOLS+0]==r) && (proxy[0][0]==r) && (acopy[0][0]==r);
-                
+
                 // subtest 2
                 acopy2 = s5;
                 proxy = s5;
@@ -1277,7 +1277,7 @@ int main()
                         passed = passed && (proxy[i][j]==acopy2[i][j]);
                         passed = passed && (targt[i*NCOLS+j]==acopy2[i][j]);
                     }
-                
+
                 // error handling test 0
                 try
                 {
@@ -1289,7 +1289,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 1
                 try
                 {
@@ -1301,7 +1301,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 2
                 try
                 {
@@ -1312,7 +1312,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 3
                 try
                 {
@@ -1323,7 +1323,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 4
                 try
                 {
@@ -1334,7 +1334,7 @@ int main()
                 { }
                 catch(...)
                 { passed = false; }
-                
+
                 // error handling test 5
                 try
                 {
@@ -1349,7 +1349,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         //
         // Report
         //
@@ -1358,7 +1358,7 @@ int main()
         if( !passed )
             return 1;
     }
-    
+
     {
         //
         // Testing CSV functionality
@@ -1369,7 +1369,7 @@ int main()
         {
             // CSV_DEFAULT must be zero
             passed = passed && alglib::CSV_DEFAULT==0;
-            
+
             // absent file - must fail
             try
             {
@@ -1381,7 +1381,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             // non-rectangular file - must fail
             try
             {
@@ -1419,7 +1419,7 @@ int main()
             { }
             catch(...)
             { passed = false; }
-            
+
             // empty file
             try
             {
@@ -1431,7 +1431,7 @@ int main()
             }
             catch(...)
             { passed = false; }
-            
+
             // one row with header, tab separator
             try
             {
@@ -1443,7 +1443,7 @@ int main()
             }
             catch(...)
             { passed = false; }
-            
+
             // no header, comma-separated, full stop as decimal point
             try
             {
@@ -1455,7 +1455,7 @@ int main()
             }
             catch(...)
             { passed = false; }
-            
+
             // header, tab-separated, mixed use of comma and full stop as decimal points
             try
             {
@@ -1467,7 +1467,7 @@ int main()
             }
             catch(...)
             { passed = false; }
-            
+
             // header, tab-separated, fixed/exponential, spaces, mixed use of comma and full stop as decimal points
             try
             {
@@ -1482,7 +1482,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         //
         // Report
         //
@@ -1491,8 +1491,8 @@ int main()
         if( !passed )
             return 1;
     }
-        
-    
+
+
     //
     // Serialization properties
     //
@@ -1516,7 +1516,7 @@ int main()
                 xy[i][j] = alglib::hqrndnormal(rs);
         alglib::kdtreebuild(xy, npts, nx, ny, 2, tree0);
         qx.setlength(nx);
-        
+
         try
         {
             // test string serialization/unserialization
@@ -1543,7 +1543,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test stream serialization/unserialization
@@ -1586,7 +1586,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test string-to-stream serialization/unserialization
@@ -1614,7 +1614,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test stream-to-string serialization/unserialization
@@ -1642,7 +1642,7 @@ int main()
         }
         catch(...)
         { passed = false; }
-            
+
         //
         // Report
         //
@@ -1721,7 +1721,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
 6qTG7Ae-1_3\n";
         alglib::real_1d_array ref_val("[-0.042560546916643, 0.942523544654062, 0.875197036560778, 0.0656948997826632, -0.743065973803404, -0.8903682039297, -0.26994815318748, 0.602248517290195, 0.980011992233124, 0.436594293214176]");
         bool passed = true;
-        
+
         try
         {
             // test unserialization from string without trailing end-of-stream symbol (dot)
@@ -1734,7 +1734,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test unserialization from string with trailing end-of-stream symbol (dot)
@@ -1747,7 +1747,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test unserialization from stream WITHOUT trailing end-of-stream symbol (dot)
@@ -1761,7 +1761,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         }
         catch(...)
         { /* do nothing, it is expected to fail */ }
-        
+
         try
         {
             // test unserialization from stream WITH trailing end-of-stream symbol (dot)
@@ -1776,7 +1776,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         }
         catch(...)
         { passed = false; }
-        
+
         try
         {
             // test that we can read from the stream after unserialization
@@ -1794,7 +1794,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         }
         catch(...)
         { passed = false; }
-            
+
         //
         // Report
         //
@@ -1893,7 +1893,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             // Select moment when we generate exception in the constructor
             //
             alglib_impl::_malloc_failure_after = alglib_impl::_alloc_counter_total+eidx;
-            
+
             //
             // Perform many activities with ALGLIB, catch exceptions.
             // It is survival test, it checks that we survive exceptions.
@@ -1986,7 +1986,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                     rbfbuildmodel(model1, rep);
                     v = rbfcalc2(model1, 0.0, 0.0);
                 }
-                
+
                 //
                 // We survived all tests, next iteration will bring no changed, terminate loop!
                 //
@@ -2042,7 +2042,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         b[i][j] = alglib::randomreal()-0.5;
                         c[i][j] = 0.0;
                     }
-                
+
                 // measure time; interleave measurements with different settings in order to
                 // reduce variance of results
                 while(time_default<mintime)
@@ -2058,7 +2058,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         c, 0, 0);
                     time_default += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global serial
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::serial);
@@ -2071,7 +2071,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         c, 0, 0);
                     time_glob_ser += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global parallel
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::parallel);
@@ -2084,7 +2084,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         c, 0, 0);
                     time_glob_smp += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global serial, local serial
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::serial);
@@ -2098,7 +2098,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         alglib::serial);
                     time_glob_ser_loc_ser += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global serial, local parallel
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::serial);
@@ -2112,7 +2112,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         alglib::parallel);
                     time_glob_ser_loc_smp += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global parallel, local serial
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::parallel);
@@ -2126,7 +2126,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         alglib::serial);
                     time_glob_smp_loc_ser += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global parallel, local parallel
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::parallel);
@@ -2140,7 +2140,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         alglib::parallel);
                     time_glob_smp_loc_smp += alglib_impl::ae_tickcount()-t0;
                     alglib::_ae_set_global_threading(default_global_threading); // restore
-                    
+
                     // global parallel, nworkers=1
                     t0 = alglib_impl::ae_tickcount();
                     alglib::setglobalthreading(alglib::parallel);
@@ -2239,7 +2239,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         fflush(stdout);
         if( !issue505_passed )
             return 1;
-            
+
         //
         // Testing issue #478 (http://bugs.alglib.net/view.php?id=478)
         // in high-quality RNG. It have to correctly handle random numbers
@@ -2266,7 +2266,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 alglib::ae_int_t ncnt = 3, nidx;
                 double n0, n1;
                 alglib::hqrndrandomize(rs);
-                
+
                 //
                 // nmax:
                 // * first nmax is just large value to test basic uniformity of generator
@@ -2277,7 +2277,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 nmax[1] *= 1.5;
                 nmax[2]  = 2147483562;
                 nmax[2] *= 3;
-                
+
                 for(nidx=0; nidx<ncnt; nidx++)
                 {
                     n0 = 0;
@@ -2312,7 +2312,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             printf(fmt_str, "* issue 478", "OK (skipped in 32-bit mode)");
             fflush(stdout);
         }
-        
+
         //
         // Testing issue #528 (http://bugs.alglib.net/view.php?id=528)
         // in shared pool and smart pointer which leak memory.
@@ -2331,7 +2331,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib_impl::ae_smart_ptr ptr0, ptr1;
             void *p0, *p1;
             seedrec seed;
-            
+
             // case #0: just seeding the pool
             alloc_cnt = alglib_impl::_alloc_counter;
             alglib_impl::ae_state_init(&_alglib_env_state);
@@ -2343,7 +2343,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
             alglib_impl::ae_state_clear(&_alglib_env_state);
             issue528_passed = issue528_passed && (alloc_cnt==alglib_impl::_alloc_counter);
-            
+
             // case #1: seeding and retrieving, not recycling
             alloc_cnt = alglib_impl::_alloc_counter;
             alglib_impl::ae_state_init(&_alglib_env_state);
@@ -2358,7 +2358,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib_impl::ae_shared_pool_retrieve(&pool, &ptr0, &_alglib_env_state);
             alglib_impl::ae_state_clear(&_alglib_env_state);
             issue528_passed = issue528_passed && (alloc_cnt==alglib_impl::_alloc_counter);
-            
+
             // case #2: seeding and retrieving twice to different pointers, recycling both
             alloc_cnt = alglib_impl::_alloc_counter;
             alglib_impl::ae_state_init(&_alglib_env_state);
@@ -2389,7 +2389,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         printf(fmt_str, "* issue 528", "??");
         fflush(stdout);
 #endif
-        
+
         //
         // Testing issue #591 (http://bugs.alglib.net/view.php?id=591)
         // in copying of object containing shared pool as one of its
@@ -2404,14 +2404,14 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib::real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
             alglib::mlpcreate0(2, 2, net0);
             alglib::mlpprocess(net0, x, y0);
-            
+
             //
             // Test assignment constructor
             //
             net1 = net0;
             alglib::mlpprocess(net1, x, y1);
             issue591_passed = issue591_passed && (fabs(y0[0]-y1[0])<1.0E-9) && (fabs(y0[1]-y1[1])<1.0E-9);
-            
+
             //
             // Test copy constructor
             //
@@ -2425,7 +2425,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         fflush(stdout);
         if( !issue591_passed )
             return 1;
-        
+
         //
         // Task #594 (http://bugs.alglib.net/view.php?id=594) - additional
         // test for correctness of copying of objects. When we copy ALGLIB
@@ -2440,7 +2440,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib::real_1d_array x("[1,2]"), y0("[0,0]"), y1("[0,0]"), y2("[0,0]");
             alglib::mlpcreate0(2, 2, net0);
             alglib::mlpprocess(net0, x, y0);
-            
+
             //
             // Test assignment and copy constructors:
             // * copy object with one of the constructors
@@ -2462,7 +2462,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
         fflush(stdout);
         if( !issue594_passed )
             return 1;
-        
+
         //
         // Issue 764#, potential memory leak in the smart pointer
         //
@@ -2476,7 +2476,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             alglib_impl::ae_smart_ptr ptr0;
             void *p0, *p1;
             seedrec seed;
-            
+
             // seeding shared pool and retrieving twice to same pointer, no recycling
             alloc_cnt = alglib_impl::_alloc_counter;
             alglib_impl::ae_state_init(&_alglib_env_state);
@@ -2539,7 +2539,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             x[0] = 0;
             alglib::mincgcreatef(1, x, 1e-5, state);
             issue824_passed = true;
-            
+
             // throw int*
             try
             {
@@ -2556,7 +2556,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             {
                 issue824_passed = false;
             }
-            
+
             // throw double*
             try
             {
@@ -2573,7 +2573,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
             {
                 issue824_passed = false;
             }
-            
+
             // done
             printf(fmt_str, "* issue 824", issue824_passed ? "OK" : "FAILED");
             fflush(stdout);
@@ -2581,7 +2581,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 return 1;
         }
     }
-    
+
     //
     // Performance testing
     //
@@ -2601,7 +2601,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 double desiredflops = n>64 ? 1.0E10 : 1.0E9;
                 int nrepeat = (int)(desiredflops/(2*pow((double)n,3.0)));
                 nrepeat = 4*(nrepeat/4+1);
-                
+
                 //
                 // Actual processing
                 //
@@ -2617,7 +2617,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                         b[i][j] = alglib::randomreal()-0.5;
                         c[i][j] = 0.0;
                     }
-                
+
                 t = alglib_impl::ae_tickcount();
                 for(k=0; k<nrepeat; k++)
                     alglib::rmatrixgemm(
@@ -2630,7 +2630,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 t = alglib_impl::ae_tickcount()-t;
                 perf0 = 1.0E-6*pow((double)n,3)*2.0*nrepeat/(0.001*t);
                 printf("* RGEMM-SEQ-%-4ld (MFLOPS)  %5.0lf\n", (long)n, (double)perf0);
-                
+
                 alglib::setnworkers(0);
                 t = alglib_impl::ae_tickcount();
                 for(k=0; k<nrepeat; k++)
@@ -2645,11 +2645,11 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
                 perf2 = 1.0E-6*pow((double)n,3)*2.0*nrepeat/(0.001*t);
                 printf("* RGEMM-MTN-%-4ld           %4.1lfx\n", (long)n, (double)(perf2/perf0));
                 alglib::setnworkers(1);
-                    
+
             }
         }
     }
-    
+
     //
     // Check allocation counter on exit
     //
@@ -2667,7 +2667,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
     else
         printf("OK\n");
 #endif
-    
+
     //
     // Return
     //

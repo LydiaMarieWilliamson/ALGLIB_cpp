@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -141,7 +141,7 @@ OUTPUT PARAMETERS
 void fftc1d(complex_1d_array &a, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = a.length();
@@ -224,7 +224,7 @@ OUTPUT PARAMETERS
 void fftc1dinv(complex_1d_array &a, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = a.length();
@@ -313,7 +313,7 @@ other FFT-related subroutines.
 void fftr1d(const real_1d_array &a, complex_1d_array &f, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = a.length();
@@ -426,7 +426,7 @@ not used) because array size is used to automatically determine FFT length
 void fftr1dinv(const complex_1d_array &f, real_1d_array &a, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = f.length();
@@ -1170,7 +1170,7 @@ Algorithm has O(N*logN) complexity for any N (composite or prime).
 INPUT PARAMETERS
     A   -   array[0..N-1] - complex function to be transformed
     N   -   problem size
-    
+
 OUTPUT PARAMETERS
     A   -   DFT of a input array, array[0..N-1]
             A_out[j] = SUM(A_in[k]*exp(-2*pi*sqrt(-1)*j*k/N), k = 0..N-1)
@@ -1195,7 +1195,7 @@ void fftc1d(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
     ae_assert(n>0, "FFTC1D: incorrect N!", _state);
     ae_assert(a->cnt>=n, "FFTC1D: Length(A)<N!", _state);
     ae_assert(isfinitecvector(a, n, _state), "FFTC1D: A contains infinite or NAN values!", _state);
-    
+
     /*
      * Special case: N=1, FFT is just identity transform.
      * After this block we assume that N is strictly greater than 1.
@@ -1205,7 +1205,7 @@ void fftc1d(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * convert input array to the more convinient format
      */
@@ -1215,7 +1215,7 @@ void fftc1d(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
         buf.ptr.p_double[2*i+0] = a->ptr.p_complex[i].x;
         buf.ptr.p_double[2*i+1] = a->ptr.p_complex[i].y;
     }
-    
+
     /*
      * Generate plan and execute it.
      *
@@ -1225,7 +1225,7 @@ void fftc1d(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
      */
     ftcomplexfftplan(n, 1, &plan, _state);
     ftapplyplan(&plan, &buf, 0, 1, _state);
-    
+
     /*
      * result
      */
@@ -1266,7 +1266,7 @@ void fftc1dinv(/* Complex */ ae_vector* a, ae_int_t n, ae_state *_state)
     ae_assert(n>0, "FFTC1DInv: incorrect N!", _state);
     ae_assert(a->cnt>=n, "FFTC1DInv: Length(A)<N!", _state);
     ae_assert(isfinitecvector(a, n, _state), "FFTC1DInv: A contains infinite or NAN values!", _state);
-    
+
     /*
      * Inverse DFT can be expressed in terms of the DFT as
      *
@@ -1335,7 +1335,7 @@ void fftr1d(/* Real    */ ae_vector* a,
     ae_assert(n>0, "FFTR1D: incorrect N!", _state);
     ae_assert(a->cnt>=n, "FFTR1D: Length(A)<N!", _state);
     ae_assert(isfinitevector(a, n, _state), "FFTR1D: A contains infinite or NAN values!", _state);
-    
+
     /*
      * Special cases:
      * * N=1, FFT is just identity transform.
@@ -1360,13 +1360,13 @@ void fftr1d(/* Real    */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Choose between odd-size and even-size FFTs
      */
     if( n%2==0 )
     {
-        
+
         /*
          * even-size real FFT, use reduction to the complex task
          */
@@ -1397,7 +1397,7 @@ void fftr1d(/* Real    */ ae_vector* a,
     }
     else
     {
-        
+
         /*
          * use complex FFT
          */
@@ -1476,7 +1476,7 @@ void fftr1dinv(/* Complex */ ae_vector* f,
     {
         ae_assert(ae_isfinite(f->ptr.p_complex[ae_ifloor((double)n/(double)2, _state)].y, _state), "FFTR1DInv: F contains infinite or NAN values!", _state);
     }
-    
+
     /*
      * Special case: N=1, FFT is just identity transform.
      * After this block we assume that N is strictly greater than 1.
@@ -1488,7 +1488,7 @@ void fftr1dinv(/* Complex */ ae_vector* f,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * inverse real FFT is reduced to the inverse real FHT,
      * which is reduced to the forward real FHT,
@@ -1546,7 +1546,7 @@ void fftr1dinternaleven(/* Real    */ ae_vector* a,
 
 
     ae_assert(n>0&&n%2==0, "FFTR1DEvenInplace: incorrect N!", _state);
-    
+
     /*
      * Special cases:
      * * N=2
@@ -1561,7 +1561,7 @@ void fftr1dinternaleven(/* Real    */ ae_vector* a,
         a->ptr.p_double[1] = y;
         return;
     }
-    
+
     /*
      * even-size real FFT, use reduction to the complex task
      */
@@ -1608,7 +1608,7 @@ void fftr1dinvinternaleven(/* Real    */ ae_vector* a,
 
 
     ae_assert(n>0&&n%2==0, "FFTR1DInvInternalEven: incorrect N!", _state);
-    
+
     /*
      * Special cases:
      * * N=2
@@ -1623,7 +1623,7 @@ void fftr1dinvinternaleven(/* Real    */ ae_vector* a,
         a->ptr.p_double[1] = y;
         return;
     }
-    
+
     /*
      * inverse real FFT is reduced to the inverse real FHT,
      * which is reduced to the forward real FHT,
@@ -1667,7 +1667,7 @@ Algorithm has O(N*logN) complexity for any N (composite or prime).
 INPUT PARAMETERS
     A   -   array[0..N-1] - real function to be transformed
     N   -   problem size
-    
+
 OUTPUT PARAMETERS
     A   -   FHT of a input array, array[0..N-1],
             A_out[k] = sum(A_in[j]*(cos(2*pi*j*k/N)+sin(2*pi*j*k/N)), j=0..N-1)
@@ -1687,7 +1687,7 @@ void fhtr1d(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
     ae_vector_init(&fa, 0, DT_COMPLEX, _state, ae_true);
 
     ae_assert(n>0, "FHTR1D: incorrect N!", _state);
-    
+
     /*
      * Special case: N=1, FHT is just identity transform.
      * After this block we assume that N is strictly greater than 1.
@@ -1697,7 +1697,7 @@ void fhtr1d(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Reduce FHt to real FFT
      */
@@ -1732,7 +1732,7 @@ void fhtr1dinv(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
 
 
     ae_assert(n>0, "FHTR1DInv: incorrect N!", _state);
-    
+
     /*
      * Special case: N=1, iFHT is just identity transform.
      * After this block we assume that N is strictly greater than 1.
@@ -1741,7 +1741,7 @@ void fhtr1dinv(/* Real    */ ae_vector* a, ae_int_t n, ae_state *_state)
     {
         return;
     }
-    
+
     /*
      * Inverse FHT can be expressed in terms of the FHT as
      *
@@ -1799,7 +1799,7 @@ void convc1d(/* Complex */ ae_vector* a,
     ae_vector_clear(r);
 
     ae_assert(n>0&&m>0, "ConvC1D: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer that B.
@@ -1962,7 +1962,7 @@ void convc1dcircular(/* Complex */ ae_vector* s,
     ae_vector_init(&buf, 0, DT_COMPLEX, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -2050,7 +2050,7 @@ void convc1dcircularinv(/* Complex */ ae_vector* a,
     _fasttransformplan_init(&plan, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvC1DCircularInv: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -2074,7 +2074,7 @@ void convc1dcircularinv(/* Complex */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Task is normalized
      */
@@ -2153,7 +2153,7 @@ void convr1d(/* Real    */ ae_vector* a,
     ae_vector_clear(r);
 
     ae_assert(n>0&&m>0, "ConvR1D: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer that B.
@@ -2300,7 +2300,7 @@ void convr1dcircular(/* Real    */ ae_vector* s,
     ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -2324,7 +2324,7 @@ void convr1dcircular(/* Real    */ ae_vector* s,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * reduce to usual convolution
      */
@@ -2397,7 +2397,7 @@ void convr1dcircularinv(/* Real    */ ae_vector* a,
     _fasttransformplan_init(&plan, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvR1DCircularInv: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -2421,13 +2421,13 @@ void convr1dcircularinv(/* Real    */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Task is normalized
      */
     if( m%2==0 )
     {
-        
+
         /*
          * size is even, use fast even-size FFT
          */
@@ -2461,7 +2461,7 @@ void convr1dcircularinv(/* Real    */ ae_vector* a,
     }
     else
     {
-        
+
         /*
          * odd-size, use general real FFT
          */
@@ -2556,13 +2556,13 @@ void convc1dx(/* Complex */ ae_vector* a,
 
     ae_assert(n>0&&m>0, "ConvC1DX: incorrect N or M!", _state);
     ae_assert(n<=m, "ConvC1DX: N<M assumption is false!", _state);
-    
+
     /*
      * Auto-select
      */
     if( alg==-1||alg==-2 )
     {
-        
+
         /*
          * Initial candidate: straightforward implementation.
          *
@@ -2579,7 +2579,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         {
             flopbest = ae_maxrealnumber;
         }
-        
+
         /*
          * Another candidate - generic FFT code
          */
@@ -2587,7 +2587,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         {
             if( circular&&ftbaseissmooth(m, _state) )
             {
-                
+
                 /*
                  * special code for circular convolution of a sequence with a smooth length
                  */
@@ -2600,7 +2600,7 @@ void convc1dx(/* Complex */ ae_vector* a,
             }
             else
             {
-                
+
                 /*
                  * general cyclic/non-cyclic convolution
                  */
@@ -2613,7 +2613,7 @@ void convc1dx(/* Complex */ ae_vector* a,
                 }
             }
         }
-        
+
         /*
          * Another candidate - overlap-add
          */
@@ -2640,7 +2640,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * straightforward formula for
      * circular and non-circular convolutions.
@@ -2649,7 +2649,7 @@ void convc1dx(/* Complex */ ae_vector* a,
      */
     if( alg==0 )
     {
-        
+
         /*
          * Special case: N=1
          */
@@ -2661,13 +2661,13 @@ void convc1dx(/* Complex */ ae_vector* a,
             ae_frame_leave(_state);
             return;
         }
-        
+
         /*
          * use straightforward formula
          */
         if( circular )
         {
-            
+
             /*
              * circular convolution
              */
@@ -2691,7 +2691,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         }
         else
         {
-            
+
             /*
              * non-circular convolution
              */
@@ -2709,7 +2709,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * general FFT-based code for
      * circular and non-circular convolutions.
@@ -2724,7 +2724,7 @@ void convc1dx(/* Complex */ ae_vector* a,
     {
         if( circular&&ftbaseissmooth(m, _state) )
         {
-            
+
             /*
              * special code for circular convolution with smooth M
              */
@@ -2770,7 +2770,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         }
         else
         {
-            
+
             /*
              * M is non-smooth, general code (circular/non-circular):
              * * first part is the same for circular and non-circular
@@ -2820,7 +2820,7 @@ void convc1dx(/* Complex */ ae_vector* a,
             t = (double)1/(double)p;
             if( circular )
             {
-                
+
                 /*
                  * circular, add tail to head
                  */
@@ -2838,7 +2838,7 @@ void convc1dx(/* Complex */ ae_vector* a,
             }
             else
             {
-                
+
                 /*
                  * non-circular, just copy
                  */
@@ -2853,7 +2853,7 @@ void convc1dx(/* Complex */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * overlap-add method for
      * circular and non-circular convolutions.
@@ -2867,7 +2867,7 @@ void convc1dx(/* Complex */ ae_vector* a,
     if( alg==2 )
     {
         ae_vector_set_length(&buf, 2*(q+n-1), _state);
-        
+
         /*
          * prepare R
          */
@@ -2887,7 +2887,7 @@ void convc1dx(/* Complex */ ae_vector* a,
                 r->ptr.p_complex[i] = ae_complex_from_i(0);
             }
         }
-        
+
         /*
          * pre-calculated FFT(B)
          */
@@ -2898,12 +2898,12 @@ void convc1dx(/* Complex */ ae_vector* a,
             bbuf.ptr.p_complex[j] = ae_complex_from_i(0);
         }
         fftc1d(&bbuf, q+n-1, _state);
-        
+
         /*
          * prepare FFT plan for chunks of A
          */
         ftcomplexfftplan(q+n-1, 1, &plan, _state);
-        
+
         /*
          * main overlap-add cycle
          */
@@ -3036,7 +3036,7 @@ void convr1dx(/* Real    */ ae_vector* a,
 
     ae_assert(n>0&&m>0, "ConvC1DX: incorrect N or M!", _state);
     ae_assert(n<=m, "ConvC1DX: N<M assumption is false!", _state);
-    
+
     /*
      * handle special cases
      */
@@ -3044,13 +3044,13 @@ void convr1dx(/* Real    */ ae_vector* a,
     {
         alg = 0;
     }
-    
+
     /*
      * Auto-select
      */
     if( alg<0 )
     {
-        
+
         /*
          * Initial candidate: straightforward implementation.
          *
@@ -3067,7 +3067,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         {
             flopbest = ae_maxrealnumber;
         }
-        
+
         /*
          * Another candidate - generic FFT code
          */
@@ -3075,7 +3075,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         {
             if( (circular&&ftbaseissmooth(m, _state))&&m%2==0 )
             {
-                
+
                 /*
                  * special code for circular convolution of a sequence with a smooth length
                  */
@@ -3088,7 +3088,7 @@ void convr1dx(/* Real    */ ae_vector* a,
             }
             else
             {
-                
+
                 /*
                  * general cyclic/non-cyclic convolution
                  */
@@ -3101,7 +3101,7 @@ void convr1dx(/* Real    */ ae_vector* a,
                 }
             }
         }
-        
+
         /*
          * Another candidate - overlap-add
          */
@@ -3128,7 +3128,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * straightforward formula for
      * circular and non-circular convolutions.
@@ -3137,7 +3137,7 @@ void convr1dx(/* Real    */ ae_vector* a,
      */
     if( alg==0 )
     {
-        
+
         /*
          * Special case: N=1
          */
@@ -3149,13 +3149,13 @@ void convr1dx(/* Real    */ ae_vector* a,
             ae_frame_leave(_state);
             return;
         }
-        
+
         /*
          * use straightforward formula
          */
         if( circular )
         {
-            
+
             /*
              * circular convolution
              */
@@ -3179,7 +3179,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         }
         else
         {
-            
+
             /*
              * non-circular convolution
              */
@@ -3197,7 +3197,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * general FFT-based code for
      * circular and non-circular convolutions.
@@ -3215,7 +3215,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         ae_assert(m+n-1>2, "ConvR1DX: internal error!", _state);
         if( (circular&&ftbaseissmooth(m, _state))&&m%2==0 )
         {
-            
+
             /*
              * special code for circular convolution with smooth even M
              */
@@ -3250,7 +3250,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         }
         else
         {
-            
+
             /*
              * M is non-smooth or non-even, general code (circular/non-circular):
              * * first part is the same for circular and non-circular
@@ -3292,7 +3292,7 @@ void convr1dx(/* Real    */ ae_vector* a,
             fftr1dinvinternaleven(&buf, p, &buf3, &plan, _state);
             if( circular )
             {
-                
+
                 /*
                  * circular, add tail to head
                  */
@@ -3305,7 +3305,7 @@ void convr1dx(/* Real    */ ae_vector* a,
             }
             else
             {
-                
+
                 /*
                  * non-circular, just copy
                  */
@@ -3316,7 +3316,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * overlap-add method
      */
@@ -3327,7 +3327,7 @@ void convr1dx(/* Real    */ ae_vector* a,
         ae_vector_set_length(&buf2, q+n-1, _state);
         ae_vector_set_length(&buf3, q+n-1, _state);
         ftcomplexfftplan((q+n-1)/2, 1, &plan, _state);
-        
+
         /*
          * prepare R
          */
@@ -3347,7 +3347,7 @@ void convr1dx(/* Real    */ ae_vector* a,
                 r->ptr.p_double[i] = (double)(0);
             }
         }
-        
+
         /*
          * pre-calculated FFT(B)
          */
@@ -3357,7 +3357,7 @@ void convr1dx(/* Real    */ ae_vector* a,
             buf2.ptr.p_double[j] = (double)(0);
         }
         fftr1dinternaleven(&buf2, q+n-1, &buf3, &plan, _state);
-        
+
         /*
          * main overlap-add cycle
          */
@@ -3535,7 +3535,7 @@ void corrc1dcircular(/* Complex */ ae_vector* signal,
     ae_vector_init(&b, 0, DT_COMPLEX, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -3559,7 +3559,7 @@ void corrc1dcircular(/* Complex */ ae_vector* signal,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Task is normalized
      */
@@ -3701,7 +3701,7 @@ void corrr1dcircular(/* Real    */ ae_vector* signal,
     ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
 
     ae_assert(n>0&&m>0, "ConvC1DCircular: incorrect N or M!", _state);
-    
+
     /*
      * normalize task: make M>=N,
      * so A will be longer (at least - not shorter) that B.
@@ -3725,7 +3725,7 @@ void corrr1dcircular(/* Real    */ ae_vector* signal,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Task is normalized
      */

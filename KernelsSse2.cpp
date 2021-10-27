@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -276,7 +276,7 @@ void rcopyv_sse2(const ae_int_t n,
     const ae_int_t tail = sse2len<<1;
     const __m128d* __restrict pSrc = (const __m128d*)(x);
     __m128d* __restrict pDest = (__m128d*)(y);
-    
+
     for(i=0; i<sse2len; i++)
         pDest[i] = pSrc[i];
     if( n-tail )
@@ -290,7 +290,7 @@ void rcopymulv_sse2(const ae_int_t n,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(x);
     __m128d* __restrict pDest = (__m128d*)(y);
@@ -364,7 +364,7 @@ void rsetv_sse2(const ae_int_t n,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     __m128d* __restrict pDest = (__m128d*)(x);
     const __m128d sse2v = _mm_set1_pd(v);
@@ -434,7 +434,7 @@ void rmulv_sse2(const ae_int_t n, const double v, double* __restrict x,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     __m128d* __restrict pDest = (__m128d*)(x);
     const __m128d sse2v = _mm_set1_pd(v);
@@ -473,7 +473,7 @@ void raddv_sse2(const ae_int_t n,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(y);
     __m128d* __restrict pDest = (__m128d*)(x);
@@ -492,7 +492,7 @@ void raddvx_sse2_xaligned(const ae_int_t n, const double alpha,
     const double* __restrict y, double* __restrict x, ae_state *_state)
 {
     ae_int_t i;
-    
+
     const ae_int_t vecLen = (n>>1)<<1;
     const __m128d sse2alpha = _mm_set1_pd(alpha);
     __m128d * __restrict pDest = (__m128d*)x;
@@ -530,7 +530,7 @@ void rmergemulv_sse2(const ae_int_t n,
      const ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(y);
     __m128d* __restrict pDest = (__m128d*)(x);
@@ -550,7 +550,7 @@ void rmergemaxv_sse2(const ae_int_t n,
      ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(y);
     __m128d* __restrict pDest = (__m128d*)(x);
@@ -570,7 +570,7 @@ void rmergeminv_sse2(const ae_int_t n,
      ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(y);
     __m128d* __restrict pDest = (__m128d*)(x);
@@ -587,7 +587,7 @@ void rmergeminv_sse2(const ae_int_t n,
 double rmaxv_sse2(ae_int_t n, /* Real    */ const double* __restrict x, ae_state* __restrict _state)
 {
     ae_int_t i;
-    
+
     const ae_int_t sse2len = n>>1;
     const __m128d* __restrict pSrc = (const __m128d*)(x);
     if( n<=4 )
@@ -658,7 +658,7 @@ static void rcopyvx_sse2_xaligned(const ae_int_t n, const double* __restrict x,
     double* __restrict y, ae_state *_state)
 {
     ae_int_t i;
-    
+
     const ae_int_t vecLen = (n>>1)<<1;
     const __m128d * __restrict pSrc = (const __m128d*)x;
     for(i=0; i<vecLen; i+=2) {

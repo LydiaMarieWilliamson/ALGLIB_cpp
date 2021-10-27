@@ -272,7 +272,7 @@ void function1_func(const real_1d_array &x, double &func, void *ptr)
     //
     func = 100*pow(x[0]+3,4) + pow(x[1]-3,4);
 }
-void function1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) 
+void function1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr)
 {
     //
     // this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4
@@ -329,7 +329,7 @@ void function2_func(const real_1d_array &x, double &func, void *ptr)
     //
     func = pow(x[0]*x[0]+1,2) + pow(x[1]-1,2);
 }
-void function2_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) 
+void function2_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr)
 {
     //
     // this callback calculates f(x0,x1) = (x0^2+1)^2 + (x1-1)^2
@@ -474,7 +474,7 @@ void bad_func(const real_1d_array &x, double &func, void *ptr)
     //
     func = 100*pow(x[0]+3,4) + pow(x[1]-3,4);
 }
-void bad_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) 
+void bad_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *ptr)
 {
     //
     // this callback calculates 'bad' function,
@@ -520,13 +520,13 @@ void  bad_jac(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, voi
     jac[1][0] = 0;
     jac[1][1] = 20*(x[1]-3);
 }
-void function_cx_1_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr) 
+void function_cx_1_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
 {
     // this callback calculates f(c,x)=exp(-c0*sqr(x0))
     // where x is a position on X-axis and c is adjustable parameter
     func = exp(-c[0]*pow(x[0],2));
 }
-void function_cx_1_grad(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr) 
+void function_cx_1_grad(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, void *ptr)
 {
     // this callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient G={df/dc[i]}
     // where x is a position on X-axis and c is adjustable parameter.
@@ -534,7 +534,7 @@ void function_cx_1_grad(const real_1d_array &c, const real_1d_array &x, double &
     func = exp(-c[0]*pow(x[0],2));
     grad[0] = -pow(x[0],2)*func;
 }
-void function_cx_1_hess(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr) 
+void function_cx_1_hess(const real_1d_array &c, const real_1d_array &x, double &func, real_1d_array &grad, real_2d_array &hess, void *ptr)
 {
     // this callback calculates f(c,x)=exp(-c0*sqr(x0)), gradient G={df/dc[i]} and Hessian H={d2f/(dc[i]*dc[j])}
     // where x is a position on X-axis and c is adjustable parameter.
@@ -543,17 +543,17 @@ void function_cx_1_hess(const real_1d_array &c, const real_1d_array &x, double &
     grad[0] = -pow(x[0],2)*func;
     hess[0][0] = pow(x[0],4)*func;
 }
-void ode_function_1_diff(const real_1d_array &y, double x, real_1d_array &dy, void *ptr) 
+void ode_function_1_diff(const real_1d_array &y, double x, real_1d_array &dy, void *ptr)
 {
     // this callback calculates f(y[],x)=-y[0]
     dy[0] = -y[0];
 }
-void int_function_1_func(double x, double xminusa, double bminusx, double &y, void *ptr) 
+void int_function_1_func(double x, double xminusa, double bminusx, double &y, void *ptr)
 {
     // this callback calculates f(x)=exp(x)
     y = exp(x);
 }
-void function_debt_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr) 
+void function_debt_func(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr)
 {
     //
     // this callback calculates f(c,x)=c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))
@@ -864,7 +864,7 @@ int main()
                 // operations: we have to convert it from HashTable representation (used for
                 // initialization and dynamic operations) to CRS format with sparseconverttocrs()
                 // call. If you omit this call, ALGLIB will generate exception on the first
-                // attempt to use S in linear operations. 
+                // attempt to use S in linear operations.
                 //
                 sparseconverttocrs(s);
 
@@ -906,12 +906,12 @@ int main()
                 //
                 // Hash-Table format used by default is very convenient (it allows easy
                 // insertion of elements, automatic memory reallocation), but has
-                // significant memory and performance overhead. Insertion of one element 
+                // significant memory and performance overhead. Insertion of one element
                 // costs hundreds of CPU cycles, and memory consumption is several times
                 // higher than that of CRS.
                 //
-                // When you work with really large matrices and when you can tell in 
-                // advance how many elements EXACTLY you need, it can be beneficial to 
+                // When you work with really large matrices and when you can tell in
+                // advance how many elements EXACTLY you need, it can be beneficial to
                 // create matrix in the CRS format from the very beginning.
                 //
                 // If you want to create matrix in the CRS format, you should:
@@ -948,7 +948,7 @@ int main()
                 //
                 // We can check it by reading matrix contents with sparseget().
                 // However, you should remember that sparseget() is inefficient on
-                // CRS matrices (it may have to pass through all elements of the row 
+                // CRS matrices (it may have to pass through all elements of the row
                 // until it finds element you need).
                 //
                 double v;
@@ -1009,7 +1009,7 @@ int main()
                 //    initialization of its elements with sparseset(). If you specified
                 //    bandwidth=1, you can not change your mind afterwards and call
                 //    sparseset() for non-existent elements.
-                // 
+                //
                 // 3. Because SKS solver need just one triangle of SPD matrix, we can
                 //    omit initialization of the lower triangle of our matrix.
                 //
@@ -1074,7 +1074,7 @@ int main()
                 //
                 // This example illustrates solution of sparse linear systems with
                 // conjugate gradient method.
-                // 
+                //
                 // Suppose that we have linear system A*x=b with sparse symmetric
                 // positive definite A (represented by sparsematrix object)
                 //         [ 5 1       ]
@@ -1125,7 +1125,7 @@ int main()
                 // formats).
                 //
                 // If you omit this call, ALGLIB will generate exception on the first
-                // attempt to use A in linear operations. 
+                // attempt to use A in linear operations.
                 //
                 sparseconverttocrs(a);
 
@@ -1185,7 +1185,7 @@ int main()
                 //
                 // This example illustrates solution of sparse linear least squares problem
                 // with LSQR algorithm.
-                // 
+                //
                 // Suppose that we have least squares problem min|A*x-b| with sparse A
                 // represented by sparsematrix object
                 //         [ 1 1 ]
@@ -1226,7 +1226,7 @@ int main()
                 // formats).
                 //
                 // If you omit this call, ALGLIB will generate exception on the first
-                // attempt to use A in linear operations. 
+                // attempt to use A in linear operations.
                 //
                 sparseconverttocrs(a);
 
@@ -2298,8 +2298,8 @@ int main()
                 // quadratic function, you should rewrite it in such way that quadratic term
                 // is multiplied by 0.5 too.
                 //
-                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as 
-                //     f(x) = 0.5*(2*x0^2+2*x1^2) + .... 
+                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
+                //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
                 // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
                 //
                 real_2d_array a = "[[2,0],[0,2]]";
@@ -2442,7 +2442,7 @@ int main()
                 // Note that quadratic term has 0.5 before it. So if you want to minimize
                 // quadratic function, you should rewrite it in such way that quadratic term
                 // is multiplied by 0.5 too.
-                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as 
+                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
                 //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
                 // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
                 //
@@ -2590,7 +2590,7 @@ int main()
                 // Note that quadratic term has 0.5 before it. So if you want to minimize
                 // quadratic function, you should rewrite it in such way that quadratic term
                 // is multiplied by 0.5 too.
-                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as 
+                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
                 //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
                 // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
                 //
@@ -2729,7 +2729,7 @@ int main()
                 // quadratic function, you should rewrite it in such way that quadratic term
                 // is multiplied by 0.5 too.
                 //
-                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as 
+                // For example, our function is f(x)=x0^2+x1^2+..., but we rewrite it as
                 //     f(x) = 0.5*(2*x0^2+2*x1^2) + ....
                 // and pass diag(2,2) as quadratic term - NOT diag(1,1)!
                 //
@@ -2838,7 +2838,7 @@ int main()
                 // quadratic function, you should rewrite it in such way that quadratic term
                 // is multiplied by 0.5 too.
                 //
-                // For example, our function is f(x)=-(x0^2+x1^2), but we rewrite it as 
+                // For example, our function is f(x)=-(x0^2+x1^2), but we rewrite it as
                 //     f(x) = 0.5*(-2*x0^2-2*x1^2)
                 // and pass diag(-2,-2) as quadratic term - NOT diag(-1,-1)!
                 //
@@ -2941,7 +2941,7 @@ int main()
                 // Hmm... this problem is bounded from below (has solution) only under constraints.
                 // What it we remove them?
                 //
-                // You may see that BLEIC algorithm detects unboundedness of the problem, 
+                // You may see that BLEIC algorithm detects unboundedness of the problem,
                 // -4 is returned as completion code. However, DENSE-AUL is unable to detect
                 // such situation and it will cycle forever (we do not test it here).
                 real_1d_array nobndl = "[-inf,-inf]";
@@ -2982,7 +2982,7 @@ int main()
             try
             {
                 //
-                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where 
+                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
                 //
                 //     f0(x0,x1) = 10*(x0+3)^2
                 //     f1(x0,x1) = (x1-3)^2
@@ -3067,7 +3067,7 @@ int main()
             try
             {
                 //
-                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where 
+                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
                 //
                 //     f0(x0,x1) = 10*(x0+3)^2
                 //     f1(x0,x1) = (x1-3)^2
@@ -3233,7 +3233,7 @@ int main()
             try
             {
                 //
-                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where 
+                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
                 //
                 //     f0(x0,x1) = 10*(x0+3)^2
                 //     f1(x0,x1) = (x1-3)^2
@@ -3335,7 +3335,7 @@ int main()
             try
             {
                 //
-                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where 
+                // This example demonstrates minimization of F(x0,x1) = f0^2+f1^2, where
                 //
                 //     f0(x0,x1) = 10*(x0+3)^2
                 //     f1(x0,x1) = (x1-3)^2
@@ -3859,7 +3859,7 @@ int main()
                 //
                 // subject to box constraints
                 //
-                //     -1 <= x0,x1 <= +1 
+                //     -1 <= x0,x1 <= +1
                 //
                 // and general linear constraints
                 //
@@ -6798,13 +6798,13 @@ int main()
                 //
                 // This example illustrates basic concepts of the IDW models:
                 // creation and evaluation.
-                // 
+                //
                 // Suppose that we have set of 2-dimensional points with associated
                 // scalar function values, and we want to build an IDW model using
                 // our data.
-                // 
+                //
                 // NOTE: we can work with N-dimensional models and vector-valued functions too :)
-                // 
+                //
                 // Typical sequence of steps is given below:
                 // 1. we create IDW builder object
                 // 2. we attach our dataset to the IDW builder and tune algorithm settings
@@ -6884,7 +6884,7 @@ int main()
             {
                 //
                 // This example shows how to serialize and unserialize IDW model.
-                // 
+                //
                 // Suppose that we have set of 2-dimensional points with associated
                 // scalar function values, and we have built an IDW model using
                 // our data.
@@ -7145,7 +7145,7 @@ int main()
                 _TestResult = _TestResult && doc_test_real_vector(a_cheb2, "[0,-1,+1]", 0.00005);
 
                 //
-                // Now we demonstrate polynomial interpolation without construction 
+                // Now we demonstrate polynomial interpolation without construction
                 // of the barycentricinterpolant structure.
                 //
                 // We calculate interpolant value at x=-2.
@@ -7804,7 +7804,7 @@ int main()
             try
             {
                 //
-                // We use piecewise linear spline to interpolate f(x)=x^2 sampled 
+                // We use piecewise linear spline to interpolate f(x)=x^2 sampled
                 // at 5 equidistant nodes on [-1,+1].
                 //
                 real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
@@ -7866,11 +7866,11 @@ int main()
             try
             {
                 //
-                // We use cubic spline to interpolate f(x)=x^2 sampled 
+                // We use cubic spline to interpolate f(x)=x^2 sampled
                 // at 5 equidistant nodes on [-1,+1].
                 //
                 // First, we use default boundary conditions ("parabolically terminated
-                // spline") because cubic spline built with such boundary conditions 
+                // spline") because cubic spline built with such boundary conditions
                 // will exactly reproduce any quadratic f(x).
                 //
                 // Then we try to use natural boundary conditions
@@ -8028,11 +8028,11 @@ int main()
                 // spline1dgriddiff2cubic() for such calculations.
                 //
                 // We use default boundary conditions ("parabolically terminated
-                // spline") because cubic spline built with such boundary conditions 
+                // spline") because cubic spline built with such boundary conditions
                 // will exactly reproduce any quadratic f(x).
                 //
-                // Actually, we could use natural conditions, but we feel that 
-                // spline which exactly reproduces f() will show us more 
+                // Actually, we could use natural conditions, but we feel that
+                // spline which exactly reproduces f() will show us more
                 // understandable results.
                 //
                 real_1d_array x = "[-1.0,-0.5,0.0,+0.5,+1.0]";
@@ -8098,20 +8098,20 @@ int main()
                 //
                 // We use cubic spline to do resampling, i.e. having
                 // values of f(x)=x^2 sampled at 5 equidistant nodes on [-1,+1]
-                // we calculate values/derivatives of cubic spline on 
+                // we calculate values/derivatives of cubic spline on
                 // another grid (equidistant with 9 nodes on [-1,+1])
                 // WITHOUT CONSTRUCTION OF SPLINE OBJECT.
                 //
                 // There are efficient functions spline1dconvcubic(),
-                // spline1dconvdiffcubic() and spline1dconvdiff2cubic() 
+                // spline1dconvdiffcubic() and spline1dconvdiff2cubic()
                 // for such calculations.
                 //
                 // We use default boundary conditions ("parabolically terminated
-                // spline") because cubic spline built with such boundary conditions 
+                // spline") because cubic spline built with such boundary conditions
                 // will exactly reproduce any quadratic f(x).
                 //
-                // Actually, we could use natural conditions, but we feel that 
-                // spline which exactly reproduces f() will show us more 
+                // Actually, we could use natural conditions, but we feel that
+                // spline which exactly reproduces f() will show us more
                 // understandable results.
                 //
                 real_1d_array x_old = "[-1.0,-0.5,0.0,+0.5,+1.0]";
@@ -8194,7 +8194,7 @@ int main()
                 // using function value only.
                 //
                 // Gradient is estimated using combination of numerical differences
-                // and secant updates. diffstep variable stores differentiation step 
+                // and secant updates. diffstep variable stores differentiation step
                 // (we have to tell algorithm what step to use).
                 //
                 real_2d_array x = "[[-1],[-0.8],[-0.6],[-0.4],[-0.2],[0],[0.2],[0.4],[0.6],[0.8],[1.0]]";
@@ -8504,7 +8504,7 @@ int main()
                 // using function value only.
                 //
                 // Gradient is estimated using combination of numerical differences
-                // and secant updates. diffstep variable stores differentiation step 
+                // and secant updates. diffstep variable stores differentiation step
                 // (we have to tell algorithm what step to use).
                 //
                 // Unconstrained solution is c=1.5, but because of constraints we should
@@ -8611,15 +8611,15 @@ int main()
                 //     c[0] - debt value at initial moment (2000),
                 //     c[1] - direction coefficient (growth or decrease),
                 //     c[2] - curvature coefficient.
-                // You may see that our variables are badly scaled - first one 
-                // is order of 10^12, and next two are somewhere about 1 in 
+                // You may see that our variables are badly scaled - first one
+                // is order of 10^12, and next two are somewhere about 1 in
                 // magnitude. Such problem is difficult to solve without some
                 // kind of scaling.
                 // That is exactly where lsfitsetscale() function can be used.
                 // We set scale of our variables to [1.0E12, 1, 1], which allows
                 // us to easily solve this problem.
                 //
-                // You can try commenting out lsfitsetscale() call - and you will 
+                // You can try commenting out lsfitsetscale() call - and you will
                 // see that algorithm will fail to converge.
                 //
                 real_2d_array x = "[[2000],[2001],[2002],[2003],[2004],[2005],[2006],[2007],[2008]]";
@@ -8815,7 +8815,7 @@ int main()
                 //                  [ 1.0  0.0  0.0 ]
                 //              first two columns contain coefficients before basis functions,
                 //              last column contains desired value of their sum.
-                //              So [1,0,0] means "1*constant_term + 0*linear_term = 0" 
+                //              So [1,0,0] means "1*constant_term + 0*linear_term = 0"
                 //
                 real_1d_array y = "[0.072436,0.246944,0.491263,0.522300,0.714064,0.921929]";
                 if( _spoil_scenario==0 )
@@ -8956,7 +8956,7 @@ int main()
                 // NOTE: result is returned as barycentricinterpolant structure.
                 //       if you want to get representation in the power basis,
                 //       you can use barycentricbar2pow() function to convert
-                //       from barycentric to power representation (see docs for 
+                //       from barycentric to power representation (see docs for
                 //       POLINT subpackage for more info).
                 //
                 polynomialfit(x, y, m, info, p, rep);
@@ -9568,7 +9568,7 @@ int main()
                 // We use RDP algorithm to approximate parametric 2D curve given by
                 // locations in t=0,1,2,3 (see below), which form piecewise linear
                 // trajectory through D-dimensional space (2-dimensional in our example).
-                // 
+                //
                 //     |
                 //     |
                 //     -     *     *     X2................X3
@@ -9602,18 +9602,18 @@ int main()
                 // representation, which needs smaller amount of memory. Say, in our example
                 // (we allow points with error smaller than 0.8) approximation will have
                 // just two sequential sections connecting X0 with X2, and X2 with X3.
-                // 
+                //
                 //     |
                 //     |
                 //     -     *     *     X2................X3
-                //     |               . 
-                //     |             .  
+                //     |               .
+                //     |             .
                 //     -     *     .     *     *     *     *
-                //     |         .    
-                //     |       .     
+                //     |         .
+                //     |       .
                 //     -     .     X1    *     *     *     *
-                //     |   .       
-                //     | .    
+                //     |   .
+                //     | .
                 //     X0----|-----|-----|-----|-----|-----|---
                 //
                 //
@@ -9652,7 +9652,7 @@ int main()
             try
             {
                 //
-                // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled 
+                // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
                 // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
                 //
                 real_1d_array x = "[0.0, 0.5, 1.0]";
@@ -9724,7 +9724,7 @@ int main()
             try
             {
                 //
-                // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled 
+                // We use bilinear spline to interpolate f(x,y)=x^2+2*y^2 sampled
                 // at (x,y) from [0.0, 0.5, 1.0] X [0.0, 1.0].
                 //
                 real_1d_array x = "[0.0, 0.5, 1.0]";
@@ -10111,7 +10111,7 @@ int main()
             try
             {
                 //
-                // We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled 
+                // We use trilinear spline to interpolate f(x,y,z)=x+xy+z sampled
                 // at (x,y,z) from [0.0, 1.0] X [0.0, 1.0] X [0.0, 1.0].
                 //
                 // We store x, y and z-values at local arrays with same names.
@@ -10315,13 +10315,13 @@ int main()
                 //
                 // This example illustrates basic concepts of the RBF models: creation, modification,
                 // evaluation.
-                // 
+                //
                 // Suppose that we have set of 2-dimensional points with associated
                 // scalar function values, and we want to build a RBF model using
                 // our data.
-                // 
+                //
                 // NOTE: we can work with 3D models too :)
-                // 
+                //
                 // Typical sequence of steps is given below:
                 // 1. we create RBF model object
                 // 2. we attach our dataset to the RBF model and tune algorithm settings
@@ -10417,7 +10417,7 @@ int main()
                 //
                 // Suppose that we have set of 2-dimensional points with associated VECTOR
                 // function values, and we want to build a RBF model using our data.
-                // 
+                //
                 // Typical sequence of steps is given below:
                 // 1. we create RBF model object
                 // 2. we attach our dataset to the RBF model and tune algorithm settings
@@ -10522,7 +10522,7 @@ int main()
             {
                 //
                 // This example show how to work with polynomial term
-                // 
+                //
                 // Suppose that we have set of 2-dimensional points with associated
                 // scalar function values, and we want to build a RBF model using
                 // our data.
@@ -10639,7 +10639,7 @@ int main()
             {
                 //
                 // This example show how to serialize and unserialize RBF model
-                // 
+                //
                 // Suppose that we have set of 2-dimensional points with associated
                 // scalar function values, and we want to build a RBF model using
                 // our data. Then we want to serialize it to string and to unserialize
@@ -10968,7 +10968,7 @@ int main()
                 //  |
                 //  |     P3
                 //  |
-                //  | P1          
+                //  | P1
                 //  |             P4
                 //  | P0          P2
                 //  |-------------------------
@@ -11018,7 +11018,7 @@ int main()
                 // * finally, we merge C5 and C7 and create C8=(P0,P1,P2,P3,P4)
                 //
                 // Thus, we have following dendrogram:
-                //  
+                //
                 //      ------8-----
                 //      |          |
                 //      |      ----7----
@@ -11036,7 +11036,7 @@ int main()
                 // intersections. Luckily, ahcreport structure contains two additional fields
                 // which help to build dendrogram from your data:
                 // * rep.p, which contains permutation applied to dataset
-                // * rep.pm, which contains another representation of merges 
+                // * rep.pm, which contains another representation of merges
                 //
                 // In our example we have:
                 // * P=[3,4,0,2,1]
@@ -11098,7 +11098,7 @@ int main()
                 //  |
                 //  |     P3
                 //  |
-                //  | P1          
+                //  | P1
                 //  |             P4
                 //  | P0          P2
                 //  |-------------------------
@@ -11318,7 +11318,7 @@ int main()
                 //  |
                 //  |     P3
                 //  |
-                //  | P1          
+                //  | P1
                 //  |             P4
                 //  | P0          P2
                 //  |-------------------------
@@ -11689,7 +11689,7 @@ int main()
                 //
                 // Apply filter.
                 // We should get [7.0000, 8.0000, 8.1667, 8.8333, 11.6667, 12.5000] as result
-                //    
+                //
                 filterlrma(x, 3);
                 _TestResult = _TestResult && doc_test_real_vector(x, "[7.0000,8.0000,8.1667,8.8333,11.6667,12.5000]", 0.00005);
                 _TestResult = _TestResult && (_spoil_scenario==-1);
@@ -11857,7 +11857,7 @@ int main()
                 // One full run of direct algorithm costs O(N*Width^2) operations, so
                 // the more points you have, the more it costs to rebuild basis from
                 // scratch.
-                // 
+                //
                 // Luckily we have incremental SSA algorithm which can perform quick
                 // updates of already computed basis in O(K*Width^2) ops, where K
                 // is a number of singular vectors extracted. Usually it is orders of
@@ -11993,8 +11993,8 @@ int main()
                 // * past due loans ("bad" ones)
                 //
                 // We assume that:
-                // * loans can transition from any state to any other state. In 
-                //   particular, past due loan can become "good" one at any moment 
+                // * loans can transition from any state to any other state. In
+                //   particular, past due loan can become "good" one at any moment
                 //   with same (fixed) probability. Not realistic, but it is toy example :)
                 // * portfolio size does not change over time
                 //
@@ -12009,11 +12009,11 @@ int main()
                 // approach (Markov Chains for Proportional/Population Data), i.e.
                 // to restore hidden transition matrix P using actual portfolio data.
                 // We have:
-                // * poportional data, i.e. proportion of loans in the normal and past 
-                //   due states (not portfolio size measured in some currency, although 
+                // * poportional data, i.e. proportion of loans in the normal and past
+                //   due states (not portfolio size measured in some currency, although
                 //   it is possible to work with population data too)
                 // * two tracks, i.e. two sequences which describe portfolio
-                //   evolution from two different starting states: [1,0] (all loans 
+                //   evolution from two different starting states: [1,0] (all loans
                 //   are "good") and [0.8,0.2] (only 80% of portfolio is in the "good"
                 //   state)
                 //
@@ -12046,7 +12046,7 @@ int main()
                 //         ( 0.95  0.50 )
                 //         (            )
                 //         ( 0.05  0.50 )
-                // which means that "good" loans can become "bad" with 5% probability, 
+                // which means that "good" loans can become "bad" with 5% probability,
                 // while "bad" loans will return to good state with 50% probability.
                 //
                 _TestResult = _TestResult && doc_test_real_matrix(p, "[[0.95,0.50],[0.05,0.50]]", 0.005);
@@ -12095,18 +12095,18 @@ int main()
                 //         (      p21  1 )
                 // i.e. four elements of P are known a priori.
                 //
-                // Although it is possible (given enough data) to In order to enforce 
+                // Although it is possible (given enough data) to In order to enforce
                 // this property we set equality constraints on these elements.
                 //
                 // We want to model transitions between these two states using MCPD
                 // approach (Markov Chains for Proportional/Population Data), i.e.
                 // to restore hidden transition matrix P using actual portfolio data.
                 // We have:
-                // * poportional data, i.e. proportion of loans in the current and past 
-                //   due states (not portfolio size measured in some currency, although 
+                // * poportional data, i.e. proportion of loans in the current and past
+                //   due states (not portfolio size measured in some currency, although
                 //   it is possible to work with population data too)
                 // * two tracks, i.e. two sequences which describe portfolio
-                //   evolution from two different starting states: [1,0,0] (all loans 
+                //   evolution from two different starting states: [1,0,0] (all loans
                 //   are "good") and [0.8,0.2,0.0] (only 80% of portfolio is in the "good"
                 //   state)
                 //
@@ -12142,8 +12142,8 @@ int main()
                 // Hidden matrix P is equal to
                 //         ( 0.95 0.50      )
                 //         ( 0.05 0.25      )
-                //         (      0.25 1.00 ) 
-                // which means that "good" loans can become past due with 5% probability, 
+                //         (      0.25 1.00 )
+                // which means that "good" loans can become past due with 5% probability,
                 // while past due loans will become charged off with 25% probability or
                 // return back to normal state with 50% probability.
                 //

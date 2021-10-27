@@ -1,3 +1,15 @@
+A6. ALGLIB ⇒ ALGLIB++ Revision Sequence
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A6.2. Test Stages
+─────────────────
+39	Integration of version 3.18.0 ― being done separately from the main branch.
+
+A6.3. Test Results
+──────────────────
+39	7519 12049 11909 9587 1635369021 (6179c03d) 83
+
+A6.4. The Most Recent Test Run
+──────────────────────────────
 echo "TestI: API Interface"
 TestI: API Interface
 ./TestI

@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -139,7 +139,7 @@ NOTE: variance is calculated by dividing sum of squares by N-1, not N.
 void samplemoments(const real_1d_array &x, double &mean, double &variance, double &skewness, double &kurtosis, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -218,7 +218,7 @@ and stored at 'Mean' variable.
 double samplemean(const real_1d_array &x, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -297,7 +297,7 @@ and stored at 'Variance' variable.
 double samplevariance(const real_1d_array &x, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -376,7 +376,7 @@ and stored at 'Skewness' variable.
 double sampleskewness(const real_1d_array &x, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -455,7 +455,7 @@ and stored at 'Kurtosis' variable.
 double samplekurtosis(const real_1d_array &x, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -528,7 +528,7 @@ Output parameters:
 void sampleadev(const real_1d_array &x, double &adev, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -601,7 +601,7 @@ Output parameters:
 void samplemedian(const real_1d_array &x, double &median, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -676,7 +676,7 @@ Output parameters:
 void samplepercentile(const real_1d_array &x, const double p, double &v, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = x.length();
@@ -751,7 +751,7 @@ Result:
 double cov2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     if( (x.length()!=y.length()))
         _ALGLIB_CPP_EXCEPTION("Error while calling 'cov2': looks like one of arguments has wrong size");
@@ -829,7 +829,7 @@ Result:
 double pearsoncorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     if( (x.length()!=y.length()))
         _ALGLIB_CPP_EXCEPTION("Error while calling 'pearsoncorr2': looks like one of arguments has wrong size");
@@ -907,7 +907,7 @@ Result:
 double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     if( (x.length()!=y.length()))
         _ALGLIB_CPP_EXCEPTION("Error while calling 'spearmancorr2': looks like one of arguments has wrong size");
@@ -1017,7 +1017,7 @@ OUTPUT PARAMETERS:
 void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m;
 
@@ -1128,7 +1128,7 @@ OUTPUT PARAMETERS:
 void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m;
 
@@ -1239,7 +1239,7 @@ OUTPUT PARAMETERS:
 void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m;
 
@@ -1362,7 +1362,7 @@ OUTPUT PARAMETERS:
 void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m1;
     ae_int_t m2;
@@ -1488,7 +1488,7 @@ OUTPUT PARAMETERS:
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m1;
     ae_int_t m2;
@@ -1614,7 +1614,7 @@ OUTPUT PARAMETERS:
 void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     ae_int_t m1;
     ae_int_t m2;
@@ -1724,7 +1724,7 @@ OUTPUT PARAMETERS:
 void rankdata(real_2d_array &xy, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t npoints;
     ae_int_t nfeatures;
 
@@ -1835,7 +1835,7 @@ OUTPUT PARAMETERS:
 void rankdatacentered(real_2d_array &xy, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t npoints;
     ae_int_t nfeatures;
 
@@ -2928,7 +2928,7 @@ INPUT PARAMETERS:
     N       -   N>=0, sample size:
                 * if given, only leading N elements of X are processed
                 * if not given, automatically determined from size of X
-    
+
 OUTPUT PARAMETERS
     Mean    -   mean.
     Variance-   variance.
@@ -2962,7 +2962,7 @@ void samplemoments(/* Real    */ ae_vector* x,
     ae_assert(n>=0, "SampleMoments: N<0", _state);
     ae_assert(x->cnt>=n, "SampleMoments: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleMoments: X is not finite vector", _state);
-    
+
     /*
      * Init, special case 'N=0'
      */
@@ -2975,7 +2975,7 @@ void samplemoments(/* Real    */ ae_vector* x,
     {
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -2984,7 +2984,7 @@ void samplemoments(/* Real    */ ae_vector* x,
         *mean = *mean+x->ptr.p_double[i];
     }
     *mean = *mean/n;
-    
+
     /*
      * Variance (using corrected two-pass algorithm)
      */
@@ -3008,7 +3008,7 @@ void samplemoments(/* Real    */ ae_vector* x,
         }
         stddev = ae_sqrt(*variance, _state);
     }
-    
+
     /*
      * Skewness and kurtosis
      */
@@ -3037,7 +3037,7 @@ INPUT PARAMETERS:
                 * if not given, automatically determined from size of X
 
 NOTE:
-                
+
 This function return result  which calculated by 'SampleMoments' function
 and stored at 'Mean' variable.
 
@@ -3072,7 +3072,7 @@ INPUT PARAMETERS:
                 * if not given, automatically determined from size of X
 
 NOTE:
-                
+
 This function return result  which calculated by 'SampleMoments' function
 and stored at 'Variance' variable.
 
@@ -3107,7 +3107,7 @@ INPUT PARAMETERS:
                 * if not given, automatically determined from size of X
 
 NOTE:
-                
+
 This function return result  which calculated by 'SampleMoments' function
 and stored at 'Skewness' variable.
 
@@ -3142,7 +3142,7 @@ INPUT PARAMETERS:
                 * if not given, automatically determined from size of X
 
 NOTE:
-                
+
 This function return result  which calculated by 'SampleMoments' function
 and stored at 'Kurtosis' variable.
 
@@ -3175,7 +3175,7 @@ Input parameters:
     N   -   N>=0, sample size:
             * if given, only leading N elements of X are processed
             * if not given, automatically determined from size of X
-    
+
 Output parameters:
     ADev-   ADev
 
@@ -3195,7 +3195,7 @@ void sampleadev(/* Real    */ ae_vector* x,
     ae_assert(n>=0, "SampleADev: N<0", _state);
     ae_assert(x->cnt>=n, "SampleADev: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleADev: X is not finite vector", _state);
-    
+
     /*
      * Init, handle N=0
      */
@@ -3205,7 +3205,7 @@ void sampleadev(/* Real    */ ae_vector* x,
     {
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -3214,7 +3214,7 @@ void sampleadev(/* Real    */ ae_vector* x,
         mean = mean+x->ptr.p_double[i];
     }
     mean = mean/n;
-    
+
     /*
      * ADev
      */
@@ -3266,7 +3266,7 @@ void samplemedian(/* Real    */ ae_vector* x,
     ae_assert(n>=0, "SampleMedian: N<0", _state);
     ae_assert(x->cnt>=n, "SampleMedian: Length(X)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SampleMedian: X is not finite vector", _state);
-    
+
     /*
      * Some degenerate cases
      */
@@ -3288,7 +3288,7 @@ void samplemedian(/* Real    */ ae_vector* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Common case, N>=3.
      * Choose X[(N-1)/2]
@@ -3300,7 +3300,7 @@ void samplemedian(/* Real    */ ae_vector* x,
     {
         if( ir<=l+1 )
         {
-            
+
             /*
              * 1 or 2 elements in partition
              */
@@ -3371,7 +3371,7 @@ void samplemedian(/* Real    */ ae_vector* x,
             }
         }
     }
-    
+
     /*
      * If N is odd, return result
      */
@@ -3494,7 +3494,7 @@ double cov2(/* Real    */ ae_vector* x,
     ae_assert(y->cnt>=n, "Cov2: Length(Y)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "Cov2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "Cov2: Y is not finite vector", _state);
-    
+
     /*
      * Special case
      */
@@ -3503,7 +3503,7 @@ double cov2(/* Real    */ ae_vector* x,
         result = (double)(0);
         return result;
     }
-    
+
     /*
      * Calculate mean.
      *
@@ -3537,7 +3537,7 @@ double cov2(/* Real    */ ae_vector* x,
         result = (double)(0);
         return result;
     }
-    
+
     /*
      * covariance
      */
@@ -3594,7 +3594,7 @@ double pearsoncorr2(/* Real    */ ae_vector* x,
     ae_assert(y->cnt>=n, "PearsonCorr2: Length(Y)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "PearsonCorr2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "PearsonCorr2: Y is not finite vector", _state);
-    
+
     /*
      * Special case
      */
@@ -3603,7 +3603,7 @@ double pearsoncorr2(/* Real    */ ae_vector* x,
         result = (double)(0);
         return result;
     }
-    
+
     /*
      * Calculate mean.
      *
@@ -3637,7 +3637,7 @@ double pearsoncorr2(/* Real    */ ae_vector* x,
         result = (double)(0);
         return result;
     }
-    
+
     /*
      * numerator and denominator
      */
@@ -3707,7 +3707,7 @@ double spearmancorr2(/* Real    */ ae_vector* x,
     ae_assert(y->cnt>=n, "SpearmanCorr2: Length(Y)<N!", _state);
     ae_assert(isfinitevector(x, n, _state), "SpearmanCorr2: X is not finite vector", _state);
     ae_assert(isfinitevector(y, n, _state), "SpearmanCorr2: Y is not finite vector", _state);
-    
+
     /*
      * Special case
      */
@@ -3729,14 +3729,14 @@ double spearmancorr2(/* Real    */ ae_vector* x,
 Covariance matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -3790,7 +3790,7 @@ void covm(/* Real    */ ae_matrix* x,
     ae_assert(x->rows>=n, "CovM: Rows(X)<N!", _state);
     ae_assert(x->cols>=m||n==0, "CovM: Cols(X)<M!", _state);
     ae_assert(apservisfinitematrix(x, n, m, _state), "CovM: X contains infinite/NAN elements", _state);
-    
+
     /*
      * N<=1, return zero
      */
@@ -3807,7 +3807,7 @@ void covm(/* Real    */ ae_matrix* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Calculate means,
      * check for constant columns
@@ -3831,7 +3831,7 @@ void covm(/* Real    */ ae_matrix* x,
             same.ptr.p_bool[j] = same.ptr.p_bool[j]&&ae_fp_eq(x->ptr.pp_double[i][j],x0.ptr.p_double[j]);
         }
     }
-    
+
     /*
      * * center variables;
      * * if we have constant columns, these columns are
@@ -3860,14 +3860,14 @@ void covm(/* Real    */ ae_matrix* x,
 Pearson product-moment correlation matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -3940,14 +3940,14 @@ void pearsoncorrm(/* Real    */ ae_matrix* x,
 Spearman's rank correlation matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4000,7 +4000,7 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
     ae_assert(x->rows>=n, "SpearmanCorrM: Rows(X)<N!", _state);
     ae_assert(x->cols>=m||n==0, "SpearmanCorrM: Cols(X)<M!", _state);
     ae_assert(apservisfinitematrix(x, n, m, _state), "SpearmanCorrM: X contains infinite/NAN elements", _state);
-    
+
     /*
      * N<=1, return zero
      */
@@ -4017,20 +4017,20 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Allocate
      */
     ae_vector_set_length(&t, ae_maxint(n, m, _state), _state);
     ae_matrix_set_length(c, m, m, _state);
-    
+
     /*
      * Replace data with ranks
      */
     ae_matrix_set_length(&xc, m, n, _state);
     rmatrixtranspose(n, m, x, 0, 0, &xc, 0, 0, _state);
     rankdata(&xc, m, n, _state);
-    
+
     /*
      * 1. Calculate means, check for constant columns
      * 2. Center variables, constant  columns are
@@ -4039,7 +4039,7 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
      */
     for(i=0; i<=m-1; i++)
     {
-        
+
         /*
          * Calculate:
          * * V - mean value of I-th variable
@@ -4055,13 +4055,13 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
             b = b&&ae_fp_eq(vv,x0);
         }
         v = v/n;
-        
+
         /*
          * Center/zero I-th variable
          */
         if( b )
         {
-            
+
             /*
              * Zero
              */
@@ -4072,7 +4072,7 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
         }
         else
         {
-            
+
             /*
              * Center
              */
@@ -4082,12 +4082,12 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
             }
         }
     }
-    
+
     /*
      * Calculate upper half of symmetric covariance matrix
      */
     rmatrixsyrk(m, n, (double)1/(double)(n-1), &xc, 0, 0, 0, 0.0, c, 0, 0, ae_true, _state);
-    
+
     /*
      * Calculate Pearson coefficients (upper triangle)
      */
@@ -4110,7 +4110,7 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
             c->ptr.pp_double[i][j] = c->ptr.pp_double[i][j]*v*t.ptr.p_double[j];
         }
     }
-    
+
     /*
      * force symmetricity
      */
@@ -4123,14 +4123,14 @@ void spearmancorrm(/* Real    */ ae_matrix* x,
 Cross-covariance matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4206,7 +4206,7 @@ void covm2(/* Real    */ ae_matrix* x,
     ae_assert(y->rows>=n, "CovM2: Rows(Y)<N!", _state);
     ae_assert(y->cols>=m2||n==0, "CovM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "CovM2: X contains infinite/NAN elements", _state);
-    
+
     /*
      * N<=1, return zero
      */
@@ -4223,7 +4223,7 @@ void covm2(/* Real    */ ae_matrix* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Allocate
      */
@@ -4233,7 +4233,7 @@ void covm2(/* Real    */ ae_matrix* x,
     ae_vector_set_length(&samex, m1, _state);
     ae_vector_set_length(&samey, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
-    
+
     /*
      * * calculate means of X
      * * center X
@@ -4267,7 +4267,7 @@ void covm2(/* Real    */ ae_matrix* x,
             }
         }
     }
-    
+
     /*
      * Repeat same steps for Y
      */
@@ -4297,7 +4297,7 @@ void covm2(/* Real    */ ae_matrix* x,
             }
         }
     }
-    
+
     /*
      * calculate cross-covariance matrix
      */
@@ -4310,14 +4310,14 @@ void covm2(/* Real    */ ae_matrix* x,
 Pearson product-moment cross-correlation matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4399,7 +4399,7 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
     ae_assert(y->rows>=n, "PearsonCorrM2: Rows(Y)<N!", _state);
     ae_assert(y->cols>=m2||n==0, "PearsonCorrM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "PearsonCorrM2: X contains infinite/NAN elements", _state);
-    
+
     /*
      * N<=1, return zero
      */
@@ -4416,7 +4416,7 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Allocate
      */
@@ -4428,7 +4428,7 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
     ae_vector_set_length(&samex, m1, _state);
     ae_vector_set_length(&samey, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
-    
+
     /*
      * * calculate means of X
      * * center X
@@ -4469,7 +4469,7 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
     {
         sx.ptr.p_double[j] = ae_sqrt(sx.ptr.p_double[j]/(n-1), _state);
     }
-    
+
     /*
      * Repeat same steps for Y
      */
@@ -4505,12 +4505,12 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
     {
         sy.ptr.p_double[j] = ae_sqrt(sy.ptr.p_double[j]/(n-1), _state);
     }
-    
+
     /*
      * calculate cross-covariance matrix
      */
     rmatrixgemm(m1, m2, n, (double)1/(double)(n-1), x, 0, 0, 1, y, 0, 0, 0, 0.0, c, 0, 0, _state);
-    
+
     /*
      * Divide by standard deviations
      */
@@ -4552,14 +4552,14 @@ void pearsoncorrm2(/* Real    */ ae_matrix* x,
 Spearman's rank cross-correlation matrix
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
   ! * hardware vendor (Intel) implementations of linear algebra primitives
   !   (C++ and C# versions, x86/x64 platform)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4635,7 +4635,7 @@ void spearmancorrm2(/* Real    */ ae_matrix* x,
     ae_assert(y->rows>=n, "SpearmanCorrM2: Rows(Y)<N!", _state);
     ae_assert(y->cols>=m2||n==0, "SpearmanCorrM2: Cols(Y)<M2!", _state);
     ae_assert(apservisfinitematrix(y, n, m2, _state), "SpearmanCorrM2: X contains infinite/NAN elements", _state);
-    
+
     /*
      * N<=1, return zero
      */
@@ -4652,7 +4652,7 @@ void spearmancorrm2(/* Real    */ ae_matrix* x,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Allocate
      */
@@ -4660,7 +4660,7 @@ void spearmancorrm2(/* Real    */ ae_matrix* x,
     ae_vector_set_length(&sx, m1, _state);
     ae_vector_set_length(&sy, m2, _state);
     ae_matrix_set_length(c, m1, m2, _state);
-    
+
     /*
      * Replace data with ranks
      */
@@ -4670,7 +4670,7 @@ void spearmancorrm2(/* Real    */ ae_matrix* x,
     rmatrixtranspose(n, m2, y, 0, 0, &yc, 0, 0, _state);
     rankdata(&xc, m1, n, _state);
     rankdata(&yc, m2, n, _state);
-    
+
     /*
      * 1. Calculate means, variances, check for constant columns
      * 2. Center variables, constant  columns are
@@ -4745,12 +4745,12 @@ void spearmancorrm2(/* Real    */ ae_matrix* x,
         }
         sy.ptr.p_double[i] = ae_sqrt(v2/(n-1), _state);
     }
-    
+
     /*
      * calculate cross-covariance matrix
      */
     rmatrixgemm(m1, m2, n, (double)1/(double)(n-1), &xc, 0, 0, 0, &yc, 0, 0, 1, 0.0, c, 0, 0, _state);
-    
+
     /*
      * Divide by standard deviations
      */
@@ -4797,12 +4797,12 @@ This function replaces data in XY by their ranks:
 * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4843,7 +4843,7 @@ void rankdata(/* Real    */ ae_matrix* xy,
     ae_assert(xy->rows>=npoints, "RankData: Rows(XY)<NPoints", _state);
     ae_assert(xy->cols>=nfeatures||npoints==0, "RankData: Cols(XY)<NFeatures", _state);
     ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
-    
+
     /*
      * Basecase cost is a maximum cost of basecase problems.
      * Problems harded than that cost will be split.
@@ -4861,7 +4861,7 @@ void rankdata(/* Real    */ ae_matrix* xy,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Parallel code
      */
@@ -4894,12 +4894,12 @@ This function replaces data in XY by their CENTERED ranks:
   mean value, but does NOT change higher moments
 
   ! COMMERCIAL EDITION OF ALGLIB:
-  ! 
+  !
   ! Commercial Edition of ALGLIB includes following important improvements
   ! of this function:
   ! * high-performance native backend with same C# interface (C# version)
   ! * multithreading support (C++ and C# versions)
-  ! 
+  !
   ! We recommend you to read 'Working with commercial version' section  of
   ! ALGLIB Reference Manual in order to find out how to  use  performance-
   ! related features provided by commercial edition of ALGLIB.
@@ -4940,7 +4940,7 @@ void rankdatacentered(/* Real    */ ae_matrix* xy,
     ae_assert(xy->rows>=npoints, "RankData: Rows(XY)<NPoints", _state);
     ae_assert(xy->cols>=nfeatures||npoints==0, "RankData: Cols(XY)<NFeatures", _state);
     ae_assert(apservisfinitematrix(xy, npoints, nfeatures, _state), "RankData: XY contains infinite/NAN elements", _state);
-    
+
     /*
      * Basecase cost is a maximum cost of basecase problems.
      * Problems harded than that cost will be split.
@@ -4958,7 +4958,7 @@ void rankdatacentered(/* Real    */ ae_matrix* xy,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Parallel code
      */
@@ -5067,7 +5067,7 @@ static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
     ae_smart_ptr_init(&_buf1, (void**)&buf1, _state, ae_true);
 
     ae_assert(i1>=i0, "RankDataRec: internal error", _state);
-    
+
     /*
      * Try to activate parallelism
      */
@@ -5079,7 +5079,7 @@ static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
             return;
         }
     }
-    
+
     /*
      * Recursively split problem, if it is too large
      */
@@ -5092,7 +5092,7 @@ static void basestat_rankdatarec(/* Real    */ ae_matrix* xy,
         ae_frame_leave(_state);
         return;
     }
-    
+
     /*
      * Retrieve buffers from pool, call serial code, return buffers to pool
      */
@@ -5243,7 +5243,7 @@ void pearsoncorrelationsignificance(double r,
     *lefttail = 0;
     *righttail = 0;
 
-    
+
     /*
      * Some special cases
      */
@@ -5268,7 +5268,7 @@ void pearsoncorrelationsignificance(double r,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * General case
      */
@@ -5332,7 +5332,7 @@ void spearmanrankcorrelationsignificance(double r,
     *lefttail = 0;
     *righttail = 0;
 
-    
+
     /*
      * Special case
      */
@@ -5343,7 +5343,7 @@ void spearmanrankcorrelationsignificance(double r,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * General case
      */
@@ -5937,7 +5937,7 @@ void jarqueberatest(/* Real    */ ae_vector* x,
 
     *p = 0;
 
-    
+
     /*
      * N is too small
      */
@@ -5946,7 +5946,7 @@ void jarqueberatest(/* Real    */ ae_vector* x,
         *p = 1.0;
         return;
     }
-    
+
     /*
      * N is large enough
      */
@@ -5978,7 +5978,7 @@ static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
     kurtosis = (double)(0);
     stddev = (double)(0);
     ae_assert(n>1, "Assertion failed", _state);
-    
+
     /*
      * Mean
      */
@@ -5987,7 +5987,7 @@ static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
         mean = mean+x->ptr.p_double[i];
     }
     mean = mean/n;
-    
+
     /*
      * Variance (using corrected two-pass algorithm)
      */
@@ -6011,7 +6011,7 @@ static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
         }
         stddev = ae_sqrt(variance, _state);
     }
-    
+
     /*
      * Skewness and kurtosis
      */
@@ -6027,7 +6027,7 @@ static void jarquebera_jarqueberastatistic(/* Real    */ ae_vector* x,
         skewness = skewness/n;
         kurtosis = kurtosis/n-3;
     }
-    
+
     /*
      * Statistic
      */
@@ -6070,7 +6070,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 5..20 are tabulated
      */
@@ -6143,7 +6143,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 20, 30, 50 are tabulated.
      * In-between values are interpolated
@@ -6169,7 +6169,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 50, 65, 100 are tabulated.
      * In-between values are interpolated
@@ -6195,7 +6195,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 100, 130, 200 are tabulated.
      * In-between values are interpolated
@@ -6221,7 +6221,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 200, 301, 501 are tabulated.
      * In-between values are interpolated
@@ -6247,7 +6247,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * N = 501, 701, 1401 are tabulated.
      * In-between values are interpolated
@@ -6273,7 +6273,7 @@ static double jarquebera_jarqueberaapprox(ae_int_t n,
         ae_frame_leave(_state);
         return result;
     }
-    
+
     /*
      * Asymptotic expansion
      */
@@ -8225,7 +8225,7 @@ void ftest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -8241,7 +8241,7 @@ void ftest(/* Real    */ ae_vector* x,
         ymean = ymean+y->ptr.p_double[i];
     }
     ymean = ymean/m;
-    
+
     /*
      * Variance (using corrected two-pass algorithm)
      */
@@ -8264,7 +8264,7 @@ void ftest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Statistic
      */
@@ -8336,7 +8336,7 @@ void onesamplevariancetest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -8346,7 +8346,7 @@ void onesamplevariancetest(/* Real    */ ae_vector* x,
         xmean = xmean+x->ptr.p_double[i];
     }
     xmean = xmean/n;
-    
+
     /*
      * Variance
      */
@@ -8363,7 +8363,7 @@ void onesamplevariancetest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Statistic
      */
@@ -8466,7 +8466,7 @@ void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
     ae_vector_init(&r, 0, DT_REAL, _state, ae_true);
     ae_vector_init(&c, 0, DT_INT, _state, ae_true);
 
-    
+
     /*
      * Prepare
      */
@@ -8503,7 +8503,7 @@ void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
         r.ptr.p_double[i] = ae_fabs(x->ptr.p_double[i]-e, _state);
         c.ptr.p_int[i] = i;
     }
-    
+
     /*
      * sort {R, C}
      */
@@ -8580,7 +8580,7 @@ void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
         }
         while(i>=1);
     }
-    
+
     /*
      * compute tied ranks
      */
@@ -8602,7 +8602,7 @@ void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
         }
         i = j;
     }
-    
+
     /*
      * Compute W+
      */
@@ -8614,7 +8614,7 @@ void wilcoxonsignedranktest(/* Real    */ ae_vector* x,
             w = w+r.ptr.p_double[i];
         }
     }
-    
+
     /*
      * Result
      */
@@ -14782,7 +14782,7 @@ void mannwhitneyutest(/* Real    */ ae_vector* x,
     ae_vector_init(&c, 0, DT_INT, _state, ae_true);
     ae_vector_init(&tiesize, 0, DT_INT, _state, ae_true);
 
-    
+
     /*
      * Prepare
      */
@@ -14807,7 +14807,7 @@ void mannwhitneyutest(/* Real    */ ae_vector* x,
         r.ptr.p_double[n+i] = y->ptr.p_double[i];
         c.ptr.p_int[n+i] = 1;
     }
-    
+
     /*
      * sort {R, C}
      */
@@ -14884,7 +14884,7 @@ void mannwhitneyutest(/* Real    */ ae_vector* x,
         }
         while(i>=1);
     }
-    
+
     /*
      * compute tied ranks
      */
@@ -14910,7 +14910,7 @@ void mannwhitneyutest(/* Real    */ ae_vector* x,
         tiecount = tiecount+1;
         i = j;
     }
-    
+
     /*
      * Compute U
      */
@@ -14923,7 +14923,7 @@ void mannwhitneyutest(/* Real    */ ae_vector* x,
         }
     }
     u = rmul2((double)(n), (double)(m), _state)+rmul2((double)(n), (double)(n+1), _state)*0.5-u;
-    
+
     /*
      * Result
      */
@@ -18656,7 +18656,7 @@ static double mannwhitneyu_usigma(double s,
 
 
     result = (double)(0);
-    
+
     /*
      * N1=5, N2 = 5, 6, 7, ...
      */
@@ -18771,7 +18771,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=6, N2 = 6, 7, 8, ...
      */
@@ -18826,7 +18826,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=7, N2 = 7, 8, ...
      */
@@ -18877,7 +18877,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=8, N2 = 8, 9, 10, ...
      */
@@ -18924,7 +18924,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=9, N2 = 9, 10, ...
      */
@@ -18967,7 +18967,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=10, N2 = 10, 11, ...
      */
@@ -19006,7 +19006,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=11, N2 = 11, 12, ...
      */
@@ -19041,7 +19041,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=12, N2 = 12, 13, ...
      */
@@ -19072,7 +19072,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=13, N2 = 13, 14, ...
      */
@@ -19099,7 +19099,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1=14, N2 = 14, 15, ...
      */
@@ -19122,7 +19122,7 @@ static double mannwhitneyu_usigma(double s,
         }
         return result;
     }
-    
+
     /*
      * N1 >= 15, N2 >= 15
      */
@@ -19243,7 +19243,7 @@ void onesamplesigntest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Calculate:
      * GTCnt - count of x[i]>Median
@@ -19264,7 +19264,7 @@ void onesamplesigntest(/* Real    */ ae_vector* x,
     }
     if( necnt==0 )
     {
-        
+
         /*
          * all x[i] are equal to Median.
          * So we can conclude that Median is a true median :)
@@ -19357,7 +19357,7 @@ void studentttest1(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -19378,7 +19378,7 @@ void studentttest1(/* Real    */ ae_vector* x,
     {
         xmean = xmean/n;
     }
-    
+
     /*
      * Variance (using corrected two-pass algorithm)
      */
@@ -19432,7 +19432,7 @@ void studentttest1(/* Real    */ ae_vector* x,
         }
         return;
     }
-    
+
     /*
      * Statistic
      */
@@ -19517,7 +19517,7 @@ void studentttest2(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -19555,7 +19555,7 @@ void studentttest2(/* Real    */ ae_vector* x,
     {
         ymean = ymean/m;
     }
-    
+
     /*
      * S
      */
@@ -19600,7 +19600,7 @@ void studentttest2(/* Real    */ ae_vector* x,
         }
         return;
     }
-    
+
     /*
      * Statistic
      */
@@ -19690,7 +19690,7 @@ void unequalvariancettest(/* Real    */ ae_vector* x,
         *righttail = 1.0;
         return;
     }
-    
+
     /*
      * Mean
      */
@@ -19728,7 +19728,7 @@ void unequalvariancettest(/* Real    */ ae_vector* x,
     {
         ymean = ymean/m;
     }
-    
+
     /*
      * Variance (using corrected two-pass algorithm)
      */
@@ -19750,7 +19750,7 @@ void unequalvariancettest(/* Real    */ ae_vector* x,
         }
         yvar = yvar/(m-1);
     }
-    
+
     /*
      * Handle different special cases
      * (one or both variances are zero).
@@ -19785,7 +19785,7 @@ void unequalvariancettest(/* Real    */ ae_vector* x,
     }
     if( ae_fp_eq(xvar,(double)(0)) )
     {
-        
+
         /*
          * X is constant, unpooled 2-sample test reduces to 1-sample test.
          *
@@ -19798,14 +19798,14 @@ void unequalvariancettest(/* Real    */ ae_vector* x,
     }
     if( ae_fp_eq(yvar,(double)(0)) )
     {
-        
+
         /*
          * Y is constant, unpooled 2-sample test reduces to 1-sample test.
          */
         studentttest1(x, n, ymean, bothtails, lefttail, righttail, _state);
         return;
     }
-    
+
     /*
      * Statistic
      */

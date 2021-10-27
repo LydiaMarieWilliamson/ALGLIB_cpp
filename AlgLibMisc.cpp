@@ -5,7 +5,7 @@ Copyright (c) Sergey Bochkanov (ALGLIB project).
 >>> SOURCE LICENSE >>>
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation (www.fsf.org); either version 2 of the 
+the Free Software Foundation (www.fsf.org); either version 2 of the
 License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -67,7 +67,7 @@ _hqrndstate_owner::_hqrndstate_owner()
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -96,7 +96,7 @@ _hqrndstate_owner::_hqrndstate_owner(const _hqrndstate_owner &rhs)
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -128,7 +128,7 @@ _hqrndstate_owner& _hqrndstate_owner::operator=(const _hqrndstate_owner &rhs)
         return *this;
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -167,11 +167,11 @@ alglib_impl::hqrndstate* _hqrndstate_owner::c_ptr() const
 {
     return const_cast<alglib_impl::hqrndstate*>(p_struct);
 }
-hqrndstate::hqrndstate() : _hqrndstate_owner() 
+hqrndstate::hqrndstate() : _hqrndstate_owner()
 {
 }
 
-hqrndstate::hqrndstate(const hqrndstate &rhs):_hqrndstate_owner(rhs) 
+hqrndstate::hqrndstate(const hqrndstate &rhs):_hqrndstate_owner(rhs)
 {
 }
 
@@ -591,7 +591,7 @@ _xdebugrecord1_owner::_xdebugrecord1_owner()
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -620,7 +620,7 @@ _xdebugrecord1_owner::_xdebugrecord1_owner(const _xdebugrecord1_owner &rhs)
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -652,7 +652,7 @@ _xdebugrecord1_owner& _xdebugrecord1_owner::operator=(const _xdebugrecord1_owner
         return *this;
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1809,7 +1809,7 @@ _kdtreerequestbuffer_owner::_kdtreerequestbuffer_owner()
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1838,7 +1838,7 @@ _kdtreerequestbuffer_owner::_kdtreerequestbuffer_owner(const _kdtreerequestbuffe
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1870,7 +1870,7 @@ _kdtreerequestbuffer_owner& _kdtreerequestbuffer_owner::operator=(const _kdtreer
         return *this;
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1909,11 +1909,11 @@ alglib_impl::kdtreerequestbuffer* _kdtreerequestbuffer_owner::c_ptr() const
 {
     return const_cast<alglib_impl::kdtreerequestbuffer*>(p_struct);
 }
-kdtreerequestbuffer::kdtreerequestbuffer() : _kdtreerequestbuffer_owner() 
+kdtreerequestbuffer::kdtreerequestbuffer() : _kdtreerequestbuffer_owner()
 {
 }
 
-kdtreerequestbuffer::kdtreerequestbuffer(const kdtreerequestbuffer &rhs):_kdtreerequestbuffer_owner(rhs) 
+kdtreerequestbuffer::kdtreerequestbuffer(const kdtreerequestbuffer &rhs):_kdtreerequestbuffer_owner(rhs)
 {
 }
 
@@ -1937,7 +1937,7 @@ _kdtree_owner::_kdtree_owner()
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1966,7 +1966,7 @@ _kdtree_owner::_kdtree_owner(const _kdtree_owner &rhs)
 {
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -1998,7 +1998,7 @@ _kdtree_owner& _kdtree_owner::operator=(const _kdtree_owner &rhs)
         return *this;
     jmp_buf _break_jump;
     alglib_impl::ae_state _state;
-    
+
     alglib_impl::ae_state_init(&_state);
     if( setjmp(_break_jump) )
     {
@@ -2037,11 +2037,11 @@ alglib_impl::kdtree* _kdtree_owner::c_ptr() const
 {
     return const_cast<alglib_impl::kdtree*>(p_struct);
 }
-kdtree::kdtree() : _kdtree_owner() 
+kdtree::kdtree() : _kdtree_owner()
 {
 }
 
-kdtree::kdtree(const kdtree &rhs):_kdtree_owner(rhs) 
+kdtree::kdtree(const kdtree &rhs):_kdtree_owner(rhs)
 {
 }
 
@@ -2065,17 +2065,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the "words"
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 void kdtreeserialize(kdtree &obj, std::string &s_out)
@@ -2300,7 +2300,7 @@ NOTES
 void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
 
     n = xy.rows();
@@ -2417,7 +2417,7 @@ NOTES
 void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     ae_int_t n;
     if( (xy.rows()!=tags.length()))
         _ALGLIB_CPP_EXCEPTION("Error while calling 'kdtreebuildtagged': looks like one of arguments has wrong size");
@@ -2578,7 +2578,7 @@ these results:
 ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -2703,7 +2703,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -2824,7 +2824,7 @@ actual results:
 ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -2943,7 +2943,7 @@ As indicated by "U" suffix, this function returns unordered results.
 ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -3078,7 +3078,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -3211,7 +3211,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -3336,7 +3336,7 @@ these results:
 ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -3475,7 +3475,7 @@ IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
 ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps, const xparams _xparams)
 {
     jmp_buf _break_jump;
-    alglib_impl::ae_state _alglib_env_state;    
+    alglib_impl::ae_state _alglib_env_state;
     bool selfmatch;
 
     selfmatch = true;
@@ -4308,7 +4308,7 @@ void hqrndseed(ae_int_t s1,
 
     _hqrndstate_clear(state);
 
-    
+
     /*
      * Protection against negative seeds:
      *
@@ -4375,13 +4375,13 @@ ae_int_t hqrnduniformi(hqrndstate* state, ae_int_t n, ae_state *_state)
 
     ae_assert(n>0, "HQRNDUniformI: N<=0!", _state);
     maxcnt = hqrnd_hqrndmax+1;
-    
+
     /*
      * Two branches: one for N<=MaxCnt, another for N>MaxCnt.
      */
     if( n>maxcnt )
     {
-        
+
         /*
          * N>=MaxCnt.
          *
@@ -4394,7 +4394,7 @@ ae_int_t hqrnduniformi(hqrndstate* state, ae_int_t n, ae_state *_state)
          */
         if( n%maxcnt==0 )
         {
-            
+
             /*
              * N is exactly divisible by MaxCnt.
              *
@@ -4416,7 +4416,7 @@ ae_int_t hqrnduniformi(hqrndstate* state, ae_int_t n, ae_state *_state)
         }
         else
         {
-            
+
             /*
              * N is NOT exactly divisible by MaxCnt.
              *
@@ -4450,7 +4450,7 @@ ae_int_t hqrnduniformi(hqrndstate* state, ae_int_t n, ae_state *_state)
     }
     else
     {
-        
+
         /*
          * N<=MaxCnt
          *
@@ -4635,7 +4635,7 @@ void hqrndnormal2(hqrndstate* state,
         s = ae_sqr(u, _state)+ae_sqr(v, _state);
         if( ae_fp_greater(s,(double)(0))&&ae_fp_less(s,(double)(1)) )
         {
-            
+
             /*
              * two Sqrt's instead of one to
              * avoid overflow when S is too small
@@ -4714,7 +4714,7 @@ INPUT PARAMETERS
         N   -   number of elements to use, N>=1
 
 RESULT
-    this function returns random number from continuous distribution which  
+    this function returns random number from continuous distribution which
     tries to approximate X as mush as possible. min(X)<=Result<=max(X).
 
   -- ALGLIB --
@@ -4779,7 +4779,7 @@ static ae_int_t hqrnd_hqrndintegerbase(hqrndstate* state,
     {
         state->s2 = state->s2+2147483399;
     }
-    
+
     /*
      * Result
      */
@@ -5913,11 +5913,11 @@ INPUT PARAMETERS
                 * 0 denotes infinity-norm
                 * 1 denotes 1-norm
                 * 2 denotes 2-norm (Euclidean norm)
-                
+
 OUTPUT PARAMETERS
     KDT     -   KD-tree
-    
-    
+
+
 NOTES
 
 1. KD-tree  creation  have O(N*logN) complexity and O(N*(2*NX+NY))  memory
@@ -6028,7 +6028,7 @@ void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
     ae_assert(xy->rows>=n, "KDTreeBuildTagged: rows(X)<N", _state);
     ae_assert(xy->cols>=nx+ny||n==0, "KDTreeBuildTagged: cols(X)<NX+NY", _state);
     ae_assert(apservisfinitematrix(xy, n, nx+ny, _state), "KDTreeBuildTagged: XY contains infinite or NaN values", _state);
-    
+
     /*
      * initialize
      */
@@ -6037,7 +6037,7 @@ void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
     kdt->ny = ny;
     kdt->normtype = normtype;
     kdt->innerbuf.kcur = 0;
-    
+
     /*
      * N=0 => quick exit
      */
@@ -6045,14 +6045,14 @@ void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
     {
         return;
     }
-    
+
     /*
      * Allocate
      */
     nearestneighbor_kdtreeallocdatasetindependent(kdt, nx, ny, _state);
     nearestneighbor_kdtreeallocdatasetdependent(kdt, n, nx, ny, _state);
     kdtreecreaterequestbuffer(kdt, &kdt->innerbuf, _state);
-    
+
     /*
      * Initial fill
      */
@@ -6062,7 +6062,7 @@ void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
         ae_v_move(&kdt->xy.ptr.pp_double[i][nx], 1, &xy->ptr.pp_double[i][0], 1, ae_v_len(nx,2*nx+ny-1));
         kdt->tags.ptr.p_int[i] = tags->ptr.p_int[i];
     }
-    
+
     /*
      * Determine bounding box
      */
@@ -6076,7 +6076,7 @@ void kdtreebuildtagged(/* Real    */ ae_matrix* xy,
             kdt->boxmax.ptr.p_double[j] = ae_maxreal(kdt->boxmax.ptr.p_double[j], kdt->xy.ptr.pp_double[i][j], _state);
         }
     }
-    
+
     /*
      * Generate tree
      */
@@ -6106,8 +6106,8 @@ INPUT PARAMETERS
 
 OUTPUT PARAMETERS
     Buf         -   external buffer.
-    
-    
+
+
 IMPORTANT: KD-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use buffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6218,7 +6218,7 @@ obtain these results (pay attention to "buf" in their names):
 * KDTreeTsQueryResultsXY() to get X- and Y-values
 * KDTreeTsQueryResultsTags() to get tag values
 * KDTreeTsQueryResultsDistances() to get distances
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6393,7 +6393,7 @@ obtain these results (pay attention to "buf" in their names):
 * KDTreeTsQueryResultsXY() to get X- and Y-values
 * KDTreeTsQueryResultsTags() to get tag values
 * KDTreeTsQueryResultsDistances() to get distances
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6456,7 +6456,7 @@ obtain these results (pay attention to "buf" in their names):
 * KDTreeTsQueryResultsDistances() to get distances
 
 As indicated by "U" suffix, this function returns unordered results.
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6509,7 +6509,7 @@ INPUT PARAMETERS
 
 RESULT
     number of actual neighbors found (either K or N, if K>N).
-    
+
 NOTES
     significant performance gain may be achieved only when Eps  is  is  on
     the order of magnitude of 1 or larger.
@@ -6566,7 +6566,7 @@ INPUT PARAMETERS
 
 RESULT
     number of actual neighbors found (either K or N, if K>N).
-    
+
 NOTES
     significant performance gain may be achieved only when Eps  is  is  on
     the order of magnitude of 1 or larger.
@@ -6578,7 +6578,7 @@ obtain these results (pay attention to "buf" in their names):
 * KDTreeTsQueryResultsXY() to get X- and Y-values
 * KDTreeTsQueryResultsTags() to get tag values
 * KDTreeTsQueryResultsDistances() to get distances
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6605,7 +6605,7 @@ ae_int_t kdtreetsqueryaknn(kdtree* kdt,
     ae_assert(ae_fp_greater_eq(eps,(double)(0)), "KDTreeTsQueryAKNN: incorrect Eps!", _state);
     ae_assert(x->cnt>=kdt->nx, "KDTreeTsQueryAKNN: Length(X)<NX!", _state);
     ae_assert(isfinitevector(x, kdt->nx, _state), "KDTreeTsQueryAKNN: X contains infinite or NaN values!", _state);
-    
+
     /*
      * Handle special case: KDT.N=0
      */
@@ -6615,12 +6615,12 @@ ae_int_t kdtreetsqueryaknn(kdtree* kdt,
         result = 0;
         return result;
     }
-    
+
     /*
      * Check consistency of request buffer
      */
     nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
-    
+
     /*
      * Prepare parameters
      */
@@ -6637,18 +6637,18 @@ ae_int_t kdtreetsqueryaknn(kdtree* kdt,
         buf->approxf = 1/(1+eps);
     }
     buf->kcur = 0;
-    
+
     /*
      * calculate distance from point to current bounding box
      */
     nearestneighbor_kdtreeinitbox(kdt, x, buf, _state);
-    
+
     /*
      * call recursive search
      * results are returned as heap
      */
     nearestneighbor_kdtreequerynnrec(kdt, buf, 0, _state);
-    
+
     /*
      * pop from heap to generate ordered representation
      *
@@ -6690,7 +6690,7 @@ these results:
 * KDTreeQueryResultsXY() to get X- and Y-values
 * KDTreeQueryResultsTags() to get tag values
 * KDTreeQueryResultsDistances() returns zeros for this request
-    
+
 NOTE: this particular query returns unordered results, because there is no
       meaningful way of  ordering  points.  Furthermore,  no 'distance' is
       associated with points - it is either INSIDE  or OUTSIDE (so request
@@ -6737,12 +6737,12 @@ obtain these results (pay attention to "ts" in their names):
 * KDTreeTsQueryResultsXY() to get X- and Y-values
 * KDTreeTsQueryResultsTags() to get tag values
 * KDTreeTsQueryResultsDistances() returns zeros for this query
-    
+
 NOTE: this particular query returns unordered results, because there is no
       meaningful way of  ordering  points.  Furthermore,  no 'distance' is
       associated with points - it is either INSIDE  or OUTSIDE (so request
       for distances will return zeros).
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -6766,12 +6766,12 @@ ae_int_t kdtreetsquerybox(kdtree* kdt,
     ae_assert(boxmax->cnt>=kdt->nx, "KDTreeTsQueryBox: Length(BoxMax)<NX!", _state);
     ae_assert(isfinitevector(boxmin, kdt->nx, _state), "KDTreeTsQueryBox: BoxMin contains infinite or NaN values!", _state);
     ae_assert(isfinitevector(boxmax, kdt->nx, _state), "KDTreeTsQueryBox: BoxMax contains infinite or NaN values!", _state);
-    
+
     /*
      * Check consistency of request buffer
      */
     nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
-    
+
     /*
      * Quick exit for degenerate boxes
      */
@@ -6784,7 +6784,7 @@ ae_int_t kdtreetsquerybox(kdtree* kdt,
             return result;
         }
     }
-    
+
     /*
      * Prepare parameters
      */
@@ -6796,7 +6796,7 @@ ae_int_t kdtreetsquerybox(kdtree* kdt,
         buf->curboxmax.ptr.p_double[j] = boxmax->ptr.p_double[j];
     }
     buf->kcur = 0;
-    
+
     /*
      * call recursive search
      */
@@ -7213,7 +7213,7 @@ void kdtreetsqueryresultsdistances(kdtree* kdt,
         ae_vector_set_length(r, buf->kcur, _state);
     }
     k = buf->kcur;
-    
+
     /*
      * unload norms
      *
@@ -7395,7 +7395,7 @@ void kdtreeexplorenodetype(kdtree* kdt,
     ae_assert(node<kdt->nodes.cnt, "KDTreeExploreNodeType: incorrect node", _state);
     if( kdt->nodes.ptr.p_int[node]>0 )
     {
-        
+
         /*
          * Leaf node
          */
@@ -7404,7 +7404,7 @@ void kdtreeexplorenodetype(kdtree* kdt,
     }
     if( kdt->nodes.ptr.p_int[node]==0 )
     {
-        
+
         /*
          * Split node
          */
@@ -7480,7 +7480,7 @@ OUTPUT VALUES:
     //      Nodes[idx+2]=offs   offset of splitting point in Splits[]
     //      Nodes[idx+3]=left   position of left child in Nodes[]
     //      Nodes[idx+4]=right  position of right child in Nodes[]
-    
+
   -- ALGLIB --
      Copyright 20.06.2016 by Bochkanov Sergey
 *************************************************************************/
@@ -7525,13 +7525,13 @@ void kdtreealloc(ae_serializer* s, kdtree* tree, ae_state *_state)
 {
 
 
-    
+
     /*
      * Header
      */
     ae_serializer_alloc_entry(s);
     ae_serializer_alloc_entry(s);
-    
+
     /*
      * Data
      */
@@ -7558,13 +7558,13 @@ void kdtreeserialize(ae_serializer* s, kdtree* tree, ae_state *_state)
 {
 
 
-    
+
     /*
      * Header
      */
     ae_serializer_serialize_int(s, getkdtreeserializationcode(_state), _state);
     ae_serializer_serialize_int(s, nearestneighbor_kdtreefirstversion, _state);
-    
+
     /*
      * Data
      */
@@ -7594,7 +7594,7 @@ void kdtreeunserialize(ae_serializer* s, kdtree* tree, ae_state *_state)
 
     _kdtree_clear(tree);
 
-    
+
     /*
      * check correctness of header
      */
@@ -7602,7 +7602,7 @@ void kdtreeunserialize(ae_serializer* s, kdtree* tree, ae_state *_state)
     ae_assert(i0==getkdtreeserializationcode(_state), "KDTreeUnserialize: stream header corrupted", _state);
     ae_serializer_unserialize_int(s, &i1, _state);
     ae_assert(i1==nearestneighbor_kdtreefirstversion, "KDTreeUnserialize: stream header corrupted", _state);
-    
+
     /*
      * Unserialize data
      */
@@ -7656,7 +7656,7 @@ obtain these results (pay attention to "buf" in their names):
 * KDTreeTsQueryResultsXY() to get X- and Y-values
 * KDTreeTsQueryResultsTags() to get tag values
 * KDTreeTsQueryResultsDistances() to get distances
-    
+
 IMPORTANT: kd-tree buffer should be used only with  KD-tree  object  which
            was used to initialize buffer. Any attempt to use biffer   with
            different object is dangerous - you  may  get  integrity  check
@@ -7679,7 +7679,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree* kdt,
     ae_int_t result;
 
 
-    
+
     /*
      * Handle special case: KDT.N=0
      */
@@ -7689,12 +7689,12 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree* kdt,
         result = 0;
         return result;
     }
-    
+
     /*
      * Check consistency of request buffer
      */
     nearestneighbor_checkrequestbufferconsistency(kdt, buf, _state);
-    
+
     /*
      * Prepare parameters
      */
@@ -7710,19 +7710,19 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree* kdt,
     buf->selfmatch = selfmatch;
     buf->approxf = (double)(1);
     buf->kcur = 0;
-    
+
     /*
      * calculate distance from point to current bounding box
      */
     nearestneighbor_kdtreeinitbox(kdt, x, buf, _state);
-    
+
     /*
      * call recursive search
      * results are returned as heap
      */
     nearestneighbor_kdtreequerynnrec(kdt, buf, 0, _state);
     result = buf->kcur;
-    
+
     /*
      * pop from heap to generate ordered representation
      *
@@ -7764,7 +7764,7 @@ static void nearestneighbor_kdtreesplit(kdtree* kdt,
     *i3 = 0;
 
     ae_assert(kdt->n>0, "KDTreeSplit: internal error", _state);
-    
+
     /*
      * split XY/Tags in two parts:
      * * [ILeft,IRight] is non-processed part of XY/Tags
@@ -7781,7 +7781,7 @@ static void nearestneighbor_kdtreesplit(kdtree* kdt,
     {
         if( kdt->xy.ptr.pp_double[ileft][d]<=s )
         {
-            
+
             /*
              * XY[ILeft] is on its place.
              * Advance ILeft.
@@ -7790,7 +7790,7 @@ static void nearestneighbor_kdtreesplit(kdtree* kdt,
         }
         else
         {
-            
+
             /*
              * XY[ILeft,..] must be at IRight.
              * Swap and advance IRight.
@@ -7827,7 +7827,7 @@ PARAMETERS
     NodesOffs   unused part of Nodes[] which must be filled by tree
     SplitsOffs  unused part of Splits[]
     I1, I2      points from [I1,I2) are processed
-    
+
 NodesOffs[] and SplitsOffs[] must be large enough.
 
   -- ALGLIB --
@@ -7864,7 +7864,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
 
     ae_assert(kdt->n>0, "KDTreeGenerateTreeRec: internal error", _state);
     ae_assert(i2>i1, "KDTreeGenerateTreeRec: internal error", _state);
-    
+
     /*
      * Generate leaf if needed
      */
@@ -7875,13 +7875,13 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
         *nodesoffs = *nodesoffs+2;
         return;
     }
-    
+
     /*
      * Load values for easier access
      */
     nx = kdt->nx;
     ny = kdt->ny;
-    
+
     /*
      * Select dimension to split:
      * * D is a dimension number
@@ -7905,7 +7905,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
         *nodesoffs = *nodesoffs+2;
         return;
     }
-    
+
     /*
      * Select split position S using sliding midpoint rule,
      * rearrange points into [I1,I3) and [I3,I2).
@@ -7947,7 +7947,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
     }
     if( minv==maxv )
     {
-        
+
         /*
          * In case all points has same value of D-th component
          * (MinV=MaxV) we enforce D-th dimension of bounding
@@ -7964,7 +7964,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
     }
     if( cntless>0&&cntgreater>0 )
     {
-        
+
         /*
          * normal midpoint split
          */
@@ -7972,13 +7972,13 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
     }
     else
     {
-        
+
         /*
          * sliding midpoint
          */
         if( cntless==0 )
         {
-            
+
             /*
              * 1. move split to MinV,
              * 2. place one point to the left bin (move to I1),
@@ -8001,7 +8001,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
         }
         else
         {
-            
+
             /*
              * 1. move split to MaxV,
              * 2. place one point to the right bin (move to I2-1),
@@ -8023,7 +8023,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
             i3 = i2-1;
         }
     }
-    
+
     /*
      * Generate 'split' node
      */
@@ -8034,7 +8034,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
     oldoffs = *nodesoffs;
     *nodesoffs = *nodesoffs+nearestneighbor_splitnodesize;
     *splitsoffs = *splitsoffs+1;
-    
+
     /*
      * Recursive generation:
      * * update CurBox
@@ -8051,7 +8051,7 @@ static void nearestneighbor_kdtreegeneratetreerec(kdtree* kdt,
     kdt->innerbuf.curboxmin.ptr.p_double[d] = s;
     nearestneighbor_kdtreegeneratetreerec(kdt, nodesoffs, splitsoffs, i3, i2, maxleafsize, _state);
     kdt->innerbuf.curboxmin.ptr.p_double[d] = v;
-    
+
     /*
      * Zero-fill unused portions of the node (avoid false warnings by Valgrind
      * about attempt to serialize uninitialized values)
@@ -8092,7 +8092,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
 
 
     ae_assert(kdt->n>0, "KDTreeQueryNNRec: internal error", _state);
-    
+
     /*
      * Leaf node.
      * Process points.
@@ -8103,7 +8103,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
         i2 = i1+kdt->nodes.ptr.p_int[offs];
         for(i=i1; i<=i2-1; i++)
         {
-            
+
             /*
              * Calculate distance
              */
@@ -8130,7 +8130,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                     ptdist = ptdist+ae_sqr(kdt->xy.ptr.pp_double[i][j]-buf->x.ptr.p_double[j], _state);
                 }
             }
-            
+
             /*
              * Skip points with zero distance if self-matches are turned off
              */
@@ -8138,14 +8138,14 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
             {
                 continue;
             }
-            
+
             /*
              * We CAN'T process point if R-criterion isn't satisfied,
              * i.e. (RNeeded<>0) AND (PtDist>R).
              */
             if( buf->rneeded==0||ptdist<=buf->rneeded )
             {
-                
+
                 /*
                  * R-criterion is satisfied, we must either:
                  * * replace worst point, if (KNeeded<>0) AND (KCur=KNeeded)
@@ -8154,7 +8154,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                  */
                 if( buf->kcur<buf->kneeded||buf->kneeded==0 )
                 {
-                    
+
                     /*
                      * add current point to heap without replacement
                      */
@@ -8162,7 +8162,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                 }
                 else
                 {
-                    
+
                     /*
                      * New points are added or not, depending on their distance.
                      * If added, they replace element at the top of the heap
@@ -8184,13 +8184,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
         }
         return;
     }
-    
+
     /*
      * Simple split
      */
     if( kdt->nodes.ptr.p_int[offs]==0 )
     {
-        
+
         /*
          * Load:
          * * D  dimension to split
@@ -8198,7 +8198,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
          */
         d = kdt->nodes.ptr.p_int[offs+1];
         s = kdt->splits.ptr.p_double[kdt->nodes.ptr.p_int[offs+2]];
-        
+
         /*
          * Calculate:
          * * ChildBestOffs      child box with best chances
@@ -8216,13 +8216,13 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
             childworstoffs = kdt->nodes.ptr.p_int[offs+3];
             bestisleft = ae_false;
         }
-        
+
         /*
          * Navigate through childs
          */
         for(i=0; i<=1; i++)
         {
-            
+
             /*
              * Select child to process:
              * * ChildOffs      current child offset in Nodes[]
@@ -8239,7 +8239,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                 updatemin = bestisleft;
                 childoffs = childworstoffs;
             }
-            
+
             /*
              * Update bounding box and current distance
              */
@@ -8287,7 +8287,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                 }
                 buf->curboxmax.ptr.p_double[d] = s;
             }
-            
+
             /*
              * Decide: to dive into cell or not to dive
              */
@@ -8299,7 +8299,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
             {
                 if( buf->kcur<buf->kneeded||buf->kneeded==0 )
                 {
-                    
+
                     /*
                      * KCur<KNeeded (i.e. not all points are found)
                      */
@@ -8307,7 +8307,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
                 }
                 else
                 {
-                    
+
                     /*
                      * KCur=KNeeded, decide to dive or not to dive
                      * using point position relative to bounding box.
@@ -8319,7 +8319,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree* kdt,
             {
                 nearestneighbor_kdtreequerynnrec(kdt, buf, childoffs, _state);
             }
-            
+
             /*
              * Restore bounding box and distance
              */
@@ -8362,7 +8362,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
 
     ae_assert(kdt->n>0, "KDTreeQueryBoxRec: internal error", _state);
     nx = kdt->nx;
-    
+
     /*
      * Check that intersection of query box with bounding box is non-empty.
      * This check is performed once for Offs=0 (tree root).
@@ -8381,7 +8381,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
             }
         }
     }
-    
+
     /*
      * Leaf node.
      * Process points.
@@ -8392,7 +8392,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
         i2 = i1+kdt->nodes.ptr.p_int[offs];
         for(i=i1; i<=i2-1; i++)
         {
-            
+
             /*
              * Check whether point is in box or not
              */
@@ -8406,7 +8406,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
             {
                 continue;
             }
-            
+
             /*
              * Add point to unordered list
              */
@@ -8416,13 +8416,13 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
         }
         return;
     }
-    
+
     /*
      * Simple split
      */
     if( kdt->nodes.ptr.p_int[offs]==0 )
     {
-        
+
         /*
          * Load:
          * * D  dimension to split
@@ -8430,7 +8430,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
          */
         d = kdt->nodes.ptr.p_int[offs+1];
         s = kdt->splits.ptr.p_double[kdt->nodes.ptr.p_int[offs+2]];
-        
+
         /*
          * Check lower split (S is upper bound of new bounding box)
          */
@@ -8441,7 +8441,7 @@ static void nearestneighbor_kdtreequeryboxrec(kdtree* kdt,
             nearestneighbor_kdtreequeryboxrec(kdt, buf, kdt->nodes.ptr.p_int[offs+3], _state);
             buf->curboxmax.ptr.p_double[d] = v;
         }
-        
+
         /*
          * Check upper split (S is lower bound of new bounding box)
          */
@@ -8477,7 +8477,7 @@ static void nearestneighbor_kdtreeinitbox(kdtree* kdt,
 
 
     ae_assert(kdt->n>0, "KDTreeInitBox: internal error", _state);
-    
+
     /*
      * calculate distance from point to current bounding box
      */

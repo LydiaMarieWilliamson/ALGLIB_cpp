@@ -120,7 +120,7 @@ It supports several programming languages (C++, C#, Delphi, VB.NET, Python) and 
 </p>
 
 <p align=justify>
-ALGLIB features include: 
+ALGLIB features include:
 </p>
 
 <ul>
@@ -663,7 +663,7 @@ demo.cpp (WINDOWS EXAMPLE)
     <b>int</b> n = 2000;
     <b>int</b> i, j;
     <b>double</b> timeneeded, flops;
-    
+
     // Initialize arrays
     a.setlength(n, n);
     b.setlength(n, n);
@@ -675,13 +675,13 @@ demo.cpp (WINDOWS EXAMPLE)
             b[i][j] = alglib::randomreal()-0.5;
             c[i][j] = 0.0;
         }
-    
+
     // Set global threading settings (applied to all ALGLIB functions);
     // default is to perform serial computations, unless parallel execution
     // is activated. Parallel execution tries to utilize all cores; this
     // behavior can be changed with alglib::setnworkers() call.
     alglib::setglobalthreading(alglib::parallel);
-    
+
     // Perform matrix-matrix product.
     flops = 2*pow((<b>double</b>)n, (<b>double</b>)3);
     timeneeded = counter();
@@ -693,10 +693,10 @@ demo.cpp (WINDOWS EXAMPLE)
         0.0,
         c, 0, 0);
     timeneeded = counter()-timeneeded;
-    
+
     // Evaluate performance
     printf("Performance is %.1f GFLOPS\n", (<b>double</b>)(1.0E-9*flops/timeneeded));
-    
+
     return 0;
 }
 
@@ -838,7 +838,7 @@ demo.cpp (LINUX EXAMPLE)
     <b>int</b> n = 2000;
     <b>int</b> i, j;
     <b>double</b> timeneeded, flops;
-    
+
     // Initialize arrays
     a.setlength(n, n);
     b.setlength(n, n);
@@ -850,13 +850,13 @@ demo.cpp (LINUX EXAMPLE)
             b[i][j] = alglib::randomreal()-0.5;
             c[i][j] = 0.0;
         }
-    
+
     // Set global threading settings (applied to all ALGLIB functions);
     // default is to perform serial computations, unless parallel execution
     // is activated. Parallel execution tries to utilize all cores; this
     // behavior can be changed with alglib::setnworkers() call.
     alglib::setglobalthreading(alglib::parallel);
-    
+
     // Perform matrix-matrix product.
     flops = 2*pow((<b>double</b>)n, (<b>double</b>)3);
     timeneeded = counter();
@@ -868,10 +868,10 @@ demo.cpp (LINUX EXAMPLE)
         0.0,
         c, 0, 0);
     timeneeded = counter()-timeneeded;
-    
+
     // Evaluate performance
     printf("Performance is %.1f GFLOPS\n", (<b>double</b>)(1.0E-9*flops/timeneeded));
-    
+
     return 0;
 }
 
@@ -1196,7 +1196,7 @@ r2.attach_to_ptr(2,3,_r2);
 <p>
 To access the array elements, an overloaded <code>operator()</code> or <code>operator[]</code> can used.
 That is, the code addressing the element of array <code>a</code> with indexes <code>[i,j]</code> can look like
-<code>a(i,j)</code> or <code>a[i][j]</code>. 
+<code>a(i,j)</code> or <code>a[i][j]</code>.
 </p>
 
 <pre class='p_example'>
@@ -1319,13 +1319,13 @@ a = <span class='s_str'>"[[2,1],[1,2]]"</span>;
 
 <span class='s_comment'>// after this line A will contain [[0.66,-0.33],[-0.33,0.66]]</span>
 <span class='s_comment'>// which is symmetric too</span>
-alglib::spdmatrixinverse(a, info, rep); 
+alglib::spdmatrixinverse(a, info, rep);
 
 <span class='s_comment'>// you may try to pass nonsymmetric matrix</span>
 a = <span class='s_str'>"[[2,1],[0,2]]"</span>;
 
 <span class='s_comment'>// but exception will be thrown in such case</span>
-alglib::spdmatrixinverse(a, info, rep); 
+alglib::spdmatrixinverse(a, info, rep);
 </pre>
 
 <p>
@@ -1351,7 +1351,7 @@ a = <span class='s_str'>"[[2,1],[NAN,2]]"</span>;
 
 <span class='s_comment'>// after this line A will contain [[0.66,-0.33],[NAN,0.66]]</span>
 <span class='s_comment'>// only upper triangle is modified</span>
-alglib::spdmatrixinverse(a, 2 <span class='s_comment'>/* N */</span>, true <span class='s_comment'>/* upper triangle is used */</span>, info, rep); 
+alglib::spdmatrixinverse(a, 2 <span class='s_comment'>/* N */</span>, true <span class='s_comment'>/* upper triangle is used */</span>, info, rep);
 </pre>
 
 
@@ -1400,7 +1400,7 @@ But if you pass matrix which contains INF in one of its elements, <code>alglib::
 First error handling strategy (error codes) is used to report "frequent" errors
 which can occur during normal execution of user program.
 Second error handling strategy (exceptions) is used to report "rare" errors
-which are result of serious flaws in your program (or ALGLIB) - 
+which are result of serious flaws in your program (or ALGLIB) -
 infinities/NAN's in the inputs, inconsistent inputs, etc.
 </p>
 
@@ -3924,7 +3924,7 @@ SEE ALSO
 #include <font color=blue><b>&quot;Integration.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> int_function_1_func(<b>double</b> x, <b>double</b> xminusa, <b>double</b> bminusx, <b>double</b> &amp;y, <b>void</b> *ptr) 
+<b>void</b> int_function_1_func(<b>double</b> x, <b>double</b> xminusa, <b>double</b> bminusx, <b>double</b> &amp;y, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(x)=exp(x)</font>
     y = exp(x);
@@ -8925,17 +8925,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> dfserialize(decisionforest &amp;obj, std::string &amp;s_out);
@@ -16261,17 +16261,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> idwserialize(idwmodel &amp;obj, std::string &amp;s_out);
@@ -18429,17 +18429,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> knnserialize(knnmodel &amp;obj, std::string &amp;s_out);
@@ -23655,7 +23655,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0))</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter</font>
@@ -23717,7 +23717,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0))</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter</font>
@@ -23771,13 +23771,13 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0))</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter</font>
     func = exp(-c[0]*pow(x[0],2));
 }
-<b>void</b> function_cx_1_grad(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_grad(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient G={df/dc[i]}</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter.</font>
@@ -23836,13 +23836,13 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0))</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter</font>
     func = exp(-c[0]*pow(x[0],2));
 }
-<b>void</b> function_cx_1_grad(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_grad(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0)) and gradient G={df/dc[i]}</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter.</font>
@@ -23850,7 +23850,7 @@ using namespace alglib;
     func = exp(-c[0]*pow(x[0],2));
     grad[0] = -pow(x[0],2)*func;
 }
-<b>void</b> function_cx_1_hess(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, real_2d_array &amp;hess, <b>void</b> *ptr) 
+<b>void</b> function_cx_1_hess(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, real_2d_array &amp;hess, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(c,x)=exp(-c0*sqr(x0)), gradient G={df/dc[i]} and Hessian H={d2f/(dc[i]*dc[j])}</font>
     <font color=navy>// where x is a position on X-axis and c is adjustable parameter.</font>
@@ -23910,7 +23910,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Interpolation.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function_debt_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr) 
+<b>void</b> function_debt_func(<b>const</b> real_1d_array &amp;c, <b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(c,x)=c[0]*(1+c[1]*(pow(x[0]-1999,c[2])-1))</font>
@@ -27762,7 +27762,7 @@ provided to MinBCOptimize().
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -29013,7 +29013,7 @@ provided to MinBLEICOptimize().
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -29117,7 +29117,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -30288,7 +30288,7 @@ INPUT PARAMETERS:
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -30381,7 +30381,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -31771,7 +31771,7 @@ provided to MinLBFGSOptimize().
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -31864,7 +31864,7 @@ using namespace alglib;
 #include <font color=blue><b>&quot;Optimization.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -32954,7 +32954,7 @@ using namespace alglib;
     <font color=navy>//</font>
     func = 100*pow(x[0]+3,4) + pow(x[1]-3,4);
 }
-<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr) 
+<b>void</b> function1_grad(<b>const</b> real_1d_array &amp;x, <b>double</b> &amp;func, real_1d_array &amp;grad, <b>void</b> *ptr)
 {
     <font color=navy>//</font>
     <font color=navy>// this callback calculates f(x0,x1) = 100*(x0+3)^4 + (x1-3)^4</font>
@@ -41830,17 +41830,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> mlpserialize(multilayerperceptron &amp;obj, std::string &amp;s_out);
@@ -42476,17 +42476,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> mlpeserialize(mlpensemble &amp;obj, std::string &amp;s_out);
@@ -44902,17 +44902,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> kdtreeserialize(kdtree &amp;obj, std::string &amp;s_out);
@@ -46352,7 +46352,7 @@ It accepts following parameters:
 #include <font color=blue><b>&quot;DiffEquations.h&quot;</b></font>
 
 using namespace alglib;
-<b>void</b> ode_function_1_diff(<b>const</b> real_1d_array &amp;y, <b>double</b> x, real_1d_array &amp;dy, <b>void</b> *ptr) 
+<b>void</b> ode_function_1_diff(<b>const</b> real_1d_array &amp;y, <b>double</b> x, real_1d_array &amp;dy, <b>void</b> *ptr)
 {
     <font color=navy>// this callback calculates f(y[],x)=-y[0]</font>
     dy[0] = -y[0];
@@ -46763,17 +46763,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> lptestproblemserialize(lptestproblem &amp;obj, std::string &amp;s_out);
@@ -51171,17 +51171,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> rbfserialize(rbfmodel &amp;obj, std::string &amp;s_out);
@@ -54410,17 +54410,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> sparseserialize(sparsematrix &amp;obj, std::string &amp;s_out);
@@ -57384,17 +57384,17 @@ Important properties of s_out:
 * it contains alphanumeric characters, dots, underscores, minus signs
 * these symbols are grouped into words, which are separated by spaces
   and Windows-style (CR+LF) newlines
-* although  serializer  uses  spaces and CR+LF as separators, you can 
+* although  serializer  uses  spaces and CR+LF as separators, you can
   replace any separator character by arbitrary combination of spaces,
   tabs, Windows or Unix newlines. It allows flexible reformatting  of
-  the  string  in  case you want to include it into text or XML file. 
+  the  string  in  case you want to include it into text or XML file.
   But you should not insert separators into the middle of the &quot;words&quot;
   nor you should change case of letters.
 * s_out can be freely moved between 32-bit and 64-bit systems, little
   and big endian machines, and so on. You can serialize structure  on
   32-bit machine and unserialize it on 64-bit one (or vice versa), or
-  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also 
-  serialize  it  in  C++ version of ALGLIB and unserialize in C# one, 
+  serialize  it  on  SPARC  and  unserialize  on  x86.  You  can also
+  serialize  it  in  C++ version of ALGLIB and unserialize in C# one,
   and vice versa.
 *************************************************************************/
 </div><div style='margin-top: 0; margin-bottom: 0;'><b>void</b> spline2dserialize(spline2dinterpolant &amp;obj, std::string &amp;s_out);
