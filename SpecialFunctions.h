@@ -1,183 +1,121 @@
-// ALGLIB 3.18.0 (source code generated 2021-10-25)
-// Copyright (c) Sergey Bochkanov (ALGLIB project).
+// ALGLIB++
+// Based on ALGLIB: Copyright (c) Sergey Bochkanov (ALGLIB project).
+// Revisions Copyright (c) Lydia Marie Williamson, Mark Hopkins Consulting
+// Source License:
+//	This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+//	as published by the Free Software Foundation (www.fsf.org);
+//	either version 2 of the License, or (at your option) any later version.
 //
-// >>> SOURCE LICENSE >>>
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation (www.fsf.org); either version 2 of the
-// License, or (at your option) any later version.
+//	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//	See the GNU General Public License for more details.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// A copy of the GNU General Public License is available at
-// http://www.fsf.org/licensing/licenses
-// >>> END OF LICENSE >>>
-#ifndef _specialfunctions_pkg_h
-#define _specialfunctions_pkg_h
+//	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
+#ifndef OnceOnlySpecialFunctions_h
+#define OnceOnlySpecialFunctions_h
+
 #include "Ap.h"
 #include "AlgLibInternal.h"
 #include "AlgLibMisc.h"
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (DATATYPES)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_GAMMAFUNC) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_NORMALDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_IBETAF) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_STUDENTTDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_FDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_IGAMMAF) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_CHISQUAREDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_BINOMIALDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_EXPINTEGRALS) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_JACOBIANELLIPTIC) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_TRIGINTEGRALS) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_CHEBYSHEV) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_POISSONDISTR) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_BETAF) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_FRESNEL) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_PSIF) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_AIRYF) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_DAWSON) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_HERMITE) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_LEGENDRE) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_BESSEL) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_LAGUERRE) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_ELLIPTIC) || !defined(AE_PARTIAL_BUILD)
-#endif
+// Declarations for the computational core: datatypes.
+namespace alglib_impl {
+// === GAMMAFUNC Package ===
 
-}
+// === NORMALDISTR Package ===
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS C++ INTERFACE
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib
-{
+// === IBETAF Package ===
 
-#if defined(AE_COMPILE_GAMMAFUNC) || !defined(AE_PARTIAL_BUILD)
+// === STUDENTTDISTR Package ===
 
-#endif
+// === FDISTR Package ===
 
-#if defined(AE_COMPILE_NORMALDISTR) || !defined(AE_PARTIAL_BUILD)
+// === IGAMMAF Package ===
 
-#endif
+// === CHISQUAREDISTR Package ===
 
-#if defined(AE_COMPILE_IBETAF) || !defined(AE_PARTIAL_BUILD)
+// === BINOMIALDISTR Package ===
 
-#endif
+// === EXPINTEGRALS Package ===
 
-#if defined(AE_COMPILE_STUDENTTDISTR) || !defined(AE_PARTIAL_BUILD)
+// === JACOBIANELLIPTIC Package ===
 
-#endif
+// === TRIGINTEGRALS Package ===
 
-#if defined(AE_COMPILE_FDISTR) || !defined(AE_PARTIAL_BUILD)
+// === CHEBYSHEV Package ===
 
-#endif
+// === POISSONDISTR Package ===
 
-#if defined(AE_COMPILE_IGAMMAF) || !defined(AE_PARTIAL_BUILD)
+// === BETAF Package ===
 
-#endif
+// === FRESNEL Package ===
 
-#if defined(AE_COMPILE_CHISQUAREDISTR) || !defined(AE_PARTIAL_BUILD)
+// === PSIF Package ===
 
-#endif
+// === AIRYF Package ===
 
-#if defined(AE_COMPILE_BINOMIALDISTR) || !defined(AE_PARTIAL_BUILD)
+// === DAWSON Package ===
 
-#endif
+// === HERMITE Package ===
 
-#if defined(AE_COMPILE_EXPINTEGRALS) || !defined(AE_PARTIAL_BUILD)
+// === LEGENDRE Package ===
 
-#endif
+// === BESSEL Package ===
 
-#if defined(AE_COMPILE_JACOBIANELLIPTIC) || !defined(AE_PARTIAL_BUILD)
+// === LAGUERRE Package ===
 
-#endif
+// === ELLIPTIC Package ===
+} // end of namespace alglib_impl
 
-#if defined(AE_COMPILE_TRIGINTEGRALS) || !defined(AE_PARTIAL_BUILD)
+// Declarations for the C++ interface.
+namespace alglib {
+// === GAMMAFUNC Package ===
 
-#endif
+// === NORMALDISTR Package ===
 
-#if defined(AE_COMPILE_CHEBYSHEV) || !defined(AE_PARTIAL_BUILD)
+// === IBETAF Package ===
 
-#endif
+// === STUDENTTDISTR Package ===
 
-#if defined(AE_COMPILE_POISSONDISTR) || !defined(AE_PARTIAL_BUILD)
+// === FDISTR Package ===
 
-#endif
+// === IGAMMAF Package ===
 
-#if defined(AE_COMPILE_BETAF) || !defined(AE_PARTIAL_BUILD)
+// === CHISQUAREDISTR Package ===
 
-#endif
+// === BINOMIALDISTR Package ===
 
-#if defined(AE_COMPILE_FRESNEL) || !defined(AE_PARTIAL_BUILD)
+// === EXPINTEGRALS Package ===
 
-#endif
+// === JACOBIANELLIPTIC Package ===
 
-#if defined(AE_COMPILE_PSIF) || !defined(AE_PARTIAL_BUILD)
+// === TRIGINTEGRALS Package ===
 
-#endif
+// === CHEBYSHEV Package ===
 
-#if defined(AE_COMPILE_AIRYF) || !defined(AE_PARTIAL_BUILD)
+// === POISSONDISTR Package ===
 
-#endif
+// === BETAF Package ===
 
-#if defined(AE_COMPILE_DAWSON) || !defined(AE_PARTIAL_BUILD)
+// === FRESNEL Package ===
 
-#endif
+// === PSIF Package ===
 
-#if defined(AE_COMPILE_HERMITE) || !defined(AE_PARTIAL_BUILD)
+// === AIRYF Package ===
 
-#endif
+// === DAWSON Package ===
 
-#if defined(AE_COMPILE_LEGENDRE) || !defined(AE_PARTIAL_BUILD)
+// === HERMITE Package ===
 
-#endif
+// === LEGENDRE Package ===
 
-#if defined(AE_COMPILE_BESSEL) || !defined(AE_PARTIAL_BUILD)
+// === BESSEL Package ===
 
-#endif
+// === LAGUERRE Package ===
 
-#if defined(AE_COMPILE_LAGUERRE) || !defined(AE_PARTIAL_BUILD)
+// === ELLIPTIC Package ===
 
-#endif
-
-#if defined(AE_COMPILE_ELLIPTIC) || !defined(AE_PARTIAL_BUILD)
-
-#endif
-
-#if defined(AE_COMPILE_GAMMAFUNC) || !defined(AE_PARTIAL_BUILD)
+// === GAMMAFUNC Package ===
 // Gamma function
 //
 // Input parameters:
@@ -197,7 +135,6 @@ namespace alglib
 // Original copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Bochkanov Sergey (2005, 2006, 2007).
 double gammafunction(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Natural logarithm of gamma function
 //
@@ -230,9 +167,8 @@ double gammafunction(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1984, 1987, 1989, 1992, 2000 by Stephen L. Moshier
 // Translated to AlgoPascal by Bochkanov Sergey (2005, 2006, 2007).
 double lngamma(const double x, double &sgngam, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_NORMALDISTR) || !defined(AE_PARTIAL_BUILD)
+// === NORMALDISTR Package ===
 // Error function
 //
 // The integral is
@@ -258,7 +194,6 @@ double lngamma(const double x, double &sgngam, const xparams _xparams = alglib::
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double errorfunction(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Complementary error function
 //
@@ -287,10 +222,8 @@ double errorfunction(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double errorfunctionc(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Same as normalcdf(), obsolete name.
 double normaldistribution(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Normal distribution PDF
 //
@@ -303,7 +236,6 @@ double normaldistribution(const double x, const xparams _xparams = alglib::xdefa
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double normalpdf(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Normal distribution CDF
 //
@@ -335,17 +267,14 @@ double normalpdf(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double normalcdf(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse of the error function
 //
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double inverf(const double e, const xparams _xparams = alglib::xdefault);
 
-
 // Same as invnormalcdf(), deprecated name
 double invnormaldistribution(const double y0, const xparams _xparams = alglib::xdefault);
-
 
 // Inverse of Normal CDF
 //
@@ -372,7 +301,6 @@ double invnormaldistribution(const double y0, const xparams _xparams = alglib::x
 // Copyright 1984, 1987, 1988, 1992, 2000 by Stephen L. Moshier
 double invnormalcdf(const double y0, const xparams _xparams = alglib::xdefault);
 
-
 // Bivariate normal PDF
 //
 // Returns probability density function of the bivariate  Gaussian  with
@@ -390,7 +318,6 @@ double invnormalcdf(const double y0, const xparams _xparams = alglib::xdefault);
 //   -- ALGLIB --
 //      Copyright 15.11.2019 by Bochkanov Sergey
 double bivariatenormalpdf(const double x, const double y, const double rho, const xparams _xparams = alglib::xdefault);
-
 
 // Bivariate normal CDF
 //
@@ -426,9 +353,8 @@ double bivariatenormalpdf(const double x, const double y, const double rho, cons
 //   -- ALGLIB --
 //      Copyright 15.11.2019 by Bochkanov Sergey
 double bivariatenormalcdf(const double x, const double y, const double rho, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_IBETAF) || !defined(AE_PARTIAL_BUILD)
+// === IBETAF Package ===
 // Incomplete beta integral
 //
 // Returns incomplete beta integral of the arguments, evaluated
@@ -470,7 +396,6 @@ double bivariatenormalcdf(const double x, const double y, const double rho, cons
 // Copyright 1984, 1995, 2000 by Stephen L. Moshier
 double incompletebeta(const double a, const double b, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse of imcomplete beta integral
 //
 // Given y, the function finds x such that
@@ -498,9 +423,8 @@ double incompletebeta(const double a, const double b, const double x, const xpar
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1996, 2000 by Stephen L. Moshier
 double invincompletebeta(const double a, const double b, const double y, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_STUDENTTDISTR) || !defined(AE_PARTIAL_BUILD)
+// === STUDENTTDISTR Package ===
 // Student's t distribution
 //
 // Computes the integral from minus infinity to t of the Student
@@ -542,7 +466,6 @@ double invincompletebeta(const double a, const double b, const double y, const x
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double studenttdistribution(const ae_int_t k, const double t, const xparams _xparams = alglib::xdefault);
 
-
 // Functional inverse of Student's t distribution
 //
 // Given probability p, finds the argument t such that stdtr(k,t)
@@ -559,9 +482,8 @@ double studenttdistribution(const ae_int_t k, const double t, const xparams _xpa
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invstudenttdistribution(const ae_int_t k, const double p, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_FDISTR) || !defined(AE_PARTIAL_BUILD)
+// === FDISTR Package ===
 // F distribution
 //
 // Returns the area from zero to x under the F density
@@ -593,7 +515,6 @@ double invstudenttdistribution(const ae_int_t k, const double p, const xparams _
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Complemented F distribution
 //
@@ -631,7 +552,6 @@ double fdistribution(const ae_int_t a, const ae_int_t b, const double x, const x
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse of complemented F distribution
 //
 // Finds the F density argument x such that the integral
@@ -666,9 +586,8 @@ double fcdistribution(const ae_int_t a, const ae_int_t b, const double x, const 
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_IGAMMAF) || !defined(AE_PARTIAL_BUILD)
+// === IGAMMAF Package ===
 // Incomplete gamma integral
 //
 // The function is defined by
@@ -697,7 +616,6 @@ double invfdistribution(const ae_int_t a, const ae_int_t b, const double y, cons
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double incompletegamma(const double a, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Complemented incomplete gamma integral
 //
@@ -731,7 +649,6 @@ double incompletegamma(const double a, const double x, const xparams _xparams = 
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double incompletegammac(const double a, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Inverse of complemented imcomplete gamma integral
 //
@@ -768,9 +685,8 @@ double incompletegammac(const double a, const double x, const xparams _xparams =
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invincompletegammac(const double a, const double y0, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_CHISQUAREDISTR) || !defined(AE_PARTIAL_BUILD)
+// === CHISQUAREDISTR Package ===
 // Chi-square distribution
 //
 // Returns the area under the left hand tail (from 0 to x)
@@ -804,7 +720,6 @@ double invincompletegammac(const double a, const double y0, const xparams _xpara
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double chisquaredistribution(const double v, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Complemented Chi-square distribution
 //
 // Returns the area under the right hand tail (from x to
@@ -836,7 +751,6 @@ double chisquaredistribution(const double v, const double x, const xparams _xpar
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double chisquarecdistribution(const double v, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse of complemented Chi-square distribution
 //
 // Finds the Chi-square argument x such that the integral
@@ -856,9 +770,8 @@ double chisquarecdistribution(const double v, const double x, const xparams _xpa
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double invchisquaredistribution(const double v, const double y, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_BINOMIALDISTR) || !defined(AE_PARTIAL_BUILD)
+// === BINOMIALDISTR Package ===
 // Binomial distribution
 //
 // Returns the sum of the terms 0 through k of the Binomial
@@ -889,7 +802,6 @@ double invchisquaredistribution(const double v, const double y, const xparams _x
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = alglib::xdefault);
-
 
 // Complemented binomial distribution
 //
@@ -924,7 +836,6 @@ double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p, 
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse binomial distribution
 //
 // Finds the event probability p such that the sum of the
@@ -952,9 +863,8 @@ double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p,
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_EXPINTEGRALS) || !defined(AE_PARTIAL_BUILD)
+// === EXPINTEGRALS Package ===
 // Exponential integral Ei(x)
 //
 //               x
@@ -979,7 +889,6 @@ double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double 
 // Cephes Math Library Release 2.8:  May, 1999
 // Copyright 1999 by Stephen L. Moshier
 double exponentialintegralei(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Exponential integral En(x)
 //
@@ -1011,9 +920,8 @@ double exponentialintegralei(const double x, const xparams _xparams = alglib::xd
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1985, 2000 by Stephen L. Moshier
 double exponentialintegralen(const double x, const ae_int_t n, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_JACOBIANELLIPTIC) || !defined(AE_PARTIAL_BUILD)
+// === JACOBIANELLIPTIC Package ===
 // Jacobian Elliptic Functions
 //
 // Evaluates the Jacobian elliptic functions sn(u|m), cn(u|m),
@@ -1053,9 +961,8 @@ double exponentialintegralen(const double x, const ae_int_t n, const xparams _xp
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_TRIGINTEGRALS) || !defined(AE_PARTIAL_BUILD)
+// === TRIGINTEGRALS Package ===
 // Sine and cosine integrals
 //
 // Evaluates the integrals
@@ -1094,7 +1001,6 @@ void jacobianellipticfunctions(const double u, const double m, double &sn, doubl
 // Cephes Math Library Release 2.1:  January, 1989
 // Copyright 1984, 1987, 1989 by Stephen L. Moshier
 void sinecosineintegrals(const double x, double &si, double &ci, const xparams _xparams = alglib::xdefault);
-
 
 // Hyperbolic sine and cosine integrals
 //
@@ -1135,9 +1041,8 @@ void sinecosineintegrals(const double x, double &si, double &ci, const xparams _
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_CHEBYSHEV) || !defined(AE_PARTIAL_BUILD)
+// === CHEBYSHEV Package ===
 // Calculation of the value of the Chebyshev polynomials of the
 // first and second kinds.
 //
@@ -1149,7 +1054,6 @@ void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi, con
 // Result:
 //     the value of the Chebyshev polynomial at x
 double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Summation of Chebyshev polynomials using Clenshaw's recurrence formula.
 //
@@ -1168,7 +1072,6 @@ double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x, co
 //     the value of the Chebyshev polynomial at x
 double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Representation of Tn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Input parameters:
@@ -1177,7 +1080,6 @@ double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, 
 // Output parameters:
 //     C   -   coefficients
 void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
-
 
 // Conversion of a series of Chebyshev polynomials to a power series.
 //
@@ -1191,9 +1093,8 @@ void chebyshevcoefficients(const ae_int_t n, real_1d_array &c, const xparams _xp
 // Output parameters
 //     B   -   power series coefficients
 void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_POISSONDISTR) || !defined(AE_PARTIAL_BUILD)
+// === POISSONDISTR Package ===
 // Poisson distribution
 //
 // Returns the sum of the first k+1 terms of the Poisson
@@ -1218,7 +1119,6 @@ void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b, c
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double poissondistribution(const ae_int_t k, const double m, const xparams _xparams = alglib::xdefault);
-
 
 // Complemented Poisson distribution
 //
@@ -1246,7 +1146,6 @@ double poissondistribution(const ae_int_t k, const double m, const xparams _xpar
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double poissoncdistribution(const ae_int_t k, const double m, const xparams _xparams = alglib::xdefault);
 
-
 // Inverse Poisson distribution
 //
 // Finds the Poisson variable x such that the integral
@@ -1265,9 +1164,8 @@ double poissoncdistribution(const ae_int_t k, const double m, const xparams _xpa
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1995, 2000 by Stephen L. Moshier
 double invpoissondistribution(const ae_int_t k, const double y, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_BETAF) || !defined(AE_PARTIAL_BUILD)
+// === BETAF Package ===
 // Beta function
 //
 //
@@ -1289,9 +1187,8 @@ double invpoissondistribution(const ae_int_t k, const double y, const xparams _x
 // Cephes Math Library Release 2.0:  April, 1987
 // Copyright 1984, 1987 by Stephen L. Moshier
 double beta(const double a, const double b, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_FRESNEL) || !defined(AE_PARTIAL_BUILD)
+// === FRESNEL Package ===
 // Fresnel integral
 //
 // Evaluates the Fresnel integrals
@@ -1333,9 +1230,8 @@ double beta(const double a, const double b, const xparams _xparams = alglib::xde
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 void fresnelintegral(const double x, double &c, double &s, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_PSIF) || !defined(AE_PARTIAL_BUILD)
+// === PSIF Package ===
 // Psi (digamma) function
 //
 //              d      -
@@ -1374,9 +1270,8 @@ void fresnelintegral(const double x, double &c, double &s, const xparams _xparam
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1992, 2000 by Stephen L. Moshier
 double psi(const double x, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_AIRYF) || !defined(AE_PARTIAL_BUILD)
+// === AIRYF Package ===
 // Airy function
 //
 // Solution of the differential equation
@@ -1408,9 +1303,8 @@ double psi(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 void airy(const double x, double &ai, double &aip, double &bi, double &bip, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_DAWSON) || !defined(AE_PARTIAL_BUILD)
+// === DAWSON Package ===
 // Dawson's Integral
 //
 // Approximates the integral
@@ -1435,9 +1329,8 @@ void airy(const double x, double &ai, double &aip, double &bi, double &bip, cons
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double dawsonintegral(const double x, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_HERMITE) || !defined(AE_PARTIAL_BUILD)
+// === HERMITE Package ===
 // Calculation of the value of the Hermite polynomial.
 //
 // Parameters:
@@ -1447,7 +1340,6 @@ double dawsonintegral(const double x, const xparams _xparams = alglib::xdefault)
 // Result:
 //     the value of the Hermite polynomial Hn at x
 double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Summation of Hermite polynomials using Clenshaw's recurrence formula.
 //
@@ -1462,7 +1354,6 @@ double hermitecalculate(const ae_int_t n, const double x, const xparams _xparams
 //     the value of the Hermite polynomial at x
 double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Representation of Hn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Input parameters:
@@ -1471,9 +1362,8 @@ double hermitesum(const real_1d_array &c, const ae_int_t n, const double x, cons
 // Output parameters:
 //     C   -   coefficients
 void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_LEGENDRE) || !defined(AE_PARTIAL_BUILD)
+// === LEGENDRE Package ===
 // Calculation of the value of the Legendre polynomial Pn.
 //
 // Parameters:
@@ -1483,7 +1373,6 @@ void hermitecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xpar
 // Result:
 //     the value of the Legendre polynomial Pn at x
 double legendrecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Summation of Legendre polynomials using Clenshaw's recurrence formula.
 //
@@ -1498,7 +1387,6 @@ double legendrecalculate(const ae_int_t n, const double x, const xparams _xparam
 //     the value of the Legendre polynomial at x
 double legendresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Representation of Pn as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Input parameters:
@@ -1507,9 +1395,8 @@ double legendresum(const real_1d_array &c, const ae_int_t n, const double x, con
 // Output parameters:
 //     C   -   coefficients
 void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_BESSEL) || !defined(AE_PARTIAL_BUILD)
+// === BESSEL Package ===
 // Bessel function of order zero
 //
 // Returns Bessel function of order zero of the argument.
@@ -1540,7 +1427,6 @@ void legendrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xpa
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double besselj0(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Bessel function of order one
 //
 // Returns Bessel function of order one of the argument.
@@ -1560,7 +1446,6 @@ double besselj0(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double besselj1(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Bessel function of integer order
 //
@@ -1588,7 +1473,6 @@ double besselj1(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besseljn(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Bessel function of the second kind, order zero
 //
@@ -1618,7 +1502,6 @@ double besseljn(const ae_int_t n, const double x, const xparams _xparams = algli
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double bessely0(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Bessel function of second kind of order one
 //
 // Returns Bessel function of the second kind of order one
@@ -1639,7 +1522,6 @@ double bessely0(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double bessely1(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Bessel function of second kind of integer order
 //
@@ -1663,7 +1545,6 @@ double bessely1(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselyn(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Modified Bessel function of order zero
 //
 // Returns modified Bessel function of order zero of the
@@ -1684,7 +1565,6 @@ double besselyn(const ae_int_t n, const double x, const xparams _xparams = algli
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besseli0(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Modified Bessel function of order one
 //
@@ -1707,7 +1587,6 @@ double besseli0(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1985, 1987, 2000 by Stephen L. Moshier
 double besseli1(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Modified Bessel function, second kind, order zero
 //
 // Returns modified Bessel function of the second kind
@@ -1729,7 +1608,6 @@ double besseli1(const double x, const xparams _xparams = alglib::xdefault);
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselk0(const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Modified Bessel function, second kind, order one
 //
 // Computes the modified Bessel function of the second kind
@@ -1748,7 +1626,6 @@ double besselk0(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double besselk1(const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Modified Bessel function, second kind, integer order
 //
@@ -1771,9 +1648,8 @@ double besselk1(const double x, const xparams _xparams = alglib::xdefault);
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1988, 2000 by Stephen L. Moshier
 double besselkn(const ae_int_t nn, const double x, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_LAGUERRE) || !defined(AE_PARTIAL_BUILD)
+// === LAGUERRE Package ===
 // Calculation of the value of the Laguerre polynomial.
 //
 // Parameters:
@@ -1783,7 +1659,6 @@ double besselkn(const ae_int_t nn, const double x, const xparams _xparams = algl
 // Result:
 //     the value of the Laguerre polynomial Ln at x
 double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
-
 
 // Summation of Laguerre polynomials using Clenshaw's recurrence formula.
 //
@@ -1797,7 +1672,6 @@ double laguerrecalculate(const ae_int_t n, const double x, const xparams _xparam
 //     the value of the Laguerre polynomial at x
 double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, const xparams _xparams = alglib::xdefault);
 
-
 // Representation of Ln as C[0] + C[1]*X + ... + C[N]*X^N
 //
 // Input parameters:
@@ -1806,9 +1680,8 @@ double laguerresum(const real_1d_array &c, const ae_int_t n, const double x, con
 // Output parameters:
 //     C   -   coefficients
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_ELLIPTIC) || !defined(AE_PARTIAL_BUILD)
+// === ELLIPTIC Package ===
 // Complete elliptic integral of the first kind
 //
 // Approximates the integral
@@ -1838,7 +1711,6 @@ void laguerrecoefficients(const ae_int_t n, real_1d_array &c, const xparams _xpa
 // Cephes Math Library, Release 2.8:  June, 2000
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double ellipticintegralk(const double m, const xparams _xparams = alglib::xdefault);
-
 
 // Complete elliptic integral of the first kind
 //
@@ -1876,7 +1748,6 @@ double ellipticintegralk(const double m, const xparams _xparams = alglib::xdefau
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double ellipticintegralkhighprecision(const double m1, const xparams _xparams = alglib::xdefault);
 
-
 // Incomplete elliptic integral of the first kind F(phi|m)
 //
 // Approximates the integral
@@ -1911,7 +1782,6 @@ double ellipticintegralkhighprecision(const double m1, const xparams _xparams = 
 // Copyright 1984, 1987, 2000 by Stephen L. Moshier
 double incompleteellipticintegralk(const double phi, const double m, const xparams _xparams = alglib::xdefault);
 
-
 // Complete elliptic integral of the second kind
 //
 // Approximates the integral
@@ -1938,7 +1808,6 @@ double incompleteellipticintegralk(const double phi, const double m, const xpara
 // Cephes Math Library, Release 2.8: June, 2000
 // Copyright 1984, 1987, 1989, 2000 by Stephen L. Moshier
 double ellipticintegrale(const double m, const xparams _xparams = alglib::xdefault);
-
 
 // Incomplete elliptic integral of the second kind
 //
@@ -1969,21 +1838,15 @@ double ellipticintegrale(const double m, const xparams _xparams = alglib::xdefau
 // Cephes Math Library Release 2.8:  June, 2000
 // Copyright 1984, 1987, 1993, 2000 by Stephen L. Moshier
 double incompleteellipticintegrale(const double phi, const double m, const xparams _xparams = alglib::xdefault);
-#endif
-}
+} // end of namespace alglib
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (FUNCTIONS)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_GAMMAFUNC) || !defined(AE_PARTIAL_BUILD)
+// Declarations for the computational core: functions.
+namespace alglib_impl {
+// === GAMMAFUNC Package ===
 double gammafunction(double x, ae_state *_state);
-double lngamma(double x, double* sgngam, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_NORMALDISTR) || !defined(AE_PARTIAL_BUILD)
+double lngamma(double x, double *sgngam, ae_state *_state);
+
+// === NORMALDISTR Package ===
 double errorfunction(double x, ae_state *_state);
 double errorfunctionc(double x, ae_state *_state);
 double normaldistribution(double x, ae_state *_state);
@@ -1992,142 +1855,85 @@ double normalcdf(double x, ae_state *_state);
 double inverf(double e, ae_state *_state);
 double invnormaldistribution(double y0, ae_state *_state);
 double invnormalcdf(double y0, ae_state *_state);
-double bivariatenormalpdf(double x,
-     double y,
-     double rho,
-     ae_state *_state);
-double bivariatenormalcdf(double x,
-     double y,
-     double rho,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_IBETAF) || !defined(AE_PARTIAL_BUILD)
+double bivariatenormalpdf(double x, double y, double rho, ae_state *_state);
+double bivariatenormalcdf(double x, double y, double rho, ae_state *_state);
+
+// === IBETAF Package ===
 double incompletebeta(double a, double b, double x, ae_state *_state);
 double invincompletebeta(double a, double b, double y, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_STUDENTTDISTR) || !defined(AE_PARTIAL_BUILD)
+
+// === STUDENTTDISTR Package ===
 double studenttdistribution(ae_int_t k, double t, ae_state *_state);
 double invstudenttdistribution(ae_int_t k, double p, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_FDISTR) || !defined(AE_PARTIAL_BUILD)
+
+// === FDISTR Package ===
 double fdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state);
 double fcdistribution(ae_int_t a, ae_int_t b, double x, ae_state *_state);
-double invfdistribution(ae_int_t a,
-     ae_int_t b,
-     double y,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_IGAMMAF) || !defined(AE_PARTIAL_BUILD)
+double invfdistribution(ae_int_t a, ae_int_t b, double y, ae_state *_state);
+
+// === IGAMMAF Package ===
 double incompletegamma(double a, double x, ae_state *_state);
 double incompletegammac(double a, double x, ae_state *_state);
 double invincompletegammac(double a, double y0, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_CHISQUAREDISTR) || !defined(AE_PARTIAL_BUILD)
+
+// === CHISQUAREDISTR Package ===
 double chisquaredistribution(double v, double x, ae_state *_state);
 double chisquarecdistribution(double v, double x, ae_state *_state);
 double invchisquaredistribution(double v, double y, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_BINOMIALDISTR) || !defined(AE_PARTIAL_BUILD)
-double binomialdistribution(ae_int_t k,
-     ae_int_t n,
-     double p,
-     ae_state *_state);
-double binomialcdistribution(ae_int_t k,
-     ae_int_t n,
-     double p,
-     ae_state *_state);
-double invbinomialdistribution(ae_int_t k,
-     ae_int_t n,
-     double y,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_EXPINTEGRALS) || !defined(AE_PARTIAL_BUILD)
+
+// === BINOMIALDISTR Package ===
+double binomialdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state);
+double binomialcdistribution(ae_int_t k, ae_int_t n, double p, ae_state *_state);
+double invbinomialdistribution(ae_int_t k, ae_int_t n, double y, ae_state *_state);
+
+// === EXPINTEGRALS Package ===
 double exponentialintegralei(double x, ae_state *_state);
 double exponentialintegralen(double x, ae_int_t n, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_JACOBIANELLIPTIC) || !defined(AE_PARTIAL_BUILD)
-void jacobianellipticfunctions(double u,
-     double m,
-     double* sn,
-     double* cn,
-     double* dn,
-     double* ph,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_TRIGINTEGRALS) || !defined(AE_PARTIAL_BUILD)
-void sinecosineintegrals(double x,
-     double* si,
-     double* ci,
-     ae_state *_state);
-void hyperbolicsinecosineintegrals(double x,
-     double* shi,
-     double* chi,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_CHEBYSHEV) || !defined(AE_PARTIAL_BUILD)
-double chebyshevcalculate(ae_int_t r,
-     ae_int_t n,
-     double x,
-     ae_state *_state);
-double chebyshevsum(RVector * c,
-     ae_int_t r,
-     ae_int_t n,
-     double x,
-     ae_state *_state);
-void chebyshevcoefficients(ae_int_t n,
-     RVector * c,
-     ae_state *_state);
-void fromchebyshev(RVector * a,
-     ae_int_t n,
-     RVector * b,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_POISSONDISTR) || !defined(AE_PARTIAL_BUILD)
+
+// === JACOBIANELLIPTIC Package ===
+void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph, ae_state *_state);
+
+// === TRIGINTEGRALS Package ===
+void sinecosineintegrals(double x, double *si, double *ci, ae_state *_state);
+void hyperbolicsinecosineintegrals(double x, double *shi, double *chi, ae_state *_state);
+
+// === CHEBYSHEV Package ===
+double chebyshevcalculate(ae_int_t r, ae_int_t n, double x, ae_state *_state);
+double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x, ae_state *_state);
+void chebyshevcoefficients(ae_int_t n, RVector *c, ae_state *_state);
+void fromchebyshev(RVector *a, ae_int_t n, RVector *b, ae_state *_state);
+
+// === POISSONDISTR Package ===
 double poissondistribution(ae_int_t k, double m, ae_state *_state);
 double poissoncdistribution(ae_int_t k, double m, ae_state *_state);
 double invpoissondistribution(ae_int_t k, double y, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_BETAF) || !defined(AE_PARTIAL_BUILD)
+
+// === BETAF Package ===
 double beta(double a, double b, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_FRESNEL) || !defined(AE_PARTIAL_BUILD)
-void fresnelintegral(double x, double* c, double* s, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_PSIF) || !defined(AE_PARTIAL_BUILD)
+
+// === FRESNEL Package ===
+void fresnelintegral(double x, double *c, double *s, ae_state *_state);
+
+// === PSIF Package ===
 double psi(double x, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_AIRYF) || !defined(AE_PARTIAL_BUILD)
-void airy(double x,
-     double* ai,
-     double* aip,
-     double* bi,
-     double* bip,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_DAWSON) || !defined(AE_PARTIAL_BUILD)
+
+// === AIRYF Package ===
+void airy(double x, double *ai, double *aip, double *bi, double *bip, ae_state *_state);
+
+// === DAWSON Package ===
 double dawsonintegral(double x, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_HERMITE) || !defined(AE_PARTIAL_BUILD)
+
+// === HERMITE Package ===
 double hermitecalculate(ae_int_t n, double x, ae_state *_state);
-double hermitesum(RVector * c,
-     ae_int_t n,
-     double x,
-     ae_state *_state);
-void hermitecoefficients(ae_int_t n,
-     RVector * c,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_LEGENDRE) || !defined(AE_PARTIAL_BUILD)
+double hermitesum(RVector *c, ae_int_t n, double x, ae_state *_state);
+void hermitecoefficients(ae_int_t n, RVector *c, ae_state *_state);
+
+// === LEGENDRE Package ===
 double legendrecalculate(ae_int_t n, double x, ae_state *_state);
-double legendresum(RVector * c,
-     ae_int_t n,
-     double x,
-     ae_state *_state);
-void legendrecoefficients(ae_int_t n,
-     RVector * c,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_BESSEL) || !defined(AE_PARTIAL_BUILD)
+double legendresum(RVector *c, ae_int_t n, double x, ae_state *_state);
+void legendrecoefficients(ae_int_t n, RVector *c, ae_state *_state);
+
+// === BESSEL Package ===
 double besselj0(double x, ae_state *_state);
 double besselj1(double x, ae_state *_state);
 double besseljn(ae_int_t n, double x, ae_state *_state);
@@ -2139,25 +1945,18 @@ double besseli1(double x, ae_state *_state);
 double besselk0(double x, ae_state *_state);
 double besselk1(double x, ae_state *_state);
 double besselkn(ae_int_t nn, double x, ae_state *_state);
-#endif
-#if defined(AE_COMPILE_LAGUERRE) || !defined(AE_PARTIAL_BUILD)
+
+// === LAGUERRE Package ===
 double laguerrecalculate(ae_int_t n, double x, ae_state *_state);
-double laguerresum(RVector * c,
-     ae_int_t n,
-     double x,
-     ae_state *_state);
-void laguerrecoefficients(ae_int_t n,
-     RVector * c,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_ELLIPTIC) || !defined(AE_PARTIAL_BUILD)
+double laguerresum(RVector *c, ae_int_t n, double x, ae_state *_state);
+void laguerrecoefficients(ae_int_t n, RVector *c, ae_state *_state);
+
+// === ELLIPTIC Package ===
 double ellipticintegralk(double m, ae_state *_state);
 double ellipticintegralkhighprecision(double m1, ae_state *_state);
 double incompleteellipticintegralk(double phi, double m, ae_state *_state);
 double ellipticintegrale(double m, ae_state *_state);
 double incompleteellipticintegrale(double phi, double m, ae_state *_state);
-#endif
+} // end of namespace alglib_impl
 
-}
-#endif
-
+#endif // OnceOnly

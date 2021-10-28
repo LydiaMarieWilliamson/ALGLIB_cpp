@@ -1,134 +1,110 @@
-// ALGLIB 3.18.0 (source code generated 2021-10-25)
-// Copyright (c) Sergey Bochkanov (ALGLIB project).
+// ALGLIB++
+// Based on ALGLIB: Copyright (c) Sergey Bochkanov (ALGLIB project).
+// Revisions Copyright (c) Lydia Marie Williamson, Mark Hopkins Consulting
+// Source License:
+//	This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+//	as published by the Free Software Foundation (www.fsf.org);
+//	either version 2 of the License, or (at your option) any later version.
 //
-// >>> SOURCE LICENSE >>>
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation (www.fsf.org); either version 2 of the
-// License, or (at your option) any later version.
+//	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//	See the GNU General Public License for more details.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// A copy of the GNU General Public License is available at
-// http://www.fsf.org/licensing/licenses
-// >>> END OF LICENSE >>>
-#ifndef _diffequations_pkg_h
-#define _diffequations_pkg_h
+//	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
+#ifndef OnceOnlyDiffEquations_h
+#define OnceOnlyDiffEquations_h
+
 #include "Ap.h"
 #include "AlgLibInternal.h"
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (DATATYPES)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
-typedef struct
-{
-    ae_int_t n;
-    ae_int_t m;
-    double xscale;
-    double h;
-    double eps;
-    ae_bool fraceps;
-    ae_vector yc;
-    ae_vector escale;
-    ae_vector xg;
-    ae_int_t solvertype;
-    ae_bool needdy;
-    double x;
-    ae_vector y;
-    ae_vector dy;
-    ae_matrix ytbl;
-    ae_int_t repterminationtype;
-    ae_int_t repnfev;
-    ae_vector yn;
-    ae_vector yns;
-    ae_vector rka;
-    ae_vector rkc;
-    ae_vector rkcs;
-    ae_matrix rkb;
-    ae_matrix rkk;
-    rcommstate rstate;
+// Declarations for the computational core: datatypes.
+namespace alglib_impl {
+// === ODESOLVER Package ===
+typedef struct {
+   ae_int_t n;
+   ae_int_t m;
+   double xscale;
+   double h;
+   double eps;
+   ae_bool fraceps;
+   ae_vector yc;
+   ae_vector escale;
+   ae_vector xg;
+   ae_int_t solvertype;
+   ae_bool needdy;
+   double x;
+   ae_vector y;
+   ae_vector dy;
+   ae_matrix ytbl;
+   ae_int_t repterminationtype;
+   ae_int_t repnfev;
+   ae_vector yn;
+   ae_vector yns;
+   ae_vector rka;
+   ae_vector rkc;
+   ae_vector rkcs;
+   ae_matrix rkb;
+   ae_matrix rkk;
+   rcommstate rstate;
 } odesolverstate;
-typedef struct
-{
-    ae_int_t nfev;
-    ae_int_t terminationtype;
+typedef struct {
+   ae_int_t nfev;
+   ae_int_t terminationtype;
 } odesolverreport;
-#endif
+} // end of namespace alglib_impl
 
-}
-
-/////////////////////////////////////////////////////////////////////////
+// Declarations for the C++ interface.
+namespace alglib {
+// === ODESOLVER Package ===
 //
-// THIS SECTION CONTAINS C++ INTERFACE
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib
-{
-
-#if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
-//
-class _odesolverstate_owner
-{
+class _odesolverstate_owner {
 public:
-    _odesolverstate_owner();
-    _odesolverstate_owner(const _odesolverstate_owner &rhs);
-    _odesolverstate_owner& operator=(const _odesolverstate_owner &rhs);
-    virtual ~_odesolverstate_owner();
-    alglib_impl::odesolverstate* c_ptr();
-    alglib_impl::odesolverstate* c_ptr() const;
+   _odesolverstate_owner();
+   _odesolverstate_owner(const _odesolverstate_owner &rhs);
+   _odesolverstate_owner &operator=(const _odesolverstate_owner &rhs);
+   virtual ~_odesolverstate_owner();
+   alglib_impl::odesolverstate *c_ptr();
+   alglib_impl::odesolverstate *c_ptr() const;
 protected:
-    alglib_impl::odesolverstate *p_struct;
+   alglib_impl::odesolverstate *p_struct;
 };
-class odesolverstate : public _odesolverstate_owner
-{
+class odesolverstate: public _odesolverstate_owner {
 public:
-    odesolverstate();
-    odesolverstate(const odesolverstate &rhs);
-    odesolverstate& operator=(const odesolverstate &rhs);
-    virtual ~odesolverstate();
-    ae_bool &needdy;
-    real_1d_array y;
-    real_1d_array dy;
-    double &x;
+   odesolverstate();
+   odesolverstate(const odesolverstate &rhs);
+   odesolverstate &operator=(const odesolverstate &rhs);
+   virtual ~odesolverstate();
+   ae_bool &needdy;
+   real_1d_array y;
+   real_1d_array dy;
+   double &x;
 
 };
-
 
 //
-class _odesolverreport_owner
-{
+class _odesolverreport_owner {
 public:
-    _odesolverreport_owner();
-    _odesolverreport_owner(const _odesolverreport_owner &rhs);
-    _odesolverreport_owner& operator=(const _odesolverreport_owner &rhs);
-    virtual ~_odesolverreport_owner();
-    alglib_impl::odesolverreport* c_ptr();
-    alglib_impl::odesolverreport* c_ptr() const;
+   _odesolverreport_owner();
+   _odesolverreport_owner(const _odesolverreport_owner &rhs);
+   _odesolverreport_owner &operator=(const _odesolverreport_owner &rhs);
+   virtual ~_odesolverreport_owner();
+   alglib_impl::odesolverreport *c_ptr();
+   alglib_impl::odesolverreport *c_ptr() const;
 protected:
-    alglib_impl::odesolverreport *p_struct;
+   alglib_impl::odesolverreport *p_struct;
 };
-class odesolverreport : public _odesolverreport_owner
-{
+class odesolverreport: public _odesolverreport_owner {
 public:
-    odesolverreport();
-    odesolverreport(const odesolverreport &rhs);
-    odesolverreport& operator=(const odesolverreport &rhs);
-    virtual ~odesolverreport();
-    ae_int_t &nfev;
-    ae_int_t &terminationtype;
+   odesolverreport();
+   odesolverreport(const odesolverreport &rhs);
+   odesolverreport &operator=(const odesolverreport &rhs);
+   virtual ~odesolverreport();
+   ae_int_t &nfev;
+   ae_int_t &terminationtype;
 
 };
-#endif
 
-#if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
+// === ODESOLVER Package ===
 // Cash-Karp adaptive ODE solver.
 //
 // This subroutine solves ODE  Y'=f(Y,x)  with  initial  conditions  Y(xs)=Ys
@@ -177,12 +153,10 @@ public:
 void odesolverrkck(const real_1d_array &y, const ae_int_t n, const real_1d_array &x, const ae_int_t m, const double eps, const double h, odesolverstate &state, const xparams _xparams = alglib::xdefault);
 void odesolverrkck(const real_1d_array &y, const real_1d_array &x, const double eps, const double h, odesolverstate &state, const xparams _xparams = alglib::xdefault);
 
-
 // This function provides reverse communication interface
 // Reverse communication interface is not documented or recommended to use.
 // See below for functions which provide better documented API
 bool odesolveriteration(const odesolverstate &state, const xparams _xparams = alglib::xdefault);
-
 
 // This function is used to launcn iterations of ODE solver
 //
@@ -194,10 +168,7 @@ bool odesolveriteration(const odesolverstate &state, const xparams _xparams = al
 //   -- ALGLIB --
 //      Copyright 01.09.2009 by Bochkanov Sergey
 //
-void odesolversolve(odesolverstate &state,
-    void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr),
-    void *ptr = NULL, const xparams _xparams = alglib::xdefault);
-
+void odesolversolve(odesolverstate &state, void (*diff)(const real_1d_array &y, double x, real_1d_array &dy, void *ptr), void *ptr = NULL, const xparams _xparams = alglib::xdefault);
 
 // ODE solver results
 //
@@ -221,42 +192,22 @@ void odesolversolve(odesolverstate &state,
 //   -- ALGLIB --
 //      Copyright 01.09.2009 by Bochkanov Sergey
 void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &xtbl, real_2d_array &ytbl, odesolverreport &rep, const xparams _xparams = alglib::xdefault);
-#endif
-}
+} // end of namespace alglib
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (FUNCTIONS)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_ODESOLVER) || !defined(AE_PARTIAL_BUILD)
-void odesolverrkck(RVector * y,
-     ae_int_t n,
-     RVector * x,
-     ae_int_t m,
-     double eps,
-     double h,
-     odesolverstate* state,
-     ae_state *_state);
-ae_bool odesolveriteration(odesolverstate* state, ae_state *_state);
-void odesolverresults(odesolverstate* state,
-     ae_int_t* m,
-     RVector * xtbl,
-     RMatrix * ytbl,
-     odesolverreport* rep,
-     ae_state *_state);
-void _odesolverstate_init(void* _p, ae_state *_state, ae_bool make_automatic);
-void _odesolverstate_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
-void _odesolverstate_clear(void* _p);
-void _odesolverstate_destroy(void* _p);
-void _odesolverreport_init(void* _p, ae_state *_state, ae_bool make_automatic);
-void _odesolverreport_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
-void _odesolverreport_clear(void* _p);
-void _odesolverreport_destroy(void* _p);
-#endif
+// Declarations for the computational core: functions.
+namespace alglib_impl {
+// === ODESOLVER Package ===
+void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
+ae_bool odesolveriteration(odesolverstate *state, ae_state *_state);
+void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state);
+void _odesolverstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
+void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _odesolverstate_clear(void *_p);
+void _odesolverstate_destroy(void *_p);
+void _odesolverreport_init(void *_p, ae_state *_state, ae_bool make_automatic);
+void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _odesolverreport_clear(void *_p);
+void _odesolverreport_destroy(void *_p);
+} // end of namespace alglib_impl
 
-}
-#endif
-
+#endif // OnceOnly

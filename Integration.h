@@ -1,110 +1,87 @@
-// ALGLIB 3.18.0 (source code generated 2021-10-25)
-// Copyright (c) Sergey Bochkanov (ALGLIB project).
+// ALGLIB++
+// Based on ALGLIB: Copyright (c) Sergey Bochkanov (ALGLIB project).
+// Revisions Copyright (c) Lydia Marie Williamson, Mark Hopkins Consulting
+// Source License:
+//	This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+//	as published by the Free Software Foundation (www.fsf.org);
+//	either version 2 of the License, or (at your option) any later version.
 //
-// >>> SOURCE LICENSE >>>
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation (www.fsf.org); either version 2 of the
-// License, or (at your option) any later version.
+//	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//	without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//	See the GNU General Public License for more details.
 //
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// A copy of the GNU General Public License is available at
-// http://www.fsf.org/licensing/licenses
-// >>> END OF LICENSE >>>
-#ifndef _integration_pkg_h
-#define _integration_pkg_h
+//	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
+#ifndef OnceOnlyIntegration_h
+#define OnceOnlyIntegration_h
+
 #include "Ap.h"
 #include "AlgLibInternal.h"
 #include "AlgLibMisc.h"
 #include "LinAlg.h"
 #include "SpecialFunctions.h"
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (DATATYPES)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
-#endif
-#if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
-typedef struct
-{
-    ae_int_t terminationtype;
-    ae_int_t nfev;
-    ae_int_t nintervals;
+// Declarations for the computational core: datatypes.
+namespace alglib_impl {
+// === GQ Package ===
+
+// === GKQ Package ===
+
+// === AUTOGK Package ===
+typedef struct {
+   ae_int_t terminationtype;
+   ae_int_t nfev;
+   ae_int_t nintervals;
 } autogkreport;
-typedef struct
-{
-    double a;
-    double b;
-    double eps;
-    double xwidth;
-    double x;
-    double f;
-    ae_int_t info;
-    double r;
-    ae_matrix heap;
-    ae_int_t heapsize;
-    ae_int_t heapwidth;
-    ae_int_t heapused;
-    double sumerr;
-    double sumabs;
-    ae_vector qn;
-    ae_vector wg;
-    ae_vector wk;
-    ae_vector wr;
-    ae_int_t n;
-    rcommstate rstate;
+typedef struct {
+   double a;
+   double b;
+   double eps;
+   double xwidth;
+   double x;
+   double f;
+   ae_int_t info;
+   double r;
+   ae_matrix heap;
+   ae_int_t heapsize;
+   ae_int_t heapwidth;
+   ae_int_t heapused;
+   double sumerr;
+   double sumabs;
+   ae_vector qn;
+   ae_vector wg;
+   ae_vector wk;
+   ae_vector wr;
+   ae_int_t n;
+   rcommstate rstate;
 } autogkinternalstate;
-typedef struct
-{
-    double a;
-    double b;
-    double alpha;
-    double beta;
-    double xwidth;
-    double x;
-    double xminusa;
-    double bminusx;
-    ae_bool needf;
-    double f;
-    ae_int_t wrappermode;
-    autogkinternalstate internalstate;
-    rcommstate rstate;
-    double v;
-    ae_int_t terminationtype;
-    ae_int_t nfev;
-    ae_int_t nintervals;
+typedef struct {
+   double a;
+   double b;
+   double alpha;
+   double beta;
+   double xwidth;
+   double x;
+   double xminusa;
+   double bminusx;
+   ae_bool needf;
+   double f;
+   ae_int_t wrappermode;
+   autogkinternalstate internalstate;
+   rcommstate rstate;
+   double v;
+   ae_int_t terminationtype;
+   ae_int_t nfev;
+   ae_int_t nintervals;
 } autogkstate;
-#endif
+} // end of namespace alglib_impl
 
-}
+// Declarations for the C++ interface.
+namespace alglib {
+// === GQ Package ===
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS C++ INTERFACE
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib
-{
+// === GKQ Package ===
 
-#if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
-
-#endif
-
-#if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
-
-#endif
-
-#if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
+// === AUTOGK Package ===
 // Integration report:
 // * TerminationType = completetion code:
 //     * -5    non-convergence of Gauss-Kronrod nodes
@@ -114,31 +91,28 @@ namespace alglib
 // * Rep.NFEV countains number of function calculations
 // * Rep.NIntervals contains number of intervals [a,b]
 //   was partitioned into.
-class _autogkreport_owner
-{
+class _autogkreport_owner {
 public:
-    _autogkreport_owner();
-    _autogkreport_owner(const _autogkreport_owner &rhs);
-    _autogkreport_owner& operator=(const _autogkreport_owner &rhs);
-    virtual ~_autogkreport_owner();
-    alglib_impl::autogkreport* c_ptr();
-    alglib_impl::autogkreport* c_ptr() const;
+   _autogkreport_owner();
+   _autogkreport_owner(const _autogkreport_owner &rhs);
+   _autogkreport_owner &operator=(const _autogkreport_owner &rhs);
+   virtual ~_autogkreport_owner();
+   alglib_impl::autogkreport *c_ptr();
+   alglib_impl::autogkreport *c_ptr() const;
 protected:
-    alglib_impl::autogkreport *p_struct;
+   alglib_impl::autogkreport *p_struct;
 };
-class autogkreport : public _autogkreport_owner
-{
+class autogkreport: public _autogkreport_owner {
 public:
-    autogkreport();
-    autogkreport(const autogkreport &rhs);
-    autogkreport& operator=(const autogkreport &rhs);
-    virtual ~autogkreport();
-    ae_int_t &terminationtype;
-    ae_int_t &nfev;
-    ae_int_t &nintervals;
+   autogkreport();
+   autogkreport(const autogkreport &rhs);
+   autogkreport &operator=(const autogkreport &rhs);
+   virtual ~autogkreport();
+   ae_int_t &terminationtype;
+   ae_int_t &nfev;
+   ae_int_t &nintervals;
 
 };
-
 
 // This structure stores state of the integration algorithm.
 //
@@ -147,35 +121,32 @@ public:
 // * autogksmooth()/AutoGKSmoothW()/... to create objects
 // * autogkintegrate() to begin integration
 // * autogkresults() to get results
-class _autogkstate_owner
-{
+class _autogkstate_owner {
 public:
-    _autogkstate_owner();
-    _autogkstate_owner(const _autogkstate_owner &rhs);
-    _autogkstate_owner& operator=(const _autogkstate_owner &rhs);
-    virtual ~_autogkstate_owner();
-    alglib_impl::autogkstate* c_ptr();
-    alglib_impl::autogkstate* c_ptr() const;
+   _autogkstate_owner();
+   _autogkstate_owner(const _autogkstate_owner &rhs);
+   _autogkstate_owner &operator=(const _autogkstate_owner &rhs);
+   virtual ~_autogkstate_owner();
+   alglib_impl::autogkstate *c_ptr();
+   alglib_impl::autogkstate *c_ptr() const;
 protected:
-    alglib_impl::autogkstate *p_struct;
+   alglib_impl::autogkstate *p_struct;
 };
-class autogkstate : public _autogkstate_owner
-{
+class autogkstate: public _autogkstate_owner {
 public:
-    autogkstate();
-    autogkstate(const autogkstate &rhs);
-    autogkstate& operator=(const autogkstate &rhs);
-    virtual ~autogkstate();
-    ae_bool &needf;
-    double &x;
-    double &xminusa;
-    double &bminusx;
-    double &f;
+   autogkstate();
+   autogkstate(const autogkstate &rhs);
+   autogkstate &operator=(const autogkstate &rhs);
+   virtual ~autogkstate();
+   ae_bool &needf;
+   double &x;
+   double &xminusa;
+   double &bminusx;
+   double &f;
 
 };
-#endif
 
-#if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
+// === GQ Package ===
 // Computation of nodes and weights for a Gauss quadrature formula
 //
 // The algorithm generates the N-point Gauss quadrature formula  with  weight
@@ -211,7 +182,6 @@ public:
 //   -- ALGLIB --
 //      Copyright 2005-2009 by Bochkanov Sergey
 void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
-
 
 // Computation of nodes and weights for a Gauss-Lobatto quadrature formula
 //
@@ -252,7 +222,6 @@ void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const 
 //      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const double b, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
 
-
 // Computation of nodes and weights for a Gauss-Radau quadrature formula
 //
 // The algorithm generates the N-point Gauss-Radau  quadrature  formula  with
@@ -292,7 +261,6 @@ void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &
 //      Copyright 2005-2009 by Bochkanov Sergey
 void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const double a, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
 
-
 // Returns nodes/weights for Gauss-Legendre quadrature on [-1,1] with N
 // nodes.
 //
@@ -316,7 +284,6 @@ void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &be
 //   -- ALGLIB --
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
-
 
 // Returns  nodes/weights  for  Gauss-Jacobi quadrature on [-1,1] with weight
 // function W(x)=Power(1-x,Alpha)*Power(1+x,Beta).
@@ -345,7 +312,6 @@ void gqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x,
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
 
-
 // Returns  nodes/weights  for  Gauss-Laguerre  quadrature  on  [0,+inf) with
 // weight function W(x)=Power(x,Alpha)*Exp(-x)
 //
@@ -372,7 +338,6 @@ void gqgenerategaussjacobi(const ae_int_t n, const double alpha, const double be
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
 
-
 // Returns  nodes/weights  for  Gauss-Hermite  quadrature on (-inf,+inf) with
 // weight function W(x)=Exp(-x*x)
 //
@@ -395,9 +360,8 @@ void gqgenerategausslaguerre(const ae_int_t n, const double alpha, ae_int_t &inf
 //   -- ALGLIB --
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &w, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
+// === GKQ Package ===
 // Computation of nodes and weights of a Gauss-Kronrod quadrature formula
 //
 // The algorithm generates the N-point Gauss-Kronrod quadrature formula  with
@@ -444,7 +408,6 @@ void gqgenerategausshermite(const ae_int_t n, ae_int_t &info, real_1d_array &x, 
 //      Copyright 08.05.2009 by Bochkanov Sergey
 void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const double mu0, const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = alglib::xdefault);
 
-
 // Returns   Gauss   and   Gauss-Kronrod   nodes/weights  for  Gauss-Legendre
 // quadrature with N points.
 //
@@ -473,7 +436,6 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
 //   -- ALGLIB --
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = alglib::xdefault);
-
 
 // Returns   Gauss   and   Gauss-Kronrod   nodes/weights   for   Gauss-Jacobi
 // quadrature on [-1,1] with weight function
@@ -511,7 +473,6 @@ void gkqgenerategausslegendre(const ae_int_t n, ae_int_t &info, real_1d_array &x
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double beta, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = alglib::xdefault);
 
-
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N points.
 //
 // Reduction to tridiagonal eigenproblem is used.
@@ -538,7 +499,6 @@ void gkqgenerategaussjacobi(const ae_int_t n, const double alpha, const double b
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, const xparams _xparams = alglib::xdefault);
 
-
 // Returns Gauss and Gauss-Kronrod nodes for quadrature with N  points  using
 // pre-calculated table. Nodes/weights were  computed  with  accuracy  up  to
 // 1.0E-32 (if MPFR version of ALGLIB is used). In standard double  precision
@@ -560,9 +520,8 @@ void gkqlegendrecalc(const ae_int_t n, ae_int_t &info, real_1d_array &x, real_1d
 //   -- ALGLIB --
 //      Copyright 12.05.2009 by Bochkanov Sergey
 void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod, real_1d_array &wgauss, double &eps, const xparams _xparams = alglib::xdefault);
-#endif
 
-#if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
+// === AUTOGK Package ===
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
 // Fast-convergent algorithm based on a Gauss-Kronrod formula is used. Result
@@ -589,7 +548,6 @@ void gkqlegendretbl(const ae_int_t n, real_1d_array &x, real_1d_array &wkronrod,
 //      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmooth(const double a, const double b, autogkstate &state, const xparams _xparams = alglib::xdefault);
 
-
 // Integration of a smooth function F(x) on a finite interval [a,b].
 //
 // This subroutine is same as AutoGKSmooth(), but it guarantees that interval
@@ -612,7 +570,6 @@ void autogksmooth(const double a, const double b, autogkstate &state, const xpar
 //   -- ALGLIB --
 //      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksmoothw(const double a, const double b, const double xwidth, autogkstate &state, const xparams _xparams = alglib::xdefault);
-
 
 // Integration on a finite interval [A,B].
 // Integrand have integrable singularities at A/B.
@@ -646,12 +603,10 @@ void autogksmoothw(const double a, const double b, const double xwidth, autogkst
 //      Copyright 06.05.2009 by Bochkanov Sergey
 void autogksingular(const double a, const double b, const double alpha, const double beta, autogkstate &state, const xparams _xparams = alglib::xdefault);
 
-
 // This function provides reverse communication interface
 // Reverse communication interface is not documented or recommended to use.
 // See below for functions which provide better documented API
 bool autogkiteration(const autogkstate &state, const xparams _xparams = alglib::xdefault);
-
 
 // This function is used to launcn iterations of the 1-dimensional integrator
 //
@@ -663,10 +618,7 @@ bool autogkiteration(const autogkstate &state, const xparams _xparams = alglib::
 //   -- ALGLIB --
 //      Copyright 07.05.2009 by Bochkanov Sergey
 //
-void autogkintegrate(autogkstate &state,
-    void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr),
-    void *ptr = NULL, const xparams _xparams = alglib::xdefault);
-
+void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, double bminusx, double &y, void *ptr), void *ptr = NULL, const xparams _xparams = alglib::xdefault);
 
 // Adaptive integration results
 //
@@ -682,140 +634,44 @@ void autogkintegrate(autogkstate &state,
 //   -- ALGLIB --
 //      Copyright 14.11.2007 by Bochkanov Sergey
 void autogkresults(const autogkstate &state, double &v, autogkreport &rep, const xparams _xparams = alglib::xdefault);
-#endif
-}
+} // end of namespace alglib
 
-/////////////////////////////////////////////////////////////////////////
-//
-// THIS SECTION CONTAINS COMPUTATIONAL CORE DECLARATIONS (FUNCTIONS)
-//
-/////////////////////////////////////////////////////////////////////////
-namespace alglib_impl
-{
-#if defined(AE_COMPILE_GQ) || !defined(AE_PARTIAL_BUILD)
-void gqgeneraterec(RVector * alpha,
-     RVector * beta,
-     double mu0,
-     ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategausslobattorec(RVector * alpha,
-     RVector * beta,
-     double mu0,
-     double a,
-     double b,
-     ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategaussradaurec(RVector * alpha,
-     RVector * beta,
-     double mu0,
-     double a,
-     ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategausslegendre(ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategaussjacobi(ae_int_t n,
-     double alpha,
-     double beta,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategausslaguerre(ae_int_t n,
-     double alpha,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-void gqgenerategausshermite(ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * w,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_GKQ) || !defined(AE_PARTIAL_BUILD)
-void gkqgeneraterec(RVector * alpha,
-     RVector * beta,
-     double mu0,
-     ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * wkronrod,
-     RVector * wgauss,
-     ae_state *_state);
-void gkqgenerategausslegendre(ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * wkronrod,
-     RVector * wgauss,
-     ae_state *_state);
-void gkqgenerategaussjacobi(ae_int_t n,
-     double alpha,
-     double beta,
-     ae_int_t* info,
-     RVector * x,
-     RVector * wkronrod,
-     RVector * wgauss,
-     ae_state *_state);
-void gkqlegendrecalc(ae_int_t n,
-     ae_int_t* info,
-     RVector * x,
-     RVector * wkronrod,
-     RVector * wgauss,
-     ae_state *_state);
-void gkqlegendretbl(ae_int_t n,
-     RVector * x,
-     RVector * wkronrod,
-     RVector * wgauss,
-     double* eps,
-     ae_state *_state);
-#endif
-#if defined(AE_COMPILE_AUTOGK) || !defined(AE_PARTIAL_BUILD)
-void autogksmooth(double a,
-     double b,
-     autogkstate* state,
-     ae_state *_state);
-void autogksmoothw(double a,
-     double b,
-     double xwidth,
-     autogkstate* state,
-     ae_state *_state);
-void autogksingular(double a,
-     double b,
-     double alpha,
-     double beta,
-     autogkstate* state,
-     ae_state *_state);
-ae_bool autogkiteration(autogkstate* state, ae_state *_state);
-void autogkresults(autogkstate* state,
-     double* v,
-     autogkreport* rep,
-     ae_state *_state);
-void _autogkreport_init(void* _p, ae_state *_state, ae_bool make_automatic);
-void _autogkreport_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
-void _autogkreport_clear(void* _p);
-void _autogkreport_destroy(void* _p);
-void _autogkinternalstate_init(void* _p, ae_state *_state, ae_bool make_automatic);
-void _autogkinternalstate_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
-void _autogkinternalstate_clear(void* _p);
-void _autogkinternalstate_destroy(void* _p);
-void _autogkstate_init(void* _p, ae_state *_state, ae_bool make_automatic);
-void _autogkstate_init_copy(void* _dst, void* _src, ae_state *_state, ae_bool make_automatic);
-void _autogkstate_clear(void* _p);
-void _autogkstate_destroy(void* _p);
-#endif
+// Declarations for the computational core: functions.
+namespace alglib_impl {
+// === GQ Package ===
+void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double a, double b, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a, ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
+void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, ae_state *_state);
 
-}
-#endif
+// === GKQ Package ===
+void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
+void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
+void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
+void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, RVector *wgauss, ae_state *_state);
+void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, double *eps, ae_state *_state);
 
+// === AUTOGK Package ===
+void autogksmooth(double a, double b, autogkstate *state, ae_state *_state);
+void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state);
+void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state);
+ae_bool autogkiteration(autogkstate *state, ae_state *_state);
+void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state);
+void _autogkreport_init(void *_p, ae_state *_state, ae_bool make_automatic);
+void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkreport_clear(void *_p);
+void _autogkreport_destroy(void *_p);
+void _autogkinternalstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
+void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkinternalstate_clear(void *_p);
+void _autogkinternalstate_destroy(void *_p);
+void _autogkstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
+void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkstate_clear(void *_p);
+void _autogkstate_destroy(void *_p);
+} // end of namespace alglib_impl
+
+#endif // OnceOnly
