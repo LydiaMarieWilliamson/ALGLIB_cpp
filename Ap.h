@@ -512,7 +512,7 @@ typedef struct {
    ae_int_t bytes_written;
 
 #ifdef AE_USE_CPP_SERIALIZATION
-   std::string * out_cppstr;
+   std::string *out_cppstr;
 #endif
 // Pointers respectively to the current position at the output/input buffers; advanced with each write/read operation.
    char *out_str;
@@ -660,10 +660,10 @@ typedef struct ae_shared_pool {
    ae_int_t size_of_object;
 
 // initializer function; accepts pointer to malloc'ed object, initializes its fields
-   void (*init)(void *dst, ae_state * state, ae_bool make_automatic);
+   void (*init)(void *dst, ae_state *state, ae_bool make_automatic);
 
 // copy constructor; accepts pointer to malloc'ed, but not initialized object
-   void (*init_copy)(void *dst, void *src, ae_state * state, ae_bool make_automatic);
+   void (*init_copy)(void *dst, void *src, ae_state *state, ae_bool make_automatic);
 
 // destructor function;
    void (*destroy)(void *ptr);
@@ -1293,7 +1293,7 @@ public:
 // NOTE: this function also checks that source ae_vector* has
 //       required datatype. An exception is generated otherwise.
 //
-   ae_vector_wrapper(alglib_impl::ae_vector * e_ptr, alglib_impl::ae_datatype datatype);
+   ae_vector_wrapper(alglib_impl::ae_vector *e_ptr, alglib_impl::ae_datatype datatype);
 
 //
 // Creates zero-size vector of specific datatype
@@ -1363,7 +1363,7 @@ protected:
 //
 // NOTE: state structure is used for error reporting purposes (longjmp on errors).
 //
-   void attach_to(alglib_impl::x_vector * new_ptr, alglib_impl::ae_state * _state);
+   void attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::ae_state *_state);
 
 //
 // Assigns RHS to current object. Returns *this.
@@ -1556,7 +1556,7 @@ public:
 // Creates object attached to external ae_vector structure, with additional
 // check for matching datatypes (e_ptr->datatype==datatype is required).
 //
-   ae_matrix_wrapper(alglib_impl::ae_matrix * e_ptr, alglib_impl::ae_datatype datatype);
+   ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
 
 //
 // Creates zero-sized matrix of specified datatype.
@@ -1616,7 +1616,7 @@ protected:
 //       on allocation error). All previously allocated memory is correctly
 //       freed on error.
 //
-   void attach_to(alglib_impl::x_matrix * new_ptr, alglib_impl::ae_state * _state);
+   void attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::ae_state *_state);
 
 //
 // This function initializes matrix and allocates own memory storage.
@@ -1624,7 +1624,7 @@ protected:
 // NOTE: initial state of wrapper object is assumed to be uninitialized;
 //       if ptr!=NULL on entry, it is considered critical error (abort is called).
 //
-   void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype, alglib_impl::ae_state * _state);
+   void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype, alglib_impl::ae_state *_state);
 
 //
 // Assigns RHS to current object.

@@ -11,8 +11,8 @@
 //	See the GNU General Public License for more details.
 //
 //	A copy of the GNU General Public License is available at http://www.fsf.org/licensing/licenses
-#ifndef OnceOnlyLinalg_h
-#define OnceOnlyLinalg_h
+#ifndef OnceOnlyLinAlg_h
+#define OnceOnlyLinAlg_h
 
 #include "Ap.h"
 #include "AlgLibInternal.h"

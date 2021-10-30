@@ -269,14 +269,10 @@ alglib_impl::optguardreport *_optguardreport_owner::c_ptr() {
 alglib_impl::optguardreport *_optguardreport_owner::c_ptr() const {
    return const_cast < alglib_impl::optguardreport * >(p_struct);
 }
-optguardreport::optguardreport():_optguardreport_owner(), nonc0suspected(p_struct->nonc0suspected), nonc0test0positive(p_struct->nonc0test0positive), nonc0fidx(p_struct->nonc0fidx), nonc0lipschitzc(p_struct->nonc0lipschitzc), nonc1suspected(p_struct->nonc1suspected),
-nonc1test0positive(p_struct->nonc1test0positive), nonc1test1positive(p_struct->nonc1test1positive), nonc1fidx(p_struct->nonc1fidx), nonc1lipschitzc(p_struct->nonc1lipschitzc), badgradsuspected(p_struct->badgradsuspected),
-badgradfidx(p_struct->badgradfidx), badgradvidx(p_struct->badgradvidx), badgradxbase(&p_struct->badgradxbase), badgraduser(&p_struct->badgraduser), badgradnum(&p_struct->badgradnum) {
+optguardreport::optguardreport():_optguardreport_owner(), nonc0suspected(p_struct->nonc0suspected), nonc0test0positive(p_struct->nonc0test0positive), nonc0fidx(p_struct->nonc0fidx), nonc0lipschitzc(p_struct->nonc0lipschitzc), nonc1suspected(p_struct->nonc1suspected), nonc1test0positive(p_struct->nonc1test0positive), nonc1test1positive(p_struct->nonc1test1positive), nonc1fidx(p_struct->nonc1fidx), nonc1lipschitzc(p_struct->nonc1lipschitzc), badgradsuspected(p_struct->badgradsuspected), badgradfidx(p_struct->badgradfidx), badgradvidx(p_struct->badgradvidx), badgradxbase(&p_struct->badgradxbase), badgraduser(&p_struct->badgraduser), badgradnum(&p_struct->badgradnum) {
 }
 
-optguardreport::optguardreport(const optguardreport &rhs):_optguardreport_owner(rhs), nonc0suspected(p_struct->nonc0suspected), nonc0test0positive(p_struct->nonc0test0positive), nonc0fidx(p_struct->nonc0fidx), nonc0lipschitzc(p_struct->nonc0lipschitzc),
-nonc1suspected(p_struct->nonc1suspected), nonc1test0positive(p_struct->nonc1test0positive), nonc1test1positive(p_struct->nonc1test1positive), nonc1fidx(p_struct->nonc1fidx), nonc1lipschitzc(p_struct->nonc1lipschitzc),
-badgradsuspected(p_struct->badgradsuspected), badgradfidx(p_struct->badgradfidx), badgradvidx(p_struct->badgradvidx), badgradxbase(&p_struct->badgradxbase), badgraduser(&p_struct->badgraduser), badgradnum(&p_struct->badgradnum) {
+optguardreport::optguardreport(const optguardreport &rhs):_optguardreport_owner(rhs), nonc0suspected(p_struct->nonc0suspected), nonc0test0positive(p_struct->nonc0test0positive), nonc0fidx(p_struct->nonc0fidx), nonc0lipschitzc(p_struct->nonc0lipschitzc), nonc1suspected(p_struct->nonc1suspected), nonc1test0positive(p_struct->nonc1test0positive), nonc1test1positive(p_struct->nonc1test1positive), nonc1fidx(p_struct->nonc1fidx), nonc1lipschitzc(p_struct->nonc1lipschitzc), badgradsuspected(p_struct->badgradsuspected), badgradfidx(p_struct->badgradfidx), badgradvidx(p_struct->badgradvidx), badgradxbase(&p_struct->badgradxbase), badgraduser(&p_struct->badgraduser), badgradnum(&p_struct->badgradnum) {
 }
 
 optguardreport &optguardreport::operator=(const optguardreport &rhs) {
@@ -422,12 +418,10 @@ alglib_impl::optguardnonc0report *_optguardnonc0report_owner::c_ptr() {
 alglib_impl::optguardnonc0report *_optguardnonc0report_owner::c_ptr() const {
    return const_cast < alglib_impl::optguardnonc0report * >(p_struct);
 }
-optguardnonc0report::optguardnonc0report():_optguardnonc0report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa),
-stpidxb(p_struct->stpidxb) {
+optguardnonc0report::optguardnonc0report():_optguardnonc0report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
-optguardnonc0report::optguardnonc0report(const optguardnonc0report &rhs):_optguardnonc0report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f),
-cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
+optguardnonc0report::optguardnonc0report(const optguardnonc0report &rhs):_optguardnonc0report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
 optguardnonc0report &optguardnonc0report::operator=(const optguardnonc0report &rhs) {
@@ -576,12 +570,10 @@ alglib_impl::optguardnonc1test0report *_optguardnonc1test0report_owner::c_ptr() 
 alglib_impl::optguardnonc1test0report *_optguardnonc1test0report_owner::c_ptr() const {
    return const_cast < alglib_impl::optguardnonc1test0report * >(p_struct);
 }
-optguardnonc1test0report::optguardnonc1test0report():_optguardnonc1test0report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa),
-stpidxb(p_struct->stpidxb) {
+optguardnonc1test0report::optguardnonc1test0report():_optguardnonc1test0report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
-optguardnonc1test0report::optguardnonc1test0report(const optguardnonc1test0report &rhs):_optguardnonc1test0report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp),
-f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
+optguardnonc1test0report::optguardnonc1test0report(const optguardnonc1test0report &rhs):_optguardnonc1test0report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), f(&p_struct->f), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
 optguardnonc1test0report &optguardnonc1test0report::operator=(const optguardnonc1test0report &rhs) {
@@ -741,12 +733,10 @@ alglib_impl::optguardnonc1test1report *_optguardnonc1test1report_owner::c_ptr() 
 alglib_impl::optguardnonc1test1report *_optguardnonc1test1report_owner::c_ptr() const {
    return const_cast < alglib_impl::optguardnonc1test1report * >(p_struct);
 }
-optguardnonc1test1report::optguardnonc1test1report():_optguardnonc1test1report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), vidx(p_struct->vidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), g(&p_struct->g), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa),
-stpidxb(p_struct->stpidxb) {
+optguardnonc1test1report::optguardnonc1test1report():_optguardnonc1test1report_owner(), positive(p_struct->positive), fidx(p_struct->fidx), vidx(p_struct->vidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), g(&p_struct->g), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
-optguardnonc1test1report::optguardnonc1test1report(const optguardnonc1test1report &rhs):_optguardnonc1test1report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), vidx(p_struct->vidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n),
-stp(&p_struct->stp), g(&p_struct->g), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
+optguardnonc1test1report::optguardnonc1test1report(const optguardnonc1test1report &rhs):_optguardnonc1test1report_owner(rhs), positive(p_struct->positive), fidx(p_struct->fidx), vidx(p_struct->vidx), x0(&p_struct->x0), d(&p_struct->d), n(p_struct->n), stp(&p_struct->stp), g(&p_struct->g), cnt(p_struct->cnt), stpidxa(p_struct->stpidxa), stpidxb(p_struct->stpidxb) {
 }
 
 optguardnonc1test1report &optguardnonc1test1report::operator=(const optguardnonc1test1report &rhs) {
@@ -2062,8 +2052,7 @@ void minlbfgsoptguardnonc1test0results(const minlbfgsstate &state, optguardnonc1
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardnonc1test0results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minlbfgsoptguardnonc1test0results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2133,8 +2122,7 @@ void minlbfgsoptguardnonc1test1results(const minlbfgsstate &state, optguardnonc1
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlbfgsoptguardnonc1test1results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minlbfgsoptguardnonc1test1results(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2540,13 +2528,10 @@ alglib_impl::minbleicreport *_minbleicreport_owner::c_ptr() {
 alglib_impl::minbleicreport *_minbleicreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minbleicreport * >(p_struct);
 }
-minbleicreport::minbleicreport():_minbleicreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), varidx(p_struct->varidx), terminationtype(p_struct->terminationtype), debugeqerr(p_struct->debugeqerr), debugfs(p_struct->debugfs), debugff(p_struct->debugff),
-debugdx(p_struct->debugdx), debugfeasqpits(p_struct->debugfeasqpits), debugfeasgpaits(p_struct->debugfeasgpaits), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount) {
+minbleicreport::minbleicreport():_minbleicreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), varidx(p_struct->varidx), terminationtype(p_struct->terminationtype), debugeqerr(p_struct->debugeqerr), debugfs(p_struct->debugfs), debugff(p_struct->debugff), debugdx(p_struct->debugdx), debugfeasqpits(p_struct->debugfeasqpits), debugfeasgpaits(p_struct->debugfeasgpaits), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount) {
 }
 
-minbleicreport::minbleicreport(const minbleicreport &rhs):_minbleicreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), varidx(p_struct->varidx), terminationtype(p_struct->terminationtype), debugeqerr(p_struct->debugeqerr),
-debugfs(p_struct->debugfs), debugff(p_struct->debugff), debugdx(p_struct->debugdx), debugfeasqpits(p_struct->debugfeasqpits), debugfeasgpaits(p_struct->debugfeasgpaits), inneriterationscount(p_struct->inneriterationscount),
-outeriterationscount(p_struct->outeriterationscount) {
+minbleicreport::minbleicreport(const minbleicreport &rhs):_minbleicreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), varidx(p_struct->varidx), terminationtype(p_struct->terminationtype), debugeqerr(p_struct->debugeqerr), debugfs(p_struct->debugfs), debugff(p_struct->debugff), debugdx(p_struct->debugdx), debugfeasqpits(p_struct->debugfeasqpits), debugfeasgpaits(p_struct->debugfeasgpaits), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount) {
 }
 
 minbleicreport &minbleicreport::operator=(const minbleicreport &rhs) {
@@ -3760,8 +3745,7 @@ void minbleicoptguardnonc1test0results(const minbleicstate &state, optguardnonc1
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardnonc1test0results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minbleicoptguardnonc1test0results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3831,8 +3815,7 @@ void minbleicoptguardnonc1test1results(const minbleicstate &state, optguardnonc1
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbleicoptguardnonc1test1results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minbleicoptguardnonc1test1results(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -4274,12 +4257,10 @@ alglib_impl::minqpreport *_minqpreport_owner::c_ptr() {
 alglib_impl::minqpreport *_minqpreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minqpreport * >(p_struct);
 }
-minqpreport::minqpreport():_minqpreport_owner(), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount), nmv(p_struct->nmv), ncholesky(p_struct->ncholesky), terminationtype(p_struct->terminationtype), lagbc(&p_struct->lagbc),
-laglc(&p_struct->laglc) {
+minqpreport::minqpreport():_minqpreport_owner(), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount), nmv(p_struct->nmv), ncholesky(p_struct->ncholesky), terminationtype(p_struct->terminationtype), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc) {
 }
 
-minqpreport::minqpreport(const minqpreport &rhs):_minqpreport_owner(rhs), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount), nmv(p_struct->nmv), ncholesky(p_struct->ncholesky),
-terminationtype(p_struct->terminationtype), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc) {
+minqpreport::minqpreport(const minqpreport &rhs):_minqpreport_owner(rhs), inneriterationscount(p_struct->inneriterationscount), outeriterationscount(p_struct->outeriterationscount), nmv(p_struct->nmv), ncholesky(p_struct->ncholesky), terminationtype(p_struct->terminationtype), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc) {
 }
 
 minqpreport &minqpreport::operator=(const minqpreport &rhs) {
@@ -5617,8 +5598,7 @@ void minqpsetlcmixed(const minqpstate &state, const sparsematrix &sparsec, const
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlcmixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek,
-      const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, &_alglib_env_state);
+   alglib_impl::minqpsetlcmixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -5653,8 +5633,7 @@ void minqpsetlcmixedlegacy(const minqpstate &state, const real_2d_array &densec,
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlcmixedlegacy(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek,
-      const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, &_alglib_env_state);
+   alglib_impl::minqpsetlcmixedlegacy(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(densec.c_ptr()), const_cast < alglib_impl::ae_vector * >(densect.c_ptr()), densek, const_cast < alglib_impl::sparsematrix * >(sparsec.c_ptr()), const_cast < alglib_impl::ae_vector * >(sparsect.c_ptr()), sparsek, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -5701,8 +5680,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -5748,8 +5726,7 @@ void minqpsetlc2dense(const minqpstate &state, const real_2d_array &a, const rea
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minqpsetlc2dense(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
@@ -5793,8 +5770,7 @@ void minqpsetlc2(const minqpstate &state, const sparsematrix &a, const real_1d_a
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minqpsetlc2(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -5849,8 +5825,7 @@ void minqpsetlc2mixed(const minqpstate &state, const sparsematrix &sparsea, cons
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minqpsetlc2mixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsea.c_ptr()), ksparse, const_cast < alglib_impl::ae_matrix * >(densea.c_ptr()), kdense,
-      const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), &_alglib_env_state);
+   alglib_impl::minqpsetlc2mixed(const_cast < alglib_impl::minqpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(sparsea.c_ptr()), ksparse, const_cast < alglib_impl::ae_matrix * >(densea.c_ptr()), kdense, const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -6202,12 +6177,10 @@ alglib_impl::minlmstate *_minlmstate_owner::c_ptr() {
 alglib_impl::minlmstate *_minlmstate_owner::c_ptr() const {
    return const_cast < alglib_impl::minlmstate * >(p_struct);
 }
-minlmstate::minlmstate():_minlmstate_owner(), needf(p_struct->needf), needfg(p_struct->needfg), needfgh(p_struct->needfgh), needfi(p_struct->needfi), needfij(p_struct->needfij), xupdated(p_struct->xupdated), f(p_struct->f), fi(&p_struct->fi), g(&p_struct->g), h(&p_struct->h),
-j(&p_struct->j), x(&p_struct->x) {
+minlmstate::minlmstate():_minlmstate_owner(), needf(p_struct->needf), needfg(p_struct->needfg), needfgh(p_struct->needfgh), needfi(p_struct->needfi), needfij(p_struct->needfij), xupdated(p_struct->xupdated), f(p_struct->f), fi(&p_struct->fi), g(&p_struct->g), h(&p_struct->h), j(&p_struct->j), x(&p_struct->x) {
 }
 
-minlmstate::minlmstate(const minlmstate &rhs):_minlmstate_owner(rhs), needf(p_struct->needf), needfg(p_struct->needfg), needfgh(p_struct->needfgh), needfi(p_struct->needfi), needfij(p_struct->needfij), xupdated(p_struct->xupdated), f(p_struct->f),
-fi(&p_struct->fi), g(&p_struct->g), h(&p_struct->h), j(&p_struct->j), x(&p_struct->x) {
+minlmstate::minlmstate(const minlmstate &rhs):_minlmstate_owner(rhs), needf(p_struct->needf), needfg(p_struct->needfg), needfgh(p_struct->needfgh), needfi(p_struct->needfi), needfij(p_struct->needfij), xupdated(p_struct->xupdated), f(p_struct->f), fi(&p_struct->fi), g(&p_struct->g), h(&p_struct->h), j(&p_struct->j), x(&p_struct->x) {
 }
 
 minlmstate &minlmstate::operator=(const minlmstate &rhs) {
@@ -6335,12 +6308,10 @@ alglib_impl::minlmreport *_minlmreport_owner::c_ptr() {
 alglib_impl::minlmreport *_minlmreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minlmreport * >(p_struct);
 }
-minlmreport::minlmreport():_minlmreport_owner(), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype), nfunc(p_struct->nfunc), njac(p_struct->njac), ngrad(p_struct->ngrad), nhess(p_struct->nhess),
-ncholesky(p_struct->ncholesky) {
+minlmreport::minlmreport():_minlmreport_owner(), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype), nfunc(p_struct->nfunc), njac(p_struct->njac), ngrad(p_struct->ngrad), nhess(p_struct->nhess), ncholesky(p_struct->ncholesky) {
 }
 
-minlmreport::minlmreport(const minlmreport &rhs):_minlmreport_owner(rhs), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype), nfunc(p_struct->nfunc), njac(p_struct->njac), ngrad(p_struct->ngrad), nhess(p_struct->nhess),
-ncholesky(p_struct->ncholesky) {
+minlmreport::minlmreport(const minlmreport &rhs):_minlmreport_owner(rhs), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype), nfunc(p_struct->nfunc), njac(p_struct->njac), ngrad(p_struct->ngrad), nhess(p_struct->nhess), ncholesky(p_struct->ncholesky) {
 }
 
 minlmreport &minlmreport::operator=(const minlmreport &rhs) {
@@ -7361,8 +7332,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
 
-void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr),
-   void *ptr, const xparams _xparams) {
+void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr), void *ptr, const xparams _xparams) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _alglib_env_state;
    alglib_impl::ae_state_init(&_alglib_env_state);
@@ -9180,8 +9150,7 @@ void mincgoptguardnonc1test0results(const mincgstate &state, optguardnonc1test0r
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardnonc1test0results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::mincgoptguardnonc1test0results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -9251,8 +9220,7 @@ void mincgoptguardnonc1test1results(const mincgstate &state, optguardnonc1test1r
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mincgoptguardnonc1test1results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::mincgoptguardnonc1test1results(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -9662,12 +9630,10 @@ alglib_impl::minlpreport *_minlpreport_owner::c_ptr() {
 alglib_impl::minlpreport *_minlpreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minlpreport * >(p_struct);
 }
-minlpreport::minlpreport():_minlpreport_owner(), f(p_struct->f), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc), y(&p_struct->y), stats(&p_struct->stats), primalerror(p_struct->primalerror), dualerror(p_struct->dualerror), slackerror(p_struct->slackerror),
-iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype) {
+minlpreport::minlpreport():_minlpreport_owner(), f(p_struct->f), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc), y(&p_struct->y), stats(&p_struct->stats), primalerror(p_struct->primalerror), dualerror(p_struct->dualerror), slackerror(p_struct->slackerror), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype) {
 }
 
-minlpreport::minlpreport(const minlpreport &rhs):_minlpreport_owner(rhs), f(p_struct->f), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc), y(&p_struct->y), stats(&p_struct->stats), primalerror(p_struct->primalerror), dualerror(p_struct->dualerror),
-slackerror(p_struct->slackerror), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype) {
+minlpreport::minlpreport(const minlpreport &rhs):_minlpreport_owner(rhs), f(p_struct->f), lagbc(&p_struct->lagbc), laglc(&p_struct->laglc), y(&p_struct->y), stats(&p_struct->stats), primalerror(p_struct->primalerror), dualerror(p_struct->dualerror), slackerror(p_struct->slackerror), iterationscount(p_struct->iterationscount), terminationtype(p_struct->terminationtype) {
 }
 
 minlpreport &minlpreport::operator=(const minlpreport &rhs) {
@@ -10315,8 +10281,7 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -10369,8 +10334,7 @@ void minlpsetlc2dense(const minlpstate &state, const real_2d_array &a, const rea
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minlpsetlc2dense(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::ae_matrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
@@ -10414,8 +10378,7 @@ void minlpsetlc2(const minlpstate &state, const sparsematrix &a, const real_1d_a
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minlpsetlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k,
-      &_alglib_env_state);
+   alglib_impl::minlpsetlc2(const_cast < alglib_impl::minlpstate * >(state.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), k, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -10863,12 +10826,10 @@ alglib_impl::minnlcreport *_minnlcreport_owner::c_ptr() {
 alglib_impl::minnlcreport *_minnlcreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minnlcreport * >(p_struct);
 }
-minnlcreport::minnlcreport():_minnlcreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), terminationtype(p_struct->terminationtype), bcerr(p_struct->bcerr), bcidx(p_struct->bcidx), lcerr(p_struct->lcerr), lcidx(p_struct->lcidx), nlcerr(p_struct->nlcerr),
-nlcidx(p_struct->nlcidx), dbgphase0its(p_struct->dbgphase0its) {
+minnlcreport::minnlcreport():_minnlcreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), terminationtype(p_struct->terminationtype), bcerr(p_struct->bcerr), bcidx(p_struct->bcidx), lcerr(p_struct->lcerr), lcidx(p_struct->lcidx), nlcerr(p_struct->nlcerr), nlcidx(p_struct->nlcidx), dbgphase0its(p_struct->dbgphase0its) {
 }
 
-minnlcreport::minnlcreport(const minnlcreport &rhs):_minnlcreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), terminationtype(p_struct->terminationtype), bcerr(p_struct->bcerr), bcidx(p_struct->bcidx),
-lcerr(p_struct->lcerr), lcidx(p_struct->lcidx), nlcerr(p_struct->nlcerr), nlcidx(p_struct->nlcidx), dbgphase0its(p_struct->dbgphase0its) {
+minnlcreport::minnlcreport(const minnlcreport &rhs):_minnlcreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), terminationtype(p_struct->terminationtype), bcerr(p_struct->bcerr), bcidx(p_struct->bcidx), lcerr(p_struct->lcerr), lcidx(p_struct->lcidx), nlcerr(p_struct->nlcerr), nlcidx(p_struct->nlcidx), dbgphase0its(p_struct->dbgphase0its) {
 }
 
 minnlcreport &minnlcreport::operator=(const minnlcreport &rhs) {
@@ -12790,8 +12751,7 @@ void minnlcoptguardnonc1test0results(const minnlcstate &state, optguardnonc1test
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardnonc1test0results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minnlcoptguardnonc1test0results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -12863,8 +12823,7 @@ void minnlcoptguardnonc1test1results(const minnlcstate &state, optguardnonc1test
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minnlcoptguardnonc1test1results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minnlcoptguardnonc1test1results(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -13266,12 +13225,10 @@ alglib_impl::minnsreport *_minnsreport_owner::c_ptr() {
 alglib_impl::minnsreport *_minnsreport_owner::c_ptr() const {
    return const_cast < alglib_impl::minnsreport * >(p_struct);
 }
-minnsreport::minnsreport():_minnsreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), cerr(p_struct->cerr), lcerr(p_struct->lcerr), nlcerr(p_struct->nlcerr), terminationtype(p_struct->terminationtype), varidx(p_struct->varidx),
-funcidx(p_struct->funcidx) {
+minnsreport::minnsreport():_minnsreport_owner(), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), cerr(p_struct->cerr), lcerr(p_struct->lcerr), nlcerr(p_struct->nlcerr), terminationtype(p_struct->terminationtype), varidx(p_struct->varidx), funcidx(p_struct->funcidx) {
 }
 
-minnsreport::minnsreport(const minnsreport &rhs):_minnsreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), cerr(p_struct->cerr), lcerr(p_struct->lcerr), nlcerr(p_struct->nlcerr), terminationtype(p_struct->terminationtype),
-varidx(p_struct->varidx), funcidx(p_struct->funcidx) {
+minnsreport::minnsreport(const minnsreport &rhs):_minnsreport_owner(rhs), iterationscount(p_struct->iterationscount), nfev(p_struct->nfev), cerr(p_struct->cerr), lcerr(p_struct->lcerr), nlcerr(p_struct->nlcerr), terminationtype(p_struct->terminationtype), varidx(p_struct->varidx), funcidx(p_struct->funcidx) {
 }
 
 minnsreport &minnsreport::operator=(const minnsreport &rhs) {
@@ -14685,8 +14642,7 @@ void minasacreate(const ae_int_t n, const real_1d_array &x, const real_1d_array 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14710,8 +14666,7 @@ void minasacreate(const real_1d_array &x, const real_1d_array &bndl, const real_
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minasacreate(n, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
@@ -14943,8 +14898,7 @@ void minasarestartfrom(const minasastate &state, const real_1d_array &x, const r
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minasarestartfrom(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minasarestartfrom(const_cast < alglib_impl::minasastate * >(state.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndl.c_ptr()), const_cast < alglib_impl::ae_vector * >(bndu.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -16253,8 +16207,7 @@ void minbcoptguardnonc1test0results(const minbcstate &state, optguardnonc1test0r
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardnonc1test0results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minbcoptguardnonc1test0results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test0report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -16324,8 +16277,7 @@ void minbcoptguardnonc1test1results(const minbcstate &state, optguardnonc1test1r
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::minbcoptguardnonc1test1results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::minbcoptguardnonc1test1results(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(strrep.c_ptr()), const_cast < alglib_impl::optguardnonc1test1report * >(lngrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -16846,8 +16798,7 @@ void lptestproblemsetlc2(const lptestproblem &p, const sparsematrix &a, const re
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lptestproblemsetlc2(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), m,
-      &_alglib_env_state);
+   alglib_impl::lptestproblemsetlc2(const_cast < alglib_impl::lptestproblem * >(p.c_ptr()), const_cast < alglib_impl::sparsematrix * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(al.c_ptr()), const_cast < alglib_impl::ae_vector * >(au.c_ptr()), m, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -36353,15 +36304,11 @@ static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, 
    if (state->dotrace) {
       ae_trace("--- variable statistics ----------------------------------------------------------------------------\n");
       ae_trace("> smallest values for nonnegative vars\n");
-      ae_trace("primal:       minG=%8.1e  minT=%8.1e  minW=%8.1e  minP=%8.1e\n", (double)(vipmsolver_minnz(&state->current.g, n, _state)), (double)(vipmsolver_minnz(&state->current.t, n, _state)), (double)(vipmsolver_minnz(&state->current.w, m, _state)),
-         (double)(vipmsolver_minnz(&state->current.p, m, _state)));
-      ae_trace("dual:         minZ=%8.1e  minS=%8.1e  minV=%8.1e  minQ=%8.1e\n", (double)(vipmsolver_minnz(&state->current.z, n, _state)), (double)(vipmsolver_minnz(&state->current.s, n, _state)), (double)(vipmsolver_minnz(&state->current.v, m, _state)),
-         (double)(vipmsolver_minnz(&state->current.q, m, _state)));
+      ae_trace("primal:       minG=%8.1e  minT=%8.1e  minW=%8.1e  minP=%8.1e\n", (double)(vipmsolver_minnz(&state->current.g, n, _state)), (double)(vipmsolver_minnz(&state->current.t, n, _state)), (double)(vipmsolver_minnz(&state->current.w, m, _state)), (double)(vipmsolver_minnz(&state->current.p, m, _state)));
+      ae_trace("dual:         minZ=%8.1e  minS=%8.1e  minV=%8.1e  minQ=%8.1e\n", (double)(vipmsolver_minnz(&state->current.z, n, _state)), (double)(vipmsolver_minnz(&state->current.s, n, _state)), (double)(vipmsolver_minnz(&state->current.v, m, _state)), (double)(vipmsolver_minnz(&state->current.q, m, _state)));
       ae_trace("> min and max complementary slackness\n");
-      ae_trace("min:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", (double)(vipmsolver_minprodnz(&state->current.g, &state->current.z, n, _state)), (double)(vipmsolver_minprodnz(&state->current.t, &state->current.s, n, _state)),
-         (double)(vipmsolver_minprodnz(&state->current.w, &state->current.v, m, _state)), (double)(vipmsolver_minprodnz(&state->current.p, &state->current.q, m, _state)));
-      ae_trace("max:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", (double)(vipmsolver_maxprodnz(&state->current.g, &state->current.z, n, _state)), (double)(vipmsolver_maxprodnz(&state->current.t, &state->current.s, n, _state)),
-         (double)(vipmsolver_maxprodnz(&state->current.w, &state->current.v, m, _state)), (double)(vipmsolver_maxprodnz(&state->current.p, &state->current.q, m, _state)));
+      ae_trace("min:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", (double)(vipmsolver_minprodnz(&state->current.g, &state->current.z, n, _state)), (double)(vipmsolver_minprodnz(&state->current.t, &state->current.s, n, _state)), (double)(vipmsolver_minprodnz(&state->current.w, &state->current.v, m, _state)), (double)(vipmsolver_minprodnz(&state->current.p, &state->current.q, m, _state)));
+      ae_trace("max:            GZ=%8.1e    TS=%8.1e    WV=%8.1e    PQ=%8.1e\n", (double)(vipmsolver_maxprodnz(&state->current.g, &state->current.z, n, _state)), (double)(vipmsolver_maxprodnz(&state->current.t, &state->current.s, n, _state)), (double)(vipmsolver_maxprodnz(&state->current.w, &state->current.v, m, _state)), (double)(vipmsolver_maxprodnz(&state->current.p, &state->current.q, m, _state)));
    }
 // Detailed output (all variables values, not suited for high-dimensional problems)
    if (state->dodetailedtrace) {
@@ -50807,8 +50754,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       // Compute using update formula
          for (i = 0; i <= m - 1; i++) {
             if (i != r) {
-               s->dseweights.ptr.p_double[i] =
-                  s->dseweights.ptr.p_double[i] - 2 * (alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]) * tau->ptr.p_double[i] + s->dseweights.ptr.p_double[r] * ae_sqr(alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r], _state);
+               s->dseweights.ptr.p_double[i] = s->dseweights.ptr.p_double[i] - 2 * (alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r]) * tau->ptr.p_double[i] + s->dseweights.ptr.p_double[r] * ae_sqr(alphaq->ptr.p_double[i] / alphaq->ptr.p_double[r], _state);
                s->dseweights.ptr.p_double[i] = ae_maxreal(s->dseweights.ptr.p_double[i], reviseddualsimplex_minbeta, _state);
             }
          }

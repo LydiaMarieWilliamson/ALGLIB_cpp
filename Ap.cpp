@@ -106,7 +106,7 @@ namespace alglib_impl {
 
 #define AE_LOCK_CYCLES 512
 #define AE_LOCK_TESTS_BEFORE_YIELD 16
-#define AE_CRITICAL_ASSERT(x) if( !(x) ) abort()
+#define AE_CRITICAL_ASSERT(x) if (!(x)) abort()
 
 // IDs for set_dbg_value
 #define _ALGLIB_USE_ALLOC_COUNTER             0
@@ -585,7 +585,8 @@ void set_memory_pool(void *ptr, size_t size) {
 
 // Calculate page size and page count, prepare pointers to page table and memory
    sm_page_size = 256;
-   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size); // we expect to have memory for at least one page + table entry + alignment
+// we expect to have memory for at least one page + table entry + alignment
+   AE_CRITICAL_ASSERT(size >= (sm_page_size + sizeof(ae_int_t)) + sm_page_size);
    sm_page_cnt = (size - sm_page_size) / (sm_page_size + sizeof(ae_int_t));
    AE_CRITICAL_ASSERT(sm_page_cnt > 0);
    sm_page_tbl = (ae_int_t *) ptr;
@@ -1951,90 +1952,88 @@ ae_int_t ae_cpuid() {
 // if not initialized, determine system properties
    if (!_ae_cpuid_initialized) {
    // SSE2
-#if defined(AE_CPU)
-#   if (AE_CPU==AE_INTEL)
-#      if AE_COMPILER==AE_MSVC
+#if defined(AE_CPU) && (AE_CPU==AE_INTEL)
+#   if AE_COMPILER==AE_MSVC
       {
       // SSE2 support
-#         if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#      if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
          int CPUInfo[4];
          __cpuid(CPUInfo, 1);
          if ((CPUInfo[3] & 0x04000000) != 0)
             _ae_cpuid_has_sse2 = ae_true;
-#         endif
+#      endif
 
       // check OS support for XSAVE XGETBV
-#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#      if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
          __cpuid(CPUInfo, 1);
          if ((CPUInfo[2] & (0x1 << 27)) != 0)
             if ((_xgetbv(0) & 0x6) == 0x6) {
             // AVX2 support
-#            if defined(_ALGLIB_HAS_AVX2_INTRINSICS) && (_MSC_VER>=1600)
+#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS) && (_MSC_VER>=1600)
                if (_ae_cpuid_has_sse2) {
                   __cpuidex(CPUInfo, 7, 0);
                   if ((CPUInfo[1] & (0x1 << 5)) != 0)
                      _ae_cpuid_has_avx2 = ae_true;
                }
-#            endif
+#         endif
 
             // FMA support
-#            if defined(_ALGLIB_HAS_FMA_INTRINSICS) && (_MSC_VER>=1600)
+#         if defined(_ALGLIB_HAS_FMA_INTRINSICS) && (_MSC_VER>=1600)
                if (_ae_cpuid_has_avx2) {
                   __cpuid(CPUInfo, 1);
                   if ((CPUInfo[2] & (0x1 << 12)) != 0)
                      _ae_cpuid_has_fma = ae_true;
                }
-#            endif
-            }
 #         endif
+            }
+#      endif
       }
-#      elif AE_COMPILER==AE_GNUC
+#   elif AE_COMPILER==AE_GNUC
       {
          ae_int_t a, b, c, d;
 
       // SSE2 support
-#         if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#      if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((d & 0x04000000) != 0)
             _ae_cpuid_has_sse2 = ae_true;
-#         endif
+#      endif
 
       // check OS support for XSAVE XGETBV
-#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#      if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((c & (0x1 << 27)) != 0) {
             __asm__ volatile ("xgetbv":"=a" (a), "=d"(d):"c"(0));
             if ((a & 0x6) == 0x6) {
             // AVX2 support
-#            if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#         if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
                if (_ae_cpuid_has_sse2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
                   if ((b & (0x1 << 5)) != 0)
                      _ae_cpuid_has_avx2 = ae_true;
                }
-#            endif
+#         endif
 
             // FMA support
-#            if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#         if defined(_ALGLIB_HAS_FMA_INTRINSICS)
                if (_ae_cpuid_has_avx2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
                   if ((c & (0x1 << 12)) != 0)
                      _ae_cpuid_has_fma = ae_true;
                }
-#            endif
+#         endif
             }
          }
-#         endif
+#      endif
       }
-#      elif AE_COMPILER==AE_SUNC
+#   elif AE_COMPILER==AE_SUNC
       {
          ae_int_t a, b, c, d;
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((d & 0x04000000) != 0)
             _ae_cpuid_has_sse2 = ae_true;
       }
-#      else
-#      endif
+#   else
 #   endif
 #endif
    // Perform one more CPUID call to generate memory fence
@@ -3120,7 +3119,7 @@ void ae_int2str(ae_int_t v, char *buf, ae_state *state) {
 //    simplify conversion to six-bit representation
    c = v < 0 ? (unsigned char)0xFF : (unsigned char)0x00;
    u.ival = v;
-   for (i = sizeof(ae_int_t); i <= 8; i++) // <=8 is preferred because it avoids unnecessary compiler warnings
+   for (i = sizeof(ae_int_t); i <= 8; i++) // i <= 8 is preferred because it avoids unnecessary compiler warnings
       u.bytes[i] = c;
    u.bytes[8] = 0;
    if (state->endianness == AE_BIG_ENDIAN) {
@@ -6442,16 +6441,14 @@ const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs)
 boolean_1d_array::~boolean_1d_array() {
 }
 
-const ae_bool &boolean_1d_array::operator() (ae_int_t i)
-const {
+const ae_bool &boolean_1d_array::operator() (ae_int_t i) const {
    return ptr->ptr.p_bool[i];
 }
 ae_bool &boolean_1d_array::operator() (ae_int_t i) {
    return ptr->ptr.p_bool[i];
 }
 
-const ae_bool &boolean_1d_array::operator[] (ae_int_t i)
-const {
+const ae_bool &boolean_1d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.p_bool[i];
 }
 ae_bool &boolean_1d_array::operator[] (ae_int_t i) {
@@ -6506,16 +6503,14 @@ const integer_1d_array &integer_1d_array::operator=(const integer_1d_array &rhs)
 integer_1d_array::~integer_1d_array() {
 }
 
-const ae_int_t &integer_1d_array::operator() (ae_int_t i)
-const {
+const ae_int_t &integer_1d_array::operator() (ae_int_t i) const {
    return ptr->ptr.p_int[i];
 }
 ae_int_t &integer_1d_array::operator() (ae_int_t i) {
    return ptr->ptr.p_int[i];
 }
 
-const ae_int_t &integer_1d_array::operator[] (ae_int_t i)
-const {
+const ae_int_t &integer_1d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.p_int[i];
 }
 ae_int_t &integer_1d_array::operator[] (ae_int_t i) {
@@ -6570,16 +6565,14 @@ const real_1d_array &real_1d_array::operator=(const real_1d_array &rhs) {
 real_1d_array::~real_1d_array() {
 }
 
-const double &real_1d_array::operator() (ae_int_t i)
-const {
+const double &real_1d_array::operator() (ae_int_t i) const {
    return ptr->ptr.p_double[i];
 }
 double &real_1d_array::operator() (ae_int_t i) {
    return ptr->ptr.p_double[i];
 }
 
-const double &real_1d_array::operator[] (ae_int_t i)
-const {
+const double &real_1d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.p_double[i];
 }
 double &real_1d_array::operator[] (ae_int_t i) {
@@ -6599,8 +6592,8 @@ void real_1d_array::setcontent(ae_int_t iLen, const double *pContent) {
       ptr->ptr.p_double[i] = pContent[i];
 }
 
-void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) // TODO: convert to constructor!!!!!!!
-{
+// TODO: convert to constructor!!!!!!!
+void real_1d_array::attach_to_ptr(ae_int_t iLen, double *pContent) {
    alglib_impl::x_vector x;
    jmp_buf _break_jump;
    alglib_impl::ae_state _state;
@@ -6663,17 +6656,17 @@ const complex_1d_array &complex_1d_array::operator=(const complex_1d_array &rhs)
 complex_1d_array::~complex_1d_array() {
 }
 
-const complex &complex_1d_array::operator() (ae_int_t i)
-const {
+const complex &complex_1d_array::operator() (ae_int_t i) const {
    return *((const complex *)(ptr->ptr.p_complex + i));
-} complex &complex_1d_array::operator() (ae_int_t i) {
+}
+complex &complex_1d_array::operator() (ae_int_t i) {
    return *((complex *)(ptr->ptr.p_complex + i));
 }
 
-const complex &complex_1d_array::operator[] (ae_int_t i)
-const {
+const complex &complex_1d_array::operator[] (ae_int_t i) const {
    return *((const complex *)(ptr->ptr.p_complex + i));
-} complex &complex_1d_array::operator[] (ae_int_t i) {
+}
+complex &complex_1d_array::operator[] (ae_int_t i) {
    return *((complex *)(ptr->ptr.p_complex + i));
 }
 
@@ -6785,7 +6778,7 @@ ae_matrix_wrapper::~ae_matrix_wrapper() {
 
 #if !defined(AE_NO_EXCEPTIONS)
 ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype datatype) {
-   std::vector < std::vector < const char *>>smat;
+   std::vector< std::vector<const char *> > smat;
    size_t i, j;
    char *p = filter_spaces(s);
    if (p == NULL)
@@ -6831,8 +6824,8 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
 }
 #endif
 
-void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) // TODO: automatic allocation of NULL ptr!!!!!
-{
+// TODO: automatic allocation of NULL ptr!!!!!
+void ae_matrix_wrapper::setlength(ae_int_t rows, ae_int_t cols) {
    jmp_buf _break_jump;
    alglib_impl::ae_state _state;
    alglib_impl::ae_state_init(&_state);
@@ -6937,16 +6930,14 @@ const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs)
    return static_cast < const boolean_2d_array &>(assign(rhs));
 }
 
-const ae_bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j)
-const {
+const ae_bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
    return ptr->ptr.pp_bool[i][j];
 }
 ae_bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
    return ptr->ptr.pp_bool[i][j];
 }
 
-const ae_bool *boolean_2d_array::operator[] (ae_int_t i)
-const {
+const ae_bool *boolean_2d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.pp_bool[i];
 }
 ae_bool *boolean_2d_array::operator[] (ae_int_t i) {
@@ -7003,16 +6994,14 @@ const integer_2d_array &integer_2d_array::operator=(const integer_2d_array &rhs)
    return static_cast < const integer_2d_array &>(assign(rhs));
 }
 
-const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j)
-const {
+const ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) const {
    return ptr->ptr.pp_int[i][j];
 }
 ae_int_t &integer_2d_array::operator() (ae_int_t i, ae_int_t j) {
    return ptr->ptr.pp_int[i][j];
 }
 
-const ae_int_t * integer_2d_array::operator[] (ae_int_t i)
-const {
+const ae_int_t *integer_2d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.pp_int[i];
 }
 ae_int_t *integer_2d_array::operator[] (ae_int_t i) {
@@ -7069,16 +7058,14 @@ const real_2d_array &real_2d_array::operator=(const real_2d_array &rhs) {
    return static_cast < const real_2d_array &>(assign(rhs));
 }
 
-const double &real_2d_array::operator() (ae_int_t i, ae_int_t j)
-const {
+const double &real_2d_array::operator() (ae_int_t i, ae_int_t j) const {
    return ptr->ptr.pp_double[i][j];
 }
 double &real_2d_array::operator() (ae_int_t i, ae_int_t j) {
    return ptr->ptr.pp_double[i][j];
 }
 
-const double *real_2d_array::operator[] (ae_int_t i)
-const {
+const double *real_2d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.pp_double[i];
 }
 double *real_2d_array::operator[] (ae_int_t i) {
@@ -7164,17 +7151,17 @@ const complex_2d_array &complex_2d_array::operator=(const complex_2d_array &rhs)
    return static_cast < const complex_2d_array &>(assign(rhs));
 }
 
-const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j)
-const {
+const complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) const {
    return *((const complex *)(ptr->ptr.pp_complex[i] + j));
-} complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
+}
+complex &complex_2d_array::operator() (ae_int_t i, ae_int_t j) {
    return *((complex *)(ptr->ptr.pp_complex[i] + j));
 }
 
-const complex *complex_2d_array::operator[] (ae_int_t i)
-const {
+const complex *complex_2d_array::operator[] (ae_int_t i) const {
    return (const complex *)(ptr->ptr.pp_complex[i]);
-} complex *complex_2d_array::operator[] (ae_int_t i) {
+}
+complex *complex_2d_array::operator[] (ae_int_t i) {
    return (complex *)(ptr->ptr.pp_complex[i]);
 }
 
@@ -7572,7 +7559,8 @@ std::string arraytostring(const ae_int_t *ptr, ae_int_t n) {
    char buf[64];
    result = "[";
    for (i = 0; i < n; i++) {
-      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf)) _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+      if (sprintf(buf, i == 0 ? "%ld" : ",%ld", long (ptr[i])) >= (int)sizeof(buf))
+         _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
       result += buf;
    }
    result += "]";
@@ -7595,7 +7583,8 @@ std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    for (i = 0; i < n; i++) {
       buf[0] = 0;
       if (fp_isfinite(ptr[i])) {
-         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof(buf)) _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
+         if (sprintf(buf, i == 0 ? mask1 : mask2, double (ptr[i])) >= (int)sizeof(buf))
+            _ALGLIB_CPP_EXCEPTION("arraytostring(): buffer overflow");
       } else if (fp_isnan(ptr[i]))
          strcpy(buf, i == 0 ? "NAN" : ",NAN");
       else if (fp_isposinf(ptr[i]))

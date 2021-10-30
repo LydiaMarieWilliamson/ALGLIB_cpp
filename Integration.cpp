@@ -84,8 +84,7 @@ void gqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gqgeneraterec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
+   alglib_impl::gqgeneraterec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -142,8 +141,7 @@ void gqgenerategausslobattorec(const real_1d_array &alpha, const real_1d_array &
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gqgenerategausslobattorec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, a, b, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
+   alglib_impl::gqgenerategausslobattorec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, a, b, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -200,8 +198,7 @@ void gqgenerategaussradaurec(const real_1d_array &alpha, const real_1d_array &be
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gqgenerategaussradaurec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, a, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
+   alglib_impl::gqgenerategaussradaurec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, a, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(w.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -438,8 +435,7 @@ void gkqgeneraterec(const real_1d_array &alpha, const real_1d_array &beta, const
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::gkqgeneraterec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(wkronrod.c_ptr()), const_cast < alglib_impl::ae_vector * >(wgauss.c_ptr()), &_alglib_env_state);
+   alglib_impl::gkqgeneraterec(const_cast < alglib_impl::ae_vector * >(alpha.c_ptr()), const_cast < alglib_impl::ae_vector * >(beta.c_ptr()), mu0, n, &info, const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(wkronrod.c_ptr()), const_cast < alglib_impl::ae_vector * >(wgauss.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }

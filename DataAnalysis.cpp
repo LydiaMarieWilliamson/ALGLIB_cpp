@@ -312,8 +312,7 @@ void pcatruncatedsubspacesparse(const sparsematrix &x, const ae_int_t npoints, c
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::pcatruncatedsubspacesparse(const_cast < alglib_impl::sparsematrix * >(x.c_ptr()), npoints, nvars, nneeded, eps, maxits, const_cast < alglib_impl::ae_vector * >(s2.c_ptr()), const_cast < alglib_impl::ae_matrix * >(v.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::pcatruncatedsubspacesparse(const_cast < alglib_impl::sparsematrix * >(x.c_ptr()), npoints, nvars, nneeded, eps, maxits, const_cast < alglib_impl::ae_vector * >(s2.c_ptr()), const_cast < alglib_impl::ae_matrix * >(v.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -401,8 +400,7 @@ void dsoptimalsplit2fast(real_1d_array &a, integer_1d_array &c, integer_1d_array
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::dsoptimalsplit2fast(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(tiesbuf.c_ptr()), const_cast < alglib_impl::ae_vector * >(cntbuf.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufi.c_ptr()), n, nc, alpha, &info, &threshold, &rms, &cvrms, &_alglib_env_state);
+   alglib_impl::dsoptimalsplit2fast(const_cast < alglib_impl::ae_vector * >(a.c_ptr()), const_cast < alglib_impl::ae_vector * >(c.c_ptr()), const_cast < alglib_impl::ae_vector * >(tiesbuf.c_ptr()), const_cast < alglib_impl::ae_vector * >(cntbuf.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufr.c_ptr()), const_cast < alglib_impl::ae_vector * >(bufi.c_ptr()), n, nc, alpha, &info, &threshold, &rms, &cvrms, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2697,8 +2695,7 @@ void mlpgrad(const multilayerperceptron &network, const real_1d_array &x, const 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpgrad(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(desiredy.c_ptr()), &e,
-      const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpgrad(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(desiredy.c_ptr()), &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2736,8 +2733,7 @@ void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpgradn(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(desiredy.c_ptr()), &e,
-      const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpgradn(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(desiredy.c_ptr()), &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2912,8 +2908,7 @@ void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpgradbatchsubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(idx.c_ptr()), subsetsize, &e,
-      const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpgradbatchsubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(idx.c_ptr()), subsetsize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -2985,8 +2980,7 @@ void mlpgradbatchsparsesubset(const multilayerperceptron &network, const sparsem
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpgradbatchsparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(idx.c_ptr()), subsetsize, &e,
-      const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpgradbatchsparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(idx.c_ptr()), subsetsize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3057,8 +3051,7 @@ void mlphessiannbatch(const multilayerperceptron &network, const real_2d_array &
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlphessiannbatch(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), ssize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()),
-      const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlphessiannbatch(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), ssize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3088,8 +3081,7 @@ void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &x
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlphessianbatch(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), ssize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()),
-      const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlphessianbatch(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), ssize, &e, const_cast < alglib_impl::ae_vector * >(grad.c_ptr()), const_cast < alglib_impl::ae_matrix * >(h.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3141,8 +3133,7 @@ void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpallerrorssubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize,
-      const_cast < alglib_impl::modelerrors * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpallerrorssubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize, const_cast < alglib_impl::modelerrors * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3196,8 +3187,7 @@ void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsem
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpallerrorssparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize,
-      const_cast < alglib_impl::modelerrors * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpallerrorssparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize, const_cast < alglib_impl::modelerrors * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -3266,8 +3256,7 @@ double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result =
-      alglib_impl::mlperrorsubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize, &_alglib_env_state);
+   double result = alglib_impl::mlperrorsubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
@@ -3341,8 +3330,7 @@ double mlperrorsparsesubset(const multilayerperceptron &network, const sparsemat
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   double result = alglib_impl::mlperrorsparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize,
-      &_alglib_env_state);
+   double result = alglib_impl::mlperrorsparsesubset(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::sparsematrix * >(xy.c_ptr()), setsize, const_cast < alglib_impl::ae_vector * >(subset.c_ptr()), subsetsize, &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < double *>(&result));
 }
@@ -4655,12 +4643,10 @@ alglib_impl::kmeansreport *_kmeansreport_owner::c_ptr() {
 alglib_impl::kmeansreport *_kmeansreport_owner::c_ptr() const {
    return const_cast < alglib_impl::kmeansreport * >(p_struct);
 }
-kmeansreport::kmeansreport():_kmeansreport_owner(), npoints(p_struct->npoints), nfeatures(p_struct->nfeatures), terminationtype(p_struct->terminationtype), iterationscount(p_struct->iterationscount), energy(p_struct->energy), k(p_struct->k), c(&p_struct->c),
-cidx(&p_struct->cidx) {
+kmeansreport::kmeansreport():_kmeansreport_owner(), npoints(p_struct->npoints), nfeatures(p_struct->nfeatures), terminationtype(p_struct->terminationtype), iterationscount(p_struct->iterationscount), energy(p_struct->energy), k(p_struct->k), c(&p_struct->c), cidx(&p_struct->cidx) {
 }
 
-kmeansreport::kmeansreport(const kmeansreport &rhs):_kmeansreport_owner(rhs), npoints(p_struct->npoints), nfeatures(p_struct->nfeatures), terminationtype(p_struct->terminationtype), iterationscount(p_struct->iterationscount), energy(p_struct->energy),
-k(p_struct->k), c(&p_struct->c), cidx(&p_struct->cidx) {
+kmeansreport::kmeansreport(const kmeansreport &rhs):_kmeansreport_owner(rhs), npoints(p_struct->npoints), nfeatures(p_struct->nfeatures), terminationtype(p_struct->terminationtype), iterationscount(p_struct->iterationscount), energy(p_struct->energy), k(p_struct->k), c(&p_struct->c), cidx(&p_struct->cidx) {
 }
 
 kmeansreport &kmeansreport::operator=(const kmeansreport &rhs) {
@@ -6024,13 +6010,10 @@ alglib_impl::dfreport *_dfreport_owner::c_ptr() {
 alglib_impl::dfreport *_dfreport_owner::c_ptr() const {
    return const_cast < alglib_impl::dfreport * >(p_struct);
 }
-dfreport::dfreport():_dfreport_owner(), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), oobrelclserror(p_struct->oobrelclserror), oobavgce(p_struct->oobavgce),
-oobrmserror(p_struct->oobrmserror), oobavgerror(p_struct->oobavgerror), oobavgrelerror(p_struct->oobavgrelerror), topvars(&p_struct->topvars), varimportances(&p_struct->varimportances) {
+dfreport::dfreport():_dfreport_owner(), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), oobrelclserror(p_struct->oobrelclserror), oobavgce(p_struct->oobavgce), oobrmserror(p_struct->oobrmserror), oobavgerror(p_struct->oobavgerror), oobavgrelerror(p_struct->oobavgrelerror), topvars(&p_struct->topvars), varimportances(&p_struct->varimportances) {
 }
 
-dfreport::dfreport(const dfreport &rhs):_dfreport_owner(rhs), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror),
-oobrelclserror(p_struct->oobrelclserror), oobavgce(p_struct->oobavgce), oobrmserror(p_struct->oobrmserror), oobavgerror(p_struct->oobavgerror), oobavgrelerror(p_struct->oobavgrelerror), topvars(&p_struct->topvars),
-varimportances(&p_struct->varimportances) {
+dfreport::dfreport(const dfreport &rhs):_dfreport_owner(rhs), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), oobrelclserror(p_struct->oobrelclserror), oobavgce(p_struct->oobavgce), oobrmserror(p_struct->oobrmserror), oobavgerror(p_struct->oobavgerror), oobavgrelerror(p_struct->oobavgrelerror), topvars(&p_struct->topvars), varimportances(&p_struct->varimportances) {
 }
 
 dfreport &dfreport::operator=(const dfreport &rhs) {
@@ -7250,8 +7233,7 @@ void dftsprocess(const decisionforest &df, const decisionforestbuffer &buf, cons
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::dftsprocess(const_cast < alglib_impl::decisionforest * >(df.c_ptr()), const_cast < alglib_impl::decisionforestbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::dftsprocess(const_cast < alglib_impl::decisionforest * >(df.c_ptr()), const_cast < alglib_impl::decisionforestbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -7446,8 +7428,7 @@ void dfbuildrandomdecisionforest(const real_2d_array &xy, const ae_int_t npoints
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::dfbuildrandomdecisionforest(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nvars, nclasses, ntrees, r, &info, const_cast < alglib_impl::decisionforest * >(df.c_ptr()), const_cast < alglib_impl::dfreport * >(rep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::dfbuildrandomdecisionforest(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nvars, nclasses, ntrees, r, &info, const_cast < alglib_impl::decisionforest * >(df.c_ptr()), const_cast < alglib_impl::dfreport * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -7473,8 +7454,7 @@ void dfbuildrandomdecisionforestx1(const real_2d_array &xy, const ae_int_t npoin
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::dfbuildrandomdecisionforestx1(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nvars, nclasses, ntrees, nrndvars, r, &info, const_cast < alglib_impl::decisionforest * >(df.c_ptr()),
-      const_cast < alglib_impl::dfreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::dfbuildrandomdecisionforestx1(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, nvars, nclasses, ntrees, nrndvars, r, &info, const_cast < alglib_impl::decisionforest * >(df.c_ptr()), const_cast < alglib_impl::dfreport * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -7696,12 +7676,10 @@ alglib_impl::lrreport *_lrreport_owner::c_ptr() {
 alglib_impl::lrreport *_lrreport_owner::c_ptr() const {
    return const_cast < alglib_impl::lrreport * >(p_struct);
 }
-lrreport::lrreport():_lrreport_owner(), c(&p_struct->c), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), cvrmserror(p_struct->cvrmserror), cvavgerror(p_struct->cvavgerror), cvavgrelerror(p_struct->cvavgrelerror),
-ncvdefects(p_struct->ncvdefects), cvdefects(&p_struct->cvdefects) {
+lrreport::lrreport():_lrreport_owner(), c(&p_struct->c), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), cvrmserror(p_struct->cvrmserror), cvavgerror(p_struct->cvavgerror), cvavgrelerror(p_struct->cvavgrelerror), ncvdefects(p_struct->ncvdefects), cvdefects(&p_struct->cvdefects) {
 }
 
-lrreport::lrreport(const lrreport &rhs):_lrreport_owner(rhs), c(&p_struct->c), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), cvrmserror(p_struct->cvrmserror), cvavgerror(p_struct->cvavgerror),
-cvavgrelerror(p_struct->cvavgrelerror), ncvdefects(p_struct->ncvdefects), cvdefects(&p_struct->cvdefects) {
+lrreport::lrreport(const lrreport &rhs):_lrreport_owner(rhs), c(&p_struct->c), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), cvrmserror(p_struct->cvrmserror), cvavgerror(p_struct->cvavgerror), cvavgrelerror(p_struct->cvavgrelerror), ncvdefects(p_struct->ncvdefects), cvdefects(&p_struct->cvdefects) {
 }
 
 lrreport &lrreport::operator=(const lrreport &rhs) {
@@ -7811,8 +7789,7 @@ void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t np
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lrbuilds(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), npoints, nvars, &info, const_cast < alglib_impl::linearmodel * >(lm.c_ptr()),
-      const_cast < alglib_impl::lrreport * >(ar.c_ptr()), &_alglib_env_state);
+   alglib_impl::lrbuilds(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), npoints, nvars, &info, const_cast < alglib_impl::linearmodel * >(lm.c_ptr()), const_cast < alglib_impl::lrreport * >(ar.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -7840,8 +7817,7 @@ void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t n
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::lrbuildzs(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), npoints, nvars, &info, const_cast < alglib_impl::linearmodel * >(lm.c_ptr()),
-      const_cast < alglib_impl::lrreport * >(ar.c_ptr()), &_alglib_env_state);
+   alglib_impl::lrbuildzs(const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), const_cast < alglib_impl::ae_vector * >(s.c_ptr()), npoints, nvars, &info, const_cast < alglib_impl::linearmodel * >(lm.c_ptr()), const_cast < alglib_impl::lrreport * >(ar.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -9716,8 +9692,7 @@ void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_i
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ssaanalyzesequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), nticks, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(noise.c_ptr()), &_alglib_env_state);
+   alglib_impl::ssaanalyzesequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), nticks, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()), const_cast < alglib_impl::ae_vector * >(noise.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -9806,8 +9781,7 @@ void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_ar
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ssaanalyzesequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), nticks, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()),
-      const_cast < alglib_impl::ae_vector * >(noise.c_ptr()), &_alglib_env_state);
+   alglib_impl::ssaanalyzesequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), nticks, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()), const_cast < alglib_impl::ae_vector * >(noise.c_ptr()), &_alglib_env_state);
 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
@@ -10282,8 +10256,7 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ssaforecastavgsequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), datalen, m, forecastlen, applysmoothing, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::ssaforecastavgsequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), datalen, m, forecastlen, applysmoothing, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -10380,8 +10353,7 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::ssaforecastavgsequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), datalen, m, forecastlen, applysmoothing, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::ssaforecastavgsequence(const_cast < alglib_impl::ssamodel * >(s.c_ptr()), const_cast < alglib_impl::ae_vector * >(data.c_ptr()), datalen, m, forecastlen, applysmoothing, const_cast < alglib_impl::ae_vector * >(trend.c_ptr()), &_alglib_env_state);
 
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
@@ -13423,8 +13395,7 @@ void knntsprocess(const knnmodel &model, const knnbuffer &buf, const real_1d_arr
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::knntsprocess(const_cast < alglib_impl::knnmodel * >(model.c_ptr()), const_cast < alglib_impl::knnbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::knntsprocess(const_cast < alglib_impl::knnmodel * >(model.c_ptr()), const_cast < alglib_impl::knnbuffer * >(buf.c_ptr()), const_cast < alglib_impl::ae_vector * >(x.c_ptr()), const_cast < alglib_impl::ae_vector * >(y.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -13782,12 +13753,10 @@ alglib_impl::mlpreport *_mlpreport_owner::c_ptr() {
 alglib_impl::mlpreport *_mlpreport_owner::c_ptr() const {
    return const_cast < alglib_impl::mlpreport * >(p_struct);
 }
-mlpreport::mlpreport():_mlpreport_owner(), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), ngrad(p_struct->ngrad), nhess(p_struct->nhess),
-ncholesky(p_struct->ncholesky) {
+mlpreport::mlpreport():_mlpreport_owner(), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), ngrad(p_struct->ngrad), nhess(p_struct->nhess), ncholesky(p_struct->ncholesky) {
 }
 
-mlpreport::mlpreport(const mlpreport &rhs):_mlpreport_owner(rhs), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), ngrad(p_struct->ngrad),
-nhess(p_struct->nhess), ncholesky(p_struct->ncholesky) {
+mlpreport::mlpreport(const mlpreport &rhs):_mlpreport_owner(rhs), relclserror(p_struct->relclserror), avgce(p_struct->avgce), rmserror(p_struct->rmserror), avgerror(p_struct->avgerror), avgrelerror(p_struct->avgrelerror), ngrad(p_struct->ngrad), nhess(p_struct->nhess), ncholesky(p_struct->ncholesky) {
 }
 
 mlpreport &mlpreport::operator=(const mlpreport &rhs) {
@@ -14120,8 +14089,7 @@ void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy,
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlptrainlbfgs(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()),
-      &_alglib_env_state);
+   alglib_impl::mlptrainlbfgs(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14189,8 +14157,7 @@ void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy,
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlptraines(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(trnxy.c_ptr()), trnsize, const_cast < alglib_impl::ae_matrix * >(valxy.c_ptr()), valsize, decay, restarts, &info,
-      const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlptraines(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(trnxy.c_ptr()), trnsize, const_cast < alglib_impl::ae_matrix * >(valxy.c_ptr()), valsize, decay, restarts, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14237,8 +14204,7 @@ void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &x
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpkfoldcvlbfgs(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, foldscount, &info,
-      const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), const_cast < alglib_impl::mlpcvreport * >(cvrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpkfoldcvlbfgs(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, foldscount, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), const_cast < alglib_impl::mlpcvreport * >(cvrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14283,8 +14249,7 @@ void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, 
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpkfoldcvlm(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, foldscount, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()),
-      const_cast < alglib_impl::mlpcvreport * >(cvrep.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpkfoldcvlm(const_cast < alglib_impl::multilayerperceptron * >(network.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, foldscount, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), const_cast < alglib_impl::mlpcvreport * >(cvrep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14912,8 +14877,7 @@ void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const a
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpebagginglm(const_cast < alglib_impl::mlpensemble * >(ensemble.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()),
-      const_cast < alglib_impl::mlpcvreport * >(ooberrors.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpebagginglm(const_cast < alglib_impl::mlpensemble * >(ensemble.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), const_cast < alglib_impl::mlpcvreport * >(ooberrors.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
@@ -14959,8 +14923,7 @@ void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, cons
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::mlpebagginglbfgs(const_cast < alglib_impl::mlpensemble * >(ensemble.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()),
-      const_cast < alglib_impl::mlpcvreport * >(ooberrors.c_ptr()), &_alglib_env_state);
+   alglib_impl::mlpebagginglbfgs(const_cast < alglib_impl::mlpensemble * >(ensemble.c_ptr()), const_cast < alglib_impl::ae_matrix * >(xy.c_ptr()), npoints, decay, restarts, wstep, maxits, &info, const_cast < alglib_impl::mlpreport * >(rep.c_ptr()), const_cast < alglib_impl::mlpcvreport * >(ooberrors.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }

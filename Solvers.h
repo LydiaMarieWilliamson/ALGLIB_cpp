@@ -3760,8 +3760,7 @@ bool nleqiteration(const nleqstate &state, const xparams _xparams = alglib::xdef
 //   -- ALGLIB --
 //      Copyright 20.03.2009 by Bochkanov Sergey
 //
-void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) =
-   NULL, void *ptr = NULL, const xparams _xparams = alglib::xdefault);
+void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL, const xparams _xparams = alglib::xdefault);
 
 // NLEQ solver results
 //

@@ -467,8 +467,7 @@ void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &x
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   alglib_impl::odesolverresults(const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &m, const_cast < alglib_impl::ae_vector * >(xtbl.c_ptr()), const_cast < alglib_impl::ae_matrix * >(ytbl.c_ptr()),
-      const_cast < alglib_impl::odesolverreport * >(rep.c_ptr()), &_alglib_env_state);
+   alglib_impl::odesolverresults(const_cast < alglib_impl::odesolverstate * >(state.c_ptr()), &m, const_cast < alglib_impl::ae_vector * >(xtbl.c_ptr()), const_cast < alglib_impl::ae_matrix * >(ytbl.c_ptr()), const_cast < alglib_impl::odesolverreport * >(rep.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return;
 }
