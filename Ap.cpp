@@ -5996,7 +5996,7 @@ static std::string arraytostring(const double *ptr, ae_int_t n, int _dps) {
    char mask1[0x40];
    if (sprintf(mask1, "%%.%d%s", dps, _dps >= 0 ? "f" : "e") >= (int)sizeof mask1)
       ThrowError("arraytostring(): buffer overflow");
-   char mask2[0x40];
+   char mask2[0x50];
    if (sprintf(mask2, ",%s", mask1) >= (int)sizeof mask2)
       ThrowError("arraytostring(): buffer overflow");
    for (ae_int_t i = 0; i < n; i++) {

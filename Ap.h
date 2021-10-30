@@ -221,7 +221,7 @@ ae_uint64_t ae_get_global_threading();
 void ae_set_global_threading(ae_uint64_t flg_value);
 
 // Service functions.
-typedef enum { CPU_SSE2 = 1 } ae_cpuid_t;
+typedef enum { CPU_SSE2 = 0x1, CPU_AVX2 = 0x2, CPU_FMA = 0x4 } ae_cpuid_t;
 extern const ae_cpuid_t CurCPU;
 ae_int_t ae_cores_count();
 ae_int_t ae_get_effective_workers(ae_int_t nworkers);

@@ -85165,7 +85165,7 @@ int main(int argc, char **argv) {
    printf("Libs:\n");
 #endif
 // CPUID results
-   printf("CPUID: %s\n", CurCPU & CPU_SSE2 ? "sse2" : "");
+   printf("CPUID:%s%s%s\n", CurCPU & CPU_SSE2 ? " sse2" : "", CurCPU & CPU_AVX2 ? " avx2" : "", CurCPU & CPU_FMA ? " fma" : "");
 // OS
 #if AE_OS == AE_POSIX
    printf("OS: POSIX\n");
