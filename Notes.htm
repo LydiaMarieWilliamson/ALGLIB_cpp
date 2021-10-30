@@ -542,7 +542,7 @@ The routines are listed by subpackage module:
 <li><b>A</b>: rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset</li>
 </ul></li>
 <li>8.6.9. spline1d<ul>
-<li><b>B</b>: spline1dfitpenalized, spline1dfitpenalizedw (Not supported after version 3.15, no commercial-level replacement in 3.16)</li>
+<li><b>B</b>: spline1dfitpenalized, spline1dfitpenalizedw (Not supported after version 3.15.0, no commercial-level replacement in 3.16.0)</li>
 </ul></li>
 <li>8.6.10. spline2d<ul>
 <li><b>B</b>: spline2dbuildercreate, spline2dbuildersetalgoblocklls, spline2dbuildersetalgofastddm, spline2dfit</li>
@@ -614,7 +614,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 ∙	Possible integration of a refactored C++ GUI-free version of Audacity is undergoing evaluation.
 ∙	For POSIX non-compliant configurations, the user assumes primary responsibility for maintenance.
 	No support will be provided, but corrections or fixes reported will be noted, tested (where possible) and added.
-∙	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16 manual.
+∙	Conflicting labelling in 6.3 and 6.3.1: partially repaired in the version 3.16.0 manual.
 ∙	The alglib_impl namespace in ALGLIB was mostly in C, as was TestC.cpp.
 ∙	Support for C is now moved away from in favor of nativizing the C++ code.
 	The Idw{0,1}.c files are a demonstration of possible future directions; we're also re-examining ALGLIB Version 2.
@@ -733,9 +733,9 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	to make them consistent with dfavgce() in DataAnalysis.cpp.
 	Remade ae_cpuid() as an initialization routine and replaced it by CurCPU.
 25	Separated the subpackages
-26	3.16 upgrade
+26	3.16.0 upgrade
 	Corrected a long-standing hidden bug testablasunit_testsyrk() in TestC.cpp: cct was initialized with itself, instead of with the transpose of cc.
-        All of the extra infrastructure for internal tracing and timing, added in ALGLIB starting with version 3.16, has been kept out of ALGLIB++.
+        All of the extra infrastructure for internal tracing and timing, added in ALGLIB starting with version 3.16.0, has been kept out of ALGLIB++.
 27	Normalized the Makefile
 	Minor change in Ap.cpp.
 28	Conversions of assignment expressions to update operators (++X, --X, X++, X--, X op= Y), where applicable.
@@ -920,7 +920,7 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 			redefined as task0 = splitlength(tasksize, chunksize), task1 = tasksize - task0;
 		―	Non-API routine splitlengtheven(tasksize, &amp;task0, &amp;task1)
 			redefined as task0 = splitlengtheven(tasksize), task1 = tasksize - task0;
-		―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17].
+		―	Non-API routine sortmiddlei() removed and replaced by its duplicate tagsortmiddlei() [newly added to version 3.17.0].
 		―	Non-API routines tagsortmiddleir(), tagsortmiddlei() redeclared with default offset = 0, and recoded.
 			Declarations changed from tagsortmiddlei*(a, b, offset, n) to tagsortmiddlei*(a, b, n, offset = 0).
 		―	Non-API routines tagsortfast[ir]() recoded.
@@ -1026,11 +1026,12 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 			removed "RVector *dt", it's not used by any of routine's callers,
 			replaced its use inside the routine by d, since it was copied to d after being assigned to.
 		―	rbf_clearreportfields(): removed and inserted inline at its point of use.
-38	Integration of version 3.17.
+38	Integration of version 3.17.0.
 	Minor corrections in TestC.cpp:
 	∙	Removed duplicate initialization of x in the &quot;Test CG solver&quot; loop of testfbls().
 	∙	Dangling references to &quot;isupper&quot; in sparserealcholeskytest() resolved.
 	∙	Dangling reference to &quot;solvertype&quot; in testminlpunit_singlecalltests() resolved.
+39	Integration of version 3.18.0.
 </pre>
 </p>
 <p>
@@ -1100,11 +1101,11 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 24	2208 3485 3461 3307 1554066501 (5ca12c45) 203 // The bugs in the dforest module and tester were repaired.
 24	2242 3485 3473 3277 1555921305 (5cbd7999) 205
 25	2283 3559 3498 3279 1557611349 (5cd74355) 203
-25	2283 3534 3510 3235 1580240643 (5e308f03) 212 // Final fixes in preparation for upgrade to 3.16.
-25	2299 3559 3510 3243 1580249792 (5e30b2c0) 204 // Final fixes in preparation for upgrade to 3.16.
-25	2268 3521 3498 3287 1580340998 (5e321706) 200 // Final test of Version 3.15.
-30	2257 3534 3486 3279 1581358777 (5e419eb9) 202 // Final test of Version 3.15 with retrofits.
-26	2146 3402 3486 3230 1580248905 (5e30af49) 220 // Version 3.16.
+25	2283 3534 3510 3235 1580240643 (5e308f03) 212 // Final fixes in preparation for upgrade to 3.16.0.
+25	2299 3559 3510 3243 1580249792 (5e30b2c0) 204 // Final fixes in preparation for upgrade to 3.16.0.
+25	2268 3521 3498 3287 1580340998 (5e321706) 200 // Final test of Version 3.15.0.
+30	2257 3534 3486 3279 1581358777 (5e419eb9) 202 // Final test of Version 3.15.0 with retrofits.
+26	2146 3402 3486 3230 1580248905 (5e30af49) 220 // Version 3.16.0.
 26	2294 3449 3522 3247 1580273645 (5e310fed) 212
 26	2273 3534 3461 2865 1580343048 (5e321f08) 213
 26	2299 3472 3486 3252 1580940186 (5e3b3b9a) 225
@@ -1167,6 +1168,7 @@ In the case of TestX, not all tests were done cleanly (i.e. with background proc
 38	1934 3135 3237 2868 1623033790 (60bd87be) 198 // Tests resumed, following updates to the local system &amp; compiler (to GCC version 11.1.1).
 38	3571 5525 5684 4897 1624304616 (60d0ebe8) 84 // Testing on System B.
 38	5181 7937 8003 7185 1635364271 (6179adaf) 75 // Minor modifications to hqrnd.
+39	5405 0.9x 7463 1.1x 8336 1.0x 7351 1.0x 1635575856 (617ce830) 72 // Reordering sub-packages to match 3.18.0.
 </pre>
 </p>
 </div>

@@ -16,126 +16,6 @@
 
 #include "AlgLibInternal.h"
 
-// === NEARESTNEIGHBOR Package ===
-// Depends on: (AlgLibInternal) SCODES, TSORT
-namespace alglib_impl {
-struct kdtreerequestbuffer {
-   ae_vector x;
-   ae_vector boxmin;
-   ae_vector boxmax;
-   ae_int_t kneeded;
-   double rneeded;
-   bool selfmatch;
-   double approxf;
-   ae_int_t kcur;
-   ae_vector idx;
-   ae_vector r;
-   ae_vector buf;
-   ae_vector curboxmin;
-   ae_vector curboxmax;
-   double curdist;
-};
-void kdtreerequestbuffer_init(void *_p, bool make_automatic);
-void kdtreerequestbuffer_copy(void *_dst, void *_src, bool make_automatic);
-void kdtreerequestbuffer_free(void *_p, bool make_automatic);
-
-struct kdtree {
-   ae_int_t n;
-   ae_int_t nx;
-   ae_int_t ny;
-   ae_int_t normtype;
-   ae_matrix xy;
-   ae_vector tags;
-   ae_vector boxmin;
-   ae_vector boxmax;
-   ae_vector nodes;
-   ae_vector splits;
-   kdtreerequestbuffer innerbuf;
-   ae_int_t debugcounter;
-};
-void kdtree_init(void *_p, bool make_automatic);
-void kdtree_copy(void *_dst, void *_src, bool make_automatic);
-void kdtree_free(void *_p, bool make_automatic);
-void kdtreealloc(ae_serializer *s, kdtree *tree);
-void kdtreeserialize(ae_serializer *s, kdtree *tree);
-void kdtreeunserialize(ae_serializer *s, kdtree *tree);
-
-void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf);
-void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt);
-void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt);
-ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch);
-ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch);
-ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch);
-ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch);
-ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch);
-ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch);
-ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch, double eps);
-ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, double eps);
-ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin, RVector *boxmax);
-ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax);
-void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x);
-void kdtreequeryresultsx(kdtree *kdt, RMatrix *x);
-void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy);
-void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy);
-void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *tags);
-void kdtreequeryresultstags(kdtree *kdt, ZVector *tags);
-void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVector *r);
-void kdtreequeryresultsdistances(kdtree *kdt, RVector *r);
-void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x);
-void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy);
-void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags);
-void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r);
-void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax);
-void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype);
-void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k);
-void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_int_t *nodele, ae_int_t *nodege);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(kdtreerequestbuffer, EndD);
-DecClass(kdtree, EndD);
-void kdtreeserialize(kdtree &obj, std::string &s_out);
-void kdtreeserialize(kdtree &obj, std::ostream &s_out);
-void kdtreeunserialize(const std::string &s_in, kdtree &obj);
-void kdtreeunserialize(const std::istream &s_in, kdtree &obj);
-
-void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf);
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
-void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
-void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
-void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
-ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k);
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
-ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k);
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
-ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
-ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r);
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
-ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
-ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r);
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
-ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps);
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
-ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps);
-ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax);
-ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax);
-void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x);
-void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x);
-void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy);
-void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy);
-void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags);
-void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags);
-void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r);
-void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r);
-void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x);
-void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy);
-void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags);
-void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r);
-} // end of namespace alglib
-
 // === HQRND Package ===
 // Depends on: (AlgLibInternal) APSERV, ABLASF
 namespace alglib_impl {
@@ -265,6 +145,126 @@ void xdebugc2neg(const complex_2d_array &a);
 void xdebugc2transpose(complex_2d_array &a);
 void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
 double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c);
+} // end of namespace alglib
+
+// === NEARESTNEIGHBOR Package ===
+// Depends on: (AlgLibInternal) SCODES, TSORT
+namespace alglib_impl {
+struct kdtreerequestbuffer {
+   ae_vector x;
+   ae_vector boxmin;
+   ae_vector boxmax;
+   ae_int_t kneeded;
+   double rneeded;
+   bool selfmatch;
+   double approxf;
+   ae_int_t kcur;
+   ae_vector idx;
+   ae_vector r;
+   ae_vector buf;
+   ae_vector curboxmin;
+   ae_vector curboxmax;
+   double curdist;
+};
+void kdtreerequestbuffer_init(void *_p, bool make_automatic);
+void kdtreerequestbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void kdtreerequestbuffer_free(void *_p, bool make_automatic);
+
+struct kdtree {
+   ae_int_t n;
+   ae_int_t nx;
+   ae_int_t ny;
+   ae_int_t normtype;
+   ae_matrix xy;
+   ae_vector tags;
+   ae_vector boxmin;
+   ae_vector boxmax;
+   ae_vector nodes;
+   ae_vector splits;
+   kdtreerequestbuffer innerbuf;
+   ae_int_t debugcounter;
+};
+void kdtree_init(void *_p, bool make_automatic);
+void kdtree_copy(void *_dst, void *_src, bool make_automatic);
+void kdtree_free(void *_p, bool make_automatic);
+void kdtreealloc(ae_serializer *s, kdtree *tree);
+void kdtreeserialize(ae_serializer *s, kdtree *tree);
+void kdtreeunserialize(ae_serializer *s, kdtree *tree);
+
+void kdtreecreaterequestbuffer(kdtree *kdt, kdtreerequestbuffer *buf);
+void kdtreebuildtagged(RMatrix *xy, ZVector *tags, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt);
+void kdtreebuild(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t normtype, kdtree *kdt);
+ae_int_t kdtreetsqueryknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch);
+ae_int_t kdtreequeryknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch);
+ae_int_t kdtreetsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch);
+ae_int_t kdtreequeryrnn(kdtree *kdt, RVector *x, double r, bool selfmatch);
+ae_int_t kdtreetsqueryrnnu(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, double r, bool selfmatch);
+ae_int_t kdtreequeryrnnu(kdtree *kdt, RVector *x, double r, bool selfmatch);
+ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae_int_t k, bool selfmatch, double eps);
+ae_int_t kdtreequeryaknn(kdtree *kdt, RVector *x, ae_int_t k, bool selfmatch, double eps);
+ae_int_t kdtreetsquerybox(kdtree *kdt, kdtreerequestbuffer *buf, RVector *boxmin, RVector *boxmax);
+ae_int_t kdtreequerybox(kdtree *kdt, RVector *boxmin, RVector *boxmax);
+void kdtreetsqueryresultsx(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *x);
+void kdtreequeryresultsx(kdtree *kdt, RMatrix *x);
+void kdtreetsqueryresultsxy(kdtree *kdt, kdtreerequestbuffer *buf, RMatrix *xy);
+void kdtreequeryresultsxy(kdtree *kdt, RMatrix *xy);
+void kdtreetsqueryresultstags(kdtree *kdt, kdtreerequestbuffer *buf, ZVector *tags);
+void kdtreequeryresultstags(kdtree *kdt, ZVector *tags);
+void kdtreetsqueryresultsdistances(kdtree *kdt, kdtreerequestbuffer *buf, RVector *r);
+void kdtreequeryresultsdistances(kdtree *kdt, RVector *r);
+void kdtreequeryresultsxi(kdtree *kdt, RMatrix *x);
+void kdtreequeryresultsxyi(kdtree *kdt, RMatrix *xy);
+void kdtreequeryresultstagsi(kdtree *kdt, ZVector *tags);
+void kdtreequeryresultsdistancesi(kdtree *kdt, RVector *r);
+void kdtreeexplorebox(kdtree *kdt, RVector *boxmin, RVector *boxmax);
+void kdtreeexplorenodetype(kdtree *kdt, ae_int_t node, ae_int_t *nodetype);
+void kdtreeexploreleaf(kdtree *kdt, ae_int_t node, RMatrix *xy, ae_int_t *k);
+void kdtreeexploresplit(kdtree *kdt, ae_int_t node, ae_int_t *d, double *s, ae_int_t *nodele, ae_int_t *nodege);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(kdtreerequestbuffer, EndD);
+DecClass(kdtree, EndD);
+void kdtreeserialize(kdtree &obj, std::string &s_out);
+void kdtreeserialize(kdtree &obj, std::ostream &s_out);
+void kdtreeunserialize(const std::string &s_in, kdtree &obj);
+void kdtreeunserialize(const std::istream &s_in, kdtree &obj);
+
+void kdtreecreaterequestbuffer(const kdtree &kdt, kdtreerequestbuffer &buf);
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+void kdtreebuildtagged(const real_2d_array &xy, const integer_1d_array &tags, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+void kdtreebuild(const real_2d_array &xy, const ae_int_t n, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+void kdtreebuild(const real_2d_array &xy, const ae_int_t nx, const ae_int_t ny, const ae_int_t normtype, kdtree &kdt);
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
+ae_int_t kdtreetsqueryknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k);
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch);
+ae_int_t kdtreequeryknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k);
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
+ae_int_t kdtreetsqueryrnn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
+ae_int_t kdtreequeryrnn(const kdtree &kdt, const real_1d_array &x, const double r);
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r, const bool selfmatch);
+ae_int_t kdtreetsqueryrnnu(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const double r);
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r, const bool selfmatch);
+ae_int_t kdtreequeryrnnu(const kdtree &kdt, const real_1d_array &x, const double r);
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
+ae_int_t kdtreetsqueryaknn(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &x, const ae_int_t k, const double eps);
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const bool selfmatch, const double eps);
+ae_int_t kdtreequeryaknn(const kdtree &kdt, const real_1d_array &x, const ae_int_t k, const double eps);
+ae_int_t kdtreetsquerybox(const kdtree &kdt, const kdtreerequestbuffer &buf, const real_1d_array &boxmin, const real_1d_array &boxmax);
+ae_int_t kdtreequerybox(const kdtree &kdt, const real_1d_array &boxmin, const real_1d_array &boxmax);
+void kdtreetsqueryresultsx(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &x);
+void kdtreequeryresultsx(const kdtree &kdt, real_2d_array &x);
+void kdtreetsqueryresultsxy(const kdtree &kdt, const kdtreerequestbuffer &buf, real_2d_array &xy);
+void kdtreequeryresultsxy(const kdtree &kdt, real_2d_array &xy);
+void kdtreetsqueryresultstags(const kdtree &kdt, const kdtreerequestbuffer &buf, integer_1d_array &tags);
+void kdtreequeryresultstags(const kdtree &kdt, integer_1d_array &tags);
+void kdtreetsqueryresultsdistances(const kdtree &kdt, const kdtreerequestbuffer &buf, real_1d_array &r);
+void kdtreequeryresultsdistances(const kdtree &kdt, real_1d_array &r);
+void kdtreequeryresultsxi(const kdtree &kdt, real_2d_array &x);
+void kdtreequeryresultsxyi(const kdtree &kdt, real_2d_array &xy);
+void kdtreequeryresultstagsi(const kdtree &kdt, integer_1d_array &tags);
+void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r);
 } // end of namespace alglib
 
 #endif // OnceOnly

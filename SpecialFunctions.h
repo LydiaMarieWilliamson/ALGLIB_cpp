@@ -55,6 +55,44 @@ double bivariatenormalpdf(const double x, const double y, const double rho);
 double bivariatenormalcdf(const double x, const double y, const double rho);
 } // end of namespace alglib
 
+// === IBETAF Package ===
+// Depends on: GAMMAFUNC, NORMALDISTR
+namespace alglib_impl {
+double incompletebeta(double a, double b, double x);
+double invincompletebeta(double a, double b, double y);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double incompletebeta(const double a, const double b, const double x);
+double invincompletebeta(const double a, const double b, const double y);
+} // end of namespace alglib
+
+// === STUDENTTDISTR Package ===
+// Depends on: IBETAF
+namespace alglib_impl {
+double studenttdistribution(ae_int_t k, double t);
+double invstudenttdistribution(ae_int_t k, double p);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double studenttdistribution(const ae_int_t k, const double t);
+double invstudenttdistribution(const ae_int_t k, const double p);
+} // end of namespace alglib
+
+// === FDISTR Package ===
+// Depends on: IBETAF
+namespace alglib_impl {
+double fdistribution(ae_int_t a, ae_int_t b, double x);
+double fcdistribution(ae_int_t a, ae_int_t b, double x);
+double invfdistribution(ae_int_t a, ae_int_t b, double y);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double fdistribution(const ae_int_t a, const ae_int_t b, const double x);
+double fcdistribution(const ae_int_t a, const ae_int_t b, const double x);
+double invfdistribution(const ae_int_t a, const ae_int_t b, const double y);
+} // end of namespace alglib
+
 // === IGAMMAF Package ===
 // Depends on: GAMMAFUNC, NORMALDISTR
 namespace alglib_impl {
@@ -69,21 +107,139 @@ double incompletegammac(const double a, const double x);
 double invincompletegammac(const double a, const double y0);
 } // end of namespace alglib
 
-// === ELLIPTIC Package ===
+// === CHISQUAREDISTR Package ===
+// Depends on: IGAMMAF
 namespace alglib_impl {
-double ellipticintegralkhighprecision(double m1);
-double ellipticintegralk(double m);
-double incompleteellipticintegralk(double phi, double m);
-double ellipticintegrale(double m);
-double incompleteellipticintegrale(double phi, double m);
+double chisquaredistribution(double v, double x);
+double chisquarecdistribution(double v, double x);
+double invchisquaredistribution(double v, double y);
 } // end of namespace alglib_impl
 
 namespace alglib {
-double ellipticintegralkhighprecision(const double m1);
-double ellipticintegralk(const double m);
-double incompleteellipticintegralk(const double phi, const double m);
-double ellipticintegrale(const double m);
-double incompleteellipticintegrale(const double phi, const double m);
+double chisquaredistribution(const double v, const double x);
+double chisquarecdistribution(const double v, const double x);
+double invchisquaredistribution(const double v, const double y);
+} // end of namespace alglib
+
+// === BINOMIALDISTR Package ===
+// Depends on: (AlgLibInternal) NEARUNITYUNIT
+// Depends on: IBETAF
+namespace alglib_impl {
+double binomialdistribution(ae_int_t k, ae_int_t n, double p);
+double binomialcdistribution(ae_int_t k, ae_int_t n, double p);
+double invbinomialdistribution(ae_int_t k, ae_int_t n, double y);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p);
+double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p);
+double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y);
+} // end of namespace alglib
+
+// === EXPINTEGRALS Package ===
+namespace alglib_impl {
+double exponentialintegralei(double x);
+double exponentialintegralen(double x, ae_int_t n);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double exponentialintegralei(const double x);
+double exponentialintegralen(const double x, const ae_int_t n);
+} // end of namespace alglib
+
+// === JACOBIANELLIPTIC Package ===
+namespace alglib_impl {
+void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph);
+} // end of namespace alglib
+
+// === TRIGINTEGRALS Package ===
+namespace alglib_impl {
+void sinecosineintegrals(double x, double *si, double *ci);
+void hyperbolicsinecosineintegrals(double x, double *shi, double *chi);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void sinecosineintegrals(const double x, double &si, double &ci);
+void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi);
+} // end of namespace alglib
+
+// === CHEBYSHEV Package ===
+namespace alglib_impl {
+double chebyshevcalculate(ae_int_t r, ae_int_t n, double x);
+double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x);
+void chebyshevcoefficients(ae_int_t n, RVector *c);
+void fromchebyshev(RVector *a, ae_int_t n, RVector *b);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x);
+double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x);
+void chebyshevcoefficients(const ae_int_t n, real_1d_array &c);
+void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b);
+} // end of namespace alglib
+
+// === POISSONDISTR Package ===
+// Depends on: IGAMMAF
+namespace alglib_impl {
+double poissondistribution(ae_int_t k, double m);
+double poissoncdistribution(ae_int_t k, double m);
+double invpoissondistribution(ae_int_t k, double y);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double poissondistribution(const ae_int_t k, const double m);
+double poissoncdistribution(const ae_int_t k, const double m);
+double invpoissondistribution(const ae_int_t k, const double y);
+} // end of namespace alglib
+
+// === BETAF Package ===
+// Depends on: GAMMAFUNC
+namespace alglib_impl {
+double beta(double a, double b);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double beta(const double a, const double b);
+} // end of namespace alglib
+
+// === FRESNEL Package ===
+namespace alglib_impl {
+void fresnelintegral(double x, double *c, double *s);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void fresnelintegral(const double x, double &c, double &s);
+} // end of namespace alglib
+
+// === PSIF Package ===
+namespace alglib_impl {
+double psi(double x);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double psi(const double x);
+} // end of namespace alglib
+
+// === AIRYF Package ===
+namespace alglib_impl {
+void airy(double x, double *ai, double *aip, double *bi, double *bip);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void airy(const double x, double &ai, double &aip, double &bi, double &bip);
+} // end of namespace alglib
+
+// === DAWSON Package ===
+namespace alglib_impl {
+double dawsonintegral(double x);
+} // end of namespace alglib_impl
+
+namespace alglib {
+double dawsonintegral(const double x);
 } // end of namespace alglib
 
 // === HERMITE Package ===
@@ -99,38 +255,17 @@ double hermitesum(const real_1d_array &c, const ae_int_t n, const double x);
 void hermitecoefficients(const ae_int_t n, real_1d_array &c);
 } // end of namespace alglib
 
-// === DAWSON Package ===
+// === LEGENDRE Package ===
 namespace alglib_impl {
-double dawsonintegral(double x);
+double legendrecalculate(ae_int_t n, double x);
+double legendresum(RVector *c, ae_int_t n, double x);
+void legendrecoefficients(ae_int_t n, RVector *c);
 } // end of namespace alglib_impl
 
 namespace alglib {
-double dawsonintegral(const double x);
-} // end of namespace alglib
-
-// === TRIGINTEGRALS Package ===
-namespace alglib_impl {
-void sinecosineintegrals(double x, double *si, double *ci);
-void hyperbolicsinecosineintegrals(double x, double *shi, double *chi);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void sinecosineintegrals(const double x, double &si, double &ci);
-void hyperbolicsinecosineintegrals(const double x, double &shi, double &chi);
-} // end of namespace alglib
-
-// === POISSONDISTR Package ===
-// Depends on: IGAMMAF
-namespace alglib_impl {
-double poissondistribution(ae_int_t k, double m);
-double poissoncdistribution(ae_int_t k, double m);
-double invpoissondistribution(ae_int_t k, double y);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double poissondistribution(const ae_int_t k, const double m);
-double poissoncdistribution(const ae_int_t k, const double m);
-double invpoissondistribution(const ae_int_t k, const double y);
+double legendrecalculate(const ae_int_t n, const double x);
+double legendresum(const real_1d_array &c, const ae_int_t n, const double x);
+void legendrecoefficients(const ae_int_t n, real_1d_array &c);
 } // end of namespace alglib
 
 // === BESSEL Package ===
@@ -162,70 +297,6 @@ double besselk1(const double x);
 double besselkn(const ae_int_t nn, const double x);
 } // end of namespace alglib
 
-// === IBETAF Package ===
-// Depends on: GAMMAFUNC, NORMALDISTR
-namespace alglib_impl {
-double incompletebeta(double a, double b, double x);
-double invincompletebeta(double a, double b, double y);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double incompletebeta(const double a, const double b, const double x);
-double invincompletebeta(const double a, const double b, const double y);
-} // end of namespace alglib
-
-// === FDISTR Package ===
-// Depends on: IBETAF
-namespace alglib_impl {
-double fdistribution(ae_int_t a, ae_int_t b, double x);
-double fcdistribution(ae_int_t a, ae_int_t b, double x);
-double invfdistribution(ae_int_t a, ae_int_t b, double y);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double fdistribution(const ae_int_t a, const ae_int_t b, const double x);
-double fcdistribution(const ae_int_t a, const ae_int_t b, const double x);
-double invfdistribution(const ae_int_t a, const ae_int_t b, const double y);
-} // end of namespace alglib
-
-// === FRESNEL Package ===
-namespace alglib_impl {
-void fresnelintegral(double x, double *c, double *s);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void fresnelintegral(const double x, double &c, double &s);
-} // end of namespace alglib
-
-// === JACOBIANELLIPTIC Package ===
-namespace alglib_impl {
-void jacobianellipticfunctions(double u, double m, double *sn, double *cn, double *dn, double *ph);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void jacobianellipticfunctions(const double u, const double m, double &sn, double &cn, double &dn, double &ph);
-} // end of namespace alglib
-
-// === PSIF Package ===
-namespace alglib_impl {
-double psi(double x);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double psi(const double x);
-} // end of namespace alglib
-
-// === EXPINTEGRALS Package ===
-namespace alglib_impl {
-double exponentialintegralei(double x);
-double exponentialintegralen(double x, ae_int_t n);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double exponentialintegralei(const double x);
-double exponentialintegralen(const double x, const ae_int_t n);
-} // end of namespace alglib
-
 // === LAGUERRE Package ===
 namespace alglib_impl {
 double laguerrecalculate(ae_int_t n, double x);
@@ -239,92 +310,21 @@ double laguerresum(const real_1d_array &c, const ae_int_t n, const double x);
 void laguerrecoefficients(const ae_int_t n, real_1d_array &c);
 } // end of namespace alglib
 
-// === CHISQUAREDISTR Package ===
-// Depends on: IGAMMAF
+// === ELLIPTIC Package ===
 namespace alglib_impl {
-double chisquaredistribution(double v, double x);
-double chisquarecdistribution(double v, double x);
-double invchisquaredistribution(double v, double y);
+double ellipticintegralkhighprecision(double m1);
+double ellipticintegralk(double m);
+double incompleteellipticintegralk(double phi, double m);
+double ellipticintegrale(double m);
+double incompleteellipticintegrale(double phi, double m);
 } // end of namespace alglib_impl
 
 namespace alglib {
-double chisquaredistribution(const double v, const double x);
-double chisquarecdistribution(const double v, const double x);
-double invchisquaredistribution(const double v, const double y);
-} // end of namespace alglib
-
-// === LEGENDRE Package ===
-namespace alglib_impl {
-double legendrecalculate(ae_int_t n, double x);
-double legendresum(RVector *c, ae_int_t n, double x);
-void legendrecoefficients(ae_int_t n, RVector *c);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double legendrecalculate(const ae_int_t n, const double x);
-double legendresum(const real_1d_array &c, const ae_int_t n, const double x);
-void legendrecoefficients(const ae_int_t n, real_1d_array &c);
-} // end of namespace alglib
-
-// === BETAF Package ===
-// Depends on: GAMMAFUNC
-namespace alglib_impl {
-double beta(double a, double b);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double beta(const double a, const double b);
-} // end of namespace alglib
-
-// === CHEBYSHEV Package ===
-namespace alglib_impl {
-double chebyshevcalculate(ae_int_t r, ae_int_t n, double x);
-double chebyshevsum(RVector *c, ae_int_t r, ae_int_t n, double x);
-void chebyshevcoefficients(ae_int_t n, RVector *c);
-void fromchebyshev(RVector *a, ae_int_t n, RVector *b);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double chebyshevcalculate(const ae_int_t r, const ae_int_t n, const double x);
-double chebyshevsum(const real_1d_array &c, const ae_int_t r, const ae_int_t n, const double x);
-void chebyshevcoefficients(const ae_int_t n, real_1d_array &c);
-void fromchebyshev(const real_1d_array &a, const ae_int_t n, real_1d_array &b);
-} // end of namespace alglib
-
-// === STUDENTTDISTR Package ===
-// Depends on: IBETAF
-namespace alglib_impl {
-double studenttdistribution(ae_int_t k, double t);
-double invstudenttdistribution(ae_int_t k, double p);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double studenttdistribution(const ae_int_t k, const double t);
-double invstudenttdistribution(const ae_int_t k, const double p);
-} // end of namespace alglib
-
-// === BINOMIALDISTR Package ===
-// Depends on: (AlgLibInternal) NEARUNITYUNIT
-// Depends on: IBETAF
-namespace alglib_impl {
-double binomialdistribution(ae_int_t k, ae_int_t n, double p);
-double binomialcdistribution(ae_int_t k, ae_int_t n, double p);
-double invbinomialdistribution(ae_int_t k, ae_int_t n, double y);
-} // end of namespace alglib_impl
-
-namespace alglib {
-double binomialdistribution(const ae_int_t k, const ae_int_t n, const double p);
-double binomialcdistribution(const ae_int_t k, const ae_int_t n, const double p);
-double invbinomialdistribution(const ae_int_t k, const ae_int_t n, const double y);
-} // end of namespace alglib
-
-// === AIRYF Package ===
-namespace alglib_impl {
-void airy(double x, double *ai, double *aip, double *bi, double *bip);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void airy(const double x, double &ai, double &aip, double &bi, double &bip);
+double ellipticintegralkhighprecision(const double m1);
+double ellipticintegralk(const double m);
+double incompleteellipticintegralk(const double phi, const double m);
+double ellipticintegrale(const double m);
+double incompleteellipticintegrale(const double phi, const double m);
 } // end of namespace alglib
 
 #endif // OnceOnly

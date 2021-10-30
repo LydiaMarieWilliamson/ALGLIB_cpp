@@ -14,6 +14,1363 @@
 #define InAlgLib
 #include "AlgLibMisc.h"
 
+// === HQRND Package ===
+// Depends on: (AlgLibInternal) APSERV, ABLASF
+namespace alglib_impl {
+static const ae_int_t hqrnd_hqrndm1 = 1 + 2 * 3 * 7 * 631 * 81031; // == 2^31 - 85
+static const ae_int_t hqrnd_hqrndm2 = 1 + 2 * 19 * 31 * 1019 * 1789; // == 2^31 - 249
+static const ae_int_t hqrnd_hqrndmax = hqrnd_hqrndm1 - 2;
+static const ae_int_t hqrnd_hqrndmagic = 1634357784;
+
+// HQRNDState  initialization  with  random  values  which come from standard
+// RNG.
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndrandomize(hqrndstate &state);
+void hqrndrandomize(hqrndstate *state) {
+   ae_int_t s0;
+   ae_int_t s1;
+   SetObj(hqrndstate, state);
+   s0 = ae_randominteger(hqrnd_hqrndm1);
+   s1 = ae_randominteger(hqrnd_hqrndm2);
+   hqrndseed(s0, s1, state);
+}
+
+// HQRNDState initialization with seed values
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
+void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state) {
+   SetObj(hqrndstate, state);
+// Protection against negative seeds:
+//
+//     SEED := -(SEED+1)
+//
+// We can't use just "-SEED" because there exists an integer number  N
+// such that -N < 0 and +N < 0. (This number is equal to 0x800...000).
+// The need  to handle such  a seed correctly  forces us to  use a bit
+// more complicated formula.
+   if (s1 < 0) {
+      s1 = -(s1 + 1);
+   }
+   if (s2 < 0) {
+      s2 = -(s2 + 1);
+   }
+   state->s1 = s1 % (hqrnd_hqrndm1 - 1) + 1;
+   state->s2 = s2 % (hqrnd_hqrndm2 - 1) + 1;
+   state->magicv = hqrnd_hqrndmagic;
+}
+
+// This function returns random integer in [0,HQRNDMax]
+//
+// P.L'Ecuyer, ‟Efficient and portable combined random number generators”, CACM 31(6), June 1988, 742-751.
+static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state) {
+   const ae_int_t a1 = 40014, q1 = hqrnd_hqrndm1 / a1, r1 = hqrnd_hqrndm1 % a1;
+   const ae_int_t a2 = 40692, q2 = hqrnd_hqrndm2 / a2, r2 = hqrnd_hqrndm2 % a2;
+// This requires:
+// ∙    (hqrnd_hqrndm1 - 1)/2 and (hqrnd_hqrndm2 - 1)/2 be relatively prime,
+// ∙    a1^2 < hqrnd_hqrndm1 and a2^2 < hqrnd_hqrndm2,
+// ∙    0 <= state->s1 < hqrnd_hqrndm1, 0 <= state->s2 < hqrnd_hqrndm2.
+// Under these conditions, the following is equivalent to:
+// ∙    state->s1 = a1 * state->s1 % hqrnd_hqrndm1, state->s2 = a2 * state->s2 % hqrnd_hqrndm2;
+// and 0 <= state->s1 < hqrnd_hqrndm1, 0 <= state->s2 < hqrnd_hqrndm2 continues to hold.
+// The period of the generator is:
+//      (hqrnd_hqrndm1 - 1)(hqrnd_hqrndm2 - 1)/2 == 2 * 3 * 7 * 19 * 31 * 631 * 1019 * 1789 * 81031 == 2^61 - 360777242114
+   ae_int_t k;
+   ae_int_t result;
+   ae_assert(state->magicv == hqrnd_hqrndmagic, "hqrnd_hqrndintegerbase: state is not correctly initialized!");
+   k = state->s1 / q1;
+   state->s1 = a1 * (state->s1 - k * q1) - k * r1;
+   if (state->s1 < 0) {
+      state->s1 += hqrnd_hqrndm1;
+   }
+   k = state->s2 / q2;
+   state->s2 = a2 * (state->s2 - k * q2) - k * r2;
+   if (state->s2 < 0) {
+      state->s2 += hqrnd_hqrndm2;
+   }
+// Result
+   result = state->s1 - state->s2;
+   if (result < 1) {
+      result += hqrnd_hqrndmax;
+   } else {
+      result--;
+   }
+   return result;
+}
+
+// This function generates random real number in (0,1),
+// not including interval boundaries
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: double hqrnduniformr(const hqrndstate &state);
+double hqrnduniformr(hqrndstate *state) {
+   double result;
+   result = (double)(hqrnd_hqrndintegerbase(state) + 1) / (double)(hqrnd_hqrndmax + 2);
+   return result;
+}
+
+// This function generates random real number in (-1,+1),
+// not including interval boundaries
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: double hqrndmiduniformr(const hqrndstate &state);
+double hqrndmiduniformr(hqrndstate *state) {
+   double result;
+   result = (double)(2 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (double)(hqrnd_hqrndmax + 2);
+   return result;
+}
+
+// This function generates random integer number in [0, N)
+//
+// 1. State structure must be initialized with HQRNDRandomize() or HQRNDSeed()
+// 2. N can be any positive number except for very large numbers:
+//    * close to 2^31 on 32-bit systems
+//    * close to 2^62 on 64-bit systems
+//    An exception will be generated if N is too large.
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
+ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
+   ae_int_t maxcnt;
+   ae_int_t mx;
+   ae_int_t a;
+   ae_int_t b;
+   ae_int_t result;
+   ae_assert(n > 0, "hqrnduniformi: N <= 0!");
+   maxcnt = hqrnd_hqrndmax + 1;
+// Two branches: one for N <= MaxCnt, another for N>MaxCnt.
+   if (n > maxcnt) {
+   // N >= MaxCnt.
+   //
+   // We have two options here:
+   // a) N is exactly divisible by MaxCnt
+   // b) N is not divisible by MaxCnt
+   //
+   // In both cases we reduce problem on interval spanning [0,N)
+   // to several subproblems on intervals spanning [0,MaxCnt).
+      if (n % maxcnt == 0) {
+      // N is exactly divisible by MaxCnt.
+      //
+      // [0,N) range is dividided into N/MaxCnt bins,
+      // each of them having length equal to MaxCnt.
+      //
+      // We generate:
+      // * random bin number B
+      // * random offset within bin A
+      // Both random numbers are generated by recursively
+      // calling hqrnduniformi().
+      //
+      // Result is equal to A+MaxCnt*B.
+         ae_assert(n / maxcnt <= maxcnt, "hqrnduniformi: N is too large");
+         a = hqrnduniformi(state, maxcnt);
+         b = hqrnduniformi(state, n / maxcnt);
+         result = a + maxcnt * b;
+      } else {
+      // N is NOT exactly divisible by MaxCnt.
+      //
+      // [0,N) range is dividided into ceil(N/MaxCnt) bins,
+      // each of them having length equal to MaxCnt.
+      //
+      // We generate:
+      // * random bin number B in [0, ceil(N/MaxCnt)-1]
+      // * random offset within bin A
+      // * if both of what is below is true
+      //   1) bin number B is that of the last bin
+      //   2) A >= N mod MaxCnt
+      //   then we repeat generation of A/B.
+      //   This stage is essential in order to avoid bias in the result.
+      // * otherwise, we return A*MaxCnt+N
+         ae_assert(n / maxcnt + 1 <= maxcnt, "hqrnduniformi: N is too large");
+         result = -1;
+         do {
+            a = hqrnduniformi(state, maxcnt);
+            b = hqrnduniformi(state, n / maxcnt + 1);
+            if (b == n / maxcnt && a >= n % maxcnt) {
+               continue;
+            }
+            result = a + maxcnt * b;
+         } while (result < 0);
+      }
+   } else {
+   // N <= MaxCnt
+   //
+   // Code below is a bit complicated because we can not simply
+   // return "hqrnd_hqrndintegerbase() mod N" - it will be skewed for
+   // large N's in [0.1*hqrnd_hqrndmax...hqrnd_hqrndmax].
+      mx = maxcnt - maxcnt % n;
+      do {
+         result = hqrnd_hqrndintegerbase(state);
+      } while (result >= mx);
+      result %= n;
+   }
+   return result;
+}
+
+// Random number generator: normal numbers
+//
+// This function generates two independent random numbers from normal
+// distribution. Its performance is equal to that of HQRNDNormal()
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndnormal2(const hqrndstate &state, double &x1, double &x2);
+void hqrndnormal2(hqrndstate *state, double *x1, double *x2) {
+   double u;
+   double v;
+   double s;
+   *x1 = 0;
+   *x2 = 0;
+   while (true) {
+      u = hqrndmiduniformr(state);
+      v = hqrndmiduniformr(state);
+      s = ae_sqr(u) + ae_sqr(v);
+      if (s > 0.0 && s < 1.0) {
+      // two sqrt's instead of one to
+      // avoid overflow when S is too small
+         s = sqrt(-2 * log(s)) / sqrt(s);
+         *x1 = u * s;
+         *x2 = v * s;
+         return;
+      }
+   }
+}
+
+// Random number generator: normal numbers
+//
+// This function generates one random number from normal distribution.
+// Its performance is equal to that of HQRNDNormal2()
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: double hqrndnormal(const hqrndstate &state);
+double hqrndnormal(hqrndstate *state) {
+   double v1;
+   double v2;
+   double result;
+   hqrndnormal2(state, &v1, &v2);
+   result = v1;
+   return result;
+}
+
+// Random number generator: vector with random entries (normal distribution)
+//
+// This function generates N random numbers from normal distribution.
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x);
+void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x) {
+   ae_int_t i;
+   ae_int_t n2;
+   double v1;
+   double v2;
+   SetVector(x);
+   n2 = n / 2;
+   rallocv(n, x);
+   for (i = 0; i < n2; i++) {
+      hqrndnormal2(state, &v1, &v2);
+      x->xR[2 * i] = v1;
+      x->xR[2 * i + 1] = v2;
+   }
+   if (n % 2 != 0) {
+      hqrndnormal2(state, &v1, &v2);
+      x->xR[n - 1] = v1;
+   }
+}
+
+// Random number generator: matrix with random entries (normal distribution)
+//
+// This function generates MxN random matrix.
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x);
+void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t n2;
+   double v1;
+   double v2;
+   SetMatrix(x);
+   n2 = n / 2;
+   ae_matrix_set_length(x, m, n);
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n2; j++) {
+         hqrndnormal2(state, &v1, &v2);
+         x->xyR[i][2 * j] = v1;
+         x->xyR[i][2 * j + 1] = v2;
+      }
+      if (n % 2 != 0) {
+         hqrndnormal2(state, &v1, &v2);
+         x->xyR[i][n - 1] = v1;
+      }
+   }
+}
+
+// Random number generator: random X and Y such that X^2+Y^2=1
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
+// API: void hqrndunit2(const hqrndstate &state, double &x, double &y);
+void hqrndunit2(hqrndstate *state, double *x, double *y) {
+   double v;
+   double mx;
+   double mn;
+   *x = 0;
+   *y = 0;
+   do {
+      hqrndnormal2(state, x, y);
+   } while (!(*x != 0.0 || *y != 0.0));
+   mx = rmax2(fabs(*x), fabs(*y));
+   mn = rmin2(fabs(*x), fabs(*y));
+   v = mx * sqrt(1 + ae_sqr(mn / mx));
+   *x /= v;
+   *y /= v;
+}
+
+// Random number generator: exponential distribution
+//
+// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
+// ALGLIB: Copyright 11.08.2007 by Sergey Bochkanov
+// API: double hqrndexponential(const hqrndstate &state, const double lambdav);
+double hqrndexponential(hqrndstate *state, double lambdav) {
+   double result;
+   ae_assert(lambdav > 0.0, "hqrndexponential: LambdaV <= 0!");
+   result = -log(hqrnduniformr(state)) / lambdav;
+   return result;
+}
+
+// This function generates  random number from discrete distribution given by
+// finite sample X.
+//
+// Inputs:
+//     State   -   high quality random number generator, must be
+//                 initialized with HQRNDRandomize() or HQRNDSeed().
+//         X   -   finite sample
+//         N   -   number of elements to use, N >= 1
+//
+// Result:
+//     this function returns one of the X[i] for random i=0..N-1
+// ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
+// API: double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
+double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n) {
+   double result;
+   ae_assert(n > 0, "hqrnddiscrete: N <= 0");
+   ae_assert(n <= x->cnt, "hqrnddiscrete: Length(X) < N");
+   result = x->xR[hqrnduniformi(state, n)];
+   return result;
+}
+
+// This function generates random number from continuous  distribution  given
+// by finite sample X.
+//
+// Inputs:
+//     State   -   high quality random number generator, must be
+//                 initialized with HQRNDRandomize() or HQRNDSeed().
+//         X   -   finite sample, array[N] (can be larger, in this  case only
+//                 leading N elements are used). THIS ARRAY MUST BE SORTED BY
+//                 ASCENDING.
+//         N   -   number of elements to use, N >= 1
+//
+// Result:
+//     this function returns random number from continuous distribution which
+//     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
+// ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
+// API: double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
+double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n) {
+   double mx;
+   double mn;
+   ae_int_t i;
+   double result;
+   ae_assert(n > 0, "hqrndcontinuous: N <= 0");
+   ae_assert(n <= x->cnt, "hqrndcontinuous: Length(X) < N");
+   if (n == 1) {
+      result = x->xR[0];
+      return result;
+   }
+   i = hqrnduniformi(state, n - 1);
+   mn = x->xR[i];
+   mx = x->xR[i + 1];
+   ae_assert(mx >= mn, "hqrndcontinuous: X is not sorted by ascending");
+   if (mx != mn) {
+      result = (mx - mn) * hqrnduniformr(state) + mn;
+   } else {
+      result = mn;
+   }
+   return result;
+}
+
+void hqrndstate_init(void *_p, bool make_automatic) {
+}
+
+void hqrndstate_copy(void *_dst, void *_src, bool make_automatic) {
+   hqrndstate *dst = (hqrndstate *)_dst;
+   hqrndstate *src = (hqrndstate *)_src;
+   dst->s1 = src->s1;
+   dst->s2 = src->s2;
+   dst->magicv = src->magicv;
+}
+
+void hqrndstate_free(void *_p, bool make_automatic) {
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+// Portable high quality random number generator state.
+// Initialized with HQRNDRandomize() or HQRNDSeed().
+//
+// Fields:
+//     S1, S2      -   seed values
+//     V           -   precomputed value
+//     MagicV      -   'magic' value used to determine whether State structure
+//                     was correctly initialized.
+DefClass(hqrndstate, EndD)
+
+void hqrndrandomize(hqrndstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndrandomize(ConstT(hqrndstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndseed(s1, s2, ConstT(hqrndstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+double hqrnduniformr(const hqrndstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrnduniformr(ConstT(hqrndstate, state));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+double hqrndmiduniformr(const hqrndstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrndmiduniformr(ConstT(hqrndstate, state));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n);
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void hqrndnormal2(const hqrndstate &state, double &x1, double &x2) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndnormal2(ConstT(hqrndstate, state), &x1, &x2);
+   alglib_impl::ae_state_clear();
+}
+
+double hqrndnormal(const hqrndstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrndnormal(ConstT(hqrndstate, state));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndnormalv(ConstT(hqrndstate, state), n, ConstT(ae_vector, x));
+   alglib_impl::ae_state_clear();
+}
+
+void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndnormalm(ConstT(hqrndstate, state), m, n, ConstT(ae_matrix, x));
+   alglib_impl::ae_state_clear();
+}
+
+void hqrndunit2(const hqrndstate &state, double &x, double &y) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::hqrndunit2(ConstT(hqrndstate, state), &x, &y);
+   alglib_impl::ae_state_clear();
+}
+
+double hqrndexponential(const hqrndstate &state, const double lambdav) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrndexponential(ConstT(hqrndstate, state), lambdav);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrnddiscrete(ConstT(hqrndstate, state), ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::hqrndcontinuous(ConstT(hqrndstate, state), ConstT(ae_vector, x), n);
+   alglib_impl::ae_state_clear();
+   return D;
+}
+} // end of namespace alglib
+
+// === XDEBUG Package ===
+namespace alglib_impl {
+// Debug functions to test the ALGLIB interface generator: not meant for use in production code.
+
+// Creates and returns XDebugRecord1 structure:
+// * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
+// * array field of Rec1 is set to [2,3]
+// ALGLIB: Copyright 27.05.2014 by Sergey Bochkanov
+// API: void xdebuginitrecord1(xdebugrecord1 &rec1);
+void xdebuginitrecord1(xdebugrecord1 *rec1) {
+   SetObj(xdebugrecord1, rec1);
+   rec1->i = 1;
+   rec1->c = ae_complex_from_d(1.0, 1.0);
+   ae_vector_set_length(&rec1->a, 2);
+   rec1->a.xR[0] = 2.0;
+   rec1->a.xR[1] = 3.0;
+}
+
+// Counts number of True values in the boolean 1D array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: ae_int_t xdebugb1count(const boolean_1d_array &a);
+ae_int_t xdebugb1count(BVector *a) {
+   ae_int_t i;
+   ae_int_t result;
+   result = 0;
+   for (i = 0; i < a->cnt; i++) {
+      if (a->xB[i]) {
+         result++;
+      }
+   }
+   return result;
+}
+
+// Replace all values in array by NOT(a[i]).
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb1not(const boolean_1d_array &a);
+void xdebugb1not(BVector *a) {
+   ae_int_t i;
+   for (i = 0; i < a->cnt; i++) {
+      a->xB[i] = !a->xB[i];
+   }
+}
+
+// Appends copy of array to itself.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb1appendcopy(boolean_1d_array &a);
+void xdebugb1appendcopy(BVector *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   NewVector(b, 0, DT_BOOL);
+   ae_vector_set_length(&b, a->cnt);
+   for (i = 0; i < b.cnt; i++) {
+      b.xB[i] = a->xB[i];
+   }
+   ae_vector_set_length(a, 2 * b.cnt);
+   for (i = 0; i < a->cnt; i++) {
+      a->xB[i] = b.xB[i % b.cnt];
+   }
+   ae_frame_leave();
+}
+
+// Generate N-element array with even-numbered elements set to True.
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a);
+void xdebugb1outeven(ae_int_t n, BVector *a) {
+   ae_int_t i;
+   SetVector(a);
+   ae_vector_set_length(a, n);
+   for (i = 0; i < a->cnt; i++) {
+      a->xB[i] = i % 2 == 0;
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: ae_int_t xdebugi1sum(const integer_1d_array &a);
+ae_int_t xdebugi1sum(ZVector *a) {
+   ae_int_t i;
+   ae_int_t result;
+   result = 0;
+   for (i = 0; i < a->cnt; i++) {
+      result += a->xZ[i];
+   }
+   return result;
+}
+
+// Replace all values in array by -A[I]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi1neg(const integer_1d_array &a);
+void xdebugi1neg(ZVector *a) {
+   ae_int_t i;
+   for (i = 0; i < a->cnt; i++) {
+      a->xZ[i] = -a->xZ[i];
+   }
+}
+
+// Appends copy of array to itself.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi1appendcopy(integer_1d_array &a);
+void xdebugi1appendcopy(ZVector *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   NewVector(b, 0, DT_INT);
+   ae_vector_set_length(&b, a->cnt);
+   for (i = 0; i < b.cnt; i++) {
+      b.xZ[i] = a->xZ[i];
+   }
+   ae_vector_set_length(a, 2 * b.cnt);
+   for (i = 0; i < a->cnt; i++) {
+      a->xZ[i] = b.xZ[i % b.cnt];
+   }
+   ae_frame_leave();
+}
+
+// Generate N-element array with even-numbered A[I] set to I, and odd-numbered
+// ones set to 0.
+//
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi1outeven(const ae_int_t n, integer_1d_array &a);
+void xdebugi1outeven(ae_int_t n, ZVector *a) {
+   ae_int_t i;
+   SetVector(a);
+   ae_vector_set_length(a, n);
+   for (i = 0; i < a->cnt; i++) {
+      if (i % 2 == 0) {
+         a->xZ[i] = i;
+      } else {
+         a->xZ[i] = 0;
+      }
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: double xdebugr1sum(const real_1d_array &a);
+double xdebugr1sum(RVector *a) {
+   ae_int_t i;
+   double result;
+   result = 0.0;
+   for (i = 0; i < a->cnt; i++) {
+      result += a->xR[i];
+   }
+   return result;
+}
+
+// Replace all values in array by -A[I]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr1neg(const real_1d_array &a);
+void xdebugr1neg(RVector *a) {
+   ae_int_t i;
+   for (i = 0; i < a->cnt; i++) {
+      a->xR[i] = -a->xR[i];
+   }
+}
+
+// Appends copy of array to itself.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr1appendcopy(real_1d_array &a);
+void xdebugr1appendcopy(RVector *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   NewVector(b, 0, DT_REAL);
+   ae_vector_set_length(&b, a->cnt);
+   for (i = 0; i < b.cnt; i++) {
+      b.xR[i] = a->xR[i];
+   }
+   ae_vector_set_length(a, 2 * b.cnt);
+   for (i = 0; i < a->cnt; i++) {
+      a->xR[i] = b.xR[i % b.cnt];
+   }
+   ae_frame_leave();
+}
+
+// Generate N-element array with even-numbered A[I] set to I*0.25,
+// and odd-numbered ones are set to 0.
+//
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr1outeven(const ae_int_t n, real_1d_array &a);
+void xdebugr1outeven(ae_int_t n, RVector *a) {
+   ae_int_t i;
+   SetVector(a);
+   ae_vector_set_length(a, n);
+   for (i = 0; i < a->cnt; i++) {
+      if (i % 2 == 0) {
+         a->xR[i] = i * 0.25;
+      } else {
+         a->xR[i] = 0.0;
+      }
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: complex xdebugc1sum(const complex_1d_array &a);
+ae_complex xdebugc1sum(CVector *a) {
+   ae_int_t i;
+   ae_complex result;
+   result = ae_complex_from_i(0);
+   for (i = 0; i < a->cnt; i++) {
+      result = ae_c_add(result, a->xC[i]);
+   }
+   return result;
+}
+
+// Replace all values in array by -A[I]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc1neg(const complex_1d_array &a);
+void xdebugc1neg(CVector *a) {
+   ae_int_t i;
+   for (i = 0; i < a->cnt; i++) {
+      a->xC[i] = ae_c_neg(a->xC[i]);
+   }
+}
+
+// Appends copy of array to itself.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc1appendcopy(complex_1d_array &a);
+void xdebugc1appendcopy(CVector *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_frame_make(&_frame_block);
+   NewVector(b, 0, DT_COMPLEX);
+   ae_vector_set_length(&b, a->cnt);
+   for (i = 0; i < b.cnt; i++) {
+      b.xC[i] = a->xC[i];
+   }
+   ae_vector_set_length(a, 2 * b.cnt);
+   for (i = 0; i < a->cnt; i++) {
+      a->xC[i] = b.xC[i % b.cnt];
+   }
+   ae_frame_leave();
+}
+
+// Generate N-element array with even-numbered A[K] set to (x,y) = (K*0.25, K*0.125)
+// and odd-numbered ones are set to 0.
+//
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc1outeven(const ae_int_t n, complex_1d_array &a);
+void xdebugc1outeven(ae_int_t n, CVector *a) {
+   ae_int_t i;
+   SetVector(a);
+   ae_vector_set_length(a, n);
+   for (i = 0; i < a->cnt; i++) {
+      if (i % 2 == 0) {
+         a->xC[i] = ae_complex_from_d(i * 0.250, i * 0.125);
+      } else {
+         a->xC[i] = ae_complex_from_i(0);
+      }
+   }
+}
+
+// Counts number of True values in the boolean 2D array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: ae_int_t xdebugb2count(const boolean_2d_array &a);
+ae_int_t xdebugb2count(BMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t result;
+   result = 0;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         if (a->xyB[i][j]) {
+            result++;
+         }
+      }
+   }
+   return result;
+}
+
+// Replace all values in array by NOT(a[i]).
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb2not(const boolean_2d_array &a);
+void xdebugb2not(BMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyB[i][j] = !a->xyB[i][j];
+      }
+   }
+}
+
+// Transposes array.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb2transpose(boolean_2d_array &a);
+void xdebugb2transpose(BMatrix *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_frame_make(&_frame_block);
+   NewMatrix(b, 0, 0, DT_BOOL);
+   ae_matrix_set_length(&b, a->rows, a->cols);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         b.xyB[i][j] = a->xyB[i][j];
+      }
+   }
+   ae_matrix_set_length(a, b.cols, b.rows);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         a->xyB[j][i] = b.xyB[i][j];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Generate MxN matrix with elements set to "sin(3*I+5*J) > 0"
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a);
+void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   SetMatrix(a);
+   ae_matrix_set_length(a, m, n);
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyB[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
+      }
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: ae_int_t xdebugi2sum(const integer_2d_array &a);
+ae_int_t xdebugi2sum(ZMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t result;
+   result = 0;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         result += a->xyZ[i][j];
+      }
+   }
+   return result;
+}
+
+// Replace all values in array by -a[i,j]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi2neg(const integer_2d_array &a);
+void xdebugi2neg(ZMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyZ[i][j] = -a->xyZ[i][j];
+      }
+   }
+}
+
+// Transposes array.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi2transpose(integer_2d_array &a);
+void xdebugi2transpose(ZMatrix *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_frame_make(&_frame_block);
+   NewMatrix(b, 0, 0, DT_INT);
+   ae_matrix_set_length(&b, a->rows, a->cols);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         b.xyZ[i][j] = a->xyZ[i][j];
+      }
+   }
+   ae_matrix_set_length(a, b.cols, b.rows);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         a->xyZ[j][i] = b.xyZ[i][j];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
+void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   SetMatrix(a);
+   ae_matrix_set_length(a, m, n);
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyZ[i][j] = ae_sign(sin((double)(3 * i + 5 * j)));
+      }
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: double xdebugr2sum(const real_2d_array &a);
+double xdebugr2sum(RMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   double result;
+   result = 0.0;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         result += a->xyR[i][j];
+      }
+   }
+   return result;
+}
+
+// Replace all values in array by -a[i,j]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr2neg(const real_2d_array &a);
+void xdebugr2neg(RMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyR[i][j] = -a->xyR[i][j];
+      }
+   }
+}
+
+// Transposes array.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr2transpose(real_2d_array &a);
+void xdebugr2transpose(RMatrix *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_frame_make(&_frame_block);
+   NewMatrix(b, 0, 0, DT_REAL);
+   ae_matrix_set_length(&b, a->rows, a->cols);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         b.xyR[i][j] = a->xyR[i][j];
+      }
+   }
+   ae_matrix_set_length(a, b.cols, b.rows);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         a->xyR[j][i] = b.xyR[i][j];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Generate MxN matrix with elements set to "sin(3*I+5*J)"
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a);
+void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   SetMatrix(a);
+   ae_matrix_set_length(a, m, n);
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyR[i][j] = sin((double)(3 * i + 5 * j));
+      }
+   }
+}
+
+// Returns sum of elements in the array.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: complex xdebugc2sum(const complex_2d_array &a);
+ae_complex xdebugc2sum(CMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_complex result;
+   result = ae_complex_from_i(0);
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         result = ae_c_add(result, a->xyC[i][j]);
+      }
+   }
+   return result;
+}
+
+// Replace all values in array by -a[i,j]
+// Array is passed using "shared" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc2neg(const complex_2d_array &a);
+void xdebugc2neg(CMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyC[i][j] = ae_c_neg(a->xyC[i][j]);
+      }
+   }
+}
+
+// Transposes array.
+// Array is passed using "var" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc2transpose(complex_2d_array &a);
+void xdebugc2transpose(CMatrix *a) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   ae_frame_make(&_frame_block);
+   NewMatrix(b, 0, 0, DT_COMPLEX);
+   ae_matrix_set_length(&b, a->rows, a->cols);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         b.xyC[i][j] = a->xyC[i][j];
+      }
+   }
+   ae_matrix_set_length(a, b.cols, b.rows);
+   for (i = 0; i < b.rows; i++) {
+      for (j = 0; j < b.cols; j++) {
+         a->xyC[j][i] = b.xyC[i][j];
+      }
+   }
+   ae_frame_leave();
+}
+
+// Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
+// Array is passed using "out" convention.
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
+void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a) {
+   ae_int_t i;
+   ae_int_t j;
+   SetMatrix(a);
+   ae_matrix_set_length(a, m, n);
+   for (i = 0; i < a->rows; i++) {
+      for (j = 0; j < a->cols; j++) {
+         a->xyC[i][j] = ae_complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
+      }
+   }
+}
+
+// Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
+// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
+// API: double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c);
+double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c) {
+   ae_int_t i;
+   ae_int_t j;
+   double result;
+   ae_assert(m >= a->rows, "Assertion failed");
+   ae_assert(m >= b->rows, "Assertion failed");
+   ae_assert(m >= c->rows, "Assertion failed");
+   ae_assert(n >= a->cols, "Assertion failed");
+   ae_assert(n >= b->cols, "Assertion failed");
+   ae_assert(n >= c->cols, "Assertion failed");
+   result = 0.0;
+   for (i = 0; i < m; i++) {
+      for (j = 0; j < n; j++) {
+         if (c->xyB[i][j]) {
+            result += a->xyR[i][j] * (1 + b->xyR[i][j]);
+         }
+      }
+   }
+   return result;
+}
+
+void xdebugrecord1_init(void *_p, bool make_automatic) {
+   xdebugrecord1 *p = (xdebugrecord1 *)_p;
+   ae_vector_init(&p->a, 0, DT_REAL, make_automatic);
+}
+
+void xdebugrecord1_copy(void *_dst, void *_src, bool make_automatic) {
+   xdebugrecord1 *dst = (xdebugrecord1 *)_dst;
+   xdebugrecord1 *src = (xdebugrecord1 *)_src;
+   dst->i = src->i;
+   dst->c = src->c;
+   ae_vector_copy(&dst->a, &src->a, make_automatic);
+}
+
+void xdebugrecord1_free(void *_p, bool make_automatic) {
+   xdebugrecord1 *p = (xdebugrecord1 *)_p;
+   ae_vector_free(&p->a, make_automatic);
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
+
+void xdebuginitrecord1(xdebugrecord1 &rec1) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebuginitrecord1(ConstT(xdebugrecord1, rec1));
+   alglib_impl::ae_state_clear();
+}
+
+ae_int_t xdebugb1count(const boolean_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void xdebugb1not(const boolean_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb1not(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugb1appendcopy(boolean_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb1appendcopy(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb1outeven(n, ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+ae_int_t xdebugi1sum(const integer_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void xdebugi1neg(const integer_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi1neg(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugi1appendcopy(integer_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi1appendcopy(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugi1outeven(const ae_int_t n, integer_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi1outeven(n, ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+double xdebugr1sum(const real_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::xdebugr1sum(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+void xdebugr1neg(const real_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr1neg(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugr1appendcopy(real_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr1appendcopy(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr1outeven(n, ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+complex xdebugc1sum(const complex_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   alglib_impl::ae_complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+   return ComplexOf(C);
+}
+
+void xdebugc1neg(const complex_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc1neg(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugc1appendcopy(complex_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc1appendcopy(ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc1outeven(n, ConstT(ae_vector, a));
+   alglib_impl::ae_state_clear();
+}
+
+ae_int_t xdebugb2count(const boolean_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void xdebugb2not(const boolean_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb2not(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugb2transpose(boolean_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb2transpose(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugb2outsin(m, n, ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+ae_int_t xdebugi2sum(const integer_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void xdebugi2neg(const integer_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi2neg(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugi2transpose(integer_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi2transpose(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugi2outsin(m, n, ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+double xdebugr2sum(const real_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::xdebugr2sum(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+
+void xdebugr2neg(const real_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr2neg(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugr2transpose(real_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr2transpose(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugr2outsin(m, n, ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+complex xdebugc2sum(const complex_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch(complex(0.0))
+   alglib_impl::ae_complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+   return ComplexOf(C);
+}
+
+void xdebugc2neg(const complex_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc2neg(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugc2transpose(complex_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc2transpose(ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::xdebugc2outsincos(m, n, ConstT(ae_matrix, a));
+   alglib_impl::ae_state_clear();
+}
+
+double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c) {
+   alglib_impl::ae_state_init();
+   TryCatch(0.0)
+   double D = alglib_impl::xdebugmaskedbiasedproductsum(m, n, ConstT(ae_matrix, a), ConstT(ae_matrix, b), ConstT(ae_matrix, c));
+   alglib_impl::ae_state_clear();
+   return D;
+}
+} // end of namespace alglib
+
 // === NEARESTNEIGHBOR Package ===
 // Depends on: (AlgLibInternal) SCODES, TSORT
 namespace alglib_impl {
@@ -2375,1362 +3732,5 @@ void kdtreequeryresultsdistancesi(const kdtree &kdt, real_1d_array &r) {
    TryCatch()
    alglib_impl::kdtreequeryresultsdistancesi(ConstT(kdtree, kdt), ConstT(ae_vector, r));
    alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === HQRND Package ===
-// Depends on: (AlgLibInternal) APSERV, ABLASF
-namespace alglib_impl {
-static const ae_int_t hqrnd_hqrndm1 = 1 + 2 * 3 * 7 * 631 * 81031; // == 2^31 - 85
-static const ae_int_t hqrnd_hqrndm2 = 1 + 2 * 19 * 31 * 1019 * 1789; // == 2^31 - 249
-static const ae_int_t hqrnd_hqrndmax = hqrnd_hqrndm1 - 2;
-static const ae_int_t hqrnd_hqrndmagic = 1634357784;
-
-// HQRNDState  initialization  with  random  values  which come from standard
-// RNG.
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndrandomize(hqrndstate &state);
-void hqrndrandomize(hqrndstate *state) {
-   ae_int_t s0;
-   ae_int_t s1;
-   SetObj(hqrndstate, state);
-   s0 = ae_randominteger(hqrnd_hqrndm1);
-   s1 = ae_randominteger(hqrnd_hqrndm2);
-   hqrndseed(s0, s1, state);
-}
-
-// HQRNDState initialization with seed values
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state);
-void hqrndseed(ae_int_t s1, ae_int_t s2, hqrndstate *state) {
-   SetObj(hqrndstate, state);
-// Protection against negative seeds:
-//
-//     SEED := -(SEED+1)
-//
-// We can't use just "-SEED" because there exists an integer number  N
-// such that -N < 0 and +N < 0. (This number is equal to 0x800...000).
-// The need  to handle such  a seed correctly  forces us to  use a bit
-// more complicated formula.
-   if (s1 < 0) {
-      s1 = -(s1 + 1);
-   }
-   if (s2 < 0) {
-      s2 = -(s2 + 1);
-   }
-   state->s1 = s1 % (hqrnd_hqrndm1 - 1) + 1;
-   state->s2 = s2 % (hqrnd_hqrndm2 - 1) + 1;
-   state->magicv = hqrnd_hqrndmagic;
-}
-
-// This function returns random integer in [0,HQRNDMax]
-//
-// P.L'Ecuyer, ‟Efficient and portable combined random number generators”, CACM 31(6), June 1988, 742-751.
-static ae_int_t hqrnd_hqrndintegerbase(hqrndstate *state) {
-   const ae_int_t a1 = 40014, q1 = hqrnd_hqrndm1 / a1, r1 = hqrnd_hqrndm1 % a1;
-   const ae_int_t a2 = 40692, q2 = hqrnd_hqrndm2 / a2, r2 = hqrnd_hqrndm2 % a2;
-// This requires:
-// ∙    (hqrnd_hqrndm1 - 1)/2 and (hqrnd_hqrndm2 - 1)/2 be relatively prime,
-// ∙    a1^2 < hqrnd_hqrndm1 and a2^2 < hqrnd_hqrndm2,
-// ∙    0 <= state->s1 < hqrnd_hqrndm1, 0 <= state->s2 < hqrnd_hqrndm2.
-// Under these conditions, the following is equivalent to:
-// ∙    state->s1 = a1 * state->s1 % hqrnd_hqrndm1, state->s2 = a2 * state->s2 % hqrnd_hqrndm2;
-// and 0 <= state->s1 < hqrnd_hqrndm1, 0 <= state->s2 < hqrnd_hqrndm2 continues to hold.
-// The period of the generator is:
-//      (hqrnd_hqrndm1 - 1)(hqrnd_hqrndm2 - 1)/2 == 2 * 3 * 7 * 19 * 31 * 631 * 1019 * 1789 * 81031 == 2^61 - 360777242114
-   ae_int_t k;
-   ae_int_t result;
-   ae_assert(state->magicv == hqrnd_hqrndmagic, "hqrnd_hqrndintegerbase: state is not correctly initialized!");
-   k = state->s1 / q1;
-   state->s1 = a1 * (state->s1 - k * q1) - k * r1;
-   if (state->s1 < 0) {
-      state->s1 += hqrnd_hqrndm1;
-   }
-   k = state->s2 / q2;
-   state->s2 = a2 * (state->s2 - k * q2) - k * r2;
-   if (state->s2 < 0) {
-      state->s2 += hqrnd_hqrndm2;
-   }
-// Result
-   result = state->s1 - state->s2;
-   if (result < 1) {
-      result += hqrnd_hqrndmax;
-   } else {
-      result--;
-   }
-   return result;
-}
-
-// This function generates random real number in (0,1),
-// not including interval boundaries
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: double hqrnduniformr(const hqrndstate &state);
-double hqrnduniformr(hqrndstate *state) {
-   double result;
-   result = (double)(hqrnd_hqrndintegerbase(state) + 1) / (double)(hqrnd_hqrndmax + 2);
-   return result;
-}
-
-// This function generates random real number in (-1,+1),
-// not including interval boundaries
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: double hqrndmiduniformr(const hqrndstate &state);
-double hqrndmiduniformr(hqrndstate *state) {
-   double result;
-   result = (double)(2 * hqrnd_hqrndintegerbase(state) - hqrnd_hqrndmax) / (double)(hqrnd_hqrndmax + 2);
-   return result;
-}
-
-// This function generates random integer number in [0, N)
-//
-// 1. State structure must be initialized with HQRNDRandomize() or HQRNDSeed()
-// 2. N can be any positive number except for very large numbers:
-//    * close to 2^31 on 32-bit systems
-//    * close to 2^62 on 64-bit systems
-//    An exception will be generated if N is too large.
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n);
-ae_int_t hqrnduniformi(hqrndstate *state, ae_int_t n) {
-   ae_int_t maxcnt;
-   ae_int_t mx;
-   ae_int_t a;
-   ae_int_t b;
-   ae_int_t result;
-   ae_assert(n > 0, "hqrnduniformi: N <= 0!");
-   maxcnt = hqrnd_hqrndmax + 1;
-// Two branches: one for N <= MaxCnt, another for N>MaxCnt.
-   if (n > maxcnt) {
-   // N >= MaxCnt.
-   //
-   // We have two options here:
-   // a) N is exactly divisible by MaxCnt
-   // b) N is not divisible by MaxCnt
-   //
-   // In both cases we reduce problem on interval spanning [0,N)
-   // to several subproblems on intervals spanning [0,MaxCnt).
-      if (n % maxcnt == 0) {
-      // N is exactly divisible by MaxCnt.
-      //
-      // [0,N) range is dividided into N/MaxCnt bins,
-      // each of them having length equal to MaxCnt.
-      //
-      // We generate:
-      // * random bin number B
-      // * random offset within bin A
-      // Both random numbers are generated by recursively
-      // calling hqrnduniformi().
-      //
-      // Result is equal to A+MaxCnt*B.
-         ae_assert(n / maxcnt <= maxcnt, "hqrnduniformi: N is too large");
-         a = hqrnduniformi(state, maxcnt);
-         b = hqrnduniformi(state, n / maxcnt);
-         result = a + maxcnt * b;
-      } else {
-      // N is NOT exactly divisible by MaxCnt.
-      //
-      // [0,N) range is dividided into ceil(N/MaxCnt) bins,
-      // each of them having length equal to MaxCnt.
-      //
-      // We generate:
-      // * random bin number B in [0, ceil(N/MaxCnt)-1]
-      // * random offset within bin A
-      // * if both of what is below is true
-      //   1) bin number B is that of the last bin
-      //   2) A >= N mod MaxCnt
-      //   then we repeat generation of A/B.
-      //   This stage is essential in order to avoid bias in the result.
-      // * otherwise, we return A*MaxCnt+N
-         ae_assert(n / maxcnt + 1 <= maxcnt, "hqrnduniformi: N is too large");
-         result = -1;
-         do {
-            a = hqrnduniformi(state, maxcnt);
-            b = hqrnduniformi(state, n / maxcnt + 1);
-            if (b == n / maxcnt && a >= n % maxcnt) {
-               continue;
-            }
-            result = a + maxcnt * b;
-         } while (result < 0);
-      }
-   } else {
-   // N <= MaxCnt
-   //
-   // Code below is a bit complicated because we can not simply
-   // return "hqrnd_hqrndintegerbase() mod N" - it will be skewed for
-   // large N's in [0.1*hqrnd_hqrndmax...hqrnd_hqrndmax].
-      mx = maxcnt - maxcnt % n;
-      do {
-         result = hqrnd_hqrndintegerbase(state);
-      } while (result >= mx);
-      result %= n;
-   }
-   return result;
-}
-
-// Random number generator: normal numbers
-//
-// This function generates two independent random numbers from normal
-// distribution. Its performance is equal to that of HQRNDNormal()
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormal2(const hqrndstate &state, double &x1, double &x2);
-void hqrndnormal2(hqrndstate *state, double *x1, double *x2) {
-   double u;
-   double v;
-   double s;
-   *x1 = 0;
-   *x2 = 0;
-   while (true) {
-      u = hqrndmiduniformr(state);
-      v = hqrndmiduniformr(state);
-      s = ae_sqr(u) + ae_sqr(v);
-      if (s > 0.0 && s < 1.0) {
-      // two sqrt's instead of one to
-      // avoid overflow when S is too small
-         s = sqrt(-2 * log(s)) / sqrt(s);
-         *x1 = u * s;
-         *x2 = v * s;
-         return;
-      }
-   }
-}
-
-// Random number generator: normal numbers
-//
-// This function generates one random number from normal distribution.
-// Its performance is equal to that of HQRNDNormal2()
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: double hqrndnormal(const hqrndstate &state);
-double hqrndnormal(hqrndstate *state) {
-   double v1;
-   double v2;
-   double result;
-   hqrndnormal2(state, &v1, &v2);
-   result = v1;
-   return result;
-}
-
-// Random number generator: vector with random entries (normal distribution)
-//
-// This function generates N random numbers from normal distribution.
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x);
-void hqrndnormalv(hqrndstate *state, ae_int_t n, RVector *x) {
-   ae_int_t i;
-   ae_int_t n2;
-   double v1;
-   double v2;
-   SetVector(x);
-   n2 = n / 2;
-   rallocv(n, x);
-   for (i = 0; i < n2; i++) {
-      hqrndnormal2(state, &v1, &v2);
-      x->xR[2 * i] = v1;
-      x->xR[2 * i + 1] = v2;
-   }
-   if (n % 2 != 0) {
-      hqrndnormal2(state, &v1, &v2);
-      x->xR[n - 1] = v1;
-   }
-}
-
-// Random number generator: matrix with random entries (normal distribution)
-//
-// This function generates MxN random matrix.
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x);
-void hqrndnormalm(hqrndstate *state, ae_int_t m, ae_int_t n, RMatrix *x) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t n2;
-   double v1;
-   double v2;
-   SetMatrix(x);
-   n2 = n / 2;
-   ae_matrix_set_length(x, m, n);
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n2; j++) {
-         hqrndnormal2(state, &v1, &v2);
-         x->xyR[i][2 * j] = v1;
-         x->xyR[i][2 * j + 1] = v2;
-      }
-      if (n % 2 != 0) {
-         hqrndnormal2(state, &v1, &v2);
-         x->xyR[i][n - 1] = v1;
-      }
-   }
-}
-
-// Random number generator: random X and Y such that X^2+Y^2=1
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 02.12.2009 by Sergey Bochkanov
-// API: void hqrndunit2(const hqrndstate &state, double &x, double &y);
-void hqrndunit2(hqrndstate *state, double *x, double *y) {
-   double v;
-   double mx;
-   double mn;
-   *x = 0;
-   *y = 0;
-   do {
-      hqrndnormal2(state, x, y);
-   } while (!(*x != 0.0 || *y != 0.0));
-   mx = rmax2(fabs(*x), fabs(*y));
-   mn = rmin2(fabs(*x), fabs(*y));
-   v = mx * sqrt(1 + ae_sqr(mn / mx));
-   *x /= v;
-   *y /= v;
-}
-
-// Random number generator: exponential distribution
-//
-// State structure must be initialized with HQRNDRandomize() or HQRNDSeed().
-// ALGLIB: Copyright 11.08.2007 by Sergey Bochkanov
-// API: double hqrndexponential(const hqrndstate &state, const double lambdav);
-double hqrndexponential(hqrndstate *state, double lambdav) {
-   double result;
-   ae_assert(lambdav > 0.0, "hqrndexponential: LambdaV <= 0!");
-   result = -log(hqrnduniformr(state)) / lambdav;
-   return result;
-}
-
-// This function generates  random number from discrete distribution given by
-// finite sample X.
-//
-// Inputs:
-//     State   -   high quality random number generator, must be
-//                 initialized with HQRNDRandomize() or HQRNDSeed().
-//         X   -   finite sample
-//         N   -   number of elements to use, N >= 1
-//
-// Result:
-//     this function returns one of the X[i] for random i=0..N-1
-// ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-// API: double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
-double hqrnddiscrete(hqrndstate *state, RVector *x, ae_int_t n) {
-   double result;
-   ae_assert(n > 0, "hqrnddiscrete: N <= 0");
-   ae_assert(n <= x->cnt, "hqrnddiscrete: Length(X) < N");
-   result = x->xR[hqrnduniformi(state, n)];
-   return result;
-}
-
-// This function generates random number from continuous  distribution  given
-// by finite sample X.
-//
-// Inputs:
-//     State   -   high quality random number generator, must be
-//                 initialized with HQRNDRandomize() or HQRNDSeed().
-//         X   -   finite sample, array[N] (can be larger, in this  case only
-//                 leading N elements are used). THIS ARRAY MUST BE SORTED BY
-//                 ASCENDING.
-//         N   -   number of elements to use, N >= 1
-//
-// Result:
-//     this function returns random number from continuous distribution which
-//     tries to approximate X as mush as possible. min(X) <= Result <= max(X).
-// ALGLIB: Copyright 08.11.2011 by Sergey Bochkanov
-// API: double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n);
-double hqrndcontinuous(hqrndstate *state, RVector *x, ae_int_t n) {
-   double mx;
-   double mn;
-   ae_int_t i;
-   double result;
-   ae_assert(n > 0, "hqrndcontinuous: N <= 0");
-   ae_assert(n <= x->cnt, "hqrndcontinuous: Length(X) < N");
-   if (n == 1) {
-      result = x->xR[0];
-      return result;
-   }
-   i = hqrnduniformi(state, n - 1);
-   mn = x->xR[i];
-   mx = x->xR[i + 1];
-   ae_assert(mx >= mn, "hqrndcontinuous: X is not sorted by ascending");
-   if (mx != mn) {
-      result = (mx - mn) * hqrnduniformr(state) + mn;
-   } else {
-      result = mn;
-   }
-   return result;
-}
-
-void hqrndstate_init(void *_p, bool make_automatic) {
-}
-
-void hqrndstate_copy(void *_dst, void *_src, bool make_automatic) {
-   hqrndstate *dst = (hqrndstate *)_dst;
-   hqrndstate *src = (hqrndstate *)_src;
-   dst->s1 = src->s1;
-   dst->s2 = src->s2;
-   dst->magicv = src->magicv;
-}
-
-void hqrndstate_free(void *_p, bool make_automatic) {
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-// Portable high quality random number generator state.
-// Initialized with HQRNDRandomize() or HQRNDSeed().
-//
-// Fields:
-//     S1, S2      -   seed values
-//     V           -   precomputed value
-//     MagicV      -   'magic' value used to determine whether State structure
-//                     was correctly initialized.
-DefClass(hqrndstate, EndD)
-
-void hqrndrandomize(hqrndstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndrandomize(ConstT(hqrndstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-void hqrndseed(const ae_int_t s1, const ae_int_t s2, hqrndstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndseed(s1, s2, ConstT(hqrndstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-double hqrnduniformr(const hqrndstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrnduniformr(ConstT(hqrndstate, state));
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-double hqrndmiduniformr(const hqrndstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrndmiduniformr(ConstT(hqrndstate, state));
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-ae_int_t hqrnduniformi(const hqrndstate &state, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::hqrnduniformi(ConstT(hqrndstate, state), n);
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void hqrndnormal2(const hqrndstate &state, double &x1, double &x2) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndnormal2(ConstT(hqrndstate, state), &x1, &x2);
-   alglib_impl::ae_state_clear();
-}
-
-double hqrndnormal(const hqrndstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrndnormal(ConstT(hqrndstate, state));
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-void hqrndnormalv(const hqrndstate &state, const ae_int_t n, real_1d_array &x) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndnormalv(ConstT(hqrndstate, state), n, ConstT(ae_vector, x));
-   alglib_impl::ae_state_clear();
-}
-
-void hqrndnormalm(const hqrndstate &state, const ae_int_t m, const ae_int_t n, real_2d_array &x) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndnormalm(ConstT(hqrndstate, state), m, n, ConstT(ae_matrix, x));
-   alglib_impl::ae_state_clear();
-}
-
-void hqrndunit2(const hqrndstate &state, double &x, double &y) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::hqrndunit2(ConstT(hqrndstate, state), &x, &y);
-   alglib_impl::ae_state_clear();
-}
-
-double hqrndexponential(const hqrndstate &state, const double lambdav) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrndexponential(ConstT(hqrndstate, state), lambdav);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-double hqrnddiscrete(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrnddiscrete(ConstT(hqrndstate, state), ConstT(ae_vector, x), n);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae_int_t n) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::hqrndcontinuous(ConstT(hqrndstate, state), ConstT(ae_vector, x), n);
-   alglib_impl::ae_state_clear();
-   return D;
-}
-} // end of namespace alglib
-
-// === XDEBUG Package ===
-namespace alglib_impl {
-// Debug functions to test the ALGLIB interface generator: not meant for use in production code.
-
-// Creates and returns XDebugRecord1 structure:
-// * integer and complex fields of Rec1 are set to 1 and 1+i correspondingly
-// * array field of Rec1 is set to [2,3]
-// ALGLIB: Copyright 27.05.2014 by Sergey Bochkanov
-// API: void xdebuginitrecord1(xdebugrecord1 &rec1);
-void xdebuginitrecord1(xdebugrecord1 *rec1) {
-   SetObj(xdebugrecord1, rec1);
-   rec1->i = 1;
-   rec1->c = ae_complex_from_d(1.0, 1.0);
-   ae_vector_set_length(&rec1->a, 2);
-   rec1->a.xR[0] = 2.0;
-   rec1->a.xR[1] = 3.0;
-}
-
-// Counts number of True values in the boolean 1D array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugb1count(const boolean_1d_array &a);
-ae_int_t xdebugb1count(BVector *a) {
-   ae_int_t i;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < a->cnt; i++) {
-      if (a->xB[i]) {
-         result++;
-      }
-   }
-   return result;
-}
-
-// Replace all values in array by NOT(a[i]).
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1not(const boolean_1d_array &a);
-void xdebugb1not(BVector *a) {
-   ae_int_t i;
-   for (i = 0; i < a->cnt; i++) {
-      a->xB[i] = !a->xB[i];
-   }
-}
-
-// Appends copy of array to itself.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1appendcopy(boolean_1d_array &a);
-void xdebugb1appendcopy(BVector *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_BOOL);
-   ae_vector_set_length(&b, a->cnt);
-   for (i = 0; i < b.cnt; i++) {
-      b.xB[i] = a->xB[i];
-   }
-   ae_vector_set_length(a, 2 * b.cnt);
-   for (i = 0; i < a->cnt; i++) {
-      a->xB[i] = b.xB[i % b.cnt];
-   }
-   ae_frame_leave();
-}
-
-// Generate N-element array with even-numbered elements set to True.
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a);
-void xdebugb1outeven(ae_int_t n, BVector *a) {
-   ae_int_t i;
-   SetVector(a);
-   ae_vector_set_length(a, n);
-   for (i = 0; i < a->cnt; i++) {
-      a->xB[i] = i % 2 == 0;
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugi1sum(const integer_1d_array &a);
-ae_int_t xdebugi1sum(ZVector *a) {
-   ae_int_t i;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < a->cnt; i++) {
-      result += a->xZ[i];
-   }
-   return result;
-}
-
-// Replace all values in array by -A[I]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1neg(const integer_1d_array &a);
-void xdebugi1neg(ZVector *a) {
-   ae_int_t i;
-   for (i = 0; i < a->cnt; i++) {
-      a->xZ[i] = -a->xZ[i];
-   }
-}
-
-// Appends copy of array to itself.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1appendcopy(integer_1d_array &a);
-void xdebugi1appendcopy(ZVector *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_INT);
-   ae_vector_set_length(&b, a->cnt);
-   for (i = 0; i < b.cnt; i++) {
-      b.xZ[i] = a->xZ[i];
-   }
-   ae_vector_set_length(a, 2 * b.cnt);
-   for (i = 0; i < a->cnt; i++) {
-      a->xZ[i] = b.xZ[i % b.cnt];
-   }
-   ae_frame_leave();
-}
-
-// Generate N-element array with even-numbered A[I] set to I, and odd-numbered
-// ones set to 0.
-//
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi1outeven(const ae_int_t n, integer_1d_array &a);
-void xdebugi1outeven(ae_int_t n, ZVector *a) {
-   ae_int_t i;
-   SetVector(a);
-   ae_vector_set_length(a, n);
-   for (i = 0; i < a->cnt; i++) {
-      if (i % 2 == 0) {
-         a->xZ[i] = i;
-      } else {
-         a->xZ[i] = 0;
-      }
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugr1sum(const real_1d_array &a);
-double xdebugr1sum(RVector *a) {
-   ae_int_t i;
-   double result;
-   result = 0.0;
-   for (i = 0; i < a->cnt; i++) {
-      result += a->xR[i];
-   }
-   return result;
-}
-
-// Replace all values in array by -A[I]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1neg(const real_1d_array &a);
-void xdebugr1neg(RVector *a) {
-   ae_int_t i;
-   for (i = 0; i < a->cnt; i++) {
-      a->xR[i] = -a->xR[i];
-   }
-}
-
-// Appends copy of array to itself.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1appendcopy(real_1d_array &a);
-void xdebugr1appendcopy(RVector *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_REAL);
-   ae_vector_set_length(&b, a->cnt);
-   for (i = 0; i < b.cnt; i++) {
-      b.xR[i] = a->xR[i];
-   }
-   ae_vector_set_length(a, 2 * b.cnt);
-   for (i = 0; i < a->cnt; i++) {
-      a->xR[i] = b.xR[i % b.cnt];
-   }
-   ae_frame_leave();
-}
-
-// Generate N-element array with even-numbered A[I] set to I*0.25,
-// and odd-numbered ones are set to 0.
-//
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr1outeven(const ae_int_t n, real_1d_array &a);
-void xdebugr1outeven(ae_int_t n, RVector *a) {
-   ae_int_t i;
-   SetVector(a);
-   ae_vector_set_length(a, n);
-   for (i = 0; i < a->cnt; i++) {
-      if (i % 2 == 0) {
-         a->xR[i] = i * 0.25;
-      } else {
-         a->xR[i] = 0.0;
-      }
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: complex xdebugc1sum(const complex_1d_array &a);
-ae_complex xdebugc1sum(CVector *a) {
-   ae_int_t i;
-   ae_complex result;
-   result = ae_complex_from_i(0);
-   for (i = 0; i < a->cnt; i++) {
-      result = ae_c_add(result, a->xC[i]);
-   }
-   return result;
-}
-
-// Replace all values in array by -A[I]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1neg(const complex_1d_array &a);
-void xdebugc1neg(CVector *a) {
-   ae_int_t i;
-   for (i = 0; i < a->cnt; i++) {
-      a->xC[i] = ae_c_neg(a->xC[i]);
-   }
-}
-
-// Appends copy of array to itself.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1appendcopy(complex_1d_array &a);
-void xdebugc1appendcopy(CVector *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_frame_make(&_frame_block);
-   NewVector(b, 0, DT_COMPLEX);
-   ae_vector_set_length(&b, a->cnt);
-   for (i = 0; i < b.cnt; i++) {
-      b.xC[i] = a->xC[i];
-   }
-   ae_vector_set_length(a, 2 * b.cnt);
-   for (i = 0; i < a->cnt; i++) {
-      a->xC[i] = b.xC[i % b.cnt];
-   }
-   ae_frame_leave();
-}
-
-// Generate N-element array with even-numbered A[K] set to (x,y) = (K*0.25, K*0.125)
-// and odd-numbered ones are set to 0.
-//
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc1outeven(const ae_int_t n, complex_1d_array &a);
-void xdebugc1outeven(ae_int_t n, CVector *a) {
-   ae_int_t i;
-   SetVector(a);
-   ae_vector_set_length(a, n);
-   for (i = 0; i < a->cnt; i++) {
-      if (i % 2 == 0) {
-         a->xC[i] = ae_complex_from_d(i * 0.250, i * 0.125);
-      } else {
-         a->xC[i] = ae_complex_from_i(0);
-      }
-   }
-}
-
-// Counts number of True values in the boolean 2D array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugb2count(const boolean_2d_array &a);
-ae_int_t xdebugb2count(BMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         if (a->xyB[i][j]) {
-            result++;
-         }
-      }
-   }
-   return result;
-}
-
-// Replace all values in array by NOT(a[i]).
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2not(const boolean_2d_array &a);
-void xdebugb2not(BMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyB[i][j] = !a->xyB[i][j];
-      }
-   }
-}
-
-// Transposes array.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2transpose(boolean_2d_array &a);
-void xdebugb2transpose(BMatrix *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_BOOL);
-   ae_matrix_set_length(&b, a->rows, a->cols);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         b.xyB[i][j] = a->xyB[i][j];
-      }
-   }
-   ae_matrix_set_length(a, b.cols, b.rows);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         a->xyB[j][i] = b.xyB[i][j];
-      }
-   }
-   ae_frame_leave();
-}
-
-// Generate MxN matrix with elements set to "sin(3*I+5*J) > 0"
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a);
-void xdebugb2outsin(ae_int_t m, ae_int_t n, BMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   SetMatrix(a);
-   ae_matrix_set_length(a, m, n);
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyB[i][j] = sin((double)(3 * i + 5 * j)) > 0.0;
-      }
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: ae_int_t xdebugi2sum(const integer_2d_array &a);
-ae_int_t xdebugi2sum(ZMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t result;
-   result = 0;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         result += a->xyZ[i][j];
-      }
-   }
-   return result;
-}
-
-// Replace all values in array by -a[i,j]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2neg(const integer_2d_array &a);
-void xdebugi2neg(ZMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = -a->xyZ[i][j];
-      }
-   }
-}
-
-// Transposes array.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2transpose(integer_2d_array &a);
-void xdebugi2transpose(ZMatrix *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_INT);
-   ae_matrix_set_length(&b, a->rows, a->cols);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         b.xyZ[i][j] = a->xyZ[i][j];
-      }
-   }
-   ae_matrix_set_length(a, b.cols, b.rows);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         a->xyZ[j][i] = b.xyZ[i][j];
-      }
-   }
-   ae_frame_leave();
-}
-
-// Generate MxN matrix with elements set to "Sign(sin(3*I+5*J))"
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a);
-void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   SetMatrix(a);
-   ae_matrix_set_length(a, m, n);
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = ae_sign(sin((double)(3 * i + 5 * j)));
-      }
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugr2sum(const real_2d_array &a);
-double xdebugr2sum(RMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   double result;
-   result = 0.0;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         result += a->xyR[i][j];
-      }
-   }
-   return result;
-}
-
-// Replace all values in array by -a[i,j]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2neg(const real_2d_array &a);
-void xdebugr2neg(RMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyR[i][j] = -a->xyR[i][j];
-      }
-   }
-}
-
-// Transposes array.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2transpose(real_2d_array &a);
-void xdebugr2transpose(RMatrix *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_REAL);
-   ae_matrix_set_length(&b, a->rows, a->cols);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         b.xyR[i][j] = a->xyR[i][j];
-      }
-   }
-   ae_matrix_set_length(a, b.cols, b.rows);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         a->xyR[j][i] = b.xyR[i][j];
-      }
-   }
-   ae_frame_leave();
-}
-
-// Generate MxN matrix with elements set to "sin(3*I+5*J)"
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a);
-void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   SetMatrix(a);
-   ae_matrix_set_length(a, m, n);
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyR[i][j] = sin((double)(3 * i + 5 * j));
-      }
-   }
-}
-
-// Returns sum of elements in the array.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: complex xdebugc2sum(const complex_2d_array &a);
-ae_complex xdebugc2sum(CMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_complex result;
-   result = ae_complex_from_i(0);
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         result = ae_c_add(result, a->xyC[i][j]);
-      }
-   }
-   return result;
-}
-
-// Replace all values in array by -a[i,j]
-// Array is passed using "shared" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2neg(const complex_2d_array &a);
-void xdebugc2neg(CMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j] = ae_c_neg(a->xyC[i][j]);
-      }
-   }
-}
-
-// Transposes array.
-// Array is passed using "var" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2transpose(complex_2d_array &a);
-void xdebugc2transpose(CMatrix *a) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   ae_frame_make(&_frame_block);
-   NewMatrix(b, 0, 0, DT_COMPLEX);
-   ae_matrix_set_length(&b, a->rows, a->cols);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         b.xyC[i][j] = a->xyC[i][j];
-      }
-   }
-   ae_matrix_set_length(a, b.cols, b.rows);
-   for (i = 0; i < b.rows; i++) {
-      for (j = 0; j < b.cols; j++) {
-         a->xyC[j][i] = b.xyC[i][j];
-      }
-   }
-   ae_frame_leave();
-}
-
-// Generate MxN matrix with elements set to "sin(3*I+5*J),cos(3*I+5*J)"
-// Array is passed using "out" convention.
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a);
-void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a) {
-   ae_int_t i;
-   ae_int_t j;
-   SetMatrix(a);
-   ae_matrix_set_length(a, m, n);
-   for (i = 0; i < a->rows; i++) {
-      for (j = 0; j < a->cols; j++) {
-         a->xyC[i][j] = ae_complex_from_d(sin((double)(3 * i + 5 * j)), cos((double)(3 * i + 5 * j)));
-      }
-   }
-}
-
-// Returns sum of a[i,j]*(1+b[i,j]) such that c[i,j] is True
-// ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
-// API: double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c);
-double xdebugmaskedbiasedproductsum(ae_int_t m, ae_int_t n, RMatrix *a, RMatrix *b, BMatrix *c) {
-   ae_int_t i;
-   ae_int_t j;
-   double result;
-   ae_assert(m >= a->rows, "Assertion failed");
-   ae_assert(m >= b->rows, "Assertion failed");
-   ae_assert(m >= c->rows, "Assertion failed");
-   ae_assert(n >= a->cols, "Assertion failed");
-   ae_assert(n >= b->cols, "Assertion failed");
-   ae_assert(n >= c->cols, "Assertion failed");
-   result = 0.0;
-   for (i = 0; i < m; i++) {
-      for (j = 0; j < n; j++) {
-         if (c->xyB[i][j]) {
-            result += a->xyR[i][j] * (1 + b->xyR[i][j]);
-         }
-      }
-   }
-   return result;
-}
-
-void xdebugrecord1_init(void *_p, bool make_automatic) {
-   xdebugrecord1 *p = (xdebugrecord1 *)_p;
-   ae_vector_init(&p->a, 0, DT_REAL, make_automatic);
-}
-
-void xdebugrecord1_copy(void *_dst, void *_src, bool make_automatic) {
-   xdebugrecord1 *dst = (xdebugrecord1 *)_dst;
-   xdebugrecord1 *src = (xdebugrecord1 *)_src;
-   dst->i = src->i;
-   dst->c = src->c;
-   ae_vector_copy(&dst->a, &src->a, make_automatic);
-}
-
-void xdebugrecord1_free(void *_p, bool make_automatic) {
-   xdebugrecord1 *p = (xdebugrecord1 *)_p;
-   ae_vector_free(&p->a, make_automatic);
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
-
-void xdebuginitrecord1(xdebugrecord1 &rec1) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebuginitrecord1(ConstT(xdebugrecord1, rec1));
-   alglib_impl::ae_state_clear();
-}
-
-ae_int_t xdebugb1count(const boolean_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::xdebugb1count(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void xdebugb1not(const boolean_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb1not(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugb1appendcopy(boolean_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb1appendcopy(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugb1outeven(const ae_int_t n, boolean_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb1outeven(n, ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-ae_int_t xdebugi1sum(const integer_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::xdebugi1sum(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void xdebugi1neg(const integer_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi1neg(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugi1appendcopy(integer_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi1appendcopy(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugi1outeven(const ae_int_t n, integer_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi1outeven(n, ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-double xdebugr1sum(const real_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::xdebugr1sum(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-void xdebugr1neg(const real_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr1neg(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugr1appendcopy(real_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr1appendcopy(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr1outeven(n, ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-complex xdebugc1sum(const complex_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   alglib_impl::ae_complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-   return ComplexOf(C);
-}
-
-void xdebugc1neg(const complex_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc1neg(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugc1appendcopy(complex_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc1appendcopy(ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugc1outeven(const ae_int_t n, complex_1d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc1outeven(n, ConstT(ae_vector, a));
-   alglib_impl::ae_state_clear();
-}
-
-ae_int_t xdebugb2count(const boolean_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::xdebugb2count(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void xdebugb2not(const boolean_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb2not(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugb2transpose(boolean_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb2transpose(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugb2outsin(const ae_int_t m, const ae_int_t n, boolean_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugb2outsin(m, n, ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-ae_int_t xdebugi2sum(const integer_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::xdebugi2sum(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void xdebugi2neg(const integer_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi2neg(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugi2transpose(integer_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi2transpose(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugi2outsin(const ae_int_t m, const ae_int_t n, integer_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugi2outsin(m, n, ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-double xdebugr2sum(const real_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::xdebugr2sum(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-   return D;
-}
-
-void xdebugr2neg(const real_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr2neg(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugr2transpose(real_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr2transpose(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugr2outsin(m, n, ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-complex xdebugc2sum(const complex_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch(complex(0.0))
-   alglib_impl::ae_complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-   return ComplexOf(C);
-}
-
-void xdebugc2neg(const complex_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc2neg(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugc2transpose(complex_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc2transpose(ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-void xdebugc2outsincos(const ae_int_t m, const ae_int_t n, complex_2d_array &a) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::xdebugc2outsincos(m, n, ConstT(ae_matrix, a));
-   alglib_impl::ae_state_clear();
-}
-
-double xdebugmaskedbiasedproductsum(const ae_int_t m, const ae_int_t n, const real_2d_array &a, const real_2d_array &b, const boolean_2d_array &c) {
-   alglib_impl::ae_state_init();
-   TryCatch(0.0)
-   double D = alglib_impl::xdebugmaskedbiasedproductsum(m, n, ConstT(ae_matrix, a), ConstT(ae_matrix, b), ConstT(ae_matrix, c));
-   alglib_impl::ae_state_clear();
-   return D;
 }
 } // end of namespace alglib

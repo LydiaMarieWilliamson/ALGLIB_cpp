@@ -275,365 +275,6 @@ double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &
 double mlperrorsparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize);
 } // end of namespace alglib
 
-// === LDA Package ===
-// Depends on: (LinAlg) MATINV, EVD
-namespace alglib_impl {
-void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w);
-void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
-void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
-} // end of namespace alglib
-
-// === SSA Package ===
-// Depends on: (LinAlg) SVD, EVD
-namespace alglib_impl {
-struct ssamodel {
-   ae_int_t nsequences;
-   ae_vector sequenceidx;
-   ae_vector sequencedata;
-   ae_int_t algotype;
-   ae_int_t windowwidth;
-   ae_int_t rtpowerup;
-   ae_int_t topk;
-   ae_int_t precomputedwidth;
-   ae_int_t precomputednbasis;
-   ae_matrix precomputedbasis;
-   ae_int_t defaultsubspaceits;
-   ae_int_t memorylimit;
-   bool arebasisandsolvervalid;
-   ae_matrix basis;
-   ae_matrix basist;
-   ae_vector sv;
-   ae_vector forecasta;
-   ae_int_t nbasis;
-   eigsubspacestate solver;
-   ae_matrix xxt;
-   hqrndstate rs;
-   ae_int_t rngseed;
-   ae_vector rtqueue;
-   ae_int_t rtqueuecnt;
-   ae_int_t rtqueuechunk;
-   ae_int_t dbgcntevd;
-   ae_vector tmp0;
-   ae_vector tmp1;
-   eigsubspacereport solverrep;
-   ae_vector alongtrend;
-   ae_vector alongnoise;
-   ae_matrix aseqtrajectory;
-   ae_matrix aseqtbproduct;
-   ae_vector aseqcounts;
-   ae_vector fctrend;
-   ae_vector fcnoise;
-   ae_matrix fctrendm;
-   ae_matrix uxbatch;
-   ae_int_t uxbatchwidth;
-   ae_int_t uxbatchsize;
-   ae_int_t uxbatchlimit;
-};
-void ssamodel_init(void *_p, bool make_automatic);
-void ssamodel_copy(void *_dst, void *_src, bool make_automatic);
-void ssamodel_free(void *_p, bool make_automatic);
-
-void ssacreate(ssamodel *s);
-void ssasetwindow(ssamodel *s, ae_int_t windowwidth);
-void ssasetseed(ssamodel *s, ae_int_t seed);
-void ssasetpoweruplength(ssamodel *s, ae_int_t pwlen);
-void ssasetmemorylimit(ssamodel *s, ae_int_t memlimit);
-void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n);
-void ssaappendpointandupdate(ssamodel *s, double x, double updateits);
-void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double updateits);
-void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int_t nbasis);
-void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk);
-void ssasetalgotopkrealtime(ssamodel *s, ae_int_t topk);
-void ssacleardata(ssamodel *s);
-void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae_int_t *nbasis);
-void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth);
-void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t *nticks);
-void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise);
-void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *trend, RVector *noise);
-void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend);
-void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t forecastlen, bool applysmoothing, RVector *trend);
-void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend);
-void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t m, ae_int_t forecastlen, bool applysmoothing, RVector *trend);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(ssamodel, EndD);
-
-void ssacreate(ssamodel &s);
-void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
-void ssasetseed(const ssamodel &s, const ae_int_t seed);
-void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
-void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit);
-void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n);
-void ssaaddsequence(const ssamodel &s, const real_1d_array &x);
-void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits);
-void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits);
-void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits);
-void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis);
-void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a);
-void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
-void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
-void ssacleardata(const ssamodel &s);
-void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis);
-void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth);
-void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks);
-void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
-void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
-void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise);
-void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend);
-void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
-void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t forecastlen, real_1d_array &trend);
-void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend);
-void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
-void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t m, const ae_int_t forecastlen, real_1d_array &trend);
-} // end of namespace alglib
-
-// === LINREG Package ===
-// Depends on: (SpecialFunctions) IGAMMAF
-// Depends on: (LinAlg) SVD
-// Depends on: (Statistics) BASESTAT
-namespace alglib_impl {
-struct linearmodel {
-   ae_vector w;
-};
-void linearmodel_init(void *_p, bool make_automatic);
-void linearmodel_copy(void *_dst, void *_src, bool make_automatic);
-void linearmodel_free(void *_p, bool make_automatic);
-
-struct lrreport {
-   ae_matrix c;
-   double rmserror;
-   double avgerror;
-   double avgrelerror;
-   double cvrmserror;
-   double cvavgerror;
-   double cvavgrelerror;
-   ae_int_t ncvdefects;
-   ae_vector cvdefects;
-};
-void lrreport_init(void *_p, bool make_automatic);
-void lrreport_copy(void *_dst, void *_src, bool make_automatic);
-void lrreport_free(void *_p, bool make_automatic);
-
-void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
-void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
-void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
-void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
-void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars);
-void lrpack(RVector *v, ae_int_t nvars, linearmodel *lm);
-double lrprocess(linearmodel *lm, RVector *x);
-double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
-double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
-double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
-void lrcopy(linearmodel *lm1, linearmodel *lm2);
-void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, double *b, double *vara, double *varb, double *covab, double *corrab, double *p);
-void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(linearmodel, EndD);
-DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
-
-void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
-void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
-void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
-void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
-void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
-void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
-double lrprocess(const linearmodel &lm, const real_1d_array &x);
-double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-} // end of namespace alglib
-
-// === FILTERS Package ===
-// Depends on: LINREG
-namespace alglib_impl {
-void filtersma(RVector *x, ae_int_t n, ae_int_t k);
-void filterema(RVector *x, ae_int_t n, double alpha);
-void filterlrma(RVector *x, ae_int_t n, ae_int_t k);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
-void filtersma(real_1d_array &x, const ae_int_t k);
-void filterema(real_1d_array &x, const ae_int_t n, const double alpha);
-void filterema(real_1d_array &x, const double alpha);
-void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
-void filterlrma(real_1d_array &x, const ae_int_t k);
-} // end of namespace alglib
-
-// === LOGIT Package ===
-// Depends on: (Solvers) DIRECTDENSESOLVERS
-// Depends on: MLPBASE
-namespace alglib_impl {
-struct logitmodel {
-   ae_vector w;
-};
-void logitmodel_init(void *_p, bool make_automatic);
-void logitmodel_copy(void *_dst, void *_src, bool make_automatic);
-void logitmodel_free(void *_p, bool make_automatic);
-
-struct logitmcstate {
-   bool brackt;
-   bool stage1;
-   ae_int_t infoc;
-   double dg;
-   double dgm;
-   double dginit;
-   double dgtest;
-   double dgx;
-   double dgxm;
-   double dgy;
-   double dgym;
-   double finit;
-   double ftest1;
-   double fm;
-   double fx;
-   double fxm;
-   double fy;
-   double fym;
-   double stx;
-   double sty;
-   double stmin;
-   double stmax;
-   double width;
-   double width1;
-   double xtrapf;
-};
-void logitmcstate_init(void *_p, bool make_automatic);
-void logitmcstate_copy(void *_dst, void *_src, bool make_automatic);
-void logitmcstate_free(void *_p, bool make_automatic);
-
-struct mnlreport {
-   ae_int_t ngrad;
-   ae_int_t nhess;
-};
-void mnlreport_init(void *_p, bool make_automatic);
-void mnlreport_copy(void *_dst, void *_src, bool make_automatic);
-void mnlreport_free(void *_p, bool make_automatic);
-
-void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep);
-void mnlprocess(logitmodel *lm, RVector *x, RVector *y);
-void mnlprocessi(logitmodel *lm, RVector *x, RVector *y);
-void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses);
-void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm);
-void mnlcopy(logitmodel *lm1, logitmodel *lm2);
-double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
-double mnlrelclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
-double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
-double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
-double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize);
-ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(logitmodel, EndD);
-DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
-
-void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
-void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
-void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
-void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses);
-void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm);
-double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize);
-ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
-} // end of namespace alglib
-
-// === MCPD Package ===
-// Depends on: (Optimization) MINBLEIC
-namespace alglib_impl {
-struct mcpdstate {
-   ae_int_t n;
-   ae_vector states;
-   ae_int_t npairs;
-   ae_matrix data;
-   ae_matrix ec;
-   ae_matrix bndl;
-   ae_matrix bndu;
-   ae_matrix c;
-   ae_vector ct;
-   ae_int_t ccnt;
-   ae_vector pw;
-   ae_matrix priorp;
-   double regterm;
-   minbleicstate bs;
-   ae_int_t repinneriterationscount;
-   ae_int_t repouteriterationscount;
-   ae_int_t repnfev;
-   ae_int_t repterminationtype;
-   minbleicreport br;
-   ae_vector tmpp;
-   ae_vector effectivew;
-   ae_vector effectivebndl;
-   ae_vector effectivebndu;
-   ae_matrix effectivec;
-   ae_vector effectivect;
-   ae_vector h;
-   ae_matrix p;
-};
-void mcpdstate_init(void *_p, bool make_automatic);
-void mcpdstate_copy(void *_dst, void *_src, bool make_automatic);
-void mcpdstate_free(void *_p, bool make_automatic);
-
-struct mcpdreport {
-   ae_int_t inneriterationscount;
-   ae_int_t outeriterationscount;
-   ae_int_t nfev;
-   ae_int_t terminationtype;
-};
-void mcpdreport_init(void *_p, bool make_automatic);
-void mcpdreport_copy(void *_dst, void *_src, bool make_automatic);
-void mcpdreport_free(void *_p, bool make_automatic);
-
-void mcpdcreate(ae_int_t n, mcpdstate *s);
-void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s);
-void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s);
-void mcpdcreateentryexit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s);
-void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k);
-void mcpdsetec(mcpdstate *s, RMatrix *ec);
-void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c);
-void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu);
-void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu);
-void mcpdsetlc(mcpdstate *s, RMatrix *c, ZVector *ct, ae_int_t k);
-void mcpdsettikhonovregularizer(mcpdstate *s, double v);
-void mcpdsetprior(mcpdstate *s, RMatrix *pp);
-void mcpdsetpredictionweights(mcpdstate *s, RVector *pw);
-void mcpdsolve(mcpdstate *s);
-void mcpdresults(mcpdstate *s, RMatrix *p, mcpdreport *rep);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(mcpdstate, EndD);
-DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
-
-void mcpdcreate(const ae_int_t n, mcpdstate &s);
-void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
-void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
-void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s);
-void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k);
-void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy);
-void mcpdsetec(const mcpdstate &s, const real_2d_array &ec);
-void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c);
-void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu);
-void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu);
-void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
-void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct);
-void mcpdsettikhonovregularizer(const mcpdstate &s, const double v);
-void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
-void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw);
-void mcpdsolve(const mcpdstate &s);
-void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep);
-} // end of namespace alglib
-
 // === MLPE Package ===
 // Depends on: MLPBASE
 namespace alglib_impl {
@@ -710,155 +351,6 @@ double mlpeavgce(const mlpensemble &ensemble, const real_2d_array &xy, const ae_
 double mlpermserror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpeavgerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
 double mlpeavgrelerror(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints);
-} // end of namespace alglib
-
-// === MLPTRAIN Package ===
-// Depends on: (Solvers) DIRECTDENSESOLVERS
-// Depends on: (Optimization) MINLBFGS
-// Depends on: MLPE
-namespace alglib_impl {
-struct mlpreport {
-   double relclserror;
-   double avgce;
-   double rmserror;
-   double avgerror;
-   double avgrelerror;
-   ae_int_t ngrad;
-   ae_int_t nhess;
-   ae_int_t ncholesky;
-};
-void mlpreport_init(void *_p, bool make_automatic);
-void mlpreport_copy(void *_dst, void *_src, bool make_automatic);
-void mlpreport_free(void *_p, bool make_automatic);
-
-struct mlpcvreport {
-   double relclserror;
-   double avgce;
-   double rmserror;
-   double avgerror;
-   double avgrelerror;
-};
-void mlpcvreport_init(void *_p, bool make_automatic);
-void mlpcvreport_copy(void *_dst, void *_src, bool make_automatic);
-void mlpcvreport_free(void *_p, bool make_automatic);
-
-struct smlptrnsession {
-   ae_vector bestparameters;
-   double bestrmserror;
-   bool randomizenetwork;
-   multilayerperceptron network;
-   minlbfgsstate optimizer;
-   minlbfgsreport optimizerrep;
-   ae_vector wbuf0;
-   ae_vector wbuf1;
-   ae_vector allminibatches;
-   ae_vector currentminibatch;
-   ae_int_t PQ;
-   ae_int_t algoused;
-   ae_int_t minibatchsize;
-   hqrndstate generator;
-};
-void smlptrnsession_init(void *_p, bool make_automatic);
-void smlptrnsession_copy(void *_dst, void *_src, bool make_automatic);
-void smlptrnsession_free(void *_p, bool make_automatic);
-
-struct mlpetrnsession {
-   ae_vector trnsubset;
-   ae_vector valsubset;
-   ae_shared_pool mlpsessions;
-   mlpreport mlprep;
-   multilayerperceptron network;
-};
-void mlpetrnsession_init(void *_p, bool make_automatic);
-void mlpetrnsession_copy(void *_dst, void *_src, bool make_automatic);
-void mlpetrnsession_free(void *_p, bool make_automatic);
-
-struct mlptrainer {
-   ae_int_t nin;
-   ae_int_t nout;
-   bool rcpar;
-   ae_int_t lbfgsfactor;
-   double decay;
-   double wstep;
-   ae_int_t maxits;
-   ae_int_t datatype;
-   ae_int_t npoints;
-   ae_matrix densexy;
-   sparsematrix sparsexy;
-   smlptrnsession session;
-   ae_int_t ngradbatch;
-   ae_vector subset;
-   ae_int_t subsetsize;
-   ae_vector valsubset;
-   ae_int_t valsubsetsize;
-   ae_int_t algokind;
-   ae_int_t minibatchsize;
-};
-void mlptrainer_init(void *_p, bool make_automatic);
-void mlptrainer_copy(void *_dst, void *_src, bool make_automatic);
-void mlptrainer_free(void *_p, bool make_automatic);
-
-struct mlpparallelizationcv {
-   multilayerperceptron network;
-   mlpreport rep;
-   ae_vector subset;
-   ae_int_t subsetsize;
-   ae_vector xyrow;
-   ae_vector y;
-   ae_int_t ngrad;
-   ae_shared_pool trnpool;
-};
-void mlpparallelizationcv_init(void *_p, bool make_automatic);
-void mlpparallelizationcv_copy(void *_dst, void *_src, bool make_automatic);
-void mlpparallelizationcv_free(void *_p, bool make_automatic);
-
-void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
-void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep);
-void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize, RMatrix *valxy, ae_int_t valsize, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
-void mlpkfoldcvlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
-void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
-void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, ae_int_t foldscount, mlpreport *rep);
-void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s);
-void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s);
-void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints);
-void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints);
-void mlpsetdecay(mlptrainer *s, double decay);
-void mlpsetcond(mlptrainer *s, double wstep, ae_int_t maxits);
-void mlpsetalgobatch(mlptrainer *s);
-void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, mlpreport *rep);
-void mlpstarttraining(mlptrainer *s, multilayerperceptron *network, bool randomstart);
-bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network);
-void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors);
-void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors);
-void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
-void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts, mlpreport *rep);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(mlpreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
-DecClass(mlpcvreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
-DecClass(mlptrainer, EndD);
-
-void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
-void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep);
-void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
-void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
-void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
-void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
-void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
-void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
-void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints);
-void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints);
-void mlpsetdecay(const mlptrainer &s, const double decay);
-void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
-void mlpsetalgobatch(const mlptrainer &s);
-void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
-void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart);
-bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network);
-void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
-void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
-void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
-void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep);
 } // end of namespace alglib
 
 // === CLUSTERING Package ===
@@ -1208,6 +700,365 @@ double dfavgerror(const decisionforest &df, const real_2d_array &xy, const ae_in
 double dfavgrelerror(const decisionforest &df, const real_2d_array &xy, const ae_int_t npoints);
 } // end of namespace alglib
 
+// === LINREG Package ===
+// Depends on: (SpecialFunctions) IGAMMAF
+// Depends on: (LinAlg) SVD
+// Depends on: (Statistics) BASESTAT
+namespace alglib_impl {
+struct linearmodel {
+   ae_vector w;
+};
+void linearmodel_init(void *_p, bool make_automatic);
+void linearmodel_copy(void *_dst, void *_src, bool make_automatic);
+void linearmodel_free(void *_p, bool make_automatic);
+
+struct lrreport {
+   ae_matrix c;
+   double rmserror;
+   double avgerror;
+   double avgrelerror;
+   double cvrmserror;
+   double cvavgerror;
+   double cvavgrelerror;
+   ae_int_t ncvdefects;
+   ae_vector cvdefects;
+};
+void lrreport_init(void *_p, bool make_automatic);
+void lrreport_copy(void *_dst, void *_src, bool make_automatic);
+void lrreport_free(void *_p, bool make_automatic);
+
+void lrbuild(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+void lrbuilds(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+void lrbuildzs(RMatrix *xy, RVector *s, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+void lrbuildz(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t *info, linearmodel *lm, lrreport *ar);
+void lrunpack(linearmodel *lm, RVector *v, ae_int_t *nvars);
+void lrpack(RVector *v, ae_int_t nvars, linearmodel *lm);
+double lrprocess(linearmodel *lm, RVector *x);
+double lrrmserror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
+double lravgerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
+double lravgrelerror(linearmodel *lm, RMatrix *xy, ae_int_t npoints);
+void lrcopy(linearmodel *lm1, linearmodel *lm2);
+void lrlines(RMatrix *xy, RVector *s, ae_int_t n, ae_int_t *info, double *a, double *b, double *vara, double *varb, double *covab, double *corrab, double *p);
+void lrline(RMatrix *xy, ae_int_t n, ae_int_t *info, double *a, double *b);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(linearmodel, EndD);
+DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
+
+void lrbuild(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuilds(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuildzs(const real_2d_array &xy, const real_1d_array &s, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrbuildz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, linearmodel &lm, lrreport &ar);
+void lrunpack(const linearmodel &lm, real_1d_array &v, ae_int_t &nvars);
+void lrpack(const real_1d_array &v, const ae_int_t nvars, linearmodel &lm);
+double lrprocess(const linearmodel &lm, const real_1d_array &x);
+double lrrmserror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double lravgrelerror(const linearmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+} // end of namespace alglib
+
+// === FILTERS Package ===
+// Depends on: LINREG
+namespace alglib_impl {
+void filtersma(RVector *x, ae_int_t n, ae_int_t k);
+void filterema(RVector *x, ae_int_t n, double alpha);
+void filterlrma(RVector *x, ae_int_t n, ae_int_t k);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void filtersma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
+void filtersma(real_1d_array &x, const ae_int_t k);
+void filterema(real_1d_array &x, const ae_int_t n, const double alpha);
+void filterema(real_1d_array &x, const double alpha);
+void filterlrma(real_1d_array &x, const ae_int_t n, const ae_int_t k);
+void filterlrma(real_1d_array &x, const ae_int_t k);
+} // end of namespace alglib
+
+// === SSA Package ===
+// Depends on: (LinAlg) SVD, EVD
+namespace alglib_impl {
+struct ssamodel {
+   ae_int_t nsequences;
+   ae_vector sequenceidx;
+   ae_vector sequencedata;
+   ae_int_t algotype;
+   ae_int_t windowwidth;
+   ae_int_t rtpowerup;
+   ae_int_t topk;
+   ae_int_t precomputedwidth;
+   ae_int_t precomputednbasis;
+   ae_matrix precomputedbasis;
+   ae_int_t defaultsubspaceits;
+   ae_int_t memorylimit;
+   bool arebasisandsolvervalid;
+   ae_matrix basis;
+   ae_matrix basist;
+   ae_vector sv;
+   ae_vector forecasta;
+   ae_int_t nbasis;
+   eigsubspacestate solver;
+   ae_matrix xxt;
+   hqrndstate rs;
+   ae_int_t rngseed;
+   ae_vector rtqueue;
+   ae_int_t rtqueuecnt;
+   ae_int_t rtqueuechunk;
+   ae_int_t dbgcntevd;
+   ae_vector tmp0;
+   ae_vector tmp1;
+   eigsubspacereport solverrep;
+   ae_vector alongtrend;
+   ae_vector alongnoise;
+   ae_matrix aseqtrajectory;
+   ae_matrix aseqtbproduct;
+   ae_vector aseqcounts;
+   ae_vector fctrend;
+   ae_vector fcnoise;
+   ae_matrix fctrendm;
+   ae_matrix uxbatch;
+   ae_int_t uxbatchwidth;
+   ae_int_t uxbatchsize;
+   ae_int_t uxbatchlimit;
+};
+void ssamodel_init(void *_p, bool make_automatic);
+void ssamodel_copy(void *_dst, void *_src, bool make_automatic);
+void ssamodel_free(void *_p, bool make_automatic);
+
+void ssacreate(ssamodel *s);
+void ssasetwindow(ssamodel *s, ae_int_t windowwidth);
+void ssasetseed(ssamodel *s, ae_int_t seed);
+void ssasetpoweruplength(ssamodel *s, ae_int_t pwlen);
+void ssasetmemorylimit(ssamodel *s, ae_int_t memlimit);
+void ssaaddsequence(ssamodel *s, RVector *x, ae_int_t n);
+void ssaappendpointandupdate(ssamodel *s, double x, double updateits);
+void ssaappendsequenceandupdate(ssamodel *s, RVector *x, ae_int_t nticks, double updateits);
+void ssasetalgoprecomputed(ssamodel *s, RMatrix *a, ae_int_t windowwidth, ae_int_t nbasis);
+void ssasetalgotopkdirect(ssamodel *s, ae_int_t topk);
+void ssasetalgotopkrealtime(ssamodel *s, ae_int_t topk);
+void ssacleardata(ssamodel *s);
+void ssagetbasis(ssamodel *s, RMatrix *a, RVector *sv, ae_int_t *windowwidth, ae_int_t *nbasis);
+void ssagetlrr(ssamodel *s, RVector *a, ae_int_t *windowwidth);
+void ssaanalyzelastwindow(ssamodel *s, RVector *trend, RVector *noise, ae_int_t *nticks);
+void ssaanalyzelast(ssamodel *s, ae_int_t nticks, RVector *trend, RVector *noise);
+void ssaanalyzesequence(ssamodel *s, RVector *data, ae_int_t nticks, RVector *trend, RVector *noise);
+void ssaforecastlast(ssamodel *s, ae_int_t nticks, RVector *trend);
+void ssaforecastsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t forecastlen, bool applysmoothing, RVector *trend);
+void ssaforecastavglast(ssamodel *s, ae_int_t m, ae_int_t nticks, RVector *trend);
+void ssaforecastavgsequence(ssamodel *s, RVector *data, ae_int_t datalen, ae_int_t m, ae_int_t forecastlen, bool applysmoothing, RVector *trend);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(ssamodel, EndD);
+
+void ssacreate(ssamodel &s);
+void ssasetwindow(const ssamodel &s, const ae_int_t windowwidth);
+void ssasetseed(const ssamodel &s, const ae_int_t seed);
+void ssasetpoweruplength(const ssamodel &s, const ae_int_t pwlen);
+void ssasetmemorylimit(const ssamodel &s, const ae_int_t memlimit);
+void ssaaddsequence(const ssamodel &s, const real_1d_array &x, const ae_int_t n);
+void ssaaddsequence(const ssamodel &s, const real_1d_array &x);
+void ssaappendpointandupdate(const ssamodel &s, const double x, const double updateits);
+void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const ae_int_t nticks, const double updateits);
+void ssaappendsequenceandupdate(const ssamodel &s, const real_1d_array &x, const double updateits);
+void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a, const ae_int_t windowwidth, const ae_int_t nbasis);
+void ssasetalgoprecomputed(const ssamodel &s, const real_2d_array &a);
+void ssasetalgotopkdirect(const ssamodel &s, const ae_int_t topk);
+void ssasetalgotopkrealtime(const ssamodel &s, const ae_int_t topk);
+void ssacleardata(const ssamodel &s);
+void ssagetbasis(const ssamodel &s, real_2d_array &a, real_1d_array &sv, ae_int_t &windowwidth, ae_int_t &nbasis);
+void ssagetlrr(const ssamodel &s, real_1d_array &a, ae_int_t &windowwidth);
+void ssaanalyzelastwindow(const ssamodel &s, real_1d_array &trend, real_1d_array &noise, ae_int_t &nticks);
+void ssaanalyzelast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
+void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, const ae_int_t nticks, real_1d_array &trend, real_1d_array &noise);
+void ssaanalyzesequence(const ssamodel &s, const real_1d_array &data, real_1d_array &trend, real_1d_array &noise);
+void ssaforecastlast(const ssamodel &s, const ae_int_t nticks, real_1d_array &trend);
+void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
+void ssaforecastsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t forecastlen, real_1d_array &trend);
+void ssaforecastavglast(const ssamodel &s, const ae_int_t m, const ae_int_t nticks, real_1d_array &trend);
+void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t datalen, const ae_int_t m, const ae_int_t forecastlen, const bool applysmoothing, real_1d_array &trend);
+void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const ae_int_t m, const ae_int_t forecastlen, real_1d_array &trend);
+} // end of namespace alglib
+
+// === LDA Package ===
+// Depends on: (LinAlg) MATINV, EVD
+namespace alglib_impl {
+void fisherlda(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RVector *w);
+void fisherldan(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, RMatrix *w);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w);
+void fisherldan(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_2d_array &w);
+} // end of namespace alglib
+
+// === MCPD Package ===
+// Depends on: (Optimization) MINBLEIC
+namespace alglib_impl {
+struct mcpdstate {
+   ae_int_t n;
+   ae_vector states;
+   ae_int_t npairs;
+   ae_matrix data;
+   ae_matrix ec;
+   ae_matrix bndl;
+   ae_matrix bndu;
+   ae_matrix c;
+   ae_vector ct;
+   ae_int_t ccnt;
+   ae_vector pw;
+   ae_matrix priorp;
+   double regterm;
+   minbleicstate bs;
+   ae_int_t repinneriterationscount;
+   ae_int_t repouteriterationscount;
+   ae_int_t repnfev;
+   ae_int_t repterminationtype;
+   minbleicreport br;
+   ae_vector tmpp;
+   ae_vector effectivew;
+   ae_vector effectivebndl;
+   ae_vector effectivebndu;
+   ae_matrix effectivec;
+   ae_vector effectivect;
+   ae_vector h;
+   ae_matrix p;
+};
+void mcpdstate_init(void *_p, bool make_automatic);
+void mcpdstate_copy(void *_dst, void *_src, bool make_automatic);
+void mcpdstate_free(void *_p, bool make_automatic);
+
+struct mcpdreport {
+   ae_int_t inneriterationscount;
+   ae_int_t outeriterationscount;
+   ae_int_t nfev;
+   ae_int_t terminationtype;
+};
+void mcpdreport_init(void *_p, bool make_automatic);
+void mcpdreport_copy(void *_dst, void *_src, bool make_automatic);
+void mcpdreport_free(void *_p, bool make_automatic);
+
+void mcpdcreate(ae_int_t n, mcpdstate *s);
+void mcpdcreateentry(ae_int_t n, ae_int_t entrystate, mcpdstate *s);
+void mcpdcreateexit(ae_int_t n, ae_int_t exitstate, mcpdstate *s);
+void mcpdcreateentryexit(ae_int_t n, ae_int_t entrystate, ae_int_t exitstate, mcpdstate *s);
+void mcpdaddtrack(mcpdstate *s, RMatrix *xy, ae_int_t k);
+void mcpdsetec(mcpdstate *s, RMatrix *ec);
+void mcpdaddec(mcpdstate *s, ae_int_t i, ae_int_t j, double c);
+void mcpdsetbc(mcpdstate *s, RMatrix *bndl, RMatrix *bndu);
+void mcpdaddbc(mcpdstate *s, ae_int_t i, ae_int_t j, double bndl, double bndu);
+void mcpdsetlc(mcpdstate *s, RMatrix *c, ZVector *ct, ae_int_t k);
+void mcpdsettikhonovregularizer(mcpdstate *s, double v);
+void mcpdsetprior(mcpdstate *s, RMatrix *pp);
+void mcpdsetpredictionweights(mcpdstate *s, RVector *pw);
+void mcpdsolve(mcpdstate *s);
+void mcpdresults(mcpdstate *s, RMatrix *p, mcpdreport *rep);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(mcpdstate, EndD);
+DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
+
+void mcpdcreate(const ae_int_t n, mcpdstate &s);
+void mcpdcreateentry(const ae_int_t n, const ae_int_t entrystate, mcpdstate &s);
+void mcpdcreateexit(const ae_int_t n, const ae_int_t exitstate, mcpdstate &s);
+void mcpdcreateentryexit(const ae_int_t n, const ae_int_t entrystate, const ae_int_t exitstate, mcpdstate &s);
+void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy, const ae_int_t k);
+void mcpdaddtrack(const mcpdstate &s, const real_2d_array &xy);
+void mcpdsetec(const mcpdstate &s, const real_2d_array &ec);
+void mcpdaddec(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double c);
+void mcpdsetbc(const mcpdstate &s, const real_2d_array &bndl, const real_2d_array &bndu);
+void mcpdaddbc(const mcpdstate &s, const ae_int_t i, const ae_int_t j, const double bndl, const double bndu);
+void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct, const ae_int_t k);
+void mcpdsetlc(const mcpdstate &s, const real_2d_array &c, const integer_1d_array &ct);
+void mcpdsettikhonovregularizer(const mcpdstate &s, const double v);
+void mcpdsetprior(const mcpdstate &s, const real_2d_array &pp);
+void mcpdsetpredictionweights(const mcpdstate &s, const real_1d_array &pw);
+void mcpdsolve(const mcpdstate &s);
+void mcpdresults(const mcpdstate &s, real_2d_array &p, mcpdreport &rep);
+} // end of namespace alglib
+
+// === LOGIT Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: MLPBASE
+namespace alglib_impl {
+struct logitmodel {
+   ae_vector w;
+};
+void logitmodel_init(void *_p, bool make_automatic);
+void logitmodel_copy(void *_dst, void *_src, bool make_automatic);
+void logitmodel_free(void *_p, bool make_automatic);
+
+struct logitmcstate {
+   bool brackt;
+   bool stage1;
+   ae_int_t infoc;
+   double dg;
+   double dgm;
+   double dginit;
+   double dgtest;
+   double dgx;
+   double dgxm;
+   double dgy;
+   double dgym;
+   double finit;
+   double ftest1;
+   double fm;
+   double fx;
+   double fxm;
+   double fy;
+   double fym;
+   double stx;
+   double sty;
+   double stmin;
+   double stmax;
+   double width;
+   double width1;
+   double xtrapf;
+};
+void logitmcstate_init(void *_p, bool make_automatic);
+void logitmcstate_copy(void *_dst, void *_src, bool make_automatic);
+void logitmcstate_free(void *_p, bool make_automatic);
+
+struct mnlreport {
+   ae_int_t ngrad;
+   ae_int_t nhess;
+};
+void mnlreport_init(void *_p, bool make_automatic);
+void mnlreport_copy(void *_dst, void *_src, bool make_automatic);
+void mnlreport_free(void *_p, bool make_automatic);
+
+void mnltrainh(RMatrix *xy, ae_int_t npoints, ae_int_t nvars, ae_int_t nclasses, ae_int_t *info, logitmodel *lm, mnlreport *rep);
+void mnlprocess(logitmodel *lm, RVector *x, RVector *y);
+void mnlprocessi(logitmodel *lm, RVector *x, RVector *y);
+void mnlunpack(logitmodel *lm, RMatrix *a, ae_int_t *nvars, ae_int_t *nclasses);
+void mnlpack(RMatrix *a, ae_int_t nvars, ae_int_t nclasses, logitmodel *lm);
+void mnlcopy(logitmodel *lm1, logitmodel *lm2);
+double mnlavgce(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+double mnlrelclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+double mnlrmserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+double mnlavgerror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+double mnlavgrelerror(logitmodel *lm, RMatrix *xy, ae_int_t ssize);
+ae_int_t mnlclserror(logitmodel *lm, RMatrix *xy, ae_int_t npoints);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(logitmodel, EndD);
+DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
+
+void mnltrainh(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, logitmodel &lm, mnlreport &rep);
+void mnlprocess(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
+void mnlprocessi(const logitmodel &lm, const real_1d_array &x, real_1d_array &y);
+void mnlunpack(const logitmodel &lm, real_2d_array &a, ae_int_t &nvars, ae_int_t &nclasses);
+void mnlpack(const real_2d_array &a, const ae_int_t nvars, const ae_int_t nclasses, logitmodel &lm);
+double mnlavgce(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlrelclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlrmserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlavgerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+double mnlavgrelerror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t ssize);
+ae_int_t mnlclserror(const logitmodel &lm, const real_2d_array &xy, const ae_int_t npoints);
+} // end of namespace alglib
+
 // === KNN Package ===
 // Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
 // Depends on: BDSS
@@ -1314,6 +1165,155 @@ double knnrmserror(const knnmodel &model, const real_2d_array &xy, const ae_int_
 double knnavgerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 double knnavgrelerror(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints);
 void knnallerrors(const knnmodel &model, const real_2d_array &xy, const ae_int_t npoints, knnreport &rep);
+} // end of namespace alglib
+
+// === MLPTRAIN Package ===
+// Depends on: (Solvers) DIRECTDENSESOLVERS
+// Depends on: (Optimization) MINLBFGS
+// Depends on: MLPE
+namespace alglib_impl {
+struct mlpreport {
+   double relclserror;
+   double avgce;
+   double rmserror;
+   double avgerror;
+   double avgrelerror;
+   ae_int_t ngrad;
+   ae_int_t nhess;
+   ae_int_t ncholesky;
+};
+void mlpreport_init(void *_p, bool make_automatic);
+void mlpreport_copy(void *_dst, void *_src, bool make_automatic);
+void mlpreport_free(void *_p, bool make_automatic);
+
+struct mlpcvreport {
+   double relclserror;
+   double avgce;
+   double rmserror;
+   double avgerror;
+   double avgrelerror;
+};
+void mlpcvreport_init(void *_p, bool make_automatic);
+void mlpcvreport_copy(void *_dst, void *_src, bool make_automatic);
+void mlpcvreport_free(void *_p, bool make_automatic);
+
+struct smlptrnsession {
+   ae_vector bestparameters;
+   double bestrmserror;
+   bool randomizenetwork;
+   multilayerperceptron network;
+   minlbfgsstate optimizer;
+   minlbfgsreport optimizerrep;
+   ae_vector wbuf0;
+   ae_vector wbuf1;
+   ae_vector allminibatches;
+   ae_vector currentminibatch;
+   ae_int_t PQ;
+   ae_int_t algoused;
+   ae_int_t minibatchsize;
+   hqrndstate generator;
+};
+void smlptrnsession_init(void *_p, bool make_automatic);
+void smlptrnsession_copy(void *_dst, void *_src, bool make_automatic);
+void smlptrnsession_free(void *_p, bool make_automatic);
+
+struct mlpetrnsession {
+   ae_vector trnsubset;
+   ae_vector valsubset;
+   ae_shared_pool mlpsessions;
+   mlpreport mlprep;
+   multilayerperceptron network;
+};
+void mlpetrnsession_init(void *_p, bool make_automatic);
+void mlpetrnsession_copy(void *_dst, void *_src, bool make_automatic);
+void mlpetrnsession_free(void *_p, bool make_automatic);
+
+struct mlptrainer {
+   ae_int_t nin;
+   ae_int_t nout;
+   bool rcpar;
+   ae_int_t lbfgsfactor;
+   double decay;
+   double wstep;
+   ae_int_t maxits;
+   ae_int_t datatype;
+   ae_int_t npoints;
+   ae_matrix densexy;
+   sparsematrix sparsexy;
+   smlptrnsession session;
+   ae_int_t ngradbatch;
+   ae_vector subset;
+   ae_int_t subsetsize;
+   ae_vector valsubset;
+   ae_int_t valsubsetsize;
+   ae_int_t algokind;
+   ae_int_t minibatchsize;
+};
+void mlptrainer_init(void *_p, bool make_automatic);
+void mlptrainer_copy(void *_dst, void *_src, bool make_automatic);
+void mlptrainer_free(void *_p, bool make_automatic);
+
+struct mlpparallelizationcv {
+   multilayerperceptron network;
+   mlpreport rep;
+   ae_vector subset;
+   ae_int_t subsetsize;
+   ae_vector xyrow;
+   ae_vector y;
+   ae_int_t ngrad;
+   ae_shared_pool trnpool;
+};
+void mlpparallelizationcv_init(void *_p, bool make_automatic);
+void mlpparallelizationcv_copy(void *_dst, void *_src, bool make_automatic);
+void mlpparallelizationcv_free(void *_p, bool make_automatic);
+
+void mlptrainlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
+void mlptrainlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep);
+void mlptraines(multilayerperceptron *network, RMatrix *trnxy, ae_int_t trnsize, RMatrix *valxy, ae_int_t valsize, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
+void mlpkfoldcvlbfgs(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
+void mlpkfoldcvlm(multilayerperceptron *network, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t foldscount, ae_int_t *info, mlpreport *rep, mlpcvreport *cvrep);
+void mlpkfoldcv(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, ae_int_t foldscount, mlpreport *rep);
+void mlpcreatetrainer(ae_int_t nin, ae_int_t nout, mlptrainer *s);
+void mlpcreatetrainercls(ae_int_t nin, ae_int_t nclasses, mlptrainer *s);
+void mlpsetdataset(mlptrainer *s, RMatrix *xy, ae_int_t npoints);
+void mlpsetsparsedataset(mlptrainer *s, sparsematrix *xy, ae_int_t npoints);
+void mlpsetdecay(mlptrainer *s, double decay);
+void mlpsetcond(mlptrainer *s, double wstep, ae_int_t maxits);
+void mlpsetalgobatch(mlptrainer *s);
+void mlptrainnetwork(mlptrainer *s, multilayerperceptron *network, ae_int_t nrestarts, mlpreport *rep);
+void mlpstarttraining(mlptrainer *s, multilayerperceptron *network, bool randomstart);
+bool mlpcontinuetraining(mlptrainer *s, multilayerperceptron *network);
+void mlpebagginglm(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors);
+void mlpebagginglbfgs(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, double wstep, ae_int_t maxits, ae_int_t *info, mlpreport *rep, mlpcvreport *ooberrors);
+void mlpetraines(mlpensemble *ensemble, RMatrix *xy, ae_int_t npoints, double decay, ae_int_t restarts, ae_int_t *info, mlpreport *rep);
+void mlptrainensemblees(mlptrainer *s, mlpensemble *ensemble, ae_int_t nrestarts, mlpreport *rep);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(mlpreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
+DecClass(mlpcvreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
+DecClass(mlptrainer, EndD);
+
+void mlptrainlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlptrainlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep);
+void mlptraines(const multilayerperceptron &network, const real_2d_array &trnxy, const ae_int_t trnsize, const real_2d_array &valxy, const ae_int_t valsize, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlpkfoldcvlbfgs(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
+void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const ae_int_t foldscount, ae_int_t &info, mlpreport &rep, mlpcvreport &cvrep);
+void mlpkfoldcv(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, const ae_int_t foldscount, mlpreport &rep);
+void mlpcreatetrainer(const ae_int_t nin, const ae_int_t nout, mlptrainer &s);
+void mlpcreatetrainercls(const ae_int_t nin, const ae_int_t nclasses, mlptrainer &s);
+void mlpsetdataset(const mlptrainer &s, const real_2d_array &xy, const ae_int_t npoints);
+void mlpsetsparsedataset(const mlptrainer &s, const sparsematrix &xy, const ae_int_t npoints);
+void mlpsetdecay(const mlptrainer &s, const double decay);
+void mlpsetcond(const mlptrainer &s, const double wstep, const ae_int_t maxits);
+void mlpsetalgobatch(const mlptrainer &s);
+void mlptrainnetwork(const mlptrainer &s, const multilayerperceptron &network, const ae_int_t nrestarts, mlpreport &rep);
+void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, const bool randomstart);
+bool mlpcontinuetraining(const mlptrainer &s, const multilayerperceptron &network);
+void mlpebagginglm(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
+void mlpebagginglbfgs(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, const double wstep, const ae_int_t maxits, ae_int_t &info, mlpreport &rep, mlpcvreport &ooberrors);
+void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_int_t npoints, const double decay, const ae_int_t restarts, ae_int_t &info, mlpreport &rep);
+void mlptrainensemblees(const mlptrainer &s, const mlpensemble &ensemble, const ae_int_t nrestarts, mlpreport &rep);
 } // end of namespace alglib
 
 // === DATACOMP Package ===

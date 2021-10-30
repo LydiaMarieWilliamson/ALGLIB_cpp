@@ -14,6 +14,144 @@
 #define InAlgLib
 #include "Solvers.h"
 
+// === POLYNOMIALSOLVER Package ===
+// Depends on: (LinAlg) TRFAC, EVD
+namespace alglib_impl {
+// Polynomial root finding.
+//
+// This function returns all roots of the polynomial
+//     P(x) = a0 + a1*x + a2*x^2 + ... + an*x^n
+// Both real and complex roots are returned (see below).
+//
+// Inputs:
+//     A       -   array[N+1], polynomial coefficients:
+//                 * A[0] is constant term
+//                 * A[N] is a coefficient of X^N
+//     N       -   polynomial degree
+//
+// Outputs:
+//     X       -   array of complex roots:
+//                 * for isolated real root, X[I] is strictly real: IMAGE(X[I])=0
+//                 * complex roots are always returned in pairs - roots occupy
+//                   positions I and I+1, with:
+//                   * X[I+1]=Conj(X[I])
+//                   * IMAGE(X[I]) > 0
+//                   * IMAGE(X[I+1]) = -IMAGE(X[I]) < 0
+//                 * multiple real roots may have non-zero imaginary part due
+//                   to roundoff errors. There is no reliable way to distinguish
+//                   real root of multiplicity 2 from two  complex  roots  in
+//                   the presence of roundoff errors.
+//     Rep     -   report, additional information, following fields are set:
+//                 * Rep.MaxErr - max( |P(xi)| )  for  i=0..N-1.  This  field
+//                   allows to quickly estimate "quality" of the roots  being
+//                   returned.
+//
+// NOTE:   this function uses companion matrix method to find roots. In  case
+//         internal EVD  solver  fails  do  find  eigenvalues,  exception  is
+//         generated.
+//
+// NOTE:   roots are not "polished" and  no  matrix  balancing  is  performed
+//         for them.
+// ALGLIB: Copyright 24.02.2014 by Sergey Bochkanov
+// API: void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
+void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep) {
+   ae_frame _frame_block;
+   ae_int_t i;
+   ae_int_t j;
+   bool status;
+   ae_int_t nz;
+   ae_int_t ne;
+   ae_complex v;
+   ae_complex vv;
+   ae_frame_make(&_frame_block);
+   DupVector(a);
+   SetVector(x);
+   SetObj(polynomialsolverreport, rep);
+   NewMatrix(c, 0, 0, DT_REAL);
+   NewMatrix(vl, 0, 0, DT_REAL);
+   NewMatrix(vr, 0, 0, DT_REAL);
+   NewVector(wr, 0, DT_REAL);
+   NewVector(wi, 0, DT_REAL);
+   ae_assert(n > 0, "PolynomialSolve: N <= 0");
+   ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1");
+   ae_assert(isfinitevector(a, n + 1), "PolynomialSolve: A contains infitite numbers");
+   ae_assert(a->xR[n] != 0.0, "PolynomialSolve: A[N]=0");
+// Prepare
+   ae_vector_set_length(x, n);
+// Normalize A:
+// * analytically determine NZ zero roots
+// * quick exit for NZ=N
+// * make residual NE-th degree polynomial monic
+//   (here NE=N-NZ)
+   nz = 0;
+   while (nz < n && a->xR[nz] == 0.0) {
+      nz++;
+   }
+   ne = n - nz;
+   for (i = nz; i <= n; i++) {
+      a->xR[i - nz] = a->xR[i] / a->xR[n];
+   }
+// For NZ<N, build companion matrix and find NE non-zero roots
+   if (ne > 0) {
+      ae_matrix_set_length(&c, ne, ne);
+      for (i = 0; i < ne; i++) {
+         for (j = 0; j < ne; j++) {
+            c.xyR[i][j] = 0.0;
+         }
+      }
+      c.xyR[0][ne - 1] = -a->xR[0];
+      for (i = 1; i < ne; i++) {
+         c.xyR[i][i - 1] = 1.0;
+         c.xyR[i][ne - 1] = -a->xR[i];
+      }
+      status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr);
+      ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed");
+      for (i = 0; i < ne; i++) {
+         x->xC[i] = ae_complex_from_d(wr.xR[i], wi.xR[i]);
+      }
+   }
+// Remaining NZ zero roots
+   for (i = ne; i < n; i++) {
+      x->xC[i] = ae_complex_from_i(0);
+   }
+// Rep
+   rep->maxerr = 0.0;
+   for (i = 0; i < ne; i++) {
+      v = ae_complex_from_i(0);
+      vv = ae_complex_from_i(1);
+      for (j = 0; j <= ne; j++) {
+         v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
+         vv = ae_c_mul(vv, x->xC[i]);
+      }
+      rep->maxerr = rmax2(rep->maxerr, ae_c_abs(v));
+   }
+   ae_frame_leave();
+}
+
+void polynomialsolverreport_init(void *_p, bool make_automatic) {
+}
+
+void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic) {
+   polynomialsolverreport *dst = (polynomialsolverreport *)_dst;
+   polynomialsolverreport *src = (polynomialsolverreport *)_src;
+   dst->maxerr = src->maxerr;
+}
+
+void polynomialsolverreport_free(void *_p, bool make_automatic) {
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+DefClass(polynomialsolverreport, AndD DecVal(maxerr))
+
+void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::polynomialsolve(ConstT(ae_vector, a), n, ConstT(ae_vector, x), ConstT(polynomialsolverreport, rep));
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
 // === DIRECTDENSESOLVERS Package ===
 // Depends on: (AlgLibInternal) XBLAS
 // Depends on: (LinAlg) RCOND, SVD
@@ -3320,1532 +3458,6 @@ void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t
 }
 } // end of namespace alglib
 
-// === LINLSQR Package ===
-// Depends on: (LinAlg) SVD, NORMESTIMATOR
-namespace alglib_impl {
-static const double linlsqr_atol = 1.0E-6;
-static const double linlsqr_btol = 1.0E-6;
-
-// This function initializes linear LSQR Solver. This solver is used to solve
-// non-symmetric (and, possibly, non-square) problems. Least squares solution
-// is returned for non-compatible systems.
-//
-// USAGE:
-// 1. User initializes algorithm state with LinLSQRCreate() call
-// 2. User tunes solver parameters with  LinLSQRSetCond() and other functions
-// 3. User  calls  LinLSQRSolveSparse()  function which takes algorithm state
-//    and SparseMatrix object.
-// 4. User calls LinLSQRResults() to get solution
-// 5. Optionally, user may call LinLSQRSolveSparse() again to  solve  another
-//    problem  with different matrix and/or right part without reinitializing
-//    LinLSQRState structure.
-//
-// Inputs:
-//     M       -   number of rows in A
-//     N       -   number of variables, N > 0
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
-//       allocated place as much as possible.
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
-void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state) {
-   SetObj(linlsqrstate, state);
-   ae_assert(m > 0, "LinLSQRCreate: M <= 0");
-   ae_assert(n > 0, "LinLSQRCreate: N <= 0");
-   linlsqrcreatebuf(m, n, state);
-}
-
-// This function initializes linear LSQR Solver.  It  provides  exactly  same
-// functionality as linlsqrcreate(), but reuses  previously  allocated  space
-// as much as possible.
-//
-// Inputs:
-//     M       -   number of rows in A
-//     N       -   number of variables, N > 0
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-// ALGLIB: Copyright 14.11.2018 by Sergey Bochkanov
-// API: void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
-void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
-   ae_int_t i;
-   ae_assert(m > 0, "LinLSQRCreateBuf: M <= 0");
-   ae_assert(n > 0, "LinLSQRCreateBuf: N <= 0");
-   state->m = m;
-   state->n = n;
-   state->prectype = 0;
-   state->epsa = linlsqr_atol;
-   state->epsb = linlsqr_btol;
-   state->epsc = 1 / sqrt(ae_machineepsilon);
-   state->maxits = 0;
-   state->lambdai = 0.0;
-   state->xrep = false;
-   state->running = false;
-   state->repiterationscount = 0;
-// * allocate arrays
-// * set RX to NAN (just for the case user calls Results() without
-//   calling SolveSparse()
-// * set B to zero
-   normestimatorcreate(m, n, 2, 2, &state->nes);
-   ae_vector_set_length(&state->rx, state->n);
-   ae_vector_set_length(&state->ui, state->m + state->n);
-   ae_vector_set_length(&state->uip1, state->m + state->n);
-   ae_vector_set_length(&state->vip1, state->n);
-   ae_vector_set_length(&state->vi, state->n);
-   ae_vector_set_length(&state->omegai, state->n);
-   ae_vector_set_length(&state->omegaip1, state->n);
-   ae_vector_set_length(&state->d, state->n);
-   ae_vector_set_length(&state->x, state->m + state->n);
-   ae_vector_set_length(&state->mv, state->m + state->n);
-   ae_vector_set_length(&state->mtv, state->n);
-   ae_vector_set_length(&state->b, state->m);
-   for (i = 0; i < n; i++) {
-      state->rx.xR[i] = NAN;
-   }
-   for (i = 0; i < m; i++) {
-      state->b.xR[i] = 0.0;
-   }
-   state->PQ = -1;
-}
-
-// This function sets right part. By default, right part is zero.
-//
-// Inputs:
-//     B       -   right part, array[N].
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-void linlsqrsetb(linlsqrstate *state, RVector *b) {
-   ae_int_t i;
-   ae_assert(!state->running, "LinLSQRSetB: you can not change B when LinLSQRIteration is running");
-   ae_assert(state->m <= b->cnt, "LinLSQRSetB: Length(B)<M");
-   ae_assert(isfinitevector(b, state->m), "LinLSQRSetB: B contains infinite or NaN values");
-   state->bnorm2 = 0.0;
-   for (i = 0; i < state->m; i++) {
-      state->b.xR[i] = b->xR[i];
-      state->bnorm2 += b->xR[i] * b->xR[i];
-   }
-}
-
-// This  function  changes  preconditioning  settings of LinLSQQSolveSparse()
-// function. By default, SolveSparse() uses diagonal preconditioner,  but  if
-// you want to use solver without preconditioning, you can call this function
-// which forces solver to use unit matrix for preconditioning.
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-// ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
-// API: void linlsqrsetprecunit(const linlsqrstate &state);
-void linlsqrsetprecunit(linlsqrstate *state) {
-   ae_assert(!state->running, "LinLSQRSetPrecUnit: you can not change preconditioner, because function LinLSQRIteration is running!");
-   state->prectype = -1;
-}
-
-// This  function  changes  preconditioning  settings  of  LinCGSolveSparse()
-// function.  LinCGSolveSparse() will use diagonal of the  system  matrix  as
-// preconditioner. This preconditioning mode is active by default.
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-// ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
-// API: void linlsqrsetprecdiag(const linlsqrstate &state);
-void linlsqrsetprecdiag(linlsqrstate *state) {
-   ae_assert(!state->running, "LinLSQRSetPrecDiag: you can not change preconditioner, because function LinCGIteration is running!");
-   state->prectype = 0;
-}
-
-// This function sets optional Tikhonov regularization coefficient.
-// It is zero by default.
-//
-// Inputs:
-//     LambdaI -   regularization factor, LambdaI >= 0
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
-void linlsqrsetlambdai(linlsqrstate *state, double lambdai) {
-   ae_assert(!state->running, "LinLSQRSetLambdaI: you can not set LambdaI, because function LinLSQRIteration is running");
-   ae_assert(isfinite(lambdai) && lambdai >= 0.0, "LinLSQRSetLambdaI: LambdaI is infinite or NaN");
-   state->lambdai = lambdai;
-}
-
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-bool linlsqriteration(linlsqrstate *state) {
-   AutoS ae_int_t summn;
-   AutoS double bnorm;
-   AutoS ae_int_t i;
-// Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
-// A Spawn occurs when the routine is (re-)started.
-// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
-// An Exit sends an exit signal indicating the end of the process.
-   if (state->PQ >= 0) switch (state->PQ) {
-      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
-      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6;
-      default: goto Exit;
-   }
-Spawn:
-   i = -58;
-   ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
-   summn = state->m + state->n;
-   bnorm = sqrt(state->bnorm2);
-   state->needmtv = state->needmv = state->xupdated = false;
-   state->userterminationneeded = false;
-   state->running = true;
-   state->repnmv = 0;
-   state->repiterationscount = 0;
-   state->r2 = state->bnorm2;
-// estimate for ANorm
-   for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); ) {
-      if (state->nes.needmv) {
-         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
-         state->repnmv++, state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
-         ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
-      } else if (state->nes.needmtv) {
-         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
-      // matrix-vector multiplication
-         state->repnmv++, state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
-         ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
-      }
-   }
-   normestimatorresults(&state->nes, &state->anorm);
-// initialize .RX by zeros
-   for (i = 0; i < state->n; i++) {
-      state->rx.xR[i] = 0.0;
-   }
-// output first report
-   if (state->xrep) {
-      ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-      state->xupdated = true, state->PQ = 2; goto Pause; Resume2: state->xupdated = false;
-   }
-// LSQR, Step 0.
-//
-// Algorithm outline corresponds to one which was described at p.50 of
-// "LSQR - an algorithm for sparse linear equations and sparse least
-// squares" by C.Paige and M.Saunders with one small addition - we
-// explicitly extend system matrix by additional N lines in order
-// to handle non-zero lambda, i.e. original A is replaced by
-//         [ A        ]
-// A_mod = [          ]
-//         [ lambda*I ].
-//
-// Step 0:
-//     x[0]          = 0
-//     beta[1]*u[1]  = b
-//     alpha[1]*v[1] = A_mod'*u[1]
-//     w[1]          = v[1]
-//     phiBar[1]     = beta[1]
-//     rhoBar[1]     = alpha[1]
-//     d[0]          = 0
-//
-// NOTE:
-// There are three criteria for stopping:
-// (S0) maximum number of iterations
-// (S1) ||Rk|| <= EpsB*||B||;
-// (S2) ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
-// It is very important that S2 always checked AFTER S1. It is necessary
-// to avoid division by zero when Rk=0.
-   state->betai = bnorm;
-   if (state->betai == 0.0) {
-   // Zero right part
-      state->running = false;
-      state->repterminationtype = 1;
-      goto Exit;
-   }
-   for (i = 0; i < summn; i++) {
-      if (i < state->m) {
-         state->ui.xR[i] = state->b.xR[i] / state->betai;
-      } else {
-         state->ui.xR[i] = 0.0;
-      }
-      state->x.xR[i] = state->ui.xR[i];
-   }
-   state->repnmv++, state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
-   for (i = 0; i < state->n; i++) {
-      state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
-   }
-   state->alphai = 0.0;
-   for (i = 0; i < state->n; i++) {
-      state->alphai += state->mtv.xR[i] * state->mtv.xR[i];
-   }
-   state->alphai = sqrt(state->alphai);
-   if (state->alphai == 0.0) {
-   // Orthogonality stopping criterion is met
-      state->running = false;
-      state->repterminationtype = 4;
-      goto Exit;
-   }
-   for (i = 0; i < state->n; i++) {
-      state->vi.xR[i] = state->mtv.xR[i] / state->alphai;
-      state->omegai.xR[i] = state->vi.xR[i];
-   }
-   state->phibari = state->betai;
-   state->rhobari = state->alphai;
-   for (i = 0; i < state->n; i++) {
-      state->d.xR[i] = 0.0;
-   }
-   state->dnorm = 0.0;
-// Steps I=1, 2, ...
-   while (true) {
-   // At I-th step State.RepIterationsCount=I.
-      state->repiterationscount++;
-   // Bidiagonalization part:
-   //     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
-   //     alpha[i+1]*v[i+1] = A_mod'*u[i+1] - beta[i+1]*v[i]
-   //
-   // NOTE:  beta[i+1]=0 or alpha[i+1]=0 will lead to successful termination
-   //        in the end of the current iteration. In this case u/v are zero.
-   // NOTE2: algorithm won't fail on zero alpha or beta (there will be no
-   //        division by zero because it will be stopped BEFORE division
-   //        occurs). However, near-zero alpha and beta won't stop algorithm
-   //        and, although no division by zero will happen, orthogonality
-   //        in U and V will be lost.
-      ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
-      state->repnmv++, state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
-      for (i = 0; i < state->n; i++) {
-         state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
-      }
-      state->betaip1 = 0.0;
-      for (i = 0; i < summn; i++) {
-         state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
-         state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
-      }
-      if (state->betaip1 != 0.0) {
-         state->betaip1 = sqrt(state->betaip1);
-         for (i = 0; i < summn; i++) {
-            state->uip1.xR[i] /= state->betaip1;
-         }
-      }
-      ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
-      state->repnmv++, state->needmtv = true, state->PQ = 5; goto Pause; Resume5: state->needmtv = false;
-      for (i = 0; i < state->n; i++) {
-         state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
-      }
-      state->alphaip1 = 0.0;
-      for (i = 0; i < state->n; i++) {
-         state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
-         state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
-      }
-      if (state->alphaip1 != 0.0) {
-         state->alphaip1 = sqrt(state->alphaip1);
-         for (i = 0; i < state->n; i++) {
-            state->vip1.xR[i] /= state->alphaip1;
-         }
-      }
-   // Build next orthogonal transformation
-      state->rhoi = safepythag2(state->rhobari, state->betaip1);
-      state->ci = state->rhobari / state->rhoi;
-      state->si = state->betaip1 / state->rhoi;
-      state->theta = state->si * state->alphaip1;
-      state->rhobarip1 = -state->ci * state->alphaip1;
-      state->phii = state->ci * state->phibari;
-      state->phibarip1 = state->si * state->phibari;
-   // Update .RNorm
-   //
-   // This tricky  formula  is  necessary  because  simply  writing
-   // State.R2:=State.PhiBarIP1*State.PhiBarIP1 does NOT guarantees
-   // monotonic decrease of R2. Roundoff error combined with 80-bit
-   // precision used internally by Intel chips allows R2 to increase
-   // slightly in some rare, but possible cases. This property is
-   // undesirable, so we prefer to guard against R increase.
-      state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1);
-   // Update d and DNorm, check condition-related stopping criteria
-      for (i = 0; i < state->n; i++) {
-         state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
-         state->dnorm += state->d.xR[i] * state->d.xR[i];
-      }
-      if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
-         state->running = false;
-         state->repterminationtype = 7;
-         goto Exit;
-      }
-   // Update x, output report
-      for (i = 0; i < state->n; i++) {
-         state->rx.xR[i] += state->phii / state->rhoi * state->omegai.xR[i];
-      }
-      if (state->xrep) {
-         ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
-         state->xupdated = true, state->PQ = 6; goto Pause; Resume6: state->xupdated = false;
-      }
-   // Check stopping criteria
-   // 1. achieved required number of iterations;
-   // 2. ||Rk|| <= EpsB*||B||;
-   // 3. ||A^T*Rk||/(||A||*||Rk||) <= EpsA;
-      if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
-      // Achieved required number of iterations
-         state->running = false;
-         state->repterminationtype = 5;
-         goto Exit;
-      }
-      if (state->phibarip1 <= state->epsb * bnorm) {
-      // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
-         state->running = false;
-         state->repterminationtype = 1;
-         goto Exit;
-      }
-      if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
-      // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
-         state->running = false;
-         state->repterminationtype = 4;
-         goto Exit;
-      }
-      if (state->userterminationneeded) {
-      // User requested termination
-         state->running = false;
-         state->repterminationtype = 8;
-         goto Exit;
-      }
-   // Update omega
-      for (i = 0; i < state->n; i++) {
-         state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
-      }
-   // Prepare for the next iteration - rename variables:
-   // u[i]   := u[i+1]
-   // v[i]   := v[i+1]
-   // rho[i] := rho[i+1]
-   // ...
-      ae_v_move(state->ui.xR, 1, state->uip1.xR, 1, summn);
-      ae_v_move(state->vi.xR, 1, state->vip1.xR, 1, state->n);
-      ae_v_move(state->omegai.xR, 1, state->omegaip1.xR, 1, state->n);
-      state->alphai = state->alphaip1;
-      state->betai = state->betaip1;
-      state->phibari = state->phibarip1;
-      state->rhobari = state->rhobarip1;
-   }
-Exit:
-   state->PQ = -1;
-   return false;
-Pause:
-   return true;
-}
-
-// Procedure for solution of A*x=b with sparse A.
-//
-// Inputs:
-//     State   -   algorithm state
-//     A       -   sparse M*N matrix in the CRS format (you MUST contvert  it
-//                 to CRS format  by  calling  SparseConvertToCRS()  function
-//                 BEFORE you pass it to this function).
-//     B       -   right part, array[M]
-//
-// Result:
-//     This function returns no result.
-//     You can get solution by calling LinCGResults()
-//
-// NOTE: this function uses lightweight preconditioning -  multiplication  by
-//       inverse of diag(A). If you want, you can turn preconditioning off by
-//       calling LinLSQRSetPrecUnit(). However, preconditioning cost is   low
-//       and preconditioner is very important for solution  of  badly  scaled
-//       problems.
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b);
-void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
-   ae_int_t n;
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t t0;
-   ae_int_t t1;
-   double v;
-   n = state->n;
-   ae_assert(!state->running, "LinLSQRSolveSparse: you can not call this function when LinLSQRIteration is running");
-   ae_assert(b->cnt >= state->m, "LinLSQRSolveSparse: Length(B)<M");
-   ae_assert(isfinitevector(b, state->m), "LinLSQRSolveSparse: B contains infinite or NaN values");
-// Allocate temporaries
-   vectorsetlengthatleast(&state->tmpd, n);
-   vectorsetlengthatleast(&state->tmpx, n);
-// Compute diagonal scaling matrix D
-   if (state->prectype == 0) {
-   // Default preconditioner - inverse of column norms
-      for (i = 0; i < n; i++) {
-         state->tmpd.xR[i] = 0.0;
-      }
-      t0 = 0;
-      t1 = 0;
-      while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
-         state->tmpd.xR[j] += ae_sqr(v);
-      }
-      for (i = 0; i < n; i++) {
-         if (state->tmpd.xR[i] > 0.0) {
-            state->tmpd.xR[i] = 1 / sqrt(state->tmpd.xR[i]);
-         } else {
-            state->tmpd.xR[i] = 1.0;
-         }
-      }
-   } else {
-   // No diagonal scaling
-      for (i = 0; i < n; i++) {
-         state->tmpd.xR[i] = 1.0;
-      }
-   }
-// Solve.
-//
-// Instead of solving A*x=b we solve preconditioned system (A*D)*(inv(D)*x)=b.
-// Transformed A is not calculated explicitly, we just modify multiplication
-// by A or A'. After solution we modify State.RX so it will store untransformed
-// variables
-   linlsqrsetb(state, b);
-   linlsqrrestart(state);
-   while (linlsqriteration(state)) {
-      if (state->needmv) {
-         for (i = 0; i < n; i++) {
-            state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
-         }
-         sparsemv(a, &state->tmpx, &state->mv);
-      } else if (state->needmtv) {
-         sparsemtv(a, &state->x, &state->mtv);
-         for (i = 0; i < n; i++) {
-            state->mtv.xR[i] *= state->tmpd.xR[i];
-         }
-      }
-   }
-   for (i = 0; i < n; i++) {
-      state->rx.xR[i] *= state->tmpd.xR[i];
-   }
-}
-
-// This function sets stopping criteria.
-//
-// Inputs:
-//     EpsA    -   algorithm will be stopped if ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
-//     EpsB    -   algorithm will be stopped if ||Rk|| <= EpsB*||B||
-//     MaxIts  -   algorithm will be stopped if number of iterations
-//                 more than MaxIts.
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// NOTE: if EpsA,EpsB,EpsC and MaxIts are zero then these variables will
-// be setted as default values.
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits);
-void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits) {
-   ae_assert(!state->running, "LinLSQRSetCond: you can not call this function when LinLSQRIteration is running");
-   ae_assert(isfinite(epsa) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN");
-   ae_assert(isfinite(epsb) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN");
-   ae_assert(maxits >= 0, "LinLSQRSetCond: MaxIts is negative");
-   if (epsa == 0.0 && epsb == 0.0 && maxits == 0) {
-      state->epsa = linlsqr_atol;
-      state->epsb = linlsqr_btol;
-      state->maxits = state->n;
-   } else {
-      state->epsa = epsa;
-      state->epsb = epsb;
-      state->maxits = maxits;
-   }
-}
-
-// LSQR solver: results.
-//
-// This function must be called after LinLSQRSolve
-//
-// Inputs:
-//     State   -   algorithm state
-//
-// Outputs:
-//     X       -   array[N], solution
-//     Rep     -   optimization report:
-//                 * Rep.TerminationType completetion code:
-//                     *  1    ||Rk|| <= EpsB*||B||
-//                     *  4    ||A^T*Rk||/(||A||*||Rk||) <= EpsA
-//                     *  5    MaxIts steps was taken
-//                     *  7    rounding errors prevent further progress,
-//                             X contains best point found so far.
-//                             (sometimes returned on singular systems)
-//                     *  8    user requested termination via calling
-//                             linlsqrrequesttermination()
-//                 * Rep.IterationsCount contains iterations count
-//                 * NMV countains number of matrix-vector calculations
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep);
-void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep) {
-   SetVector(x);
-   SetObj(linlsqrreport, rep);
-   ae_assert(!state->running, "LinLSQRResult: you can not call this function when LinLSQRIteration is running");
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
-   ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
-   rep->iterationscount = state->repiterationscount;
-   rep->nmv = state->repnmv;
-   rep->terminationtype = state->repterminationtype;
-}
-
-// This function turns on/off reporting.
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     NeedXRep-   whether iteration reports are needed or not
-//
-// If NeedXRep is True, algorithm will call rep() callback function if  it is
-// provided to MinCGOptimize().
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-// API: void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
-void linlsqrsetxrep(linlsqrstate *state, bool needxrep) {
-   state->xrep = needxrep;
-}
-
-// This function restarts LinLSQRIteration
-// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
-void linlsqrrestart(linlsqrstate *state) {
-   state->PQ = -1;
-   state->repiterationscount = 0;
-}
-
-// This function is used to peek into LSQR solver and get  current  iteration
-// counter. You can safely "peek" into the solver from another thread.
-//
-// Inputs:
-//     S           -   solver object
-//
-// Result:
-//     iteration counter, in [0,INF)
-// ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
-// API: ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
-ae_int_t linlsqrpeekiterationscount(linlsqrstate *s) {
-   ae_int_t result;
-   result = s->repiterationscount;
-   return result;
-}
-
-// This subroutine submits request for termination of the running solver.  It
-// can be called from some other thread which wants LSQR solver to  terminate
-// (obviously, the  thread  running  LSQR  solver can not request termination
-// because it is already busy working on LSQR).
-//
-// As result, solver  stops  at  point  which  was  "current  accepted"  when
-// termination  request  was  submitted  and returns error code 8 (successful
-// termination).  Such   termination   is  a smooth  process  which  properly
-// deallocates all temporaries.
-//
-// Inputs:
-//     State   -   solver structure
-//
-// NOTE: calling this function on solver which is NOT running  will  have  no
-//       effect.
-//
-// NOTE: multiple calls to this function are possible. First call is counted,
-//       subsequent calls are silently ignored.
-//
-// NOTE: solver clears termination flag on its start, it means that  if  some
-//       other thread will request termination too soon, its request will went
-//       unnoticed.
-// ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
-// API: void linlsqrrequesttermination(const linlsqrstate &state);
-void linlsqrrequesttermination(linlsqrstate *state) {
-   state->userterminationneeded = true;
-}
-
-void linlsqrstate_init(void *_p, bool make_automatic) {
-   linlsqrstate *p = (linlsqrstate *)_p;
-   normestimatorstate_init(&p->nes, make_automatic);
-   ae_vector_init(&p->rx, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->b, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->ui, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->uip1, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->vi, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->vip1, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->omegai, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->omegaip1, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->d, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->mv, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->mtv, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->tmpd, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->tmpx, 0, DT_REAL, make_automatic);
-}
-
-void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
-   linlsqrstate *dst = (linlsqrstate *)_dst;
-   linlsqrstate *src = (linlsqrstate *)_src;
-   normestimatorstate_copy(&dst->nes, &src->nes, make_automatic);
-   ae_vector_copy(&dst->rx, &src->rx, make_automatic);
-   ae_vector_copy(&dst->b, &src->b, make_automatic);
-   dst->n = src->n;
-   dst->m = src->m;
-   dst->prectype = src->prectype;
-   ae_vector_copy(&dst->ui, &src->ui, make_automatic);
-   ae_vector_copy(&dst->uip1, &src->uip1, make_automatic);
-   ae_vector_copy(&dst->vi, &src->vi, make_automatic);
-   ae_vector_copy(&dst->vip1, &src->vip1, make_automatic);
-   ae_vector_copy(&dst->omegai, &src->omegai, make_automatic);
-   ae_vector_copy(&dst->omegaip1, &src->omegaip1, make_automatic);
-   dst->alphai = src->alphai;
-   dst->alphaip1 = src->alphaip1;
-   dst->betai = src->betai;
-   dst->betaip1 = src->betaip1;
-   dst->phibari = src->phibari;
-   dst->phibarip1 = src->phibarip1;
-   dst->phii = src->phii;
-   dst->rhobari = src->rhobari;
-   dst->rhobarip1 = src->rhobarip1;
-   dst->rhoi = src->rhoi;
-   dst->ci = src->ci;
-   dst->si = src->si;
-   dst->theta = src->theta;
-   dst->lambdai = src->lambdai;
-   ae_vector_copy(&dst->d, &src->d, make_automatic);
-   dst->anorm = src->anorm;
-   dst->bnorm2 = src->bnorm2;
-   dst->dnorm = src->dnorm;
-   dst->r2 = src->r2;
-   ae_vector_copy(&dst->x, &src->x, make_automatic);
-   ae_vector_copy(&dst->mv, &src->mv, make_automatic);
-   ae_vector_copy(&dst->mtv, &src->mtv, make_automatic);
-   dst->epsa = src->epsa;
-   dst->epsb = src->epsb;
-   dst->epsc = src->epsc;
-   dst->maxits = src->maxits;
-   dst->xrep = src->xrep;
-   dst->xupdated = src->xupdated;
-   dst->needmv = src->needmv;
-   dst->needmtv = src->needmtv;
-   dst->repiterationscount = src->repiterationscount;
-   dst->repnmv = src->repnmv;
-   dst->repterminationtype = src->repterminationtype;
-   dst->running = src->running;
-   dst->userterminationneeded = src->userterminationneeded;
-   ae_vector_copy(&dst->tmpd, &src->tmpd, make_automatic);
-   ae_vector_copy(&dst->tmpx, &src->tmpx, make_automatic);
-   dst->PQ = src->PQ;
-}
-
-void linlsqrstate_free(void *_p, bool make_automatic) {
-   linlsqrstate *p = (linlsqrstate *)_p;
-   normestimatorstate_free(&p->nes, make_automatic);
-   ae_vector_free(&p->rx, make_automatic);
-   ae_vector_free(&p->b, make_automatic);
-   ae_vector_free(&p->ui, make_automatic);
-   ae_vector_free(&p->uip1, make_automatic);
-   ae_vector_free(&p->vi, make_automatic);
-   ae_vector_free(&p->vip1, make_automatic);
-   ae_vector_free(&p->omegai, make_automatic);
-   ae_vector_free(&p->omegaip1, make_automatic);
-   ae_vector_free(&p->d, make_automatic);
-   ae_vector_free(&p->x, make_automatic);
-   ae_vector_free(&p->mv, make_automatic);
-   ae_vector_free(&p->mtv, make_automatic);
-   ae_vector_free(&p->tmpd, make_automatic);
-   ae_vector_free(&p->tmpx, make_automatic);
-}
-
-void linlsqrreport_init(void *_p, bool make_automatic) {
-}
-
-void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic) {
-   linlsqrreport *dst = (linlsqrreport *)_dst;
-   linlsqrreport *src = (linlsqrreport *)_src;
-   dst->iterationscount = src->iterationscount;
-   dst->nmv = src->nmv;
-   dst->terminationtype = src->terminationtype;
-}
-
-void linlsqrreport_free(void *_p, bool make_automatic) {
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-// This object stores state of the LinLSQR method.
-// You should use ALGLIB functions to work with this object.
-DefClass(linlsqrstate, EndD)
-DefClass(linlsqrreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(terminationtype))
-
-void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrcreate(m, n, ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrcreatebuf(m, n, ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsetprecunit(const linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsetprecunit(ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsetprecdiag(const linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsetprecdiag(ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsetlambdai(ConstT(linlsqrstate, state), lambdai);
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsolvesparse(ConstT(linlsqrstate, state), ConstT(sparsematrix, a), ConstT(ae_vector, b));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsetcond(ConstT(linlsqrstate, state), epsa, epsb, maxits);
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrresults(ConstT(linlsqrstate, state), ConstT(ae_vector, x), ConstT(linlsqrreport, rep));
-   alglib_impl::ae_state_clear();
-}
-
-void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrsetxrep(ConstT(linlsqrstate, state), needxrep);
-   alglib_impl::ae_state_clear();
-}
-
-ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s) {
-   alglib_impl::ae_state_init();
-   TryCatch(0)
-   ae_int_t Z = alglib_impl::linlsqrpeekiterationscount(ConstT(linlsqrstate, s));
-   alglib_impl::ae_state_clear();
-   return Z;
-}
-
-void linlsqrrequesttermination(const linlsqrstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::linlsqrrequesttermination(ConstT(linlsqrstate, state));
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === POLYNOMIALSOLVER Package ===
-// Depends on: (LinAlg) TRFAC, EVD
-namespace alglib_impl {
-// Polynomial root finding.
-//
-// This function returns all roots of the polynomial
-//     P(x) = a0 + a1*x + a2*x^2 + ... + an*x^n
-// Both real and complex roots are returned (see below).
-//
-// Inputs:
-//     A       -   array[N+1], polynomial coefficients:
-//                 * A[0] is constant term
-//                 * A[N] is a coefficient of X^N
-//     N       -   polynomial degree
-//
-// Outputs:
-//     X       -   array of complex roots:
-//                 * for isolated real root, X[I] is strictly real: IMAGE(X[I])=0
-//                 * complex roots are always returned in pairs - roots occupy
-//                   positions I and I+1, with:
-//                   * X[I+1]=Conj(X[I])
-//                   * IMAGE(X[I]) > 0
-//                   * IMAGE(X[I+1]) = -IMAGE(X[I]) < 0
-//                 * multiple real roots may have non-zero imaginary part due
-//                   to roundoff errors. There is no reliable way to distinguish
-//                   real root of multiplicity 2 from two  complex  roots  in
-//                   the presence of roundoff errors.
-//     Rep     -   report, additional information, following fields are set:
-//                 * Rep.MaxErr - max( |P(xi)| )  for  i=0..N-1.  This  field
-//                   allows to quickly estimate "quality" of the roots  being
-//                   returned.
-//
-// NOTE:   this function uses companion matrix method to find roots. In  case
-//         internal EVD  solver  fails  do  find  eigenvalues,  exception  is
-//         generated.
-//
-// NOTE:   roots are not "polished" and  no  matrix  balancing  is  performed
-//         for them.
-// ALGLIB: Copyright 24.02.2014 by Sergey Bochkanov
-// API: void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
-void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep) {
-   ae_frame _frame_block;
-   ae_int_t i;
-   ae_int_t j;
-   bool status;
-   ae_int_t nz;
-   ae_int_t ne;
-   ae_complex v;
-   ae_complex vv;
-   ae_frame_make(&_frame_block);
-   DupVector(a);
-   SetVector(x);
-   SetObj(polynomialsolverreport, rep);
-   NewMatrix(c, 0, 0, DT_REAL);
-   NewMatrix(vl, 0, 0, DT_REAL);
-   NewMatrix(vr, 0, 0, DT_REAL);
-   NewVector(wr, 0, DT_REAL);
-   NewVector(wi, 0, DT_REAL);
-   ae_assert(n > 0, "PolynomialSolve: N <= 0");
-   ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1");
-   ae_assert(isfinitevector(a, n + 1), "PolynomialSolve: A contains infitite numbers");
-   ae_assert(a->xR[n] != 0.0, "PolynomialSolve: A[N]=0");
-// Prepare
-   ae_vector_set_length(x, n);
-// Normalize A:
-// * analytically determine NZ zero roots
-// * quick exit for NZ=N
-// * make residual NE-th degree polynomial monic
-//   (here NE=N-NZ)
-   nz = 0;
-   while (nz < n && a->xR[nz] == 0.0) {
-      nz++;
-   }
-   ne = n - nz;
-   for (i = nz; i <= n; i++) {
-      a->xR[i - nz] = a->xR[i] / a->xR[n];
-   }
-// For NZ<N, build companion matrix and find NE non-zero roots
-   if (ne > 0) {
-      ae_matrix_set_length(&c, ne, ne);
-      for (i = 0; i < ne; i++) {
-         for (j = 0; j < ne; j++) {
-            c.xyR[i][j] = 0.0;
-         }
-      }
-      c.xyR[0][ne - 1] = -a->xR[0];
-      for (i = 1; i < ne; i++) {
-         c.xyR[i][i - 1] = 1.0;
-         c.xyR[i][ne - 1] = -a->xR[i];
-      }
-      status = rmatrixevd(&c, ne, 0, &wr, &wi, &vl, &vr);
-      ae_assert(status, "PolynomialSolve: inernal error - EVD solver failed");
-      for (i = 0; i < ne; i++) {
-         x->xC[i] = ae_complex_from_d(wr.xR[i], wi.xR[i]);
-      }
-   }
-// Remaining NZ zero roots
-   for (i = ne; i < n; i++) {
-      x->xC[i] = ae_complex_from_i(0);
-   }
-// Rep
-   rep->maxerr = 0.0;
-   for (i = 0; i < ne; i++) {
-      v = ae_complex_from_i(0);
-      vv = ae_complex_from_i(1);
-      for (j = 0; j <= ne; j++) {
-         v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
-         vv = ae_c_mul(vv, x->xC[i]);
-      }
-      rep->maxerr = rmax2(rep->maxerr, ae_c_abs(v));
-   }
-   ae_frame_leave();
-}
-
-void polynomialsolverreport_init(void *_p, bool make_automatic) {
-}
-
-void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic) {
-   polynomialsolverreport *dst = (polynomialsolverreport *)_dst;
-   polynomialsolverreport *src = (polynomialsolverreport *)_src;
-   dst->maxerr = src->maxerr;
-}
-
-void polynomialsolverreport_free(void *_p, bool make_automatic) {
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-DefClass(polynomialsolverreport, AndD DecVal(maxerr))
-
-void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::polynomialsolve(ConstT(ae_vector, a), n, ConstT(ae_vector, x), ConstT(polynomialsolverreport, rep));
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === NLEQ Package ===
-// Depends on: (AlgLibInternal) LINMIN
-// Depends on: (LinAlg) FBLS
-namespace alglib_impl {
-// LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
-// This algorithm solves a system of nonlinear equations
-//     F[0](x[0], ..., x[N-1])   = 0
-//     F[1](x[0], ..., x[N-1])   = 0
-//     ...
-//     F[M-1](x[0], ..., x[N-1]) = 0
-// where M/N do not necessarily coincide. The algorithm converges quadratically
-// under following conditions:
-//     * the solution set XS is nonempty
-//     * for some xs in XS there exist such neighbourhood N(xs) that:
-//       * vector function F(x) and its Jacobian J(x) are continuously
-//         differentiable on N
-//       * ||F(x)|| provides local error bound on N, i.e. there  exists  such
-//         c1, that ||F(x)|| > c1*distance(x,XS)
-// Note that these conditions are much more weaker than usual non-singularity
-// conditions. For example, algorithm will converge for any  affine  function
-// F (whether its Jacobian singular or not).
-//
-// REQUIREMENTS:
-// Algorithm will request following information during its operation:
-// * function vector F[] and Jacobian matrix at given point X
-// * value of merit function f(x)=F[0]^2(x)+...+F[M-1]^2(x) at given point X
-//
-// USAGE:
-// 1. User initializes algorithm state with NLEQCreateLM() call
-// 2. User tunes solver parameters with  NLEQSetCond(),  NLEQSetStpMax()  and
-//    other functions
-// 3. User  calls  NLEQSolve()  function  which  takes  algorithm  state  and
-//    pointers (delegates, etc.) to callback functions which calculate  merit
-//    function value and Jacobian.
-// 4. User calls NLEQResults() to get solution
-// 5. Optionally, user may call NLEQRestartFrom() to  solve  another  problem
-//    with same parameters (N/M) but another starting  point  and/or  another
-//    function vector. NLEQRestartFrom() allows to reuse already  initialized
-//    structure.
-//
-// Inputs:
-//     N       -   space dimension, N > 1:
-//                 * if provided, only leading N elements of X are used
-//                 * if not provided, determined automatically from size of X
-//     M       -   system size
-//     X       -   starting point
-//
-// Outputs:
-//     State   -   structure which stores algorithm state
-//
-// NOTES:
-// 1. you may tune stopping conditions with NLEQSetCond() function
-// 2. if target function contains exp() or other fast growing functions,  and
-//    optimization algorithm makes too large steps which leads  to  overflow,
-//    use NLEQSetStpMax() function to bound algorithm's steps.
-// 3. this  algorithm  is  a  slightly  modified implementation of the method
-//    described  in  'Levenberg-Marquardt  method  for constrained  nonlinear
-//    equations with strong local convergence properties' by Christian Kanzow
-//    Nobuo Yamashita and Masao Fukushima and further  developed  in  'On the
-//    convergence of a New Levenberg-Marquardt Method'  by  Jin-yan  Fan  and
-//    Ya-Xiang Yuan.
-// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
-// API: void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
-// API: void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
-void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state) {
-   SetObj(nleqstate, state);
-   ae_assert(n >= 1, "NLEQCreateLM: N<1!");
-   ae_assert(m >= 1, "NLEQCreateLM: M < 1!");
-   ae_assert(x->cnt >= n, "NLEQCreateLM: Length(X)<N!");
-   ae_assert(isfinitevector(x, n), "NLEQCreateLM: X contains infinite or NaN values!");
-// Initialize
-   state->n = n;
-   state->m = m;
-   nleqsetcond(state, 0.0, 0);
-   nleqsetxrep(state, false);
-   nleqsetstpmax(state, 0.0);
-   ae_vector_set_length(&state->x, n);
-   ae_vector_set_length(&state->xbase, n);
-   ae_matrix_set_length(&state->j, m, n);
-   ae_vector_set_length(&state->fi, m);
-   ae_vector_set_length(&state->rightpart, n);
-   ae_vector_set_length(&state->candstep, n);
-   nleqrestartfrom(state, x);
-}
-
-// This function sets stopping conditions for the nonlinear solver
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     EpsF    - >= 0
-//                 The subroutine finishes  its work if on k+1-th iteration
-//                 the condition ||F|| <= EpsF is satisfied
-//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
-//                 iterations is unlimited.
-//
-// Passing EpsF=0 and MaxIts=0 simultaneously will lead to  automatic
-// stopping criterion selection (small EpsF).
-//
-// NOTES:
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
-void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits) {
-   ae_assert(isfinite(epsf), "NLEQSetCond: EpsF is not finite number!");
-   ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!");
-   ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!");
-   if (epsf == 0.0 && maxits == 0) {
-      epsf = 1.0E-6;
-   }
-   state->epsf = epsf;
-   state->maxits = maxits;
-}
-
-// This function turns on/off reporting.
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     NeedXRep-   whether iteration reports are needed or not
-//
-// If NeedXRep is True, algorithm will call rep() callback function if  it is
-// provided to NLEQSolve().
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetxrep(const nleqstate &state, const bool needxrep);
-void nleqsetxrep(nleqstate *state, bool needxrep) {
-   state->xrep = needxrep;
-}
-
-// This function sets maximum step length
-//
-// Inputs:
-//     State   -   structure which stores algorithm state
-//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
-//                 want to limit step length.
-//
-// Use this subroutine when target function  contains  exp()  or  other  fast
-// growing functions, and algorithm makes  too  large  steps  which  lead  to
-// overflow. This function allows us to reject steps that are too large  (and
-// therefore expose us to the possible overflow) without actually calculating
-// function value at the x+stp*d.
-// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
-// API: void nleqsetstpmax(const nleqstate &state, const double stpmax);
-void nleqsetstpmax(nleqstate *state, double stpmax) {
-   ae_assert(isfinite(stpmax), "NLEQSetStpMax: StpMax is not finite!");
-   ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!");
-   state->stpmax = stpmax;
-}
-
-// Increases lambda, returns False when there is a danger of overflow
-static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
-   double lnlambda;
-   double lnnu;
-   double lnlambdaup;
-   double lnmax;
-   bool result;
-   result = false;
-   lnlambda = log(*lambdav);
-   lnlambdaup = log(lambdaup);
-   lnnu = log(*nu);
-   lnmax = 0.5 * log(ae_maxrealnumber);
-   if (lnlambda + lnlambdaup + lnnu > lnmax) {
-      return result;
-   }
-   if (lnnu + log(2.0) > lnmax) {
-      return result;
-   }
-   *lambdav *= lambdaup * (*nu);
-   *nu *= 2;
-   result = true;
-   return result;
-}
-
-// Decreases lambda, but leaves it unchanged when there is danger of underflow.
-static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown) {
-   *nu = 1.0;
-   if (log(*lambdav) + log(lambdadown) < log(ae_minrealnumber)) {
-      *lambdav = ae_minrealnumber;
-   } else {
-      *lambdav *= lambdadown;
-   }
-}
-
-// This function provides a reverse communication interface, which is not documented or recommended for use.
-// Instead, it is recommended that you use the better-documented API function nleqsolve() listed below.
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-// API: bool nleqiteration(const nleqstate &state);
-// API: void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
-bool nleqiteration(nleqstate *state) {
-   AutoS ae_int_t n;
-   AutoS ae_int_t m;
-   AutoS ae_int_t i;
-   AutoS double lambdaup;
-   AutoS double lambdadown;
-   AutoS double lambdav;
-   AutoS double rho;
-   AutoS double mu;
-   AutoS double stepnorm;
-   AutoS bool b;
-// Manually threaded two-way signalling.
-// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
-// A Spawn occurs when the routine is (re-)started.
-// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
-// An Exit sends an exit signal indicating the end of the process.
-   if (state->PQ >= 0) switch (state->PQ) {
-      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3; case 4: goto Resume4;
-      default: goto Exit;
-   }
-Spawn:
-   i = -919;
-   b = true;
-   lambdaup = 81;
-   lambdadown = 255;
-   lambdav = 74;
-   rho = -788;
-   mu = 809;
-   stepnorm = 205;
-// Prepare
-   n = state->n;
-   m = state->m;
-   state->xupdated = state->needfij = state->needf = false;
-   state->repterminationtype = 0;
-   state->repiterationscount = 0;
-   state->repnfunc = 0;
-   state->repnjac = 0;
-// Calculate F/G, initialize algorithm
-   state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->repnfunc++;
-   ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
-   state->fbase = state->f;
-   state->fprev = ae_maxrealnumber;
-   if (state->xrep) {
-   // progress report
-      state->xupdated = true, state->PQ = 1; goto Pause; Resume1: state->xupdated = false;
-   }
-   if (state->f <= ae_sqr(state->epsf)) {
-      state->repterminationtype = 1;
-      goto Exit;
-   }
-// Main cycle
-   lambdaup = 10.0;
-   lambdadown = 0.3;
-   lambdav = 0.001;
-   rho = 1.0;
-   do {
-   // Get Jacobian;
-   // before we get to this point we already have State.XBase filled
-   // with current point and State.FBase filled with function value
-   // at XBase
-      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-      state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false, state->repnfunc++, state->repnjac++;
-      rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
-      ae_v_muld(state->rightpart.xR, 1, n, -1);
-   // Inner cycle: find good lambda
-      while (true) {
-      // Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F
-      // to get step d=-y where:
-      // * Mu=||F|| - is damping parameter for nonlinear system
-      // * Lambda   - is additional Levenberg-Marquardt parameter
-      //              for better convergence when far away from minimum
-         for (i = 0; i < n; i++) {
-            state->candstep.xR[i] = 0.0;
-         }
-         fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf);
-      // Normalize step (it must be no more than StpMax)
-         stepnorm = 0.0;
-         for (i = 0; i < n; i++) {
-            if (state->candstep.xR[i] != 0.0) {
-               stepnorm = 1.0;
-               break;
-            }
-         }
-         linminnormalized(&state->candstep, &stepnorm, n);
-         if (state->stpmax != 0.0) {
-            stepnorm = rmin2(stepnorm, state->stpmax);
-         }
-      // Test new step - is it good enough?
-      // * if not, Lambda is increased and we try again.
-      // * if step is good, we decrease Lambda and move on.
-      //
-      // We can break this cycle on two occasions:
-      // * step is so small that x + step == x (in floating point arithmetics)
-      // * lambda is so large
-         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-         ae_v_addd(state->x.xR, 1, state->candstep.xR, 1, n, stepnorm);
-         b = true;
-         for (i = 0; i < n; i++) {
-            if (state->x.xR[i] != state->xbase.xR[i]) {
-               b = false;
-               break;
-            }
-         }
-         if (b) {
-         // Step is too small, force zero step and break
-            stepnorm = 0.0;
-            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-            state->f = state->fbase;
-            break;
-         }
-         state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false, state->repnfunc++;
-         if (state->f < state->fbase) {
-         // function value decreased, move on
-            nleq_decreaselambda(&lambdav, &rho, lambdadown);
-            break;
-         }
-         if (!nleq_increaselambda(&lambdav, &rho, lambdaup)) {
-         // Lambda is too large (near overflow), force zero step and break
-            stepnorm = 0.0;
-            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-            state->f = state->fbase;
-            break;
-         }
-      }
-   // Accept step:
-   // * new position
-   // * new function value
-      state->fbase = state->f;
-      ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
-      state->repiterationscount++;
-   // Report new iteration
-      if (state->xrep) {
-         state->f = state->fbase;
-         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
-         state->xupdated = true, state->PQ = 4; goto Pause; Resume4: state->xupdated = false;
-      }
-   // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
-   // If one of the conditions is met, RepTerminationType is changed.
-      if (sqrt(state->f) <= state->epsf) {
-         state->repterminationtype = 1;
-      }
-      if (stepnorm == 0.0 && state->repterminationtype == 0) {
-         state->repterminationtype = -4;
-      }
-      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
-         state->repterminationtype = 5;
-      }
-   // Now, iteration is finally over
-   } while (state->repterminationtype == 0);
-Exit:
-   state->PQ = -1;
-   return false;
-Pause:
-   return true;
-}
-
-// NLEQ solver results
-//
-// Inputs:
-//     State   -   algorithm state.
-//
-// Outputs:
-//     X       -   array[0..N-1], solution
-//     Rep     -   optimization report:
-//                 * Rep.TerminationType completetion code:
-//                     * -4    ERROR:  algorithm   has   converged   to   the
-//                             stationary point Xf which is local minimum  of
-//                             f=F[0]^2+...+F[m-1]^2, but is not solution  of
-//                             nonlinear system.
-//                     *  1    sqrt(f) <= EpsF.
-//                     *  5    MaxIts steps was taken
-//                     *  7    stopping conditions are too stringent,
-//                             further improvement is impossible
-//                 * Rep.IterationsCount contains iterations count
-//                 * NFEV countains number of function calculations
-//                 * ActiveConstraints contains number of active constraints
-// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
-// API: void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqresults(nleqstate *state, RVector *x, nleqreport *rep) {
-   SetVector(x);
-   SetObj(nleqreport, rep);
-   nleqresultsbuf(state, x, rep);
-}
-
-// NLEQ solver results
-//
-// Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
-// to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
-// intended to be used in the inner cycles of performance critical algorithms
-// where array reallocation penalty is too large to be ignored.
-// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
-// API: void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep) {
-   if (x->cnt < state->n) {
-      ae_vector_set_length(x, state->n);
-   }
-   ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
-   rep->iterationscount = state->repiterationscount;
-   rep->nfunc = state->repnfunc;
-   rep->njac = state->repnjac;
-   rep->terminationtype = state->repterminationtype;
-}
-
-// This  subroutine  restarts  CG  algorithm from new point. All optimization
-// parameters are left unchanged.
-//
-// This  function  allows  to  solve multiple  optimization  problems  (which
-// must have same number of dimensions) without object reallocation penalty.
-//
-// Inputs:
-//     State   -   structure used for reverse communication previously
-//                 allocated with MinCGCreate call.
-//     X       -   new starting point.
-//     BndL    -   new lower bounds
-//     BndU    -   new upper bounds
-// ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
-// API: void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
-void nleqrestartfrom(nleqstate *state, RVector *x) {
-   ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!");
-   ae_assert(isfinitevector(x, state->n), "NLEQRestartFrom: X contains infinite or NaN values!");
-   ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
-   state->PQ = -1;
-}
-
-void nleqstate_init(void *_p, bool make_automatic) {
-   nleqstate *p = (nleqstate *)_p;
-   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->fi, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->j, 0, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->candstep, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->rightpart, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->cgbuf, 0, DT_REAL, make_automatic);
-}
-
-void nleqstate_copy(void *_dst, void *_src, bool make_automatic) {
-   nleqstate *dst = (nleqstate *)_dst;
-   nleqstate *src = (nleqstate *)_src;
-   dst->n = src->n;
-   dst->m = src->m;
-   dst->epsf = src->epsf;
-   dst->maxits = src->maxits;
-   dst->xrep = src->xrep;
-   dst->stpmax = src->stpmax;
-   ae_vector_copy(&dst->x, &src->x, make_automatic);
-   dst->f = src->f;
-   ae_vector_copy(&dst->fi, &src->fi, make_automatic);
-   ae_matrix_copy(&dst->j, &src->j, make_automatic);
-   dst->needf = src->needf;
-   dst->needfij = src->needfij;
-   dst->xupdated = src->xupdated;
-   dst->PQ = src->PQ;
-   dst->repiterationscount = src->repiterationscount;
-   dst->repnfunc = src->repnfunc;
-   dst->repnjac = src->repnjac;
-   dst->repterminationtype = src->repterminationtype;
-   ae_vector_copy(&dst->xbase, &src->xbase, make_automatic);
-   dst->fbase = src->fbase;
-   dst->fprev = src->fprev;
-   ae_vector_copy(&dst->candstep, &src->candstep, make_automatic);
-   ae_vector_copy(&dst->rightpart, &src->rightpart, make_automatic);
-   ae_vector_copy(&dst->cgbuf, &src->cgbuf, make_automatic);
-}
-
-void nleqstate_free(void *_p, bool make_automatic) {
-   nleqstate *p = (nleqstate *)_p;
-   ae_vector_free(&p->x, make_automatic);
-   ae_vector_free(&p->fi, make_automatic);
-   ae_matrix_free(&p->j, make_automatic);
-   ae_vector_free(&p->xbase, make_automatic);
-   ae_vector_free(&p->candstep, make_automatic);
-   ae_vector_free(&p->rightpart, make_automatic);
-   ae_vector_free(&p->cgbuf, make_automatic);
-}
-
-void nleqreport_init(void *_p, bool make_automatic) {
-}
-
-void nleqreport_copy(void *_dst, void *_src, bool make_automatic) {
-   nleqreport *dst = (nleqreport *)_dst;
-   nleqreport *src = (nleqreport *)_src;
-   dst->iterationscount = src->iterationscount;
-   dst->nfunc = src->nfunc;
-   dst->njac = src->njac;
-   dst->terminationtype = src->terminationtype;
-}
-
-void nleqreport_free(void *_p, bool make_automatic) {
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-DefClass(nleqstate, AndD DecVal(needf) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
-DefClass(nleqreport, AndD DecVal(iterationscount) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(terminationtype))
-
-void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
-   alglib_impl::ae_state_clear();
-}
-#if !defined AE_NO_EXCEPTIONS
-void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state) {
-   ae_int_t n = x.length();
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
-   alglib_impl::ae_state_clear();
-}
-#endif
-
-void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqsetcond(ConstT(nleqstate, state), epsf, maxits);
-   alglib_impl::ae_state_clear();
-}
-
-void nleqsetxrep(const nleqstate &state, const bool needxrep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqsetxrep(ConstT(nleqstate, state), needxrep);
-   alglib_impl::ae_state_clear();
-}
-
-void nleqsetstpmax(const nleqstate &state, const double stpmax) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqsetstpmax(ConstT(nleqstate, state), stpmax);
-   alglib_impl::ae_state_clear();
-}
-
-bool nleqiteration(const nleqstate &state) {
-   alglib_impl::ae_state_init();
-   TryCatch(false)
-   bool Ok = alglib_impl::nleqiteration(ConstT(nleqstate, state));
-   alglib_impl::ae_state_clear();
-   return Ok;
-}
-
-// This family of functions is used to launch iterations of nonlinear solver
-//
-// These functions accept following parameters:
-//     state   -   algorithm state
-//     func    -   callback which calculates function (or merit function)
-//                 value func at given point x
-//     jac     -   callback which calculates function vector fi[]
-//                 and Jacobian jac at given point x
-//     rep     -   optional callback which is called after each iteration
-//                 can be NULL
-//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
-//                 can be NULL
-// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
-void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::ae_assert(func != NULL, "nleqsolve: func is NULL");
-   alglib_impl::ae_assert(jac != NULL, "nleqsolve: jac is NULL");
-   while (alglib_impl::nleqiteration(state.c_ptr()))
-   BegPoll
-      if (state.needf) func(state.x, state.f, ptr);
-      else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
-      else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
-      else alglib_impl::ae_assert(false, "nleqsolve: some derivatives were not provided?");
-   EndPoll
-   alglib_impl::ae_state_clear();
-}
-
-void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqresults(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
-   alglib_impl::ae_state_clear();
-}
-
-void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqresultsbuf(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
-   alglib_impl::ae_state_clear();
-}
-
-void nleqrestartfrom(const nleqstate &state, const real_1d_array &x) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::nleqrestartfrom(ConstT(nleqstate, state), ConstT(ae_vector, x));
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
 // === DIRECTSPARSESOLVERS Package ===
 // Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
@@ -5928,6 +4540,1394 @@ void lincgsetxrep(const lincgstate &state, const bool needxrep) {
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::lincgsetxrep(ConstT(lincgstate, state), needxrep);
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
+// === LINLSQR Package ===
+// Depends on: (LinAlg) SVD, NORMESTIMATOR
+namespace alglib_impl {
+static const double linlsqr_atol = 1.0E-6;
+static const double linlsqr_btol = 1.0E-6;
+
+// This function initializes linear LSQR Solver. This solver is used to solve
+// non-symmetric (and, possibly, non-square) problems. Least squares solution
+// is returned for non-compatible systems.
+//
+// USAGE:
+// 1. User initializes algorithm state with LinLSQRCreate() call
+// 2. User tunes solver parameters with  LinLSQRSetCond() and other functions
+// 3. User  calls  LinLSQRSolveSparse()  function which takes algorithm state
+//    and SparseMatrix object.
+// 4. User calls LinLSQRResults() to get solution
+// 5. Optionally, user may call LinLSQRSolveSparse() again to  solve  another
+//    problem  with different matrix and/or right part without reinitializing
+//    LinLSQRState structure.
+//
+// Inputs:
+//     M       -   number of rows in A
+//     N       -   number of variables, N > 0
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// NOTE: see also linlsqrcreatebuf()  for  version  which  reuses  previously
+//       allocated place as much as possible.
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
+void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state) {
+   SetObj(linlsqrstate, state);
+   ae_assert(m > 0, "LinLSQRCreate: M <= 0");
+   ae_assert(n > 0, "LinLSQRCreate: N <= 0");
+   linlsqrcreatebuf(m, n, state);
+}
+
+// This function initializes linear LSQR Solver.  It  provides  exactly  same
+// functionality as linlsqrcreate(), but reuses  previously  allocated  space
+// as much as possible.
+//
+// Inputs:
+//     M       -   number of rows in A
+//     N       -   number of variables, N > 0
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+// ALGLIB: Copyright 14.11.2018 by Sergey Bochkanov
+// API: void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
+void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
+   ae_int_t i;
+   ae_assert(m > 0, "LinLSQRCreateBuf: M <= 0");
+   ae_assert(n > 0, "LinLSQRCreateBuf: N <= 0");
+   state->m = m;
+   state->n = n;
+   state->prectype = 0;
+   state->epsa = linlsqr_atol;
+   state->epsb = linlsqr_btol;
+   state->epsc = 1 / sqrt(ae_machineepsilon);
+   state->maxits = 0;
+   state->lambdai = 0.0;
+   state->xrep = false;
+   state->running = false;
+   state->repiterationscount = 0;
+// * allocate arrays
+// * set RX to NAN (just for the case user calls Results() without
+//   calling SolveSparse()
+// * set B to zero
+   normestimatorcreate(m, n, 2, 2, &state->nes);
+   ae_vector_set_length(&state->rx, state->n);
+   ae_vector_set_length(&state->ui, state->m + state->n);
+   ae_vector_set_length(&state->uip1, state->m + state->n);
+   ae_vector_set_length(&state->vip1, state->n);
+   ae_vector_set_length(&state->vi, state->n);
+   ae_vector_set_length(&state->omegai, state->n);
+   ae_vector_set_length(&state->omegaip1, state->n);
+   ae_vector_set_length(&state->d, state->n);
+   ae_vector_set_length(&state->x, state->m + state->n);
+   ae_vector_set_length(&state->mv, state->m + state->n);
+   ae_vector_set_length(&state->mtv, state->n);
+   ae_vector_set_length(&state->b, state->m);
+   for (i = 0; i < n; i++) {
+      state->rx.xR[i] = NAN;
+   }
+   for (i = 0; i < m; i++) {
+      state->b.xR[i] = 0.0;
+   }
+   state->PQ = -1;
+}
+
+// This function sets right part. By default, right part is zero.
+//
+// Inputs:
+//     B       -   right part, array[N].
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+void linlsqrsetb(linlsqrstate *state, RVector *b) {
+   ae_int_t i;
+   ae_assert(!state->running, "LinLSQRSetB: you can not change B when LinLSQRIteration is running");
+   ae_assert(state->m <= b->cnt, "LinLSQRSetB: Length(B)<M");
+   ae_assert(isfinitevector(b, state->m), "LinLSQRSetB: B contains infinite or NaN values");
+   state->bnorm2 = 0.0;
+   for (i = 0; i < state->m; i++) {
+      state->b.xR[i] = b->xR[i];
+      state->bnorm2 += b->xR[i] * b->xR[i];
+   }
+}
+
+// This  function  changes  preconditioning  settings of LinLSQQSolveSparse()
+// function. By default, SolveSparse() uses diagonal preconditioner,  but  if
+// you want to use solver without preconditioning, you can call this function
+// which forces solver to use unit matrix for preconditioning.
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+// ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
+// API: void linlsqrsetprecunit(const linlsqrstate &state);
+void linlsqrsetprecunit(linlsqrstate *state) {
+   ae_assert(!state->running, "LinLSQRSetPrecUnit: you can not change preconditioner, because function LinLSQRIteration is running!");
+   state->prectype = -1;
+}
+
+// This  function  changes  preconditioning  settings  of  LinCGSolveSparse()
+// function.  LinCGSolveSparse() will use diagonal of the  system  matrix  as
+// preconditioner. This preconditioning mode is active by default.
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+// ALGLIB: Copyright 19.11.2012 by Sergey Bochkanov
+// API: void linlsqrsetprecdiag(const linlsqrstate &state);
+void linlsqrsetprecdiag(linlsqrstate *state) {
+   ae_assert(!state->running, "LinLSQRSetPrecDiag: you can not change preconditioner, because function LinCGIteration is running!");
+   state->prectype = 0;
+}
+
+// This function sets optional Tikhonov regularization coefficient.
+// It is zero by default.
+//
+// Inputs:
+//     LambdaI -   regularization factor, LambdaI >= 0
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
+void linlsqrsetlambdai(linlsqrstate *state, double lambdai) {
+   ae_assert(!state->running, "LinLSQRSetLambdaI: you can not set LambdaI, because function LinLSQRIteration is running");
+   ae_assert(isfinite(lambdai) && lambdai >= 0.0, "LinLSQRSetLambdaI: LambdaI is infinite or NaN");
+   state->lambdai = lambdai;
+}
+
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+bool linlsqriteration(linlsqrstate *state) {
+   AutoS ae_int_t summn;
+   AutoS double bnorm;
+   AutoS ae_int_t i;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->PQ >= 0) switch (state->PQ) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3;
+      case 4: goto Resume4; case 5: goto Resume5; case 6: goto Resume6;
+      default: goto Exit;
+   }
+Spawn:
+   i = -58;
+   ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B");
+   summn = state->m + state->n;
+   bnorm = sqrt(state->bnorm2);
+   state->needmtv = state->needmv = state->xupdated = false;
+   state->userterminationneeded = false;
+   state->running = true;
+   state->repnmv = 0;
+   state->repiterationscount = 0;
+   state->r2 = state->bnorm2;
+// estimate for ANorm
+   for (normestimatorrestart(&state->nes); normestimatoriteration(&state->nes); ) {
+      if (state->nes.needmv) {
+         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->n);
+         state->repnmv++, state->needmv = true, state->PQ = 0; goto Pause; Resume0: state->needmv = false;
+         ae_v_move(state->nes.mv.xR, 1, state->mv.xR, 1, state->m);
+      } else if (state->nes.needmtv) {
+         ae_v_move(state->x.xR, 1, state->nes.x.xR, 1, state->m);
+      // matrix-vector multiplication
+         state->repnmv++, state->needmtv = true, state->PQ = 1; goto Pause; Resume1: state->needmtv = false;
+         ae_v_move(state->nes.mtv.xR, 1, state->mtv.xR, 1, state->n);
+      }
+   }
+   normestimatorresults(&state->nes, &state->anorm);
+// initialize .RX by zeros
+   for (i = 0; i < state->n; i++) {
+      state->rx.xR[i] = 0.0;
+   }
+// output first report
+   if (state->xrep) {
+      ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+      state->xupdated = true, state->PQ = 2; goto Pause; Resume2: state->xupdated = false;
+   }
+// LSQR, Step 0.
+//
+// Algorithm outline corresponds to one which was described at p.50 of
+// "LSQR - an algorithm for sparse linear equations and sparse least
+// squares" by C.Paige and M.Saunders with one small addition - we
+// explicitly extend system matrix by additional N lines in order
+// to handle non-zero lambda, i.e. original A is replaced by
+//         [ A        ]
+// A_mod = [          ]
+//         [ lambda*I ].
+//
+// Step 0:
+//     x[0]          = 0
+//     beta[1]*u[1]  = b
+//     alpha[1]*v[1] = A_mod'*u[1]
+//     w[1]          = v[1]
+//     phiBar[1]     = beta[1]
+//     rhoBar[1]     = alpha[1]
+//     d[0]          = 0
+//
+// NOTE:
+// There are three criteria for stopping:
+// (S0) maximum number of iterations
+// (S1) ||Rk|| <= EpsB*||B||;
+// (S2) ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
+// It is very important that S2 always checked AFTER S1. It is necessary
+// to avoid division by zero when Rk=0.
+   state->betai = bnorm;
+   if (state->betai == 0.0) {
+   // Zero right part
+      state->running = false;
+      state->repterminationtype = 1;
+      goto Exit;
+   }
+   for (i = 0; i < summn; i++) {
+      if (i < state->m) {
+         state->ui.xR[i] = state->b.xR[i] / state->betai;
+      } else {
+         state->ui.xR[i] = 0.0;
+      }
+      state->x.xR[i] = state->ui.xR[i];
+   }
+   state->repnmv++, state->needmtv = true, state->PQ = 3; goto Pause; Resume3: state->needmtv = false;
+   for (i = 0; i < state->n; i++) {
+      state->mtv.xR[i] += state->lambdai * state->ui.xR[state->m + i];
+   }
+   state->alphai = 0.0;
+   for (i = 0; i < state->n; i++) {
+      state->alphai += state->mtv.xR[i] * state->mtv.xR[i];
+   }
+   state->alphai = sqrt(state->alphai);
+   if (state->alphai == 0.0) {
+   // Orthogonality stopping criterion is met
+      state->running = false;
+      state->repterminationtype = 4;
+      goto Exit;
+   }
+   for (i = 0; i < state->n; i++) {
+      state->vi.xR[i] = state->mtv.xR[i] / state->alphai;
+      state->omegai.xR[i] = state->vi.xR[i];
+   }
+   state->phibari = state->betai;
+   state->rhobari = state->alphai;
+   for (i = 0; i < state->n; i++) {
+      state->d.xR[i] = 0.0;
+   }
+   state->dnorm = 0.0;
+// Steps I=1, 2, ...
+   while (true) {
+   // At I-th step State.RepIterationsCount=I.
+      state->repiterationscount++;
+   // Bidiagonalization part:
+   //     beta[i+1]*u[i+1]  = A_mod*v[i]-alpha[i]*u[i]
+   //     alpha[i+1]*v[i+1] = A_mod'*u[i+1] - beta[i+1]*v[i]
+   //
+   // NOTE:  beta[i+1]=0 or alpha[i+1]=0 will lead to successful termination
+   //        in the end of the current iteration. In this case u/v are zero.
+   // NOTE2: algorithm won't fail on zero alpha or beta (there will be no
+   //        division by zero because it will be stopped BEFORE division
+   //        occurs). However, near-zero alpha and beta won't stop algorithm
+   //        and, although no division by zero will happen, orthogonality
+   //        in U and V will be lost.
+      ae_v_move(state->x.xR, 1, state->vi.xR, 1, state->n);
+      state->repnmv++, state->needmv = true, state->PQ = 4; goto Pause; Resume4: state->needmv = false;
+      for (i = 0; i < state->n; i++) {
+         state->mv.xR[state->m + i] = state->lambdai * state->vi.xR[i];
+      }
+      state->betaip1 = 0.0;
+      for (i = 0; i < summn; i++) {
+         state->uip1.xR[i] = state->mv.xR[i] - state->alphai * state->ui.xR[i];
+         state->betaip1 += state->uip1.xR[i] * state->uip1.xR[i];
+      }
+      if (state->betaip1 != 0.0) {
+         state->betaip1 = sqrt(state->betaip1);
+         for (i = 0; i < summn; i++) {
+            state->uip1.xR[i] /= state->betaip1;
+         }
+      }
+      ae_v_move(state->x.xR, 1, state->uip1.xR, 1, state->m);
+      state->repnmv++, state->needmtv = true, state->PQ = 5; goto Pause; Resume5: state->needmtv = false;
+      for (i = 0; i < state->n; i++) {
+         state->mtv.xR[i] += state->lambdai * state->uip1.xR[state->m + i];
+      }
+      state->alphaip1 = 0.0;
+      for (i = 0; i < state->n; i++) {
+         state->vip1.xR[i] = state->mtv.xR[i] - state->betaip1 * state->vi.xR[i];
+         state->alphaip1 += state->vip1.xR[i] * state->vip1.xR[i];
+      }
+      if (state->alphaip1 != 0.0) {
+         state->alphaip1 = sqrt(state->alphaip1);
+         for (i = 0; i < state->n; i++) {
+            state->vip1.xR[i] /= state->alphaip1;
+         }
+      }
+   // Build next orthogonal transformation
+      state->rhoi = safepythag2(state->rhobari, state->betaip1);
+      state->ci = state->rhobari / state->rhoi;
+      state->si = state->betaip1 / state->rhoi;
+      state->theta = state->si * state->alphaip1;
+      state->rhobarip1 = -state->ci * state->alphaip1;
+      state->phii = state->ci * state->phibari;
+      state->phibarip1 = state->si * state->phibari;
+   // Update .RNorm
+   //
+   // This tricky  formula  is  necessary  because  simply  writing
+   // State.R2:=State.PhiBarIP1*State.PhiBarIP1 does NOT guarantees
+   // monotonic decrease of R2. Roundoff error combined with 80-bit
+   // precision used internally by Intel chips allows R2 to increase
+   // slightly in some rare, but possible cases. This property is
+   // undesirable, so we prefer to guard against R increase.
+      state->r2 = rmin2(state->r2, state->phibarip1 * state->phibarip1);
+   // Update d and DNorm, check condition-related stopping criteria
+      for (i = 0; i < state->n; i++) {
+         state->d.xR[i] = 1 / state->rhoi * (state->vi.xR[i] - state->theta * state->d.xR[i]);
+         state->dnorm += state->d.xR[i] * state->d.xR[i];
+      }
+      if (sqrt(state->dnorm) * state->anorm >= state->epsc) {
+         state->running = false;
+         state->repterminationtype = 7;
+         goto Exit;
+      }
+   // Update x, output report
+      for (i = 0; i < state->n; i++) {
+         state->rx.xR[i] += state->phii / state->rhoi * state->omegai.xR[i];
+      }
+      if (state->xrep) {
+         ae_v_move(state->x.xR, 1, state->rx.xR, 1, state->n);
+         state->xupdated = true, state->PQ = 6; goto Pause; Resume6: state->xupdated = false;
+      }
+   // Check stopping criteria
+   // 1. achieved required number of iterations;
+   // 2. ||Rk|| <= EpsB*||B||;
+   // 3. ||A^T*Rk||/(||A||*||Rk||) <= EpsA;
+      if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
+      // Achieved required number of iterations
+         state->running = false;
+         state->repterminationtype = 5;
+         goto Exit;
+      }
+      if (state->phibarip1 <= state->epsb * bnorm) {
+      // ||Rk|| <= EpsB*||B||, here ||Rk||=PhiBar
+         state->running = false;
+         state->repterminationtype = 1;
+         goto Exit;
+      }
+      if (state->alphaip1 * fabs(state->ci) / state->anorm <= state->epsa) {
+      // ||A^T*Rk||/(||A||*||Rk||) <= EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
+         state->running = false;
+         state->repterminationtype = 4;
+         goto Exit;
+      }
+      if (state->userterminationneeded) {
+      // User requested termination
+         state->running = false;
+         state->repterminationtype = 8;
+         goto Exit;
+      }
+   // Update omega
+      for (i = 0; i < state->n; i++) {
+         state->omegaip1.xR[i] = state->vip1.xR[i] - state->theta / state->rhoi * state->omegai.xR[i];
+      }
+   // Prepare for the next iteration - rename variables:
+   // u[i]   := u[i+1]
+   // v[i]   := v[i+1]
+   // rho[i] := rho[i+1]
+   // ...
+      ae_v_move(state->ui.xR, 1, state->uip1.xR, 1, summn);
+      ae_v_move(state->vi.xR, 1, state->vip1.xR, 1, state->n);
+      ae_v_move(state->omegai.xR, 1, state->omegaip1.xR, 1, state->n);
+      state->alphai = state->alphaip1;
+      state->betai = state->betaip1;
+      state->phibari = state->phibarip1;
+      state->rhobari = state->rhobarip1;
+   }
+Exit:
+   state->PQ = -1;
+   return false;
+Pause:
+   return true;
+}
+
+// Procedure for solution of A*x=b with sparse A.
+//
+// Inputs:
+//     State   -   algorithm state
+//     A       -   sparse M*N matrix in the CRS format (you MUST contvert  it
+//                 to CRS format  by  calling  SparseConvertToCRS()  function
+//                 BEFORE you pass it to this function).
+//     B       -   right part, array[M]
+//
+// Result:
+//     This function returns no result.
+//     You can get solution by calling LinCGResults()
+//
+// NOTE: this function uses lightweight preconditioning -  multiplication  by
+//       inverse of diag(A). If you want, you can turn preconditioning off by
+//       calling LinLSQRSetPrecUnit(). However, preconditioning cost is   low
+//       and preconditioner is very important for solution  of  badly  scaled
+//       problems.
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b);
+void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
+   ae_int_t n;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t t0;
+   ae_int_t t1;
+   double v;
+   n = state->n;
+   ae_assert(!state->running, "LinLSQRSolveSparse: you can not call this function when LinLSQRIteration is running");
+   ae_assert(b->cnt >= state->m, "LinLSQRSolveSparse: Length(B)<M");
+   ae_assert(isfinitevector(b, state->m), "LinLSQRSolveSparse: B contains infinite or NaN values");
+// Allocate temporaries
+   vectorsetlengthatleast(&state->tmpd, n);
+   vectorsetlengthatleast(&state->tmpx, n);
+// Compute diagonal scaling matrix D
+   if (state->prectype == 0) {
+   // Default preconditioner - inverse of column norms
+      for (i = 0; i < n; i++) {
+         state->tmpd.xR[i] = 0.0;
+      }
+      t0 = 0;
+      t1 = 0;
+      while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
+         state->tmpd.xR[j] += ae_sqr(v);
+      }
+      for (i = 0; i < n; i++) {
+         if (state->tmpd.xR[i] > 0.0) {
+            state->tmpd.xR[i] = 1 / sqrt(state->tmpd.xR[i]);
+         } else {
+            state->tmpd.xR[i] = 1.0;
+         }
+      }
+   } else {
+   // No diagonal scaling
+      for (i = 0; i < n; i++) {
+         state->tmpd.xR[i] = 1.0;
+      }
+   }
+// Solve.
+//
+// Instead of solving A*x=b we solve preconditioned system (A*D)*(inv(D)*x)=b.
+// Transformed A is not calculated explicitly, we just modify multiplication
+// by A or A'. After solution we modify State.RX so it will store untransformed
+// variables
+   linlsqrsetb(state, b);
+   linlsqrrestart(state);
+   while (linlsqriteration(state)) {
+      if (state->needmv) {
+         for (i = 0; i < n; i++) {
+            state->tmpx.xR[i] = state->tmpd.xR[i] * state->x.xR[i];
+         }
+         sparsemv(a, &state->tmpx, &state->mv);
+      } else if (state->needmtv) {
+         sparsemtv(a, &state->x, &state->mtv);
+         for (i = 0; i < n; i++) {
+            state->mtv.xR[i] *= state->tmpd.xR[i];
+         }
+      }
+   }
+   for (i = 0; i < n; i++) {
+      state->rx.xR[i] *= state->tmpd.xR[i];
+   }
+}
+
+// This function sets stopping criteria.
+//
+// Inputs:
+//     EpsA    -   algorithm will be stopped if ||A^T*Rk||/(||A||*||Rk||) <= EpsA.
+//     EpsB    -   algorithm will be stopped if ||Rk|| <= EpsB*||B||
+//     MaxIts  -   algorithm will be stopped if number of iterations
+//                 more than MaxIts.
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// NOTE: if EpsA,EpsB,EpsC and MaxIts are zero then these variables will
+// be setted as default values.
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits);
+void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits) {
+   ae_assert(!state->running, "LinLSQRSetCond: you can not call this function when LinLSQRIteration is running");
+   ae_assert(isfinite(epsa) && epsa >= 0.0, "LinLSQRSetCond: EpsA is negative, INF or NAN");
+   ae_assert(isfinite(epsb) && epsb >= 0.0, "LinLSQRSetCond: EpsB is negative, INF or NAN");
+   ae_assert(maxits >= 0, "LinLSQRSetCond: MaxIts is negative");
+   if (epsa == 0.0 && epsb == 0.0 && maxits == 0) {
+      state->epsa = linlsqr_atol;
+      state->epsb = linlsqr_btol;
+      state->maxits = state->n;
+   } else {
+      state->epsa = epsa;
+      state->epsb = epsb;
+      state->maxits = maxits;
+   }
+}
+
+// LSQR solver: results.
+//
+// This function must be called after LinLSQRSolve
+//
+// Inputs:
+//     State   -   algorithm state
+//
+// Outputs:
+//     X       -   array[N], solution
+//     Rep     -   optimization report:
+//                 * Rep.TerminationType completetion code:
+//                     *  1    ||Rk|| <= EpsB*||B||
+//                     *  4    ||A^T*Rk||/(||A||*||Rk||) <= EpsA
+//                     *  5    MaxIts steps was taken
+//                     *  7    rounding errors prevent further progress,
+//                             X contains best point found so far.
+//                             (sometimes returned on singular systems)
+//                     *  8    user requested termination via calling
+//                             linlsqrrequesttermination()
+//                 * Rep.IterationsCount contains iterations count
+//                 * NMV countains number of matrix-vector calculations
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep);
+void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep) {
+   SetVector(x);
+   SetObj(linlsqrreport, rep);
+   ae_assert(!state->running, "LinLSQRResult: you can not call this function when LinLSQRIteration is running");
+   if (x->cnt < state->n) {
+      ae_vector_set_length(x, state->n);
+   }
+   ae_v_move(x->xR, 1, state->rx.xR, 1, state->n);
+   rep->iterationscount = state->repiterationscount;
+   rep->nmv = state->repnmv;
+   rep->terminationtype = state->repterminationtype;
+}
+
+// This function turns on/off reporting.
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     NeedXRep-   whether iteration reports are needed or not
+//
+// If NeedXRep is True, algorithm will call rep() callback function if  it is
+// provided to MinCGOptimize().
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+// API: void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
+void linlsqrsetxrep(linlsqrstate *state, bool needxrep) {
+   state->xrep = needxrep;
+}
+
+// This function restarts LinLSQRIteration
+// ALGLIB: Copyright 30.11.2011 by Sergey Bochkanov
+void linlsqrrestart(linlsqrstate *state) {
+   state->PQ = -1;
+   state->repiterationscount = 0;
+}
+
+// This function is used to peek into LSQR solver and get  current  iteration
+// counter. You can safely "peek" into the solver from another thread.
+//
+// Inputs:
+//     S           -   solver object
+//
+// Result:
+//     iteration counter, in [0,INF)
+// ALGLIB: Copyright 21.05.2018 by Sergey Bochkanov
+// API: ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
+ae_int_t linlsqrpeekiterationscount(linlsqrstate *s) {
+   ae_int_t result;
+   result = s->repiterationscount;
+   return result;
+}
+
+// This subroutine submits request for termination of the running solver.  It
+// can be called from some other thread which wants LSQR solver to  terminate
+// (obviously, the  thread  running  LSQR  solver can not request termination
+// because it is already busy working on LSQR).
+//
+// As result, solver  stops  at  point  which  was  "current  accepted"  when
+// termination  request  was  submitted  and returns error code 8 (successful
+// termination).  Such   termination   is  a smooth  process  which  properly
+// deallocates all temporaries.
+//
+// Inputs:
+//     State   -   solver structure
+//
+// NOTE: calling this function on solver which is NOT running  will  have  no
+//       effect.
+//
+// NOTE: multiple calls to this function are possible. First call is counted,
+//       subsequent calls are silently ignored.
+//
+// NOTE: solver clears termination flag on its start, it means that  if  some
+//       other thread will request termination too soon, its request will went
+//       unnoticed.
+// ALGLIB: Copyright 08.10.2014 by Sergey Bochkanov
+// API: void linlsqrrequesttermination(const linlsqrstate &state);
+void linlsqrrequesttermination(linlsqrstate *state) {
+   state->userterminationneeded = true;
+}
+
+void linlsqrstate_init(void *_p, bool make_automatic) {
+   linlsqrstate *p = (linlsqrstate *)_p;
+   normestimatorstate_init(&p->nes, make_automatic);
+   ae_vector_init(&p->rx, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->b, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->ui, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->uip1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->vi, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->vip1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->omegai, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->omegaip1, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->d, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->mv, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->mtv, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmpd, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmpx, 0, DT_REAL, make_automatic);
+}
+
+void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic) {
+   linlsqrstate *dst = (linlsqrstate *)_dst;
+   linlsqrstate *src = (linlsqrstate *)_src;
+   normestimatorstate_copy(&dst->nes, &src->nes, make_automatic);
+   ae_vector_copy(&dst->rx, &src->rx, make_automatic);
+   ae_vector_copy(&dst->b, &src->b, make_automatic);
+   dst->n = src->n;
+   dst->m = src->m;
+   dst->prectype = src->prectype;
+   ae_vector_copy(&dst->ui, &src->ui, make_automatic);
+   ae_vector_copy(&dst->uip1, &src->uip1, make_automatic);
+   ae_vector_copy(&dst->vi, &src->vi, make_automatic);
+   ae_vector_copy(&dst->vip1, &src->vip1, make_automatic);
+   ae_vector_copy(&dst->omegai, &src->omegai, make_automatic);
+   ae_vector_copy(&dst->omegaip1, &src->omegaip1, make_automatic);
+   dst->alphai = src->alphai;
+   dst->alphaip1 = src->alphaip1;
+   dst->betai = src->betai;
+   dst->betaip1 = src->betaip1;
+   dst->phibari = src->phibari;
+   dst->phibarip1 = src->phibarip1;
+   dst->phii = src->phii;
+   dst->rhobari = src->rhobari;
+   dst->rhobarip1 = src->rhobarip1;
+   dst->rhoi = src->rhoi;
+   dst->ci = src->ci;
+   dst->si = src->si;
+   dst->theta = src->theta;
+   dst->lambdai = src->lambdai;
+   ae_vector_copy(&dst->d, &src->d, make_automatic);
+   dst->anorm = src->anorm;
+   dst->bnorm2 = src->bnorm2;
+   dst->dnorm = src->dnorm;
+   dst->r2 = src->r2;
+   ae_vector_copy(&dst->x, &src->x, make_automatic);
+   ae_vector_copy(&dst->mv, &src->mv, make_automatic);
+   ae_vector_copy(&dst->mtv, &src->mtv, make_automatic);
+   dst->epsa = src->epsa;
+   dst->epsb = src->epsb;
+   dst->epsc = src->epsc;
+   dst->maxits = src->maxits;
+   dst->xrep = src->xrep;
+   dst->xupdated = src->xupdated;
+   dst->needmv = src->needmv;
+   dst->needmtv = src->needmtv;
+   dst->repiterationscount = src->repiterationscount;
+   dst->repnmv = src->repnmv;
+   dst->repterminationtype = src->repterminationtype;
+   dst->running = src->running;
+   dst->userterminationneeded = src->userterminationneeded;
+   ae_vector_copy(&dst->tmpd, &src->tmpd, make_automatic);
+   ae_vector_copy(&dst->tmpx, &src->tmpx, make_automatic);
+   dst->PQ = src->PQ;
+}
+
+void linlsqrstate_free(void *_p, bool make_automatic) {
+   linlsqrstate *p = (linlsqrstate *)_p;
+   normestimatorstate_free(&p->nes, make_automatic);
+   ae_vector_free(&p->rx, make_automatic);
+   ae_vector_free(&p->b, make_automatic);
+   ae_vector_free(&p->ui, make_automatic);
+   ae_vector_free(&p->uip1, make_automatic);
+   ae_vector_free(&p->vi, make_automatic);
+   ae_vector_free(&p->vip1, make_automatic);
+   ae_vector_free(&p->omegai, make_automatic);
+   ae_vector_free(&p->omegaip1, make_automatic);
+   ae_vector_free(&p->d, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->mv, make_automatic);
+   ae_vector_free(&p->mtv, make_automatic);
+   ae_vector_free(&p->tmpd, make_automatic);
+   ae_vector_free(&p->tmpx, make_automatic);
+}
+
+void linlsqrreport_init(void *_p, bool make_automatic) {
+}
+
+void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic) {
+   linlsqrreport *dst = (linlsqrreport *)_dst;
+   linlsqrreport *src = (linlsqrreport *)_src;
+   dst->iterationscount = src->iterationscount;
+   dst->nmv = src->nmv;
+   dst->terminationtype = src->terminationtype;
+}
+
+void linlsqrreport_free(void *_p, bool make_automatic) {
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+// This object stores state of the LinLSQR method.
+// You should use ALGLIB functions to work with this object.
+DefClass(linlsqrstate, EndD)
+DefClass(linlsqrreport, AndD DecVal(iterationscount) AndD DecVal(nmv) AndD DecVal(terminationtype))
+
+void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrcreate(m, n, ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrcreatebuf(m, n, ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsetprecunit(const linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsetprecunit(ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsetprecdiag(const linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsetprecdiag(ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsetlambdai(ConstT(linlsqrstate, state), lambdai);
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsolvesparse(ConstT(linlsqrstate, state), ConstT(sparsematrix, a), ConstT(ae_vector, b));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsetcond(ConstT(linlsqrstate, state), epsa, epsb, maxits);
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrresults(ConstT(linlsqrstate, state), ConstT(ae_vector, x), ConstT(linlsqrreport, rep));
+   alglib_impl::ae_state_clear();
+}
+
+void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrsetxrep(ConstT(linlsqrstate, state), needxrep);
+   alglib_impl::ae_state_clear();
+}
+
+ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s) {
+   alglib_impl::ae_state_init();
+   TryCatch(0)
+   ae_int_t Z = alglib_impl::linlsqrpeekiterationscount(ConstT(linlsqrstate, s));
+   alglib_impl::ae_state_clear();
+   return Z;
+}
+
+void linlsqrrequesttermination(const linlsqrstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::linlsqrrequesttermination(ConstT(linlsqrstate, state));
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
+// === NLEQ Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
+namespace alglib_impl {
+// LEVENBERG-MARQUARDT-LIKE NONLINEAR SOLVER
+// This algorithm solves a system of nonlinear equations
+//     F[0](x[0], ..., x[N-1])   = 0
+//     F[1](x[0], ..., x[N-1])   = 0
+//     ...
+//     F[M-1](x[0], ..., x[N-1]) = 0
+// where M/N do not necessarily coincide. The algorithm converges quadratically
+// under following conditions:
+//     * the solution set XS is nonempty
+//     * for some xs in XS there exist such neighbourhood N(xs) that:
+//       * vector function F(x) and its Jacobian J(x) are continuously
+//         differentiable on N
+//       * ||F(x)|| provides local error bound on N, i.e. there  exists  such
+//         c1, that ||F(x)|| > c1*distance(x,XS)
+// Note that these conditions are much more weaker than usual non-singularity
+// conditions. For example, algorithm will converge for any  affine  function
+// F (whether its Jacobian singular or not).
+//
+// REQUIREMENTS:
+// Algorithm will request following information during its operation:
+// * function vector F[] and Jacobian matrix at given point X
+// * value of merit function f(x)=F[0]^2(x)+...+F[M-1]^2(x) at given point X
+//
+// USAGE:
+// 1. User initializes algorithm state with NLEQCreateLM() call
+// 2. User tunes solver parameters with  NLEQSetCond(),  NLEQSetStpMax()  and
+//    other functions
+// 3. User  calls  NLEQSolve()  function  which  takes  algorithm  state  and
+//    pointers (delegates, etc.) to callback functions which calculate  merit
+//    function value and Jacobian.
+// 4. User calls NLEQResults() to get solution
+// 5. Optionally, user may call NLEQRestartFrom() to  solve  another  problem
+//    with same parameters (N/M) but another starting  point  and/or  another
+//    function vector. NLEQRestartFrom() allows to reuse already  initialized
+//    structure.
+//
+// Inputs:
+//     N       -   space dimension, N > 1:
+//                 * if provided, only leading N elements of X are used
+//                 * if not provided, determined automatically from size of X
+//     M       -   system size
+//     X       -   starting point
+//
+// Outputs:
+//     State   -   structure which stores algorithm state
+//
+// NOTES:
+// 1. you may tune stopping conditions with NLEQSetCond() function
+// 2. if target function contains exp() or other fast growing functions,  and
+//    optimization algorithm makes too large steps which leads  to  overflow,
+//    use NLEQSetStpMax() function to bound algorithm's steps.
+// 3. this  algorithm  is  a  slightly  modified implementation of the method
+//    described  in  'Levenberg-Marquardt  method  for constrained  nonlinear
+//    equations with strong local convergence properties' by Christian Kanzow
+//    Nobuo Yamashita and Masao Fukushima and further  developed  in  'On the
+//    convergence of a New Levenberg-Marquardt Method'  by  Jin-yan  Fan  and
+//    Ya-Xiang Yuan.
+// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
+// API: void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
+// API: void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
+void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state) {
+   SetObj(nleqstate, state);
+   ae_assert(n >= 1, "NLEQCreateLM: N<1!");
+   ae_assert(m >= 1, "NLEQCreateLM: M < 1!");
+   ae_assert(x->cnt >= n, "NLEQCreateLM: Length(X)<N!");
+   ae_assert(isfinitevector(x, n), "NLEQCreateLM: X contains infinite or NaN values!");
+// Initialize
+   state->n = n;
+   state->m = m;
+   nleqsetcond(state, 0.0, 0);
+   nleqsetxrep(state, false);
+   nleqsetstpmax(state, 0.0);
+   ae_vector_set_length(&state->x, n);
+   ae_vector_set_length(&state->xbase, n);
+   ae_matrix_set_length(&state->j, m, n);
+   ae_vector_set_length(&state->fi, m);
+   ae_vector_set_length(&state->rightpart, n);
+   ae_vector_set_length(&state->candstep, n);
+   nleqrestartfrom(state, x);
+}
+
+// This function sets stopping conditions for the nonlinear solver
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     EpsF    - >= 0
+//                 The subroutine finishes  its work if on k+1-th iteration
+//                 the condition ||F|| <= EpsF is satisfied
+//     MaxIts  -   maximum number of iterations. If MaxIts=0, the  number  of
+//                 iterations is unlimited.
+//
+// Passing EpsF=0 and MaxIts=0 simultaneously will lead to  automatic
+// stopping criterion selection (small EpsF).
+//
+// NOTES:
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
+void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits) {
+   ae_assert(isfinite(epsf), "NLEQSetCond: EpsF is not finite number!");
+   ae_assert(epsf >= 0.0, "NLEQSetCond: negative EpsF!");
+   ae_assert(maxits >= 0, "NLEQSetCond: negative MaxIts!");
+   if (epsf == 0.0 && maxits == 0) {
+      epsf = 1.0E-6;
+   }
+   state->epsf = epsf;
+   state->maxits = maxits;
+}
+
+// This function turns on/off reporting.
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     NeedXRep-   whether iteration reports are needed or not
+//
+// If NeedXRep is True, algorithm will call rep() callback function if  it is
+// provided to NLEQSolve().
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetxrep(const nleqstate &state, const bool needxrep);
+void nleqsetxrep(nleqstate *state, bool needxrep) {
+   state->xrep = needxrep;
+}
+
+// This function sets maximum step length
+//
+// Inputs:
+//     State   -   structure which stores algorithm state
+//     StpMax  -   maximum step length, >= 0. Set StpMax to 0.0,  if you don't
+//                 want to limit step length.
+//
+// Use this subroutine when target function  contains  exp()  or  other  fast
+// growing functions, and algorithm makes  too  large  steps  which  lead  to
+// overflow. This function allows us to reject steps that are too large  (and
+// therefore expose us to the possible overflow) without actually calculating
+// function value at the x+stp*d.
+// ALGLIB: Copyright 20.08.2010 by Sergey Bochkanov
+// API: void nleqsetstpmax(const nleqstate &state, const double stpmax);
+void nleqsetstpmax(nleqstate *state, double stpmax) {
+   ae_assert(isfinite(stpmax), "NLEQSetStpMax: StpMax is not finite!");
+   ae_assert(stpmax >= 0.0, "NLEQSetStpMax: StpMax<0!");
+   state->stpmax = stpmax;
+}
+
+// Increases lambda, returns False when there is a danger of overflow
+static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
+   double lnlambda;
+   double lnnu;
+   double lnlambdaup;
+   double lnmax;
+   bool result;
+   result = false;
+   lnlambda = log(*lambdav);
+   lnlambdaup = log(lambdaup);
+   lnnu = log(*nu);
+   lnmax = 0.5 * log(ae_maxrealnumber);
+   if (lnlambda + lnlambdaup + lnnu > lnmax) {
+      return result;
+   }
+   if (lnnu + log(2.0) > lnmax) {
+      return result;
+   }
+   *lambdav *= lambdaup * (*nu);
+   *nu *= 2;
+   result = true;
+   return result;
+}
+
+// Decreases lambda, but leaves it unchanged when there is danger of underflow.
+static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown) {
+   *nu = 1.0;
+   if (log(*lambdav) + log(lambdadown) < log(ae_minrealnumber)) {
+      *lambdav = ae_minrealnumber;
+   } else {
+      *lambdav *= lambdadown;
+   }
+}
+
+// This function provides a reverse communication interface, which is not documented or recommended for use.
+// Instead, it is recommended that you use the better-documented API function nleqsolve() listed below.
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+// API: bool nleqiteration(const nleqstate &state);
+// API: void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+bool nleqiteration(nleqstate *state) {
+   AutoS ae_int_t n;
+   AutoS ae_int_t m;
+   AutoS ae_int_t i;
+   AutoS double lambdaup;
+   AutoS double lambdadown;
+   AutoS double lambdav;
+   AutoS double rho;
+   AutoS double mu;
+   AutoS double stepnorm;
+   AutoS bool b;
+// Manually threaded two-way signalling.
+// Locals are set arbitrarily the first time around and are retained between pauses and subsequent resumes.
+// A Spawn occurs when the routine is (re-)started.
+// A Pause sends an event signal and waits for a response with data before carrying out the matching Resume.
+// An Exit sends an exit signal indicating the end of the process.
+   if (state->PQ >= 0) switch (state->PQ) {
+      case 0: goto Resume0; case 1: goto Resume1; case 2: goto Resume2; case 3: goto Resume3; case 4: goto Resume4;
+      default: goto Exit;
+   }
+Spawn:
+   i = -919;
+   b = true;
+   lambdaup = 81;
+   lambdadown = 255;
+   lambdav = 74;
+   rho = -788;
+   mu = 809;
+   stepnorm = 205;
+// Prepare
+   n = state->n;
+   m = state->m;
+   state->xupdated = state->needfij = state->needf = false;
+   state->repterminationtype = 0;
+   state->repiterationscount = 0;
+   state->repnfunc = 0;
+   state->repnjac = 0;
+// Calculate F/G, initialize algorithm
+   state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->repnfunc++;
+   ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
+   state->fbase = state->f;
+   state->fprev = ae_maxrealnumber;
+   if (state->xrep) {
+   // progress report
+      state->xupdated = true, state->PQ = 1; goto Pause; Resume1: state->xupdated = false;
+   }
+   if (state->f <= ae_sqr(state->epsf)) {
+      state->repterminationtype = 1;
+      goto Exit;
+   }
+// Main cycle
+   lambdaup = 10.0;
+   lambdadown = 0.3;
+   lambdav = 0.001;
+   rho = 1.0;
+   do {
+   // Get Jacobian;
+   // before we get to this point we already have State.XBase filled
+   // with current point and State.FBase filled with function value
+   // at XBase
+      ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+      state->needfij = true, state->PQ = 2; goto Pause; Resume2: state->needfij = false, state->repnfunc++, state->repnjac++;
+      rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0);
+      ae_v_muld(state->rightpart.xR, 1, n, -1);
+   // Inner cycle: find good lambda
+      while (true) {
+      // Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F
+      // to get step d=-y where:
+      // * Mu=||F|| - is damping parameter for nonlinear system
+      // * Lambda   - is additional Levenberg-Marquardt parameter
+      //              for better convergence when far away from minimum
+         for (i = 0; i < n; i++) {
+            state->candstep.xR[i] = 0.0;
+         }
+         fblssolvecgx(&state->j, m, n, lambdav, &state->rightpart, &state->candstep, &state->cgbuf);
+      // Normalize step (it must be no more than StpMax)
+         stepnorm = 0.0;
+         for (i = 0; i < n; i++) {
+            if (state->candstep.xR[i] != 0.0) {
+               stepnorm = 1.0;
+               break;
+            }
+         }
+         linminnormalized(&state->candstep, &stepnorm, n);
+         if (state->stpmax != 0.0) {
+            stepnorm = rmin2(stepnorm, state->stpmax);
+         }
+      // Test new step - is it good enough?
+      // * if not, Lambda is increased and we try again.
+      // * if step is good, we decrease Lambda and move on.
+      //
+      // We can break this cycle on two occasions:
+      // * step is so small that x + step == x (in floating point arithmetics)
+      // * lambda is so large
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         ae_v_addd(state->x.xR, 1, state->candstep.xR, 1, n, stepnorm);
+         b = true;
+         for (i = 0; i < n; i++) {
+            if (state->x.xR[i] != state->xbase.xR[i]) {
+               b = false;
+               break;
+            }
+         }
+         if (b) {
+         // Step is too small, force zero step and break
+            stepnorm = 0.0;
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->f = state->fbase;
+            break;
+         }
+         state->needf = true, state->PQ = 3; goto Pause; Resume3: state->needf = false, state->repnfunc++;
+         if (state->f < state->fbase) {
+         // function value decreased, move on
+            nleq_decreaselambda(&lambdav, &rho, lambdadown);
+            break;
+         }
+         if (!nleq_increaselambda(&lambdav, &rho, lambdaup)) {
+         // Lambda is too large (near overflow), force zero step and break
+            stepnorm = 0.0;
+            ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+            state->f = state->fbase;
+            break;
+         }
+      }
+   // Accept step:
+   // * new position
+   // * new function value
+      state->fbase = state->f;
+      ae_v_addd(state->xbase.xR, 1, state->candstep.xR, 1, n, stepnorm);
+      state->repiterationscount++;
+   // Report new iteration
+      if (state->xrep) {
+         state->f = state->fbase;
+         ae_v_move(state->x.xR, 1, state->xbase.xR, 1, n);
+         state->xupdated = true, state->PQ = 4; goto Pause; Resume4: state->xupdated = false;
+      }
+   // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
+   // If one of the conditions is met, RepTerminationType is changed.
+      if (sqrt(state->f) <= state->epsf) {
+         state->repterminationtype = 1;
+      }
+      if (stepnorm == 0.0 && state->repterminationtype == 0) {
+         state->repterminationtype = -4;
+      }
+      if (state->repiterationscount >= state->maxits && state->maxits > 0) {
+         state->repterminationtype = 5;
+      }
+   // Now, iteration is finally over
+   } while (state->repterminationtype == 0);
+Exit:
+   state->PQ = -1;
+   return false;
+Pause:
+   return true;
+}
+
+// NLEQ solver results
+//
+// Inputs:
+//     State   -   algorithm state.
+//
+// Outputs:
+//     X       -   array[0..N-1], solution
+//     Rep     -   optimization report:
+//                 * Rep.TerminationType completetion code:
+//                     * -4    ERROR:  algorithm   has   converged   to   the
+//                             stationary point Xf which is local minimum  of
+//                             f=F[0]^2+...+F[m-1]^2, but is not solution  of
+//                             nonlinear system.
+//                     *  1    sqrt(f) <= EpsF.
+//                     *  5    MaxIts steps was taken
+//                     *  7    stopping conditions are too stringent,
+//                             further improvement is impossible
+//                 * Rep.IterationsCount contains iterations count
+//                 * NFEV countains number of function calculations
+//                 * ActiveConstraints contains number of active constraints
+// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
+// API: void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
+void nleqresults(nleqstate *state, RVector *x, nleqreport *rep) {
+   SetVector(x);
+   SetObj(nleqreport, rep);
+   nleqresultsbuf(state, x, rep);
+}
+
+// NLEQ solver results
+//
+// Buffered implementation of NLEQResults(), which uses pre-allocated  buffer
+// to store X[]. If buffer size is  too  small,  it  resizes  buffer.  It  is
+// intended to be used in the inner cycles of performance critical algorithms
+// where array reallocation penalty is too large to be ignored.
+// ALGLIB: Copyright 20.08.2009 by Sergey Bochkanov
+// API: void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
+void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep) {
+   if (x->cnt < state->n) {
+      ae_vector_set_length(x, state->n);
+   }
+   ae_v_move(x->xR, 1, state->xbase.xR, 1, state->n);
+   rep->iterationscount = state->repiterationscount;
+   rep->nfunc = state->repnfunc;
+   rep->njac = state->repnjac;
+   rep->terminationtype = state->repterminationtype;
+}
+
+// This  subroutine  restarts  CG  algorithm from new point. All optimization
+// parameters are left unchanged.
+//
+// This  function  allows  to  solve multiple  optimization  problems  (which
+// must have same number of dimensions) without object reallocation penalty.
+//
+// Inputs:
+//     State   -   structure used for reverse communication previously
+//                 allocated with MinCGCreate call.
+//     X       -   new starting point.
+//     BndL    -   new lower bounds
+//     BndU    -   new upper bounds
+// ALGLIB: Copyright 30.07.2010 by Sergey Bochkanov
+// API: void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
+void nleqrestartfrom(nleqstate *state, RVector *x) {
+   ae_assert(x->cnt >= state->n, "NLEQRestartFrom: Length(X)<N!");
+   ae_assert(isfinitevector(x, state->n), "NLEQRestartFrom: X contains infinite or NaN values!");
+   ae_v_move(state->x.xR, 1, x->xR, 1, state->n);
+   state->PQ = -1;
+}
+
+void nleqstate_init(void *_p, bool make_automatic) {
+   nleqstate *p = (nleqstate *)_p;
+   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->fi, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->j, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->xbase, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->candstep, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->rightpart, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->cgbuf, 0, DT_REAL, make_automatic);
+}
+
+void nleqstate_copy(void *_dst, void *_src, bool make_automatic) {
+   nleqstate *dst = (nleqstate *)_dst;
+   nleqstate *src = (nleqstate *)_src;
+   dst->n = src->n;
+   dst->m = src->m;
+   dst->epsf = src->epsf;
+   dst->maxits = src->maxits;
+   dst->xrep = src->xrep;
+   dst->stpmax = src->stpmax;
+   ae_vector_copy(&dst->x, &src->x, make_automatic);
+   dst->f = src->f;
+   ae_vector_copy(&dst->fi, &src->fi, make_automatic);
+   ae_matrix_copy(&dst->j, &src->j, make_automatic);
+   dst->needf = src->needf;
+   dst->needfij = src->needfij;
+   dst->xupdated = src->xupdated;
+   dst->PQ = src->PQ;
+   dst->repiterationscount = src->repiterationscount;
+   dst->repnfunc = src->repnfunc;
+   dst->repnjac = src->repnjac;
+   dst->repterminationtype = src->repterminationtype;
+   ae_vector_copy(&dst->xbase, &src->xbase, make_automatic);
+   dst->fbase = src->fbase;
+   dst->fprev = src->fprev;
+   ae_vector_copy(&dst->candstep, &src->candstep, make_automatic);
+   ae_vector_copy(&dst->rightpart, &src->rightpart, make_automatic);
+   ae_vector_copy(&dst->cgbuf, &src->cgbuf, make_automatic);
+}
+
+void nleqstate_free(void *_p, bool make_automatic) {
+   nleqstate *p = (nleqstate *)_p;
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->fi, make_automatic);
+   ae_matrix_free(&p->j, make_automatic);
+   ae_vector_free(&p->xbase, make_automatic);
+   ae_vector_free(&p->candstep, make_automatic);
+   ae_vector_free(&p->rightpart, make_automatic);
+   ae_vector_free(&p->cgbuf, make_automatic);
+}
+
+void nleqreport_init(void *_p, bool make_automatic) {
+}
+
+void nleqreport_copy(void *_dst, void *_src, bool make_automatic) {
+   nleqreport *dst = (nleqreport *)_dst;
+   nleqreport *src = (nleqreport *)_src;
+   dst->iterationscount = src->iterationscount;
+   dst->nfunc = src->nfunc;
+   dst->njac = src->njac;
+   dst->terminationtype = src->terminationtype;
+}
+
+void nleqreport_free(void *_p, bool make_automatic) {
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+DefClass(nleqstate, AndD DecVal(needf) AndD DecVal(needfij) AndD DecVal(xupdated) AndD DecVal(f) AndD DecVar(fi) AndD DecVar(j) AndD DecVar(x))
+DefClass(nleqreport, AndD DecVal(iterationscount) AndD DecVal(nfunc) AndD DecVal(njac) AndD DecVal(terminationtype))
+
+void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
+   alglib_impl::ae_state_clear();
+}
+#if !defined AE_NO_EXCEPTIONS
+void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state) {
+   ae_int_t n = x.length();
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqcreatelm(n, m, ConstT(ae_vector, x), ConstT(nleqstate, state));
+   alglib_impl::ae_state_clear();
+}
+#endif
+
+void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqsetcond(ConstT(nleqstate, state), epsf, maxits);
+   alglib_impl::ae_state_clear();
+}
+
+void nleqsetxrep(const nleqstate &state, const bool needxrep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqsetxrep(ConstT(nleqstate, state), needxrep);
+   alglib_impl::ae_state_clear();
+}
+
+void nleqsetstpmax(const nleqstate &state, const double stpmax) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqsetstpmax(ConstT(nleqstate, state), stpmax);
+   alglib_impl::ae_state_clear();
+}
+
+bool nleqiteration(const nleqstate &state) {
+   alglib_impl::ae_state_init();
+   TryCatch(false)
+   bool Ok = alglib_impl::nleqiteration(ConstT(nleqstate, state));
+   alglib_impl::ae_state_clear();
+   return Ok;
+}
+
+// This family of functions is used to launch iterations of nonlinear solver
+//
+// These functions accept following parameters:
+//     state   -   algorithm state
+//     func    -   callback which calculates function (or merit function)
+//                 value func at given point x
+//     jac     -   callback which calculates function vector fi[]
+//                 and Jacobian jac at given point x
+//     rep     -   optional callback which is called after each iteration
+//                 can be NULL
+//     ptr     -   optional pointer which is passed to func/grad/hess/jac/rep
+//                 can be NULL
+// ALGLIB: Copyright 20.03.2009 by Sergey Bochkanov
+void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr)/* = NULL*/, void *ptr/* = NULL*/) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::ae_assert(func != NULL, "nleqsolve: func is NULL");
+   alglib_impl::ae_assert(jac != NULL, "nleqsolve: jac is NULL");
+   while (alglib_impl::nleqiteration(state.c_ptr()))
+   BegPoll
+      if (state.needf) func(state.x, state.f, ptr);
+      else if (state.needfij) jac(state.x, state.fi, state.j, ptr);
+      else if (state.xupdated) { if (rep != NULL) rep(state.x, state.f, ptr); }
+      else alglib_impl::ae_assert(false, "nleqsolve: some derivatives were not provided?");
+   EndPoll
+   alglib_impl::ae_state_clear();
+}
+
+void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqresults(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
+   alglib_impl::ae_state_clear();
+}
+
+void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqresultsbuf(ConstT(nleqstate, state), ConstT(ae_vector, x), ConstT(nleqreport, rep));
+   alglib_impl::ae_state_clear();
+}
+
+void nleqrestartfrom(const nleqstate &state, const real_1d_array &x) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::nleqrestartfrom(ConstT(nleqstate, state), ConstT(ae_vector, x));
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib

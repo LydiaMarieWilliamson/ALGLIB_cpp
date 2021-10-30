@@ -16,6 +16,25 @@
 
 #include "LinAlg.h"
 
+// === POLYNOMIALSOLVER Package ===
+// Depends on: (LinAlg) TRFAC, EVD
+namespace alglib_impl {
+struct polynomialsolverreport {
+   double maxerr;
+};
+void polynomialsolverreport_init(void *_p, bool make_automatic);
+void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic);
+void polynomialsolverreport_free(void *_p, bool make_automatic);
+
+void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(polynomialsolverreport, double &maxerr;);
+
+void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
+} // end of namespace alglib
+
 // === DIRECTDENSESOLVERS Package ===
 // Depends on: (AlgLibInternal) XBLAS
 // Depends on: (LinAlg) RCOND, SVD
@@ -118,199 +137,6 @@ void hpdmatrixcholeskysolvemfast(const complex_2d_array &cha, const ae_int_t n, 
 void hpdmatrixcholeskysolve(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x);
 void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info);
 void rmatrixsolvels(const real_2d_array &a, const ae_int_t nrows, const ae_int_t ncols, const real_1d_array &b, const double threshold, ae_int_t &info, densesolverlsreport &rep, real_1d_array &x);
-} // end of namespace alglib
-
-// === LINLSQR Package ===
-// Depends on: (LinAlg) SVD, NORMESTIMATOR
-namespace alglib_impl {
-struct linlsqrstate {
-   normestimatorstate nes;
-   ae_vector rx;
-   ae_vector b;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t prectype;
-   ae_vector ui;
-   ae_vector uip1;
-   ae_vector vi;
-   ae_vector vip1;
-   ae_vector omegai;
-   ae_vector omegaip1;
-   double alphai;
-   double alphaip1;
-   double betai;
-   double betaip1;
-   double phibari;
-   double phibarip1;
-   double phii;
-   double rhobari;
-   double rhobarip1;
-   double rhoi;
-   double ci;
-   double si;
-   double theta;
-   double lambdai;
-   ae_vector d;
-   double anorm;
-   double bnorm2;
-   double dnorm;
-   double r2;
-   ae_vector x;
-   ae_vector mv;
-   ae_vector mtv;
-   double epsa;
-   double epsb;
-   double epsc;
-   ae_int_t maxits;
-   bool xrep;
-   bool xupdated;
-   bool needmv;
-   bool needmtv;
-// bool needmv2; //(@) Not used.
-// bool needvmv; //(@) Not used.
-// bool needprec; //(@) Not used.
-   ae_int_t repiterationscount;
-   ae_int_t repnmv;
-   ae_int_t repterminationtype;
-   bool running;
-   bool userterminationneeded;
-   ae_vector tmpd;
-   ae_vector tmpx;
-   ae_int_t PQ;
-};
-void linlsqrstate_init(void *_p, bool make_automatic);
-void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic);
-void linlsqrstate_free(void *_p, bool make_automatic);
-
-struct linlsqrreport {
-   ae_int_t iterationscount;
-   ae_int_t nmv;
-   ae_int_t terminationtype;
-};
-void linlsqrreport_init(void *_p, bool make_automatic);
-void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic);
-void linlsqrreport_free(void *_p, bool make_automatic);
-
-void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state);
-void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state);
-void linlsqrsetb(linlsqrstate *state, RVector *b);
-void linlsqrsetprecunit(linlsqrstate *state);
-void linlsqrsetprecdiag(linlsqrstate *state);
-void linlsqrsetlambdai(linlsqrstate *state, double lambdai);
-bool linlsqriteration(linlsqrstate *state);
-void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b);
-void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits);
-void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep);
-void linlsqrsetxrep(linlsqrstate *state, bool needxrep);
-void linlsqrrestart(linlsqrstate *state);
-ae_int_t linlsqrpeekiterationscount(linlsqrstate *s);
-void linlsqrrequesttermination(linlsqrstate *state);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(linlsqrstate, EndD);
-DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
-
-void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
-void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
-void linlsqrsetprecunit(const linlsqrstate &state);
-void linlsqrsetprecdiag(const linlsqrstate &state);
-void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
-void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b);
-void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits);
-void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep);
-void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
-ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
-void linlsqrrequesttermination(const linlsqrstate &state);
-} // end of namespace alglib
-
-// === POLYNOMIALSOLVER Package ===
-// Depends on: (LinAlg) TRFAC, EVD
-namespace alglib_impl {
-struct polynomialsolverreport {
-   double maxerr;
-};
-void polynomialsolverreport_init(void *_p, bool make_automatic);
-void polynomialsolverreport_copy(void *_dst, void *_src, bool make_automatic);
-void polynomialsolverreport_free(void *_p, bool make_automatic);
-
-void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport *rep);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(polynomialsolverreport, double &maxerr;);
-
-void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array &x, polynomialsolverreport &rep);
-} // end of namespace alglib
-
-// === NLEQ Package ===
-// Depends on: (AlgLibInternal) LINMIN
-// Depends on: (LinAlg) FBLS
-namespace alglib_impl {
-struct nleqstate {
-   ae_int_t n;
-   ae_int_t m;
-   double epsf;
-   ae_int_t maxits;
-   bool xrep;
-   double stpmax;
-   ae_vector x;
-   double f;
-   ae_vector fi;
-   ae_matrix j;
-   bool needf;
-   bool needfij;
-   bool xupdated;
-   ae_int_t PQ;
-   ae_int_t repiterationscount;
-   ae_int_t repnfunc;
-   ae_int_t repnjac;
-   ae_int_t repterminationtype;
-   ae_vector xbase;
-   double fbase;
-   double fprev;
-   ae_vector candstep;
-   ae_vector rightpart;
-   ae_vector cgbuf;
-};
-void nleqstate_init(void *_p, bool make_automatic);
-void nleqstate_copy(void *_dst, void *_src, bool make_automatic);
-void nleqstate_free(void *_p, bool make_automatic);
-
-struct nleqreport {
-   ae_int_t iterationscount;
-   ae_int_t nfunc;
-   ae_int_t njac;
-   ae_int_t terminationtype;
-};
-void nleqreport_init(void *_p, bool make_automatic);
-void nleqreport_copy(void *_dst, void *_src, bool make_automatic);
-void nleqreport_free(void *_p, bool make_automatic);
-
-void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state);
-void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits);
-void nleqsetxrep(nleqstate *state, bool needxrep);
-void nleqsetstpmax(nleqstate *state, double stpmax);
-bool nleqiteration(nleqstate *state);
-void nleqresults(nleqstate *state, RVector *x, nleqreport *rep);
-void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep);
-void nleqrestartfrom(nleqstate *state, RVector *x);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
-DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
-
-void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
-void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
-void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
-void nleqsetxrep(const nleqstate &state, const bool needxrep);
-void nleqsetstpmax(const nleqstate &state, const double stpmax);
-bool nleqiteration(const nleqstate &state);
-void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
-void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
-void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
 } // end of namespace alglib
 
 // === DIRECTSPARSESOLVERS Package ===
@@ -425,6 +251,180 @@ void lincgresults(const lincgstate &state, real_1d_array &x, lincgreport &rep);
 void lincgsetrestartfreq(const lincgstate &state, const ae_int_t srf);
 void lincgsetrupdatefreq(const lincgstate &state, const ae_int_t freq);
 void lincgsetxrep(const lincgstate &state, const bool needxrep);
+} // end of namespace alglib
+
+// === LINLSQR Package ===
+// Depends on: (LinAlg) SVD, NORMESTIMATOR
+namespace alglib_impl {
+struct linlsqrstate {
+   normestimatorstate nes;
+   ae_vector rx;
+   ae_vector b;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t prectype;
+   ae_vector ui;
+   ae_vector uip1;
+   ae_vector vi;
+   ae_vector vip1;
+   ae_vector omegai;
+   ae_vector omegaip1;
+   double alphai;
+   double alphaip1;
+   double betai;
+   double betaip1;
+   double phibari;
+   double phibarip1;
+   double phii;
+   double rhobari;
+   double rhobarip1;
+   double rhoi;
+   double ci;
+   double si;
+   double theta;
+   double lambdai;
+   ae_vector d;
+   double anorm;
+   double bnorm2;
+   double dnorm;
+   double r2;
+   ae_vector x;
+   ae_vector mv;
+   ae_vector mtv;
+   double epsa;
+   double epsb;
+   double epsc;
+   ae_int_t maxits;
+   bool xrep;
+   bool xupdated;
+   bool needmv;
+   bool needmtv;
+// bool needmv2; //(@) Not used.
+// bool needvmv; //(@) Not used.
+// bool needprec; //(@) Not used.
+   ae_int_t repiterationscount;
+   ae_int_t repnmv;
+   ae_int_t repterminationtype;
+   bool running;
+   bool userterminationneeded;
+   ae_vector tmpd;
+   ae_vector tmpx;
+   ae_int_t PQ;
+};
+void linlsqrstate_init(void *_p, bool make_automatic);
+void linlsqrstate_copy(void *_dst, void *_src, bool make_automatic);
+void linlsqrstate_free(void *_p, bool make_automatic);
+
+struct linlsqrreport {
+   ae_int_t iterationscount;
+   ae_int_t nmv;
+   ae_int_t terminationtype;
+};
+void linlsqrreport_init(void *_p, bool make_automatic);
+void linlsqrreport_copy(void *_dst, void *_src, bool make_automatic);
+void linlsqrreport_free(void *_p, bool make_automatic);
+
+void linlsqrcreate(ae_int_t m, ae_int_t n, linlsqrstate *state);
+void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state);
+void linlsqrsetb(linlsqrstate *state, RVector *b);
+void linlsqrsetprecunit(linlsqrstate *state);
+void linlsqrsetprecdiag(linlsqrstate *state);
+void linlsqrsetlambdai(linlsqrstate *state, double lambdai);
+bool linlsqriteration(linlsqrstate *state);
+void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b);
+void linlsqrsetcond(linlsqrstate *state, double epsa, double epsb, ae_int_t maxits);
+void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep);
+void linlsqrsetxrep(linlsqrstate *state, bool needxrep);
+void linlsqrrestart(linlsqrstate *state);
+ae_int_t linlsqrpeekiterationscount(linlsqrstate *s);
+void linlsqrrequesttermination(linlsqrstate *state);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(linlsqrstate, EndD);
+DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
+
+void linlsqrcreate(const ae_int_t m, const ae_int_t n, linlsqrstate &state);
+void linlsqrcreatebuf(const ae_int_t m, const ae_int_t n, const linlsqrstate &state);
+void linlsqrsetprecunit(const linlsqrstate &state);
+void linlsqrsetprecdiag(const linlsqrstate &state);
+void linlsqrsetlambdai(const linlsqrstate &state, const double lambdai);
+void linlsqrsolvesparse(const linlsqrstate &state, const sparsematrix &a, const real_1d_array &b);
+void linlsqrsetcond(const linlsqrstate &state, const double epsa, const double epsb, const ae_int_t maxits);
+void linlsqrresults(const linlsqrstate &state, real_1d_array &x, linlsqrreport &rep);
+void linlsqrsetxrep(const linlsqrstate &state, const bool needxrep);
+ae_int_t linlsqrpeekiterationscount(const linlsqrstate &s);
+void linlsqrrequesttermination(const linlsqrstate &state);
+} // end of namespace alglib
+
+// === NLEQ Package ===
+// Depends on: (AlgLibInternal) LINMIN
+// Depends on: (LinAlg) FBLS
+namespace alglib_impl {
+struct nleqstate {
+   ae_int_t n;
+   ae_int_t m;
+   double epsf;
+   ae_int_t maxits;
+   bool xrep;
+   double stpmax;
+   ae_vector x;
+   double f;
+   ae_vector fi;
+   ae_matrix j;
+   bool needf;
+   bool needfij;
+   bool xupdated;
+   ae_int_t PQ;
+   ae_int_t repiterationscount;
+   ae_int_t repnfunc;
+   ae_int_t repnjac;
+   ae_int_t repterminationtype;
+   ae_vector xbase;
+   double fbase;
+   double fprev;
+   ae_vector candstep;
+   ae_vector rightpart;
+   ae_vector cgbuf;
+};
+void nleqstate_init(void *_p, bool make_automatic);
+void nleqstate_copy(void *_dst, void *_src, bool make_automatic);
+void nleqstate_free(void *_p, bool make_automatic);
+
+struct nleqreport {
+   ae_int_t iterationscount;
+   ae_int_t nfunc;
+   ae_int_t njac;
+   ae_int_t terminationtype;
+};
+void nleqreport_init(void *_p, bool make_automatic);
+void nleqreport_copy(void *_dst, void *_src, bool make_automatic);
+void nleqreport_free(void *_p, bool make_automatic);
+
+void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state);
+void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits);
+void nleqsetxrep(nleqstate *state, bool needxrep);
+void nleqsetstpmax(nleqstate *state, double stpmax);
+bool nleqiteration(nleqstate *state);
+void nleqresults(nleqstate *state, RVector *x, nleqreport *rep);
+void nleqresultsbuf(nleqstate *state, RVector *x, nleqreport *rep);
+void nleqrestartfrom(nleqstate *state, RVector *x);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
+DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
+
+void nleqcreatelm(const ae_int_t n, const ae_int_t m, const real_1d_array &x, nleqstate &state);
+void nleqcreatelm(const ae_int_t m, const real_1d_array &x, nleqstate &state);
+void nleqsetcond(const nleqstate &state, const double epsf, const ae_int_t maxits);
+void nleqsetxrep(const nleqstate &state, const bool needxrep);
+void nleqsetstpmax(const nleqstate &state, const double stpmax);
+bool nleqiteration(const nleqstate &state);
+void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &func, void *ptr), void (*jac)(const real_1d_array &x, real_1d_array &fi, real_2d_array &jac, void *ptr), void (*rep)(const real_1d_array &x, double func, void *ptr) = NULL, void *ptr = NULL);
+void nleqresults(const nleqstate &state, real_1d_array &x, nleqreport &rep);
+void nleqresultsbuf(const nleqstate &state, real_1d_array &x, nleqreport &rep);
+void nleqrestartfrom(const nleqstate &state, const real_1d_array &x);
 } // end of namespace alglib
 
 #endif // OnceOnly

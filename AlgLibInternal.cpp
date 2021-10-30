@@ -14,57 +14,6 @@
 #define InAlgLib
 #include "AlgLibInternal.h"
 
-// === SCODES Package ===
-namespace alglib_impl {
-ae_int_t getrdfserializationcode() {
-   ae_int_t result;
-   result = 1;
-   return result;
-}
-
-ae_int_t getkdtreeserializationcode() {
-   ae_int_t result;
-   result = 2;
-   return result;
-}
-
-ae_int_t getmlpserializationcode() {
-   ae_int_t result;
-   result = 3;
-   return result;
-}
-
-ae_int_t getmlpeserializationcode() {
-   ae_int_t result;
-   result = 4;
-   return result;
-}
-
-ae_int_t getrbfserializationcode() {
-   ae_int_t result;
-   result = 5;
-   return result;
-}
-
-ae_int_t getspline2dserializationcode() {
-   ae_int_t result;
-   result = 6;
-   return result;
-}
-
-ae_int_t getidwserializationcode() {
-   ae_int_t result;
-   result = 7;
-   return result;
-}
-
-ae_int_t getknnserializationcode() {
-   ae_int_t result;
-   result = 108;
-   return result;
-}
-} // end of namespace alglib_impl
-
 // === APSERV Package ===
 namespace alglib_impl {
 // The function performs zero-coalescing on real value.
@@ -1515,606 +1464,6 @@ void RVector_copy(void *_dst, void *_src, bool make_automatic) {
 void RVector_free(void *_p, bool make_automatic) {
    RVector *p = (RVector *)_p;
    ae_vector_free(p, make_automatic);
-}
-} // end of namespace alglib_impl
-
-// === TSORT Package ===
-// Depends on: APSERV
-namespace alglib_impl {
-// Internal versions respectively of tagsortfasti(), tagsortfastr() and tagsortfast():
-// sort the n-vector ap and apply the same permutations to abp (and to bp and bbp, if present).
-// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
-static void tsort_tagsortfastirec(double *ap, ae_int_t *bp, double *abp, ae_int_t *bbp, ae_int_t n) {
-   while (n > 16) {
-   // Quicksort: choose the pivot.
-      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
-      if (al > am) swapr(&al, &am);
-      if (am > ah) swapr(&am, &ah);
-      if (al > am) swapr(&al, &am);
-   // Pass through ap/bp:
-   // * everything < am goes to the left of ap/bp,
-   // * everything == am goes to the right of abp/bbp (in the reverse order),
-   // * everything > am goes to the left of abp/bbp (in the normal order,
-   // * everything from the right of abp/bbp to the middle goes to the right of ap/bp back in normal order,
-   // * everything from the left of abp/bbp to the middle goes to the right of ap/bp.
-      ae_int_t lts = 0, eqs = 0, gts = 0;
-      for (ae_int_t i = 0; i < n; i++) {
-         double ai = ap[i];
-         ae_int_t bi = bp[i];
-         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
-         if (ai >= am)
-            abp[k] = ai, bbp[k] = bi;
-         else if (i != k)
-            ap[k] = ai, bp[k] = bi;
-      }
-      ae_int_t les = lts + eqs;
-      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
-         ap[j] = abp[k], bp[j] = bbp[k];
-      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
-         ap[j] = abp[k], bp[j] = bbp[k];
-   // Sort the left part of the vector, and skip over the middle part.
-      tsort_tagsortfastirec(ap, bp, abp, bbp, lts);
-      ap += les, bp += les, abp += les, bbp += les, n -= les;
-   }
-// The non-recursive sort for small arrays.
-   for (ae_int_t j = 1; j < n; j++) {
-   // Find a place, if any, in [0,j) to insert ap[j] at.
-   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
-      double aj = ap[j];
-      ae_int_t k = j;
-      while (--k >= 0 && ap[k] > aj);
-      if (++k >= j) continue;
-   // Move element j down to position k.
-      ae_int_t bj = bp[j];
-      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1], bp[i] = bp[i - 1];
-      ap[k] = aj, bp[k] = bj;
-   }
-}
-
-static void tsort_tagsortfastrrec(double *ap, double *bp, double *abp, double *bbp, ae_int_t n) {
-   while (n > 16) {
-   // Quicksort: choose the pivot.
-      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
-      if (al > am) swapr(&al, &am);
-      if (am > ah) swapr(&am, &ah);
-      if (al > am) swapr(&al, &am);
-   // Pass through ap/bp:
-   // * everything < am goes to the left of ap/bp,
-   // * everything == am goes to the right of abp/bbp (in the reverse order),
-   // * everything > am goes to the left of abp/bbp (in the normal order,
-   // * everything from the right of abp/bbp to the middle goes to the right of ap/bp back in normal order,
-   // * everything from the left of abp/bbp to the middle goes to the right of ap/bp.
-      ae_int_t lts = 0, eqs = 0, gts = 0;
-      for (ae_int_t i = 0; i < n; i++) {
-         double ai = ap[i];
-         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
-         if (ai >= am)
-            abp[k] = ai, bbp[k] = bp[i];
-         else if (i != k)
-            ap[k] = ai, bp[k] = bp[i];
-      }
-      ae_int_t les = lts + eqs;
-      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
-         ap[j] = abp[k], bp[j] = bbp[k];
-      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
-         ap[j] = abp[k], bp[j] = bbp[k];
-   // Sort the left part of the vector, and skip over the middle part.
-      tsort_tagsortfastrrec(ap, bp, abp, bbp, lts);
-      ap += les, bp += les, abp += les, bbp += les, n -= les;
-   }
-// The non-recursive sort for small arrays.
-   for (ae_int_t j = 1; j < n; j++) {
-   // Find a place, if any, in [0,j) to insert ap[j] at.
-   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
-      double aj = ap[j];
-      ae_int_t k = j;
-      while (--k >= 0 && ap[k] > aj);
-      if (++k >= j) continue;
-   // Move element j down to position k.
-      double bj = bp[j];
-      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1], bp[i] = bp[i - 1];
-      ap[k] = aj, bp[k] = bj;
-   }
-}
-
-static void tsort_tagsortfastrec(double *ap, double *abp, ae_int_t n) {
-   while (n > 16) {
-   // Quicksort: choose the pivot.
-      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
-      if (al > am) swapr(&al, &am);
-      if (am > ah) swapr(&am, &ah);
-      if (al > am) swapr(&al, &am);
-   // Pass through ap:
-   // * everything < am goes to the left of ap,
-   // * everything == am goes to the right of abp (in the reverse order),
-   // * everything > am goes to the left of abp (in the normal order,
-   // * everything from the right of abp to the middle goes to the right of ap back in normal order,
-   // * everything from the left of abp to the middle goes to the right of ap.
-      ae_int_t lts = 0, eqs = 0, gts = 0;
-      for (ae_int_t i = 0; i < n; i++) {
-         double ai = ap[i];
-         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
-         if (ai >= am)
-            abp[k] = ai;
-         else if (i != k)
-            ap[k] = ai;
-      }
-      ae_int_t les = lts + eqs;
-      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
-         ap[j] = abp[k];
-      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
-         ap[j] = abp[k];
-   // Sort the left part of the vector, and skip over the middle part.
-      tsort_tagsortfastrec(ap, abp, lts);
-      ap += les, abp += les, n -= les;
-   }
-// The non-recursive sort for small arrays.
-   for (ae_int_t j = 1; j < n; j++) {
-   // Find a place, if any, in [0,j) to insert ap[j] at.
-   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
-      double aj = ap[j];
-      ae_int_t k = j;
-      while (--k >= 0 && ap[k] > aj);
-      if (++k >= j) continue;
-   // Move element j down to position k.
-      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1];
-      ap[k] = aj;
-   }
-}
-
-// Versions of tagsort() optimized for real keys and {integer, real, no} labels respectively.
-// The vector a is sorted, and same permutations are applied to the vector b, if present.
-// NOTES:
-// 1.	these functions assume that the vector a is finite
-//	and don't check for it or for other conditions (size of input arrays, etc.).
-// 2.	these functions use buffer(s), bufa and bufb, that will be reallocated to size n, if necessary.
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n) {
-// Special case
-   if (n <= 1) return;
-// Test for already sorted set
-   bool isascending = true, isdescending = true;
-   for (ae_int_t i = 1; i < n; i++) {
-      isascending = isascending && a->xR[i] >= a->xR[i - 1];
-      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
-   }
-   if (isascending) return;
-   else if (isdescending) {
-      for (ae_int_t i = 0; i < n; i++) {
-         ae_int_t j = n - 1 - i;
-         if (j <= i) break;
-         swapr(&a->xR[i], &a->xR[j]);
-         swapi(&b->xZ[i], &b->xZ[j]);
-      }
-   } else {
-   // General case
-      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
-      if (bufb->cnt < n) ae_vector_set_length(bufb, n);
-      tsort_tagsortfastirec(a->xR, b->xZ, bufa->xR, bufb->xZ, n);
-   }
-}
-
-void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n) {
-// Special case
-   if (n <= 1) return;
-// Test for already sorted set
-   bool isascending = true, isdescending = true;
-   for (ae_int_t i = 1; i < n; i++) {
-      isascending = isascending && a->xR[i] >= a->xR[i - 1];
-      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
-   }
-   if (isascending) return;
-   else if (isdescending) {
-      for (ae_int_t i = 0; i < n; i++) {
-         ae_int_t j = n - 1 - i;
-         if (j <= i) break;
-         swapr(&a->xR[i], &a->xR[j]);
-         swapr(&b->xR[i], &b->xR[j]);
-      }
-   } else {
-   // General case
-      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
-      if (bufb->cnt < n) ae_vector_set_length(bufb, n);
-      tsort_tagsortfastrrec(a->xR, b->xR, bufa->xR, bufb->xR, n);
-   }
-}
-
-void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
-// Special case
-   if (n <= 1) return;
-// Test for already sorted set
-   bool isascending = true, isdescending = true;
-   for (ae_int_t i = 1; i < n; i++) {
-      isascending = isascending && a->xR[i] >= a->xR[i - 1];
-      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
-   }
-   if (isascending) return;
-   else if (isdescending) {
-      for (ae_int_t i = 0; i < n; i++) {
-         ae_int_t j = n - 1 - i;
-         if (j <= i) break;
-         swapr(&a->xR[i], &a->xR[j]);
-      }
-   } else {
-   // General case
-      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
-      tsort_tagsortfastrec(a->xR, bufa->xR, n);
-   }
-}
-
-// Versions of tagsort*(), optimized for integer keys optionally with real labels, suitable for sorting the middle of the vector.
-// Sort the vector a, starting at offset, and apply the same permutations to the vector b, if it is specified.
-// NOTE:
-//	These functions assume that the vector a is finite
-//	and do not check for it or for other conditions (size of input arrays, etc.).
-// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
-void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset/* = 0*/) {
-// Special case.
-   if (n <= 1) return;
-// General case, n > 1: sort, update bp.
-   ae_int_t *ap = a->xZ + offset;
-   double *bp = b->xR + offset;
-   for (ae_int_t nh = 1; nh < n; nh++)
-      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2) {
-         swapi(ap + nl, ap + nm);
-         swapr(bp + nl, bp + nm);
-      }
-   for (ae_int_t nh = n - 1; nh > 0; nh--) {
-      swapi(ap, ap + nh);
-      swapr(bp, bp + nh);
-      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
-         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
-         if (ap[nl] >= ap[nm]) break;
-         swapi(ap + nl, ap + nm);
-         swapr(bp + nl, bp + nm);
-      }
-   }
-}
-
-void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset/* = 0*/) {
-// Special case.
-   if (n <= 1) return;
-// General case, n > 1: sort.
-   ae_int_t *ap = a->xZ + offset;
-   for (ae_int_t nh = 1; nh < n; nh++)
-      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2)
-         swapi(ap + nl, ap + nm);
-   for (ae_int_t nh = n - 1; nh > 0; nh--) {
-      swapi(ap, ap + nh);
-      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
-         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
-         if (ap[nl] >= ap[nm]) break;
-         swapi(ap + nl, ap + nm);
-      }
-   }
-}
-
-// Buffered variant of TagSort, which accepts pre-allocated output arrays as
-// well as special structure for buffered allocations. If arrays are too
-// short, they are reallocated. If they are large enough, no memory
-// allocation is done.
-//
-// It is intended to be used in the performance-critical parts of code, where
-// additional allocations can lead to severe performance degradation
-// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf) {
-   ae_int_t i;
-   ae_int_t lv;
-   ae_int_t lp;
-   ae_int_t rv;
-   ae_int_t rp;
-// Special cases.
-   if (n <= 0) {
-      return;
-   }
-   if (n == 1) {
-      vectorsetlengthatleast(p1, 1);
-      vectorsetlengthatleast(p2, 1);
-      p1->xZ[0] = 0;
-      p2->xZ[0] = 0;
-      return;
-   }
-// General case, N > 1: prepare permutations table P1
-   vectorsetlengthatleast(p1, n);
-   for (i = 0; i < n; i++) {
-      p1->xZ[i] = i;
-   }
-// General case, N > 1: sort, update P1
-   vectorsetlengthatleast(&buf->ra0, n);
-   vectorsetlengthatleast(&buf->ia0, n);
-   tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n);
-// General case, N > 1: fill permutations table P2
-//
-// To fill P2 we maintain two arrays:
-// * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
-// * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
-//
-// At each step we making permutation of two items:
-//   Left, which is given by position/value pair LP/LV
-//   and Right, which is given by RP/RV
-// and updating PV[] and VP[] correspondingly.
-   vectorsetlengthatleast(&buf->ia0, n);
-   vectorsetlengthatleast(&buf->ia1, n);
-   vectorsetlengthatleast(p2, n);
-   for (i = 0; i < n; i++) {
-      buf->ia0.xZ[i] = i;
-      buf->ia1.xZ[i] = i;
-   }
-   for (i = 0; i < n; i++) {
-   // calculate LP, LV, RP, RV
-      lp = i;
-      lv = buf->ia1.xZ[lp];
-      rv = p1->xZ[i];
-      rp = buf->ia0.xZ[rv];
-   // Fill P2
-      p2->xZ[i] = rp;
-   // update PV and VP
-      buf->ia1.xZ[lp] = rv;
-      buf->ia1.xZ[rp] = lv;
-      buf->ia0.xZ[lv] = rp;
-      buf->ia0.xZ[rv] = lp;
-   }
-}
-
-// This function sorts array of real keys by ascending.
-//
-// Its results are:
-// * sorted array A
-// * permutation tables P1, P2
-//
-// Algorithm outputs permutation tables using two formats:
-// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
-//   value which was moved there from J-th position.
-// * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
-//   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
-//
-// Inputs:
-//     A       -   unsorted array
-//     N       -   array size
-//
-// Outputs:
-//     A       -   sorted array
-//     P1, P2  -   permutation tables, array[N]
-//
-// NOTES:
-//     this function assumes that A[] is finite; it doesn't checks that
-//     condition. All other conditions (size of input arrays, etc.) are not
-//     checked too.
-// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
-void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2) {
-   ae_frame _frame_block;
-   ae_frame_make(&_frame_block);
-   SetVector(p1);
-   SetVector(p2);
-   NewObj(apbuffers, buf);
-   tagsortbuf(a, n, p1, p2, &buf);
-   ae_frame_leave();
-}
-
-// Heap operations: adds element to the heap
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap (without new element).
-//                 updated on output
-//     VA      -   value of the element being added
-//     VB      -   value of the tag
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb) {
-   ae_int_t j;
-   ae_int_t k;
-   double v;
-   if (*n < 0) {
-      return;
-   }
-// N=0 is a special case
-   if (*n == 0) {
-      a->xR[0] = va;
-      b->xZ[0] = vb;
-      ++*n;
-      return;
-   }
-// add current point to the heap
-// (add to the bottom, then move up)
-//
-// we don't write point to the heap
-// until its final position is determined
-// (it allow us to reduce number of array access operations)
-   j = *n;
-   ++*n;
-   while (j > 0) {
-      k = (j - 1) / 2;
-      v = a->xR[k];
-      if (v < va) {
-      // swap with higher element
-         a->xR[j] = v;
-         b->xZ[j] = b->xZ[k];
-         j = k;
-      } else {
-      // element in its place. terminate.
-         break;
-      }
-   }
-   a->xR[j] = va;
-   b->xZ[j] = vb;
-}
-
-// Heap operations: replaces top element with new element
-// (which is moved down)
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N-1]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap
-//     VA      -   value of the element which replaces top element
-//     VB      -   value of the tag
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb) {
-   ae_int_t j;
-   ae_int_t k1;
-   ae_int_t k2;
-   double v;
-   double v1;
-   double v2;
-   if (n < 1) {
-      return;
-   }
-// N=1 is a special case
-   if (n == 1) {
-      a->xR[0] = va;
-      b->xZ[0] = vb;
-      return;
-   }
-// move down through heap:
-// * J  -   current element
-// * K1 -   first child (always exists)
-// * K2 -   second child (may not exists)
-//
-// we don't write point to the heap
-// until its final position is determined
-// (it allow us to reduce number of array access operations)
-   j = 0;
-   k1 = 1;
-   k2 = 2;
-   while (k1 < n) {
-      if (k2 >= n) {
-      // only one child.
-      //
-      // swap and terminate (because this child
-      // have no siblings due to heap structure)
-         v = a->xR[k1];
-         if (v > va) {
-            a->xR[j] = v;
-            b->xZ[j] = b->xZ[k1];
-            j = k1;
-         }
-         break;
-      } else {
-      // two childs
-         v1 = a->xR[k1];
-         v2 = a->xR[k2];
-         if (v1 > v2) {
-            if (va < v1) {
-               a->xR[j] = v1;
-               b->xZ[j] = b->xZ[k1];
-               j = k1;
-            } else {
-               break;
-            }
-         } else {
-            if (va < v2) {
-               a->xR[j] = v2;
-               b->xZ[j] = b->xZ[k2];
-               j = k2;
-            } else {
-               break;
-            }
-         }
-         k1 = 2 * j + 1;
-         k2 = 2 * j + 2;
-      }
-   }
-   a->xR[j] = va;
-   b->xZ[j] = vb;
-}
-
-// Heap operations: pops top element from the heap
-//
-// PARAMETERS:
-//     A       -   heap itself, must be at least array[0..N-1]
-//     B       -   array of integer tags, which are updated according to
-//                 permutations in the heap
-//     N       -   size of the heap, N >= 1
-//
-// On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
-// decreased by 1.
-// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
-void tagheappopi(RVector *a, ZVector *b, ae_int_t *n) {
-   double va;
-   ae_int_t vb;
-   if (*n < 1) {
-      return;
-   }
-// N=1 is a special case
-   if (*n == 1) {
-      *n = 0;
-      return;
-   }
-// swap top element and last element,
-// then reorder heap
-   va = a->xR[*n - 1];
-   vb = b->xZ[*n - 1];
-   a->xR[*n - 1] = a->xR[0];
-   b->xZ[*n - 1] = b->xZ[0];
-   --*n;
-   tagheapreplacetopi(a, b, *n, va, vb);
-}
-
-// Search first element less than T in sorted array.
-//
-// PARAMETERS:
-//     A - sorted array by ascending from 0 to N-1
-//     N - number of elements in array
-//     T - the desired element
-//
-// Result:
-//     The very first element's index, which isn't less than T.
-// In the case when there aren't such elements, returns N.
-ae_int_t lowerbound(RVector *a, ae_int_t n, double t) {
-   ae_int_t l;
-   ae_int_t half;
-   ae_int_t first;
-   ae_int_t middle;
-   ae_int_t result;
-   l = n;
-   first = 0;
-   while (l > 0) {
-      half = l / 2;
-      middle = first + half;
-      if (a->xR[middle] < t) {
-         first = middle + 1;
-         l -= half + 1;
-      } else {
-         l = half;
-      }
-   }
-   result = first;
-   return result;
-}
-
-// Search first element more than T in sorted array.
-//
-// PARAMETERS:
-//     A - sorted array by ascending from 0 to N-1
-//     N - number of elements in array
-//     T - the desired element
-//
-// Result:
-//     The very first element's index, which more than T.
-// In the case when there aren't such elements, returns N.
-ae_int_t upperbound(RVector *a, ae_int_t n, double t) {
-   ae_int_t l;
-   ae_int_t half;
-   ae_int_t first;
-   ae_int_t middle;
-   ae_int_t result;
-   l = n;
-   first = 0;
-   while (l > 0) {
-      half = l / 2;
-      middle = first + half;
-      if (t < a->xR[middle]) {
-         l = half;
-      } else {
-         first = middle + 1;
-         l -= half + 1;
-      }
-   }
-   result = first;
-   return result;
 }
 } // end of namespace alglib_impl
 
@@ -4147,6 +3496,398 @@ void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix 
 }
 } // end of namespace alglib_impl
 
+// === HBLAS Package ===
+namespace alglib_impl {
+void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y) {
+   ae_int_t i;
+   ae_int_t ba1;
+   ae_int_t by1;
+   ae_int_t by2;
+   ae_int_t bx1;
+   ae_int_t bx2;
+   ae_int_t n;
+   ae_complex v;
+   n = i2 - i1 + 1;
+   if (n <= 0) {
+      return;
+   }
+// Let A = L + D + U, where
+//  L is strictly lower triangular (main diagonal is zero)
+//  D is diagonal
+//  U is strictly upper triangular (main diagonal is zero)
+//
+// A*x = L*x + D*x + U*x
+//
+// Calculate D*x first
+   for (i = i1; i <= i2; i++) {
+      y->xC[i - i1 + 1] = ae_c_mul(a->xyC[i][i], x->xC[i - i1 + 1]);
+   }
+// Add L*x + U*x
+   if (isupper) {
+      for (i = i1; i < i2; i++) {
+      // Add L*x to the result
+         v = x->xC[i - i1 + 1];
+         by1 = i - i1 + 2;
+         by2 = n;
+         ba1 = i + 1;
+         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
+      // Add U*x to the result
+         bx1 = i - i1 + 2;
+         bx2 = n;
+         ba1 = i + 1;
+         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
+         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
+      }
+   } else {
+      for (i = i1 + 1; i <= i2; i++) {
+      // Add L*x to the result
+         bx1 = 1;
+         bx2 = i - i1;
+         ba1 = i1;
+         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
+         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
+      // Add U*x to the result
+         v = x->xC[i - i1 + 1];
+         by1 = 1;
+         by2 = i - i1;
+         ba1 = i1;
+         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
+      }
+   }
+   ae_v_cmulc(&y->xC[1], 1, n, alpha);
+}
+
+void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha) {
+   ae_int_t i;
+   ae_int_t tp1;
+   ae_int_t tp2;
+   ae_complex v;
+   if (isupper) {
+      for (i = i1; i <= i2; i++) {
+         tp1 = i + 1 - i1;
+         tp2 = i2 - i1 + 1;
+         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
+         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
+         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         ae_v_cadd(&a->xyC[i][i], 1, &t->xC[tp1], 1, "N", i2 - i + 1);
+      }
+   } else {
+      for (i = i1; i <= i2; i++) {
+         tp1 = 1;
+         tp2 = i + 1 - i1;
+         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
+         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
+         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
+         ae_v_cadd(&a->xyC[i][i1], 1, &t->xC[tp1], 1, "N", i - i1 + 1);
+      }
+   }
+}
+} // end of namespace alglib_impl
+
+// === CREFLECTIONS Package ===
+namespace alglib_impl {
+// Generation of an elementary complex reflection transformation
+//
+// The subroutine generates elementary complex reflection H of  order  N,  so
+// that, for a given X, the following equality holds true:
+//
+//      ( X(1) )   ( Beta )
+// H' * (  ..  ) = (  0   ),   H'*H = I,   Beta is a real number
+//      ( X(n) )   (  0   )
+//
+// where
+//
+//               ( V(1) )
+// H = 1 - Tau * (  ..  ) * ( conj(V(1)), ..., conj(V(n)) )
+//               ( V(n) )
+//
+// where the first component of vector V equals 1.
+//
+// Inputs:
+//     X   -   vector. Array with elements [1..N].
+//     N   -   reflection order.
+//
+// Outputs:
+//     X   -   components from 2 to N are replaced by vector V.
+//             The first component is replaced with parameter Beta.
+//     Tau -   scalar value Tau.
+//
+// This subroutine is the modification of CLARFG subroutines  from the LAPACK
+// library. It has similar functionality except for the fact that it  doesn't
+// handle errors when intermediate results cause an overflow.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
+void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau) {
+   ae_int_t j;
+   ae_complex alpha;
+   double alphi;
+   double alphr;
+   double beta;
+   double xnorm;
+   double mx;
+   ae_complex t;
+   double s;
+   ae_complex v;
+   tau->x = 0;
+   tau->y = 0;
+   if (n <= 0) {
+      *tau = ae_complex_from_i(0);
+      return;
+   }
+// Scale if needed (to avoid overflow/underflow during intermediate
+// calculations).
+   mx = 0.0;
+   for (j = 1; j <= n; j++) {
+      mx = rmax2(ae_c_abs(x->xC[j]), mx);
+   }
+   s = 1.0;
+   if (mx != 0.0) {
+      if (mx < 1.0) {
+         s = sqrt(ae_minrealnumber);
+         v = ae_complex_from_d(1 / s);
+         ae_v_cmulc(&x->xC[1], 1, n, v);
+      } else {
+         s = sqrt(ae_maxrealnumber);
+         v = ae_complex_from_d(1 / s);
+         ae_v_cmulc(&x->xC[1], 1, n, v);
+      }
+   }
+// calculate
+   alpha = x->xC[1];
+   mx = 0.0;
+   for (j = 2; j <= n; j++) {
+      mx = rmax2(ae_c_abs(x->xC[j]), mx);
+   }
+   xnorm = 0.0;
+   if (mx != 0.0) {
+      for (j = 2; j <= n; j++) {
+         t = ae_c_div_d(x->xC[j], mx);
+         xnorm += ae_c_mul(t, ae_c_conj(t)).x;
+      }
+      xnorm = sqrt(xnorm) * mx;
+   }
+   alphr = alpha.x;
+   alphi = alpha.y;
+   if (xnorm == 0.0 && alphi == 0.0) {
+      *tau = ae_complex_from_i(0);
+      x->xC[1] = ae_c_mul_d(x->xC[1], s);
+      return;
+   }
+   mx = rmax2(fabs(alphr), fabs(alphi));
+   mx = rmax2(mx, fabs(xnorm));
+   beta = -mx * sqrt(ae_sqr(alphr / mx) + ae_sqr(alphi / mx) + ae_sqr(xnorm / mx));
+   if (alphr < 0.0) {
+      beta = -beta;
+   }
+   tau->x = (beta - alphr) / beta;
+   tau->y = -alphi / beta;
+   alpha = ae_c_d_div(1, ae_c_sub_d(alpha, beta));
+   if (n > 1) {
+      ae_v_cmulc(&x->xC[2], 1, n - 1, alpha);
+   }
+   alpha = ae_complex_from_d(beta);
+   x->xC[1] = alpha;
+// Scale back
+   x->xC[1] = ae_c_mul_d(x->xC[1], s);
+}
+
+// Application of an elementary reflection to a rectangular matrix of size MxN
+//
+// The  algorithm  pre-multiplies  the  matrix  by  an  elementary reflection
+// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
+// description of the GenerateReflection). Not the whole matrix  but  only  a
+// part of it is transformed (rows from M1 to M2, columns from N1 to N2). Only
+// the elements of this submatrix are changed.
+//
+// Note: the matrix is multiplied by H, not by H'.   If  it  is  required  to
+// multiply the matrix by H', it is necessary to pass Conj(Tau) instead of Tau.
+//
+// Inputs:
+//     C       -   matrix to be transformed.
+//     Tau     -   scalar defining transformation.
+//     V       -   column defining transformation.
+//                 Array whose index ranges within [1..M2-M1+1]
+//     M1, M2  -   range of rows to be transformed.
+//     N1, N2  -   range of columns to be transformed.
+//     WORK    -   working array whose index goes from N1 to N2.
+//
+// Outputs:
+//     C       -   the result of multiplying the input matrix C by the
+//                 transformation matrix which is given by Tau and V.
+//                 If N1>N2 or M1>M2, C is not modified.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
+void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
+   ae_complex t;
+   ae_int_t i;
+   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
+      return;
+   }
+// w := C^T * conj(v)
+   for (i = n1; i <= n2; i++) {
+      work->xC[i] = ae_complex_from_i(0);
+   }
+   for (i = m1; i <= m2; i++) {
+      t = ae_c_conj(v->xC[i + 1 - m1]);
+      ae_v_caddc(&work->xC[n1], 1, &c->xyC[i][n1], 1, "N", n2 - n1 + 1, t);
+   }
+// C := C - tau * v * w^T
+   for (i = m1; i <= m2; i++) {
+      t = ae_c_mul(v->xC[i - m1 + 1], tau);
+      ae_v_csubc(&c->xyC[i][n1], 1, &work->xC[n1], 1, "N", n2 - n1 + 1, t);
+   }
+}
+
+// Application of an elementary reflection to a rectangular matrix of size MxN
+//
+// The  algorithm  post-multiplies  the  matrix  by  an elementary reflection
+// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
+// description  of  the  GenerateReflection). Not the whole matrix but only a
+// part  of  it  is  transformed (rows from M1 to M2, columns from N1 to N2).
+// Only the elements of this submatrix are changed.
+//
+// Inputs:
+//     C       -   matrix to be transformed.
+//     Tau     -   scalar defining transformation.
+//     V       -   column defining transformation.
+//                 Array whose index ranges within [1..N2-N1+1]
+//     M1, M2  -   range of rows to be transformed.
+//     N1, N2  -   range of columns to be transformed.
+//     WORK    -   working array whose index goes from M1 to M2.
+//
+// Outputs:
+//     C       -   the result of multiplying the input matrix C by the
+//                 transformation matrix which is given by Tau and V.
+//                 If N1>N2 or M1>M2, C is not modified.
+//
+//   -- LAPACK auxiliary routine (version 3.0) --
+//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
+//      Courant Institute, Argonne National Lab, and Rice University
+//      September 30, 1994
+void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
+   ae_complex t;
+   ae_int_t i;
+   ae_int_t vm;
+   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
+      return;
+   }
+// w := C * v
+   vm = n2 - n1 + 1;
+   for (i = m1; i <= m2; i++) {
+      t = ae_v_cdotproduct(&c->xyC[i][n1], 1, "N", &v->xC[1], 1, "N", n2 - n1 + 1);
+      work->xC[i] = t;
+   }
+// C := C - w * conj(v^T)
+   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
+   for (i = m1; i <= m2; i++) {
+      t = ae_c_mul(work->xC[i], tau);
+      ae_v_csubc(&c->xyC[i][n1], 1, &v->xC[1], 1, "N", n2 - n1 + 1, t);
+   }
+   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
+}
+} // end of namespace alglib_impl
+
+// === SBLAS Package ===
+// Depends on: APSERV
+namespace alglib_impl {
+void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y) {
+   ae_int_t i;
+   ae_int_t ba1;
+   ae_int_t by1;
+   ae_int_t by2;
+   ae_int_t bx1;
+   ae_int_t bx2;
+   ae_int_t n;
+   double v;
+   n = i2 - i1 + 1;
+   if (n <= 0) {
+      return;
+   }
+// Let A = L + D + U, where
+//  L is strictly lower triangular (main diagonal is zero)
+//  D is diagonal
+//  U is strictly upper triangular (main diagonal is zero)
+//
+// A*x = L*x + D*x + U*x
+//
+// Calculate D*x first
+   for (i = i1; i <= i2; i++) {
+      y->xR[i - i1 + 1] = a->xyR[i][i] * x->xR[i - i1 + 1];
+   }
+// Add L*x + U*x
+   if (isupper) {
+      for (i = i1; i < i2; i++) {
+      // Add L*x to the result
+         v = x->xR[i - i1 + 1];
+         by1 = i - i1 + 2;
+         by2 = n;
+         ba1 = i + 1;
+         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
+      // Add U*x to the result
+         bx1 = i - i1 + 2;
+         bx2 = n;
+         ba1 = i + 1;
+         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
+         y->xR[i - i1 + 1] += v;
+      }
+   } else {
+      for (i = i1 + 1; i <= i2; i++) {
+      // Add L*x to the result
+         bx1 = 1;
+         bx2 = i - i1;
+         ba1 = i1;
+         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
+         y->xR[i - i1 + 1] += v;
+      // Add U*x to the result
+         v = x->xR[i - i1 + 1];
+         by1 = 1;
+         by2 = i - i1;
+         ba1 = i1;
+         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
+      }
+   }
+   ae_v_muld(&y->xR[1], 1, n, alpha);
+}
+
+void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha) {
+   ae_int_t i;
+   ae_int_t tp1;
+   ae_int_t tp2;
+   double v;
+   if (isupper) {
+      for (i = i1; i <= i2; i++) {
+         tp1 = i + 1 - i1;
+         tp2 = i2 - i1 + 1;
+         v = x->xR[i + 1 - i1];
+         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
+         v = y->xR[i + 1 - i1];
+         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
+         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
+         ae_v_add(&a->xyR[i][i], 1, &t->xR[tp1], 1, i2 - i + 1);
+      }
+   } else {
+      for (i = i1; i <= i2; i++) {
+         tp1 = 1;
+         tp2 = i + 1 - i1;
+         v = x->xR[i + 1 - i1];
+         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
+         v = y->xR[i + 1 - i1];
+         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
+         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
+         ae_v_add(&a->xyR[i][i1], 1, &t->xR[tp1], 1, i - i1 + 1);
+      }
+   }
+}
+} // end of namespace alglib_impl
+
 // === ABLASMKL Package ===
 namespace alglib_impl {
 // MKL-based kernel
@@ -4590,212 +4331,962 @@ bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha
 }
 } // end of namespace alglib_impl
 
-// === CREFLECTIONS Package ===
+// === SCODES Package ===
 namespace alglib_impl {
-// Generation of an elementary complex reflection transformation
+ae_int_t getrdfserializationcode() {
+   ae_int_t result;
+   result = 1;
+   return result;
+}
+
+ae_int_t getkdtreeserializationcode() {
+   ae_int_t result;
+   result = 2;
+   return result;
+}
+
+ae_int_t getmlpserializationcode() {
+   ae_int_t result;
+   result = 3;
+   return result;
+}
+
+ae_int_t getmlpeserializationcode() {
+   ae_int_t result;
+   result = 4;
+   return result;
+}
+
+ae_int_t getrbfserializationcode() {
+   ae_int_t result;
+   result = 5;
+   return result;
+}
+
+ae_int_t getspline2dserializationcode() {
+   ae_int_t result;
+   result = 6;
+   return result;
+}
+
+ae_int_t getidwserializationcode() {
+   ae_int_t result;
+   result = 7;
+   return result;
+}
+
+ae_int_t getknnserializationcode() {
+   ae_int_t result;
+   result = 108;
+   return result;
+}
+} // end of namespace alglib_impl
+
+// === TSORT Package ===
+// Depends on: APSERV
+namespace alglib_impl {
+// Internal versions respectively of tagsortfasti(), tagsortfastr() and tagsortfast():
+// sort the n-vector ap and apply the same permutations to abp (and to bp and bbp, if present).
+// ALGLIB: Copyright 06.09.2010 by Sergey Bochkanov
+static void tsort_tagsortfastirec(double *ap, ae_int_t *bp, double *abp, ae_int_t *bbp, ae_int_t n) {
+   while (n > 16) {
+   // Quicksort: choose the pivot.
+      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
+      if (al > am) swapr(&al, &am);
+      if (am > ah) swapr(&am, &ah);
+      if (al > am) swapr(&al, &am);
+   // Pass through ap/bp:
+   // * everything < am goes to the left of ap/bp,
+   // * everything == am goes to the right of abp/bbp (in the reverse order),
+   // * everything > am goes to the left of abp/bbp (in the normal order,
+   // * everything from the right of abp/bbp to the middle goes to the right of ap/bp back in normal order,
+   // * everything from the left of abp/bbp to the middle goes to the right of ap/bp.
+      ae_int_t lts = 0, eqs = 0, gts = 0;
+      for (ae_int_t i = 0; i < n; i++) {
+         double ai = ap[i];
+         ae_int_t bi = bp[i];
+         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
+         if (ai >= am)
+            abp[k] = ai, bbp[k] = bi;
+         else if (i != k)
+            ap[k] = ai, bp[k] = bi;
+      }
+      ae_int_t les = lts + eqs;
+      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
+         ap[j] = abp[k], bp[j] = bbp[k];
+      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
+         ap[j] = abp[k], bp[j] = bbp[k];
+   // Sort the left part of the vector, and skip over the middle part.
+      tsort_tagsortfastirec(ap, bp, abp, bbp, lts);
+      ap += les, bp += les, abp += les, bbp += les, n -= les;
+   }
+// The non-recursive sort for small arrays.
+   for (ae_int_t j = 1; j < n; j++) {
+   // Find a place, if any, in [0,j) to insert ap[j] at.
+   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
+      double aj = ap[j];
+      ae_int_t k = j;
+      while (--k >= 0 && ap[k] > aj);
+      if (++k >= j) continue;
+   // Move element j down to position k.
+      ae_int_t bj = bp[j];
+      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1], bp[i] = bp[i - 1];
+      ap[k] = aj, bp[k] = bj;
+   }
+}
+
+static void tsort_tagsortfastrrec(double *ap, double *bp, double *abp, double *bbp, ae_int_t n) {
+   while (n > 16) {
+   // Quicksort: choose the pivot.
+      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
+      if (al > am) swapr(&al, &am);
+      if (am > ah) swapr(&am, &ah);
+      if (al > am) swapr(&al, &am);
+   // Pass through ap/bp:
+   // * everything < am goes to the left of ap/bp,
+   // * everything == am goes to the right of abp/bbp (in the reverse order),
+   // * everything > am goes to the left of abp/bbp (in the normal order,
+   // * everything from the right of abp/bbp to the middle goes to the right of ap/bp back in normal order,
+   // * everything from the left of abp/bbp to the middle goes to the right of ap/bp.
+      ae_int_t lts = 0, eqs = 0, gts = 0;
+      for (ae_int_t i = 0; i < n; i++) {
+         double ai = ap[i];
+         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
+         if (ai >= am)
+            abp[k] = ai, bbp[k] = bp[i];
+         else if (i != k)
+            ap[k] = ai, bp[k] = bp[i];
+      }
+      ae_int_t les = lts + eqs;
+      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
+         ap[j] = abp[k], bp[j] = bbp[k];
+      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
+         ap[j] = abp[k], bp[j] = bbp[k];
+   // Sort the left part of the vector, and skip over the middle part.
+      tsort_tagsortfastrrec(ap, bp, abp, bbp, lts);
+      ap += les, bp += les, abp += les, bbp += les, n -= les;
+   }
+// The non-recursive sort for small arrays.
+   for (ae_int_t j = 1; j < n; j++) {
+   // Find a place, if any, in [0,j) to insert ap[j] at.
+   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
+      double aj = ap[j];
+      ae_int_t k = j;
+      while (--k >= 0 && ap[k] > aj);
+      if (++k >= j) continue;
+   // Move element j down to position k.
+      double bj = bp[j];
+      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1], bp[i] = bp[i - 1];
+      ap[k] = aj, bp[k] = bj;
+   }
+}
+
+static void tsort_tagsortfastrec(double *ap, double *abp, ae_int_t n) {
+   while (n > 16) {
+   // Quicksort: choose the pivot.
+      double al = ap[0], am = ap[(n - 1) / 2], ah = ap[n - 1];
+      if (al > am) swapr(&al, &am);
+      if (am > ah) swapr(&am, &ah);
+      if (al > am) swapr(&al, &am);
+   // Pass through ap:
+   // * everything < am goes to the left of ap,
+   // * everything == am goes to the right of abp (in the reverse order),
+   // * everything > am goes to the left of abp (in the normal order,
+   // * everything from the right of abp to the middle goes to the right of ap back in normal order,
+   // * everything from the left of abp to the middle goes to the right of ap.
+      ae_int_t lts = 0, eqs = 0, gts = 0;
+      for (ae_int_t i = 0; i < n; i++) {
+         double ai = ap[i];
+         ae_int_t k = ai < am ? lts++ : ai > am ? gts++ : n - ++eqs;
+         if (ai >= am)
+            abp[k] = ai;
+         else if (i != k)
+            ap[k] = ai;
+      }
+      ae_int_t les = lts + eqs;
+      for (ae_int_t k = n - eqs, j = les - 1; k < n; k++, j--)
+         ap[j] = abp[k];
+      for (ae_int_t k = 0, j = les; k < gts; k++, j++)
+         ap[j] = abp[k];
+   // Sort the left part of the vector, and skip over the middle part.
+      tsort_tagsortfastrec(ap, abp, lts);
+      ap += les, abp += les, n -= les;
+   }
+// The non-recursive sort for small arrays.
+   for (ae_int_t j = 1; j < n; j++) {
+   // Find a place, if any, in [0,j) to insert ap[j] at.
+   // Skip of ap[j] can be left intact; i.e. if all elements have the same value of ap[j] or larger than any of them.
+      double aj = ap[j];
+      ae_int_t k = j;
+      while (--k >= 0 && ap[k] > aj);
+      if (++k >= j) continue;
+   // Move element j down to position k.
+      for (ae_int_t i = j; i > k; i--) ap[i] = ap[i - 1];
+      ap[k] = aj;
+   }
+}
+
+// Versions of tagsort() optimized for real keys and {integer, real, no} labels respectively.
+// The vector a is sorted, and same permutations are applied to the vector b, if present.
+// NOTES:
+// 1.	these functions assume that the vector a is finite
+//	and don't check for it or for other conditions (size of input arrays, etc.).
+// 2.	these functions use buffer(s), bufa and bufb, that will be reallocated to size n, if necessary.
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n) {
+// Special case
+   if (n <= 1) return;
+// Test for already sorted set
+   bool isascending = true, isdescending = true;
+   for (ae_int_t i = 1; i < n; i++) {
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
+   }
+   if (isascending) return;
+   else if (isdescending) {
+      for (ae_int_t i = 0; i < n; i++) {
+         ae_int_t j = n - 1 - i;
+         if (j <= i) break;
+         swapr(&a->xR[i], &a->xR[j]);
+         swapi(&b->xZ[i], &b->xZ[j]);
+      }
+   } else {
+   // General case
+      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
+      if (bufb->cnt < n) ae_vector_set_length(bufb, n);
+      tsort_tagsortfastirec(a->xR, b->xZ, bufa->xR, bufb->xZ, n);
+   }
+}
+
+void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n) {
+// Special case
+   if (n <= 1) return;
+// Test for already sorted set
+   bool isascending = true, isdescending = true;
+   for (ae_int_t i = 1; i < n; i++) {
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
+   }
+   if (isascending) return;
+   else if (isdescending) {
+      for (ae_int_t i = 0; i < n; i++) {
+         ae_int_t j = n - 1 - i;
+         if (j <= i) break;
+         swapr(&a->xR[i], &a->xR[j]);
+         swapr(&b->xR[i], &b->xR[j]);
+      }
+   } else {
+   // General case
+      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
+      if (bufb->cnt < n) ae_vector_set_length(bufb, n);
+      tsort_tagsortfastrrec(a->xR, b->xR, bufa->xR, bufb->xR, n);
+   }
+}
+
+void tagsortfast(RVector *a, RVector *bufa, ae_int_t n) {
+// Special case
+   if (n <= 1) return;
+// Test for already sorted set
+   bool isascending = true, isdescending = true;
+   for (ae_int_t i = 1; i < n; i++) {
+      isascending = isascending && a->xR[i] >= a->xR[i - 1];
+      isdescending = isdescending && a->xR[i] <= a->xR[i - 1];
+   }
+   if (isascending) return;
+   else if (isdescending) {
+      for (ae_int_t i = 0; i < n; i++) {
+         ae_int_t j = n - 1 - i;
+         if (j <= i) break;
+         swapr(&a->xR[i], &a->xR[j]);
+      }
+   } else {
+   // General case
+      if (bufa->cnt < n) ae_vector_set_length(bufa, n);
+      tsort_tagsortfastrec(a->xR, bufa->xR, n);
+   }
+}
+
+// Versions of tagsort*(), optimized for integer keys optionally with real labels, suitable for sorting the middle of the vector.
+// Sort the vector a, starting at offset, and apply the same permutations to the vector b, if it is specified.
+// NOTE:
+//	These functions assume that the vector a is finite
+//	and do not check for it or for other conditions (size of input arrays, etc.).
+// ALGLIB: Copyright 11.12.2008 by Sergey Bochkanov
+void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset/* = 0*/) {
+// Special case.
+   if (n <= 1) return;
+// General case, n > 1: sort, update bp.
+   ae_int_t *ap = a->xZ + offset;
+   double *bp = b->xR + offset;
+   for (ae_int_t nh = 1; nh < n; nh++)
+      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2) {
+         swapi(ap + nl, ap + nm);
+         swapr(bp + nl, bp + nm);
+      }
+   for (ae_int_t nh = n - 1; nh > 0; nh--) {
+      swapi(ap, ap + nh);
+      swapr(bp, bp + nh);
+      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
+         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
+         if (ap[nl] >= ap[nm]) break;
+         swapi(ap + nl, ap + nm);
+         swapr(bp + nl, bp + nm);
+      }
+   }
+}
+
+void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset/* = 0*/) {
+// Special case.
+   if (n <= 1) return;
+// General case, n > 1: sort.
+   ae_int_t *ap = a->xZ + offset;
+   for (ae_int_t nh = 1; nh < n; nh++)
+      for (ae_int_t nm = nh, nl = (nh - 1) / 2; nm > 0 && ap[nl] < ap[nm]; nm = nl, nl = (nl - 1) / 2)
+         swapi(ap + nl, ap + nm);
+   for (ae_int_t nh = n - 1; nh > 0; nh--) {
+      swapi(ap, ap + nh);
+      for (ae_int_t nl = 0, nm = 1; nm < nh; nl = nm, nm = 2 * nm + 1) {
+         if (nm + 1 < nh && ap[nm + 1] > ap[nm]) nm++;
+         if (ap[nl] >= ap[nm]) break;
+         swapi(ap + nl, ap + nm);
+      }
+   }
+}
+
+// Buffered variant of TagSort, which accepts pre-allocated output arrays as
+// well as special structure for buffered allocations. If arrays are too
+// short, they are reallocated. If they are large enough, no memory
+// allocation is done.
 //
-// The subroutine generates elementary complex reflection H of  order  N,  so
-// that, for a given X, the following equality holds true:
-//
-//      ( X(1) )   ( Beta )
-// H' * (  ..  ) = (  0   ),   H'*H = I,   Beta is a real number
-//      ( X(n) )   (  0   )
-//
-// where
-//
-//               ( V(1) )
-// H = 1 - Tau * (  ..  ) * ( conj(V(1)), ..., conj(V(n)) )
-//               ( V(n) )
-//
-// where the first component of vector V equals 1.
-//
-// Inputs:
-//     X   -   vector. Array with elements [1..N].
-//     N   -   reflection order.
-//
-// Outputs:
-//     X   -   components from 2 to N are replaced by vector V.
-//             The first component is replaced with parameter Beta.
-//     Tau -   scalar value Tau.
-//
-// This subroutine is the modification of CLARFG subroutines  from the LAPACK
-// library. It has similar functionality except for the fact that it  doesn't
-// handle errors when intermediate results cause an overflow.
-//
-//   -- LAPACK auxiliary routine (version 3.0) --
-//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-//      Courant Institute, Argonne National Lab, and Rice University
-//      September 30, 1994
-void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau) {
-   ae_int_t j;
-   ae_complex alpha;
-   double alphi;
-   double alphr;
-   double beta;
-   double xnorm;
-   double mx;
-   ae_complex t;
-   double s;
-   ae_complex v;
-   tau->x = 0;
-   tau->y = 0;
+// It is intended to be used in the performance-critical parts of code, where
+// additional allocations can lead to severe performance degradation
+// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
+void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf) {
+   ae_int_t i;
+   ae_int_t lv;
+   ae_int_t lp;
+   ae_int_t rv;
+   ae_int_t rp;
+// Special cases.
    if (n <= 0) {
-      *tau = ae_complex_from_i(0);
       return;
    }
-// Scale if needed (to avoid overflow/underflow during intermediate
-// calculations).
-   mx = 0.0;
-   for (j = 1; j <= n; j++) {
-      mx = rmax2(ae_c_abs(x->xC[j]), mx);
+   if (n == 1) {
+      vectorsetlengthatleast(p1, 1);
+      vectorsetlengthatleast(p2, 1);
+      p1->xZ[0] = 0;
+      p2->xZ[0] = 0;
+      return;
    }
-   s = 1.0;
-   if (mx != 0.0) {
-      if (mx < 1.0) {
-         s = sqrt(ae_minrealnumber);
-         v = ae_complex_from_d(1 / s);
-         ae_v_cmulc(&x->xC[1], 1, n, v);
+// General case, N > 1: prepare permutations table P1
+   vectorsetlengthatleast(p1, n);
+   for (i = 0; i < n; i++) {
+      p1->xZ[i] = i;
+   }
+// General case, N > 1: sort, update P1
+   vectorsetlengthatleast(&buf->ra0, n);
+   vectorsetlengthatleast(&buf->ia0, n);
+   tagsortfasti(a, p1, &buf->ra0, &buf->ia0, n);
+// General case, N > 1: fill permutations table P2
+//
+// To fill P2 we maintain two arrays:
+// * PV (Buf.IA0), Position(Value). PV[i] contains position of I-th key at the moment
+// * VP (Buf.IA1), Value(Position). VP[i] contains key which has position I at the moment
+//
+// At each step we making permutation of two items:
+//   Left, which is given by position/value pair LP/LV
+//   and Right, which is given by RP/RV
+// and updating PV[] and VP[] correspondingly.
+   vectorsetlengthatleast(&buf->ia0, n);
+   vectorsetlengthatleast(&buf->ia1, n);
+   vectorsetlengthatleast(p2, n);
+   for (i = 0; i < n; i++) {
+      buf->ia0.xZ[i] = i;
+      buf->ia1.xZ[i] = i;
+   }
+   for (i = 0; i < n; i++) {
+   // calculate LP, LV, RP, RV
+      lp = i;
+      lv = buf->ia1.xZ[lp];
+      rv = p1->xZ[i];
+      rp = buf->ia0.xZ[rv];
+   // Fill P2
+      p2->xZ[i] = rp;
+   // update PV and VP
+      buf->ia1.xZ[lp] = rv;
+      buf->ia1.xZ[rp] = lv;
+      buf->ia0.xZ[lv] = rp;
+      buf->ia0.xZ[rv] = lp;
+   }
+}
+
+// This function sorts array of real keys by ascending.
+//
+// Its results are:
+// * sorted array A
+// * permutation tables P1, P2
+//
+// Algorithm outputs permutation tables using two formats:
+// * as usual permutation of [0..N-1]. If P1[i]=j, then sorted A[i]  contains
+//   value which was moved there from J-th position.
+// * as a sequence of pairwise permutations. Sorted A[] may  be  obtained  by
+//   swaping A[i] and A[P2[i]] for all i from 0 to N-1.
+//
+// Inputs:
+//     A       -   unsorted array
+//     N       -   array size
+//
+// Outputs:
+//     A       -   sorted array
+//     P1, P2  -   permutation tables, array[N]
+//
+// NOTES:
+//     this function assumes that A[] is finite; it doesn't checks that
+//     condition. All other conditions (size of input arrays, etc.) are not
+//     checked too.
+// ALGLIB: Copyright 14.05.2008 by Sergey Bochkanov
+void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2) {
+   ae_frame _frame_block;
+   ae_frame_make(&_frame_block);
+   SetVector(p1);
+   SetVector(p2);
+   NewObj(apbuffers, buf);
+   tagsortbuf(a, n, p1, p2, &buf);
+   ae_frame_leave();
+}
+
+// Heap operations: adds element to the heap
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap (without new element).
+//                 updated on output
+//     VA      -   value of the element being added
+//     VB      -   value of the tag
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb) {
+   ae_int_t j;
+   ae_int_t k;
+   double v;
+   if (*n < 0) {
+      return;
+   }
+// N=0 is a special case
+   if (*n == 0) {
+      a->xR[0] = va;
+      b->xZ[0] = vb;
+      ++*n;
+      return;
+   }
+// add current point to the heap
+// (add to the bottom, then move up)
+//
+// we don't write point to the heap
+// until its final position is determined
+// (it allow us to reduce number of array access operations)
+   j = *n;
+   ++*n;
+   while (j > 0) {
+      k = (j - 1) / 2;
+      v = a->xR[k];
+      if (v < va) {
+      // swap with higher element
+         a->xR[j] = v;
+         b->xZ[j] = b->xZ[k];
+         j = k;
       } else {
-         s = sqrt(ae_maxrealnumber);
-         v = ae_complex_from_d(1 / s);
-         ae_v_cmulc(&x->xC[1], 1, n, v);
+      // element in its place. terminate.
+         break;
       }
    }
-// calculate
-   alpha = x->xC[1];
-   mx = 0.0;
-   for (j = 2; j <= n; j++) {
-      mx = rmax2(ae_c_abs(x->xC[j]), mx);
+   a->xR[j] = va;
+   b->xZ[j] = vb;
+}
+
+// Heap operations: replaces top element with new element
+// (which is moved down)
+//
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap
+//     VA      -   value of the element which replaces top element
+//     VB      -   value of the tag
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb) {
+   ae_int_t j;
+   ae_int_t k1;
+   ae_int_t k2;
+   double v;
+   double v1;
+   double v2;
+   if (n < 1) {
+      return;
    }
-   xnorm = 0.0;
-   if (mx != 0.0) {
-      for (j = 2; j <= n; j++) {
-         t = ae_c_div_d(x->xC[j], mx);
-         xnorm += ae_c_mul(t, ae_c_conj(t)).x;
+// N=1 is a special case
+   if (n == 1) {
+      a->xR[0] = va;
+      b->xZ[0] = vb;
+      return;
+   }
+// move down through heap:
+// * J  -   current element
+// * K1 -   first child (always exists)
+// * K2 -   second child (may not exists)
+//
+// we don't write point to the heap
+// until its final position is determined
+// (it allow us to reduce number of array access operations)
+   j = 0;
+   k1 = 1;
+   k2 = 2;
+   while (k1 < n) {
+      if (k2 >= n) {
+      // only one child.
+      //
+      // swap and terminate (because this child
+      // have no siblings due to heap structure)
+         v = a->xR[k1];
+         if (v > va) {
+            a->xR[j] = v;
+            b->xZ[j] = b->xZ[k1];
+            j = k1;
+         }
+         break;
+      } else {
+      // two childs
+         v1 = a->xR[k1];
+         v2 = a->xR[k2];
+         if (v1 > v2) {
+            if (va < v1) {
+               a->xR[j] = v1;
+               b->xZ[j] = b->xZ[k1];
+               j = k1;
+            } else {
+               break;
+            }
+         } else {
+            if (va < v2) {
+               a->xR[j] = v2;
+               b->xZ[j] = b->xZ[k2];
+               j = k2;
+            } else {
+               break;
+            }
+         }
+         k1 = 2 * j + 1;
+         k2 = 2 * j + 2;
       }
-      xnorm = sqrt(xnorm) * mx;
    }
-   alphr = alpha.x;
-   alphi = alpha.y;
-   if (xnorm == 0.0 && alphi == 0.0) {
-      *tau = ae_complex_from_i(0);
-      x->xC[1] = ae_c_mul_d(x->xC[1], s);
-      return;
-   }
-   mx = rmax2(fabs(alphr), fabs(alphi));
-   mx = rmax2(mx, fabs(xnorm));
-   beta = -mx * sqrt(ae_sqr(alphr / mx) + ae_sqr(alphi / mx) + ae_sqr(xnorm / mx));
-   if (alphr < 0.0) {
-      beta = -beta;
-   }
-   tau->x = (beta - alphr) / beta;
-   tau->y = -alphi / beta;
-   alpha = ae_c_d_div(1, ae_c_sub_d(alpha, beta));
-   if (n > 1) {
-      ae_v_cmulc(&x->xC[2], 1, n - 1, alpha);
-   }
-   alpha = ae_complex_from_d(beta);
-   x->xC[1] = alpha;
-// Scale back
-   x->xC[1] = ae_c_mul_d(x->xC[1], s);
+   a->xR[j] = va;
+   b->xZ[j] = vb;
 }
 
-// Application of an elementary reflection to a rectangular matrix of size MxN
+// Heap operations: pops top element from the heap
 //
-// The  algorithm  pre-multiplies  the  matrix  by  an  elementary reflection
-// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
-// description of the GenerateReflection). Not the whole matrix  but  only  a
-// part of it is transformed (rows from M1 to M2, columns from N1 to N2). Only
-// the elements of this submatrix are changed.
+// PARAMETERS:
+//     A       -   heap itself, must be at least array[0..N-1]
+//     B       -   array of integer tags, which are updated according to
+//                 permutations in the heap
+//     N       -   size of the heap, N >= 1
 //
-// Note: the matrix is multiplied by H, not by H'.   If  it  is  required  to
-// multiply the matrix by H', it is necessary to pass Conj(Tau) instead of Tau.
-//
-// Inputs:
-//     C       -   matrix to be transformed.
-//     Tau     -   scalar defining transformation.
-//     V       -   column defining transformation.
-//                 Array whose index ranges within [1..M2-M1+1]
-//     M1, M2  -   range of rows to be transformed.
-//     N1, N2  -   range of columns to be transformed.
-//     WORK    -   working array whose index goes from N1 to N2.
-//
-// Outputs:
-//     C       -   the result of multiplying the input matrix C by the
-//                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
-//
-//   -- LAPACK auxiliary routine (version 3.0) --
-//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-//      Courant Institute, Argonne National Lab, and Rice University
-//      September 30, 1994
-void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
-   ae_complex t;
-   ae_int_t i;
-   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
+// On output top element is moved to A[N-1], B[N-1], heap is reordered, N is
+// decreased by 1.
+// ALGLIB: Copyright 28.02.2010 by Sergey Bochkanov
+void tagheappopi(RVector *a, ZVector *b, ae_int_t *n) {
+   double va;
+   ae_int_t vb;
+   if (*n < 1) {
       return;
    }
-// w := C^T * conj(v)
-   for (i = n1; i <= n2; i++) {
-      work->xC[i] = ae_complex_from_i(0);
+// N=1 is a special case
+   if (*n == 1) {
+      *n = 0;
+      return;
    }
-   for (i = m1; i <= m2; i++) {
-      t = ae_c_conj(v->xC[i + 1 - m1]);
-      ae_v_caddc(&work->xC[n1], 1, &c->xyC[i][n1], 1, "N", n2 - n1 + 1, t);
+// swap top element and last element,
+// then reorder heap
+   va = a->xR[*n - 1];
+   vb = b->xZ[*n - 1];
+   a->xR[*n - 1] = a->xR[0];
+   b->xZ[*n - 1] = b->xZ[0];
+   --*n;
+   tagheapreplacetopi(a, b, *n, va, vb);
+}
+
+// Search first element less than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+// Result:
+//     The very first element's index, which isn't less than T.
+// In the case when there aren't such elements, returns N.
+ae_int_t lowerbound(RVector *a, ae_int_t n, double t) {
+   ae_int_t l;
+   ae_int_t half;
+   ae_int_t first;
+   ae_int_t middle;
+   ae_int_t result;
+   l = n;
+   first = 0;
+   while (l > 0) {
+      half = l / 2;
+      middle = first + half;
+      if (a->xR[middle] < t) {
+         first = middle + 1;
+         l -= half + 1;
+      } else {
+         l = half;
+      }
    }
-// C := C - tau * v * w^T
-   for (i = m1; i <= m2; i++) {
-      t = ae_c_mul(v->xC[i - m1 + 1], tau);
-      ae_v_csubc(&c->xyC[i][n1], 1, &work->xC[n1], 1, "N", n2 - n1 + 1, t);
+   result = first;
+   return result;
+}
+
+// Search first element more than T in sorted array.
+//
+// PARAMETERS:
+//     A - sorted array by ascending from 0 to N-1
+//     N - number of elements in array
+//     T - the desired element
+//
+// Result:
+//     The very first element's index, which more than T.
+// In the case when there aren't such elements, returns N.
+ae_int_t upperbound(RVector *a, ae_int_t n, double t) {
+   ae_int_t l;
+   ae_int_t half;
+   ae_int_t first;
+   ae_int_t middle;
+   ae_int_t result;
+   l = n;
+   first = 0;
+   while (l > 0) {
+      half = l / 2;
+      middle = first + half;
+      if (t < a->xR[middle]) {
+         l = half;
+      } else {
+         first = middle + 1;
+         l -= half + 1;
+      }
+   }
+   result = first;
+   return result;
+}
+} // end of namespace alglib_impl
+
+// === BLAS Package ===
+namespace alglib_impl {
+double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2) {
+   ae_int_t n;
+   ae_int_t ix;
+   double absxi;
+   double scl;
+   double ssq;
+   double result;
+   n = i2 - i1 + 1;
+   if (n < 1) {
+      result = 0.0;
+      return result;
+   }
+   if (n == 1) {
+      result = fabs(x->xR[i1]);
+      return result;
+   }
+   scl = 0.0;
+   ssq = 1.0;
+   for (ix = i1; ix <= i2; ix++) {
+      if (x->xR[ix] != 0.0) {
+         absxi = fabs(x->xR[ix]);
+         if (scl < absxi) {
+            ssq = 1 + ssq * ae_sqr(scl / absxi);
+            scl = absxi;
+         } else {
+            ssq += ae_sqr(absxi / scl);
+         }
+      }
+   }
+   result = scl * sqrt(ssq);
+   return result;
+}
+
+ae_int_t vectoridxabsmax(RVector *x, ae_int_t i1, ae_int_t i2) {
+   ae_int_t i;
+   ae_int_t result;
+   result = i1;
+   for (i = i1 + 1; i <= i2; i++) {
+      if (fabs(x->xR[i]) > fabs(x->xR[result])) {
+         result = i;
+      }
+   }
+   return result;
+}
+
+ae_int_t columnidxabsmax(RMatrix *x, ae_int_t i1, ae_int_t i2, ae_int_t j) {
+   ae_int_t i;
+   ae_int_t result;
+   result = i1;
+   for (i = i1 + 1; i <= i2; i++) {
+      if (fabs(x->xyR[i][j]) > fabs(x->xyR[result][j])) {
+         result = i;
+      }
+   }
+   return result;
+}
+
+ae_int_t rowidxabsmax(RMatrix *x, ae_int_t j1, ae_int_t j2, ae_int_t i) {
+   ae_int_t j;
+   ae_int_t result;
+   result = j1;
+   for (j = j1 + 1; j <= j2; j++) {
+      if (fabs(x->xyR[i][j]) > fabs(x->xyR[i][result])) {
+         result = j;
+      }
+   }
+   return result;
+}
+
+double upperhessenberg1norm(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
+   ae_int_t i;
+   ae_int_t j;
+   double result;
+   ae_assert(i2 - i1 == j2 - j1, "upperhessenberg1norm: i2 - i1 != j2 - j1!");
+   for (j = j1; j <= j2; j++) {
+      work->xR[j] = 0.0;
+   }
+   for (i = i1; i <= i2; i++) {
+      for (j = imax2(j1, j1 + i - i1 - 1); j <= j2; j++) {
+         work->xR[j] += fabs(a->xyR[i][j]);
+      }
+   }
+   result = 0.0;
+   for (j = j1; j <= j2; j++) {
+      result = rmax2(result, work->xR[j]);
+   }
+   return result;
+}
+
+void copymatrix(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
+   ae_int_t isrc;
+   ae_int_t idst;
+   if (is1 > is2 || js1 > js2) {
+      return;
+   }
+   ae_assert(is2 - is1 == id2 - id1, "copymatrix: different sizes!");
+   ae_assert(js2 - js1 == jd2 - jd1, "copymatrix: different sizes!");
+   for (isrc = is1; isrc <= is2; isrc++) {
+      idst = isrc - is1 + id1;
+      ae_v_move(&b->xyR[idst][jd1], 1, &a->xyR[isrc][js1], 1, jd2 - jd1 + 1);
    }
 }
 
-// Application of an elementary reflection to a rectangular matrix of size MxN
-//
-// The  algorithm  post-multiplies  the  matrix  by  an elementary reflection
-// transformation  which  is  given  by  column  V  and  scalar  Tau (see the
-// description  of  the  GenerateReflection). Not the whole matrix but only a
-// part  of  it  is  transformed (rows from M1 to M2, columns from N1 to N2).
-// Only the elements of this submatrix are changed.
-//
-// Inputs:
-//     C       -   matrix to be transformed.
-//     Tau     -   scalar defining transformation.
-//     V       -   column defining transformation.
-//                 Array whose index ranges within [1..N2-N1+1]
-//     M1, M2  -   range of rows to be transformed.
-//     N1, N2  -   range of columns to be transformed.
-//     WORK    -   working array whose index goes from M1 to M2.
-//
-// Outputs:
-//     C       -   the result of multiplying the input matrix C by the
-//                 transformation matrix which is given by Tau and V.
-//                 If N1>N2 or M1>M2, C is not modified.
-//
-//   -- LAPACK auxiliary routine (version 3.0) --
-//      Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd.,
-//      Courant Institute, Argonne National Lab, and Rice University
-//      September 30, 1994
-void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work) {
-   ae_complex t;
+void inplacetranspose(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
    ae_int_t i;
-   ae_int_t vm;
-   if (ae_c_eq_d(tau, 0.0) || n1 > n2 || m1 > m2) {
+   ae_int_t j;
+   ae_int_t ips;
+   ae_int_t jps;
+   ae_int_t l;
+   if (i1 > i2 || j1 > j2) {
       return;
    }
-// w := C * v
-   vm = n2 - n1 + 1;
-   for (i = m1; i <= m2; i++) {
-      t = ae_v_cdotproduct(&c->xyC[i][n1], 1, "N", &v->xC[1], 1, "N", n2 - n1 + 1);
-      work->xC[i] = t;
+   ae_assert(i1 - i2 == j1 - j2, "inplacetranspose: error: incorrect array size!");
+   for (i = i1; i < i2; i++) {
+      j = j1 + i - i1;
+      ips = i + 1;
+      jps = j1 + ips - i1;
+      l = i2 - i;
+      ae_v_move(&work->xR[1], 1, &a->xyR[ips][j], a->stride, l);
+      ae_v_move(&a->xyR[ips][j], a->stride, &a->xyR[i][jps], 1, i2 - ips + 1);
+      ae_v_move(&a->xyR[i][jps], 1, &work->xR[1], 1, j2 - jps + 1);
    }
-// C := C - w * conj(v^T)
-   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
-   for (i = m1; i <= m2; i++) {
-      t = ae_c_mul(work->xC[i], tau);
-      ae_v_csubc(&c->xyC[i][n1], 1, &v->xC[1], 1, "N", n2 - n1 + 1, t);
+}
+
+void copyandtranspose(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
+   ae_int_t isrc;
+   ae_int_t jdst;
+   if (is1 > is2 || js1 > js2) {
+      return;
    }
-   ae_v_cmove(&v->xC[1], 1, &v->xC[1], 1, "Conj", vm);
+   ae_assert(is2 - is1 == jd2 - jd1, "copyandtranspose: different sizes!");
+   ae_assert(js2 - js1 == id2 - id1, "copyandtranspose: different sizes!");
+   for (isrc = is1; isrc <= is2; isrc++) {
+      jdst = isrc - is1 + jd1;
+      ae_v_move(&b->xyR[id1][jdst], b->stride, &a->xyR[isrc][js1], 1, id2 - id1 + 1);
+   }
+}
+
+void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector *x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector *y, ae_int_t iy1, ae_int_t iy2, double beta) {
+   ae_int_t i;
+   double v;
+   if (!trans) {
+   // y := alpha*A*x + beta*y;
+      if (i1 > i2 || j1 > j2) {
+         return;
+      }
+      ae_assert(j2 - j1 == ix2 - ix1, "matrixvectormultiply: a and x dont match!");
+      ae_assert(i2 - i1 == iy2 - iy1, "matrixvectormultiply: a and y dont match!");
+   // beta*y
+      if (beta == 0.0) {
+         for (i = iy1; i <= iy2; i++) {
+            y->xR[i] = 0.0;
+         }
+      } else {
+         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
+      }
+   // alpha*A*x
+      for (i = i1; i <= i2; i++) {
+         v = ae_v_dotproduct(&a->xyR[i][j1], 1, &x->xR[ix1], 1, j2 - j1 + 1);
+         y->xR[iy1 + i - i1] += alpha * v;
+      }
+   } else {
+   // y := alpha*A'*x + beta*y;
+      if (i1 > i2 || j1 > j2) {
+         return;
+      }
+      ae_assert(i2 - i1 == ix2 - ix1, "matrixvectormultiply: a and x dont match!");
+      ae_assert(j2 - j1 == iy2 - iy1, "matrixvectormultiply: a and y dont match!");
+   // beta*y
+      if (beta == 0.0) {
+         for (i = iy1; i <= iy2; i++) {
+            y->xR[i] = 0.0;
+         }
+      } else {
+         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
+      }
+   // alpha*A'*x
+      for (i = i1; i <= i2; i++) {
+         v = alpha * x->xR[ix1 + i - i1];
+         ae_v_addd(&y->xR[iy1], 1, &a->xyR[i][j1], 1, iy2 - iy1 + 1, v);
+      }
+   }
+}
+
+void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work) {
+   ae_int_t arows;
+   ae_int_t acols;
+   ae_int_t brows;
+   ae_int_t bcols;
+   ae_int_t crows;
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   ae_int_t l;
+   ae_int_t r;
+   double v;
+// Setup
+   if (!transa) {
+      arows = ai2 - ai1 + 1;
+      acols = aj2 - aj1 + 1;
+   } else {
+      arows = aj2 - aj1 + 1;
+      acols = ai2 - ai1 + 1;
+   }
+   if (!transb) {
+      brows = bi2 - bi1 + 1;
+      bcols = bj2 - bj1 + 1;
+   } else {
+      brows = bj2 - bj1 + 1;
+      bcols = bi2 - bi1 + 1;
+   }
+   ae_assert(acols == brows, "matrixmatrixmultiply: incorrect matrix sizes!");
+   if (arows <= 0 || acols <= 0 || brows <= 0 || bcols <= 0) {
+      return;
+   }
+   crows = arows;
+// Test WORK
+   i = imax2(arows, acols);
+   i = imax2(brows, i);
+   i = imax2(i, bcols);
+   work->xR[1] = 0.0;
+   work->xR[i] = 0.0;
+// Prepare C
+   if (beta == 0.0) {
+      for (i = ci1; i <= ci2; i++) {
+         for (j = cj1; j <= cj2; j++) {
+            c->xyR[i][j] = 0.0;
+         }
+      }
+   } else {
+      for (i = ci1; i <= ci2; i++) {
+         ae_v_muld(&c->xyR[i][cj1], 1, cj2 - cj1 + 1, beta);
+      }
+   }
+// A*B
+   if (!transa && !transb) {
+      for (l = ai1; l <= ai2; l++) {
+         for (r = bi1; r <= bi2; r++) {
+            v = alpha * a->xyR[l][aj1 + r - bi1];
+            k = ci1 + l - ai1;
+            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
+         }
+      }
+      return;
+   }
+// A*B'
+   if (!transa && transb) {
+      if (arows * acols < brows * bcols) {
+         for (r = bi1; r <= bi2; r++) {
+            for (l = ai1; l <= ai2; l++) {
+               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
+            }
+         }
+         return;
+      } else {
+         for (l = ai1; l <= ai2; l++) {
+            for (r = bi1; r <= bi2; r++) {
+               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
+               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
+            }
+         }
+         return;
+      }
+   }
+// A'*B
+   if (transa && !transb) {
+      for (l = aj1; l <= aj2; l++) {
+         for (r = bi1; r <= bi2; r++) {
+            v = alpha * a->xyR[ai1 + r - bi1][l];
+            k = ci1 + l - aj1;
+            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
+         }
+      }
+      return;
+   }
+// A'*B'
+   if (transa && transb) {
+      if (arows * acols < brows * bcols) {
+         for (r = bi1; r <= bi2; r++) {
+            k = cj1 + r - bi1;
+            for (i = 1; i <= crows; i++) {
+               work->xR[i] = 0.0;
+            }
+            for (l = ai1; l <= ai2; l++) {
+               v = alpha * b->xyR[r][bj1 + l - ai1];
+               ae_v_addd(&work->xR[1], 1, &a->xyR[l][aj1], 1, crows, v);
+            }
+            ae_v_add(&c->xyR[ci1][k], c->stride, &work->xR[1], 1, ci2 - ci1 + 1);
+         }
+         return;
+      } else {
+         for (l = aj1; l <= aj2; l++) {
+            k = ai2 - ai1 + 1;
+            ae_v_move(&work->xR[1], 1, &a->xyR[ai1][l], a->stride, k);
+            for (r = bi1; r <= bi2; r++) {
+               v = ae_v_dotproduct(&work->xR[1], 1, &b->xyR[r][bj1], 1, k);
+               c->xyR[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
+            }
+         }
+         return;
+      }
+   }
 }
 } // end of namespace alglib_impl
 
@@ -5015,6 +5506,121 @@ void generaterotation(double f, double g, double *cs, double *sn, double *r) {
             *r = -*r;
          }
       }
+   }
+}
+} // end of namespace alglib_impl
+
+// === BASICSTATOPS Package ===
+// Depends on: TSORT
+namespace alglib_impl {
+// Internal tied ranking subroutine.
+//
+// Inputs:
+//     X       -   array to rank
+//     N       -   array size
+//     IsCentered- whether ranks are centered or not:
+//                 * True      -   ranks are centered in such way that  their
+//                                 sum is zero
+//                 * False     -   ranks are not centered
+//     Buf     -   temporary buffers
+//
+// NOTE: when IsCentered is True and all X[] are equal, this  function  fills
+//       X by zeros (exact zeros are used, not sum which is only approximately
+//       equal to zero).
+void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf) {
+   ae_int_t i;
+   ae_int_t j;
+   ae_int_t k;
+   double tmp;
+   double voffs;
+// Prepare
+   if (n < 1) {
+      return;
+   }
+   if (n == 1) {
+      x->xR[0] = 0.0;
+      return;
+   }
+   if (buf->ra1.cnt < n) {
+      ae_vector_set_length(&buf->ra1, n);
+   }
+   if (buf->ia1.cnt < n) {
+      ae_vector_set_length(&buf->ia1, n);
+   }
+   for (i = 0; i < n; i++) {
+      buf->ra1.xR[i] = x->xR[i];
+      buf->ia1.xZ[i] = i;
+   }
+   tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
+// Special test for all values being equal
+   if (buf->ra1.xR[0] == buf->ra1.xR[n - 1]) {
+      if (iscentered) {
+         tmp = 0.0;
+      } else {
+         tmp = (double)(n - 1) / 2.0;
+      }
+      for (i = 0; i < n; i++) {
+         x->xR[i] = tmp;
+      }
+      return;
+   }
+// compute tied ranks
+   i = 0;
+   while (i < n) {
+      j = i + 1;
+      while (j < n) {
+         if (buf->ra1.xR[j] != buf->ra1.xR[i]) {
+            break;
+         }
+         j++;
+      }
+      for (k = i; k < j; k++) {
+         buf->ra1.xR[k] = (double)(i + j - 1) / 2.0;
+      }
+      i = j;
+   }
+// back to x
+   if (iscentered) {
+      voffs = (double)(n - 1) / 2.0;
+   } else {
+      voffs = 0.0;
+   }
+   for (i = 0; i < n; i++) {
+      x->xR[buf->ia1.xZ[i]] = buf->ra1.xR[i] - voffs;
+   }
+}
+
+// Internal untied ranking subroutine.
+//
+// Inputs:
+//     X       -   array to rank
+//     N       -   array size
+//     Buf     -   temporary buffers
+//
+// Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
+void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
+   ae_int_t i;
+// Prepare
+   if (n < 1) {
+      return;
+   }
+   if (n == 1) {
+      x->xR[0] = 0.0;
+      return;
+   }
+   if (buf->ra1.cnt < n) {
+      ae_vector_set_length(&buf->ra1, n);
+   }
+   if (buf->ia1.cnt < n) {
+      ae_vector_set_length(&buf->ia1, n);
+   }
+   for (i = 0; i < n; i++) {
+      buf->ra1.xR[i] = x->xR[i];
+      buf->ia1.xZ[i] = i;
+   }
+   tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
+   for (i = 0; i < n; i++) {
+      x->xR[buf->ia1.xZ[i]] = (double)i;
    }
 }
 } // end of namespace alglib_impl
@@ -5999,493 +6605,244 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
 }
 } // end of namespace alglib_impl
 
-// === HBLAS Package ===
+// === XBLAS Package ===
 namespace alglib_impl {
-void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y) {
-   ae_int_t i;
-   ae_int_t ba1;
-   ae_int_t by1;
-   ae_int_t by2;
-   ae_int_t bx1;
-   ae_int_t bx2;
-   ae_int_t n;
-   ae_complex v;
-   n = i2 - i1 + 1;
-   if (n <= 0) {
-      return;
-   }
-// Let A = L + D + U, where
-//  L is strictly lower triangular (main diagonal is zero)
-//  D is diagonal
-//  U is strictly upper triangular (main diagonal is zero)
-//
-// A*x = L*x + D*x + U*x
-//
-// Calculate D*x first
-   for (i = i1; i <= i2; i++) {
-      y->xC[i - i1 + 1] = ae_c_mul(a->xyC[i][i], x->xC[i - i1 + 1]);
-   }
-// Add L*x + U*x
-   if (isupper) {
-      for (i = i1; i < i2; i++) {
-      // Add L*x to the result
-         v = x->xC[i - i1 + 1];
-         by1 = i - i1 + 2;
-         by2 = n;
-         ba1 = i + 1;
-         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
-      // Add U*x to the result
-         bx1 = i - i1 + 2;
-         bx2 = n;
-         ba1 = i + 1;
-         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
-         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
-      }
-   } else {
-      for (i = i1 + 1; i <= i2; i++) {
-      // Add L*x to the result
-         bx1 = 1;
-         bx2 = i - i1;
-         ba1 = i1;
-         v = ae_v_cdotproduct(&x->xC[bx1], 1, "N", &a->xyC[i][ba1], 1, "N", bx2 - bx1 + 1);
-         y->xC[i - i1 + 1] = ae_c_add(y->xC[i - i1 + 1], v);
-      // Add U*x to the result
-         v = x->xC[i - i1 + 1];
-         by1 = 1;
-         by2 = i - i1;
-         ba1 = i1;
-         ae_v_caddc(&y->xC[by1], 1, &a->xyC[i][ba1], 1, "Conj", by2 - by1 + 1, v);
-      }
-   }
-   ae_v_cmulc(&y->xC[1], 1, n, alpha);
-}
-
-void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha) {
-   ae_int_t i;
-   ae_int_t tp1;
-   ae_int_t tp2;
-   ae_complex v;
-   if (isupper) {
-      for (i = i1; i <= i2; i++) {
-         tp1 = i + 1 - i1;
-         tp2 = i2 - i1 + 1;
-         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
-         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
-         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         ae_v_cadd(&a->xyC[i][i], 1, &t->xC[tp1], 1, "N", i2 - i + 1);
-      }
-   } else {
-      for (i = i1; i <= i2; i++) {
-         tp1 = 1;
-         tp2 = i + 1 - i1;
-         v = ae_c_mul(alpha, x->xC[i + 1 - i1]);
-         ae_v_cmovec(&t->xC[tp1], 1, &y->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         v = ae_c_mul(ae_c_conj(alpha), y->xC[i + 1 - i1]);
-         ae_v_caddc(&t->xC[tp1], 1, &x->xC[tp1], 1, "Conj", tp2 - tp1 + 1, v);
-         ae_v_cadd(&a->xyC[i][i1], 1, &t->xC[tp1], 1, "N", i - i1 + 1);
-      }
-   }
-}
-} // end of namespace alglib_impl
-
-// === SBLAS Package ===
-// Depends on: APSERV
-namespace alglib_impl {
-void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y) {
-   ae_int_t i;
-   ae_int_t ba1;
-   ae_int_t by1;
-   ae_int_t by2;
-   ae_int_t bx1;
-   ae_int_t bx2;
-   ae_int_t n;
-   double v;
-   n = i2 - i1 + 1;
-   if (n <= 0) {
-      return;
-   }
-// Let A = L + D + U, where
-//  L is strictly lower triangular (main diagonal is zero)
-//  D is diagonal
-//  U is strictly upper triangular (main diagonal is zero)
-//
-// A*x = L*x + D*x + U*x
-//
-// Calculate D*x first
-   for (i = i1; i <= i2; i++) {
-      y->xR[i - i1 + 1] = a->xyR[i][i] * x->xR[i - i1 + 1];
-   }
-// Add L*x + U*x
-   if (isupper) {
-      for (i = i1; i < i2; i++) {
-      // Add L*x to the result
-         v = x->xR[i - i1 + 1];
-         by1 = i - i1 + 2;
-         by2 = n;
-         ba1 = i + 1;
-         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
-      // Add U*x to the result
-         bx1 = i - i1 + 2;
-         bx2 = n;
-         ba1 = i + 1;
-         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
-         y->xR[i - i1 + 1] += v;
-      }
-   } else {
-      for (i = i1 + 1; i <= i2; i++) {
-      // Add L*x to the result
-         bx1 = 1;
-         bx2 = i - i1;
-         ba1 = i1;
-         v = ae_v_dotproduct(&x->xR[bx1], 1, &a->xyR[i][ba1], 1, bx2 - bx1 + 1);
-         y->xR[i - i1 + 1] += v;
-      // Add U*x to the result
-         v = x->xR[i - i1 + 1];
-         by1 = 1;
-         by2 = i - i1;
-         ba1 = i1;
-         ae_v_addd(&y->xR[by1], 1, &a->xyR[i][ba1], 1, by2 - by1 + 1, v);
-      }
-   }
-   ae_v_muld(&y->xR[1], 1, n, alpha);
-}
-
-void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha) {
-   ae_int_t i;
-   ae_int_t tp1;
-   ae_int_t tp2;
-   double v;
-   if (isupper) {
-      for (i = i1; i <= i2; i++) {
-         tp1 = i + 1 - i1;
-         tp2 = i2 - i1 + 1;
-         v = x->xR[i + 1 - i1];
-         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
-         v = y->xR[i + 1 - i1];
-         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
-         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
-         ae_v_add(&a->xyR[i][i], 1, &t->xR[tp1], 1, i2 - i + 1);
-      }
-   } else {
-      for (i = i1; i <= i2; i++) {
-         tp1 = 1;
-         tp2 = i + 1 - i1;
-         v = x->xR[i + 1 - i1];
-         ae_v_moved(&t->xR[tp1], 1, &y->xR[tp1], 1, tp2 - tp1 + 1, v);
-         v = y->xR[i + 1 - i1];
-         ae_v_addd(&t->xR[tp1], 1, &x->xR[tp1], 1, tp2 - tp1 + 1, v);
-         ae_v_muld(&t->xR[tp1], 1, tp2 - tp1 + 1, alpha);
-         ae_v_add(&a->xyR[i][i1], 1, &t->xR[tp1], 1, i - i1 + 1);
-      }
-   }
-}
-} // end of namespace alglib_impl
-
-// === BLAS Package ===
-namespace alglib_impl {
-double vectornorm2(RVector *x, ae_int_t i1, ae_int_t i2) {
-   ae_int_t n;
-   ae_int_t ix;
-   double absxi;
-   double scl;
-   double ssq;
+// Fast pow
+// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
+static double xblas_xfastpow(double r, ae_int_t n) {
    double result;
-   n = i2 - i1 + 1;
-   if (n < 1) {
-      result = 0.0;
-      return result;
-   }
-   if (n == 1) {
-      result = fabs(x->xR[i1]);
-      return result;
-   }
-   scl = 0.0;
-   ssq = 1.0;
-   for (ix = i1; ix <= i2; ix++) {
-      if (x->xR[ix] != 0.0) {
-         absxi = fabs(x->xR[ix]);
-         if (scl < absxi) {
-            ssq = 1 + ssq * ae_sqr(scl / absxi);
-            scl = absxi;
-         } else {
-            ssq += ae_sqr(absxi / scl);
-         }
-      }
-   }
-   result = scl * sqrt(ssq);
-   return result;
-}
-
-ae_int_t vectoridxabsmax(RVector *x, ae_int_t i1, ae_int_t i2) {
-   ae_int_t i;
-   ae_int_t result;
-   result = i1;
-   for (i = i1 + 1; i <= i2; i++) {
-      if (fabs(x->xR[i]) > fabs(x->xR[result])) {
-         result = i;
-      }
-   }
-   return result;
-}
-
-ae_int_t columnidxabsmax(RMatrix *x, ae_int_t i1, ae_int_t i2, ae_int_t j) {
-   ae_int_t i;
-   ae_int_t result;
-   result = i1;
-   for (i = i1 + 1; i <= i2; i++) {
-      if (fabs(x->xyR[i][j]) > fabs(x->xyR[result][j])) {
-         result = i;
-      }
-   }
-   return result;
-}
-
-ae_int_t rowidxabsmax(RMatrix *x, ae_int_t j1, ae_int_t j2, ae_int_t i) {
-   ae_int_t j;
-   ae_int_t result;
-   result = j1;
-   for (j = j1 + 1; j <= j2; j++) {
-      if (fabs(x->xyR[i][j]) > fabs(x->xyR[i][result])) {
-         result = j;
-      }
-   }
-   return result;
-}
-
-double upperhessenberg1norm(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
-   ae_int_t i;
-   ae_int_t j;
-   double result;
-   ae_assert(i2 - i1 == j2 - j1, "upperhessenberg1norm: i2 - i1 != j2 - j1!");
-   for (j = j1; j <= j2; j++) {
-      work->xR[j] = 0.0;
-   }
-   for (i = i1; i <= i2; i++) {
-      for (j = imax2(j1, j1 + i - i1 - 1); j <= j2; j++) {
-         work->xR[j] += fabs(a->xyR[i][j]);
-      }
-   }
    result = 0.0;
-   for (j = j1; j <= j2; j++) {
-      result = rmax2(result, work->xR[j]);
+   if (n > 0) {
+      if (n % 2 == 0) {
+         result = ae_sqr(xblas_xfastpow(r, n / 2));
+      } else {
+         result = r * xblas_xfastpow(r, n - 1);
+      }
+      return result;
+   }
+   if (n == 0) {
+      result = 1.0;
+   }
+   if (n < 0) {
+      result = xblas_xfastpow(1 / r, -n);
    }
    return result;
 }
 
-void copymatrix(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
-   ae_int_t isrc;
-   ae_int_t idst;
-   if (is1 > is2 || js1 > js2) {
-      return;
-   }
-   ae_assert(is2 - is1 == id2 - id1, "copymatrix: different sizes!");
-   ae_assert(js2 - js1 == jd2 - jd1, "copymatrix: different sizes!");
-   for (isrc = is1; isrc <= is2; isrc++) {
-      idst = isrc - is1 + id1;
-      ae_v_move(&b->xyR[idst][jd1], 1, &a->xyR[isrc][js1], 1, jd2 - jd1 + 1);
-   }
-}
-
-void inplacetranspose(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, RVector *work) {
+// Internal subroutine for extra-precise calculation of SUM(w[i]).
+//
+// Inputs:
+//     W   -   array[0..N-1], values to be added
+//             W is modified during calculations.
+//     MX  -   max(W[i])
+//     N   -   array size
+//
+// Outputs:
+//     R   -   SUM(w[i])
+//     RErr-   error estimate for R
+// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
+static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr) {
    ae_int_t i;
-   ae_int_t j;
-   ae_int_t ips;
-   ae_int_t jps;
-   ae_int_t l;
-   if (i1 > i2 || j1 > j2) {
-      return;
-   }
-   ae_assert(i1 - i2 == j1 - j2, "inplacetranspose: error: incorrect array size!");
-   for (i = i1; i < i2; i++) {
-      j = j1 + i - i1;
-      ips = i + 1;
-      jps = j1 + ips - i1;
-      l = i2 - i;
-      ae_v_move(&work->xR[1], 1, &a->xyR[ips][j], a->stride, l);
-      ae_v_move(&a->xyR[ips][j], a->stride, &a->xyR[i][jps], 1, i2 - ips + 1);
-      ae_v_move(&a->xyR[i][jps], 1, &work->xR[1], 1, j2 - jps + 1);
-   }
-}
-
-void copyandtranspose(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2) {
-   ae_int_t isrc;
-   ae_int_t jdst;
-   if (is1 > is2 || js1 > js2) {
-      return;
-   }
-   ae_assert(is2 - is1 == jd2 - jd1, "copyandtranspose: different sizes!");
-   ae_assert(js2 - js1 == id2 - id1, "copyandtranspose: different sizes!");
-   for (isrc = is1; isrc <= is2; isrc++) {
-      jdst = isrc - is1 + jd1;
-      ae_v_move(&b->xyR[id1][jdst], b->stride, &a->xyR[isrc][js1], 1, id2 - id1 + 1);
-   }
-}
-
-void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector *x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector *y, ae_int_t iy1, ae_int_t iy2, double beta) {
-   ae_int_t i;
-   double v;
-   if (!trans) {
-   // y := alpha*A*x + beta*y;
-      if (i1 > i2 || j1 > j2) {
-         return;
-      }
-      ae_assert(j2 - j1 == ix2 - ix1, "matrixvectormultiply: a and x dont match!");
-      ae_assert(i2 - i1 == iy2 - iy1, "matrixvectormultiply: a and y dont match!");
-   // beta*y
-      if (beta == 0.0) {
-         for (i = iy1; i <= iy2; i++) {
-            y->xR[i] = 0.0;
-         }
-      } else {
-         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
-      }
-   // alpha*A*x
-      for (i = i1; i <= i2; i++) {
-         v = ae_v_dotproduct(&a->xyR[i][j1], 1, &x->xR[ix1], 1, j2 - j1 + 1);
-         y->xR[iy1 + i - i1] += alpha * v;
-      }
-   } else {
-   // y := alpha*A'*x + beta*y;
-      if (i1 > i2 || j1 > j2) {
-         return;
-      }
-      ae_assert(i2 - i1 == ix2 - ix1, "matrixvectormultiply: a and x dont match!");
-      ae_assert(j2 - j1 == iy2 - iy1, "matrixvectormultiply: a and y dont match!");
-   // beta*y
-      if (beta == 0.0) {
-         for (i = iy1; i <= iy2; i++) {
-            y->xR[i] = 0.0;
-         }
-      } else {
-         ae_v_muld(&y->xR[iy1], 1, iy2 - iy1 + 1, beta);
-      }
-   // alpha*A'*x
-      for (i = i1; i <= i2; i++) {
-         v = alpha * x->xR[ix1 + i - i1];
-         ae_v_addd(&y->xR[iy1], 1, &a->xyR[i][j1], 1, iy2 - iy1 + 1, v);
-      }
-   }
-}
-
-void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work) {
-   ae_int_t arows;
-   ae_int_t acols;
-   ae_int_t brows;
-   ae_int_t bcols;
-   ae_int_t crows;
-   ae_int_t i;
-   ae_int_t j;
    ae_int_t k;
-   ae_int_t l;
-   ae_int_t r;
+   ae_int_t ks;
    double v;
-// Setup
-   if (!transa) {
-      arows = ai2 - ai1 + 1;
-      acols = aj2 - aj1 + 1;
-   } else {
-      arows = aj2 - aj1 + 1;
-      acols = ai2 - ai1 + 1;
-   }
-   if (!transb) {
-      brows = bi2 - bi1 + 1;
-      bcols = bj2 - bj1 + 1;
-   } else {
-      brows = bj2 - bj1 + 1;
-      bcols = bi2 - bi1 + 1;
-   }
-   ae_assert(acols == brows, "matrixmatrixmultiply: incorrect matrix sizes!");
-   if (arows <= 0 || acols <= 0 || brows <= 0 || bcols <= 0) {
+   double s;
+   double ln2;
+   double chunk;
+   double invchunk;
+   bool allzeros;
+   *r = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
+// * N is too large to use integer arithmetics
+   if (n == 0) {
+      *r = 0.0;
+      *rerr = 0.0;
       return;
    }
-   crows = arows;
-// Test WORK
-   i = imax2(arows, acols);
-   i = imax2(brows, i);
-   i = imax2(i, bcols);
-   work->xR[1] = 0.0;
-   work->xR[i] = 0.0;
-// Prepare C
-   if (beta == 0.0) {
-      for (i = ci1; i <= ci2; i++) {
-         for (j = cj1; j <= cj2; j++) {
-            c->xyR[i][j] = 0.0;
-         }
-      }
-   } else {
-      for (i = ci1; i <= ci2; i++) {
-         ae_v_muld(&c->xyR[i][cj1], 1, cj2 - cj1 + 1, beta);
-      }
+   if (mx == 0.0) {
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
    }
-// A*B
-   if (!transa && !transb) {
-      for (l = ai1; l <= ai2; l++) {
-         for (r = bi1; r <= bi2; r++) {
-            v = alpha * a->xyR[l][aj1 + r - bi1];
-            k = ci1 + l - ai1;
-            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
-         }
+   ae_assert(n < 0x20000000, "xblas_xsum: n is too large!");
+// Prepare
+   ln2 = log(2.0);
+   *rerr = mx * ae_machineepsilon;
+// 1. find S such that 0.5 <= S*MX<1
+// 2. multiply W by S, so task is normalized in some sense
+// 3. S:=1/S so we can obtain original vector multiplying by S
+   k = RoundZ(log(mx) / ln2);
+   s = xblas_xfastpow(2.0, -k);
+   if (!isfinite(s)) {
+   // Overflow or underflow during evaluation of S; fallback low-precision code
+      *r = 0.0;
+      *rerr = mx * ae_machineepsilon;
+      for (i = 0; i < n; i++) {
+         *r += w->xR[i];
       }
       return;
    }
-// A*B'
-   if (!transa && transb) {
-      if (arows * acols < brows * bcols) {
-         for (r = bi1; r <= bi2; r++) {
-            for (l = ai1; l <= ai2; l++) {
-               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
-               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
-            }
+   while (s * mx >= 1.0) {
+      s *= 0.5;
+   }
+   while (s * mx < 0.5) {
+      s *= 2;
+   }
+   ae_v_muld(w->xR, 1, n, s);
+   s = 1 / s;
+// find Chunk=2^M such that N*Chunk<2^29
+//
+// we have chosen upper limit (2^29) with enough space left
+// to tolerate possible problems with rounding and N's close
+// to the limit, so we don't want to be very strict here.
+   k = TruncZ(log(536870912.0 / (double)n) / ln2);
+   chunk = xblas_xfastpow(2.0, k);
+   if (chunk < 2.0) {
+      chunk = 2.0;
+   }
+   invchunk = 1 / chunk;
+// calculate result
+   *r = 0.0;
+   ae_v_muld(w->xR, 1, n, chunk);
+   while (true) {
+      s *= invchunk;
+      allzeros = true;
+      ks = 0;
+      for (i = 0; i < n; i++) {
+         v = w->xR[i];
+         k = TruncZ(v);
+         if (v != (double)k) {
+            allzeros = false;
          }
-         return;
-      } else {
-         for (l = ai1; l <= ai2; l++) {
-            for (r = bi1; r <= bi2; r++) {
-               v = ae_v_dotproduct(&a->xyR[l][aj1], 1, &b->xyR[r][bj1], 1, aj2 - aj1 + 1);
-               c->xyR[ci1 + l - ai1][cj1 + r - bi1] += alpha * v;
-            }
-         }
-         return;
+         w->xR[i] = chunk * (v - k);
+         ks += k;
+      }
+      *r += s * ks;
+      v = fabs(*r);
+      if (allzeros || s * n + mx == mx) {
+         break;
       }
    }
-// A'*B
-   if (transa && !transb) {
-      for (l = aj1; l <= aj2; l++) {
-         for (r = bi1; r <= bi2; r++) {
-            v = alpha * a->xyR[ai1 + r - bi1][l];
-            k = ci1 + l - aj1;
-            ae_v_addd(&c->xyR[k][cj1], 1, &b->xyR[r][bj1], 1, cj2 - cj1 + 1, v);
-         }
-      }
+// correct error
+   *rerr = rmax2(*rerr, fabs(*r) * ae_machineepsilon);
+}
+
+// More precise dot-product. Absolute error of  subroutine  result  is  about
+// 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
+//
+// Inputs:
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..N-1], pre-allocated temporary storage
+//
+// Outputs:
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
+// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
+void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr) {
+   ae_int_t i;
+   double mx;
+   double v;
+   *r = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
+   if (n == 0) {
+      *r = 0.0;
+      *rerr = 0.0;
       return;
    }
-// A'*B'
-   if (transa && transb) {
-      if (arows * acols < brows * bcols) {
-         for (r = bi1; r <= bi2; r++) {
-            k = cj1 + r - bi1;
-            for (i = 1; i <= crows; i++) {
-               work->xR[i] = 0.0;
-            }
-            for (l = ai1; l <= ai2; l++) {
-               v = alpha * b->xyR[r][bj1 + l - ai1];
-               ae_v_addd(&work->xR[1], 1, &a->xyR[l][aj1], 1, crows, v);
-            }
-            ae_v_add(&c->xyR[ci1][k], c->stride, &work->xR[1], 1, ci2 - ci1 + 1);
-         }
-         return;
-      } else {
-         for (l = aj1; l <= aj2; l++) {
-            k = ai2 - ai1 + 1;
-            ae_v_move(&work->xR[1], 1, &a->xyR[ai1][l], a->stride, k);
-            for (r = bi1; r <= bi2; r++) {
-               v = ae_v_dotproduct(&work->xR[1], 1, &b->xyR[r][bj1], 1, k);
-               c->xyR[ci1 + l - aj1][cj1 + r - bi1] += alpha * v;
-            }
-         }
-         return;
-      }
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->xR[i] * b->xR[i];
+      temp->xR[i] = v;
+      mx = rmax2(mx, fabs(v));
+   }
+   if (mx == 0.0) {
+      *r = 0.0;
+      *rerr = 0.0;
+      return;
+   }
+   xblas_xsum(temp, mx, n, r, rerr);
+}
+
+// More precise complex dot-product. Absolute error of  subroutine  result is
+// about 1 ulp of max(MX,V), where:
+//     MX = max( |a[i]*b[i]| )
+//     V  = |(a,b)|
+//
+// Inputs:
+//     A       -   array[0..N-1], vector 1
+//     B       -   array[0..N-1], vector 2
+//     N       -   vectors length, N<2^29.
+//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
+//
+// Outputs:
+//     R       -   (A,B)
+//     RErr    -   estimate of error. This estimate accounts for both  errors
+//                 during  calculation  of  (A,B)  and  errors  introduced by
+//                 rounding of A and B to fit in double (about 1 ulp).
+// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
+void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr) {
+   ae_int_t i;
+   double mx;
+   double v;
+   double rerrx;
+   double rerry;
+   r->x = 0;
+   r->y = 0;
+   *rerr = 0;
+// special cases:
+// * N=0
+   if (n == 0) {
+      *r = ae_complex_from_i(0);
+      *rerr = 0.0;
+      return;
+   }
+// calculate real part
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->xC[i].x * b->xC[i].x;
+      temp->xR[2 * i] = v;
+      mx = rmax2(mx, fabs(v));
+      v = -a->xC[i].y * b->xC[i].y;
+      temp->xR[2 * i + 1] = v;
+      mx = rmax2(mx, fabs(v));
+   }
+   if (mx == 0.0) {
+      r->x = 0.0;
+      rerrx = 0.0;
+   } else {
+      xblas_xsum(temp, mx, 2 * n, &r->x, &rerrx);
+   }
+// calculate imaginary part
+   mx = 0.0;
+   for (i = 0; i < n; i++) {
+      v = a->xC[i].x * b->xC[i].y;
+      temp->xR[2 * i] = v;
+      mx = rmax2(mx, fabs(v));
+      v = a->xC[i].y * b->xC[i].x;
+      temp->xR[2 * i + 1] = v;
+      mx = rmax2(mx, fabs(v));
+   }
+   if (mx == 0.0) {
+      r->y = 0.0;
+      rerry = 0.0;
+   } else {
+      xblas_xsum(temp, mx, 2 * n, &r->y, &rerry);
+   }
+// total error
+   if (rerrx == 0.0 && rerry == 0.0) {
+      *rerr = 0.0;
+   } else {
+      *rerr = rmax2(rerrx, rerry) * sqrt(1 + ae_sqr(rmin2(rerrx, rerry) / rmax2(rerrx, rerry)));
    }
 }
 } // end of namespace alglib_impl
@@ -7093,536 +7450,80 @@ void armijostate_free(void *_p, bool make_automatic) {
 }
 } // end of namespace alglib_impl
 
-// === XBLAS Package ===
+// === NEARUNITYUNIT Package ===
 namespace alglib_impl {
-// Fast pow
-// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static double xblas_xfastpow(double r, ae_int_t n) {
+double nulog1p(double x) {
+   double z;
+   double lp;
+   double lq;
    double result;
-   result = 0.0;
-   if (n > 0) {
-      if (n % 2 == 0) {
-         result = ae_sqr(xblas_xfastpow(r, n / 2));
-      } else {
-         result = r * xblas_xfastpow(r, n - 1);
-      }
+   z = 1.0 + x;
+   if (z < 0.70710678118654752440 || z > 1.41421356237309504880) {
+      result = log(z);
       return result;
    }
-   if (n == 0) {
-      result = 1.0;
-   }
-   if (n < 0) {
-      result = xblas_xfastpow(1 / r, -n);
-   }
+   z = x * x;
+   lp = 4.5270000862445199635215E-5;
+   lp = lp * x + 4.9854102823193375972212E-1;
+   lp = lp * x + 6.5787325942061044846969E0;
+   lp = lp * x + 2.9911919328553073277375E1;
+   lp = lp * x + 6.0949667980987787057556E1;
+   lp = lp * x + 5.7112963590585538103336E1;
+   lp = lp * x + 2.0039553499201281259648E1;
+   lq = 1.0000000000000000000000E0;
+   lq = lq * x + 1.5062909083469192043167E1;
+   lq = lq * x + 8.3047565967967209469434E1;
+   lq = lq * x + 2.2176239823732856465394E2;
+   lq = lq * x + 3.0909872225312059774938E2;
+   lq = lq * x + 2.1642788614495947685003E2;
+   lq = lq * x + 6.0118660497603843919306E1;
+   z = -0.5 * z + x * (z * lp / lq);
+   result = x + z;
    return result;
 }
 
-// Internal subroutine for extra-precise calculation of SUM(w[i]).
-//
-// Inputs:
-//     W   -   array[0..N-1], values to be added
-//             W is modified during calculations.
-//     MX  -   max(W[i])
-//     N   -   array size
-//
-// Outputs:
-//     R   -   SUM(w[i])
-//     RErr-   error estimate for R
-// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-static void xblas_xsum(RVector *w, double mx, ae_int_t n, double *r, double *rerr) {
-   ae_int_t i;
-   ae_int_t k;
-   ae_int_t ks;
-   double v;
-   double s;
-   double ln2;
-   double chunk;
-   double invchunk;
-   bool allzeros;
-   *r = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
-// * N is too large to use integer arithmetics
-   if (n == 0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
+double nuexpm1(double x) {
+   double r;
+   double xx;
+   double ep;
+   double eq;
+   double result;
+   if (x < -0.5 || x > 0.5) {
+      result = exp(x) - 1.0;
+      return result;
    }
-   if (mx == 0.0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   ae_assert(n < 0x20000000, "xblas_xsum: n is too large!");
-// Prepare
-   ln2 = log(2.0);
-   *rerr = mx * ae_machineepsilon;
-// 1. find S such that 0.5 <= S*MX<1
-// 2. multiply W by S, so task is normalized in some sense
-// 3. S:=1/S so we can obtain original vector multiplying by S
-   k = RoundZ(log(mx) / ln2);
-   s = xblas_xfastpow(2.0, -k);
-   if (!isfinite(s)) {
-   // Overflow or underflow during evaluation of S; fallback low-precision code
-      *r = 0.0;
-      *rerr = mx * ae_machineepsilon;
-      for (i = 0; i < n; i++) {
-         *r += w->xR[i];
-      }
-      return;
-   }
-   while (s * mx >= 1.0) {
-      s *= 0.5;
-   }
-   while (s * mx < 0.5) {
-      s *= 2;
-   }
-   ae_v_muld(w->xR, 1, n, s);
-   s = 1 / s;
-// find Chunk=2^M such that N*Chunk<2^29
-//
-// we have chosen upper limit (2^29) with enough space left
-// to tolerate possible problems with rounding and N's close
-// to the limit, so we don't want to be very strict here.
-   k = TruncZ(log(536870912.0 / (double)n) / ln2);
-   chunk = xblas_xfastpow(2.0, k);
-   if (chunk < 2.0) {
-      chunk = 2.0;
-   }
-   invchunk = 1 / chunk;
-// calculate result
-   *r = 0.0;
-   ae_v_muld(w->xR, 1, n, chunk);
-   while (true) {
-      s *= invchunk;
-      allzeros = true;
-      ks = 0;
-      for (i = 0; i < n; i++) {
-         v = w->xR[i];
-         k = TruncZ(v);
-         if (v != (double)k) {
-            allzeros = false;
-         }
-         w->xR[i] = chunk * (v - k);
-         ks += k;
-      }
-      *r += s * ks;
-      v = fabs(*r);
-      if (allzeros || s * n + mx == mx) {
-         break;
-      }
-   }
-// correct error
-   *rerr = rmax2(*rerr, fabs(*r) * ae_machineepsilon);
-}
-
-// More precise dot-product. Absolute error of  subroutine  result  is  about
-// 1 ulp of max(MX,V), where:
-//     MX = max( |a[i]*b[i]| )
-//     V  = |(a,b)|
-//
-// Inputs:
-//     A       -   array[0..N-1], vector 1
-//     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..N-1], pre-allocated temporary storage
-//
-// Outputs:
-//     R       -   (A,B)
-//     RErr    -   estimate of error. This estimate accounts for both  errors
-//                 during  calculation  of  (A,B)  and  errors  introduced by
-//                 rounding of A and B to fit in double (about 1 ulp).
-// ALGLIB: Copyright 24.08.2009 by Sergey Bochkanov
-void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr) {
-   ae_int_t i;
-   double mx;
-   double v;
-   *r = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
-   if (n == 0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->xR[i] * b->xR[i];
-      temp->xR[i] = v;
-      mx = rmax2(mx, fabs(v));
-   }
-   if (mx == 0.0) {
-      *r = 0.0;
-      *rerr = 0.0;
-      return;
-   }
-   xblas_xsum(temp, mx, n, r, rerr);
-}
-
-// More precise complex dot-product. Absolute error of  subroutine  result is
-// about 1 ulp of max(MX,V), where:
-//     MX = max( |a[i]*b[i]| )
-//     V  = |(a,b)|
-//
-// Inputs:
-//     A       -   array[0..N-1], vector 1
-//     B       -   array[0..N-1], vector 2
-//     N       -   vectors length, N<2^29.
-//     Temp    -   array[0..2*N-1], pre-allocated temporary storage
-//
-// Outputs:
-//     R       -   (A,B)
-//     RErr    -   estimate of error. This estimate accounts for both  errors
-//                 during  calculation  of  (A,B)  and  errors  introduced by
-//                 rounding of A and B to fit in double (about 1 ulp).
-// ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
-void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr) {
-   ae_int_t i;
-   double mx;
-   double v;
-   double rerrx;
-   double rerry;
-   r->x = 0;
-   r->y = 0;
-   *rerr = 0;
-// special cases:
-// * N=0
-   if (n == 0) {
-      *r = ae_complex_from_i(0);
-      *rerr = 0.0;
-      return;
-   }
-// calculate real part
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->xC[i].x * b->xC[i].x;
-      temp->xR[2 * i] = v;
-      mx = rmax2(mx, fabs(v));
-      v = -a->xC[i].y * b->xC[i].y;
-      temp->xR[2 * i + 1] = v;
-      mx = rmax2(mx, fabs(v));
-   }
-   if (mx == 0.0) {
-      r->x = 0.0;
-      rerrx = 0.0;
-   } else {
-      xblas_xsum(temp, mx, 2 * n, &r->x, &rerrx);
-   }
-// calculate imaginary part
-   mx = 0.0;
-   for (i = 0; i < n; i++) {
-      v = a->xC[i].x * b->xC[i].y;
-      temp->xR[2 * i] = v;
-      mx = rmax2(mx, fabs(v));
-      v = a->xC[i].y * b->xC[i].x;
-      temp->xR[2 * i + 1] = v;
-      mx = rmax2(mx, fabs(v));
-   }
-   if (mx == 0.0) {
-      r->y = 0.0;
-      rerry = 0.0;
-   } else {
-      xblas_xsum(temp, mx, 2 * n, &r->y, &rerry);
-   }
-// total error
-   if (rerrx == 0.0 && rerry == 0.0) {
-      *rerr = 0.0;
-   } else {
-      *rerr = rmax2(rerrx, rerry) * sqrt(1 + ae_sqr(rmin2(rerrx, rerry) / rmax2(rerrx, rerry)));
-   }
-}
-} // end of namespace alglib_impl
-
-// === BASICSTATOPS Package ===
-// Depends on: TSORT
-namespace alglib_impl {
-// Internal tied ranking subroutine.
-//
-// Inputs:
-//     X       -   array to rank
-//     N       -   array size
-//     IsCentered- whether ranks are centered or not:
-//                 * True      -   ranks are centered in such way that  their
-//                                 sum is zero
-//                 * False     -   ranks are not centered
-//     Buf     -   temporary buffers
-//
-// NOTE: when IsCentered is True and all X[] are equal, this  function  fills
-//       X by zeros (exact zeros are used, not sum which is only approximately
-//       equal to zero).
-void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf) {
-   ae_int_t i;
-   ae_int_t j;
-   ae_int_t k;
-   double tmp;
-   double voffs;
-// Prepare
-   if (n < 1) {
-      return;
-   }
-   if (n == 1) {
-      x->xR[0] = 0.0;
-      return;
-   }
-   if (buf->ra1.cnt < n) {
-      ae_vector_set_length(&buf->ra1, n);
-   }
-   if (buf->ia1.cnt < n) {
-      ae_vector_set_length(&buf->ia1, n);
-   }
-   for (i = 0; i < n; i++) {
-      buf->ra1.xR[i] = x->xR[i];
-      buf->ia1.xZ[i] = i;
-   }
-   tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
-// Special test for all values being equal
-   if (buf->ra1.xR[0] == buf->ra1.xR[n - 1]) {
-      if (iscentered) {
-         tmp = 0.0;
-      } else {
-         tmp = (double)(n - 1) / 2.0;
-      }
-      for (i = 0; i < n; i++) {
-         x->xR[i] = tmp;
-      }
-      return;
-   }
-// compute tied ranks
-   i = 0;
-   while (i < n) {
-      j = i + 1;
-      while (j < n) {
-         if (buf->ra1.xR[j] != buf->ra1.xR[i]) {
-            break;
-         }
-         j++;
-      }
-      for (k = i; k < j; k++) {
-         buf->ra1.xR[k] = (double)(i + j - 1) / 2.0;
-      }
-      i = j;
-   }
-// back to x
-   if (iscentered) {
-      voffs = (double)(n - 1) / 2.0;
-   } else {
-      voffs = 0.0;
-   }
-   for (i = 0; i < n; i++) {
-      x->xR[buf->ia1.xZ[i]] = buf->ra1.xR[i] - voffs;
-   }
-}
-
-// Internal untied ranking subroutine.
-//
-// Inputs:
-//     X       -   array to rank
-//     N       -   array size
-//     Buf     -   temporary buffers
-//
-// Returns untied ranks (in case of a tie ranks are resolved arbitrarily).
-void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf) {
-   ae_int_t i;
-// Prepare
-   if (n < 1) {
-      return;
-   }
-   if (n == 1) {
-      x->xR[0] = 0.0;
-      return;
-   }
-   if (buf->ra1.cnt < n) {
-      ae_vector_set_length(&buf->ra1, n);
-   }
-   if (buf->ia1.cnt < n) {
-      ae_vector_set_length(&buf->ia1, n);
-   }
-   for (i = 0; i < n; i++) {
-      buf->ra1.xR[i] = x->xR[i];
-      buf->ia1.xZ[i] = i;
-   }
-   tagsortfasti(&buf->ra1, &buf->ia1, &buf->ra2, &buf->ia2, n);
-   for (i = 0; i < n; i++) {
-      x->xR[buf->ia1.xZ[i]] = (double)i;
-   }
-}
-} // end of namespace alglib_impl
-
-// === HPCCORES Package ===
-namespace alglib_impl {
-// Stub function.
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
+   xx = x * x;
+   ep = 1.2617719307481059087798E-4;
+   ep = ep * xx + 3.0299440770744196129956E-2;
+   ep = ep * xx + 9.9999999999999999991025E-1;
+   eq = 3.0019850513866445504159E-6;
+   eq = eq * xx + 2.5244834034968410419224E-3;
+   eq = eq * xx + 2.2726554820815502876593E-1;
+   eq = eq * xx + 2.0000000000000000000897E0;
+   r = x * ep;
+   r /= eq - r;
+   result = r + r;
    return result;
-#else
-   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
-#endif
 }
 
-// Stub function.
-// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
-static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
+double nucosm1(double x) {
+   double xx;
+   double c;
+   double result;
+   if (x < -0.25 * ae_pi || x > 0.25 * ae_pi) {
+      result = cos(x) - 1;
+      return result;
+   }
+   xx = x * x;
+   c = 4.7377507964246204691685E-14;
+   c = c * xx - 1.1470284843425359765671E-11;
+   c = c * xx + 2.0876754287081521758361E-9;
+   c = c * xx - 2.7557319214999787979814E-7;
+   c = c * xx + 2.4801587301570552304991E-5;
+   c = c * xx - 1.3888888888888872993737E-3;
+   c = c * xx + 4.1666666666666666609054E-2;
+   result = -0.5 * xx + xx * xx * c;
    return result;
-#else
-   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
-#endif
-}
-
-// Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
-// You  have to call this function  before  calling  HPCChunkedGradient() for
-// a new set of weights. You have to call it only once, see example below:
-//
-// HOW TO PROCESS DATASET WITH THIS FUNCTION:
-//     Grad:=0
-//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
-//     foreach chunk-of-dataset do
-//         HPCChunkedGradient(...)
-//     HPCFinalizeChunkedGradient(Buf, Grad)
-//
-void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf) {
-   ae_int_t i;
-   ae_int_t batch4size;
-   ae_int_t chunksize;
-   chunksize = 4;
-   batch4size = 3 * chunksize * ntotal + chunksize * (2 * nout + 1);
-   if (buf->xy.rows < chunksize || buf->xy.cols < nin + nout) {
-      ae_matrix_set_length(&buf->xy, chunksize, nin + nout);
-   }
-   if (buf->xy2.rows < chunksize || buf->xy2.cols < nin + nout) {
-      ae_matrix_set_length(&buf->xy2, chunksize, nin + nout);
-   }
-   if (buf->xyrow.cnt < nin + nout) {
-      ae_vector_set_length(&buf->xyrow, nin + nout);
-   }
-   if (buf->x.cnt < nin) {
-      ae_vector_set_length(&buf->x, nin);
-   }
-   if (buf->y.cnt < nout) {
-      ae_vector_set_length(&buf->y, nout);
-   }
-   if (buf->desiredy.cnt < nout) {
-      ae_vector_set_length(&buf->desiredy, nout);
-   }
-   if (buf->batch4buf.cnt < batch4size) {
-      ae_vector_set_length(&buf->batch4buf, batch4size);
-   }
-   if (buf->hpcbuf.cnt < wcount) {
-      ae_vector_set_length(&buf->hpcbuf, wcount);
-   }
-   if (buf->g.cnt < wcount) {
-      ae_vector_set_length(&buf->g, wcount);
-   }
-   if (!hpccores_hpcpreparechunkedgradientx(weights, wcount, &buf->hpcbuf)) {
-      for (i = 0; i < wcount; i++) {
-         buf->hpcbuf.xR[i] = 0.0;
-      }
-   }
-   buf->wcount = wcount;
-   buf->ntotal = ntotal;
-   buf->nin = nin;
-   buf->nout = nout;
-   buf->chunksize = chunksize;
-}
-
-// Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
-// You  have to call this function  after  calling  HPCChunkedGradient()  for
-// a new set of weights. You have to call it only once, see example below:
-//
-// HOW TO PROCESS DATASET WITH THIS FUNCTION:
-//     Grad:=0
-//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
-//     foreach chunk-of-dataset do
-//         HPCChunkedGradient(...)
-//     HPCFinalizeChunkedGradient(Buf, Grad)
-//
-void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad) {
-   ae_int_t i;
-   if (!hpccores_hpcfinalizechunkedgradientx(&buf->hpcbuf, buf->wcount, grad)) {
-      for (i = 0; i < buf->wcount; i++) {
-         grad->xR[i] += buf->hpcbuf.xR[i];
-      }
-   }
-}
-
-// Fast kernel for chunked gradient.
-//
-bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcchunkedgradient(weights, structinfo, columnmeans, columnsigmas, xy, cstart, csize, batch4buf, hpcbuf, e, naturalerrorfunc);
-#endif
-}
-
-// Fast kernel for chunked processing.
-//
-bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf) {
-#ifndef ALGLIB_INTERCEPTS_SSE2
-   bool result;
-   result = false;
-   return result;
-#else
-   return _ialglib_i_hpcchunkedprocess(weights, structinfo, columnmeans, columnsigmas, xy, cstart, csize, batch4buf, hpcbuf);
-#endif
-}
-
-void mlpbuffers_init(void *_p, bool make_automatic) {
-   mlpbuffers *p = (mlpbuffers *)_p;
-   ae_vector_init(&p->batch4buf, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->hpcbuf, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->xy, 0, 0, DT_REAL, make_automatic);
-   ae_matrix_init(&p->xy2, 0, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->xyrow, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->desiredy, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->g, 0, DT_REAL, make_automatic);
-   ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
-}
-
-void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic) {
-   mlpbuffers *dst = (mlpbuffers *)_dst;
-   mlpbuffers *src = (mlpbuffers *)_src;
-   dst->chunksize = src->chunksize;
-   dst->ntotal = src->ntotal;
-   dst->nin = src->nin;
-   dst->nout = src->nout;
-   dst->wcount = src->wcount;
-   ae_vector_copy(&dst->batch4buf, &src->batch4buf, make_automatic);
-   ae_vector_copy(&dst->hpcbuf, &src->hpcbuf, make_automatic);
-   ae_matrix_copy(&dst->xy, &src->xy, make_automatic);
-   ae_matrix_copy(&dst->xy2, &src->xy2, make_automatic);
-   ae_vector_copy(&dst->xyrow, &src->xyrow, make_automatic);
-   ae_vector_copy(&dst->x, &src->x, make_automatic);
-   ae_vector_copy(&dst->y, &src->y, make_automatic);
-   ae_vector_copy(&dst->desiredy, &src->desiredy, make_automatic);
-   dst->e = src->e;
-   ae_vector_copy(&dst->g, &src->g, make_automatic);
-   ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
-}
-
-void mlpbuffers_free(void *_p, bool make_automatic) {
-   mlpbuffers *p = (mlpbuffers *)_p;
-   ae_vector_free(&p->batch4buf, make_automatic);
-   ae_vector_free(&p->hpcbuf, make_automatic);
-   ae_matrix_free(&p->xy, make_automatic);
-   ae_matrix_free(&p->xy2, make_automatic);
-   ae_vector_free(&p->xyrow, make_automatic);
-   ae_vector_free(&p->x, make_automatic);
-   ae_vector_free(&p->y, make_automatic);
-   ae_vector_free(&p->desiredy, make_automatic);
-   ae_vector_free(&p->g, make_automatic);
-   ae_vector_free(&p->tmp0, make_automatic);
 }
 } // end of namespace alglib_impl
 
@@ -9051,79 +8952,178 @@ void fasttransformplan_free(void *_p, bool make_automatic) {
 }
 } // end of namespace alglib_impl
 
-// === NEARUNITYUNIT Package ===
+// === HPCCORES Package ===
 namespace alglib_impl {
-double nulog1p(double x) {
-   double z;
-   double lp;
-   double lq;
-   double result;
-   z = 1.0 + x;
-   if (z < 0.70710678118654752440 || z > 1.41421356237309504880) {
-      result = log(z);
-      return result;
-   }
-   z = x * x;
-   lp = 4.5270000862445199635215E-5;
-   lp = lp * x + 4.9854102823193375972212E-1;
-   lp = lp * x + 6.5787325942061044846969E0;
-   lp = lp * x + 2.9911919328553073277375E1;
-   lp = lp * x + 6.0949667980987787057556E1;
-   lp = lp * x + 5.7112963590585538103336E1;
-   lp = lp * x + 2.0039553499201281259648E1;
-   lq = 1.0000000000000000000000E0;
-   lq = lq * x + 1.5062909083469192043167E1;
-   lq = lq * x + 8.3047565967967209469434E1;
-   lq = lq * x + 2.2176239823732856465394E2;
-   lq = lq * x + 3.0909872225312059774938E2;
-   lq = lq * x + 2.1642788614495947685003E2;
-   lq = lq * x + 6.0118660497603843919306E1;
-   z = -0.5 * z + x * (z * lp / lq);
-   result = x + z;
+// Stub function.
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcpreparechunkedgradientx(RVector *weights, ae_int_t wcount, RVector *hpcbuf) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
    return result;
+#else
+   return _ialglib_i_hpcpreparechunkedgradientx(weights, wcount, hpcbuf);
+#endif
 }
 
-double nuexpm1(double x) {
-   double r;
-   double xx;
-   double ep;
-   double eq;
-   double result;
-   if (x < -0.5 || x > 0.5) {
-      result = exp(x) - 1.0;
-      return result;
-   }
-   xx = x * x;
-   ep = 1.2617719307481059087798E-4;
-   ep = ep * xx + 3.0299440770744196129956E-2;
-   ep = ep * xx + 9.9999999999999999991025E-1;
-   eq = 3.0019850513866445504159E-6;
-   eq = eq * xx + 2.5244834034968410419224E-3;
-   eq = eq * xx + 2.2726554820815502876593E-1;
-   eq = eq * xx + 2.0000000000000000000897E0;
-   r = x * ep;
-   r /= eq - r;
-   result = r + r;
+// Stub function.
+// ALGLIB Routine: Copyright 14.06.2013 by Sergey Bochkanov
+static bool hpccores_hpcfinalizechunkedgradientx(RVector *buf, ae_int_t wcount, RVector *grad) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
    return result;
+#else
+   return _ialglib_i_hpcfinalizechunkedgradientx(buf, wcount, grad);
+#endif
 }
 
-double nucosm1(double x) {
-   double xx;
-   double c;
-   double result;
-   if (x < -0.25 * ae_pi || x > 0.25 * ae_pi) {
-      result = cos(x) - 1;
-      return result;
+// Prepares HPC compuations  of  chunked  gradient with HPCChunkedGradient().
+// You  have to call this function  before  calling  HPCChunkedGradient() for
+// a new set of weights. You have to call it only once, see example below:
+//
+// HOW TO PROCESS DATASET WITH THIS FUNCTION:
+//     Grad:=0
+//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
+//     foreach chunk-of-dataset do
+//         HPCChunkedGradient(...)
+//     HPCFinalizeChunkedGradient(Buf, Grad)
+//
+void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf) {
+   ae_int_t i;
+   ae_int_t batch4size;
+   ae_int_t chunksize;
+   chunksize = 4;
+   batch4size = 3 * chunksize * ntotal + chunksize * (2 * nout + 1);
+   if (buf->xy.rows < chunksize || buf->xy.cols < nin + nout) {
+      ae_matrix_set_length(&buf->xy, chunksize, nin + nout);
    }
-   xx = x * x;
-   c = 4.7377507964246204691685E-14;
-   c = c * xx - 1.1470284843425359765671E-11;
-   c = c * xx + 2.0876754287081521758361E-9;
-   c = c * xx - 2.7557319214999787979814E-7;
-   c = c * xx + 2.4801587301570552304991E-5;
-   c = c * xx - 1.3888888888888872993737E-3;
-   c = c * xx + 4.1666666666666666609054E-2;
-   result = -0.5 * xx + xx * xx * c;
+   if (buf->xy2.rows < chunksize || buf->xy2.cols < nin + nout) {
+      ae_matrix_set_length(&buf->xy2, chunksize, nin + nout);
+   }
+   if (buf->xyrow.cnt < nin + nout) {
+      ae_vector_set_length(&buf->xyrow, nin + nout);
+   }
+   if (buf->x.cnt < nin) {
+      ae_vector_set_length(&buf->x, nin);
+   }
+   if (buf->y.cnt < nout) {
+      ae_vector_set_length(&buf->y, nout);
+   }
+   if (buf->desiredy.cnt < nout) {
+      ae_vector_set_length(&buf->desiredy, nout);
+   }
+   if (buf->batch4buf.cnt < batch4size) {
+      ae_vector_set_length(&buf->batch4buf, batch4size);
+   }
+   if (buf->hpcbuf.cnt < wcount) {
+      ae_vector_set_length(&buf->hpcbuf, wcount);
+   }
+   if (buf->g.cnt < wcount) {
+      ae_vector_set_length(&buf->g, wcount);
+   }
+   if (!hpccores_hpcpreparechunkedgradientx(weights, wcount, &buf->hpcbuf)) {
+      for (i = 0; i < wcount; i++) {
+         buf->hpcbuf.xR[i] = 0.0;
+      }
+   }
+   buf->wcount = wcount;
+   buf->ntotal = ntotal;
+   buf->nin = nin;
+   buf->nout = nout;
+   buf->chunksize = chunksize;
+}
+
+// Finalizes HPC compuations  of  chunked gradient with HPCChunkedGradient().
+// You  have to call this function  after  calling  HPCChunkedGradient()  for
+// a new set of weights. You have to call it only once, see example below:
+//
+// HOW TO PROCESS DATASET WITH THIS FUNCTION:
+//     Grad:=0
+//     HPCPrepareChunkedGradient(Weights, WCount, NTotal, NOut, Buf)
+//     foreach chunk-of-dataset do
+//         HPCChunkedGradient(...)
+//     HPCFinalizeChunkedGradient(Buf, Grad)
+//
+void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad) {
+   ae_int_t i;
+   if (!hpccores_hpcfinalizechunkedgradientx(&buf->hpcbuf, buf->wcount, grad)) {
+      for (i = 0; i < buf->wcount; i++) {
+         grad->xR[i] += buf->hpcbuf.xR[i];
+      }
+   }
+}
+
+// Fast kernel for chunked gradient.
+//
+bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
    return result;
+#else
+   return _ialglib_i_hpcchunkedgradient(weights, structinfo, columnmeans, columnsigmas, xy, cstart, csize, batch4buf, hpcbuf, e, naturalerrorfunc);
+#endif
+}
+
+// Fast kernel for chunked processing.
+//
+bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf) {
+#ifndef ALGLIB_INTERCEPTS_SSE2
+   bool result;
+   result = false;
+   return result;
+#else
+   return _ialglib_i_hpcchunkedprocess(weights, structinfo, columnmeans, columnsigmas, xy, cstart, csize, batch4buf, hpcbuf);
+#endif
+}
+
+void mlpbuffers_init(void *_p, bool make_automatic) {
+   mlpbuffers *p = (mlpbuffers *)_p;
+   ae_vector_init(&p->batch4buf, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->hpcbuf, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->xy, 0, 0, DT_REAL, make_automatic);
+   ae_matrix_init(&p->xy2, 0, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->xyrow, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->x, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->y, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->desiredy, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->g, 0, DT_REAL, make_automatic);
+   ae_vector_init(&p->tmp0, 0, DT_REAL, make_automatic);
+}
+
+void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic) {
+   mlpbuffers *dst = (mlpbuffers *)_dst;
+   mlpbuffers *src = (mlpbuffers *)_src;
+   dst->chunksize = src->chunksize;
+   dst->ntotal = src->ntotal;
+   dst->nin = src->nin;
+   dst->nout = src->nout;
+   dst->wcount = src->wcount;
+   ae_vector_copy(&dst->batch4buf, &src->batch4buf, make_automatic);
+   ae_vector_copy(&dst->hpcbuf, &src->hpcbuf, make_automatic);
+   ae_matrix_copy(&dst->xy, &src->xy, make_automatic);
+   ae_matrix_copy(&dst->xy2, &src->xy2, make_automatic);
+   ae_vector_copy(&dst->xyrow, &src->xyrow, make_automatic);
+   ae_vector_copy(&dst->x, &src->x, make_automatic);
+   ae_vector_copy(&dst->y, &src->y, make_automatic);
+   ae_vector_copy(&dst->desiredy, &src->desiredy, make_automatic);
+   dst->e = src->e;
+   ae_vector_copy(&dst->g, &src->g, make_automatic);
+   ae_vector_copy(&dst->tmp0, &src->tmp0, make_automatic);
+}
+
+void mlpbuffers_free(void *_p, bool make_automatic) {
+   mlpbuffers *p = (mlpbuffers *)_p;
+   ae_vector_free(&p->batch4buf, make_automatic);
+   ae_vector_free(&p->hpcbuf, make_automatic);
+   ae_matrix_free(&p->xy, make_automatic);
+   ae_matrix_free(&p->xy2, make_automatic);
+   ae_vector_free(&p->xyrow, make_automatic);
+   ae_vector_free(&p->x, make_automatic);
+   ae_vector_free(&p->y, make_automatic);
+   ae_vector_free(&p->desiredy, make_automatic);
+   ae_vector_free(&p->g, make_automatic);
+   ae_vector_free(&p->tmp0, make_automatic);
 }
 } // end of namespace alglib_impl

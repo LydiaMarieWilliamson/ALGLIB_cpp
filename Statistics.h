@@ -87,26 +87,6 @@ void rankdatacentered(const real_2d_array &xy, const ae_int_t npoints, const ae_
 void rankdatacentered(const real_2d_array &xy);
 } // end of namespace alglib
 
-// === WSR Package ===
-// Depends on: (AlgLibInternal) APSERV
-namespace alglib_impl {
-void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail);
-} // end of namespace alglib
-
-// === STEST Package ===
-// Depends on: (SpecialFunctions) BINOMIALDISTR
-namespace alglib_impl {
-void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
-} // end of namespace alglib
-
 // === CORRELATIONTESTS Package ===
 // Depends on: (SpecialFunctions) STUDENTTDISTR
 // Depends on: BASESTAT
@@ -118,30 +98,6 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
 namespace alglib {
 void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
 void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
-} // end of namespace alglib
-
-// === STUDENTTTESTS Package ===
-// Depends on: (SpecialFunctions) STUDENTTDISTR
-namespace alglib_impl {
-void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail);
-void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
-void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
-void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-} // end of namespace alglib
-
-// === MANNWHITNEYU Package ===
-// Depends on: (AlgLibMisc) HQRND
-namespace alglib_impl {
-void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 } // end of namespace alglib
 
 // === JARQUEBERA Package ===
@@ -163,6 +119,50 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 namespace alglib {
 void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail);
+} // end of namespace alglib
+
+// === WSR Package ===
+// Depends on: (AlgLibInternal) APSERV
+namespace alglib_impl {
+void wilcoxonsignedranktest(RVector *x, ae_int_t n, double e, double *bothtails, double *lefttail, double *righttail);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const double e, double &bothtails, double &lefttail, double &righttail);
+} // end of namespace alglib
+
+// === MANNWHITNEYU Package ===
+// Depends on: (AlgLibMisc) HQRND
+namespace alglib_impl {
+void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
+} // end of namespace alglib
+
+// === STEST Package ===
+// Depends on: (SpecialFunctions) BINOMIALDISTR
+namespace alglib_impl {
+void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
+} // end of namespace alglib
+
+// === STUDENTTTESTS Package ===
+// Depends on: (SpecialFunctions) STUDENTTDISTR
+namespace alglib_impl {
+void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail);
+void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
+void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
+void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
 } // end of namespace alglib
 
 #endif // OnceOnly

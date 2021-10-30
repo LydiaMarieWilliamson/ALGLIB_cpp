@@ -1807,6 +1807,1362 @@ void rankdatacentered(const real_2d_array &xy) {
 #endif
 } // end of namespace alglib
 
+// === CORRELATIONTESTS Package ===
+// Depends on: (SpecialFunctions) STUDENTTDISTR
+// Depends on: BASESTAT
+namespace alglib_impl {
+// Pearson's correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5
+//     * normality of distributions of X and Y.
+//
+// Inputs:
+//     R   -   Pearson's correlation coefficient for X and Y
+//     N   -   number of elements in samples, N >= 5.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
+void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
+   double t;
+   double p;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+// Some special cases
+   if (r >= 1.0) {
+      *bothtails = 0.0;
+      *lefttail = 1.0;
+      *righttail = 0.0;
+      return;
+   }
+   if (r <= -1.0) {
+      *bothtails = 0.0;
+      *lefttail = 0.0;
+      *righttail = 1.0;
+      return;
+   }
+   if (n < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// General case
+   t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
+   p = studenttdistribution(n - 2, t);
+   *bothtails = 2 * rmin2(p, 1 - p);
+   *lefttail = p;
+   *righttail = 1 - p;
+}
+
+// Tail(T,N), accepts T < 0
+static double correlationtests_spearmantail(double t, ae_int_t n) {
+   switch (n) {
+      case 5:
+         return
+            t <= -7.584e-01 ? (
+               t <= -1.704e+00 ? (
+                  t <= -3.580e+00 ? 8.304e-03 : t <= -2.322e+00 ? 4.163e-02: 6.641e-02
+               ) : t <= -1.303e+00 ? 1.164e-01 : t <= -1.003e+00 ? 1.748e-01 : 2.249e-01
+            ) : t <= -1.759e-01 ? (
+               t <= -5.468e-01 ? 2.581e-01 : t <= -3.555e-01 ? 3.413e-01 : 3.911e-01
+            ) : t <= -1.741e-03 ? 4.747e-01 : t <= -0.000e+00 ? 5.248e-01 : studenttdistribution(3, t);
+      case 6:
+         return
+            t <= -2.045e+00 ? (
+               t <= -3.834e+00 ? (
+                  t <= -5.663e+00 ? 1.366e-03: 8.350e-03
+               ) : t <= -2.968e+00 ? 1.668e-02 : t <= -2.430e+00 ? 2.921e-02 : 5.144e-02
+            ) : t <= -1.295e+00 ? (
+               t <= -1.747e+00 ? 6.797e-02 : t <= -1.502e+00 ? 8.752e-02 : 1.210e-01
+            ) : t <= -1.113e+00 ? 1.487e-01 : t <= -1.001e+00 ? 1.780e-01 : studenttdistribution(4, t);
+      case 7:
+         return
+            t <= -2.068e+00 ? (
+               t <= -3.728e+00 ? (
+                  t <= -5.620e+00 ? (
+                     t <= -8.159e+00 ? 2.081e-04 : 1.393e-03
+                  ) : t <= -4.445e+00 ? 3.398e-03 : 6.187e-03
+               ) : t <= -2.844e+00 ? (
+                  t <= -3.226e+00 ? 1.200e-02: 1.712e-02
+               ) : t <= -2.539e+00 ? 2.408e-02 : t <= -2.285e+00 ? 3.320e-02 : 4.406e-02
+            ) : t <= -1.420e+00 ? (
+               t <= -1.710e+00 ? (
+                  t <= -1.879e+00 ? 5.478e-02 : 6.946e-02
+               ) : t <= -1.559e+00 ? 8.331e-02 : 1.001e-01
+            ) : t <= -1.173e+00 ? (
+               t <= -1.292e+00 ? 1.180e-01: 1.335e-01
+            ) : t <= -1.062e+00 ? 1.513e-01 : t <= -1.001e+00 ? 1.770e-01 : studenttdistribution(5, t);
+      case 8:
+         return
+            t <= -3.381e+00 ? (
+               t <= -5.213e+00 ? (
+                  t <= -7.685e+00 ? (
+                     t <= -1.103e+01 ? 2.194e-05 : 2.008e-04
+                  ) : t <= -6.143e+00 ? 5.686e-04 : 1.138e-03
+               ) : t <= -4.081e+00 ? (
+                  t <= -4.567e+00 ? 2.310e-03 : 3.634e-03
+               ) : t <= -3.697e+00 ? 5.369e-03 : 7.708e-03
+            ) : t <= -2.502e+00 ? (
+               t <= -2.884e+00 ? (
+                  t <= -3.114e+00 ? 1.087e-02 : 1.397e-02
+               ) : t <= -2.682e+00 ? 1.838e-02 : 2.288e-02
+            ) : t <= -2.192e+00 ? (
+               t <= -2.340e+00 ? 2.883e-02 : 3.469e-02
+            ) : t <= -2.057e+00 ? 4.144e-02 : t <= -2.001e+00 ? 4.804e-02 : studenttdistribution(6, t);
+     case 9:
+         return
+            t <= -3.336e+00 ? (
+               t <= -4.991e+00 ? (
+                  t <= -6.890e+00 ? (
+                     t <= -9.989e+00 ? 2.306e-05 : t <= -8.069e+00 ? 8.167e-05 : 1.744e-04
+                  ) : t <= -6.077e+00 ? 3.625e-04 : t <= -5.469e+00 ? 6.450e-04 : 1.001e-03
+               ) : t <= -3.991e+00 ? (
+                  t <= -4.600e+00 ? 1.514e-03 : t <= -4.272e+00 ? 2.213e-03 : 2.990e-03
+               ) : t <= -3.746e+00 ? 4.101e-03 : t <= -3.530e+00 ? 5.355e-03 : 6.887e-03
+            ) : t <= -2.477e+00 ? (
+               t <= -2.855e+00 ? (
+                  t <= -3.161e+00 ? 8.598e-03 : t <= -3.002e+00 ? 1.065e-02 : 1.268e-02
+               ) : t <= -2.720e+00 ? 1.552e-02 : t <= -2.595e+00 ? 1.836e-02 : 2.158e-02
+            ) : t <= -2.166e+00 ? (
+               t <= -2.368e+00 ? 2.512e-02 : t <= -2.264e+00 ? 2.942e-02 : 3.325e-02
+            ) : t <= -2.073e+00 ? 3.800e-02 : t <= -2.001e+00 ? 4.285e-02 : studenttdistribution(7, t);
+      default: return studenttdistribution(n - 2, t);
+   }
+}
+
+// Spearman's rank correlation coefficient significance test
+//
+// This test checks hypotheses about whether X  and  Y  are  samples  of  two
+// continuous  distributions  having  zero  correlation  or   whether   their
+// correlation is non-zero.
+//
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - X and Y have zero correlation)
+//     * left-tailed test (null hypothesis - the correlation  coefficient  is
+//       greater than or equal to 0)
+//     * right-tailed test (null hypothesis - the correlation coefficient  is
+//       less than or equal to 0).
+//
+// Requirements:
+//     * the number of elements in each sample is not less than 5.
+//
+// The test is non-parametric and doesn't require distributions X and Y to be
+// normal.
+//
+// Inputs:
+//     R   -   Spearman's rank correlation coefficient for X and Y
+//     N   -   number of elements in samples, N >= 5.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
+void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
+   double t;
+   double p;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+// Special case
+   if (n < 5) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// General case
+   if (r >= 1.0) {
+      t = 1.0E10;
+   } else {
+      if (r <= -1.0) {
+         t = -1.0E10;
+      } else {
+         t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
+      }
+   }
+   if (t < 0.0) {
+      p = correlationtests_spearmantail(t, n);
+      *bothtails = 2 * p;
+      *lefttail = p;
+      *righttail = 1 - p;
+   } else {
+      p = correlationtests_spearmantail(-t, n);
+      *bothtails = 2 * p;
+      *lefttail = 1 - p;
+      *righttail = p;
+   }
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::pearsoncorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+
+void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::spearmanrankcorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
+// === JARQUEBERA Package ===
+namespace alglib_impl {
+static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
+   *r += c * (*tj);
+   double t = 2.0 * x * (*tj1) - (*tj);
+   *tj = *tj1, *tj1 = t;
+}
+
+static double jarquebera_jbtbl5(double s) {
+   if (s <= 0.4000) {
+      double x = 2 * (s - 0.000000) / 0.400000 - 1, x2 = x * x;
+      const double c0 = -1.097885e-20, c1 = -2.854501e-20, c2 = -1.756616e-20;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.1000) {
+      double x = 2 * (s - 0.400000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -1.324545e+00, c1 = -1.075941e+00, c2 = -9.772272e-01, c3 = +3.175686e-01;
+      const double c4 = -1.576162e-01, c5 = +1.126861e-01, c6 = -3.434425e-02, c7 = -2.790359e-01;
+      const double c8 = +2.809178e-02, c9 = -5.479704e-01, ca = +3.717040e-02, cb = -5.294170e-01;
+      const double cc = +2.880632e-02, cd = -3.023344e-01, ce = +1.601531e-02, cf = -7.920403e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
+}
+
+static double jarquebera_jbtbl6(double s) {
+   if (s <= 0.2500) {
+      double x = 2 * (s - 0.000000) / 0.250000 - 1, x2 = x * x;
+      const double c0 = -2.274707e-04, c1 = -5.700471e-04, c2 = -3.425764e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.3000) {
+      double x = 2 * (s - 0.250000) / 1.050000 - 1, x2 = x * x;
+      const double c0 = -1.339000e+00, c1 = -2.011104e+00, c2 = -8.168177e-01, c3 = -1.085666e-01;
+      const double c4 = +7.738606e-02, c5 = +7.022876e-02, c6 = +3.462402e-02, c7 = +6.908270e-03;
+      const double c8 = -8.230772e-03, c9 = -1.006996e-02, ca = -5.410222e-03, cb = -2.893768e-03;
+      const double cc = +8.114564e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 1.8500) {
+      double x = 2 * (s - 1.300000) / 0.550000 - 1, x2 = x * x;
+      const double c0 = -6.794311e+00, c1 = -3.578700e+00, c2 = -1.394664e+00, c3 = -7.928290e-01;
+      const double c4 = -4.813273e-01, c5 = -3.076063e-01, c6 = -1.835380e-01, c7 = -1.013013e-01;
+      const double c8 = -5.058903e-02, c9 = -1.856915e-02, ca = -6.710887e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.770029e+02 * (s - 1.850000e+00) - 1.371015e+01;
+}
+
+static double jarquebera_jbtbl7(double s) {
+   if (s <= 1.4000) {
+      double x = 2 * (s - 0.000000) / 1.400000 - 1, x2 = x * x;
+      const double c0 = -1.093681e+00, c1 = -1.695911e+00, c2 = -7.473192e-01, c3 = -1.203236e-01;
+      const double c4 = +6.590379e-02, c5 = +6.291876e-02, c6 = +3.132007e-02, c7 = +9.411147e-03;
+      const double c8 = -1.180067e-03, c9 = -3.487610e-03, ca = -2.436561e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.400000) / 1.600000 - 1, x2 = x * x;
+      const double c0 = -5.947854e+00, c1 = -2.772675e+00, c2 = -4.707912e-01, c3 = -1.691171e-01;
+      const double c4 = -4.132795e-02, c5 = -1.481310e-02, c6 = +2.867536e-03, c7 = +8.772327e-04;
+      const double c8 = +5.033387e-03, c9 = -1.378277e-03, ca = -2.497964e-03, cb = -3.636814e-03;
+      const double cc = -9.581640e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.2000) {
+      double x = 2 * (s - 3.000000) / 0.200000 - 1, x2 = x * x;
+      const double c0 = -7.511008e+00, c1 = -8.140472e-01, c2 = +1.682053e+00, c3 = -2.568561e-02;
+      const double c4 = -1.933930e+00, c5 = -8.140472e-01, c6 = -3.895025e+00, c7 = -8.140472e-01;
+      const double c8 = -1.933930e+00, c9 = -2.568561e-02, ca = +1.682053e+00;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.824116e+03 * (s - 3.200000e+00) - 1.440330e+01;
+}
+
+static double jarquebera_jbtbl8(double s) {
+   if (s <= 1.3000) {
+      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
+      const double c0 = -7.199015e-01, c1 = -1.095921e+00, c2 = -4.736828e-01, c3 = -1.047438e-01;
+      const double c4 = -2.484320e-03, c5 = +7.937923e-03, c6 = +4.810470e-03, c7 = +2.139780e-03;
+      const double c8 = +6.708443e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -3.378966e+00, c1 = -7.802461e-01, c2 = +1.547593e-01, c3 = -6.241042e-02;
+      const double c4 = +1.203274e-02, c5 = +5.201990e-03, c6 = -5.125597e-03, c7 = +1.584426e-03;
+      const double c8 = +2.546069e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -6.828366e+00, c1 = -3.137533e+00, c2 = -5.016671e-01, c3 = -1.745637e-01;
+      const double c4 = -5.189801e-02, c5 = -1.621610e-02, c6 = -6.741122e-03, c7 = -4.516368e-03;
+      const double c8 = +3.552085e-04, c9 = +2.787029e-03, ca = +5.359774e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.087028e+00 * (s - 5.000000e+00) - 1.071300e+01;
+}
+
+static double jarquebera_jbtbl9(double s) {
+   if (s <= 1.3000) {
+      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
+      const double c0 = -6.279320e-01, c1 = -9.277151e-01, c2 = -3.669339e-01, c3 = -7.086149e-02;
+      const double c4 = -1.333816e-03, c5 = +3.871249e-03, c6 = +2.007048e-03, c7 = +7.482245e-04;
+      const double c8 = +2.355615e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
+      const double c0 = -2.981430e+00, c1 = -7.972248e-01, c2 = +1.747737e-01, c3 = -3.808530e-02;
+      const double c4 = -7.888305e-03, c5 = +9.001302e-03, c6 = -1.378767e-03, c7 = -1.108510e-03;
+      const double c8 = +5.915372e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 7.0000) {
+      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
+      const double c0 = -6.387463e+00, c1 = -2.845231e+00, c2 = -1.809956e-01, c3 = -7.543461e-02;
+      const double c4 = -4.880397e-03, c5 = -1.160074e-02, c6 = -7.356527e-03, c7 = -4.394428e-03;
+      const double c8 = +9.619892e-04, c9 = -2.758763e-04, ca = +4.790977e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.020952e+00 * (s - 7.000000e+00) - 9.516623e+00;
+}
+
+static double jarquebera_jbtbl10(double s) {
+   if (s <= 1.2000) {
+      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
+      const double c0 = -4.590993e-01, c1 = -6.562730e-01, c2 = -2.353934e-01, c3 = -4.069933e-02;
+      const double c4 = -1.849151e-03, c5 = +8.931406e-04, c6 = +3.636295e-04, c7 = +1.178340e-05;
+      const double c8 = -8.917749e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.0000) {
+      double x = 2 * (s - 1.200000) / 0.800000 - 1, x2 = x * x;
+      const double c0 = -2.537658e+00, c1 = -9.962401e-01, c2 = +1.838715e-01, c3 = +1.055792e-02;
+      const double c4 = -2.580316e-02, c5 = +1.781701e-03, c6 = +3.770362e-03, c7 = -4.838983e-04;
+      const double c8 = -6.999052e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 7.0000) {
+      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
+      const double c0 = -5.337524e+00, c1 = -1.877029e+00, c2 = +4.734650e-02, c3 = -4.249254e-02;
+      const double c4 = +3.320250e-03, c5 = -6.432266e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else return -8.711035e-01 * (s - 7.000000e+00) - 7.212811e+00;
+}
+
+static double jarquebera_jbtbl11(double s) {
+   if (s <= 1.2000) {
+      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
+      const double c0 = -4.339517e-01, c1 = -6.051558e-01, c2 = -2.000992e-01, c3 = -3.022547e-02;
+      const double c4 = -9.808401e-04, c5 = +5.592870e-04, c6 = +3.575081e-04, c7 = +2.086173e-04;
+      const double c8 = +6.089011e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 2.2500) {
+      double x = 2 * (s - 1.200000) / 1.050000 - 1, x2 = x * x;
+      const double c0 = -2.523221e+00, c1 = -1.068388e+00, c2 = +2.179661e-01, c3 = -1.555524e-03;
+      const double c4 = -3.238964e-02, c5 = +7.364320e-03, c6 = +4.895771e-03, c7 = -1.762774e-03;
+      const double c8 = -8.201340e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 8.0000) {
+      double x = 2 * (s - 2.250000) / 5.750000 - 1, x2 = x * x;
+      const double c0 = -5.212179e+00, c1 = -1.684579e+00, c2 = +8.299519e-02, c3 = -3.606261e-02;
+      const double c4 = +7.310869e-03, c5 = -3.320115e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else return -5.715445e-01 * (s - 8.000000e+00) - 6.845834e+00;
+}
+
+static double jarquebera_jbtbl12(double s) {
+   if (s <= 1.0000) {
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.736742e-01, c1 = -3.657836e-01, c2 = -1.047209e-01, c3 = -1.319599e-02;
+      const double c4 = -5.545631e-04, c5 = +9.280445e-05, c6 = +2.815679e-05, c7 = -2.213519e-05;
+      const double c8 = +1.256838e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.573947e+00, c1 = -1.515287e+00, c2 = +3.611880e-01, c3 = -3.271311e-02;
+      const double c4 = -6.495815e-02, c5 = +4.141186e-02, c6 = +7.180886e-04, c7 = -1.388211e-02;
+      const double c8 = +4.890761e-03, c9 = +3.233175e-03, ca = -2.946156e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 12.0000) {
+      double x = 2 * (s - 3.000000) / 9.000000 - 1, x2 = x * x;
+      const double c0 = -5.947819e+00, c1 = -2.034157e+00, c2 = +6.878986e-02, c3 = -4.078603e-02;
+      const double c4 = +6.990977e-03, c5 = -2.866215e-03, c6 = +3.897866e-03, c7 = +2.512252e-03;
+      const double c8 = +2.073743e-03, c9 = +3.022621e-03, ca = +1.501343e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.877243e-01 * (s - 1.200000e+01) - 7.936839e+00;
+}
+
+static double jarquebera_jbtbl13(double s) {
+   if (s <= 1.0000) {
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.713276e-01, c1 = -3.557541e-01, c2 = -9.459092e-02, c3 = -1.044145e-02;
+      const double c4 = -2.546132e-04, c5 = +1.002374e-04, c6 = +2.349456e-05, c7 = -7.025669e-05;
+      const double c8 = -1.590242e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.454383e+00, c1 = -1.467539e+00, c2 = +3.270774e-01, c3 = -8.075763e-03;
+      const double c4 = -6.611647e-02, c5 = +2.990785e-02, c6 = +8.109212e-03, c7 = -1.135031e-02;
+      const double c8 = +5.915919e-04, c9 = +3.522390e-03, ca = -1.144701e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 13.0000) {
+      double x = 2 * (s - 3.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.736127e+00, c1 = -1.920809e+00, c2 = +1.175858e-01, c3 = -4.002049e-02;
+      const double c4 = +1.158966e-02, c5 = -3.157781e-03, c6 = +2.762172e-03, c7 = +5.780347e-04;
+      const double c8 = -1.193310e-03, c9 = -2.442421e-05, ca = +2.547756e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.799944e-01 * (s - 1.300000e+01) - 7.566269e+00;
+}
+
+static double jarquebera_jbtbl14(double s) {
+   if (s <= 1.0000) {
+      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
+      const double c0 = -2.698527e-01, c1 = -3.479081e-01, c2 = -8.640733e-02, c3 = -8.466899e-03;
+      const double c4 = -1.469485e-04, c5 = +2.150009e-05, c6 = +1.965975e-05, c7 = -4.710210e-05;
+      const double c8 = -1.327808e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 3.0000) {
+      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -2.350359e+00, c1 = -1.421365e+00, c2 = +2.960468e-01, c3 = +1.149167e-02;
+      const double c4 = -6.361109e-02, c5 = +1.976022e-02, c6 = +1.082700e-02, c7 = -8.563328e-03;
+      const double c8 = -1.453123e-03, c9 = +2.917559e-03, ca = -1.151067e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 3.000000) / 12.000000 - 1, x2 = x * x;
+      const double c0 = -5.746892e+00, c1 = -2.010441e+00, c2 = +1.566146e-01, c3 = -5.129690e-02;
+      const double c4 = +1.929724e-02, c5 = -2.524227e-03, c6 = +3.192933e-03, c7 = -4.254730e-04;
+      const double c8 = +1.620685e-03, c9 = +7.289618e-04, ca = -2.112350e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.590621e-01 * (s - 1.500000e+01) - 7.632238e+00;
+}
+
+static double jarquebera_jbtbl15(double s) {
+   if (s <= 2.0000) {
+      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -1.043660e+00, c1 = -1.361653e+00, c2 = -3.009497e-01, c3 = +4.951784e-02;
+      const double c4 = +4.377903e-02, c5 = +1.003253e-02, c6 = -1.271309e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.582778e+00, c1 = -8.349578e-01, c2 = +9.476514e-02, c3 = -2.717385e-02;
+      const double c4 = +1.222591e-02, c5 = -6.635124e-03, c6 = +2.815993e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 17.0000) {
+      double x = 2 * (s - 5.000000) / 12.000000 - 1, x2 = x * x;
+      const double c0 = -6.115476e+00, c1 = -1.655936e+00, c2 = +8.404310e-02, c3 = -2.663794e-02;
+      const double c4 = +8.868618e-03, c5 = +1.381447e-03, c6 = +9.444801e-04, c7 = -1.581503e-04;
+      const double c8 = -9.468696e-04, c9 = +1.728509e-03, ca = +1.206470e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.927937e-01 * (s - 1.700000e+01) - 7.700983e+00;
+}
+
+static double jarquebera_jbtbl16(double s) {
+   if (s <= 2.0000) {
+      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
+      const double c0 = -1.002570e+00, c1 = -1.298141e+00, c2 = -2.832803e-01, c3 = +3.877026e-02;
+      const double c4 = +3.539436e-02, c5 = +8.439658e-03, c6 = -4.756911e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 5.0000) {
+      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.486198e+00, c1 = -8.242944e-01, c2 = +1.020002e-01, c3 = -3.130531e-02;
+      const double c4 = +1.512373e-02, c5 = -8.054876e-03, c6 = +3.556839e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 5.000000) / 15.000000 - 1, x2 = x * x;
+      const double c0 = -6.241608e+00, c1 = -1.832655e+00, c2 = +1.340545e-01, c3 = -3.361143e-02;
+      const double c4 = +1.283219e-02, c5 = +3.484549e-03, c6 = +1.805968e-03, c7 = -2.057243e-03;
+      const double c8 = -1.454439e-03, c9 = -2.177513e-03, ca = -1.819209e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.391580e-01 * (s - 2.000000e+01) - 7.963205e+00;
+}
+
+static double jarquebera_jbtbl17(double s) {
+   if (s <= 3.0000) {
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.566973e+00, c1 = -1.810330e+00, c2 = -4.840039e-02, c3 = +2.337294e-01;
+      const double c4 = -5.383549e-04, c5 = -5.556515e-02, c6 = -8.656965e-03, c7 = +1.404569e-02;
+      const double c8 = +6.447867e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.905684e+00, c1 = -6.222920e-01, c2 = +4.146667e-02, c3 = -4.809176e-03;
+      const double c4 = +1.057028e-03, c5 = -1.211838e-04, c6 = -4.099683e-04, c7 = +1.161105e-04;
+      const double c8 = +2.225465e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 24.0000) {
+      double x = 2 * (s - 6.000000) / 18.000000 - 1, x2 = x * x;
+      const double c0 = -6.594282e+00, c1 = -1.917838e+00, c2 = +1.455980e-01, c3 = -2.999589e-02;
+      const double c4 = +5.604263e-03, c5 = -3.484445e-03, c6 = -1.819937e-03, c7 = -2.930390e-03;
+      const double c8 = +2.771761e-04, c9 = -6.232581e-04, ca = -7.029083e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.127771e-01 * (s - 2.400000e+01) - 8.400197e+00;
+}
+
+static double jarquebera_jbtbl18(double s) {
+   if (s <= 3.0000) {
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.526802e+00, c1 = -1.762373e+00, c2 = -5.598890e-02, c3 = +2.189437e-01;
+      const double c4 = +5.971721e-03, c5 = -4.823067e-02, c6 = -1.064501e-02, c7 = +1.014932e-02;
+      const double c8 = +5.953513e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.818669e+00, c1 = -6.070918e-01, c2 = +4.277196e-02, c3 = -4.879817e-03;
+      const double c4 = +6.887357e-04, c5 = +1.638451e-05, c6 = +1.502800e-04, c7 = -3.165796e-05;
+      const double c8 = +5.034960e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
+      const double c0 = -6.010656e+00, c1 = -1.496296e+00, c2 = +1.002227e-01, c3 = -2.338250e-02;
+      const double c4 = +4.137036e-03, c5 = -2.586202e-03, c6 = -9.736384e-04, c7 = +1.332251e-03;
+      const double c8 = +1.877982e-03, c9 = -1.160963e-05, ca = -2.547247e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.684623e-01 * (s - 2.000000e+01) - 7.428883e+00;
+}
+
+static double jarquebera_jbtbl19(double s) {
+   if (s <= 3.0000) {
+      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -1.490213e+00, c1 = -1.719633e+00, c2 = -6.459123e-02, c3 = +2.034878e-01;
+      const double c4 = +1.113868e-02, c5 = -4.030922e-02, c6 = -1.054022e-02, c7 = +7.525623e-03;
+      const double c8 = +5.277360e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 6.0000) {
+      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
+      const double c0 = -3.744750e+00, c1 = -5.977749e-01, c2 = +4.223716e-02, c3 = -5.363889e-03;
+      const double c4 = +5.711774e-04, c5 = -5.557257e-04, c6 = +4.254794e-04, c7 = +9.034207e-05;
+      const double c8 = +5.498107e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 20.0000) {
+      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
+      const double c0 = -5.872768e+00, c1 = -1.430689e+00, c2 = +1.136575e-01, c3 = -1.726627e-02;
+      const double c4 = +3.421110e-03, c5 = -1.581510e-03, c6 = -5.559520e-04, c7 = -6.838208e-04;
+      const double c8 = +8.428839e-04, c9 = -7.170682e-04, ca = -6.006647e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.539373e-01 * (s - 2.000000e+01) - 7.206941e+00;
+}
+
+static double jarquebera_jbtbl20(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.854794e+00, c1 = -1.948947e+00, c2 = +1.632184e-01, c3 = +2.139397e-01;
+      const double c4 = -1.006237e-01, c5 = -3.810031e-02, c6 = +3.573620e-02, c7 = +9.951242e-03;
+      const double c8 = -1.274092e-02, c9 = -3.464196e-03, ca = +4.882139e-03, cb = +1.575144e-03;
+      const double cc = -1.822804e-03, cd = -7.061348e-04, ce = +5.908404e-04, cf = +1.978353e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -5.030989e+00, c1 = -1.327151e+00, c2 = +1.346404e-01, c3 = -2.840051e-02;
+      const double c4 = +7.578551e-03, c5 = -9.813886e-04, c6 = +5.905973e-05, c7 = -5.358489e-04;
+      const double c8 = -3.450795e-04, c9 = -6.941157e-04, ca = -7.432418e-04, cb = -2.070537e-04;
+      const double cc = +9.375654e-04, cd = +5.367378e-04, ce = +9.890859e-04, cf = +6.679782e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -7.015854e+00, c1 = -7.487737e-01, c2 = +2.244254e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.318007e-01 * (s - 2.500000e+01) - 7.742185e+00;
+}
+
+static double jarquebera_jbtbl30(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.630822e+00, c1 = -1.724298e+00, c2 = +7.872756e-02, c3 = +1.658268e-01;
+      const double c4 = -3.573597e-02, c5 = -2.994157e-02, c6 = +5.994825e-03, c7 = +7.394303e-03;
+      const double c8 = -5.785029e-04, c9 = -1.990264e-03, ca = -1.037838e-04, cb = +6.755546e-04;
+      const double cc = +1.774473e-04, cd = -2.821395e-04, ce = -1.392603e-04, cf = +1.353313e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
+      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.539322e+00, c1 = -1.197018e+00, c2 = +1.396848e-01, c3 = -2.804293e-02;
+      const double c4 = +6.867928e-03, c5 = -2.768758e-03, c6 = +5.211792e-04, c7 = +4.925799e-04;
+      const double c8 = +5.046235e-04, c9 = -9.536469e-05, ca = -6.489642e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.263462e+00, c1 = -6.177316e-01, c2 = +2.590637e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.028212e-01 * (s - 2.500000e+01) - 6.855288e+00;
+}
+
+static double jarquebera_jbtbl50(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.436279e+00, c1 = -1.519711e+00, c2 = +1.148699e-02, c3 = +1.001204e-01;
+      const double c4 = -3.207620e-03, c5 = -1.034778e-02, c6 = -1.220322e-03, c7 = +1.033260e-03;
+      const double c8 = +2.588280e-04, c9 = -1.851653e-04, ca = -1.287733e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.234645e+00, c1 = -1.189127e+00, c2 = +1.429738e-01, c3 = -3.058822e-02;
+      const double c4 = +9.086776e-03, c5 = -1.445783e-03, c6 = +1.311671e-03, c7 = -7.261298e-04;
+      const double c8 = +6.496987e-04, c9 = +2.605249e-04, ca = +8.162282e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.921095e+00, c1 = -5.888603e-01, c2 = +3.080113e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -9.313116e-02 * (s - 2.500000e+01) - 6.479154e+00;
+}
+
+static double jarquebera_jbtbl65(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.360024e+00, c1 = -1.434631e+00, c2 = -6.514580e-03, c3 = +7.332038e-02;
+      const double c4 = +1.158197e-03, c5 = -5.121233e-03, c6 = -1.051056e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.148601e+00, c1 = -1.214233e+00, c2 = +1.487977e-01, c3 = -3.424720e-02;
+      const double c4 = +1.116715e-02, c5 = -4.043152e-03, c6 = +1.718149e-03, c7 = -1.313701e-03;
+      const double c8 = +3.097305e-04, c9 = +2.181031e-04, ca = +1.256975e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
+      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.858951e+00, c1 = -5.895179e-01, c2 = +2.933237e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -9.443768e-02 * (s - 2.500000e+01) - 6.419137e+00;
+}
+
+static double jarquebera_jbtbl100(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.257021e+00, c1 = -1.313418e+00, c2 = -1.628931e-02, c3 = +4.264287e-02;
+      const double c4 = +1.518487e-03, c5 = -1.499826e-03, c6 = -4.836044e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.056508e+00, c1 = -1.279690e+00, c2 = +1.665746e-01, c3 = -4.290012e-02;
+      const double c4 = +1.487632e-02, c5 = -5.704465e-03, c6 = +2.211669e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.866099e+00, c1 = -6.399767e-01, c2 = +2.498208e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.080097e-01 * (s - 2.500000e+01) - 6.481094e+00;
+}
+
+static double jarquebera_jbtbl130(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.207999e+00, c1 = -1.253864e+00, c2 = -1.618032e-02, c3 = +3.112729e-02;
+      const double c4 = +1.210546e-03, c5 = -4.732602e-04, c6 = -2.410527e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.026324e+00, c1 = -1.331990e+00, c2 = +1.779129e-01, c3 = -4.674749e-02;
+      const double c4 = +1.669077e-02, c5 = -5.679136e-03, c6 = +8.833221e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -5.893951e+00, c1 = -6.475304e-01, c2 = +3.116734e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.045722e-01 * (s - 2.500000e+01) - 6.510314e+00;
+}
+
+static double jarquebera_jbtbl200(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.146155e+00, c1 = -1.177398e+00, c2 = -1.297970e-02, c3 = +1.869745e-02;
+      const double c4 = +1.717288e-04, c5 = -1.982108e-04, c6 = +6.427636e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.034235e+00, c1 = -1.455006e+00, c2 = +1.942996e-01, c3 = -4.973795e-02;
+      const double c4 = +1.418812e-02, c5 = -3.156778e-03, c6 = +4.896705e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.086071e+00, c1 = -7.152176e-01, c2 = +3.725393e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.132404e-01 * (s - 2.500000e+01) - 6.764034e+00;
+}
+
+static double jarquebera_jbtbl301(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.104290e+00, c1 = -1.125800e+00, c2 = -9.595847e-03, c3 = +1.219666e-02;
+      const double c4 = +1.502210e-04, c5 = -6.414543e-05, c6 = +6.754115e-05;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.065955e+00, c1 = -1.582060e+00, c2 = +2.004472e-01, c3 = -4.709092e-02;
+      const double c4 = +1.105779e-02, c5 = +1.197391e-03, c6 = -8.386780e-04;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.311384e+00, c1 = -7.918763e-01, c2 = +3.626584e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.293626e-01 * (s - 2.500000e+01) - 7.066995e+00;
+}
+
+static double jarquebera_jbtbl501(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.067426e+00, c1 = -1.079765e+00, c2 = -5.463005e-03, c3 = +6.875659e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.127574e+00, c1 = -1.740694e+00, c2 = +2.044502e-01, c3 = -3.746714e-02;
+      const double c4 = +3.810594e-04, c5 = +1.197111e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.628194e+00, c1 = -8.846221e-01, c2 = +4.386405e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.418332e-01 * (s - 2.500000e+01) - 7.468952e+00;
+}
+
+static double jarquebera_jbtbl701(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.050999e+00, c1 = -1.059769e+00, c2 = -3.922680e-03, c3 = +4.847054e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.192182e+00, c1 = -1.860007e+00, c2 = +1.963942e-01, c3 = -2.838711e-02;
+      const double c4 = -2.893112e-04, c5 = +2.159788e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -6.917851e+00, c1 = -9.817020e-01, c2 = +5.383727e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -1.532706e-01 * (s - 2.500000e+01) - 7.845715e+00;
+}
+
+static double jarquebera_jbtbl1401(double s) {
+   if (s <= 4.0000) {
+      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
+      const double c0 = -1.026266e+00, c1 = -1.030061e+00, c2 = -1.259222e-03, c3 = +2.536254e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 15.0000) {
+      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
+      const double c0 = -4.329849e+00, c1 = -2.095443e+00, c2 = +1.759363e-01, c3 = -7.751359e-03;
+      const double c4 = -6.124368e-03, c5 = -1.793114e-03;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
+      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
+      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
+      return result > 0.0 ? 0.0 : result;
+   } else if (s <= 25.0000) {
+      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
+      const double c0 = -7.544330e+00, c1 = -1.225382e+00, c2 = +5.392349e-02;
+      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
+      double result = c0 * t0 + c1 * t1 + c2 * t2;
+      return result > 0.0 ? 0.0 : result;
+   } else return -2.019375e-01 * (s - 2.500000e+01) - 8.715788e+00;
+}
+
+static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
+   ae_frame _frame_block;
+   double x = s;
+   ae_frame_make(&_frame_block);
+   NewVector(vx, 0, DT_REAL);
+   NewVector(vy, 0, DT_REAL);
+   NewMatrix(ctbl, 0, 0, DT_REAL);
+   double result;
+// N = 5, 6, ..., 20, 30, 50, 65, 100, 130, 200, 301, 501, 701, 1401 are tabulated.
+// In-between values up to 1400 are interpolated using an interpolating polynomial of the second degree.
+// Anything under 5 or beyond 1400 is tabulated by an asymptotic expansion.
+   if (n <= 20) switch (n) {
+      default: ae_frame_leave(); return 1.0;
+      case 5: result = jarquebera_jbtbl5(x); break;
+      case 6: result = jarquebera_jbtbl6(x); break;
+      case 7: result = jarquebera_jbtbl7(x); break;
+      case 8: result = jarquebera_jbtbl8(x); break;
+      case 9: result = jarquebera_jbtbl9(x); break;
+      case 10: result = jarquebera_jbtbl10(x); break;
+      case 11: result = jarquebera_jbtbl11(x); break;
+      case 12: result = jarquebera_jbtbl12(x); break;
+      case 13: result = jarquebera_jbtbl13(x); break;
+      case 14: result = jarquebera_jbtbl14(x); break;
+      case 15: result = jarquebera_jbtbl15(x); break;
+      case 16: result = jarquebera_jbtbl16(x); break;
+      case 17: result = jarquebera_jbtbl17(x); break;
+      case 18: result = jarquebera_jbtbl18(x); break;
+      case 19: result = jarquebera_jbtbl19(x); break;
+      case 20: result = jarquebera_jbtbl20(x); break;
+   } else if (n > 20 && n <= 50) {
+      double t1 = -1.0 / 20.0, t2 = -1.0 / 30.0, t3 = -1.0 / 50.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl20(x), f2 = jarquebera_jbtbl30(x), f3 = jarquebera_jbtbl50(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 50 && n <= 100) {
+      double t1 = -1.0 / 50.0, t2 = -1.0 / 65.0, t3 = -1.0 / 100.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl50(x), f2 = jarquebera_jbtbl65(x), f3 = jarquebera_jbtbl100(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 100 && n <= 200) {
+      double t1 = -1.0 / 100.0, t2 = -1.0 / 130.0, t3 = -1.0 / 200.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl100(x), f2 = jarquebera_jbtbl130(x), f3 = jarquebera_jbtbl200(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 200 && n <= 501) {
+      double t1 = -1.0 / 200.0, t2 = -1.0 / 301.0, t3 = -1.0 / 501.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl200(x), f2 = jarquebera_jbtbl301(x), f3 = jarquebera_jbtbl501(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) result = 0.0;
+   } else if (n > 501 && n <= 1401) {
+      double t1 = -1.0 / 501.0, t2 = -1.0 / 701.0, t3 = -1.0 / 1401.0, t = -1.0 / n;
+      double f1 = jarquebera_jbtbl501(x), f2 = jarquebera_jbtbl701(x), f3 = jarquebera_jbtbl1401(x);
+      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
+      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
+      if (result > 0.0) result = 0.0;
+   } else {
+      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
+      if (result > 0.0) result = 0.0;
+   }
+   result = exp(result);
+   ae_frame_leave();
+   return result;
+}
+
+// Jarque-Bera test
+//
+// This test checks hypotheses about the fact that a  given  sample  X  is  a
+// sample of normal random variable.
+//
+// Requirements:
+//     * the number of elements in the sample is not less than 5.
+//
+// Inputs:
+//     X   -   sample. Array whose index goes from 0 to N-1.
+//     N   -   size of the sample. N >= 5
+//
+// Outputs:
+//     P           -   p-value for the test
+//
+// Accuracy of the approximation used (5 <= N <= 1951):
+//
+// p-value          relative error (5 <= N <= 1951)
+// [1, 0.1]            < 1%
+// [0.1, 0.01]         < 2%
+// [0.01, 0.001]       < 6%
+// [0.001, 0]          wasn't measured
+//
+// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
+// from table values.
+// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
+// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
+void jarqueberatest(RVector *x, ae_int_t n, double *p) {
+   *p = 0;
+// N is too small.
+   if (n < 5) {
+      *p = 1.0;
+      return;
+   }
+// N is large enough.
+   double mean = 0.0;
+   double variance = 0.0;
+   double skewness = 0.0;
+   double kurtosis = 0.0;
+   double stddev = 0.0;
+   ae_assert(n > 1, "Assertion failed");
+// Mean.
+   for (ae_int_t i = 0; i < n; i++) mean += x->xR[i];
+   mean /= n;
+// Variance (using corrected two-pass algorithm).
+   if (n != 1) {
+      double v1 = 0.0;
+      for (ae_int_t i = 0; i < n; i++) v1 += ae_sqr(x->xR[i] - mean);
+      double v2 = 0.0;
+      for (ae_int_t i = 0; i < n; i++) v2 += x->xR[i] - mean;
+      v2 = ae_sqr(v2) / n;
+      variance = (v1 - v2) / (n - 1);
+      if (variance < 0.0) variance = 0.0;
+      stddev = sqrt(variance);
+   }
+// Skewness and kurtosis.
+   if (stddev != 0.0) {
+      for (ae_int_t i = 0; i < n; i++) {
+         double v = (x->xR[i] - mean) / stddev;
+         double v2 = v * v;
+         skewness += v2 * v;
+         kurtosis += v2 * v2;
+      }
+      skewness /= n;
+      kurtosis = kurtosis / n - 3;
+   }
+// Statistic.
+   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4.0));
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::jarqueberatest(ConstT(ae_vector, x), n, &p);
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
+// === VARIANCETESTS Package ===
+// Depends on: (SpecialFunctions) FDISTR, CHISQUAREDISTR
+namespace alglib_impl {
+// Two-sample F-test
+//
+// This test checks three hypotheses about dispersions of the given  samples.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersions are equal)
+//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
+//       sample is greater than or equal to  the  dispersion  of  the  second
+//       sample).
+//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
+//       sample is less than or equal to the dispersion of the second sample)
+//
+// The test is based on the following assumptions:
+//     * the given samples have normal distributions
+//     * the samples are independent.
+//
+// Inputs:
+//     X   -   sample 1. Array whose index goes from 0 to N-1.
+//     N   -   sample size.
+//     Y   -   sample 2. Array whose index goes from 0 to M-1.
+//     M   -   sample size.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
+void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
+   ae_int_t i;
+   double xmean;
+   double ymean;
+   double xvar;
+   double yvar;
+   ae_int_t df1;
+   ae_int_t df2;
+   double stat;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   if (n <= 2 || m <= 2) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Mean
+   xmean = 0.0;
+   for (i = 0; i < n; i++) {
+      xmean += x->xR[i];
+   }
+   xmean /= n;
+   ymean = 0.0;
+   for (i = 0; i < m; i++) {
+      ymean += y->xR[i];
+   }
+   ymean /= m;
+// Variance (using corrected two-pass algorithm)
+   xvar = 0.0;
+   for (i = 0; i < n; i++) {
+      xvar += ae_sqr(x->xR[i] - xmean);
+   }
+   xvar /= n - 1;
+   yvar = 0.0;
+   for (i = 0; i < m; i++) {
+      yvar += ae_sqr(y->xR[i] - ymean);
+   }
+   yvar /= m - 1;
+   if (xvar == 0.0 || yvar == 0.0) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Statistic
+   df1 = n - 1;
+   df2 = m - 1;
+   stat = rmin2(xvar / yvar, yvar / xvar);
+   *bothtails = 1 - (fdistribution(df1, df2, 1 / stat) - fdistribution(df1, df2, stat));
+   *lefttail = fdistribution(df1, df2, xvar / yvar);
+   *righttail = 1 - (*lefttail);
+}
+
+// One-sample chi-square test
+//
+// This test checks three hypotheses about the dispersion of the given sample
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the dispersion equals  the  given
+//       number)
+//     * left-tailed test (null hypothesis - the dispersion is  greater  than
+//       or equal to the given number)
+//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
+//       equal to the given number).
+//
+// Test is based on the following assumptions:
+//     * the given sample has a normal distribution.
+//
+// Inputs:
+//     X           -   sample 1. Array whose index goes from 0 to N-1.
+//     N           -   size of the sample.
+//     Variance    -   dispersion value to compare with.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
+// API: void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail);
+void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail) {
+   ae_int_t i;
+   double xmean;
+   double xvar;
+   double s;
+   double stat;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   if (n <= 1) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Mean
+   xmean = 0.0;
+   for (i = 0; i < n; i++) {
+      xmean += x->xR[i];
+   }
+   xmean /= n;
+// Variance
+   xvar = 0.0;
+   for (i = 0; i < n; i++) {
+      xvar += ae_sqr(x->xR[i] - xmean);
+   }
+   xvar /= n - 1;
+   if (xvar == 0.0) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Statistic
+   stat = (n - 1) * xvar / variance;
+   s = chisquaredistribution((double)(n - 1), stat);
+   *bothtails = 2 * rmin2(s, 1 - s);
+   *lefttail = s;
+   *righttail = 1 - (*lefttail);
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::ftest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+
+void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::onesamplevariancetest(ConstT(ae_vector, x), n, variance, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
 // === WSR Package ===
 // Depends on: (AlgLibInternal) APSERV
 namespace alglib_impl {
@@ -2504,751 +3860,6 @@ void wilcoxonsignedranktest(const real_1d_array &x, const ae_int_t n, const doub
    alglib_impl::ae_state_init();
    TryCatch()
    alglib_impl::wilcoxonsignedranktest(ConstT(ae_vector, x), n, e, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === STEST Package ===
-// Depends on: (SpecialFunctions) BINOMIALDISTR
-namespace alglib_impl {
-// Sign test
-//
-// This test checks three hypotheses about the median of  the  given  sample.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the median is equal to the  given
-//       value)
-//     * left-tailed test (null hypothesis - the median is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the  median  is  less  than  or
-//       equal to the given value)
-//
-// Requirements:
-//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
-//       the test could not be applied to nominal variables).
-//
-// The test is non-parametric and doesn't require distribution X to be normal
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of the sample.
-//     Median  -   assumed median value.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// While   calculating   p-values   high-precision   binomial    distribution
-// approximation is used, so significance levels have about 15 exact digits.
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
-// API: void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
-void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail) {
-   ae_int_t i;
-   ae_int_t gtcnt;
-   ae_int_t necnt;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   if (n <= 1) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Calculate:
-// GTCnt - count of x[i]>Median
-// NECnt - count of x[i] != Median
-   gtcnt = 0;
-   necnt = 0;
-   for (i = 0; i < n; i++) {
-      if (x->xR[i] > median) {
-         gtcnt++;
-      }
-      if (x->xR[i] != median) {
-         necnt++;
-      }
-   }
-   if (necnt == 0) {
-   // all x[i] are equal to Median.
-   // So we can conclude that Median is a true median :)
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-   *bothtails = rmin2(2 * binomialdistribution(imin2(gtcnt, necnt - gtcnt), necnt, 0.5), 1.0);
-   *lefttail = binomialdistribution(gtcnt, necnt, 0.5);
-   *righttail = binomialcdistribution(gtcnt - 1, necnt, 0.5);
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::onesamplesigntest(ConstT(ae_vector, x), n, median, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === CORRELATIONTESTS Package ===
-// Depends on: (SpecialFunctions) STUDENTTDISTR
-// Depends on: BASESTAT
-namespace alglib_impl {
-// Pearson's correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5
-//     * normality of distributions of X and Y.
-//
-// Inputs:
-//     R   -   Pearson's correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
-void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
-   double t;
-   double p;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-// Some special cases
-   if (r >= 1.0) {
-      *bothtails = 0.0;
-      *lefttail = 1.0;
-      *righttail = 0.0;
-      return;
-   }
-   if (r <= -1.0) {
-      *bothtails = 0.0;
-      *lefttail = 0.0;
-      *righttail = 1.0;
-      return;
-   }
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// General case
-   t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
-   p = studenttdistribution(n - 2, t);
-   *bothtails = 2 * rmin2(p, 1 - p);
-   *lefttail = p;
-   *righttail = 1 - p;
-}
-
-// Tail(T,N), accepts T < 0
-static double correlationtests_spearmantail(double t, ae_int_t n) {
-   switch (n) {
-      case 5:
-         return
-            t <= -7.584e-01 ? (
-               t <= -1.704e+00 ? (
-                  t <= -3.580e+00 ? 8.304e-03 : t <= -2.322e+00 ? 4.163e-02: 6.641e-02
-               ) : t <= -1.303e+00 ? 1.164e-01 : t <= -1.003e+00 ? 1.748e-01 : 2.249e-01
-            ) : t <= -1.759e-01 ? (
-               t <= -5.468e-01 ? 2.581e-01 : t <= -3.555e-01 ? 3.413e-01 : 3.911e-01
-            ) : t <= -1.741e-03 ? 4.747e-01 : t <= -0.000e+00 ? 5.248e-01 : studenttdistribution(3, t);
-      case 6:
-         return
-            t <= -2.045e+00 ? (
-               t <= -3.834e+00 ? (
-                  t <= -5.663e+00 ? 1.366e-03: 8.350e-03
-               ) : t <= -2.968e+00 ? 1.668e-02 : t <= -2.430e+00 ? 2.921e-02 : 5.144e-02
-            ) : t <= -1.295e+00 ? (
-               t <= -1.747e+00 ? 6.797e-02 : t <= -1.502e+00 ? 8.752e-02 : 1.210e-01
-            ) : t <= -1.113e+00 ? 1.487e-01 : t <= -1.001e+00 ? 1.780e-01 : studenttdistribution(4, t);
-      case 7:
-         return
-            t <= -2.068e+00 ? (
-               t <= -3.728e+00 ? (
-                  t <= -5.620e+00 ? (
-                     t <= -8.159e+00 ? 2.081e-04 : 1.393e-03
-                  ) : t <= -4.445e+00 ? 3.398e-03 : 6.187e-03
-               ) : t <= -2.844e+00 ? (
-                  t <= -3.226e+00 ? 1.200e-02: 1.712e-02
-               ) : t <= -2.539e+00 ? 2.408e-02 : t <= -2.285e+00 ? 3.320e-02 : 4.406e-02
-            ) : t <= -1.420e+00 ? (
-               t <= -1.710e+00 ? (
-                  t <= -1.879e+00 ? 5.478e-02 : 6.946e-02
-               ) : t <= -1.559e+00 ? 8.331e-02 : 1.001e-01
-            ) : t <= -1.173e+00 ? (
-               t <= -1.292e+00 ? 1.180e-01: 1.335e-01
-            ) : t <= -1.062e+00 ? 1.513e-01 : t <= -1.001e+00 ? 1.770e-01 : studenttdistribution(5, t);
-      case 8:
-         return
-            t <= -3.381e+00 ? (
-               t <= -5.213e+00 ? (
-                  t <= -7.685e+00 ? (
-                     t <= -1.103e+01 ? 2.194e-05 : 2.008e-04
-                  ) : t <= -6.143e+00 ? 5.686e-04 : 1.138e-03
-               ) : t <= -4.081e+00 ? (
-                  t <= -4.567e+00 ? 2.310e-03 : 3.634e-03
-               ) : t <= -3.697e+00 ? 5.369e-03 : 7.708e-03
-            ) : t <= -2.502e+00 ? (
-               t <= -2.884e+00 ? (
-                  t <= -3.114e+00 ? 1.087e-02 : 1.397e-02
-               ) : t <= -2.682e+00 ? 1.838e-02 : 2.288e-02
-            ) : t <= -2.192e+00 ? (
-               t <= -2.340e+00 ? 2.883e-02 : 3.469e-02
-            ) : t <= -2.057e+00 ? 4.144e-02 : t <= -2.001e+00 ? 4.804e-02 : studenttdistribution(6, t);
-     case 9:
-         return
-            t <= -3.336e+00 ? (
-               t <= -4.991e+00 ? (
-                  t <= -6.890e+00 ? (
-                     t <= -9.989e+00 ? 2.306e-05 : t <= -8.069e+00 ? 8.167e-05 : 1.744e-04
-                  ) : t <= -6.077e+00 ? 3.625e-04 : t <= -5.469e+00 ? 6.450e-04 : 1.001e-03
-               ) : t <= -3.991e+00 ? (
-                  t <= -4.600e+00 ? 1.514e-03 : t <= -4.272e+00 ? 2.213e-03 : 2.990e-03
-               ) : t <= -3.746e+00 ? 4.101e-03 : t <= -3.530e+00 ? 5.355e-03 : 6.887e-03
-            ) : t <= -2.477e+00 ? (
-               t <= -2.855e+00 ? (
-                  t <= -3.161e+00 ? 8.598e-03 : t <= -3.002e+00 ? 1.065e-02 : 1.268e-02
-               ) : t <= -2.720e+00 ? 1.552e-02 : t <= -2.595e+00 ? 1.836e-02 : 2.158e-02
-            ) : t <= -2.166e+00 ? (
-               t <= -2.368e+00 ? 2.512e-02 : t <= -2.264e+00 ? 2.942e-02 : 3.325e-02
-            ) : t <= -2.073e+00 ? 3.800e-02 : t <= -2.001e+00 ? 4.285e-02 : studenttdistribution(7, t);
-      default: return studenttdistribution(n - 2, t);
-   }
-}
-
-// Spearman's rank correlation coefficient significance test
-//
-// This test checks hypotheses about whether X  and  Y  are  samples  of  two
-// continuous  distributions  having  zero  correlation  or   whether   their
-// correlation is non-zero.
-//
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - X and Y have zero correlation)
-//     * left-tailed test (null hypothesis - the correlation  coefficient  is
-//       greater than or equal to 0)
-//     * right-tailed test (null hypothesis - the correlation coefficient  is
-//       less than or equal to 0).
-//
-// Requirements:
-//     * the number of elements in each sample is not less than 5.
-//
-// The test is non-parametric and doesn't require distributions X and Y to be
-// normal.
-//
-// Inputs:
-//     R   -   Spearman's rank correlation coefficient for X and Y
-//     N   -   number of elements in samples, N >= 5.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail);
-void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails, double *lefttail, double *righttail) {
-   double t;
-   double p;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-// Special case
-   if (n < 5) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// General case
-   if (r >= 1.0) {
-      t = 1.0E10;
-   } else {
-      if (r <= -1.0) {
-         t = -1.0E10;
-      } else {
-         t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
-      }
-   }
-   if (t < 0.0) {
-      p = correlationtests_spearmantail(t, n);
-      *bothtails = 2 * p;
-      *lefttail = p;
-      *righttail = 1 - p;
-   } else {
-      p = correlationtests_spearmantail(-t, n);
-      *bothtails = 2 * p;
-      *lefttail = 1 - p;
-      *righttail = p;
-   }
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-void pearsoncorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::pearsoncorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-
-void spearmanrankcorrelationsignificance(const double r, const ae_int_t n, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::spearmanrankcorrelationsignificance(r, n, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === STUDENTTTESTS Package ===
-// Depends on: (SpecialFunctions) STUDENTTDISTR
-namespace alglib_impl {
-// One-sample t-test
-//
-// This test checks three hypotheses about the mean of the given sample.  The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
-//       value)
-//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
-//       equal to the given value)
-//     * right-tailed test (null hypothesis - the mean is less than or  equal
-//       to the given value).
-//
-// The test is based on the assumption that  a  given  sample  has  a  normal
-// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
-// differs from normal, the test will work incorrectly.
-//
-// Inputs:
-//     X       -   sample. Array whose index goes from 0 to N-1.
-//     N       -   size of sample, N >= 0
-//     Mean    -   assumed value of the mean.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0, all p-values are set to 1.0
-//       * when variance of X[] is exactly zero, p-values are set
-//         to 1.0 or 0.0, depending on difference between sample mean and
-//         value of mean being tested.
-// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
-// API: void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
-void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail) {
-   ae_int_t i;
-   double xmean;
-   double x0;
-   double v;
-   bool samex;
-   double xvariance;
-   double xstddev;
-   double v1;
-   double v2;
-   double stat;
-   double s;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   if (n <= 0) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Mean
-   xmean = 0.0;
-   x0 = x->xR[0];
-   samex = true;
-   for (i = 0; i < n; i++) {
-      v = x->xR[i];
-      xmean += v;
-      samex = samex && v == x0;
-   }
-   if (samex) {
-      xmean = x0;
-   } else {
-      xmean /= n;
-   }
-// Variance (using corrected two-pass algorithm)
-   xvariance = 0.0;
-   xstddev = 0.0;
-   if (n != 1 && !samex) {
-      v1 = 0.0;
-      for (i = 0; i < n; i++) {
-         v1 += ae_sqr(x->xR[i] - xmean);
-      }
-      v2 = 0.0;
-      for (i = 0; i < n; i++) {
-         v2 += x->xR[i] - xmean;
-      }
-      v2 = ae_sqr(v2) / n;
-      xvariance = (v1 - v2) / (n - 1);
-      if (xvariance < 0.0) {
-         xvariance = 0.0;
-      }
-      xstddev = sqrt(xvariance);
-   }
-   if (xstddev == 0.0) {
-      if (xmean == mean) {
-         *bothtails = 1.0;
-      } else {
-         *bothtails = 0.0;
-      }
-      if (xmean >= mean) {
-         *lefttail = 1.0;
-      } else {
-         *lefttail = 0.0;
-      }
-      if (xmean <= mean) {
-         *righttail = 1.0;
-      } else {
-         *righttail = 0.0;
-      }
-      return;
-   }
-// Statistic
-   stat = (xmean - mean) / (xstddev / sqrt((double)n));
-   s = studenttdistribution(n - 1, stat);
-   *bothtails = 2 * rmin2(s, 1 - s);
-   *lefttail = s;
-   *righttail = 1 - s;
-}
-
-// Two-sample pooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * dispersions are equal
-//     * samples are independent.
-//
-// Inputs:
-//     X       -   sample 1. Array whose index goes from 0 to N-1.
-//     N       -   size of sample.
-//     Y       -   sample 2. Array whose index goes from 0 to M-1.
-//     M       -   size of sample.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has exactly zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
-// API: void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
-   ae_int_t i;
-   bool samex;
-   bool samey;
-   double x0;
-   double y0;
-   double xmean;
-   double ymean;
-   double v;
-   double stat;
-   double s;
-   double p;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   if (n <= 0 || m <= 0) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Mean
-   xmean = 0.0;
-   x0 = x->xR[0];
-   samex = true;
-   for (i = 0; i < n; i++) {
-      v = x->xR[i];
-      xmean += v;
-      samex = samex && v == x0;
-   }
-   if (samex) {
-      xmean = x0;
-   } else {
-      xmean /= n;
-   }
-   ymean = 0.0;
-   y0 = y->xR[0];
-   samey = true;
-   for (i = 0; i < m; i++) {
-      v = y->xR[i];
-      ymean += v;
-      samey = samey && v == y0;
-   }
-   if (samey) {
-      ymean = y0;
-   } else {
-      ymean /= m;
-   }
-// S
-   s = 0.0;
-   if (n + m > 2) {
-      for (i = 0; i < n; i++) {
-         s += ae_sqr(x->xR[i] - xmean);
-      }
-      for (i = 0; i < m; i++) {
-         s += ae_sqr(y->xR[i] - ymean);
-      }
-      s = sqrt(s * (1.0 / (double)n + 1.0 / (double)m) / (n + m - 2));
-   }
-   if (s == 0.0) {
-      if (xmean == ymean) {
-         *bothtails = 1.0;
-      } else {
-         *bothtails = 0.0;
-      }
-      if (xmean >= ymean) {
-         *lefttail = 1.0;
-      } else {
-         *lefttail = 0.0;
-      }
-      if (xmean <= ymean) {
-         *righttail = 1.0;
-      } else {
-         *righttail = 0.0;
-      }
-      return;
-   }
-// Statistic
-   stat = (xmean - ymean) / s;
-   p = studenttdistribution(n + m - 2, stat);
-   *bothtails = 2 * rmin2(p, 1 - p);
-   *lefttail = p;
-   *righttail = 1 - p;
-}
-
-// Two-sample unpooled test
-//
-// This test checks three hypotheses about the mean of the given samples. The
-// following tests are performed:
-//     * two-tailed test (null hypothesis - the means are equal)
-//     * left-tailed test (null hypothesis - the mean of the first sample  is
-//       greater than or equal to the mean of the second sample)
-//     * right-tailed test (null hypothesis - the mean of the first sample is
-//       less than or equal to the mean of the second sample).
-//
-// Test is based on the following assumptions:
-//     * given samples have normal distributions
-//     * samples are independent.
-// Equality of variances is NOT required.
-//
-// Inputs:
-//     X - sample 1. Array whose index goes from 0 to N-1.
-//     N - size of the sample.
-//     Y - sample 2. Array whose index goes from 0 to M-1.
-//     M - size of the sample.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-//
-// NOTE: this function correctly handles degenerate cases:
-//       * when N=0 or M=0, all p-values are set to 1.0
-//       * when both samples has zero variance, p-values are set
-//         to 1.0 or 0.0, depending on difference between means.
-//       * when only one sample has zero variance, test reduces to 1-sample
-//         version.
-// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
-// API: void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
-   ae_int_t i;
-   bool samex;
-   bool samey;
-   double x0;
-   double y0;
-   double xmean;
-   double ymean;
-   double xvar;
-   double yvar;
-   double v;
-   double df;
-   double p;
-   double stat;
-   double c;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   if (n <= 0 || m <= 0) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Mean
-   xmean = 0.0;
-   x0 = x->xR[0];
-   samex = true;
-   for (i = 0; i < n; i++) {
-      v = x->xR[i];
-      xmean += v;
-      samex = samex && v == x0;
-   }
-   if (samex) {
-      xmean = x0;
-   } else {
-      xmean /= n;
-   }
-   ymean = 0.0;
-   y0 = y->xR[0];
-   samey = true;
-   for (i = 0; i < m; i++) {
-      v = y->xR[i];
-      ymean += v;
-      samey = samey && v == y0;
-   }
-   if (samey) {
-      ymean = y0;
-   } else {
-      ymean /= m;
-   }
-// Variance (using corrected two-pass algorithm)
-   xvar = 0.0;
-   if (n >= 2 && !samex) {
-      for (i = 0; i < n; i++) {
-         xvar += ae_sqr(x->xR[i] - xmean);
-      }
-      xvar /= n - 1;
-   }
-   yvar = 0.0;
-   if (m >= 2 && !samey) {
-      for (i = 0; i < m; i++) {
-         yvar += ae_sqr(y->xR[i] - ymean);
-      }
-      yvar /= m - 1;
-   }
-// Handle different special cases
-// (one or both variances are zero).
-   if (xvar == 0.0 && yvar == 0.0) {
-      if (xmean == ymean) {
-         *bothtails = 1.0;
-      } else {
-         *bothtails = 0.0;
-      }
-      if (xmean >= ymean) {
-         *lefttail = 1.0;
-      } else {
-         *lefttail = 0.0;
-      }
-      if (xmean <= ymean) {
-         *righttail = 1.0;
-      } else {
-         *righttail = 0.0;
-      }
-      return;
-   }
-   if (xvar == 0.0) {
-   // X is constant, unpooled 2-sample test reduces to 1-sample test.
-   //
-   // NOTE: right-tail and left-tail must be passed to 1-sample
-   //       t-test in reverse order because we reverse order of
-   //       of samples.
-      studentttest1(y, m, xmean, bothtails, righttail, lefttail);
-      return;
-   }
-   if (yvar == 0.0) {
-   // Y is constant, unpooled 2-sample test reduces to 1-sample test.
-      studentttest1(x, n, ymean, bothtails, lefttail, righttail);
-      return;
-   }
-// Statistic
-   stat = (xmean - ymean) / sqrt(xvar / n + yvar / m);
-   c = xvar / n / (xvar / n + yvar / m);
-   df = (double)(n - 1) * (m - 1) / ((m - 1) * ae_sqr(c) + (n - 1) * ae_sqr(1 - c));
-   if (stat > 0.0) {
-      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
-   } else {
-      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
-   }
-   *bothtails = 2 * rmin2(p, 1 - p);
-   *lefttail = p;
-   *righttail = 1 - p;
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::studentttest1(ConstT(ae_vector, x), n, mean, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-
-void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::studentttest2(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
-   alglib_impl::ae_state_clear();
-}
-
-void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::unequalvariancettest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib
@@ -6864,971 +7475,30 @@ void mannwhitneyutest(const real_1d_array &x, const ae_int_t n, const real_1d_ar
 }
 } // end of namespace alglib
 
-// === JARQUEBERA Package ===
+// === STEST Package ===
+// Depends on: (SpecialFunctions) BINOMIALDISTR
 namespace alglib_impl {
-static void jarquebera_jbcheb(double x, double c, double *tj, double *tj1, double *r) {
-   *r += c * (*tj);
-   double t = 2.0 * x * (*tj1) - (*tj);
-   *tj = *tj1, *tj1 = t;
-}
-
-static double jarquebera_jbtbl5(double s) {
-   if (s <= 0.4000) {
-      double x = 2 * (s - 0.000000) / 0.400000 - 1, x2 = x * x;
-      const double c0 = -1.097885e-20, c1 = -2.854501e-20, c2 = -1.756616e-20;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 1.1000) {
-      double x = 2 * (s - 0.400000) / 0.700000 - 1, x2 = x * x;
-      const double c0 = -1.324545e+00, c1 = -1.075941e+00, c2 = -9.772272e-01, c3 = +3.175686e-01;
-      const double c4 = -1.576162e-01, c5 = +1.126861e-01, c6 = -3.434425e-02, c7 = -2.790359e-01;
-      const double c8 = +2.809178e-02, c9 = -5.479704e-01, ca = +3.717040e-02, cb = -5.294170e-01;
-      const double cc = +2.880632e-02, cd = -3.023344e-01, ce = +1.601531e-02, cf = -7.920403e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
-      return result > 0.0 ? 0.0 : result;
-   } else return -5.188419e+02 * (s - 1.100000e+00) - 4.767297e+00;
-}
-
-static double jarquebera_jbtbl6(double s) {
-   if (s <= 0.2500) {
-      double x = 2 * (s - 0.000000) / 0.250000 - 1, x2 = x * x;
-      const double c0 = -2.274707e-04, c1 = -5.700471e-04, c2 = -3.425764e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 1.3000) {
-      double x = 2 * (s - 0.250000) / 1.050000 - 1, x2 = x * x;
-      const double c0 = -1.339000e+00, c1 = -2.011104e+00, c2 = -8.168177e-01, c3 = -1.085666e-01;
-      const double c4 = +7.738606e-02, c5 = +7.022876e-02, c6 = +3.462402e-02, c7 = +6.908270e-03;
-      const double c8 = -8.230772e-03, c9 = -1.006996e-02, ca = -5.410222e-03, cb = -2.893768e-03;
-      const double cc = +8.114564e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 1.8500) {
-      double x = 2 * (s - 1.300000) / 0.550000 - 1, x2 = x * x;
-      const double c0 = -6.794311e+00, c1 = -3.578700e+00, c2 = -1.394664e+00, c3 = -7.928290e-01;
-      const double c4 = -4.813273e-01, c5 = -3.076063e-01, c6 = -1.835380e-01, c7 = -1.013013e-01;
-      const double c8 = -5.058903e-02, c9 = -1.856915e-02, ca = -6.710887e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.770029e+02 * (s - 1.850000e+00) - 1.371015e+01;
-}
-
-static double jarquebera_jbtbl7(double s) {
-   if (s <= 1.4000) {
-      double x = 2 * (s - 0.000000) / 1.400000 - 1, x2 = x * x;
-      const double c0 = -1.093681e+00, c1 = -1.695911e+00, c2 = -7.473192e-01, c3 = -1.203236e-01;
-      const double c4 = +6.590379e-02, c5 = +6.291876e-02, c6 = +3.132007e-02, c7 = +9.411147e-03;
-      const double c8 = -1.180067e-03, c9 = -3.487610e-03, ca = -2.436561e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 3.0000) {
-      double x = 2 * (s - 1.400000) / 1.600000 - 1, x2 = x * x;
-      const double c0 = -5.947854e+00, c1 = -2.772675e+00, c2 = -4.707912e-01, c3 = -1.691171e-01;
-      const double c4 = -4.132795e-02, c5 = -1.481310e-02, c6 = +2.867536e-03, c7 = +8.772327e-04;
-      const double c8 = +5.033387e-03, c9 = -1.378277e-03, ca = -2.497964e-03, cb = -3.636814e-03;
-      const double cc = -9.581640e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 3.2000) {
-      double x = 2 * (s - 3.000000) / 0.200000 - 1, x2 = x * x;
-      const double c0 = -7.511008e+00, c1 = -8.140472e-01, c2 = +1.682053e+00, c3 = -2.568561e-02;
-      const double c4 = -1.933930e+00, c5 = -8.140472e-01, c6 = -3.895025e+00, c7 = -8.140472e-01;
-      const double c8 = -1.933930e+00, c9 = -2.568561e-02, ca = +1.682053e+00;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.824116e+03 * (s - 3.200000e+00) - 1.440330e+01;
-}
-
-static double jarquebera_jbtbl8(double s) {
-   if (s <= 1.3000) {
-      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
-      const double c0 = -7.199015e-01, c1 = -1.095921e+00, c2 = -4.736828e-01, c3 = -1.047438e-01;
-      const double c4 = -2.484320e-03, c5 = +7.937923e-03, c6 = +4.810470e-03, c7 = +2.139780e-03;
-      const double c8 = +6.708443e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 2.0000) {
-      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
-      const double c0 = -3.378966e+00, c1 = -7.802461e-01, c2 = +1.547593e-01, c3 = -6.241042e-02;
-      const double c4 = +1.203274e-02, c5 = +5.201990e-03, c6 = -5.125597e-03, c7 = +1.584426e-03;
-      const double c8 = +2.546069e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 5.0000) {
-      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -6.828366e+00, c1 = -3.137533e+00, c2 = -5.016671e-01, c3 = -1.745637e-01;
-      const double c4 = -5.189801e-02, c5 = -1.621610e-02, c6 = -6.741122e-03, c7 = -4.516368e-03;
-      const double c8 = +3.552085e-04, c9 = +2.787029e-03, ca = +5.359774e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -5.087028e+00 * (s - 5.000000e+00) - 1.071300e+01;
-}
-
-static double jarquebera_jbtbl9(double s) {
-   if (s <= 1.3000) {
-      double x = 2 * (s - 0.000000) / 1.300000 - 1, x2 = x * x;
-      const double c0 = -6.279320e-01, c1 = -9.277151e-01, c2 = -3.669339e-01, c3 = -7.086149e-02;
-      const double c4 = -1.333816e-03, c5 = +3.871249e-03, c6 = +2.007048e-03, c7 = +7.482245e-04;
-      const double c8 = +2.355615e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 2.0000) {
-      double x = 2 * (s - 1.300000) / 0.700000 - 1, x2 = x * x;
-      const double c0 = -2.981430e+00, c1 = -7.972248e-01, c2 = +1.747737e-01, c3 = -3.808530e-02;
-      const double c4 = -7.888305e-03, c5 = +9.001302e-03, c6 = -1.378767e-03, c7 = -1.108510e-03;
-      const double c8 = +5.915372e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 7.0000) {
-      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
-      const double c0 = -6.387463e+00, c1 = -2.845231e+00, c2 = -1.809956e-01, c3 = -7.543461e-02;
-      const double c4 = -4.880397e-03, c5 = -1.160074e-02, c6 = -7.356527e-03, c7 = -4.394428e-03;
-      const double c8 = +9.619892e-04, c9 = -2.758763e-04, ca = +4.790977e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.020952e+00 * (s - 7.000000e+00) - 9.516623e+00;
-}
-
-static double jarquebera_jbtbl10(double s) {
-   if (s <= 1.2000) {
-      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
-      const double c0 = -4.590993e-01, c1 = -6.562730e-01, c2 = -2.353934e-01, c3 = -4.069933e-02;
-      const double c4 = -1.849151e-03, c5 = +8.931406e-04, c6 = +3.636295e-04, c7 = +1.178340e-05;
-      const double c8 = -8.917749e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 2.0000) {
-      double x = 2 * (s - 1.200000) / 0.800000 - 1, x2 = x * x;
-      const double c0 = -2.537658e+00, c1 = -9.962401e-01, c2 = +1.838715e-01, c3 = +1.055792e-02;
-      const double c4 = -2.580316e-02, c5 = +1.781701e-03, c6 = +3.770362e-03, c7 = -4.838983e-04;
-      const double c8 = -6.999052e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 7.0000) {
-      double x = 2 * (s - 2.000000) / 5.000000 - 1, x2 = x * x;
-      const double c0 = -5.337524e+00, c1 = -1.877029e+00, c2 = +4.734650e-02, c3 = -4.249254e-02;
-      const double c4 = +3.320250e-03, c5 = -6.432266e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
-      return result > 0.0 ? 0.0 : result;
-   } else return -8.711035e-01 * (s - 7.000000e+00) - 7.212811e+00;
-}
-
-static double jarquebera_jbtbl11(double s) {
-   if (s <= 1.2000) {
-      double x = 2 * (s - 0.000000) / 1.200000 - 1, x2 = x * x;
-      const double c0 = -4.339517e-01, c1 = -6.051558e-01, c2 = -2.000992e-01, c3 = -3.022547e-02;
-      const double c4 = -9.808401e-04, c5 = +5.592870e-04, c6 = +3.575081e-04, c7 = +2.086173e-04;
-      const double c8 = +6.089011e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 2.2500) {
-      double x = 2 * (s - 1.200000) / 1.050000 - 1, x2 = x * x;
-      const double c0 = -2.523221e+00, c1 = -1.068388e+00, c2 = +2.179661e-01, c3 = -1.555524e-03;
-      const double c4 = -3.238964e-02, c5 = +7.364320e-03, c6 = +4.895771e-03, c7 = -1.762774e-03;
-      const double c8 = -8.201340e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 8.0000) {
-      double x = 2 * (s - 2.250000) / 5.750000 - 1, x2 = x * x;
-      const double c0 = -5.212179e+00, c1 = -1.684579e+00, c2 = +8.299519e-02, c3 = -3.606261e-02;
-      const double c4 = +7.310869e-03, c5 = -3.320115e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
-      return result > 0.0 ? 0.0 : result;
-   } else return -5.715445e-01 * (s - 8.000000e+00) - 6.845834e+00;
-}
-
-static double jarquebera_jbtbl12(double s) {
-   if (s <= 1.0000) {
-      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
-      const double c0 = -2.736742e-01, c1 = -3.657836e-01, c2 = -1.047209e-01, c3 = -1.319599e-02;
-      const double c4 = -5.545631e-04, c5 = +9.280445e-05, c6 = +2.815679e-05, c7 = -2.213519e-05;
-      const double c8 = +1.256838e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 3.0000) {
-      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
-      const double c0 = -2.573947e+00, c1 = -1.515287e+00, c2 = +3.611880e-01, c3 = -3.271311e-02;
-      const double c4 = -6.495815e-02, c5 = +4.141186e-02, c6 = +7.180886e-04, c7 = -1.388211e-02;
-      const double c8 = +4.890761e-03, c9 = +3.233175e-03, ca = -2.946156e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 12.0000) {
-      double x = 2 * (s - 3.000000) / 9.000000 - 1, x2 = x * x;
-      const double c0 = -5.947819e+00, c1 = -2.034157e+00, c2 = +6.878986e-02, c3 = -4.078603e-02;
-      const double c4 = +6.990977e-03, c5 = -2.866215e-03, c6 = +3.897866e-03, c7 = +2.512252e-03;
-      const double c8 = +2.073743e-03, c9 = +3.022621e-03, ca = +1.501343e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.877243e-01 * (s - 1.200000e+01) - 7.936839e+00;
-}
-
-static double jarquebera_jbtbl13(double s) {
-   if (s <= 1.0000) {
-      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
-      const double c0 = -2.713276e-01, c1 = -3.557541e-01, c2 = -9.459092e-02, c3 = -1.044145e-02;
-      const double c4 = -2.546132e-04, c5 = +1.002374e-04, c6 = +2.349456e-05, c7 = -7.025669e-05;
-      const double c8 = -1.590242e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 3.0000) {
-      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
-      const double c0 = -2.454383e+00, c1 = -1.467539e+00, c2 = +3.270774e-01, c3 = -8.075763e-03;
-      const double c4 = -6.611647e-02, c5 = +2.990785e-02, c6 = +8.109212e-03, c7 = -1.135031e-02;
-      const double c8 = +5.915919e-04, c9 = +3.522390e-03, ca = -1.144701e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 13.0000) {
-      double x = 2 * (s - 3.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -5.736127e+00, c1 = -1.920809e+00, c2 = +1.175858e-01, c3 = -4.002049e-02;
-      const double c4 = +1.158966e-02, c5 = -3.157781e-03, c6 = +2.762172e-03, c7 = +5.780347e-04;
-      const double c8 = -1.193310e-03, c9 = -2.442421e-05, ca = +2.547756e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.799944e-01 * (s - 1.300000e+01) - 7.566269e+00;
-}
-
-static double jarquebera_jbtbl14(double s) {
-   if (s <= 1.0000) {
-      double x = 2 * (s - 0.000000) / 1.000000 - 1, x2 = x * x;
-      const double c0 = -2.698527e-01, c1 = -3.479081e-01, c2 = -8.640733e-02, c3 = -8.466899e-03;
-      const double c4 = -1.469485e-04, c5 = +2.150009e-05, c6 = +1.965975e-05, c7 = -4.710210e-05;
-      const double c8 = -1.327808e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 3.0000) {
-      double x = 2 * (s - 1.000000) / 2.000000 - 1, x2 = x * x;
-      const double c0 = -2.350359e+00, c1 = -1.421365e+00, c2 = +2.960468e-01, c3 = +1.149167e-02;
-      const double c4 = -6.361109e-02, c5 = +1.976022e-02, c6 = +1.082700e-02, c7 = -8.563328e-03;
-      const double c8 = -1.453123e-03, c9 = +2.917559e-03, ca = -1.151067e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 3.000000) / 12.000000 - 1, x2 = x * x;
-      const double c0 = -5.746892e+00, c1 = -2.010441e+00, c2 = +1.566146e-01, c3 = -5.129690e-02;
-      const double c4 = +1.929724e-02, c5 = -2.524227e-03, c6 = +3.192933e-03, c7 = -4.254730e-04;
-      const double c8 = +1.620685e-03, c9 = +7.289618e-04, ca = -2.112350e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.590621e-01 * (s - 1.500000e+01) - 7.632238e+00;
-}
-
-static double jarquebera_jbtbl15(double s) {
-   if (s <= 2.0000) {
-      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
-      const double c0 = -1.043660e+00, c1 = -1.361653e+00, c2 = -3.009497e-01, c3 = +4.951784e-02;
-      const double c4 = +4.377903e-02, c5 = +1.003253e-02, c6 = -1.271309e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 5.0000) {
-      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -3.582778e+00, c1 = -8.349578e-01, c2 = +9.476514e-02, c3 = -2.717385e-02;
-      const double c4 = +1.222591e-02, c5 = -6.635124e-03, c6 = +2.815993e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 17.0000) {
-      double x = 2 * (s - 5.000000) / 12.000000 - 1, x2 = x * x;
-      const double c0 = -6.115476e+00, c1 = -1.655936e+00, c2 = +8.404310e-02, c3 = -2.663794e-02;
-      const double c4 = +8.868618e-03, c5 = +1.381447e-03, c6 = +9.444801e-04, c7 = -1.581503e-04;
-      const double c8 = -9.468696e-04, c9 = +1.728509e-03, ca = +1.206470e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.927937e-01 * (s - 1.700000e+01) - 7.700983e+00;
-}
-
-static double jarquebera_jbtbl16(double s) {
-   if (s <= 2.0000) {
-      double x = 2 * (s - 0.000000) / 2.000000 - 1, x2 = x * x;
-      const double c0 = -1.002570e+00, c1 = -1.298141e+00, c2 = -2.832803e-01, c3 = +3.877026e-02;
-      const double c4 = +3.539436e-02, c5 = +8.439658e-03, c6 = -4.756911e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 5.0000) {
-      double x = 2 * (s - 2.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -3.486198e+00, c1 = -8.242944e-01, c2 = +1.020002e-01, c3 = -3.130531e-02;
-      const double c4 = +1.512373e-02, c5 = -8.054876e-03, c6 = +3.556839e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 20.0000) {
-      double x = 2 * (s - 5.000000) / 15.000000 - 1, x2 = x * x;
-      const double c0 = -6.241608e+00, c1 = -1.832655e+00, c2 = +1.340545e-01, c3 = -3.361143e-02;
-      const double c4 = +1.283219e-02, c5 = +3.484549e-03, c6 = +1.805968e-03, c7 = -2.057243e-03;
-      const double c8 = -1.454439e-03, c9 = -2.177513e-03, ca = -1.819209e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.391580e-01 * (s - 2.000000e+01) - 7.963205e+00;
-}
-
-static double jarquebera_jbtbl17(double s) {
-   if (s <= 3.0000) {
-      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -1.566973e+00, c1 = -1.810330e+00, c2 = -4.840039e-02, c3 = +2.337294e-01;
-      const double c4 = -5.383549e-04, c5 = -5.556515e-02, c6 = -8.656965e-03, c7 = +1.404569e-02;
-      const double c8 = +6.447867e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 6.0000) {
-      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -3.905684e+00, c1 = -6.222920e-01, c2 = +4.146667e-02, c3 = -4.809176e-03;
-      const double c4 = +1.057028e-03, c5 = -1.211838e-04, c6 = -4.099683e-04, c7 = +1.161105e-04;
-      const double c8 = +2.225465e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 24.0000) {
-      double x = 2 * (s - 6.000000) / 18.000000 - 1, x2 = x * x;
-      const double c0 = -6.594282e+00, c1 = -1.917838e+00, c2 = +1.455980e-01, c3 = -2.999589e-02;
-      const double c4 = +5.604263e-03, c5 = -3.484445e-03, c6 = -1.819937e-03, c7 = -2.930390e-03;
-      const double c8 = +2.771761e-04, c9 = -6.232581e-04, ca = -7.029083e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.127771e-01 * (s - 2.400000e+01) - 8.400197e+00;
-}
-
-static double jarquebera_jbtbl18(double s) {
-   if (s <= 3.0000) {
-      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -1.526802e+00, c1 = -1.762373e+00, c2 = -5.598890e-02, c3 = +2.189437e-01;
-      const double c4 = +5.971721e-03, c5 = -4.823067e-02, c6 = -1.064501e-02, c7 = +1.014932e-02;
-      const double c8 = +5.953513e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 6.0000) {
-      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -3.818669e+00, c1 = -6.070918e-01, c2 = +4.277196e-02, c3 = -4.879817e-03;
-      const double c4 = +6.887357e-04, c5 = +1.638451e-05, c6 = +1.502800e-04, c7 = -3.165796e-05;
-      const double c8 = +5.034960e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 20.0000) {
-      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
-      const double c0 = -6.010656e+00, c1 = -1.496296e+00, c2 = +1.002227e-01, c3 = -2.338250e-02;
-      const double c4 = +4.137036e-03, c5 = -2.586202e-03, c6 = -9.736384e-04, c7 = +1.332251e-03;
-      const double c8 = +1.877982e-03, c9 = -1.160963e-05, ca = -2.547247e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.684623e-01 * (s - 2.000000e+01) - 7.428883e+00;
-}
-
-static double jarquebera_jbtbl19(double s) {
-   if (s <= 3.0000) {
-      double x = 2 * (s - 0.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -1.490213e+00, c1 = -1.719633e+00, c2 = -6.459123e-02, c3 = +2.034878e-01;
-      const double c4 = +1.113868e-02, c5 = -4.030922e-02, c6 = -1.054022e-02, c7 = +7.525623e-03;
-      const double c8 = +5.277360e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 6.0000) {
-      double x = 2 * (s - 3.000000) / 3.000000 - 1, x2 = x * x;
-      const double c0 = -3.744750e+00, c1 = -5.977749e-01, c2 = +4.223716e-02, c3 = -5.363889e-03;
-      const double c4 = +5.711774e-04, c5 = -5.557257e-04, c6 = +4.254794e-04, c7 = +9.034207e-05;
-      const double c8 = +5.498107e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 20.0000) {
-      double x = 2 * (s - 6.000000) / 14.000000 - 1, x2 = x * x;
-      const double c0 = -5.872768e+00, c1 = -1.430689e+00, c2 = +1.136575e-01, c3 = -1.726627e-02;
-      const double c4 = +3.421110e-03, c5 = -1.581510e-03, c6 = -5.559520e-04, c7 = -6.838208e-04;
-      const double c8 = +8.428839e-04, c9 = -7.170682e-04, ca = -6.006647e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.539373e-01 * (s - 2.000000e+01) - 7.206941e+00;
-}
-
-static double jarquebera_jbtbl20(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.854794e+00, c1 = -1.948947e+00, c2 = +1.632184e-01, c3 = +2.139397e-01;
-      const double c4 = -1.006237e-01, c5 = -3.810031e-02, c6 = +3.573620e-02, c7 = +9.951242e-03;
-      const double c8 = -1.274092e-02, c9 = -3.464196e-03, ca = +4.882139e-03, cb = +1.575144e-03;
-      const double cc = -1.822804e-03, cd = -7.061348e-04, ce = +5.908404e-04, cf = +1.978353e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -5.030989e+00, c1 = -1.327151e+00, c2 = +1.346404e-01, c3 = -2.840051e-02;
-      const double c4 = +7.578551e-03, c5 = -9.813886e-04, c6 = +5.905973e-05, c7 = -5.358489e-04;
-      const double c8 = -3.450795e-04, c9 = -6.941157e-04, ca = -7.432418e-04, cb = -2.070537e-04;
-      const double cc = +9.375654e-04, cd = +5.367378e-04, ce = +9.890859e-04, cf = +6.679782e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -7.015854e+00, c1 = -7.487737e-01, c2 = +2.244254e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.318007e-01 * (s - 2.500000e+01) - 7.742185e+00;
-}
-
-static double jarquebera_jbtbl30(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.630822e+00, c1 = -1.724298e+00, c2 = +7.872756e-02, c3 = +1.658268e-01;
-      const double c4 = -3.573597e-02, c5 = -2.994157e-02, c6 = +5.994825e-03, c7 = +7.394303e-03;
-      const double c8 = -5.785029e-04, c9 = -1.990264e-03, ca = -1.037838e-04, cb = +6.755546e-04;
-      const double cc = +1.774473e-04, cd = -2.821395e-04, ce = -1.392603e-04, cf = +1.353313e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8, tb = x2 * ta - t9;
-      double tc = x2 * tb - ta, td = x2 * tc - tb, te = x2 * td - tc, tf = x2 * te - td;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta + cb * tb + cc * tc + cd * td + ce * te + cf * tf;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.539322e+00, c1 = -1.197018e+00, c2 = +1.396848e-01, c3 = -2.804293e-02;
-      const double c4 = +6.867928e-03, c5 = -2.768758e-03, c6 = +5.211792e-04, c7 = +4.925799e-04;
-      const double c8 = +5.046235e-04, c9 = -9.536469e-05, ca = -6.489642e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -6.263462e+00, c1 = -6.177316e-01, c2 = +2.590637e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.028212e-01 * (s - 2.500000e+01) - 6.855288e+00;
-}
-
-static double jarquebera_jbtbl50(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.436279e+00, c1 = -1.519711e+00, c2 = +1.148699e-02, c3 = +1.001204e-01;
-      const double c4 = -3.207620e-03, c5 = -1.034778e-02, c6 = -1.220322e-03, c7 = +1.033260e-03;
-      const double c8 = +2.588280e-04, c9 = -1.851653e-04, ca = -1.287733e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.234645e+00, c1 = -1.189127e+00, c2 = +1.429738e-01, c3 = -3.058822e-02;
-      const double c4 = +9.086776e-03, c5 = -1.445783e-03, c6 = +1.311671e-03, c7 = -7.261298e-04;
-      const double c8 = +6.496987e-04, c9 = +2.605249e-04, ca = +8.162282e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -5.921095e+00, c1 = -5.888603e-01, c2 = +3.080113e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -9.313116e-02 * (s - 2.500000e+01) - 6.479154e+00;
-}
-
-static double jarquebera_jbtbl65(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.360024e+00, c1 = -1.434631e+00, c2 = -6.514580e-03, c3 = +7.332038e-02;
-      const double c4 = +1.158197e-03, c5 = -5.121233e-03, c6 = -1.051056e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.148601e+00, c1 = -1.214233e+00, c2 = +1.487977e-01, c3 = -3.424720e-02;
-      const double c4 = +1.116715e-02, c5 = -4.043152e-03, c6 = +1.718149e-03, c7 = -1.313701e-03;
-      const double c8 = +3.097305e-04, c9 = +2.181031e-04, ca = +1.256975e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4, t7 = x2 * t6 - t5;
-      double t8 = x2 * t7 - t6, t9 = x2 * t8 - t7, ta = x2 * t9 - t8;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6 + c7 * t7 + c8 * t8 + c9 * t9 + ca * ta;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -5.858951e+00, c1 = -5.895179e-01, c2 = +2.933237e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -9.443768e-02 * (s - 2.500000e+01) - 6.419137e+00;
-}
-
-static double jarquebera_jbtbl100(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.257021e+00, c1 = -1.313418e+00, c2 = -1.628931e-02, c3 = +4.264287e-02;
-      const double c4 = +1.518487e-03, c5 = -1.499826e-03, c6 = -4.836044e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.056508e+00, c1 = -1.279690e+00, c2 = +1.665746e-01, c3 = -4.290012e-02;
-      const double c4 = +1.487632e-02, c5 = -5.704465e-03, c6 = +2.211669e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -5.866099e+00, c1 = -6.399767e-01, c2 = +2.498208e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.080097e-01 * (s - 2.500000e+01) - 6.481094e+00;
-}
-
-static double jarquebera_jbtbl130(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.207999e+00, c1 = -1.253864e+00, c2 = -1.618032e-02, c3 = +3.112729e-02;
-      const double c4 = +1.210546e-03, c5 = -4.732602e-04, c6 = -2.410527e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.026324e+00, c1 = -1.331990e+00, c2 = +1.779129e-01, c3 = -4.674749e-02;
-      const double c4 = +1.669077e-02, c5 = -5.679136e-03, c6 = +8.833221e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -5.893951e+00, c1 = -6.475304e-01, c2 = +3.116734e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.045722e-01 * (s - 2.500000e+01) - 6.510314e+00;
-}
-
-static double jarquebera_jbtbl200(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.146155e+00, c1 = -1.177398e+00, c2 = -1.297970e-02, c3 = +1.869745e-02;
-      const double c4 = +1.717288e-04, c5 = -1.982108e-04, c6 = +6.427636e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.034235e+00, c1 = -1.455006e+00, c2 = +1.942996e-01, c3 = -4.973795e-02;
-      const double c4 = +1.418812e-02, c5 = -3.156778e-03, c6 = +4.896705e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -6.086071e+00, c1 = -7.152176e-01, c2 = +3.725393e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.132404e-01 * (s - 2.500000e+01) - 6.764034e+00;
-}
-
-static double jarquebera_jbtbl301(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.104290e+00, c1 = -1.125800e+00, c2 = -9.595847e-03, c3 = +1.219666e-02;
-      const double c4 = +1.502210e-04, c5 = -6.414543e-05, c6 = +6.754115e-05;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.065955e+00, c1 = -1.582060e+00, c2 = +2.004472e-01, c3 = -4.709092e-02;
-      const double c4 = +1.105779e-02, c5 = +1.197391e-03, c6 = -8.386780e-04;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3, t6 = x2 * t5 - t4;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5 + c6 * t6;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -6.311384e+00, c1 = -7.918763e-01, c2 = +3.626584e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.293626e-01 * (s - 2.500000e+01) - 7.066995e+00;
-}
-
-static double jarquebera_jbtbl501(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.067426e+00, c1 = -1.079765e+00, c2 = -5.463005e-03, c3 = +6.875659e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.127574e+00, c1 = -1.740694e+00, c2 = +2.044502e-01, c3 = -3.746714e-02;
-      const double c4 = +3.810594e-04, c5 = +1.197111e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -6.628194e+00, c1 = -8.846221e-01, c2 = +4.386405e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.418332e-01 * (s - 2.500000e+01) - 7.468952e+00;
-}
-
-static double jarquebera_jbtbl701(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.050999e+00, c1 = -1.059769e+00, c2 = -3.922680e-03, c3 = +4.847054e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.192182e+00, c1 = -1.860007e+00, c2 = +1.963942e-01, c3 = -2.838711e-02;
-      const double c4 = -2.893112e-04, c5 = +2.159788e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -6.917851e+00, c1 = -9.817020e-01, c2 = +5.383727e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -1.532706e-01 * (s - 2.500000e+01) - 7.845715e+00;
-}
-
-static double jarquebera_jbtbl1401(double s) {
-   if (s <= 4.0000) {
-      double x = 2 * (s - 0.000000) / 4.000000 - 1, x2 = x * x;
-      const double c0 = -1.026266e+00, c1 = -1.030061e+00, c2 = -1.259222e-03, c3 = +2.536254e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 15.0000) {
-      double x = 2 * (s - 4.000000) / 11.000000 - 1, x2 = x * x;
-      const double c0 = -4.329849e+00, c1 = -2.095443e+00, c2 = +1.759363e-01, c3 = -7.751359e-03;
-      const double c4 = -6.124368e-03, c5 = -1.793114e-03;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0, t3 = x2 * t2 - t1;
-      double t4 = x2 * t3 - t2, t5 = x2 * t4 - t3;
-      double result = c0 * t0 + c1 * t1 + c2 * t2 + c3 * t3 + c4 * t4 + c5 * t5;
-      return result > 0.0 ? 0.0 : result;
-   } else if (s <= 25.0000) {
-      double x = 2 * (s - 15.000000) / 10.000000 - 1, x2 = x * x;
-      const double c0 = -7.544330e+00, c1 = -1.225382e+00, c2 = +5.392349e-02;
-      double t0 = 1.0, t1 = x, t2 = x2 * t1 - t0;
-      double result = c0 * t0 + c1 * t1 + c2 * t2;
-      return result > 0.0 ? 0.0 : result;
-   } else return -2.019375e-01 * (s - 2.500000e+01) - 8.715788e+00;
-}
-
-static double jarquebera_jarqueberaapprox(ae_int_t n, double s) {
-   ae_frame _frame_block;
-   double x = s;
-   ae_frame_make(&_frame_block);
-   NewVector(vx, 0, DT_REAL);
-   NewVector(vy, 0, DT_REAL);
-   NewMatrix(ctbl, 0, 0, DT_REAL);
-   double result;
-// N = 5, 6, ..., 20, 30, 50, 65, 100, 130, 200, 301, 501, 701, 1401 are tabulated.
-// In-between values up to 1400 are interpolated using an interpolating polynomial of the second degree.
-// Anything under 5 or beyond 1400 is tabulated by an asymptotic expansion.
-   if (n <= 20) switch (n) {
-      default: ae_frame_leave(); return 1.0;
-      case 5: result = jarquebera_jbtbl5(x); break;
-      case 6: result = jarquebera_jbtbl6(x); break;
-      case 7: result = jarquebera_jbtbl7(x); break;
-      case 8: result = jarquebera_jbtbl8(x); break;
-      case 9: result = jarquebera_jbtbl9(x); break;
-      case 10: result = jarquebera_jbtbl10(x); break;
-      case 11: result = jarquebera_jbtbl11(x); break;
-      case 12: result = jarquebera_jbtbl12(x); break;
-      case 13: result = jarquebera_jbtbl13(x); break;
-      case 14: result = jarquebera_jbtbl14(x); break;
-      case 15: result = jarquebera_jbtbl15(x); break;
-      case 16: result = jarquebera_jbtbl16(x); break;
-      case 17: result = jarquebera_jbtbl17(x); break;
-      case 18: result = jarquebera_jbtbl18(x); break;
-      case 19: result = jarquebera_jbtbl19(x); break;
-      case 20: result = jarquebera_jbtbl20(x); break;
-   } else if (n > 20 && n <= 50) {
-      double t1 = -1.0 / 20.0, t2 = -1.0 / 30.0, t3 = -1.0 / 50.0, t = -1.0 / n;
-      double f1 = jarquebera_jbtbl20(x), f2 = jarquebera_jbtbl30(x), f3 = jarquebera_jbtbl50(x);
-      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) result = 0.0;
-   } else if (n > 50 && n <= 100) {
-      double t1 = -1.0 / 50.0, t2 = -1.0 / 65.0, t3 = -1.0 / 100.0, t = -1.0 / n;
-      double f1 = jarquebera_jbtbl50(x), f2 = jarquebera_jbtbl65(x), f3 = jarquebera_jbtbl100(x);
-      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) result = 0.0;
-   } else if (n > 100 && n <= 200) {
-      double t1 = -1.0 / 100.0, t2 = -1.0 / 130.0, t3 = -1.0 / 200.0, t = -1.0 / n;
-      double f1 = jarquebera_jbtbl100(x), f2 = jarquebera_jbtbl130(x), f3 = jarquebera_jbtbl200(x);
-      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) result = 0.0;
-   } else if (n > 200 && n <= 501) {
-      double t1 = -1.0 / 200.0, t2 = -1.0 / 301.0, t3 = -1.0 / 501.0, t = -1.0 / n;
-      double f1 = jarquebera_jbtbl200(x), f2 = jarquebera_jbtbl301(x), f3 = jarquebera_jbtbl501(x);
-      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) result = 0.0;
-   } else if (n > 501 && n <= 1401) {
-      double t1 = -1.0 / 501.0, t2 = -1.0 / 701.0, t3 = -1.0 / 1401.0, t = -1.0 / n;
-      double f1 = jarquebera_jbtbl501(x), f2 = jarquebera_jbtbl701(x), f3 = jarquebera_jbtbl1401(x);
-      double f12 = ((t - t2) * f1 + (t1 - t) * f2) / (t1 - t2), f23 = ((t - t3) * f2 + (t2 - t) * f3) / (t2 - t3);
-      result = ((t - t3) * f12 + (t1 - t) * f23) / (t1 - t3);
-      if (result > 0.0) result = 0.0;
-   } else {
-      result = -0.5 * x + (jarquebera_jbtbl1401(x) + 0.5 * x) * sqrt(1401.0 / (double)n);
-      if (result > 0.0) result = 0.0;
-   }
-   result = exp(result);
-   ae_frame_leave();
-   return result;
-}
-
-// Jarque-Bera test
+// Sign test
 //
-// This test checks hypotheses about the fact that a  given  sample  X  is  a
-// sample of normal random variable.
+// This test checks three hypotheses about the median of  the  given  sample.
+// The following tests are performed:
+//     * two-tailed test (null hypothesis - the median is equal to the  given
+//       value)
+//     * left-tailed test (null hypothesis - the median is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the  median  is  less  than  or
+//       equal to the given value)
 //
 // Requirements:
-//     * the number of elements in the sample is not less than 5.
+//     * the scale of measurement should be ordinal, interval or ratio  (i.e.
+//       the test could not be applied to nominal variables).
+//
+// The test is non-parametric and doesn't require distribution X to be normal
 //
 // Inputs:
-//     X   -   sample. Array whose index goes from 0 to N-1.
-//     N   -   size of the sample. N >= 5
-//
-// Outputs:
-//     P           -   p-value for the test
-//
-// Accuracy of the approximation used (5 <= N <= 1951):
-//
-// p-value          relative error (5 <= N <= 1951)
-// [1, 0.1]            < 1%
-// [0.1, 0.01]         < 2%
-// [0.01, 0.001]       < 6%
-// [0.001, 0]          wasn't measured
-//
-// For N > 1951 accuracy wasn't measured but it shouldn't be sharply  different
-// from table values.
-// ALGLIB: Copyright 09.04.2007 by Sergey Bochkanov
-// API: void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p);
-void jarqueberatest(RVector *x, ae_int_t n, double *p) {
-   *p = 0;
-// N is too small.
-   if (n < 5) {
-      *p = 1.0;
-      return;
-   }
-// N is large enough.
-   double mean = 0.0;
-   double variance = 0.0;
-   double skewness = 0.0;
-   double kurtosis = 0.0;
-   double stddev = 0.0;
-   ae_assert(n > 1, "Assertion failed");
-// Mean.
-   for (ae_int_t i = 0; i < n; i++) mean += x->xR[i];
-   mean /= n;
-// Variance (using corrected two-pass algorithm).
-   if (n != 1) {
-      double v1 = 0.0;
-      for (ae_int_t i = 0; i < n; i++) v1 += ae_sqr(x->xR[i] - mean);
-      double v2 = 0.0;
-      for (ae_int_t i = 0; i < n; i++) v2 += x->xR[i] - mean;
-      v2 = ae_sqr(v2) / n;
-      variance = (v1 - v2) / (n - 1);
-      if (variance < 0.0) variance = 0.0;
-      stddev = sqrt(variance);
-   }
-// Skewness and kurtosis.
-   if (stddev != 0.0) {
-      for (ae_int_t i = 0; i < n; i++) {
-         double v = (x->xR[i] - mean) / stddev;
-         double v2 = v * v;
-         skewness += v2 * v;
-         kurtosis += v2 * v2;
-      }
-      skewness /= n;
-      kurtosis = kurtosis / n - 3;
-   }
-// Statistic.
-   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4.0));
-}
-} // end of namespace alglib_impl
-
-namespace alglib {
-void jarqueberatest(const real_1d_array &x, const ae_int_t n, double &p) {
-   alglib_impl::ae_state_init();
-   TryCatch()
-   alglib_impl::jarqueberatest(ConstT(ae_vector, x), n, &p);
-   alglib_impl::ae_state_clear();
-}
-} // end of namespace alglib
-
-// === VARIANCETESTS Package ===
-// Depends on: (SpecialFunctions) FDISTR, CHISQUAREDISTR
-namespace alglib_impl {
-// Two-sample F-test
-//
-// This test checks three hypotheses about dispersions of the given  samples.
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersions are equal)
-//     * left-tailed test (null hypothesis  -  the  dispersion  of  the first
-//       sample is greater than or equal to  the  dispersion  of  the  second
-//       sample).
-//     * right-tailed test (null hypothesis - the  dispersion  of  the  first
-//       sample is less than or equal to the dispersion of the second sample)
-//
-// The test is based on the following assumptions:
-//     * the given samples have normal distributions
-//     * the samples are independent.
-//
-// Inputs:
-//     X   -   sample 1. Array whose index goes from 0 to N-1.
-//     N   -   sample size.
-//     Y   -   sample 2. Array whose index goes from 0 to M-1.
-//     M   -   sample size.
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of the sample.
+//     Median  -   assumed median value.
 //
 // Outputs:
 //     BothTails   -   p-value for two-tailed test.
@@ -7840,100 +7510,15 @@ namespace alglib_impl {
 //     RightTail   -   p-value for right-tailed test.
 //                     If RightTail is less than the given significance level
 //                     the null hypothesis is rejected.
-// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
-// API: void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
-void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
+//
+// While   calculating   p-values   high-precision   binomial    distribution
+// approximation is used, so significance levels have about 15 exact digits.
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail);
+void onesamplesigntest(RVector *x, ae_int_t n, double median, double *bothtails, double *lefttail, double *righttail) {
    ae_int_t i;
-   double xmean;
-   double ymean;
-   double xvar;
-   double yvar;
-   ae_int_t df1;
-   ae_int_t df2;
-   double stat;
-   *bothtails = 0;
-   *lefttail = 0;
-   *righttail = 0;
-   if (n <= 2 || m <= 2) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Mean
-   xmean = 0.0;
-   for (i = 0; i < n; i++) {
-      xmean += x->xR[i];
-   }
-   xmean /= n;
-   ymean = 0.0;
-   for (i = 0; i < m; i++) {
-      ymean += y->xR[i];
-   }
-   ymean /= m;
-// Variance (using corrected two-pass algorithm)
-   xvar = 0.0;
-   for (i = 0; i < n; i++) {
-      xvar += ae_sqr(x->xR[i] - xmean);
-   }
-   xvar /= n - 1;
-   yvar = 0.0;
-   for (i = 0; i < m; i++) {
-      yvar += ae_sqr(y->xR[i] - ymean);
-   }
-   yvar /= m - 1;
-   if (xvar == 0.0 || yvar == 0.0) {
-      *bothtails = 1.0;
-      *lefttail = 1.0;
-      *righttail = 1.0;
-      return;
-   }
-// Statistic
-   df1 = n - 1;
-   df2 = m - 1;
-   stat = rmin2(xvar / yvar, yvar / xvar);
-   *bothtails = 1 - (fdistribution(df1, df2, 1 / stat) - fdistribution(df1, df2, stat));
-   *lefttail = fdistribution(df1, df2, xvar / yvar);
-   *righttail = 1 - (*lefttail);
-}
-
-// One-sample chi-square test
-//
-// This test checks three hypotheses about the dispersion of the given sample
-// The following tests are performed:
-//     * two-tailed test (null hypothesis - the dispersion equals  the  given
-//       number)
-//     * left-tailed test (null hypothesis - the dispersion is  greater  than
-//       or equal to the given number)
-//     * right-tailed test (null hypothesis  -  dispersion is  less  than  or
-//       equal to the given number).
-//
-// Test is based on the following assumptions:
-//     * the given sample has a normal distribution.
-//
-// Inputs:
-//     X           -   sample 1. Array whose index goes from 0 to N-1.
-//     N           -   size of the sample.
-//     Variance    -   dispersion value to compare with.
-//
-// Outputs:
-//     BothTails   -   p-value for two-tailed test.
-//                     If BothTails is less than the given significance level
-//                     the null hypothesis is rejected.
-//     LeftTail    -   p-value for left-tailed test.
-//                     If LeftTail is less than the given significance level,
-//                     the null hypothesis is rejected.
-//     RightTail   -   p-value for right-tailed test.
-//                     If RightTail is less than the given significance level
-//                     the null hypothesis is rejected.
-// ALGLIB: Copyright 19.09.2006 by Sergey Bochkanov
-// API: void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail);
-void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *bothtails, double *lefttail, double *righttail) {
-   ae_int_t i;
-   double xmean;
-   double xvar;
-   double s;
-   double stat;
+   ae_int_t gtcnt;
+   ae_int_t necnt;
    *bothtails = 0;
    *lefttail = 0;
    *righttail = 0;
@@ -7943,45 +7528,460 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
       *righttail = 1.0;
       return;
    }
-// Mean
-   xmean = 0.0;
+// Calculate:
+// GTCnt - count of x[i]>Median
+// NECnt - count of x[i] != Median
+   gtcnt = 0;
+   necnt = 0;
    for (i = 0; i < n; i++) {
-      xmean += x->xR[i];
+      if (x->xR[i] > median) {
+         gtcnt++;
+      }
+      if (x->xR[i] != median) {
+         necnt++;
+      }
    }
-   xmean /= n;
-// Variance
-   xvar = 0.0;
-   for (i = 0; i < n; i++) {
-      xvar += ae_sqr(x->xR[i] - xmean);
-   }
-   xvar /= n - 1;
-   if (xvar == 0.0) {
+   if (necnt == 0) {
+   // all x[i] are equal to Median.
+   // So we can conclude that Median is a true median :)
       *bothtails = 1.0;
       *lefttail = 1.0;
       *righttail = 1.0;
       return;
    }
-// Statistic
-   stat = (n - 1) * xvar / variance;
-   s = chisquaredistribution((double)(n - 1), stat);
-   *bothtails = 2 * rmin2(s, 1 - s);
-   *lefttail = s;
-   *righttail = 1 - (*lefttail);
+   *bothtails = rmin2(2 * binomialdistribution(imin2(gtcnt, necnt - gtcnt), necnt, 0.5), 1.0);
+   *lefttail = binomialdistribution(gtcnt, necnt, 0.5);
+   *righttail = binomialcdistribution(gtcnt - 1, necnt, 0.5);
 }
 } // end of namespace alglib_impl
 
 namespace alglib {
-void ftest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
+void onesamplesigntest(const real_1d_array &x, const ae_int_t n, const double median, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::ftest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::onesamplesigntest(ConstT(ae_vector, x), n, median, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+} // end of namespace alglib
+
+// === STUDENTTTESTS Package ===
+// Depends on: (SpecialFunctions) STUDENTTDISTR
+namespace alglib_impl {
+// One-sample t-test
+//
+// This test checks three hypotheses about the mean of the given sample.  The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the mean is equal  to  the  given
+//       value)
+//     * left-tailed test (null hypothesis - the  mean  is  greater  than  or
+//       equal to the given value)
+//     * right-tailed test (null hypothesis - the mean is less than or  equal
+//       to the given value).
+//
+// The test is based on the assumption that  a  given  sample  has  a  normal
+// distribution and  an  unknown  dispersion.  If  the  distribution  sharply
+// differs from normal, the test will work incorrectly.
+//
+// Inputs:
+//     X       -   sample. Array whose index goes from 0 to N-1.
+//     N       -   size of sample, N >= 0
+//     Mean    -   assumed value of the mean.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0, all p-values are set to 1.0
+//       * when variance of X[] is exactly zero, p-values are set
+//         to 1.0 or 0.0, depending on difference between sample mean and
+//         value of mean being tested.
+// ALGLIB: Copyright 08.09.2006 by Sergey Bochkanov
+// API: void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail);
+void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, double *lefttail, double *righttail) {
+   ae_int_t i;
+   double xmean;
+   double x0;
+   double v;
+   bool samex;
+   double xvariance;
+   double xstddev;
+   double v1;
+   double v2;
+   double stat;
+   double s;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   if (n <= 0) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Mean
+   xmean = 0.0;
+   x0 = x->xR[0];
+   samex = true;
+   for (i = 0; i < n; i++) {
+      v = x->xR[i];
+      xmean += v;
+      samex = samex && v == x0;
+   }
+   if (samex) {
+      xmean = x0;
+   } else {
+      xmean /= n;
+   }
+// Variance (using corrected two-pass algorithm)
+   xvariance = 0.0;
+   xstddev = 0.0;
+   if (n != 1 && !samex) {
+      v1 = 0.0;
+      for (i = 0; i < n; i++) {
+         v1 += ae_sqr(x->xR[i] - xmean);
+      }
+      v2 = 0.0;
+      for (i = 0; i < n; i++) {
+         v2 += x->xR[i] - xmean;
+      }
+      v2 = ae_sqr(v2) / n;
+      xvariance = (v1 - v2) / (n - 1);
+      if (xvariance < 0.0) {
+         xvariance = 0.0;
+      }
+      xstddev = sqrt(xvariance);
+   }
+   if (xstddev == 0.0) {
+      if (xmean == mean) {
+         *bothtails = 1.0;
+      } else {
+         *bothtails = 0.0;
+      }
+      if (xmean >= mean) {
+         *lefttail = 1.0;
+      } else {
+         *lefttail = 0.0;
+      }
+      if (xmean <= mean) {
+         *righttail = 1.0;
+      } else {
+         *righttail = 0.0;
+      }
+      return;
+   }
+// Statistic
+   stat = (xmean - mean) / (xstddev / sqrt((double)n));
+   s = studenttdistribution(n - 1, stat);
+   *bothtails = 2 * rmin2(s, 1 - s);
+   *lefttail = s;
+   *righttail = 1 - s;
+}
+
+// Two-sample pooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * dispersions are equal
+//     * samples are independent.
+//
+// Inputs:
+//     X       -   sample 1. Array whose index goes from 0 to N-1.
+//     N       -   size of sample.
+//     Y       -   sample 2. Array whose index goes from 0 to M-1.
+//     M       -   size of sample.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has exactly zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
+void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
+   ae_int_t i;
+   bool samex;
+   bool samey;
+   double x0;
+   double y0;
+   double xmean;
+   double ymean;
+   double v;
+   double stat;
+   double s;
+   double p;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   if (n <= 0 || m <= 0) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Mean
+   xmean = 0.0;
+   x0 = x->xR[0];
+   samex = true;
+   for (i = 0; i < n; i++) {
+      v = x->xR[i];
+      xmean += v;
+      samex = samex && v == x0;
+   }
+   if (samex) {
+      xmean = x0;
+   } else {
+      xmean /= n;
+   }
+   ymean = 0.0;
+   y0 = y->xR[0];
+   samey = true;
+   for (i = 0; i < m; i++) {
+      v = y->xR[i];
+      ymean += v;
+      samey = samey && v == y0;
+   }
+   if (samey) {
+      ymean = y0;
+   } else {
+      ymean /= m;
+   }
+// S
+   s = 0.0;
+   if (n + m > 2) {
+      for (i = 0; i < n; i++) {
+         s += ae_sqr(x->xR[i] - xmean);
+      }
+      for (i = 0; i < m; i++) {
+         s += ae_sqr(y->xR[i] - ymean);
+      }
+      s = sqrt(s * (1.0 / (double)n + 1.0 / (double)m) / (n + m - 2));
+   }
+   if (s == 0.0) {
+      if (xmean == ymean) {
+         *bothtails = 1.0;
+      } else {
+         *bothtails = 0.0;
+      }
+      if (xmean >= ymean) {
+         *lefttail = 1.0;
+      } else {
+         *lefttail = 0.0;
+      }
+      if (xmean <= ymean) {
+         *righttail = 1.0;
+      } else {
+         *righttail = 0.0;
+      }
+      return;
+   }
+// Statistic
+   stat = (xmean - ymean) / s;
+   p = studenttdistribution(n + m - 2, stat);
+   *bothtails = 2 * rmin2(p, 1 - p);
+   *lefttail = p;
+   *righttail = 1 - p;
+}
+
+// Two-sample unpooled test
+//
+// This test checks three hypotheses about the mean of the given samples. The
+// following tests are performed:
+//     * two-tailed test (null hypothesis - the means are equal)
+//     * left-tailed test (null hypothesis - the mean of the first sample  is
+//       greater than or equal to the mean of the second sample)
+//     * right-tailed test (null hypothesis - the mean of the first sample is
+//       less than or equal to the mean of the second sample).
+//
+// Test is based on the following assumptions:
+//     * given samples have normal distributions
+//     * samples are independent.
+// Equality of variances is NOT required.
+//
+// Inputs:
+//     X - sample 1. Array whose index goes from 0 to N-1.
+//     N - size of the sample.
+//     Y - sample 2. Array whose index goes from 0 to M-1.
+//     M - size of the sample.
+//
+// Outputs:
+//     BothTails   -   p-value for two-tailed test.
+//                     If BothTails is less than the given significance level
+//                     the null hypothesis is rejected.
+//     LeftTail    -   p-value for left-tailed test.
+//                     If LeftTail is less than the given significance level,
+//                     the null hypothesis is rejected.
+//     RightTail   -   p-value for right-tailed test.
+//                     If RightTail is less than the given significance level
+//                     the null hypothesis is rejected.
+//
+// NOTE: this function correctly handles degenerate cases:
+//       * when N=0 or M=0, all p-values are set to 1.0
+//       * when both samples has zero variance, p-values are set
+//         to 1.0 or 0.0, depending on difference between means.
+//       * when only one sample has zero variance, test reduces to 1-sample
+//         version.
+// ALGLIB: Copyright 18.09.2006 by Sergey Bochkanov
+// API: void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail);
+void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, double *lefttail, double *righttail) {
+   ae_int_t i;
+   bool samex;
+   bool samey;
+   double x0;
+   double y0;
+   double xmean;
+   double ymean;
+   double xvar;
+   double yvar;
+   double v;
+   double df;
+   double p;
+   double stat;
+   double c;
+   *bothtails = 0;
+   *lefttail = 0;
+   *righttail = 0;
+   if (n <= 0 || m <= 0) {
+      *bothtails = 1.0;
+      *lefttail = 1.0;
+      *righttail = 1.0;
+      return;
+   }
+// Mean
+   xmean = 0.0;
+   x0 = x->xR[0];
+   samex = true;
+   for (i = 0; i < n; i++) {
+      v = x->xR[i];
+      xmean += v;
+      samex = samex && v == x0;
+   }
+   if (samex) {
+      xmean = x0;
+   } else {
+      xmean /= n;
+   }
+   ymean = 0.0;
+   y0 = y->xR[0];
+   samey = true;
+   for (i = 0; i < m; i++) {
+      v = y->xR[i];
+      ymean += v;
+      samey = samey && v == y0;
+   }
+   if (samey) {
+      ymean = y0;
+   } else {
+      ymean /= m;
+   }
+// Variance (using corrected two-pass algorithm)
+   xvar = 0.0;
+   if (n >= 2 && !samex) {
+      for (i = 0; i < n; i++) {
+         xvar += ae_sqr(x->xR[i] - xmean);
+      }
+      xvar /= n - 1;
+   }
+   yvar = 0.0;
+   if (m >= 2 && !samey) {
+      for (i = 0; i < m; i++) {
+         yvar += ae_sqr(y->xR[i] - ymean);
+      }
+      yvar /= m - 1;
+   }
+// Handle different special cases
+// (one or both variances are zero).
+   if (xvar == 0.0 && yvar == 0.0) {
+      if (xmean == ymean) {
+         *bothtails = 1.0;
+      } else {
+         *bothtails = 0.0;
+      }
+      if (xmean >= ymean) {
+         *lefttail = 1.0;
+      } else {
+         *lefttail = 0.0;
+      }
+      if (xmean <= ymean) {
+         *righttail = 1.0;
+      } else {
+         *righttail = 0.0;
+      }
+      return;
+   }
+   if (xvar == 0.0) {
+   // X is constant, unpooled 2-sample test reduces to 1-sample test.
+   //
+   // NOTE: right-tail and left-tail must be passed to 1-sample
+   //       t-test in reverse order because we reverse order of
+   //       of samples.
+      studentttest1(y, m, xmean, bothtails, righttail, lefttail);
+      return;
+   }
+   if (yvar == 0.0) {
+   // Y is constant, unpooled 2-sample test reduces to 1-sample test.
+      studentttest1(x, n, ymean, bothtails, lefttail, righttail);
+      return;
+   }
+// Statistic
+   stat = (xmean - ymean) / sqrt(xvar / n + yvar / m);
+   c = xvar / n / (xvar / n + yvar / m);
+   df = (double)(n - 1) * (m - 1) / ((m - 1) * ae_sqr(c) + (n - 1) * ae_sqr(1 - c));
+   if (stat > 0.0) {
+      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
+   } else {
+      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
+   }
+   *bothtails = 2 * rmin2(p, 1 - p);
+   *lefttail = p;
+   *righttail = 1 - p;
+}
+} // end of namespace alglib_impl
+
+namespace alglib {
+void studentttest1(const real_1d_array &x, const ae_int_t n, const double mean, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::studentttest1(ConstT(ae_vector, x), n, mean, &bothtails, &lefttail, &righttail);
    alglib_impl::ae_state_clear();
 }
 
-void onesamplevariancetest(const real_1d_array &x, const ae_int_t n, const double variance, double &bothtails, double &lefttail, double &righttail) {
+void studentttest2(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
    alglib_impl::ae_state_init();
    TryCatch()
-   alglib_impl::onesamplevariancetest(ConstT(ae_vector, x), n, variance, &bothtails, &lefttail, &righttail);
+   alglib_impl::studentttest2(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
+   alglib_impl::ae_state_clear();
+}
+
+void unequalvariancettest(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, double &bothtails, double &lefttail, double &righttail) {
+   alglib_impl::ae_state_init();
+   TryCatch()
+   alglib_impl::unequalvariancettest(ConstT(ae_vector, x), n, ConstT(ae_vector, y), m, &bothtails, &lefttail, &righttail);
    alglib_impl::ae_state_clear();
 }
 } // end of namespace alglib

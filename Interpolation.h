@@ -17,6 +17,44 @@
 #include "Integration.h"
 #include "Optimization.h"
 
+// === RATINT Package ===
+// Depends on: (AlgLibInternal) TSORT
+namespace alglib_impl {
+struct barycentricinterpolant {
+   ae_int_t n;
+   double sy;
+   ae_vector x;
+   ae_vector y;
+   ae_vector w;
+};
+void barycentricinterpolant_init(void *_p, bool make_automatic);
+void barycentricinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void barycentricinterpolant_free(void *_p, bool make_automatic);
+
+double barycentriccalc(barycentricinterpolant *b, double t);
+void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df);
+void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df, double *d2f);
+void barycentriclintransx(barycentricinterpolant *b, double ca, double cb);
+void barycentriclintransy(barycentricinterpolant *b, double ca, double cb);
+void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVector *y, RVector *w);
+void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b);
+void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b);
+void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(barycentricinterpolant, EndD);
+
+double barycentriccalc(const barycentricinterpolant &b, const double t);
+void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df);
+void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f);
+void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb);
+void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb);
+void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w);
+void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b);
+void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b);
+} // end of namespace alglib
+
 // === IDW Package ===
 // Depends on: (AlgLibMisc) HQRND, NEARESTNEIGHBOR
 // Depends on: (LinAlg) ABLAS
@@ -146,71 +184,6 @@ double idwcalc3(const idwmodel &s, const double x0, const double x1, const doubl
 void idwfit(const idwbuilder &state, idwmodel &model, idwreport &rep);
 } // end of namespace alglib
 
-// === RATINT Package ===
-// Depends on: (AlgLibInternal) TSORT
-namespace alglib_impl {
-struct barycentricinterpolant {
-   ae_int_t n;
-   double sy;
-   ae_vector x;
-   ae_vector y;
-   ae_vector w;
-};
-void barycentricinterpolant_init(void *_p, bool make_automatic);
-void barycentricinterpolant_copy(void *_dst, void *_src, bool make_automatic);
-void barycentricinterpolant_free(void *_p, bool make_automatic);
-
-double barycentriccalc(barycentricinterpolant *b, double t);
-void barycentricdiff1(barycentricinterpolant *b, double t, double *f, double *df);
-void barycentricdiff2(barycentricinterpolant *b, double t, double *f, double *df, double *d2f);
-void barycentriclintransx(barycentricinterpolant *b, double ca, double cb);
-void barycentriclintransy(barycentricinterpolant *b, double ca, double cb);
-void barycentricunpack(barycentricinterpolant *b, ae_int_t *n, RVector *x, RVector *y, RVector *w);
-void barycentricbuildxyw(RVector *x, RVector *y, RVector *w, ae_int_t n, barycentricinterpolant *b);
-void barycentricbuildfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t d, barycentricinterpolant *b);
-void barycentriccopy(barycentricinterpolant *b, barycentricinterpolant *b2);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(barycentricinterpolant, EndD);
-
-double barycentriccalc(const barycentricinterpolant &b, const double t);
-void barycentricdiff1(const barycentricinterpolant &b, const double t, double &f, double &df);
-void barycentricdiff2(const barycentricinterpolant &b, const double t, double &f, double &df, double &d2f);
-void barycentriclintransx(const barycentricinterpolant &b, const double ca, const double cb);
-void barycentriclintransy(const barycentricinterpolant &b, const double ca, const double cb);
-void barycentricunpack(const barycentricinterpolant &b, ae_int_t &n, real_1d_array &x, real_1d_array &y, real_1d_array &w);
-void barycentricbuildxyw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, barycentricinterpolant &b);
-void barycentricbuildfloaterhormann(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t d, barycentricinterpolant &b);
-} // end of namespace alglib
-
-// === FITSPHERE Package ===
-// Depends on: (Optimization) MINNLC, MINLM
-namespace alglib_impl {
-struct fitsphereinternalreport {
-   ae_int_t nfev;
-   ae_int_t iterationscount;
-};
-void fitsphereinternalreport_init(void *_p, bool make_automatic);
-void fitsphereinternalreport_copy(void *_dst, void *_src, bool make_automatic);
-void fitsphereinternalreport_free(void *_p, bool make_automatic);
-
-void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep);
-void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
-void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r);
-void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
-void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo);
-void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
-void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r);
-void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
-void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
-void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
-} // end of namespace alglib
-
 // === INTFITSERV Package ===
 // Depends on: (LinAlg) TRFAC
 namespace alglib_impl {
@@ -218,6 +191,46 @@ void lsfitscalexy(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, R
 void buildpriorterm(RMatrix *xy, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v);
 void buildpriorterm1(RVector *xy1, ae_int_t n, ae_int_t nx, ae_int_t ny, ae_int_t modeltype, double priorval, RMatrix *v);
 } // end of namespace alglib_impl
+
+// === POLINT Package ===
+// Depends on: RATINT
+namespace alglib_impl {
+void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *t);
+void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentricinterpolant *p);
+void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a);
+void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricinterpolant *p);
+void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant *p);
+void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
+void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
+void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
+double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t);
+double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t);
+double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t);
+void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p);
+void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p);
+void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a);
+void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a);
+void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p);
+void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p);
+void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
+void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p);
+void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
+void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
+void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
+void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
+void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
+void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
+double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
+double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t);
+double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
+double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t);
+double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
+double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t);
+} // end of namespace alglib
 
 // === SPLINE1D Package ===
 // Depends on: (LinAlg) FBLS
@@ -313,158 +326,6 @@ void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const
 void spline1dfitpenalizedw(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t m, const double rho, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
 void spline1dfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t m, const double lambdans, spline1dinterpolant &s, spline1dfitreport &rep);
-} // end of namespace alglib
-
-// === PARAMETRIC Package ===
-// Depends on: (Integration) AUTOGK
-// Depends on: SPLINE1D
-namespace alglib_impl {
-struct pspline2interpolant {
-   ae_int_t n;
-   bool periodic;
-   ae_vector p;
-   spline1dinterpolant x;
-   spline1dinterpolant y;
-};
-void pspline2interpolant_init(void *_p, bool make_automatic);
-void pspline2interpolant_copy(void *_dst, void *_src, bool make_automatic);
-void pspline2interpolant_free(void *_p, bool make_automatic);
-
-struct pspline3interpolant {
-   ae_int_t n;
-   bool periodic;
-   ae_vector p;
-   spline1dinterpolant x;
-   spline1dinterpolant y;
-   spline1dinterpolant z;
-};
-void pspline3interpolant_init(void *_p, bool make_automatic);
-void pspline3interpolant_copy(void *_dst, void *_src, bool make_automatic);
-void pspline3interpolant_free(void *_p, bool make_automatic);
-
-void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p);
-void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p);
-void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p);
-void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p);
-void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t);
-void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t);
-void pspline2calc(pspline2interpolant *p, double t, double *x, double *y);
-void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z);
-void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y);
-void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, double *z);
-void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy);
-void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz);
-void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y);
-void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z);
-double pspline2arclength(pspline2interpolant *p, double a, double b);
-double pspline3arclength(pspline3interpolant *p, double a, double b);
-void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, double stopeps, RMatrix *x2, ZVector *idx2, ae_int_t *nsections);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(pspline2interpolant, EndD);
-DecClass(pspline3interpolant, EndD);
-
-void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
-void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
-void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
-void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
-void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t);
-void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t);
-void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y);
-void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
-void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y);
-void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
-void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy);
-void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz);
-void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y);
-void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z);
-double pspline2arclength(const pspline2interpolant &p, const double a, const double b);
-double pspline3arclength(const pspline3interpolant &p, const double a, const double b);
-void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections);
-} // end of namespace alglib
-
-// === SPLINE3D Package ===
-// Depends on: SPLINE1D
-namespace alglib_impl {
-struct spline3dinterpolant {
-   ae_int_t k;
-   ae_int_t stype;
-   ae_int_t n;
-   ae_int_t m;
-   ae_int_t l;
-   ae_int_t d;
-   ae_vector x;
-   ae_vector y;
-   ae_vector z;
-   ae_vector f;
-};
-void spline3dinterpolant_init(void *_p, bool make_automatic);
-void spline3dinterpolant_copy(void *_dst, void *_src, bool make_automatic);
-void spline3dinterpolant_free(void *_p, bool make_automatic);
-
-void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVector *f);
-void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f);
-double spline3dcalc(spline3dinterpolant *c, double x, double y, double z);
-void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz);
-void spline3dlintransf(spline3dinterpolant *c, double a, double b);
-void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc);
-void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycount, ae_int_t oldxcount, ae_int_t newzcount, ae_int_t newycount, ae_int_t newxcount, RVector *b);
-void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *z, ae_int_t l, RVector *f, ae_int_t d, spline3dinterpolant *c);
-void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t *l, ae_int_t *d, ae_int_t *stype, RMatrix *tbl);
-} // end of namespace alglib_impl
-
-namespace alglib {
-DecClass(spline3dinterpolant, EndD);
-
-void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
-void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
-double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z);
-void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz);
-void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b);
-void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b);
-void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c);
-void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl);
-} // end of namespace alglib
-
-// === POLINT Package ===
-// Depends on: RATINT
-namespace alglib_impl {
-void polynomialbar2cheb(barycentricinterpolant *p, double a, double b, RVector *t);
-void polynomialcheb2bar(RVector *t, ae_int_t n, double a, double b, barycentricinterpolant *p);
-void polynomialbar2pow(barycentricinterpolant *p, double c, double s, RVector *a);
-void polynomialpow2bar(RVector *a, ae_int_t n, double c, double s, barycentricinterpolant *p);
-void polynomialbuild(RVector *x, RVector *y, ae_int_t n, barycentricinterpolant *p);
-void polynomialbuildeqdist(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
-void polynomialbuildcheb1(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
-void polynomialbuildcheb2(double a, double b, RVector *y, ae_int_t n, barycentricinterpolant *p);
-double polynomialcalceqdist(double a, double b, RVector *f, ae_int_t n, double t);
-double polynomialcalccheb1(double a, double b, RVector *f, ae_int_t n, double t);
-double polynomialcalccheb2(double a, double b, RVector *f, ae_int_t n, double t);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void polynomialbar2cheb(const barycentricinterpolant &p, const double a, const double b, real_1d_array &t);
-void polynomialcheb2bar(const real_1d_array &t, const ae_int_t n, const double a, const double b, barycentricinterpolant &p);
-void polynomialcheb2bar(const real_1d_array &t, const double a, const double b, barycentricinterpolant &p);
-void polynomialbar2pow(const barycentricinterpolant &p, const double c, const double s, real_1d_array &a);
-void polynomialbar2pow(const barycentricinterpolant &p, real_1d_array &a);
-void polynomialpow2bar(const real_1d_array &a, const ae_int_t n, const double c, const double s, barycentricinterpolant &p);
-void polynomialpow2bar(const real_1d_array &a, barycentricinterpolant &p);
-void polynomialbuild(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
-void polynomialbuild(const real_1d_array &x, const real_1d_array &y, barycentricinterpolant &p);
-void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
-void polynomialbuildeqdist(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
-void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
-void polynomialbuildcheb1(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
-void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, const ae_int_t n, barycentricinterpolant &p);
-void polynomialbuildcheb2(const double a, const double b, const real_1d_array &y, barycentricinterpolant &p);
-double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
-double polynomialcalceqdist(const double a, const double b, const real_1d_array &f, const double t);
-double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
-double polynomialcalccheb1(const double a, const double b, const real_1d_array &f, const double t);
-double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const ae_int_t n, const double t);
-double polynomialcalccheb2(const double a, const double b, const real_1d_array &f, const double t);
 } // end of namespace alglib
 
 // === LSFIT Package ===
@@ -677,87 +538,178 @@ void lsfitresults(const lsfitstate &state, ae_int_t &info, real_1d_array &c, lsf
 void lsfitsetgradientcheck(const lsfitstate &state, const double teststep);
 } // end of namespace alglib
 
-// === RBFV2 Package ===
+// === FITSPHERE Package ===
+// Depends on: (Optimization) MINNLC, MINLM
+namespace alglib_impl {
+struct fitsphereinternalreport {
+   ae_int_t nfev;
+   ae_int_t iterationscount;
+};
+void fitsphereinternalreport_init(void *_p, bool make_automatic);
+void fitsphereinternalreport_copy(void *_dst, void *_src, bool make_automatic);
+void fitsphereinternalreport_free(void *_p, bool make_automatic);
+
+void fitsphereinternal(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, ae_int_t solvertype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi, fitsphereinternalreport *rep);
+void fitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
+void fitspherels(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *r);
+void fitspheremc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
+void fitspheremi(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo);
+void fitspheremz(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void fitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
+void fitspherels(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &r);
+void fitspheremc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
+void fitspheremi(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
+void fitspheremz(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
+} // end of namespace alglib
+
+// === PARAMETRIC Package ===
+// Depends on: (Integration) AUTOGK
+// Depends on: SPLINE1D
+namespace alglib_impl {
+struct pspline2interpolant {
+   ae_int_t n;
+   bool periodic;
+   ae_vector p;
+   spline1dinterpolant x;
+   spline1dinterpolant y;
+};
+void pspline2interpolant_init(void *_p, bool make_automatic);
+void pspline2interpolant_copy(void *_dst, void *_src, bool make_automatic);
+void pspline2interpolant_free(void *_p, bool make_automatic);
+
+struct pspline3interpolant {
+   ae_int_t n;
+   bool periodic;
+   ae_vector p;
+   spline1dinterpolant x;
+   spline1dinterpolant y;
+   spline1dinterpolant z;
+};
+void pspline3interpolant_init(void *_p, bool make_automatic);
+void pspline3interpolant_copy(void *_dst, void *_src, bool make_automatic);
+void pspline3interpolant_free(void *_p, bool make_automatic);
+
+void pspline2build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p);
+void pspline3build(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p);
+void pspline2buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline2interpolant *p);
+void pspline3buildperiodic(RMatrix *xy, ae_int_t n, ae_int_t st, ae_int_t pt, pspline3interpolant *p);
+void pspline2parametervalues(pspline2interpolant *p, ae_int_t *n, RVector *t);
+void pspline3parametervalues(pspline3interpolant *p, ae_int_t *n, RVector *t);
+void pspline2calc(pspline2interpolant *p, double t, double *x, double *y);
+void pspline3calc(pspline3interpolant *p, double t, double *x, double *y, double *z);
+void pspline2tangent(pspline2interpolant *p, double t, double *x, double *y);
+void pspline3tangent(pspline3interpolant *p, double t, double *x, double *y, double *z);
+void pspline2diff(pspline2interpolant *p, double t, double *x, double *dx, double *y, double *dy);
+void pspline3diff(pspline3interpolant *p, double t, double *x, double *dx, double *y, double *dy, double *z, double *dz);
+void pspline2diff2(pspline2interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y);
+void pspline3diff2(pspline3interpolant *p, double t, double *x, double *dx, double *d2x, double *y, double *dy, double *d2y, double *z, double *dz, double *d2z);
+double pspline2arclength(pspline2interpolant *p, double a, double b);
+double pspline3arclength(pspline3interpolant *p, double a, double b);
+void parametricrdpfixed(RMatrix *x, ae_int_t n, ae_int_t d, ae_int_t stopm, double stopeps, RMatrix *x2, ZVector *idx2, ae_int_t *nsections);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(pspline2interpolant, EndD);
+DecClass(pspline3interpolant, EndD);
+
+void pspline2build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
+void pspline3build(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
+void pspline2buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline2interpolant &p);
+void pspline3buildperiodic(const real_2d_array &xy, const ae_int_t n, const ae_int_t st, const ae_int_t pt, pspline3interpolant &p);
+void pspline2parametervalues(const pspline2interpolant &p, ae_int_t &n, real_1d_array &t);
+void pspline3parametervalues(const pspline3interpolant &p, ae_int_t &n, real_1d_array &t);
+void pspline2calc(const pspline2interpolant &p, const double t, double &x, double &y);
+void pspline3calc(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
+void pspline2tangent(const pspline2interpolant &p, const double t, double &x, double &y);
+void pspline3tangent(const pspline3interpolant &p, const double t, double &x, double &y, double &z);
+void pspline2diff(const pspline2interpolant &p, const double t, double &x, double &dx, double &y, double &dy);
+void pspline3diff(const pspline3interpolant &p, const double t, double &x, double &dx, double &y, double &dy, double &z, double &dz);
+void pspline2diff2(const pspline2interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y);
+void pspline3diff2(const pspline3interpolant &p, const double t, double &x, double &dx, double &d2x, double &y, double &dy, double &d2y, double &z, double &dz, double &d2z);
+double pspline2arclength(const pspline2interpolant &p, const double a, const double b);
+double pspline3arclength(const pspline3interpolant &p, const double a, const double b);
+void parametricrdpfixed(const real_2d_array &x, const ae_int_t n, const ae_int_t d, const ae_int_t stopm, const double stopeps, real_2d_array &x2, integer_1d_array &idx2, ae_int_t &nsections);
+} // end of namespace alglib
+
+// === RBFV1 Package ===
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: LSFIT
 namespace alglib_impl {
-struct rbfv2calcbuffer {
-   ae_vector x;
-   ae_vector curboxmin;
-   ae_vector curboxmax;
-   double curdist2;
-   ae_vector x123;
-   ae_vector y123;
+struct rbfv1calcbuffer {
+   ae_vector calcbufxcx;
+   ae_matrix calcbufx;
+   ae_vector calcbuftags;
+   kdtreerequestbuffer requestbuffer;
 };
-void rbfv2calcbuffer_init(void *_p, bool make_automatic);
-void rbfv2calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv2calcbuffer_free(void *_p, bool make_automatic);
+void rbfv1calcbuffer_init(void *_p, bool make_automatic);
+void rbfv1calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1calcbuffer_free(void *_p, bool make_automatic);
 
-struct rbfv2model {
+struct rbfv1model {
    ae_int_t ny;
    ae_int_t nx;
-   ae_int_t bf;
-   ae_int_t nh;
-   ae_vector ri;
-   ae_vector s;
-   ae_vector kdroots;
-   ae_vector kdnodes;
-   ae_vector kdsplits;
-   ae_vector kdboxmin;
-   ae_vector kdboxmax;
-   ae_vector cw;
+   ae_int_t nc;
+   ae_int_t nl;
+   kdtree tree;
+   ae_matrix xc;
+   ae_matrix wr;
+   double rmax;
    ae_matrix v;
-   double lambdareg;
-   ae_int_t maxits;
-   double supportr;
-   ae_int_t basisfunction;
-   rbfv2calcbuffer calcbuf;
+   ae_vector calcbufxcx;
+   ae_matrix calcbufx;
+   ae_vector calcbuftags;
 };
-void rbfv2model_init(void *_p, bool make_automatic);
-void rbfv2model_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv2model_free(void *_p, bool make_automatic);
-void rbfv2alloc(ae_serializer *s, rbfv2model *model);
-void rbfv2serialize(ae_serializer *s, rbfv2model *model);
-void rbfv2unserialize(ae_serializer *s, rbfv2model *model);
+void rbfv1model_init(void *_p, bool make_automatic);
+void rbfv1model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1model_free(void *_p, bool make_automatic);
+void rbfv1alloc(ae_serializer *s, rbfv1model *model);
+void rbfv1serialize(ae_serializer *s, rbfv1model *model);
+void rbfv1unserialize(ae_serializer *s, rbfv1model *model);
 
-struct rbfv2gridcalcbuffer {
-   rbfv2calcbuffer calcbuf;
-   ae_vector cx;
-   ae_vector rx;
-   ae_vector ry;
+struct gridcalc3v1buf {
    ae_vector tx;
+   ae_vector cx;
    ae_vector ty;
-   ae_vector rf;
+   ae_vector flag0;
+   ae_vector flag1;
+   ae_vector flag2;
+   ae_vector flag12;
+   ae_vector expbuf0;
+   ae_vector expbuf1;
+   ae_vector expbuf2;
+   kdtreerequestbuffer requestbuf;
+   ae_matrix calcbufx;
+   ae_vector calcbuftags;
 };
-void rbfv2gridcalcbuffer_init(void *_p, bool make_automatic);
-void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic);
+void gridcalc3v1buf_init(void *_p, bool make_automatic);
+void gridcalc3v1buf_copy(void *_dst, void *_src, bool make_automatic);
+void gridcalc3v1buf_free(void *_p, bool make_automatic);
 
-struct rbfv2report {
+struct rbfv1report {
+   ae_int_t arows;
+   ae_int_t acols;
+   ae_int_t annz;
+   ae_int_t iterationscount;
+   ae_int_t nmv;
    ae_int_t terminationtype;
-   double maxerror;
-   double rmserror;
 };
-void rbfv2report_init(void *_p, bool make_automatic);
-void rbfv2report_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv2report_free(void *_p, bool make_automatic);
+void rbfv1report_init(void *_p, bool make_automatic);
+void rbfv1report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv1report_free(void *_p, bool make_automatic);
 
-void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s);
-void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf);
-void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scalevec, ae_int_t aterm, ae_int_t nh, double rbase, double lambdans, rbfv2model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv2report *rep);
-double rbfv2farradius(ae_int_t bf);
-double rbfv2nearradius(ae_int_t bf);
-double rbfv2basisfunc(ae_int_t bf, double d2);
-void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *d2f);
-double rbfv2calc1(rbfv2model *s, double x0);
-double rbfv2calc2(rbfv2model *s, double x0, double x1);
-double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2);
-void rbfv2calcbuf(rbfv2model *s, RVector *x, RVector *y);
-void rbfv2tscalcbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y);
-void rbfv2gridcalc2(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
-void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, BVector *flagy, bool sparsey, RVector *y);
-void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
-void rbfv2unpack(rbfv2model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
+void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s);
+void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf);
+void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep);
+double rbfv1calc2(rbfv1model *s, double x0, double x1);
+double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2);
+void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y);
+void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y);
+void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
+void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
+void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
 } // end of namespace alglib_impl
 
 // === SPLINE2D Package ===
@@ -940,83 +892,147 @@ void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double l
 void spline2dfit(const spline2dbuilder &state, spline2dinterpolant &s, spline2dfitreport &rep);
 } // end of namespace alglib
 
-// === RBFV1 Package ===
+// === RBFV2 Package ===
 // Depends on: (AlgLibMisc) NEARESTNEIGHBOR
 // Depends on: LSFIT
 namespace alglib_impl {
-struct rbfv1calcbuffer {
-   ae_vector calcbufxcx;
-   ae_matrix calcbufx;
-   ae_vector calcbuftags;
-   kdtreerequestbuffer requestbuffer;
+struct rbfv2calcbuffer {
+   ae_vector x;
+   ae_vector curboxmin;
+   ae_vector curboxmax;
+   double curdist2;
+   ae_vector x123;
+   ae_vector y123;
 };
-void rbfv1calcbuffer_init(void *_p, bool make_automatic);
-void rbfv1calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv1calcbuffer_free(void *_p, bool make_automatic);
+void rbfv2calcbuffer_init(void *_p, bool make_automatic);
+void rbfv2calcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2calcbuffer_free(void *_p, bool make_automatic);
 
-struct rbfv1model {
+struct rbfv2model {
    ae_int_t ny;
    ae_int_t nx;
-   ae_int_t nc;
-   ae_int_t nl;
-   kdtree tree;
-   ae_matrix xc;
-   ae_matrix wr;
-   double rmax;
+   ae_int_t bf;
+   ae_int_t nh;
+   ae_vector ri;
+   ae_vector s;
+   ae_vector kdroots;
+   ae_vector kdnodes;
+   ae_vector kdsplits;
+   ae_vector kdboxmin;
+   ae_vector kdboxmax;
+   ae_vector cw;
    ae_matrix v;
-   ae_vector calcbufxcx;
-   ae_matrix calcbufx;
-   ae_vector calcbuftags;
+   double lambdareg;
+   ae_int_t maxits;
+   double supportr;
+   ae_int_t basisfunction;
+   rbfv2calcbuffer calcbuf;
 };
-void rbfv1model_init(void *_p, bool make_automatic);
-void rbfv1model_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv1model_free(void *_p, bool make_automatic);
-void rbfv1alloc(ae_serializer *s, rbfv1model *model);
-void rbfv1serialize(ae_serializer *s, rbfv1model *model);
-void rbfv1unserialize(ae_serializer *s, rbfv1model *model);
+void rbfv2model_init(void *_p, bool make_automatic);
+void rbfv2model_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2model_free(void *_p, bool make_automatic);
+void rbfv2alloc(ae_serializer *s, rbfv2model *model);
+void rbfv2serialize(ae_serializer *s, rbfv2model *model);
+void rbfv2unserialize(ae_serializer *s, rbfv2model *model);
 
-struct gridcalc3v1buf {
-   ae_vector tx;
+struct rbfv2gridcalcbuffer {
+   rbfv2calcbuffer calcbuf;
    ae_vector cx;
+   ae_vector rx;
+   ae_vector ry;
+   ae_vector tx;
    ae_vector ty;
-   ae_vector flag0;
-   ae_vector flag1;
-   ae_vector flag2;
-   ae_vector flag12;
-   ae_vector expbuf0;
-   ae_vector expbuf1;
-   ae_vector expbuf2;
-   kdtreerequestbuffer requestbuf;
-   ae_matrix calcbufx;
-   ae_vector calcbuftags;
+   ae_vector rf;
 };
-void gridcalc3v1buf_init(void *_p, bool make_automatic);
-void gridcalc3v1buf_copy(void *_dst, void *_src, bool make_automatic);
-void gridcalc3v1buf_free(void *_p, bool make_automatic);
+void rbfv2gridcalcbuffer_init(void *_p, bool make_automatic);
+void rbfv2gridcalcbuffer_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2gridcalcbuffer_free(void *_p, bool make_automatic);
 
-struct rbfv1report {
-   ae_int_t arows;
-   ae_int_t acols;
-   ae_int_t annz;
-   ae_int_t iterationscount;
-   ae_int_t nmv;
+struct rbfv2report {
    ae_int_t terminationtype;
+   double maxerror;
+   double rmserror;
 };
-void rbfv1report_init(void *_p, bool make_automatic);
-void rbfv1report_copy(void *_dst, void *_src, bool make_automatic);
-void rbfv1report_free(void *_p, bool make_automatic);
+void rbfv2report_init(void *_p, bool make_automatic);
+void rbfv2report_copy(void *_dst, void *_src, bool make_automatic);
+void rbfv2report_free(void *_p, bool make_automatic);
 
-void rbfv1create(ae_int_t nx, ae_int_t ny, rbfv1model *s);
-void rbfv1createcalcbuffer(rbfv1model *s, rbfv1calcbuffer *buf);
-void rbfv1buildmodel(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t aterm, ae_int_t algorithmtype, ae_int_t nlayers, double radvalue, double radzvalue, double lambdav, double epsort, double epserr, ae_int_t maxits, rbfv1model *s, rbfv1report *rep);
-double rbfv1calc2(rbfv1model *s, double x0, double x1);
-double rbfv1calc3(rbfv1model *s, double x0, double x1, double x2);
-void rbfv1calcbuf(rbfv1model *s, RVector *x, RVector *y);
-void rbfv1tscalcbuf(rbfv1model *s, rbfv1calcbuffer *buf, RVector *x, RVector *y);
-void rbfv1gridcalc2(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
-void rbfv1gridcalc3vrec(rbfv1model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, BVector *flagy, bool sparsey, double searchradius, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
-void rbfv1unpack(rbfv1model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
+void rbfv2create(ae_int_t nx, ae_int_t ny, rbfv2model *s);
+void rbfv2createcalcbuffer(rbfv2model *s, rbfv2calcbuffer *buf);
+void rbfv2buildhierarchical(RMatrix *x, RMatrix *y, ae_int_t n, RVector *scalevec, ae_int_t aterm, ae_int_t nh, double rbase, double lambdans, rbfv2model *s, ae_int_t *progress10000, bool *terminationrequest, rbfv2report *rep);
+double rbfv2farradius(ae_int_t bf);
+double rbfv2nearradius(ae_int_t bf);
+double rbfv2basisfunc(ae_int_t bf, double d2);
+void rbfv2basisfuncdiff2(ae_int_t bf, double d2, double *f, double *df, double *d2f);
+double rbfv2calc1(rbfv2model *s, double x0);
+double rbfv2calc2(rbfv2model *s, double x0, double x1);
+double rbfv2calc3(rbfv2model *s, double x0, double x1, double x2);
+void rbfv2calcbuf(rbfv2model *s, RVector *x, RVector *y);
+void rbfv2tscalcbuf(rbfv2model *s, rbfv2calcbuffer *buf, RVector *x, RVector *y);
+void rbfv2gridcalc2(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RMatrix *y);
+void rbfv2gridcalcvx(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, BVector *flagy, bool sparsey, RVector *y);
+void rbfv2partialgridcalcrec(rbfv2model *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n1, RVector *x2, ae_int_t n2, RVector *x3, ae_int_t n3, ZVector *blocks0, ae_int_t block0a, ae_int_t block0b, ZVector *blocks1, ae_int_t block1a, ae_int_t block1b, ZVector *blocks2, ae_int_t block2a, ae_int_t block2b, ZVector *blocks3, ae_int_t block3a, ae_int_t block3b, BVector *flagy, bool sparsey, ae_int_t levelidx, double avgfuncpernode, ae_shared_pool *bufpool, RVector *y);
+void rbfv2unpack(rbfv2model *s, ae_int_t *nx, ae_int_t *ny, RMatrix *xwr, ae_int_t *nc, RMatrix *v);
 } // end of namespace alglib_impl
+
+// === SPLINE3D Package ===
+// Depends on: SPLINE1D
+namespace alglib_impl {
+struct spline3dinterpolant {
+   ae_int_t k;
+   ae_int_t stype;
+   ae_int_t n;
+   ae_int_t m;
+   ae_int_t l;
+   ae_int_t d;
+   ae_vector x;
+   ae_vector y;
+   ae_vector z;
+   ae_vector f;
+};
+void spline3dinterpolant_init(void *_p, bool make_automatic);
+void spline3dinterpolant_copy(void *_dst, void *_src, bool make_automatic);
+void spline3dinterpolant_free(void *_p, bool make_automatic);
+
+void spline3dcalcvbuf(spline3dinterpolant *c, double x, double y, double z, RVector *f);
+void spline3dcalcv(spline3dinterpolant *c, double x, double y, double z, RVector *f);
+double spline3dcalc(spline3dinterpolant *c, double x, double y, double z);
+void spline3dlintransxyz(spline3dinterpolant *c, double ax, double bx, double ay, double by, double az, double bz);
+void spline3dlintransf(spline3dinterpolant *c, double a, double b);
+void spline3dcopy(spline3dinterpolant *c, spline3dinterpolant *cc);
+void spline3dresampletrilinear(RVector *a, ae_int_t oldzcount, ae_int_t oldycount, ae_int_t oldxcount, ae_int_t newzcount, ae_int_t newycount, ae_int_t newxcount, RVector *b);
+void spline3dbuildtrilinearv(RVector *x, ae_int_t n, RVector *y, ae_int_t m, RVector *z, ae_int_t l, RVector *f, ae_int_t d, spline3dinterpolant *c);
+void spline3dunpackv(spline3dinterpolant *c, ae_int_t *n, ae_int_t *m, ae_int_t *l, ae_int_t *d, ae_int_t *stype, RMatrix *tbl);
+} // end of namespace alglib_impl
+
+namespace alglib {
+DecClass(spline3dinterpolant, EndD);
+
+void spline3dcalcvbuf(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
+void spline3dcalcv(const spline3dinterpolant &c, const double x, const double y, const double z, real_1d_array &f);
+double spline3dcalc(const spline3dinterpolant &c, const double x, const double y, const double z);
+void spline3dlintransxyz(const spline3dinterpolant &c, const double ax, const double bx, const double ay, const double by, const double az, const double bz);
+void spline3dlintransf(const spline3dinterpolant &c, const double a, const double b);
+void spline3dresampletrilinear(const real_1d_array &a, const ae_int_t oldzcount, const ae_int_t oldycount, const ae_int_t oldxcount, const ae_int_t newzcount, const ae_int_t newycount, const ae_int_t newxcount, real_1d_array &b);
+void spline3dbuildtrilinearv(const real_1d_array &x, const ae_int_t n, const real_1d_array &y, const ae_int_t m, const real_1d_array &z, const ae_int_t l, const real_1d_array &f, const ae_int_t d, spline3dinterpolant &c);
+void spline3dunpackv(const spline3dinterpolant &c, ae_int_t &n, ae_int_t &m, ae_int_t &l, ae_int_t &d, ae_int_t &stype, real_2d_array &tbl);
+} // end of namespace alglib
+
+// === INTCOMP Package ===
+// Depends on: FITSPHERE, SPLINE1D
+namespace alglib_impl {
+void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
+void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
+void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo);
+void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi);
+} // end of namespace alglib_impl
+
+namespace alglib {
+void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
+void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
+void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
+void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
+} // end of namespace alglib
 
 // === RBF Package ===
 // Depends on: RBFV2, RBFV1
@@ -1151,22 +1167,6 @@ void rbfunpack(const rbfmodel &s, ae_int_t &nx, ae_int_t &ny, real_2d_array &xwr
 ae_int_t rbfgetmodelversion(const rbfmodel &s);
 double rbfpeekprogress(const rbfmodel &s);
 void rbfrequesttermination(const rbfmodel &s);
-} // end of namespace alglib
-
-// === INTCOMP Package ===
-// Depends on: FITSPHERE, SPLINE1D
-namespace alglib_impl {
-void nsfitspherex(RMatrix *xy, ae_int_t npoints, ae_int_t nx, ae_int_t problemtype, double epsx, ae_int_t aulits, double penalty, RVector *cx, double *rlo, double *rhi);
-void nsfitspheremcc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rhi);
-void nsfitspheremic(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo);
-void nsfitspheremzc(RMatrix *xy, ae_int_t npoints, ae_int_t nx, RVector *cx, double *rlo, double *rhi);
-} // end of namespace alglib_impl
-
-namespace alglib {
-void nsfitspherex(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, const ae_int_t problemtype, const double epsx, const ae_int_t aulits, const double penalty, real_1d_array &cx, double &rlo, double &rhi);
-void nsfitspheremcc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rhi);
-void nsfitspheremic(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo);
-void nsfitspheremzc(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nx, real_1d_array &cx, double &rlo, double &rhi);
 } // end of namespace alglib
 
 #endif // OnceOnly

@@ -16,18 +16,6 @@
 
 #include "Ap.h"
 
-// === SCODES Package ===
-namespace alglib_impl {
-ae_int_t getrdfserializationcode();
-ae_int_t getkdtreeserializationcode();
-ae_int_t getmlpserializationcode();
-ae_int_t getmlpeserializationcode();
-ae_int_t getrbfserializationcode();
-ae_int_t getspline2dserializationcode();
-ae_int_t getidwserializationcode();
-ae_int_t getknnserializationcode();
-} // end of namespace alglib_impl
-
 // === APSERV Package ===
 namespace alglib_impl {
 struct apbuffers {
@@ -139,23 +127,6 @@ double smpactivationlevel();
 double spawnlevel();
 } // end of namespace alglib_impl
 
-// === TSORT Package ===
-// Depends on: APSERV
-namespace alglib_impl {
-void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n);
-void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n);
-void tagsortfast(RVector *a, RVector *bufa, ae_int_t n);
-void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset = 0);
-void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset = 0);
-void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf);
-void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2);
-void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb);
-void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb);
-void tagheappopi(RVector *a, ZVector *b, ae_int_t *n);
-ae_int_t lowerbound(RVector *a, ae_int_t n, double t);
-ae_int_t upperbound(RVector *a, ae_int_t n, double t);
-} // end of namespace alglib_impl
-
 // === ABLASF Package ===
 namespace alglib_impl {
 double rdotv(ae_int_t n, RVector *x, RVector *y);
@@ -223,6 +194,26 @@ void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, 
 void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 } // end of namespace alglib_impl
 
+// === HBLAS Package ===
+namespace alglib_impl {
+void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y);
+void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha);
+} // end of namespace alglib_impl
+
+// === CREFLECTIONS Package ===
+namespace alglib_impl {
+void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau);
+void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
+void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
+} // end of namespace alglib_impl
+
+// === SBLAS Package ===
+// Depends on: APSERV
+namespace alglib_impl {
+void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y);
+void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha);
+} // end of namespace alglib_impl
+
 // === ABLASMKL Package ===
 namespace alglib_impl {
 bool rmatrixgermkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, double alpha, RVector *u, ae_int_t iu, RVector *v, ae_int_t iv);
@@ -258,43 +249,33 @@ bool smatrixtdevdmkl(RVector *d, RVector *e, ae_int_t n, ae_int_t zneeded, RMatr
 bool sparsegemvcrsmkl(ae_int_t opa, ae_int_t arows, ae_int_t acols, double alpha, RVector *vals, ZVector *cidx, ZVector *ridx, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy);
 } // end of namespace alglib_impl
 
-// === CREFLECTIONS Package ===
+// === SCODES Package ===
 namespace alglib_impl {
-void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau);
-void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
-void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
+ae_int_t getrdfserializationcode();
+ae_int_t getkdtreeserializationcode();
+ae_int_t getmlpserializationcode();
+ae_int_t getmlpeserializationcode();
+ae_int_t getrbfserializationcode();
+ae_int_t getspline2dserializationcode();
+ae_int_t getidwserializationcode();
+ae_int_t getknnserializationcode();
 } // end of namespace alglib_impl
 
-// === ROTATIONS Package ===
-namespace alglib_impl {
-void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work);
-void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work);
-void generaterotation(double f, double g, double *cs, double *sn, double *r);
-} // end of namespace alglib_impl
-
-// === TRLINSOLVE Package ===
-namespace alglib_impl {
-void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit);
-void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm);
-} // end of namespace alglib_impl
-
-// === SAFESOLVE Package ===
-namespace alglib_impl {
-bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth);
-bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth);
-} // end of namespace alglib_impl
-
-// === HBLAS Package ===
-namespace alglib_impl {
-void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y);
-void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha);
-} // end of namespace alglib_impl
-
-// === SBLAS Package ===
+// === TSORT Package ===
 // Depends on: APSERV
 namespace alglib_impl {
-void symmetricmatrixvectormultiply(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, double alpha, RVector *y);
-void symmetricrank2update(RMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, RVector *x, RVector *y, RVector *t, double alpha);
+void tagsortfasti(RVector *a, ZVector *b, RVector *bufa, ZVector *bufb, ae_int_t n);
+void tagsortfastr(RVector *a, RVector *b, RVector *bufa, RVector *bufb, ae_int_t n);
+void tagsortfast(RVector *a, RVector *bufa, ae_int_t n);
+void tagsortmiddleir(ZVector *a, RVector *b, ae_int_t n, ae_int_t offset = 0);
+void tagsortmiddlei(ZVector *a, ae_int_t n, ae_int_t offset = 0);
+void tagsortbuf(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2, apbuffers *buf);
+void tagsort(RVector *a, ae_int_t n, ZVector *p1, ZVector *p2);
+void tagheappushi(RVector *a, ZVector *b, ae_int_t *n, double va, ae_int_t vb);
+void tagheapreplacetopi(RVector *a, ZVector *b, ae_int_t n, double va, ae_int_t vb);
+void tagheappopi(RVector *a, ZVector *b, ae_int_t *n);
+ae_int_t lowerbound(RVector *a, ae_int_t n, double t);
+ae_int_t upperbound(RVector *a, ae_int_t n, double t);
 } // end of namespace alglib_impl
 
 // === BLAS Package ===
@@ -309,6 +290,38 @@ void inplacetranspose(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_
 void copyandtranspose(RMatrix *a, ae_int_t is1, ae_int_t is2, ae_int_t js1, ae_int_t js2, RMatrix *b, ae_int_t id1, ae_int_t id2, ae_int_t jd1, ae_int_t jd2);
 void matrixvectormultiply(RMatrix *a, ae_int_t i1, ae_int_t i2, ae_int_t j1, ae_int_t j2, bool trans, RVector *x, ae_int_t ix1, ae_int_t ix2, double alpha, RVector *y, ae_int_t iy1, ae_int_t iy2, double beta);
 void matrixmatrixmultiply(RMatrix *a, ae_int_t ai1, ae_int_t ai2, ae_int_t aj1, ae_int_t aj2, bool transa, RMatrix *b, ae_int_t bi1, ae_int_t bi2, ae_int_t bj1, ae_int_t bj2, bool transb, double alpha, RMatrix *c, ae_int_t ci1, ae_int_t ci2, ae_int_t cj1, ae_int_t cj2, double beta, RVector *work);
+} // end of namespace alglib_impl
+
+// === ROTATIONS Package ===
+namespace alglib_impl {
+void applyrotationsfromtheleft(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work);
+void applyrotationsfromtheright(bool isforward, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, RVector *c, RVector *s, RMatrix *a, RVector *work);
+void generaterotation(double f, double g, double *cs, double *sn, double *r);
+} // end of namespace alglib_impl
+
+// === BASICSTATOPS Package ===
+// Depends on: TSORT
+namespace alglib_impl {
+void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf);
+void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf);
+} // end of namespace alglib_impl
+
+// === TRLINSOLVE Package ===
+namespace alglib_impl {
+void rmatrixtrsafesolve(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit);
+void safesolvetriangular(RMatrix *a, ae_int_t n, RVector *x, double *s, bool isupper, bool istrans, bool isunit, bool normin, RVector *cnorm);
+} // end of namespace alglib_impl
+
+// === SAFESOLVE Package ===
+namespace alglib_impl {
+bool rmatrixscaledtrsafesolve(RMatrix *a, double sa, ae_int_t n, RVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth);
+bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, bool isupper, ae_int_t trans, bool isunit, double maxgrowth);
+} // end of namespace alglib_impl
+
+// === XBLAS Package ===
+namespace alglib_impl {
+void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr);
+void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr);
 } // end of namespace alglib_impl
 
 // === LINMIN Package ===
@@ -372,47 +385,11 @@ bool armijoiteration(armijostate *state);
 void armijoresults(armijostate *state, ae_int_t *info, double *stp, double *f);
 } // end of namespace alglib_impl
 
-// === XBLAS Package ===
+// === NEARUNITYUNIT Package ===
 namespace alglib_impl {
-void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr);
-void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr);
-} // end of namespace alglib_impl
-
-// === BASICSTATOPS Package ===
-// Depends on: TSORT
-namespace alglib_impl {
-void rankx(RVector *x, ae_int_t n, bool iscentered, apbuffers *buf);
-void rankxuntied(RVector *x, ae_int_t n, apbuffers *buf);
-} // end of namespace alglib_impl
-
-// === HPCCORES Package ===
-namespace alglib_impl {
-struct mlpbuffers {
-   ae_int_t chunksize;
-   ae_int_t ntotal;
-   ae_int_t nin;
-   ae_int_t nout;
-   ae_int_t wcount;
-   ae_vector batch4buf;
-   ae_vector hpcbuf;
-   ae_matrix xy;
-   ae_matrix xy2;
-   ae_vector xyrow;
-   ae_vector x;
-   ae_vector y;
-   ae_vector desiredy;
-   double e;
-   ae_vector g;
-   ae_vector tmp0;
-};
-void mlpbuffers_init(void *_p, bool make_automatic);
-void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic);
-void mlpbuffers_free(void *_p, bool make_automatic);
-
-void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf);
-void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad);
-bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc);
-bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf);
+double nulog1p(double x);
+double nuexpm1(double x);
+double nucosm1(double x);
 } // end of namespace alglib_impl
 
 // === NTHEORY Package ===
@@ -443,11 +420,34 @@ ae_int_t ftbasefindsmootheven(ae_int_t n);
 double ftbasegetflopestimate(ae_int_t n);
 } // end of namespace alglib_impl
 
-// === NEARUNITYUNIT Package ===
+// === HPCCORES Package ===
 namespace alglib_impl {
-double nulog1p(double x);
-double nuexpm1(double x);
-double nucosm1(double x);
+struct mlpbuffers {
+   ae_int_t chunksize;
+   ae_int_t ntotal;
+   ae_int_t nin;
+   ae_int_t nout;
+   ae_int_t wcount;
+   ae_vector batch4buf;
+   ae_vector hpcbuf;
+   ae_matrix xy;
+   ae_matrix xy2;
+   ae_vector xyrow;
+   ae_vector x;
+   ae_vector y;
+   ae_vector desiredy;
+   double e;
+   ae_vector g;
+   ae_vector tmp0;
+};
+void mlpbuffers_init(void *_p, bool make_automatic);
+void mlpbuffers_copy(void *_dst, void *_src, bool make_automatic);
+void mlpbuffers_free(void *_p, bool make_automatic);
+
+void hpcpreparechunkedgradient(RVector *weights, ae_int_t wcount, ae_int_t ntotal, ae_int_t nin, ae_int_t nout, mlpbuffers *buf);
+void hpcfinalizechunkedgradient(mlpbuffers *buf, RVector *grad);
+bool hpcchunkedgradient(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf, double *e, bool naturalerrorfunc);
+bool hpcchunkedprocess(RVector *weights, ZVector *structinfo, RVector *columnmeans, RVector *columnsigmas, RMatrix *xy, ae_int_t cstart, ae_int_t csize, RVector *batch4buf, RVector *hpcbuf);
 } // end of namespace alglib_impl
 
 #endif // OnceOnly
