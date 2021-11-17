@@ -30,8 +30,8 @@ void hqrndrandomize(hqrndstate *state) {
    ae_int_t s0;
    ae_int_t s1;
    SetObj(hqrndstate, state);
-   s0 = ae_randominteger(hqrnd_hqrndm1);
-   s1 = ae_randominteger(hqrnd_hqrndm2);
+   s0 = randominteger(hqrnd_hqrndm1);
+   s1 = randominteger(hqrnd_hqrndm2);
    hqrndseed(s0, s1, state);
 }
 
@@ -223,7 +223,7 @@ void hqrndnormal2(hqrndstate *state, double *x1, double *x2) {
    while (true) {
       u = hqrndmiduniformr(state);
       v = hqrndmiduniformr(state);
-      s = ae_sqr(u) + ae_sqr(v);
+      s = sqr(u) + sqr(v);
       if (s > 0.0 && s < 1.0) {
       // two sqrt's instead of one to
       // avoid overflow when S is too small
@@ -323,7 +323,7 @@ void hqrndunit2(hqrndstate *state, double *x, double *y) {
    } while (!(*x != 0.0 || *y != 0.0));
    mx = rmax2(fabs(*x), fabs(*y));
    mn = rmin2(fabs(*x), fabs(*y));
-   v = mx * sqrt(1 + ae_sqr(mn / mx));
+   v = mx * sqrt(1 + sqr(mn / mx));
    *x /= v;
    *y /= v;
 }
@@ -731,9 +731,9 @@ void xdebugr1outeven(ae_int_t n, RVector *a) {
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: complex xdebugc1sum(const complex_1d_array &a);
-ae_complex xdebugc1sum(CVector *a) {
+complex xdebugc1sum(CVector *a) {
    ae_int_t i;
-   ae_complex result;
+   complex result;
    result = ae_complex_from_i(0);
    for (i = 0; i < a->cnt; i++) {
       result = ae_c_add(result, a->xC[i]);
@@ -930,7 +930,7 @@ void xdebugi2outsin(ae_int_t m, ae_int_t n, ZMatrix *a) {
    ae_matrix_set_length(a, m, n);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
-         a->xyZ[i][j] = ae_sign(sin((double)(3 * i + 5 * j)));
+         a->xyZ[i][j] = sign(sin((double)(3 * i + 5 * j)));
       }
    }
 }
@@ -1009,10 +1009,10 @@ void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a) {
 // Returns sum of elements in the array.
 // ALGLIB: Copyright 11.10.2013 by Sergey Bochkanov
 // API: complex xdebugc2sum(const complex_2d_array &a);
-ae_complex xdebugc2sum(CMatrix *a) {
+complex xdebugc2sum(CMatrix *a) {
    ae_int_t i;
    ae_int_t j;
-   ae_complex result;
+   complex result;
    result = ae_complex_from_i(0);
    for (i = 0; i < a->rows; i++) {
       for (j = 0; j < a->cols; j++) {
@@ -1220,7 +1220,7 @@ void xdebugr1outeven(const ae_int_t n, real_1d_array &a) {
 complex xdebugc1sum(const complex_1d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(0.0)
-   alglib_impl::ae_complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a));
+   alglib_impl::complex C = alglib_impl::xdebugc1sum(ConstT(ae_vector, a));
    alglib_impl::ae_state_clear();
    return ComplexOf(C);
 }
@@ -1336,7 +1336,7 @@ void xdebugr2outsin(const ae_int_t m, const ae_int_t n, real_2d_array &a) {
 complex xdebugc2sum(const complex_2d_array &a) {
    alglib_impl::ae_state_init();
    TryCatch(complex(0.0))
-   alglib_impl::ae_complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a));
+   alglib_impl::complex C = alglib_impl::xdebugc2sum(ConstT(ae_matrix, a));
    alglib_impl::ae_state_clear();
    return ComplexOf(C);
 }
@@ -1942,10 +1942,10 @@ static void nearestneighbor_kdtreeinitbox(kdtree *kdt, RVector *x, kdtreerequest
          buf->curboxmin.xR[i] = vmin;
          buf->curboxmax.xR[i] = vmax;
          if (vx < vmin) {
-            buf->curdist += ae_sqr(vmin - vx);
+            buf->curdist += sqr(vmin - vx);
          } else {
             if (vx > vmax) {
-               buf->curdist += ae_sqr(vx - vmax);
+               buf->curdist += sqr(vx - vmax);
             }
          }
       }
@@ -1994,7 +1994,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
          }
          if (kdt->normtype == 2) {
             for (j = 0; j < nx; j++) {
-               ptdist += ae_sqr(kdt->xy.xyR[i][j] - buf->x.xR[j]);
+               ptdist += sqr(kdt->xy.xyR[i][j] - buf->x.xR[j]);
             }
          }
       // Skip points with zero distance if self-matches are turned off
@@ -2072,7 +2072,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist -= rmax2(v - t1, 0.0) - s + t1;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= ae_sqr(rmax2(v - t1, 0.0)) - ae_sqr(s - t1);
+                  buf->curdist -= sqr(rmax2(v - t1, 0.0)) - sqr(s - t1);
                }
             }
             buf->curboxmin.xR[d] = s;
@@ -2088,7 +2088,7 @@ static void nearestneighbor_kdtreequerynnrec(kdtree *kdt, kdtreerequestbuffer *b
                   buf->curdist -= rmax2(t1 - v, 0.0) - t1 + s;
                }
                if (kdt->normtype == 2) {
-                  buf->curdist -= ae_sqr(rmax2(t1 - v, 0.0)) - ae_sqr(t1 - s);
+                  buf->curdist -= sqr(rmax2(t1 - v, 0.0)) - sqr(t1 - s);
                }
             }
             buf->curboxmax.xR[d] = s;
@@ -2180,7 +2180,7 @@ static ae_int_t nearestneighbor_tsqueryrnn(kdtree *kdt, kdtreerequestbuffer *buf
    if (kdt->normtype != 2) {
       buf->rneeded = r;
    } else {
-      buf->rneeded = ae_sqr(r);
+      buf->rneeded = sqr(r);
    }
    buf->selfmatch = selfmatch;
    buf->approxf = 1.0;
@@ -2468,7 +2468,7 @@ ae_int_t kdtreetsqueryaknn(kdtree *kdt, kdtreerequestbuffer *buf, RVector *x, ae
    buf->rneeded = 0.0;
    buf->selfmatch = selfmatch;
    if (kdt->normtype == 2) {
-      buf->approxf = 1 / ae_sqr(1 + eps);
+      buf->approxf = 1 / sqr(1 + eps);
    } else {
       buf->approxf = 1 / (1 + eps);
    }

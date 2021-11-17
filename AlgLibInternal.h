@@ -49,14 +49,14 @@ double logbase2(double x);
 //(@) Originally: approxequal(double A, double B, double Tiny);
 //(@) AlgLib: Copyright 02.12.2009 by Sergey Bochkanov
 static inline bool NearAtR(double A, double B, double Tiny) { return fabs(A - B) <= Tiny; }
-static inline bool NearAtCR(ae_complex A, double B, double Tiny) { return ae_c_abs(ae_c_sub_d(A, B)) <= Tiny; }
-static inline bool NearAtC(ae_complex A, ae_complex B, double Tiny) { return ae_c_abs(ae_c_sub(A, B)) <= Tiny; }
+static inline bool NearAtCR(complex A, double B, double Tiny) { return abscomplex(ae_c_sub_d(A, B)) <= Tiny; }
+static inline bool NearAtC(complex A, complex B, double Tiny) { return abscomplex(ae_c_sub(A, B)) <= Tiny; }
 static inline bool NearR(double A, double B, double Tiny) { return fabs(A - B) < Tiny; }
-static inline bool NearC(ae_complex A, ae_complex B, double Tiny) { return ae_c_abs(ae_c_sub(A, B)) < Tiny; }
+static inline bool NearC(complex A, complex B, double Tiny) { return abscomplex(ae_c_sub(A, B)) < Tiny; }
 static inline bool SmallAtR(double A, double Tiny) { return fabs(A) <= Tiny; }
-static inline bool SmallAtC(ae_complex A, double Tiny) { return ae_c_abs(A) <= Tiny; }
+static inline bool SmallAtC(complex A, double Tiny) { return abscomplex(A) <= Tiny; }
 static inline bool SmallR(double A, double Tiny) { return fabs(A) < Tiny; }
-static inline bool SmallC(ae_complex A, double Tiny) { return ae_c_abs(A) < Tiny; }
+static inline bool SmallC(complex A, double Tiny) { return abscomplex(A) < Tiny; }
 
 void taskgenint1d(double a, double b, ae_int_t n, RVector *x, RVector *y);
 void taskgenint1dequidist(double a, double b, ae_int_t n, RVector *x, RVector *y);
@@ -92,16 +92,16 @@ void randomunit(ae_int_t n, RVector *x);
 void swapb(bool *v0, bool *v1);
 void swapi(ae_int_t *v0, ae_int_t *v1);
 void swapr(double *v0, double *v1);
-void swapc(ae_complex *v0, ae_complex *v1);
+void swapc(complex *v0, complex *v1);
 void swapcols(RMatrix *a, ae_int_t j0, ae_int_t j1, ae_int_t nrows);
 void swaprows(RMatrix *a, ae_int_t i0, ae_int_t i1, ae_int_t ncols);
 void swapentries(RVector *a, ae_int_t i0, ae_int_t i1, ae_int_t entrywidth);
 void swapelementsi(ZVector *a, ae_int_t i0, ae_int_t i1);
 void swapelements(RVector *a, ae_int_t i0, ae_int_t i1);
 double possign(double x);
-void alloccomplex(ae_serializer *s, ae_complex v);
-void serializecomplex(ae_serializer *s, ae_complex v);
-ae_complex unserializecomplex(ae_serializer *s);
+void alloccomplex(ae_serializer *s, complex v);
+void serializecomplex(ae_serializer *s, complex v);
+complex unserializecomplex(ae_serializer *s);
 void allocrealarray(ae_serializer *s, RVector *v, ae_int_t n);
 void serializerealarray(ae_serializer *s, RVector *v, ae_int_t n);
 void unserializerealarray(ae_serializer *s, RVector *v);
@@ -185,26 +185,26 @@ bool cmatrixrighttrsmf(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t
 bool rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
-bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
+bool cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixgemmk44v00(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixgemmk44v01(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixgemmk44v10(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixgemmk44v11(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, RMatrix *b, ae_int_t ib, ae_int_t jb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
 void rmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
-void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
+void cmatrixgemmk(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 } // end of namespace alglib_impl
 
 // === HBLAS Package ===
 namespace alglib_impl {
-void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, ae_complex alpha, CVector *y);
-void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, ae_complex alpha);
+void hermitianmatrixvectormultiply(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, complex alpha, CVector *y);
+void hermitianrank2update(CMatrix *a, bool isupper, ae_int_t i1, ae_int_t i2, CVector *x, CVector *y, CVector *t, complex alpha);
 } // end of namespace alglib_impl
 
 // === CREFLECTIONS Package ===
 namespace alglib_impl {
-void complexgeneratereflection(CVector *x, ae_int_t n, ae_complex *tau);
-void complexapplyreflectionfromtheleft(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
-void complexapplyreflectionfromtheright(CMatrix *c, ae_complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
+void complexgeneratereflection(CVector *x, ae_int_t n, complex *tau);
+void complexapplyreflectionfromtheleft(CMatrix *c, complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
+void complexapplyreflectionfromtheright(CMatrix *c, complex tau, CVector *v, ae_int_t m1, ae_int_t m2, ae_int_t n1, ae_int_t n2, CVector *work);
 } // end of namespace alglib_impl
 
 // === SBLAS Package ===
@@ -227,7 +227,7 @@ bool rmatrixsymvmkl(ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t 
 bool rmatrixsyrkmkl(ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool cmatrixherkmkl(ae_int_t n, ae_int_t k, double alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, CMatrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
 bool rmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc);
-bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
+bool cmatrixgemmmkl(ae_int_t m, ae_int_t n, ae_int_t k, complex alpha, CMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, CMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, complex beta, CMatrix *c, ae_int_t ic, ae_int_t jc);
 bool rmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2);
 bool cmatrixlefttrsmmkl(ae_int_t m, ae_int_t n, CMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, CMatrix *x, ae_int_t i2, ae_int_t j2);
 bool rmatrixrighttrsmmkl(ae_int_t m, ae_int_t n, RMatrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, RMatrix *x, ae_int_t i2, ae_int_t j2);
@@ -321,7 +321,7 @@ bool cmatrixscaledtrsafesolve(CMatrix *a, double sa, ae_int_t n, CVector *x, boo
 // === XBLAS Package ===
 namespace alglib_impl {
 void xdot(RVector *a, RVector *b, ae_int_t n, RVector *temp, double *r, double *rerr);
-void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, ae_complex *r, double *rerr);
+void xcdot(CVector *a, CVector *b, ae_int_t n, RVector *temp, complex *r, double *rerr);
 } // end of namespace alglib_impl
 
 // === LINMIN Package ===

@@ -67,13 +67,13 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    if (n != 1) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += ae_sqr(x->xR[i] - (*mean));
+         v1 += sqr(x->xR[i] - (*mean));
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
          v2 += x->xR[i] - (*mean);
       }
-      v2 = ae_sqr(v2) / n;
+      v2 = sqr(v2) / n;
       *variance = (v1 - v2) / (n - 1);
       if (*variance < 0.0) {
          *variance = 0.0;
@@ -84,9 +84,9 @@ void samplemoments(RVector *x, ae_int_t n, double *mean, double *variance, doubl
    if (stddev != 0.0) {
       for (i = 0; i < n; i++) {
          v = (x->xR[i] - (*mean)) / stddev;
-         v2 = ae_sqr(v);
+         v2 = sqr(v);
          *skewness += v2 * v;
-         *kurtosis += ae_sqr(v2);
+         *kurtosis += sqr(v2);
       }
       *skewness /= n;
       *kurtosis = *kurtosis / n - 3;
@@ -536,8 +536,8 @@ double pearsoncorr2(RVector *x, RVector *y, ae_int_t n) {
    for (i = 0; i < n; i++) {
       t1 = x->xR[i] - xmean;
       t2 = y->xR[i] - ymean;
-      xv += ae_sqr(t1);
-      yv += ae_sqr(t2);
+      xv += sqr(t1);
+      yv += sqr(t2);
       s += t1 * t2;
    }
    if (xv == 0.0 || yv == 0.0) {
@@ -1870,7 +1870,7 @@ void pearsoncorrelationsignificance(double r, ae_int_t n, double *bothtails, dou
       return;
    }
 // General case
-   t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
+   t = r * sqrt((n - 2) / (1 - sqr(r)));
    p = studenttdistribution(n - 2, t);
    *bothtails = 2 * rmin2(p, 1 - p);
    *lefttail = p;
@@ -2008,7 +2008,7 @@ void spearmanrankcorrelationsignificance(double r, ae_int_t n, double *bothtails
       if (r <= -1.0) {
          t = -1.0E10;
       } else {
-         t = r * sqrt((n - 2) / (1 - ae_sqr(r)));
+         t = r * sqrt((n - 2) / (1 - sqr(r)));
       }
    }
    if (t < 0.0) {
@@ -2950,10 +2950,10 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p) {
 // Variance (using corrected two-pass algorithm).
    if (n != 1) {
       double v1 = 0.0;
-      for (ae_int_t i = 0; i < n; i++) v1 += ae_sqr(x->xR[i] - mean);
+      for (ae_int_t i = 0; i < n; i++) v1 += sqr(x->xR[i] - mean);
       double v2 = 0.0;
       for (ae_int_t i = 0; i < n; i++) v2 += x->xR[i] - mean;
-      v2 = ae_sqr(v2) / n;
+      v2 = sqr(v2) / n;
       variance = (v1 - v2) / (n - 1);
       if (variance < 0.0) variance = 0.0;
       stddev = sqrt(variance);
@@ -2970,7 +2970,7 @@ void jarqueberatest(RVector *x, ae_int_t n, double *p) {
       kurtosis = kurtosis / n - 3;
    }
 // Statistic.
-   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(ae_sqr(skewness) + ae_sqr(kurtosis) / 4.0));
+   *p = jarquebera_jarqueberaapprox(n, (double)n / 6.0 *(sqr(skewness) + sqr(kurtosis) / 4.0));
 }
 } // end of namespace alglib_impl
 
@@ -3051,12 +3051,12 @@ void ftest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bothtails, do
 // Variance (using corrected two-pass algorithm)
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar += ae_sqr(x->xR[i] - xmean);
+      xvar += sqr(x->xR[i] - xmean);
    }
    xvar /= n - 1;
    yvar = 0.0;
    for (i = 0; i < m; i++) {
-      yvar += ae_sqr(y->xR[i] - ymean);
+      yvar += sqr(y->xR[i] - ymean);
    }
    yvar /= m - 1;
    if (xvar == 0.0 || yvar == 0.0) {
@@ -3129,7 +3129,7 @@ void onesamplevariancetest(RVector *x, ae_int_t n, double variance, double *both
 // Variance
    xvar = 0.0;
    for (i = 0; i < n; i++) {
-      xvar += ae_sqr(x->xR[i] - xmean);
+      xvar += sqr(x->xR[i] - xmean);
    }
    xvar /= n - 1;
    if (xvar == 0.0) {
@@ -7446,9 +7446,9 @@ void mannwhitneyutest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *bo
    u = (double)n * m + 0.5 * n * (n + 1) - u;
 // Result
    mu = (double)n * m / 2;
-   tmp = ns * (ae_sqr((double)ns) - 1) / 12;
+   tmp = ns * (sqr((double)ns) - 1) / 12;
    for (i = 0; i < tiecount; i++) {
-      tmp -= tiesize.xZ[i] * (ae_sqr((double)(tiesize.xZ[i])) - 1) / 12;
+      tmp -= tiesize.xZ[i] * (sqr((double)(tiesize.xZ[i])) - 1) / 12;
    }
    sigma = sqrt((double)n * m / ns / (ns - 1) * tmp);
    s = (u - mu) / sigma;
@@ -7646,13 +7646,13 @@ void studentttest1(RVector *x, ae_int_t n, double mean, double *bothtails, doubl
    if (n != 1 && !samex) {
       v1 = 0.0;
       for (i = 0; i < n; i++) {
-         v1 += ae_sqr(x->xR[i] - xmean);
+         v1 += sqr(x->xR[i] - xmean);
       }
       v2 = 0.0;
       for (i = 0; i < n; i++) {
          v2 += x->xR[i] - xmean;
       }
-      v2 = ae_sqr(v2) / n;
+      v2 = sqr(v2) / n;
       xvariance = (v1 - v2) / (n - 1);
       if (xvariance < 0.0) {
          xvariance = 0.0;
@@ -7775,10 +7775,10 @@ void studentttest2(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double *botht
    s = 0.0;
    if (n + m > 2) {
       for (i = 0; i < n; i++) {
-         s += ae_sqr(x->xR[i] - xmean);
+         s += sqr(x->xR[i] - xmean);
       }
       for (i = 0; i < m; i++) {
-         s += ae_sqr(y->xR[i] - ymean);
+         s += sqr(y->xR[i] - ymean);
       }
       s = sqrt(s * (1.0 / (double)n + 1.0 / (double)m) / (n + m - 2));
    }
@@ -7903,14 +7903,14 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
    xvar = 0.0;
    if (n >= 2 && !samex) {
       for (i = 0; i < n; i++) {
-         xvar += ae_sqr(x->xR[i] - xmean);
+         xvar += sqr(x->xR[i] - xmean);
       }
       xvar /= n - 1;
    }
    yvar = 0.0;
    if (m >= 2 && !samey) {
       for (i = 0; i < m; i++) {
-         yvar += ae_sqr(y->xR[i] - ymean);
+         yvar += sqr(y->xR[i] - ymean);
       }
       yvar /= m - 1;
    }
@@ -7951,11 +7951,11 @@ void unequalvariancettest(RVector *x, ae_int_t n, RVector *y, ae_int_t m, double
 // Statistic
    stat = (xmean - ymean) / sqrt(xvar / n + yvar / m);
    c = xvar / n / (xvar / n + yvar / m);
-   df = (double)(n - 1) * (m - 1) / ((m - 1) * ae_sqr(c) + (n - 1) * ae_sqr(1 - c));
+   df = (double)(n - 1) * (m - 1) / ((m - 1) * sqr(c) + (n - 1) * sqr(1 - c));
    if (stat > 0.0) {
-      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
+      p = 1 - 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat)));
    } else {
-      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + ae_sqr(stat)));
+      p = 0.5 * incompletebeta(df / 2, 0.5, df / (df + sqr(stat)));
    }
    *bothtails = 2 * rmin2(p, 1 - p);
    *lefttail = p;

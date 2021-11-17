@@ -89,9 +89,9 @@ double gammafunction(double x) {
             p++;
             z = q - p;
          }
-         z = q * sin(ae_pi * z);
+         z = q * sin(pi * z);
          z = fabs(z);
-         z = ae_pi / (z * gammafunc_gammastirf(q));
+         z = pi / (z * gammafunc_gammastirf(q));
       } else {
          z = gammafunc_gammastirf(x);
       }
@@ -211,7 +211,7 @@ double lngamma(double x, double *sgngam) {
          p++;
          z = p - q;
       }
-      z = q * sin(ae_pi * z);
+      z = q * sin(pi * z);
       result = logpi - log(z) - w;
       return result;
    }
@@ -402,7 +402,7 @@ double errorfunctionc(double x) {
 // API: double normalpdf(const double x);
 double normalpdf(double x) {
    ae_assert(isfinite(x), "NormalPDF: X is infinite");
-   return exp(-x * x / 2) / sqrt(2 * ae_pi);
+   return exp(-x * x / 2) / sqrt(2 * pi);
 }
 
 // Normal distribution CDF
@@ -509,8 +509,8 @@ double inverfr2(double z) {
 // API: double invnormalcdf(const double y0);
 double invnormalcdf(double y0) {
    const double expm2 = 0.13533528323661269189;
-   if (y0 <= 0.0) return -ae_maxrealnumber;
-   else if (y0 >= 1.0) return +ae_maxrealnumber;
+   if (y0 <= 0.0) return -maxrealnumber;
+   else if (y0 >= 1.0) return +maxrealnumber;
    ae_int_t sign = y0 <= expm2 ? -1 : y0 > 1.0 - expm2 ? +1 : 0;
    if (sign == 0) return inverfr0(y0 - 0.5);
    else if (sign > 0) y0 = 1.0 - y0;
@@ -555,7 +555,7 @@ double bivariatenormalpdf(double x, double y, double rho) {
    ae_assert(isfinite(rho), "BivariateNormalCDF: Rho is infinite");
    ae_assert(-1.0 < rho && rho < 1.0, "BivariateNormalCDF: Rho is not in (-1,+1) range");
    onerho2 = (1 - rho) * (1 + rho);
-   result = exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2)) / (2 * ae_pi * sqrt(onerho2));
+   result = exp(-(x * x + y * y - 2 * rho * x * y) / (2 * onerho2)) / (2 * pi * sqrt(onerho2));
    return result;
 }
 
@@ -664,14 +664,14 @@ double bivariatenormalcdf(double x, double y, double rho) {
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.1069393259953184, 0.9041172563704749);
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, -0.9815606342467192);
       v += normaldistr_bvnintegrate3(rangea, rangeb, x, y, 0.0471753363865118, 0.9815606342467192);
-      v = v * 0.5 * (rangeb - rangea) / (2 * ae_pi);
+      v = v * 0.5 * (rangeb - rangea) / (2 * pi);
       result = normalcdf(x) * normalcdf(y) + v;
    } else {
    // Rho is large, compute integral using using formula (6) by Alan Genz, integrated
    // by means of 20-point Gauss-Legendre quadrature.
       x = -x;
       y = -y;
-      s = (double)(ae_sign(rho));
+      s = (double)(sign(rho));
       if (s > 0.0) {
          fxys = normalcdf(-rmax2(x, y));
       } else {
@@ -683,8 +683,8 @@ double bivariatenormalcdf(double x, double y, double rho) {
       ta = rangeb;
       tb = fabs(x - s * y);
       tc = (4 - s * x * y) / 8;
-      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2 * ta * ta)) - tb * (1 - tc * tb * tb / 3) * sqrt(2 * ae_pi) * normalcdf(-tb / ta);
-      v0 = v0 * exp(-s * x * y / 2) / (2 * ae_pi);
+      v0 = ta * (1 - tc * (tb * tb - ta * ta) / 3) * exp(-tb * tb / (2 * ta * ta)) - tb * (1 - tc * tb * tb / 3) * sqrt(2 * pi) * normalcdf(-tb / ta);
+      v0 = v0 * exp(-s * x * y / 2) / (2 * pi);
    // Compute second term (numerical integral, 20-point Gauss-Legendre rule) from formula (6)
       v1 = 0.0;
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.1527533871307258, -0.0765265211334973);
@@ -707,7 +707,7 @@ double bivariatenormalcdf(double x, double y, double rho) {
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0406014298003869, 0.9639719272779138);
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, -0.9931285991850949);
       v1 += normaldistr_bvnintegrate6(rangea, rangeb, x, y, s, 0.0176140071391521, 0.9931285991850949);
-      v1 = v1 * 0.5 * (rangeb - rangea) / (2 * ae_pi);
+      v1 = v1 * 0.5 * (rangeb - rangea) / (2 * pi);
       result = fxys - s * (v0 + v1);
    }
    result = rmax2(result, 0.0);
@@ -842,7 +842,7 @@ static double ibetaf_incompletebetafe(double a, double b, double x, double big, 
    ans = 1.0;
    r = 1.0;
    n = 0;
-   thresh = 3.0 * ae_machineepsilon;
+   thresh = 3.0 * machineepsilon;
    do {
       xk = -x * k1 * k2 / (k3 * k4);
       pk = pkm1 + pkm2 * xk;
@@ -940,7 +940,7 @@ static double ibetaf_incompletebetafe2(double a, double b, double x, double big,
    ans = 1.0;
    r = 1.0;
    n = 0;
-   thresh = 3.0 * ae_machineepsilon;
+   thresh = 3.0 * machineepsilon;
    do {
       xk = -z * k1 * k2 / (k3 * k4);
       pk = pkm1 + pkm2 * xk;
@@ -1017,7 +1017,7 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    t = u;
    n = 2.0;
    s = 0.0;
-   z = ae_machineepsilon * ai;
+   z = machineepsilon * ai;
    while (!SmallAtR(v, z)) {
       u = (n - b) * x / n;
       t *= u;
@@ -1028,12 +1028,12 @@ static double ibetaf_incompletebetaps(double a, double b, double x, double maxga
    s += t1;
    s += ai;
    u = a * log(x);
-   if (a + b < maxgam && SmallR(u, log(ae_maxrealnumber))) {
+   if (a + b < maxgam && SmallR(u, log(maxrealnumber))) {
       t = gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       s *= t * pow(x, a);
    } else {
       t = lngamma(a + b, &sg) - lngamma(a, &sg) - lngamma(b, &sg) + u + log(s);
-      if (t < log(ae_minrealnumber)) {
+      if (t < log(minrealnumber)) {
          s = 0.0;
       } else {
          s = exp(t);
@@ -1099,8 +1099,8 @@ double incompletebeta(double a, double b, double x) {
    big = 4.503599627370496e15;
    biginv = 2.22044604925031308085e-16;
    maxgam = 171.624376956302725;
-   minlog = log(ae_minrealnumber);
-   maxlog = log(ae_maxrealnumber);
+   minlog = log(minrealnumber);
+   maxlog = log(maxrealnumber);
    ae_assert(a > 0.0 && b > 0.0, "Domain error in IncompleteBeta");
    ae_assert(x >= 0.0 && x <= 1.0, "Domain error in IncompleteBeta");
    if (x == 0.0) {
@@ -1129,8 +1129,8 @@ double incompletebeta(double a, double b, double x) {
    }
    if (flag == 1 && b * x <= 1.0 && x <= 0.95) {
       t = ibetaf_incompletebetaps(a, b, x, maxgam);
-      if (t <= ae_machineepsilon) {
-         result = 1.0 - ae_machineepsilon;
+      if (t <= machineepsilon) {
+         result = 1.0 - machineepsilon;
       } else {
          result = 1.0 - t;
       }
@@ -1151,8 +1151,8 @@ double incompletebeta(double a, double b, double x) {
       t *= w;
       t *= gammafunction(a + b) / (gammafunction(a) * gammafunction(b));
       if (flag == 1) {
-         if (t <= ae_machineepsilon) {
-            result = 1.0 - ae_machineepsilon;
+         if (t <= machineepsilon) {
+            result = 1.0 - machineepsilon;
          } else {
             result = 1.0 - t;
          }
@@ -1169,8 +1169,8 @@ double incompletebeta(double a, double b, double x) {
       t = exp(y);
    }
    if (flag == 1) {
-      if (t <= ae_machineepsilon) {
-         t = 1.0 - ae_machineepsilon;
+      if (t <= machineepsilon) {
+         t = 1.0 - machineepsilon;
       } else {
          t = 1.0 - t;
       }
@@ -1304,7 +1304,7 @@ double invincompletebeta(double a, double b, double y) {
          x = 2.0 / (1.0 / (2.0 * aaa - 1.0) + 1.0 / (2.0 * bbb - 1.0));
          d = yp * sqrt(x + lgm) / x - (1.0 / (2.0 * bbb - 1.0) - 1.0 / (2.0 * aaa - 1.0)) * (lgm + 5.0 / 6.0 - 2.0 / (3.0 * x));
          d *= 2.0;
-         if (d < log(ae_minrealnumber)) {
+         if (d < log(minrealnumber)) {
             x = 0.0;
             break;
          }
@@ -1332,7 +1332,7 @@ double invincompletebeta(double a, double b, double y) {
             if (i != 0) {
                x = x0 + di * (x1 - x0);
                if (x == 1.0) {
-                  x = 1.0 - ae_machineepsilon;
+                  x = 1.0 - machineepsilon;
                }
                if (x == 0.0) {
                   di = 0.5;
@@ -1394,7 +1394,7 @@ double invincompletebeta(double a, double b, double y) {
                }
             } else {
                x1 = x;
-               if (rflg == 1 && x1 < ae_machineepsilon) {
+               if (rflg == 1 && x1 < machineepsilon) {
                   x = 0.0;
                   break;
                }
@@ -1426,7 +1426,7 @@ double invincompletebeta(double a, double b, double y) {
    // breakihalvecycle
       if (mainlooppos == breakihalvecycle) {
          if (x0 >= 1.0) {
-            x = 1.0 - ae_machineepsilon;
+            x = 1.0 - machineepsilon;
             break;
          }
          if (x <= 0.0) {
@@ -1475,10 +1475,10 @@ double invincompletebeta(double a, double b, double y) {
                continue;
             }
             d = (aaa - 1.0) * log(x) + (bbb - 1.0) * log(1.0 - x) + lgm;
-            if (d < log(ae_minrealnumber)) {
+            if (d < log(minrealnumber)) {
                break;
             }
-            if (d > log(ae_maxrealnumber)) {
+            if (d > log(maxrealnumber)) {
                mainlooppos = breaknewtcycle;
                continue;
             }
@@ -1502,7 +1502,7 @@ double invincompletebeta(double a, double b, double y) {
                }
             }
             x = xt;
-            if (SmallR(d / x, 128.0 * ae_machineepsilon)) {
+            if (SmallR(d / x, 128.0 * machineepsilon)) {
                break;
             }
             i++;
@@ -1515,15 +1515,15 @@ double invincompletebeta(double a, double b, double y) {
       }
    // breaknewtcycle
       if (mainlooppos == breaknewtcycle) {
-         dithresh = 256.0 * ae_machineepsilon;
+         dithresh = 256.0 * machineepsilon;
          mainlooppos = ihalve;
          continue;
       }
    }
 // done
    if (rflg != 0) {
-      if (x <= ae_machineepsilon) {
-         x = 1.0 - ae_machineepsilon;
+      if (x <= machineepsilon) {
+         x = 1.0 - machineepsilon;
       } else {
          x = 1.0 - x;
       }
@@ -1629,19 +1629,19 @@ double studenttdistribution(ae_int_t k, double t) {
          f = 1.0;
          tz = 1.0;
          j = 3;
-         while (j < k - 1 && tz / f > ae_machineepsilon) {
+         while (j < k - 1 && tz / f > machineepsilon) {
             tz *= (j - 1) / (z * j);
             f += tz;
             j += 2;
          }
          p += f * xsqk / z;
       }
-      p = p * 2.0 / ae_pi;
+      p = p * 2.0 / pi;
    } else {
       f = 1.0;
       tz = 1.0;
       j = 2;
-      while (j < k - 1 && tz / f > ae_machineepsilon) {
+      while (j < k - 1 && tz / f > machineepsilon) {
          tz *= (j - 1) / (z * j);
          f += tz;
          j += 2;
@@ -1699,8 +1699,8 @@ double invstudenttdistribution(ae_int_t k, double p) {
       rflg = 1;
    }
    z = invincompletebeta(0.5 * rk, 0.5, 2.0 * p);
-   if (ae_maxrealnumber * z < rk) {
-      result = rflg * ae_maxrealnumber;
+   if (maxrealnumber * z < rk) {
+      result = rflg * maxrealnumber;
       return result;
    }
    t = sqrt(rk / z - rk);
@@ -2860,7 +2860,7 @@ double exponentialintegralen(double x, ae_int_t n) {
          } else {
             t = 1.0;
          }
-      } while (t >= ae_machineepsilon);
+      } while (t >= machineepsilon);
       t = 1.0;
       for (i = 1; i < n; i++) {
          t = t * z / i;
@@ -2902,7 +2902,7 @@ double exponentialintegralen(double x, ae_int_t n) {
             qkm2 /= big;
             qkm1 /= big;
          }
-      } while (t >= ae_machineepsilon);
+      } while (t >= machineepsilon);
       result *= exp(-x);
    }
    return result;
@@ -3016,7 +3016,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    c.xR[0] = sqrt(m);
    twon = 1.0;
    i = 0;
-   while (!SmallAtR(c.xR[i] / a.xR[i], ae_machineepsilon)) {
+   while (!SmallAtR(c.xR[i] / a.xR[i], machineepsilon)) {
       if (i > 7) {
          ae_assert(false, "Overflow in JacobianEllipticFunctions");
          break;
@@ -3100,7 +3100,7 @@ void sinecosineintegrals(double x, double *si, double *ci) {
    if (neg) x = -x;
    if (x == 0.0) {
       *si = 0.0;
-      *ci = -ae_maxrealnumber;
+      *ci = -maxrealnumber;
       return;
    } else if (x > 1.0E9) {
       *si = HalfPi - cos(x) / x;
@@ -3217,7 +3217,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
    if (neg) x = -x;
    if (x == 0.0) {
       *shi = 0.0;
-      *chi = -ae_maxrealnumber;
+      *chi = -maxrealnumber;
       return;
    }
    double s, c;
@@ -3232,7 +3232,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
          a /= k;
          s += a / k;
          k++;
-      } while (!SmallR(a / s, ae_machineepsilon));
+      } while (!SmallR(a / s, machineepsilon));
       s *= x;
       c += Eul + log(x);
    } else if (x < 18.0) {
@@ -3308,7 +3308,7 @@ void hyperbolicsinecosineintegrals(double x, double *shi, double *chi) {
       b2 = a*b0 - b1 + c02, b1 = a*b2 - b0 + c01, b0 = a*b1 - b2 + c00;
       c = Eul + log(x) + k * 0.5 * (b0 - b2);
    } else {
-      c = s = ae_maxrealnumber;
+      c = s = maxrealnumber;
    }
    if (neg) s = -s;
    *shi = s;
@@ -3683,7 +3683,7 @@ double beta(double a, double b) {
       sg *= s;
       y += lngamma(a, &s);
       sg *= s;
-      ae_assert(y <= log(ae_maxrealnumber), "Overflow in Beta");
+      ae_assert(y <= log(maxrealnumber), "Overflow in Beta");
       result = sg * exp(y);
       return result;
    }
@@ -3799,17 +3799,17 @@ void fresnelintegral(double x, double *c, double *s) {
       cd = cd * t + 8.68029542941784300606E-4;
       cd = cd * t + 4.12142090722199792936E-2;
       cd = cd * t + 1.00000000000000000118E0;
-      *s = ae_sign(xxa) * x * x2 * sn / sd;
-      *c = ae_sign(xxa) * x * cn / cd;
+      *s = sign(xxa) * x * x2 * sn / sd;
+      *c = sign(xxa) * x * cn / cd;
       return;
    }
    if (x > 36974.0) {
-      *c = ae_sign(xxa) * 0.5;
-      *s = ae_sign(xxa) * 0.5;
+      *c = sign(xxa) * 0.5;
+      *s = sign(xxa) * 0.5;
       return;
    }
    x2 = x * x;
-   t = ae_pi * x2;
+   t = pi * x2;
    u = 1 / (t * t);
    t = 1 / t;
    fn = 4.21543555043677546506E-1;
@@ -3861,11 +3861,11 @@ void fresnelintegral(double x, double *c, double *s) {
    t = HalfPi * x2;
    cc = cos(t);
    ss = sin(t);
-   t = ae_pi * x;
+   t = pi * x;
    *c = 0.5 + (f * ss - g * cc) / t;
    *s = 0.5 - (f * cc + g * ss) / t;
-   *c *= ae_sign(xxa);
-   *s *= ae_sign(xxa);
+   *c *= sign(xxa);
+   *s *= sign(xxa);
 }
 } // end of namespace alglib_impl
 
@@ -3939,7 +3939,7 @@ double psi(double x) {
       p = (double)(FloorZ(q));
       if (p == q) {
          ae_assert(false, "Singularity in Psi(x)");
-         result = ae_maxrealnumber;
+         result = maxrealnumber;
          return result;
       }
       nz = q - p;
@@ -3948,7 +3948,7 @@ double psi(double x) {
             p++;
             nz = q - p;
          }
-         nz = ae_pi / tan(ae_pi * nz);
+         nz = pi / tan(pi * nz);
       } else {
          nz = 0.0;
       }
@@ -4077,8 +4077,8 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    if (x > 25.77) {
       *ai = 0.0;
       *aip = 0.0;
-      *bi = ae_maxrealnumber;
-      *bip = ae_maxrealnumber;
+      *bi = maxrealnumber;
+      *bip = maxrealnumber;
       return;
    }
    if (x < -2.09) {
@@ -4132,7 +4132,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
       agd = agd * zz + 1.17166733214413521882E-6;
       agd = agd * zz + 4.91834570062930015649E-9;
       ug = z * agn / agd;
-      theta = zeta + 0.25 * ae_pi;
+      theta = zeta + 0.25 * pi;
       f = sin(theta);
       g = cos(theta);
       *ai = k * (f * uf - g * ug);
@@ -4268,7 +4268,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    ug = x;
    k = 1.0;
    z = x * x * x;
-   while (t > ae_machineepsilon) {
+   while (t > machineepsilon) {
       uf *= z;
       k++;
       uf /= k;
@@ -4297,7 +4297,7 @@ void airy(double x, double *ai, double *aip, double *bi, double *bip) {
    g = 1.0 + ug;
    uf /= 3.0;
    t = 1.0;
-   while (t > ae_machineepsilon) {
+   while (t > machineepsilon) {
       uf *= z;
       ug /= k;
       k++;
@@ -4738,8 +4738,8 @@ double besselj0(double x) {
    if (x > 8.0) {
       double pzero, qzero;
       bessel_besselasympt0(8.0 / x, &pzero, &qzero);
-      double nn = x - ae_pi / 4.0;
-      return sqrt(2.0 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
+      double nn = x - pi / 4.0;
+      return sqrt(2.0 / pi / x) * (pzero * cos(nn) - qzero * sin(nn));
    }
    double xsq = x * x;
    const double p16 = +26857.86856980014981415848441, p14 = -40504123.71833132706360663322, p12 = +25071582855.36881945555156435;
@@ -4796,8 +4796,8 @@ double besselj1(double x) {
    if (x > 8.0) {
       double pzero, qzero;
       bessel_besselasympt1(8.0 / x, &pzero, &qzero);
-      double nn = x - 3.0 * ae_pi / 4.0;
-      double result = sqrt(2.0 / ae_pi / x) * (pzero * cos(nn) - qzero * sin(nn));
+      double nn = x - 3.0 * pi / 4.0;
+      double result = sqrt(2.0 / pi / x) * (pzero * cos(nn) - qzero * sin(nn));
       return neg ? -result : +result;
    }
    double xsq = x * x;
@@ -4850,7 +4850,7 @@ double besseljn(ae_int_t n, double x) {
    if (n == 0) return sg * besselj0(x);
    else if (n == 1) return sg * besselj1(x);
    else if (n == 2) return x == 0.0 ? 0.0 : sg * (2.0 * besselj1(x) / x - besselj0(x));
-   else if (x < ae_machineepsilon) return 0.0;
+   else if (x < machineepsilon) return 0.0;
    ae_int_t k = 53;
    double pk = 2.0 * (n + k);
    double ans = pk;
@@ -4903,10 +4903,10 @@ double bessely0(double x) {
    if (x > 8.0) {
       double pzero, qzero;
       bessel_besselasympt0(8.0 / x, &pzero, &qzero);
-      double nn = x - ae_pi / 4.0;
-      return sqrt(2.0 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
+      double nn = x - pi / 4.0;
+      return sqrt(2.0 / pi / x) * (pzero * sin(nn) + qzero * cos(nn));
    }
-   double xsq = ae_sqr(x);
+   double xsq = sqr(x);
    const double p16 = -41370.35497933148554125235152, p14 = +59152134.65686889654273830069, p12 = -34363712229.79040378171030138;
    const double p10 = +10255208596863.94284509167421, p08 = -1648605817185729.473122082537, p06 = +137562431639934407.8571335453;
    const double p04 = -5247065581112764941.297350814, p02 = +65874732757195549259.99402049, p00 = -27502866786291095837.01933175;
@@ -4915,7 +4915,7 @@ double bessely0(double x) {
    const double q12 = 579512264.0700729537480087915, q10 = 261306575504.1081249568482092, q08 = 91620380340751.85262489147968;
    const double q06 = 23928830434997818.57439356652, q04 = 4192417043410839973.904769661, q02 = 372645883898616588198.9980;
    double q4 = q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq * (q16 + xsq)))))));
-   return p4 / q4 + 2.0 / ae_pi * besselj0(x) * log(x);
+   return p4 / q4 + 2.0 / pi * besselj0(x) * log(x);
 }
 
 // Bessel function of second kind of order one
@@ -4942,8 +4942,8 @@ double bessely1(double x) {
    if (x > 8.0) {
       double pzero, qzero;
       bessel_besselasympt1(8.0 / x, &pzero, &qzero);
-      double nn = x - 3.0 * ae_pi / 4.0;
-      return sqrt(2.0 / ae_pi / x) * (pzero * sin(nn) + qzero * cos(nn));
+      double nn = x - 3.0 * pi / 4.0;
+      return sqrt(2.0 / pi / x) * (pzero * sin(nn) + qzero * cos(nn));
    }
    double xsq = x * x;
    const double p17 = -2108847.540133123652824139923, p15 = +3639488548.124002058278999428, p13 = -2580681702194.450950541426399;
@@ -4954,7 +4954,7 @@ double bessely1(double x) {
    const double q10 = 646534088126.5275571961681500, q08 = 297663212564727.6729292742282, q06 = 108225825940881955.2553850180;
    const double q04 = 29549879358971486742.90758119, q02 = 5435310377188854170800.653097, q00 = 508206736694124324531442.4152;
    double q4 = q00 + xsq * (q02 + xsq * (q04 + xsq * (q06 + xsq * (q08 + xsq * (q10 + xsq * (q12 + xsq * (q14 + xsq * (q16 + xsq))))))));
-   return p4 / q4 + 2.0 / ae_pi * (besselj1(x) * log(x) - 1.0 / x);
+   return p4 / q4 + 2.0 / pi * (besselj1(x) * log(x) - 1.0 / x);
 }
 
 // Bessel function of second kind of integer order
@@ -5294,14 +5294,14 @@ double besselkn(ae_int_t nn, double x) {
                zn *= z;
                double t = nk1f * zn / kf;
                s += t;
-               ae_assert(ae_maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN");
-               ae_assert(!(tox > 1.0 && ae_maxrealnumber / tox < zmn), "Overflow in BesselKN");
+               ae_assert(maxrealnumber - fabs(t) > fabs(s), "Overflow in BesselKN");
+               ae_assert(!(tox > 1.0 && maxrealnumber / tox < zmn), "Overflow in BesselKN");
                zmn *= tox;
             }
             s *= 0.5;
             double t = fabs(s);
-            ae_assert(!(zmn > 1.0 && ae_maxrealnumber / zmn < t), "Overflow in BesselKN");
-            ae_assert(!(t > 1.0 && ae_maxrealnumber / t < zmn), "Overflow in BesselKN");
+            ae_assert(!(zmn > 1.0 && maxrealnumber / zmn < t), "Overflow in BesselKN");
+            ae_assert(!(t > 1.0 && maxrealnumber / t < zmn), "Overflow in BesselKN");
             ans = s * zmn;
          }
       }
@@ -5322,13 +5322,13 @@ double besselkn(ae_int_t nn, double x) {
          pn += 1.0 / (k + n);
          s += (pk + pn - tlg) * t;
          k++;
-      } while (!SmallAtR(t / s, ae_machineepsilon));
+      } while (!SmallAtR(t / s, machineepsilon));
       s = 0.5 * s / zmn;
       if (n % 2 != 0) s = -s;
       return ans + s;
    }
-   if (x > log(ae_maxrealnumber)) return 0.0;
-   double pn = 4.0 * (n * n), pk = 1.0, z0 = 8.0 * x, fn = 1.0, nkf = ae_maxrealnumber;
+   if (x > log(maxrealnumber)) return 0.0;
+   double pn = 4.0 * (n * n), pk = 1.0, z0 = 8.0 * x, fn = 1.0, nkf = maxrealnumber;
    double t = 1.0, s = t;
    ae_int_t i = 0;
    do {
@@ -5341,8 +5341,8 @@ double besselkn(ae_int_t nn, double x) {
       fn++;
       pk += 2.0;
       i++;
-   } while (!SmallAtR(t / s, ae_machineepsilon));
-   return exp(-x) * sqrt(ae_pi / (2.0 * x)) * s;
+   } while (!SmallAtR(t / s, machineepsilon));
+   return exp(-x) * sqrt(pi / (2.0 * x)) * s;
 }
 } // end of namespace alglib_impl
 
@@ -5578,7 +5578,7 @@ double ellipticintegralkhighprecision(double m1) {
    double p;
    double q;
    double result;
-   if (m1 <= ae_machineepsilon) {
+   if (m1 <= machineepsilon) {
       result = 1.3862943611198906188E0 - 0.5 * log(m1);
    } else {
       p = 1.37982864606273237150E-4;
@@ -5728,10 +5728,10 @@ double incompleteellipticintegralk(double phi, double m) {
    c = sqrt(m);
    d = 1;
    md = 0;
-   while (!SmallAtR(c / a, ae_machineepsilon)) {
+   while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
-      phi += atan(t * temp) + md * ae_pi;
-      md = TruncZ((phi + HalfPi) / ae_pi);
+      phi += atan(t * temp) + md * pi;
+      md = TruncZ((phi + HalfPi) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -5739,7 +5739,7 @@ double incompleteellipticintegralk(double phi, double m) {
       b = temp;
       d += d;
    }
-   temp = (atan(t) + md * ae_pi) / (d * a);
+   temp = (atan(t) + md * pi) / (d * a);
    if (s < 0) {
       temp = -temp;
    }
@@ -5898,10 +5898,10 @@ double incompleteellipticintegrale(double phi, double m) {
    d = 1;
    e = 0.0;
    md = 0;
-   while (!SmallAtR(c / a, ae_machineepsilon)) {
+   while (!SmallAtR(c / a, machineepsilon)) {
       temp = b / a;
-      lphi += atan(t * temp) + md * ae_pi;
-      md = TruncZ((lphi + HalfPi) / ae_pi);
+      lphi += atan(t * temp) + md * pi;
+      md = TruncZ((lphi + HalfPi) / pi);
       t = t * (1.0 + temp) / (1.0 - temp * t * t);
       c = 0.5 * (a - b);
       temp = sqrt(a * b);
@@ -5911,7 +5911,7 @@ double incompleteellipticintegrale(double phi, double m) {
       e += c * sin(lphi);
    }
    temp = ebig / ellipticintegralk(m);
-   temp *= (atan(t) + md * ae_pi) / (d * a);
+   temp *= (atan(t) + md * pi) / (d * a);
    temp += e;
    if (s < 0) {
       temp = -temp;

@@ -91,7 +91,7 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
    ae_vector_set_length(w, n);
    for (i = 1; i <= n; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * ae_sqr(z.xyR[0][i - 1]);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
    ae_frame_leave();
 }
@@ -230,7 +230,7 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    ae_vector_set_length(w, n + 2);
    for (i = 1; i <= n + 2; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * ae_sqr(z.xyR[0][i - 1]);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
    ae_frame_leave();
 }
@@ -325,7 +325,7 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
    ae_vector_set_length(w, n + 1);
    for (i = 1; i <= n + 1; i++) {
       x->xR[i - 1] = d.xR[i - 1];
-      w->xR[i - 1] = mu0 * ae_sqr(z.xyR[0][i - 1]);
+      w->xR[i - 1] = mu0 * sqr(z.xyR[0][i - 1]);
    }
    ae_frame_leave();
 }
@@ -371,7 +371,7 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w)
    }
    beta.xR[0] = 2.0;
    for (i = 1; i < n; i++) {
-      beta.xR[i] = 1 / (4 - 1 / ae_sqr((double)i));
+      beta.xR[i] = 1 / (4 - 1 / sqr((double)i));
    }
    gqgeneraterec(&alpha, &beta, beta.xR[0], n, info, x, w);
 // test basic properties to detect errors
@@ -435,20 +435,20 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
    t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
-   if (t > log(ae_maxrealnumber)) {
+   if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
       return;
    }
    b.xR[0] = exp(t);
    if (n > 1) {
-      alpha2 = ae_sqr(alpha);
-      beta2 = ae_sqr(beta);
+      alpha2 = sqr(alpha);
+      beta2 = sqr(beta);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
       for (i = 2; i < n; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
       }
    }
    gqgeneraterec(&a, &b, b.xR[0], n, info, x, w);
@@ -508,7 +508,7 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    ae_vector_set_length(&b, n);
    a.xR[0] = alpha + 1;
    t = lngamma(alpha + 1, &s);
-   if (t >= log(ae_maxrealnumber)) {
+   if (t >= log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
       return;
@@ -854,7 +854,7 @@ void gkqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w
    SetVector(x);
    SetVector(wkronrod);
    SetVector(wgauss);
-   if (ae_machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
+   if (machineepsilon > 1.0E-32 && (n == 15 || n == 21 || n == 31 || n == 41 || n == 51 || n == 61)) {
       *info = 1;
       gkqlegendretbl(n, x, wkronrod, wgauss, &eps);
    } else {
@@ -929,20 +929,20 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    apb = alpha + beta;
    a.xR[0] = (beta - alpha) / (apb + 2);
    t = (apb + 1) * log(2.0) + lngamma(alpha + 1, &s) + lngamma(beta + 1, &s) - lngamma(apb + 2, &s);
-   if (t > log(ae_maxrealnumber)) {
+   if (t > log(maxrealnumber)) {
       *info = -4;
       ae_frame_leave();
       return;
    }
    b.xR[0] = exp(t);
    if (clen > 1) {
-      alpha2 = ae_sqr(alpha);
-      beta2 = ae_sqr(beta);
+      alpha2 = sqr(alpha);
+      beta2 = sqr(beta);
       a.xR[1] = (beta2 - alpha2) / ((apb + 2) * (apb + 4));
-      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * ae_sqr(apb + 2));
+      b.xR[1] = 4 * (alpha + 1) * (beta + 1) / ((apb + 3) * sqr(apb + 2));
       for (i = 2; i < clen; i++) {
          a.xR[i] = 0.25 * (beta2 - alpha2) / (i * i * (1 + 0.5 * apb / i) * (1 + 0.5 * (apb + 2) / i));
-         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * ae_sqr(1 + 0.5 * apb / i));
+         b.xR[i] = 0.25 * (1 + alpha / i) * (1 + beta / i) * (1 + apb / i) / ((1 + 0.5 * (apb + 1) / i) * (1 + 0.5 * (apb - 1) / i) * sqr(1 + 0.5 * apb / i));
       }
    }
    gkqgeneraterec(&a, &b, b.xR[0], n, info, x, wkronrod, wgauss);
@@ -1012,7 +1012,7 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    }
    beta.xR[0] = 2.0;
    for (k = 1; k < blen; k++) {
-      beta.xR[k] = 1 / (4 - 1 / ae_sqr((double)k));
+      beta.xR[k] = 1 / (4 - 1 / sqr((double)k));
    }
    gkqgeneraterec(&alpha, &beta, mu0, n, info, x, wkronrod, wgauss);
 // test basic properties to detect errors
@@ -1071,7 +1071,7 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
       wkronrod->xR[i] = 0.0;
       wgauss->xR[i] = 0.0;
    }
-   *eps = rmax2(ae_machineepsilon, 1.0E-32);
+   *eps = rmax2(machineepsilon, 1.0E-32);
    if (n == 15) {
       ng = 4;
       wgauss->xR[0] = 0.129484966168869693270611432679082;
@@ -1697,7 +1697,7 @@ Spawn:
    }
    state->info = 1;
    if (state->eps == 0.0) {
-      state->eps = 100000 * ae_machineepsilon;
+      state->eps = 100000 * machineepsilon;
    }
 // First, prepare heap
 // * column 0   -   absolute error

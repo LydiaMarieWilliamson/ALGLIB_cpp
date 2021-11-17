@@ -65,7 +65,7 @@ double hqrndcontinuous(const hqrndstate &state, const real_1d_array &x, const ae
 namespace alglib_impl {
 struct xdebugrecord1 {
    ae_int_t i;
-   ae_complex c;
+   complex c;
    ae_vector a;
 };
 void xdebugrecord1_init(void *_p, bool make_automatic);
@@ -85,7 +85,7 @@ double xdebugr1sum(RVector *a);
 void xdebugr1neg(RVector *a);
 void xdebugr1appendcopy(RVector *a);
 void xdebugr1outeven(ae_int_t n, RVector *a);
-ae_complex xdebugc1sum(CVector *a);
+complex xdebugc1sum(CVector *a);
 void xdebugc1neg(CVector *a);
 void xdebugc1appendcopy(CVector *a);
 void xdebugc1outeven(ae_int_t n, CVector *a);
@@ -101,7 +101,7 @@ double xdebugr2sum(RMatrix *a);
 void xdebugr2neg(RMatrix *a);
 void xdebugr2transpose(RMatrix *a);
 void xdebugr2outsin(ae_int_t m, ae_int_t n, RMatrix *a);
-ae_complex xdebugc2sum(CMatrix *a);
+complex xdebugc2sum(CMatrix *a);
 void xdebugc2neg(CMatrix *a);
 void xdebugc2transpose(CMatrix *a);
 void xdebugc2outsincos(ae_int_t m, ae_int_t n, CMatrix *a);

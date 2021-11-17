@@ -140,9 +140,9 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
    ae_int_t i;
    ae_int_t n2;
    ae_int_t idx;
-   ae_complex hn;
-   ae_complex hmnc;
-   ae_complex v;
+   complex hn;
+   complex hmnc;
+   complex v;
    ae_frame_make(&_frame_block);
    SetVector(f);
    NewVector(buf, 0, DT_REAL);
@@ -182,13 +182,13 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f) {
          hn = ae_complex_from_d(buf.xR[idx], buf.xR[idx + 1]);
          idx = 2 * ((n2 - i) % n2);
          hmnc = ae_complex_from_d(buf.xR[idx], -buf.xR[idx + 1]);
-         v = ae_complex_from_d(-sin(-2 * ae_pi * i / n), cos(-2 * ae_pi * i / n));
+         v = ae_complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
          f->xC[i] = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
          f->xC[i].x *= 0.5;
          f->xC[i].y *= 0.5;
       }
       for (i = n2 + 1; i < n; i++) {
-         f->xC[i] = ae_c_conj(f->xC[n - i]);
+         f->xC[i] = conj(f->xC[n - i]);
       }
    } else {
    // use complex FFT
@@ -291,9 +291,9 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
    ae_int_t i;
    ae_int_t n2;
    ae_int_t idx;
-   ae_complex hn;
-   ae_complex hmnc;
-   ae_complex v;
+   complex hn;
+   complex hmnc;
+   complex v;
    ae_assert(n > 0 && n % 2 == 0, "FFTR1DEvenInplace: incorrect N!");
 // Special cases:
 // * N=2
@@ -316,7 +316,7 @@ void fftr1dinternaleven(RVector *a, ae_int_t n, RVector *buf, fasttransformplan 
       hn = ae_complex_from_d(buf->xR[idx], buf->xR[idx + 1]);
       idx = 2 * (n2 - i);
       hmnc = ae_complex_from_d(buf->xR[idx], -buf->xR[idx + 1]);
-      v = ae_complex_from_d(-sin(-2 * ae_pi * i / n), cos(-2 * ae_pi * i / n));
+      v = ae_complex_from_d(-sin(-2 * pi * i / n), cos(-2 * pi * i / n));
       v = ae_c_sub(ae_c_add(hn, hmnc), ae_c_mul(v, ae_c_sub(hn, hmnc)));
       a->xR[2 * i] = 0.5 * v.x;
       a->xR[2 * i + 1] = 0.5 * v.y;
@@ -587,9 +587,9 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    double t;
    ae_frame_make(&_frame_block);
    SetVector(r);
@@ -720,9 +720,9 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    double t;
    ae_frame_make(&_frame_block);
    SetVector(r);
@@ -841,9 +841,9 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t p;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    ae_frame_make(&_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL);
@@ -961,9 +961,9 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    ae_int_t i1;
    ae_int_t i2;
    ae_int_t j2;
-   ae_complex c1;
-   ae_complex c2;
-   ae_complex c3;
+   complex c1;
+   complex c2;
+   complex c3;
    ae_frame_make(&_frame_block);
    SetVector(r);
    NewVector(buf, 0, DT_REAL);
@@ -1065,7 +1065,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
    ae_int_t i2;
    ae_int_t j1;
    ae_int_t j2;
-   ae_complex v;
+   complex v;
    double ax;
    double ay;
    double bx;
@@ -1095,7 +1095,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          flopbest = (double)(2 * m * n);
       } else {
-         flopbest = ae_maxrealnumber;
+         flopbest = maxrealnumber;
       }
    // Another candidate - generic FFT code
       if (alg == -1) {
@@ -1432,7 +1432,7 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_
       if (alg == -1) {
          flopbest = 0.15 * m * n;
       } else {
-         flopbest = ae_maxrealnumber;
+         flopbest = maxrealnumber;
       }
    // Another candidate - generic FFT code
       if (alg == -1) {
@@ -1782,7 +1782,7 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!");
    ae_vector_set_length(&p, m);
    for (i = 0; i < m; i++) {
-      p.xC[m - 1 - i] = ae_c_conj(pattern->xC[i]);
+      p.xC[m - 1 - i] = conj(pattern->xC[i]);
    }
    convc1d(&p, m, signal, n, &b);
    ae_vector_set_length(r, m + n - 1);
@@ -1848,7 +1848,7 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
 // Task is normalized
    ae_vector_set_length(&p, n);
    for (i = 0; i < n; i++) {
-      p.xC[n - 1 - i] = ae_c_conj(pattern->xC[i]);
+      p.xC[n - 1 - i] = conj(pattern->xC[i]);
    }
    convc1dcircular(signal, m, &p, n, &b);
    ae_vector_set_length(c, m);

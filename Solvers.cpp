@@ -61,8 +61,8 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    bool status;
    ae_int_t nz;
    ae_int_t ne;
-   ae_complex v;
-   ae_complex vv;
+   complex v;
+   complex vv;
    ae_frame_make(&_frame_block);
    DupVector(a);
    SetVector(x);
@@ -123,7 +123,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
          v = ae_c_add(v, ae_c_mul_d(vv, a->xR[j]));
          vv = ae_c_mul(vv, x->xC[i]);
       }
-      rep->maxerr = rmax2(rep->maxerr, ae_c_abs(v));
+      rep->maxerr = rmax2(rep->maxerr, abscomplex(v));
    }
    ae_frame_leave();
 }
@@ -956,7 +956,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *xb) {
    ae_int_t i;
-   ae_complex v;
+   complex v;
    for (i = 0; i < n; i++) {
       if (p->xZ[i] != i) {
          swapc(&xb->xC[i], &xb->xC[p->xZ[i]]);
@@ -982,7 +982,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    ae_int_t k;
    ae_int_t rfs;
    ae_int_t nrfs;
-   ae_complex v;
+   complex v;
    double verr;
    bool smallerr;
    bool terminatenexttime;
@@ -2603,12 +2603,12 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *
 // ALGLIB: Copyright 27.01.2010 by Sergey Bochkanov
 static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb) {
    ae_int_t i;
-   ae_complex v;
+   complex v;
 // A = L*L' or A=U'*U
    if (isupper) {
    // Solve U'*y=b first.
       for (i = 0; i < n; i++) {
-         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i]));
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
          if (i < n - 1) {
             v = xb->xC[i];
             ae_v_csubc(&xb->xC[i + 1], 1, &cha->xyC[i][i + 1], 1, "Conj", n - i - 1, v);
@@ -2633,7 +2633,7 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, b
       }
    // Solve L'*x=y then.
       for (i = n - 1; i >= 0; i--) {
-         xb->xC[i] = ae_c_div(xb->xC[i], ae_c_conj(cha->xyC[i][i]));
+         xb->xC[i] = ae_c_div(xb->xC[i], conj(cha->xyC[i][i]));
          if (i > 0) {
             v = xb->xC[i];
             ae_v_csubc(xb->xC, 1, cha->xyC[i], 1, "Conj", i, v);
@@ -3034,7 +3034,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       return;
    }
    if (threshold == 0.0) {
-      threshold = 1000 * ae_machineepsilon;
+      threshold = 1000 * machineepsilon;
    }
 // Factorize A first
    svdfailed = !rmatrixsvd(a, nrows, ncols, 1, 2, 2, &sv, &u, &vt);
@@ -4276,7 +4276,7 @@ void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector 
          state->vmv = vmv;
       } else if (state->needprec) {
          for (i = 0; i < n; i++) {
-            state->pv.xR[i] = state->x.xR[i] * ae_sqr(state->tmpd.xR[i]);
+            state->pv.xR[i] = state->x.xR[i] * sqr(state->tmpd.xR[i]);
          }
       }
    }
@@ -4603,7 +4603,7 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state) {
    state->prectype = 0;
    state->epsa = linlsqr_atol;
    state->epsb = linlsqr_btol;
-   state->epsc = 1 / sqrt(ae_machineepsilon);
+   state->epsc = 1 / sqrt(machineepsilon);
    state->maxits = 0;
    state->lambdai = 0.0;
    state->xrep = false;
@@ -4991,7 +4991,7 @@ void linlsqrsolvesparse(linlsqrstate *state, sparsematrix *a, RVector *b) {
       t0 = 0;
       t1 = 0;
       while (sparseenumerate(a, &t0, &t1, &i, &j, &v)) {
-         state->tmpd.xR[j] += ae_sqr(v);
+         state->tmpd.xR[j] += sqr(v);
       }
       for (i = 0; i < n; i++) {
          if (state->tmpd.xR[i] > 0.0) {
@@ -5514,7 +5514,7 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
    lnlambda = log(*lambdav);
    lnlambdaup = log(lambdaup);
    lnnu = log(*nu);
-   lnmax = 0.5 * log(ae_maxrealnumber);
+   lnmax = 0.5 * log(maxrealnumber);
    if (lnlambda + lnlambdaup + lnnu > lnmax) {
       return result;
    }
@@ -5530,8 +5530,8 @@ static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup) {
 // Decreases lambda, but leaves it unchanged when there is danger of underflow.
 static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown) {
    *nu = 1.0;
-   if (log(*lambdav) + log(lambdadown) < log(ae_minrealnumber)) {
-      *lambdav = ae_minrealnumber;
+   if (log(*lambdav) + log(lambdadown) < log(minrealnumber)) {
+      *lambdav = minrealnumber;
    } else {
       *lambdav *= lambdadown;
    }
@@ -5583,12 +5583,12 @@ Spawn:
    state->needf = true, state->PQ = 0; goto Pause; Resume0: state->needf = false, state->repnfunc++;
    ae_v_move(state->xbase.xR, 1, state->x.xR, 1, n);
    state->fbase = state->f;
-   state->fprev = ae_maxrealnumber;
+   state->fprev = maxrealnumber;
    if (state->xrep) {
    // progress report
       state->xupdated = true, state->PQ = 1; goto Pause; Resume1: state->xupdated = false;
    }
-   if (state->f <= ae_sqr(state->epsf)) {
+   if (state->f <= sqr(state->epsf)) {
       state->repterminationtype = 1;
       goto Exit;
    }
