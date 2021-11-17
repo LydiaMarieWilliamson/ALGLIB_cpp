@@ -76,7 +76,7 @@ Other configurations have not been tested, but this should be suitable for a POS
 </p>
 <p>
 <a name=supp_DemoFile class=sheader></a><h2>A2. ALGLIB++ Demo</h2>
-An implementation of the demo program cited in <a href="Manual.htm#gs_compile_examples">Section 4.4</a> of the ALGLIB Reference Manual for the configuration Linux:x86:GCC may be found under the <a href="Demo/">Demo/</a> directory.
+An implementation of the demo program cited in <a href="Manual.htm#gs_compile_examples">Section 4.4</a> of the ALGLIB Reference Manual for the configuration Linux:x86_64:GCC may be found under the <a href="Demo/">Demo/</a> directory.
 If running under this configuration, run ./Test.sh under Demo/.
 Again, for other configurations, you will need to do some experimentation to find what works.
 </p>
@@ -620,8 +620,8 @@ The <a href=#supp_CppDemoModule>C++ Demo Module</a> is partly derived from one o
 	The Idw{0,1}.c files are a demonstration of possible future directions; we're also re-examining ALGLIB Version 2.
 	The ALGLIB library's infrastructure is naturally tailored for C++; laden with idioms that practically scream out "C++!".
 ∙	Test{I,X,Y,Z} work with alglib and are C++.
-∙	The Makefile and revisions have only been tried with Linux:x86:GCC.
-∙	The revision to handle the rounding on the FP unit was only added in for Linux:x86:GCC.
+∙	The Makefile and revisions have only been tried with Linux:x86_64:GCC.
+∙	The revision to handle the rounding on the FP unit was only added in for Linux:x86_64:GCC.
 ∙	Only the structural changes mentioned here were made; not any recoding, other than what was done for this.
 	The initial "structural" changes made, before actual recoding included a normalization of the ordering
 	(determined automatically with the aid of the compiler) of the routines and extraction of a dependency list;
