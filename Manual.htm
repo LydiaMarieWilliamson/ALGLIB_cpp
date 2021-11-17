@@ -354,7 +354,7 @@ A list of routines with commercial support in ALGLIB, broken down by subpackage,
 </p>
 <p>
 <a name=gs_compatibility_cpu class=sheader></a><h3>3.1. CPU</h3>
-ALGLIB++ has been tested on an x86 CPU, but should inherit the compatibility possessed by ALGLIB with x86_64, ARM and SPARC and other CPU's which:
+ALGLIB++ has been tested on an x86_64 CPU, and should inherit the compatibility possessed by ALGLIB with x86_64, ARM and SPARC and other CPU's which:
 <ul>
 <li>support double precision arithmetic</li>
 <li>compiles with IEEE 754 floating point standard (especially in its handling of IEEE special values)</li>
@@ -584,7 +584,7 @@ In this and the following examples we will omit compiler output for the sake of 
 <p><div align=center>
 <b><font size=-1><font color=red>NOTE:</font></b>
 The following figures are those cited for ALGLIB <a href="https://www.alglib.net/translator/man/manual.cpp.html#gs_compile_examples_win">in the ALGLIB reference</a>.
-The performance of ALGLIB++, when compiled under Windows:MSVC:x64/x86, has not yet been determined.
+The performance of ALGLIB++, when compiled under Windows:MSVC:x86_64, has not yet been determined.
 </font>
 </div></p>
 <pre class=p_code_head>
@@ -615,7 +615,7 @@ Performance: 4.5 GFLOPS
 <p>
 Well, in the first run 0.7 GFLOPS is not very impressive for a 3.2GHz CPU.
 The second run is better, but still not impressed.
-For the third test, we turn on optimizations for x86 architecture: define <code>AE_CPU=AE_INTEL</code>.
+For the third test, we turn on optimizations for x86_64 architecture: define <code>AE_CPU=AE_INTEL</code>.
 With this option any SSE2 supported provided by the CPU, will be exploited to make for further speedup.
 </p>
 <p>
@@ -680,7 +680,7 @@ using namespace alglib;
 <p>
 The examples below cover Linux compilation on Linux from the command line with GCC.
 The results cited by the original developers were on a 2-core x64 Intel CPU with 2x Hyperthreading enabled.
-The results cited below are on an x86 Intel Core 2 Duo processor and an AMD Ryzen processor.
+The results cited below are on an x86_64 Intel Core 2 Duo processor and an AMD Ryzen processor.
 </p>
 <p>
 The first example covers platform-agnostic compilation without optimization settings - the simplest way to compile ALGLIB++.
@@ -717,7 +717,7 @@ These counts are system-dependent; but the relative speed-up is proportional (e.
 <p>
 For the first run, 0.6 GFLOPS is not very fast.
 The second run, after <code>-O3</code> is added to the compiler parameters, is better, but still not impressive.
-For the third test, we optimize further for x86 architecture by defining <code>AE_CPU=AE_INTEL</code>.
+For the third test, we optimize further for x86 or x86_64 architecture by defining <code>AE_CPU=AE_INTEL</code>.
 With this option any SSE2 supported provided by the CPU, will be exploited to make for further speedup.
 </p>
 <p>
