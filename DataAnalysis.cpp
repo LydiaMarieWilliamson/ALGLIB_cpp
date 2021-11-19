@@ -8829,9 +8829,9 @@ static void clustering_clusterizerrunahcinternal(clusterizerstate *s, RMatrix *d
 //
 // NOTE: Agglomerative  hierarchical  clustering  algorithm  has two  phases:
 //       distance matrix calculation and clustering  itself. Only first phase
-//       (distance matrix  calculation)  is  accelerated  by  Intel  MKL  and
-//       multithreading. Thus, acceleration is significant only for medium or
-//       high-dimensional problems.
+//       (distance matrix calculation) is accelerated by SIMD and SMP.  Thus,
+//       acceleration is significant  only  for  medium  or  high-dimensional
+//       problems.
 //
 //       Although activating multithreading gives some speedup  over  single-
 //       threaded execution, you  should  not  expect  nearly-linear  scaling

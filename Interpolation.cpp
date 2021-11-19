@@ -8390,8 +8390,9 @@ void polynomialfitwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc
 // unterface for unconstrained unweighted fitting. See  PolynomialFitWC()  if
 // you need constrained fitting.
 //
-// Task is linear, so linear least squares solver is used. Complexity of this
-// computational scheme is O(N*M^2), mostly dominated by least squares solver
+// The task is linear, thus the linear least  squares  solver  is  used.  The
+// complexity of this computational scheme is O(N*M^2), mostly  dominated  by
+// the least squares solver
 //
 // SEE ALSO:
 //     PolynomialFitWC()

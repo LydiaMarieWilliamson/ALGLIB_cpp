@@ -1121,6 +1121,9 @@ void xdebugrecord1_free(void *_p, bool make_automatic) {
 } // end of namespace alglib_impl
 
 namespace alglib {
+// This is a debug class intended for testing ALGLIB interface generator.
+// Never use it in any real life project.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
 DefClass(xdebugrecord1, AndD DecVal(i) AndD DecComplex(c) AndD DecVar(a))
 
 void xdebuginitrecord1(xdebugrecord1 &rec1) {

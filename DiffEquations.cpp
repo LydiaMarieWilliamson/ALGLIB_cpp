@@ -19,6 +19,7 @@
 namespace alglib_impl {
 static const double odesolver_odesolvermaxgrow = 3.0;
 static const double odesolver_odesolvermaxshrink = 10.0;
+static double odesolver_odesolverguaranteeddecay = 0.9;
 
 // Internal initialization subroutine
 static void odesolver_odesolverinit(ae_int_t solvertype, RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state) {
@@ -324,7 +325,7 @@ Spawn:
                h2 = h / odesolver_odesolvermaxshrink;
             }
             if (err > state->eps) {
-               h = h2;
+               h = rmin2(h2, odesolver_odesolverguaranteeddecay * h);
                continue;
             }
          // advance position

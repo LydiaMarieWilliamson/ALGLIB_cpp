@@ -517,6 +517,14 @@ void s1_grad(const real_1d_array &x, double &func, real_1d_array &grad, void *pt
 
 int main() {
    bool AllOk = true;
+   printf("CPUID:%s%s%s\n", alglib_impl::CurCPU & alglib_impl::CPU_SSE2 ? " sse2" : "", alglib_impl::CurCPU & alglib_impl::CPU_AVX2 ? " avx2" : "", alglib_impl::CurCPU & alglib_impl::CPU_FMA ? " fma" : "");
+#if AE_OS == AE_POSIX
+   printf("OS: POSIX\n");
+#elif AE_OS == AE_WINDOWS
+   printf("OS: Windows\n");
+#else
+   printf("OS: Other\n");
+#endif
    printf("C++ tests. Please wait...\n");
 #if AE_MALLOC == AE_BASIC_STATIC_MALLOC
    const ae_int_t _static_pool_size = 1000000;

@@ -2877,7 +2877,12 @@ using namespace alglib;
 </div>
 <a name=struct_xdebugrecord1></a><h6 class=pageheader>xdebugrecord1 Class</h6>
 <hr width=600 align=left>
-<pre class=narration></pre>
+<pre class=narration>
+// This is a debug class intended for testing ALGLIB interface generator.
+// Never use it in any real life project.
+// ALGLIB: Copyright 20.07.2021 by Sergey Bochkanov
+</pre>
+<hr width=600 align=left>
 <pre class=declaration>
 <b>class</b> xdebugrecord1 {
    ae_int_t i;
@@ -3668,9 +3673,9 @@ This function performs agglomerative hierarchical clustering
 
 NOTE: Agglomerative  hierarchical  clustering  algorithm  has two  phases:
       distance matrix calculation and clustering  itself. Only first phase
-      (distance matrix  calculation)  is  accelerated  by  Intel  MKL  and
-      multithreading. Thus, acceleration is significant only for medium or
-      high-dimensional problems.
+      (distance matrix calculation) is accelerated by SIMD and SMP.  Thus,
+      acceleration is significant  only  for  medium  or  high-dimensional
+      problems.
 
       Although activating multithreading gives some speedup  over  single-
       threaded execution, you  should  not  expect  nearly-linear  scaling
@@ -17446,8 +17451,9 @@ Fitting by polynomials in barycentric form. This function provides  simple
 unterface for unconstrained unweighted fitting. See  PolynomialFitWC()  if
 you need constrained fitting.
 
-Task is linear, so linear least squares solver is used. Complexity of this
-computational scheme is O(N*M^2), mostly dominated by least squares solver
+The task is linear, thus the linear least  squares  solver  is  used.  The
+complexity of this computational scheme is O(N*M^2), mostly  dominated  by
+the least squares solver
 
 SEE ALSO:
     PolynomialFitWC()
