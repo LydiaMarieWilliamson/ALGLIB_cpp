@@ -560,7 +560,7 @@ typedef bool (*ae_stream_writer)(const char *S, ae_int_t Aux);
 //	-	read exactly N symbols from the stream to the buffer; checking that they are all non-space non-linefeed ones
 //	-	append a trailing '\0' to the buffer
 //	-	return value true for success, false if any of the conditions above fails,
-//		in w hich case, the contents of S are not used.
+//		in which case, the contents of S are not used.
 typedef bool (*ae_stream_reader)(ae_int_t Aux, ae_int_t N, char *S);
 
 typedef enum {
