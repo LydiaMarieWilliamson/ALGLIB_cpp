@@ -5959,8 +5959,8 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    *cn = 0;
    *dn = 0;
    *ph = 0;
-   ae_vector_init(&a, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&c, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&a, 0, DT_REAL, _state, true);
+   ae_vector_init(&c, 0, DT_REAL, _state, true);
 
    ae_assert(ae_fp_greater_eq(m, (double)(0)) && ae_fp_less_eq(m, (double)(1)), "Domain error in JacobianEllipticFunctions: m<0 or m>1", _state);
    ae_vector_set_length(&a, 8 + 1, _state);
@@ -5997,7 +5997,7 @@ void jacobianellipticfunctions(double u, double m, double *sn, double *cn, doubl
    i = 0;
    while (ae_fp_greater(ae_fabs(c.ptr.p_double[i] / a.ptr.p_double[i], _state), ae_machineepsilon)) {
       if (i > 7) {
-         ae_assert(ae_false, "Overflow in JacobianEllipticFunctions", _state);
+         ae_assert(false, "Overflow in JacobianEllipticFunctions", _state);
          break;
       }
       ai = a.ptr.p_double[i];
@@ -6960,7 +6960,7 @@ double psi(double x, ae_state *_state) {
       q = x;
       p = (double)(ae_ifloor(q, _state));
       if (ae_fp_eq(p, q)) {
-         ae_assert(ae_false, "Singularity in Psi(x)", _state);
+         ae_assert(false, "Singularity in Psi(x)", _state);
          result = ae_maxrealnumber;
          return result;
       }

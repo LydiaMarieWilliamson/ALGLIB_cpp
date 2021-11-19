@@ -45,23 +45,23 @@ typedef struct {
    alglib_impl::ae_complex cval;
    double rval;
     alglib_impl::ae_int_t ival;
-   ae_bool bval;
+   bool bval;
     alglib_impl::ae_vector i1val;
 } innerrec;
 
 typedef struct {
-   ae_bool bval;
+   bool bval;
    innerrec recval;
     alglib_impl::ae_shared_pool pool;
 } seedrec;
 
-void _innerrec_init(void *_p, alglib_impl::ae_state *_state, ae_bool make_automatic) {
+void _innerrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *p = (innerrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
    alglib_impl::ae_vector_init(&p->i1val, 0, alglib_impl::DT_INT, _state, make_automatic);
 }
 
-void _innerrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, ae_bool make_automatic) {
+void _innerrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
    innerrec *dst = (innerrec *) _dst;
    innerrec *src = (innerrec *) _src;
    dst->cval = src->cval;
@@ -83,14 +83,14 @@ void _innerrec_destroy(void *_p) {
    alglib_impl::ae_vector_destroy(&p->i1val);
 }
 
-void _seedrec_init(void *_p, alglib_impl::ae_state *_state, ae_bool make_automatic) {
+void _seedrec_init(void *_p, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *p = (seedrec *) _p;
    alglib_impl::ae_touch_ptr((void *)p);
    _innerrec_init(&p->recval, _state, make_automatic);
    alglib_impl::ae_shared_pool_init(&p->pool, _state, make_automatic);
 }
 
-void _seedrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, ae_bool make_automatic) {
+void _seedrec_init_copy(void *_dst, void *_src, alglib_impl::ae_state *_state, bool make_automatic) {
    seedrec *dst = (seedrec *) _dst;
    seedrec *src = (seedrec *) _src;
    dst->bval = src->bval;
@@ -301,7 +301,7 @@ int main() {
 //
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter activated...\n");
-   alglib_impl::_use_alloc_counter = ae_true;
+   alglib_impl::_use_alloc_counter = true;
    if (alglib_impl::_alloc_counter != 0) {
       printf("FAILURE: alloc_counter is non-zero on start!\n");
       return 1;
@@ -2214,7 +2214,7 @@ AECfwTIX814 00000000q04 Big__6hwt04 nSPzmAQrh_B 2H3o-KftH14 \
          memset(&pool, 0, sizeof(pool));
          memset(&seed, 0, sizeof(seed));
          alglib_impl::ae_shared_pool_init(&pool, &_alglib_env_state, true);
-         _seedrec_init(&seed, &_alglib_env_state, ae_true);
+         _seedrec_init(&seed, &_alglib_env_state, true);
          alglib_impl::ae_shared_pool_set_seed(&pool, &seed, sizeof(seed), _seedrec_init, _seedrec_init_copy, _seedrec_destroy, &_alglib_env_state);
          alglib_impl::ae_state_clear(&_alglib_env_state);
          issue528_passed = issue528_passed && (alloc_cnt == alglib_impl::_alloc_counter);

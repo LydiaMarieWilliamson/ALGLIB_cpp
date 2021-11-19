@@ -141,7 +141,7 @@ typedef struct {
 #elif AE_OS==AE_POSIX
    pthread_mutex_t mutex;
 #else
-   ae_bool is_locked;
+   bool is_locked;
 #endif
 } _lock;
 
@@ -182,14 +182,14 @@ ae_int_t _alglib_cores_to_use = 0;
 // Debug counters
 ae_int_t _alloc_counter = 0;
 ae_int_t _alloc_counter_total = 0;
-ae_bool _use_alloc_counter = ae_false;
+bool _use_alloc_counter = false;
 
 ae_int_t _dbg_alloc_total = 0;
-ae_bool _use_dbg_counters = ae_false;
+bool _use_dbg_counters = false;
 
-ae_bool _use_vendor_kernels = ae_true;
+bool _use_vendor_kernels = true;
 
-ae_bool debug_workstealing = ae_false; // debug workstealing environment? False by default
+bool debug_workstealing = false; // debug workstealing environment? False by default
 ae_int_t dbgws_pushroot_ok = 0;
 ae_int_t dbgws_pushroot_failed = 0;
 
@@ -203,7 +203,7 @@ volatile ae_int64_t _ae_dbg_lock_yields = 0;
 #endif
 
 // Allocation debugging
-ae_bool _force_malloc_failure = ae_false;
+bool _force_malloc_failure = false;
 ae_int_t _malloc_failure_after = 0;
 
 // Trace-related declarations:
@@ -221,7 +221,7 @@ ae_int_t _malloc_failure_after = 0;
 #define ALGLIB_TRACE_BUFFER_LEN (ALGLIB_TRACE_TAGS_LEN+2+1)
 static ae_int_t alglib_trace_type = ALGLIB_TRACE_NONE;
 FILE *alglib_trace_file = NULL;
-static ae_bool alglib_fclose_trace = ae_false;
+static bool alglib_fclose_trace = false;
 static char alglib_trace_tags[ALGLIB_TRACE_BUFFER_LEN];
 
 // Fields for memory allocation over static array
@@ -236,12 +236,12 @@ static unsigned char *sm_mem = NULL;
 #endif
 
 // These declarations are used to ensure that
-// sizeof(ae_bool)=1, sizeof(ae_int32_t)==4, sizeof(ae_int64_t)==8, sizeof(ae_int_t)==sizeof(void*).
+// sizeof(bool)=1, sizeof(ae_int32_t)==4, sizeof(ae_int64_t)==8, sizeof(ae_int_t)==sizeof(void*).
 // they will lead to syntax error otherwise (array size will be negative).
 //
 // you can remove them, if you want - they are not used anywhere.
 //
-static char _ae_bool_must_be_8_bits_wide[1 - 2 * ((int)(sizeof(ae_bool)) - 1) *((int)(sizeof(ae_bool)) - 1)];
+static char _ae_bool_must_be_8_bits_wide[1 - 2 * ((int)(sizeof(bool)) - 1) *((int)(sizeof(bool)) - 1)];
 static char _ae_int32_t_must_be_32_bits_wide[1 - 2 * ((int)(sizeof(ae_int32_t)) - 4) *((int)(sizeof(ae_int32_t)) - 4)];
 static char _ae_int64_t_must_be_64_bits_wide[1 - 2 * ((int)(sizeof(ae_int64_t)) - 8) *((int)(sizeof(ae_int64_t)) - 8)];
 static char _ae_uint64_t_must_be_64_bits_wide[1 - 2 * ((int)(sizeof(ae_uint64_t)) - 8) *((int)(sizeof(ae_uint64_t)) - 8)];
@@ -368,9 +368,9 @@ ae_uint64_t ae_get_global_threading() {
    return ((ae_uint64_t) _alglib_global_threading_flags) << _ALGLIB_FLG_THREADING_SHIFT;
 }
 
-void ae_set_error_flag(ae_bool *p_flag, ae_bool cond, const char *filename, int lineno, const char *xdesc) {
+void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc) {
    if (cond) {
-      *p_flag = ae_true;
+      *p_flag = true;
       sef_file = filename;
       sef_line = lineno;
       sef_xdesc = xdesc;
@@ -829,7 +829,7 @@ void ae_matrix_update_row_pointers(ae_matrix *dst, void *storage) {
 ae_int_t ae_sizeof(ae_datatype datatype) {
    switch (datatype) {
       case DT_BOOL:
-         return (ae_int_t) sizeof(ae_bool);
+         return (ae_int_t) sizeof(bool);
       case DT_INT:
          return (ae_int_t) sizeof(ae_int_t);
       case DT_REAL:
@@ -845,7 +845,7 @@ ae_int_t ae_sizeof(ae_datatype datatype) {
 //
 // This function is used in the constructors to check that  instance  fields
 // on entry are correctly initialized by zeros.
-ae_bool ae_check_zeros(const void *ptr, ae_int_t n) {
+bool ae_check_zeros(const void *ptr, ae_int_t n) {
    ae_int_t nu, nr, i;
    unsigned long long c = 0x0;
 
@@ -1017,7 +1017,7 @@ void ae_db_attach(ae_dyn_block *block, ae_state *state) {
 //   for already allocated blocks.
 //
 // NOTE: no memory allocation is performed for initialization with size=0
-void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, ae_bool make_automatic) {
+void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(block, sizeof(*block)));
 
@@ -1130,7 +1130,7 @@ void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2) {
 //                     of the state structure;
 //
 // NOTE: no memory allocation is performed for initialization with size=0
-void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, ae_bool make_automatic) {
+void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic) {
 // Integrity checks
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
@@ -1145,7 +1145,7 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_stat
    dst->cnt = size;
    dst->datatype = datatype;
    dst->ptr.p_ptr = dst->data.ptr;
-   dst->is_attached = ae_false;
+   dst->is_attached = false;
 }
 
 // This function creates copy of ae_vector. New copy of the data is created,
@@ -1163,7 +1163,7 @@ void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_stat
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, ae_bool make_automatic) {
+void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
 
    ae_vector_init(dst, src->cnt, src->datatype, state, make_automatic);
@@ -1188,7 +1188,7 @@ void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, ae_boo
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic) {
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
 
    ae_vector_init(dst, (ae_int_t) src->cnt, (ae_datatype) src->datatype, state, make_automatic);
@@ -1206,7 +1206,7 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bo
 //   remains untouched
 // * SRC, however, CAN NOT BE REALLOCATED AS LONG AS DST EXISTS
 //
-// NOTE: is_attached field is set  to  ae_true  in  order  to  indicate  that
+// NOTE: is_attached field is set  to  true  in  order  to  indicate  that
 //       vector does not own its memory.
 //
 // dst                 destination vector
@@ -1218,7 +1218,7 @@ void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bo
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic) {
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic) {
    volatile ae_int_t cnt;
 
    AE_CRITICAL_ASSERT(state != NULL);
@@ -1241,7 +1241,7 @@ void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, 
 // init
    dst->cnt = cnt;
    dst->ptr.p_ptr = src->x_ptr.p_ptr;
-   dst->is_attached = ae_true;
+   dst->is_attached = true;
 }
 
 // This function changes length of ae_vector.
@@ -1287,7 +1287,7 @@ void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state) {
    ae_int_t bytes_total;
 
    memset(&tmp, 0, sizeof(tmp));
-   ae_vector_init(&tmp, newsize, dst->datatype, state, ae_false);
+   ae_vector_init(&tmp, newsize, dst->datatype, state, false);
    bytes_total = (dst->cnt < newsize ? dst->cnt : newsize) * ae_sizeof(dst->datatype);
    if (bytes_total > 0)
       memmove(tmp.ptr.p_ptr, dst->ptr.p_ptr, bytes_total);
@@ -1311,7 +1311,7 @@ void ae_vector_clear(ae_vector *dst) {
    dst->cnt = 0;
    ae_db_free(&dst->data);
    dst->ptr.p_ptr = 0;
-   dst->is_attached = ae_false;
+   dst->is_attached = false;
 }
 
 // This  function  provides "DESTROY"  functionality for vector (contents is
@@ -1364,7 +1364,7 @@ void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2) {
 // dst is assumed to be uninitialized, its fields are ignored.
 //
 // NOTE: no memory allocation is performed for initialization with rows=cols=0
-void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, ae_bool make_automatic) {
+void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
 
@@ -1374,7 +1374,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
    if (rows == 0 || cols == 0) {
       dst->rows = 0;
       dst->cols = 0;
-      dst->is_attached = ae_false;
+      dst->is_attached = false;
       dst->ptr.pp_void = NULL;
       dst->stride = 0;
       dst->datatype = datatype;
@@ -1382,7 +1382,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
       return;
    }
 // init, being ready for exception during allocation (rows=cols=ptr=NULL on entry)
-   dst->is_attached = ae_false;
+   dst->is_attached = false;
    dst->rows = 0;
    dst->cols = 0;
    dst->ptr.pp_void = NULL;
@@ -1407,7 +1407,7 @@ void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype da
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, ae_bool make_automatic) {
+void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic) {
    ae_int_t i;
    ae_matrix_init(dst, src->rows, src->cols, src->datatype, state, make_automatic);
    if (src->rows != 0 && src->cols != 0) {
@@ -1433,7 +1433,7 @@ void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, ae_boo
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic) {
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
    char *p_src_row;
    char *p_dst_row;
    ae_int_t row_size;
@@ -1468,7 +1468,7 @@ void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bo
 //                     of the state structure;
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic) {
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic) {
    ae_int_t rows, cols;
 
    AE_CRITICAL_ASSERT(state != NULL);
@@ -1491,7 +1491,7 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
       cols = 0;
    }
 // init, being ready for allocation error
-   dst->is_attached = ae_true;
+   dst->is_attached = true;
    dst->rows = 0;
    dst->cols = 0;
    dst->stride = cols;
@@ -1522,9 +1522,9 @@ void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, 
 // state               ALGLIB environment state
 //
 // Error handling:
-// * if state is NULL, returns ae_false on allocation error
+// * if state is NULL, returns false on allocation error
 // * if state is not NULL, calls ae_break() on allocation error
-// * returns ae_true on success
+// * returns true on success
 //
 // NOTES:
 // * matrix must be initialized
@@ -1571,7 +1571,7 @@ void ae_matrix_clear(ae_matrix *dst) {
    dst->stride = 0;
    ae_db_free(&dst->data);
    dst->ptr.p_ptr = 0;
-   dst->is_attached = ae_false;
+   dst->is_attached = false;
 }
 
 // This  function  provides  "DESTROY" functionality for matrix (contents is
@@ -1634,15 +1634,15 @@ void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2) {
 //   in abort() call.
 //
 // After initialization, smart pointer stores NULL pointer.
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, ae_bool make_automatic) {
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bool make_automatic) {
    AE_CRITICAL_ASSERT(state != NULL);
    AE_CRITICAL_ASSERT(ae_check_zeros(dst, sizeof(*dst)));
    dst->subscriber = subscriber;
    dst->ptr = NULL;
    if (dst->subscriber != NULL)
       *(dst->subscriber) = dst->ptr;
-   dst->is_owner = ae_false;
-   dst->is_dynamic = ae_false;
+   dst->is_owner = false;
+   dst->is_dynamic = false;
    dst->frame_entry.deallocator = ae_smart_ptr_destroy;
    dst->frame_entry.ptr = dst;
    if (make_automatic)
@@ -1663,8 +1663,8 @@ void ae_smart_ptr_clear(void *_dst) {
       if (dst->is_dynamic)
          ae_free(dst->ptr);
    }
-   dst->is_owner = ae_false;
-   dst->is_dynamic = ae_false;
+   dst->is_owner = false;
+   dst->is_dynamic = false;
    dst->ptr = NULL;
    dst->destroy = NULL;
    if (dst->subscriber != NULL)
@@ -1695,7 +1695,7 @@ void ae_smart_ptr_destroy(void *_dst) {
 // subscriber was specified during pointer creation).
 //
 // You can specify NULL new_ptr, in which case is_owner/destroy are ignored.
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_bool is_dynamic, void (*destroy)(void *)) {
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*destroy)(void *)) {
    if(dst->is_owner && dst->ptr != NULL) {
       dst->destroy(dst->ptr);
       if (dst->is_dynamic)
@@ -1708,8 +1708,8 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_
       dst->destroy = destroy;
    } else {
       dst->ptr = NULL;
-      dst->is_owner = ae_false;
-      dst->is_dynamic = ae_false;
+      dst->is_owner = false;
+      dst->is_dynamic = false;
       dst->destroy = NULL;
    }
    if (dst->subscriber != NULL)
@@ -1726,8 +1726,8 @@ void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_
 //
 // dst                 destination smart pointer.
 void ae_smart_ptr_release(ae_smart_ptr *dst) {
-   dst->is_owner = ae_false;
-   dst->is_dynamic = ae_false;
+   dst->is_owner = false;
+   dst->is_dynamic = false;
    dst->ptr = NULL;
    dst->destroy = NULL;
    if (dst->subscriber != NULL)
@@ -1781,7 +1781,7 @@ void ae_x_set_vector(x_vector *dst, ae_vector *src, ae_state *state) {
       else if (dst->last_action == ACT_NEW_LOCATION)
          dst->last_action = ACT_NEW_LOCATION;
       else
-         ae_assert(ae_false, "ALGLIB: internal error in ae_x_set_vector()", state);
+         ae_assert(false, "ALGLIB: internal error in ae_x_set_vector()", state);
    }
    if (src->cnt)
       memmove(dst->x_ptr.p_ptr, src->ptr.p_ptr, (size_t)(src->cnt * ae_sizeof(src->datatype)));
@@ -1840,7 +1840,7 @@ void ae_x_set_matrix(x_matrix *dst, ae_matrix *src, ae_state *state) {
       else if (dst->last_action == ACT_NEW_LOCATION)
          dst->last_action = ACT_NEW_LOCATION;
       else
-         ae_assert(ae_false, "ALGLIB: internal error in ae_x_set_vector()", state);
+         ae_assert(false, "ALGLIB: internal error in ae_x_set_vector()", state);
    }
    if (src->rows != 0 && src->cols != 0) {
       p_src_row = (char *)(src->ptr.pp_void[0]);
@@ -1920,7 +1920,7 @@ void x_vector_clear(x_vector *dst) {
 // IMPORTANT: this function ALWAYS evaluates its argument.  It  can  not  be
 //            replaced by macro which does nothing. So, you may place actual
 //            function calls at cond, and these will always be performed.
-void ae_assert(ae_bool cond, const char *msg, ae_state *state) {
+void ae_assert(bool cond, const char *msg, ae_state *state) {
    if (!cond)
       ae_break(state, ERR_ASSERTION_FAILED, msg);
 }
@@ -1935,10 +1935,10 @@ void ae_assert(ae_bool cond, const char *msg, ae_state *state) {
 // Note: results of this function depend on both CPU and compiler;
 // if compiler doesn't support SSE intrinsics, function won't set
 // corresponding flag.
-static volatile ae_bool _ae_cpuid_initialized = ae_false;
-static volatile ae_bool _ae_cpuid_has_sse2 = ae_false;
-static volatile ae_bool _ae_cpuid_has_avx2 = ae_false;
-static volatile ae_bool _ae_cpuid_has_fma = ae_false;
+static volatile bool _ae_cpuid_initialized = false;
+static volatile bool _ae_cpuid_has_sse2 = false;
+static volatile bool _ae_cpuid_has_avx2 = false;
+static volatile bool _ae_cpuid_has_fma = false;
 ae_int_t ae_cpuid() {
 // to speed up CPU detection we cache results from previous attempts
 // there is no synchronization, but it is still thread safe.
@@ -1960,7 +1960,7 @@ ae_int_t ae_cpuid() {
          int CPUInfo[4];
          __cpuid(CPUInfo, 1);
          if ((CPUInfo[3] & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = ae_true;
+            _ae_cpuid_has_sse2 = true;
 #      endif
 
       // check OS support for XSAVE XGETBV
@@ -1973,7 +1973,7 @@ ae_int_t ae_cpuid() {
                if (_ae_cpuid_has_sse2) {
                   __cpuidex(CPUInfo, 7, 0);
                   if ((CPUInfo[1] & (0x1 << 5)) != 0)
-                     _ae_cpuid_has_avx2 = ae_true;
+                     _ae_cpuid_has_avx2 = true;
                }
 #         endif
 
@@ -1982,7 +1982,7 @@ ae_int_t ae_cpuid() {
                if (_ae_cpuid_has_avx2) {
                   __cpuid(CPUInfo, 1);
                   if ((CPUInfo[2] & (0x1 << 12)) != 0)
-                     _ae_cpuid_has_fma = ae_true;
+                     _ae_cpuid_has_fma = true;
                }
 #         endif
             }
@@ -1996,7 +1996,7 @@ ae_int_t ae_cpuid() {
 #      if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((d & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = ae_true;
+            _ae_cpuid_has_sse2 = true;
 #      endif
 
       // check OS support for XSAVE XGETBV
@@ -2010,7 +2010,7 @@ ae_int_t ae_cpuid() {
                if (_ae_cpuid_has_sse2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(7), "c"(0));
                   if ((b & (0x1 << 5)) != 0)
-                     _ae_cpuid_has_avx2 = ae_true;
+                     _ae_cpuid_has_avx2 = true;
                }
 #         endif
 
@@ -2019,7 +2019,7 @@ ae_int_t ae_cpuid() {
                if (_ae_cpuid_has_avx2) {
                   __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
                   if ((c & (0x1 << 12)) != 0)
-                     _ae_cpuid_has_fma = ae_true;
+                     _ae_cpuid_has_fma = true;
                }
 #         endif
             }
@@ -2031,7 +2031,7 @@ ae_int_t ae_cpuid() {
          ae_int_t a, b, c, d;
          __asm__ __volatile__("cpuid":"=a"(a), "=b"(b), "=c"(c), "=d"(d):"a"(1));
          if ((d & 0x04000000) != 0)
-            _ae_cpuid_has_sse2 = ae_true;
+            _ae_cpuid_has_sse2 = true;
       }
 #   else
 #   endif
@@ -2058,7 +2058,7 @@ ae_int_t ae_cpuid() {
 #endif
 
    // set initialization flag
-      _ae_cpuid_initialized = ae_true;
+      _ae_cpuid_initialized = true;
    }
 // return
    result = 0;
@@ -2083,7 +2083,7 @@ void ae_trace_file(const char *tags, const char *filename) {
       if (alglib_trace_file != NULL)
          fclose(alglib_trace_file);
       alglib_trace_file = NULL;
-      alglib_fclose_trace = ae_false;
+      alglib_fclose_trace = false;
    }
 // store ",tags," to buffer. Leading and trailing commas allow us
 // to perform checks for various tags by simply calling strstr().
@@ -2097,7 +2097,7 @@ void ae_trace_file(const char *tags, const char *filename) {
 // set up trace
    alglib_trace_type = ALGLIB_TRACE_FILE;
    alglib_trace_file = fopen(filename, "ab");
-   alglib_fclose_trace = ae_true;
+   alglib_fclose_trace = true;
 }
 
 // Disables tracing
@@ -2106,16 +2106,16 @@ void ae_trace_disable() {
    if (alglib_fclose_trace)
       fclose(alglib_trace_file);
    alglib_trace_file = NULL;
-   alglib_fclose_trace = ae_false;
+   alglib_fclose_trace = false;
 }
 
 // Checks whether specific kind of tracing is enabled
-ae_bool ae_is_trace_enabled(const char *tag) {
+bool ae_is_trace_enabled(const char *tag) {
    char buf[ALGLIB_TRACE_BUFFER_LEN];
 
 // check global trace status
    if (alglib_trace_type == ALGLIB_TRACE_NONE || alglib_trace_file == NULL)
-      return ae_false;
+      return false;
 
 // copy tag to buffer, lowercase it
    memset(buf, 0, ALGLIB_TRACE_BUFFER_LEN);
@@ -2128,15 +2128,15 @@ ae_bool ae_is_trace_enabled(const char *tag) {
 // contains tag (followed by comma, which means exact match)
    buf[strlen(buf) - 1] = ',';
    if (strstr(alglib_trace_tags, buf) != NULL)
-      return ae_true;
+      return true;
 
 // contains tag (followed by dot, which means match with child)
    buf[strlen(buf) - 1] = '.';
    if (strstr(alglib_trace_tags, buf) != NULL)
-      return ae_true;
+      return true;
 
 // nothing
-   return ae_false;
+   return false;
 }
 
 void ae_trace(const char *printf_fmt, ...) {
@@ -2178,47 +2178,47 @@ int ae_tickcount() {
 }
 
 // Real math functions
-ae_bool ae_fp_eq(double v1, double v2) {
+bool ae_fp_eq(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
    volatile double y = v2;
    return x == y;
 }
 
-ae_bool ae_fp_neq(double v1, double v2) {
+bool ae_fp_neq(double v1, double v2) {
 // IEEE-strict floating point comparison
    return !ae_fp_eq(v1, v2);
 }
 
-ae_bool ae_fp_less(double v1, double v2) {
+bool ae_fp_less(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
    volatile double y = v2;
    return x < y;
 }
 
-ae_bool ae_fp_less_eq(double v1, double v2) {
+bool ae_fp_less_eq(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
    volatile double y = v2;
    return x <= y;
 }
 
-ae_bool ae_fp_greater(double v1, double v2) {
+bool ae_fp_greater(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
    volatile double y = v2;
    return x > y;
 }
 
-ae_bool ae_fp_greater_eq(double v1, double v2) {
+bool ae_fp_greater_eq(double v1, double v2) {
 // IEEE-strict floating point comparison
    volatile double x = v1;
    volatile double y = v2;
    return x >= y;
 }
 
-ae_bool ae_isfinite_stateless(double x, ae_int_t endianness) {
+bool ae_isfinite_stateless(double x, ae_int_t endianness) {
    union _u {
       double a;
       ae_int32_t p[2];
@@ -2232,7 +2232,7 @@ ae_bool ae_isfinite_stateless(double x, ae_int_t endianness) {
    return (high & (ae_int32_t) 0x7FF00000) != (ae_int32_t) 0x7FF00000;
 }
 
-ae_bool ae_isnan_stateless(double x, ae_int_t endianness) {
+bool ae_isnan_stateless(double x, ae_int_t endianness) {
    union _u {
       double a;
       ae_int32_t p[2];
@@ -2249,7 +2249,7 @@ ae_bool ae_isnan_stateless(double x, ae_int_t endianness) {
    return ((high & 0x7FF00000) == 0x7FF00000) && (((high & 0x000FFFFF) != 0) || (low != 0));
 }
 
-ae_bool ae_isinf_stateless(double x, ae_int_t endianness) {
+bool ae_isinf_stateless(double x, ae_int_t endianness) {
    union _u {
       double a;
       ae_int32_t p[2];
@@ -2268,7 +2268,7 @@ ae_bool ae_isinf_stateless(double x, ae_int_t endianness) {
    return ((high & 0x7FFFFFFF) == 0x7FF00000) && (low == 0);
 }
 
-ae_bool ae_isposinf_stateless(double x, ae_int_t endianness) {
+bool ae_isposinf_stateless(double x, ae_int_t endianness) {
    union _u {
       double a;
       ae_int32_t p[2];
@@ -2287,7 +2287,7 @@ ae_bool ae_isposinf_stateless(double x, ae_int_t endianness) {
    return (high == (ae_int32_t) 0x7FF00000) && (low == 0);
 }
 
-ae_bool ae_isneginf_stateless(double x, ae_int_t endianness) {
+bool ae_isneginf_stateless(double x, ae_int_t endianness) {
    union _u {
       double a;
       ae_int32_t p[2];
@@ -2328,23 +2328,23 @@ ae_int_t ae_get_endianness() {
    return AE_MIXED_ENDIAN;
 }
 
-ae_bool ae_isfinite(double x, ae_state *state) {
+bool ae_isfinite(double x, ae_state *state) {
    return ae_isfinite_stateless(x, state->endianness);
 }
 
-ae_bool ae_isnan(double x, ae_state *state) {
+bool ae_isnan(double x, ae_state *state) {
    return ae_isnan_stateless(x, state->endianness);
 }
 
-ae_bool ae_isinf(double x, ae_state *state) {
+bool ae_isinf(double x, ae_state *state) {
    return ae_isinf_stateless(x, state->endianness);
 }
 
-ae_bool ae_isposinf(double x, ae_state *state) {
+bool ae_isposinf(double x, ae_state *state) {
    return ae_isposinf_stateless(x, state->endianness);
 }
 
-ae_bool ae_isneginf(double x, ae_state *state) {
+bool ae_isneginf(double x, ae_state *state) {
    return ae_isneginf_stateless(x, state->endianness);
 }
 
@@ -2519,7 +2519,7 @@ static double x_safepythag2(double x, double y) {
 //  a) mx       maximum value of A[i,j] found so far
 //  b) err      componentwise difference between elements of BL and BU^T
 //
-static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, ae_bool *nonfinite, double *mx, double *err, ae_state *_state) {
+static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err, ae_state *_state) {
 // try to split problem into two smaller ones
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
@@ -2546,7 +2546,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
          prow = p1 + i * a->stride;
          for (j = 0; j < len1; j++) {
             if (!ae_isfinite(*pcol, _state) || !ae_isfinite(*prow, _state)) {
-               *nonfinite = ae_true;
+               *nonfinite = true;
             } else {
                v = fabs(*pcol);
                *mx = *mx > v ? *mx : v;
@@ -2574,7 +2574,7 @@ static void is_symmetric_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
 //  a) mx       maximum value of A[i,j] found so far
 //  b) err      componentwise difference between A0 and A0^T
 //
-static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, ae_bool *nonfinite, double *mx, double *err, ae_state *_state) {
+static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err, ae_state *_state) {
    double *p, *prow, *pcol;
    double v;
    ae_int_t i, j;
@@ -2595,7 +2595,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       prow = p + i * a->stride;
       for (j = 0; j < i; j++, pcol += a->stride, prow++) {
          if (!ae_isfinite(*pcol, _state) || !ae_isfinite(*prow, _state)) {
-            *nonfinite = ae_true;
+            *nonfinite = true;
          } else {
             v = fabs(*pcol);
             *mx = *mx > v ? *mx : v;
@@ -2623,7 +2623,7 @@ static void is_symmetric_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
 //  a) mx       maximum value of A[i,j] found so far
 //  b) err      componentwise difference between elements of BL and BU^H
 //
-static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, ae_bool *nonfinite, double *mx, double *err, ae_state *_state) {
+static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t offset1, ae_int_t len0, ae_int_t len1, bool *nonfinite, double *mx, double *err, ae_state *_state) {
 // try to split problem into two smaller ones
    if (len0 > x_nb || len1 > x_nb) {
       ae_int_t n1, n2;
@@ -2650,7 +2650,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
          prow = p1 + i * a->stride;
          for (j = 0; j < len1; j++) {
             if (!ae_isfinite(pcol->x, _state) || !ae_isfinite(pcol->y, _state) || !ae_isfinite(prow->x, _state) || !ae_isfinite(prow->y, _state)) {
-               *nonfinite = ae_true;
+               *nonfinite = true;
             } else {
                v = x_safepythag2(pcol->x, pcol->y);
                *mx = *mx > v ? *mx : v;
@@ -2678,7 +2678,7 @@ static void is_hermitian_rec_off_stat(x_matrix *a, ae_int_t offset0, ae_int_t of
 //  a) mx       maximum value of A[i,j] found so far
 //  b) err      componentwise difference between A0 and A0^H
 //
-static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, ae_bool *nonfinite, double *mx, double *err, ae_state *_state) {
+static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t len, bool *nonfinite, double *mx, double *err, ae_state *_state) {
    ae_complex *p, *prow, *pcol;
    double v;
    ae_int_t i, j;
@@ -2699,7 +2699,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
       prow = p + i * a->stride;
       for (j = 0; j < i; j++, pcol += a->stride, prow++) {
          if (!ae_isfinite(pcol->x, _state) || !ae_isfinite(pcol->y, _state) || !ae_isfinite(prow->x, _state) || !ae_isfinite(prow->y, _state)) {
-            *nonfinite = ae_true;
+            *nonfinite = true;
          } else {
             v = x_safepythag2(pcol->x, pcol->y);
             *mx = *mx > v ? *mx : v;
@@ -2710,7 +2710,7 @@ static void is_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t le
          }
       }
       if (!ae_isfinite(p[i + i * a->stride].x, _state) || !ae_isfinite(p[i + i * a->stride].y, _state)) {
-         *nonfinite = ae_true;
+         *nonfinite = true;
       } else {
          v = fabs(p[i + i * a->stride].x);
          *mx = *mx > v ? *mx : v;
@@ -2864,91 +2864,91 @@ static void force_hermitian_rec_diag_stat(x_matrix *a, ae_int_t offset, ae_int_t
          *pcol = *prow;
    }
 }
-ae_bool x_is_symmetric(x_matrix *a) {
+bool x_is_symmetric(x_matrix *a) {
    double mx, err;
-   ae_bool nonfinite;
+   bool nonfinite;
    ae_state _alglib_env_state;
    if (a->datatype != DT_REAL)
-      return ae_false;
+      return false;
    if (a->cols != a->rows)
-      return ae_false;
+      return false;
    if (a->cols == 0 || a->rows == 0)
-      return ae_true;
+      return true;
    ae_state_init(&_alglib_env_state);
    mx = 0;
    err = 0;
-   nonfinite = ae_false;
+   nonfinite = false;
    is_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
    if (nonfinite)
-      return ae_false;
+      return false;
    if (mx == 0)
-      return ae_true;
+      return true;
    return err / mx <= 1.0E-14;
 }
-ae_bool x_is_hermitian(x_matrix *a) {
+bool x_is_hermitian(x_matrix *a) {
    double mx, err;
-   ae_bool nonfinite;
+   bool nonfinite;
    ae_state _alglib_env_state;
    if (a->datatype != DT_COMPLEX)
-      return ae_false;
+      return false;
    if (a->cols != a->rows)
-      return ae_false;
+      return false;
    if (a->cols == 0 || a->rows == 0)
-      return ae_true;
+      return true;
    ae_state_init(&_alglib_env_state);
    mx = 0;
    err = 0;
-   nonfinite = ae_false;
+   nonfinite = false;
    is_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows, &nonfinite, &mx, &err, &_alglib_env_state);
    if (nonfinite)
-      return ae_false;
+      return false;
    if (mx == 0)
-      return ae_true;
+      return true;
    return err / mx <= 1.0E-14;
 }
-ae_bool x_force_symmetric(x_matrix *a) {
+bool x_force_symmetric(x_matrix *a) {
    if (a->datatype != DT_REAL)
-      return ae_false;
+      return false;
    if (a->cols != a->rows)
-      return ae_false;
+      return false;
    if (a->cols == 0 || a->rows == 0)
-      return ae_true;
+      return true;
    force_symmetric_rec_diag_stat(a, 0, (ae_int_t) a->rows);
-   return ae_true;
+   return true;
 }
-ae_bool x_force_hermitian(x_matrix *a) {
+bool x_force_hermitian(x_matrix *a) {
    if (a->datatype != DT_COMPLEX)
-      return ae_false;
+      return false;
    if (a->cols != a->rows)
-      return ae_false;
+      return false;
    if (a->cols == 0 || a->rows == 0)
-      return ae_true;
+      return true;
    force_hermitian_rec_diag_stat(a, 0, (ae_int_t) a->rows);
-   return ae_true;
+   return true;
 }
 
-ae_bool ae_is_symmetric(ae_matrix *a) {
+bool ae_is_symmetric(ae_matrix *a) {
    x_matrix x;
    x.owner = OWN_CALLER;
    ae_x_attach_to_matrix(&x, a);
    return x_is_symmetric(&x);
 }
 
-ae_bool ae_is_hermitian(ae_matrix *a) {
+bool ae_is_hermitian(ae_matrix *a) {
    x_matrix x;
    x.owner = OWN_CALLER;
    ae_x_attach_to_matrix(&x, a);
    return x_is_hermitian(&x);
 }
 
-ae_bool ae_force_symmetric(ae_matrix *a) {
+bool ae_force_symmetric(ae_matrix *a) {
    x_matrix x;
    x.owner = OWN_CALLER;
    ae_x_attach_to_matrix(&x, a);
    return x_force_symmetric(&x);
 }
 
-ae_bool ae_force_hermitian(ae_matrix *a) {
+bool ae_force_hermitian(ae_matrix *a) {
    x_matrix x;
    x.owner = OWN_CALLER;
    ae_x_attach_to_matrix(&x, a);
@@ -3046,7 +3046,7 @@ void ae_foursixbits2threebytes(const ae_int_t *src, unsigned char *dst) {
 // buf         buffer, at least 12 characters wide
 //             (11 chars for value, one for trailing zero)
 // state       ALGLIB environment state
-void ae_bool2str(ae_bool v, char *buf, ae_state *state) {
+void ae_bool2str(bool v, char *buf, ae_state *state) {
    char c = v ? '1' : '0';
    ae_int_t i;
    for (i = 0; i < AE_SER_ENTRY_LENGTH; i++)
@@ -3062,22 +3062,22 @@ void ae_bool2str(ae_bool v, char *buf, ae_state *state) {
 // state       ALGLIB environment state
 //
 // This function raises an error in case unexpected symbol is found
-ae_bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
-   ae_bool was0, was1;
+bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
+   bool was0, was1;
    const char *emsg = "ALGLIB: unable to read boolean value from stream";
 
-   was0 = ae_false;
-   was1 = ae_false;
+   was0 = false;
+   was1 = false;
    while (*buf == ' ' || *buf == '\t' || *buf == '\n' || *buf == '\r')
       buf++;
    while (*buf != ' ' && *buf != '\t' && *buf != '\n' && *buf != '\r' && *buf != 0) {
       if (*buf == '0') {
-         was0 = ae_true;
+         was0 = true;
          buf++;
          continue;
       }
       if (*buf == '1') {
-         was1 = ae_true;
+         was1 = true;
          buf++;
          continue;
       }
@@ -3088,7 +3088,7 @@ ae_bool ae_str2bool(const char *buf, ae_state *state, const char **pasttheend) {
       ae_break(state, ERR_ASSERTION_FAILED, emsg);
    if (was0 && was1)
       ae_break(state, ERR_ASSERTION_FAILED, emsg);
-   return was1 ? ae_true : ae_false;
+   return was1 ? true : false;
 }
 
 // This function serializes integer value into buffer
@@ -3463,7 +3463,7 @@ void _ae_init_lock_raw(_lock *p) {
 #elif AE_OS==AE_POSIX
    pthread_mutex_init(&p->mutex, NULL);
 #else
-   p->is_locked = ae_false;
+   p->is_locked = false;
 #endif
 }
 
@@ -3504,7 +3504,7 @@ void _ae_acquire_lock_raw(_lock *p) {
    ;
 #else
    AE_CRITICAL_ASSERT(!p->is_locked);
-   p->is_locked = ae_true;
+   p->is_locked = true;
 #endif
 }
 
@@ -3517,7 +3517,7 @@ void _ae_release_lock_raw(_lock *p) {
 #elif AE_OS==AE_POSIX
    pthread_mutex_unlock(&p->mutex);
 #else
-   p->is_locked = ae_false;
+   p->is_locked = false;
 #endif
 }
 
@@ -3541,18 +3541,18 @@ void _ae_free_lock_raw(_lock *p) {
 //       state pointer. In this case all exception arising during construction
 //       are handled as critical failures, with abort() being called.
 //       make_automatic must be false on such calls.
-void ae_init_lock(ae_lock *lock, ae_state *state, ae_bool make_automatic) {
+void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic) {
    _lock *p;
    AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
    if (state == NULL) {
       ae_state _tmp_state;
       AE_CRITICAL_ASSERT(!make_automatic);
       ae_state_init(&_tmp_state);
-      ae_init_lock(lock, &_tmp_state, ae_false);
+      ae_init_lock(lock, &_tmp_state, false);
       ae_state_clear(&_tmp_state);
       return;
    }
-   lock->eternal = ae_false;
+   lock->eternal = false;
    ae_db_init(&lock->db, sizeof(_lock), state, make_automatic);
    lock->lock_ptr = lock->db.ptr;
    p = (_lock *) lock->lock_ptr;
@@ -3575,7 +3575,7 @@ void ae_init_lock(ae_lock *lock, ae_state *state, ae_bool make_automatic) {
 void ae_init_lock_eternal(ae_lock *lock) {
    _lock *p;
    AE_CRITICAL_ASSERT(ae_check_zeros(lock, sizeof(*lock)));
-   lock->eternal = ae_true;
+   lock->eternal = true;
    lock->lock_ptr = eternal_malloc(sizeof(_lock));
    p = (_lock *) lock->lock_ptr;
    _ae_init_lock_raw(p);
@@ -3621,7 +3621,7 @@ void ae_free_lock(ae_lock *lock) {
 //   in abort() call.
 //
 // dst is assumed to be uninitialized, its fields are ignored.
-void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic) {
+void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic) {
    ae_shared_pool *dst;
 
    AE_CRITICAL_ASSERT(state != NULL);
@@ -3641,7 +3641,7 @@ void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic) {
    dst->frame_entry.ptr = dst;
    if (make_automatic)
       ae_db_attach(&dst->frame_entry, state);
-   ae_init_lock(&dst->pool_lock, state, ae_false);
+   ae_init_lock(&dst->pool_lock, state, false);
 }
 
 // This function clears all dynamically allocated fields of the pool except
@@ -3690,7 +3690,7 @@ static void ae_shared_pool_internalclear(ae_shared_pool *dst) {
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool make_automatic) {
+void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make_automatic) {
    ae_shared_pool *dst, *src;
    ae_shared_pool_entry *ptr;
 
@@ -3711,7 +3711,7 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool m
    if (src->seed_object != NULL) {
       dst->seed_object = ae_malloc(dst->size_of_object, state);
       memset(dst->seed_object, 0, dst->size_of_object);
-      dst->init_copy(dst->seed_object, src->seed_object, state, ae_false);
+      dst->init_copy(dst->seed_object, src->seed_object, state, false);
    }
 // copy recycled objects
    dst->recycled_objects = NULL;
@@ -3728,7 +3728,7 @@ void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool m
    // prepare place for object, init_copy() it
       tmp->obj = ae_malloc(dst->size_of_object, state);
       memset(tmp->obj, 0, dst->size_of_object);
-      dst->init_copy(tmp->obj, ptr->obj, state, ae_false);
+      dst->init_copy(tmp->obj, ptr->obj, state, false);
    }
 
 // recycled entries are not copied because they do not store any information
@@ -3776,7 +3776,7 @@ void ae_shared_pool_destroy(void *_dst) {
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-ae_bool ae_shared_pool_is_initialized(void *_dst) {
+bool ae_shared_pool_is_initialized(void *_dst) {
    ae_shared_pool *dst = (ae_shared_pool *) _dst;
    return dst->seed_object != NULL;
 }
@@ -3794,7 +3794,7 @@ ae_bool ae_shared_pool_is_initialized(void *_dst) {
 //
 // NOTE: this function is NOT thread-safe. It does not acquire pool lock, so
 //       you should NOT call it when lock can be used by another thread.
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, ae_bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, ae_bool make_automatic), void (*destroy)(void *ptr), ae_state *state) {
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*destroy)(void *ptr), ae_state *state) {
 // state!=NULL, allocation errors result in exception
    AE_CRITICAL_ASSERT(state != NULL);
 
@@ -3810,7 +3810,7 @@ void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t si
 // set seed object
    dst->seed_object = ae_malloc(size_of_object, state);
    memset(dst->seed_object, 0, size_of_object);
-   init_copy(dst->seed_object, seed_object, state, ae_false);
+   init_copy(dst->seed_object, seed_object, state, false);
 }
 
 // This  function  retrieves  a  copy  of  the seed object from the pool and
@@ -3856,7 +3856,7 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
       ae_release_lock(&pool->pool_lock);
 
    // assign object to smart pointer
-      ae_smart_ptr_assign(pptr, new_obj, ae_true, ae_true, pool->destroy);
+      ae_smart_ptr_assign(pptr, new_obj, true, true, pool->destroy);
       return;
    }
 // release lock; we do not need it anymore because copy constructor does not modify source variable
@@ -3866,10 +3866,10 @@ void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state 
 // (do not want to lose it in case of future failures)
    new_obj = ae_malloc(pool->size_of_object, state);
    memset(new_obj, 0, pool->size_of_object);
-   ae_smart_ptr_assign(pptr, new_obj, ae_true, ae_true, pool->destroy);
+   ae_smart_ptr_assign(pptr, new_obj, true, true, pool->destroy);
 
 // perform actual copying; before this line smartptr points to zero-filled instance
-   pool->init_copy(new_obj, pool->seed_object, state, ae_false);
+   pool->init_copy(new_obj, pool->seed_object, state, false);
 }
 
 // This function recycles object owned by smart  pointer  by  moving  it  to
@@ -3972,11 +3972,11 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_
 
 // exit on empty list
    if (pool->enumeration_counter == NULL) {
-      ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
       return;
    }
 // assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, ae_false, ae_false, pool->destroy);
+   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->destroy);
 }
 
 // This function allows to enumerate recycled elements of the  shared  pool.
@@ -3999,7 +3999,7 @@ void ae_shared_pool_first_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_
 void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state) {
 // exit on end of list
    if (pool->enumeration_counter == NULL) {
-      ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
       return;
    }
 // modify internal enumeration counter
@@ -4007,11 +4007,11 @@ void ae_shared_pool_next_recycled(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_s
 
 // exit on empty list
    if (pool->enumeration_counter == NULL) {
-      ae_smart_ptr_assign(pptr, NULL, ae_false, ae_false, NULL);
+      ae_smart_ptr_assign(pptr, NULL, false, false, NULL);
       return;
    }
 // assign object to smart pointer
-   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, ae_false, ae_false, pool->destroy);
+   ae_smart_ptr_assign(pptr, pool->enumeration_counter->obj, false, false, pool->destroy);
 }
 
 // This function clears internal list of recycled objects and  seed  object.
@@ -4178,7 +4178,7 @@ void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader rea
    serializer->stream_aux = aux;
 }
 
-void ae_serializer_serialize_bool(ae_serializer *serializer, ae_bool v, ae_state *state) {
+void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *state) {
    char buf[AE_SER_ENTRY_LENGTH + 2 + 1];
    const char *emsg = "ALGLIB: serialization integrity error";
    ae_int_t bytes_appended;
@@ -4339,7 +4339,7 @@ void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *by
    }
 }
 
-void ae_serializer_unserialize_bool(ae_serializer *serializer, ae_bool *v, ae_state *state) {
+void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state) {
    if (serializer->mode == AE_SM_FROM_STRING) {
       *v = ae_str2bool(serializer->in_str, state, &serializer->in_str);
       return;
@@ -4514,7 +4514,7 @@ double ae_c_abs(ae_complex z, ae_state *state) {
    }
 }
 
-ae_bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
+bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -4522,7 +4522,7 @@ ae_bool ae_c_eq(ae_complex lhs, ae_complex rhs) {
    return x1 == x2 && y1 == y2;
 }
 
-ae_bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
+bool ae_c_neq(ae_complex lhs, ae_complex rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs.x;
    volatile double y1 = lhs.y;
@@ -4569,7 +4569,7 @@ ae_complex ae_c_div(ae_complex lhs, ae_complex rhs) {
    return result;
 }
 
-ae_bool ae_c_eq_d(ae_complex lhs, double rhs) {
+bool ae_c_eq_d(ae_complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
@@ -4577,7 +4577,7 @@ ae_bool ae_c_eq_d(ae_complex lhs, double rhs) {
    return x1 == x2 && y1 == y2;
 }
 
-ae_bool ae_c_neq_d(ae_complex lhs, double rhs) {
+bool ae_c_neq_d(ae_complex lhs, double rhs) {
    volatile double x1 = lhs.x;
    volatile double x2 = rhs;
    volatile double y1 = lhs.y;
@@ -4642,8 +4642,8 @@ ae_complex ae_c_d_div(double lhs, ae_complex rhs) {
 ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *conj0, const ae_complex *v1, ae_int_t stride1, const char *conj1, ae_int_t n) {
    double rx = 0, ry = 0;
    ae_int_t i;
-   ae_bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
-   ae_bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
+   bool bconj0 = !((conj0[0] == 'N') || (conj0[0] == 'n'));
+   bool bconj1 = !((conj1[0] == 'N') || (conj1[0] == 'n'));
    ae_complex result;
    if (bconj0 && bconj1) {
       double v0x, v0y, v1x, v1y;
@@ -4695,7 +4695,7 @@ ae_complex ae_v_cdotproduct(const ae_complex *v0, ae_int_t stride0, const char *
 }
 
 void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4723,7 +4723,7 @@ void ae_v_cmove(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4755,7 +4755,7 @@ void ae_v_cmoveneg(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc
 }
 
 void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4787,7 +4787,7 @@ void ae_v_cmoved(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
 }
 
 void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4823,7 +4823,7 @@ void ae_v_cmovec(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, 
 }
 
 void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4855,7 +4855,7 @@ void ae_v_cadd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae
 }
 
 void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, double alpha) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4887,7 +4887,7 @@ void ae_v_caddd(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n, ae_complex alpha) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -4921,7 +4921,7 @@ void ae_v_caddc(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, a
 }
 
 void ae_v_csub(ae_complex *vdst, ae_int_t stride_dst, const ae_complex *vsrc, ae_int_t stride_src, const char *conj_src, ae_int_t n) {
-   ae_bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
+   bool bconj = !((conj_src[0] == 'N') || (conj_src[0] == 'n'));
    ae_int_t i;
    if (stride_dst != 1 || stride_src != 1) {
    // general unoptimized case
@@ -5151,7 +5151,7 @@ ae_int_t ae_v_len(ae_int_t a, ae_int_t b) {
 }
 
 // RComm functions
-void _rcommstate_init(rcommstate *p, ae_state *_state, ae_bool make_automatic) {
+void _rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic) {
 // initial zero-filling
    memset(&p->ba, 0, sizeof(p->ba));
    memset(&p->ia, 0, sizeof(p->ia));
@@ -5165,7 +5165,7 @@ void _rcommstate_init(rcommstate *p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->ca, 0, DT_COMPLEX, _state, make_automatic);
 }
 
-void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, ae_bool make_automatic) {
+void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic) {
 // initial zero-filling
    memset(&dst->ba, 0, sizeof(dst->ba));
    memset(&dst->ia, 0, sizeof(dst->ia));
@@ -5203,7 +5203,7 @@ char *filter_spaces(const char *s);
 void str_vector_create(const char *src, bool match_head_only, std::vector < const char *>*p_vec);
 void str_matrix_create(const char *src, std::vector < std::vector < const char *> >*p_mat);
 
-ae_bool parse_bool_delim(const char *s, const char *delim);
+bool parse_bool_delim(const char *s, const char *delim);
 ae_int_t parse_int_delim(const char *s, const char *delim);
 bool _parse_real_delim(const char *s, const char *delim, double *result, const char **new_s);
 double parse_real_delim(const char *s, const char *delim);
@@ -6278,7 +6278,7 @@ ae_vector_wrapper::ae_vector_wrapper(alglib_impl::ae_datatype datatype) {
    ptr = &inner_vec;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init(ptr, 0, datatype, &_state, ae_false);
+   ae_vector_init(ptr, 0, datatype, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6303,7 +6303,7 @@ ae_vector_wrapper::ae_vector_wrapper(const ae_vector_wrapper &rhs, alglib_impl::
    ptr = &inner_vec;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init_copy(ptr, rhs.ptr, &_state, ae_false);
+   ae_vector_init_copy(ptr, rhs.ptr, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6342,7 +6342,7 @@ void ae_vector_wrapper::attach_to(alglib_impl::x_vector *new_ptr, alglib_impl::a
       ae_vector_clear(ptr);
    ptr = &inner_vec;
    memset(ptr, 0, sizeof(*ptr));
-   ae_vector_init_attach_to_x(ptr, new_ptr, _state, ae_false);
+   ae_vector_init_attach_to_x(ptr, new_ptr, _state, false);
    is_frozen_proxy = true;
 }
 
@@ -6400,7 +6400,7 @@ ae_vector_wrapper::ae_vector_wrapper(const char *s, alglib_impl::ae_datatype dat
          ptr = &inner_vec;
          is_frozen_proxy = false;
          memset(ptr, 0, sizeof(*ptr));
-         ae_vector_init(ptr, (ae_int_t) (svec.size()), datatype, &_state, ae_false);
+         ae_vector_init(ptr, (ae_int_t) (svec.size()), datatype, &_state, false);
          ae_state_clear(&_state);
       }
       for (i = 0; i < svec.size(); i++) {
@@ -6441,17 +6441,17 @@ const boolean_1d_array &boolean_1d_array::operator=(const boolean_1d_array &rhs)
 boolean_1d_array::~boolean_1d_array() {
 }
 
-const ae_bool &boolean_1d_array::operator() (ae_int_t i) const {
+const bool &boolean_1d_array::operator() (ae_int_t i) const {
    return ptr->ptr.p_bool[i];
 }
-ae_bool &boolean_1d_array::operator() (ae_int_t i) {
+bool &boolean_1d_array::operator() (ae_int_t i) {
    return ptr->ptr.p_bool[i];
 }
 
-const ae_bool &boolean_1d_array::operator[] (ae_int_t i) const {
+const bool &boolean_1d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.p_bool[i];
 }
-ae_bool &boolean_1d_array::operator[] (ae_int_t i) {
+bool &boolean_1d_array::operator[] (ae_int_t i) {
    return ptr->ptr.p_bool[i];
 }
 
@@ -6468,11 +6468,11 @@ void boolean_1d_array::setcontent(ae_int_t iLen, const bool *pContent) {
       ptr->ptr.p_bool[i] = pContent[i];
 }
 
-ae_bool *boolean_1d_array::getcontent() {
+bool *boolean_1d_array::getcontent() {
    return ptr->ptr.p_bool;
 }
 
-const ae_bool *boolean_1d_array::getcontent() const {
+const bool *boolean_1d_array::getcontent() const {
    return ptr->ptr.p_bool;
 }
 
@@ -6739,7 +6739,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(alglib_impl::ae_datatype datatype) {
    ptr = &inner_mat;
    is_frozen_proxy = false;
    memset(ptr, 0, sizeof(*ptr));
-   ae_matrix_init(ptr, 0, 0, datatype, &_state, ae_false);
+   ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
    ae_state_clear(&_state);
 
 }
@@ -6766,7 +6766,7 @@ ae_matrix_wrapper::ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::
    if (rhs.ptr != NULL) {
       ptr = &inner_mat;
       memset(ptr, 0, sizeof(*ptr));
-      ae_matrix_init_copy(ptr, rhs.ptr, &_state, ae_false);
+      ae_matrix_init_copy(ptr, rhs.ptr, &_state, false);
    }
    ae_state_clear(&_state);
 }
@@ -6796,9 +6796,9 @@ ae_matrix_wrapper::ae_matrix_wrapper(const char *s, alglib_impl::ae_datatype dat
          is_frozen_proxy = false;
          memset(ptr, 0, sizeof(*ptr));
          if (smat.size() != 0)
-            ae_matrix_init(ptr, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, ae_false);
+            ae_matrix_init(ptr, (ae_int_t) (smat.size()), (ae_int_t) (smat[0].size()), datatype, &_state, false);
          else
-            ae_matrix_init(ptr, 0, 0, datatype, &_state, ae_false);
+            ae_matrix_init(ptr, 0, 0, datatype, &_state, false);
          ae_state_clear(&_state);
       }
       for (i = 0; i < smat.size(); i++)
@@ -6871,7 +6871,7 @@ void ae_matrix_wrapper::attach_to(alglib_impl::x_matrix *new_ptr, alglib_impl::a
       ae_matrix_clear(ptr);
    ptr = &inner_mat;
    memset(ptr, 0, sizeof(*ptr));
-   ae_matrix_init_attach_to_x(ptr, new_ptr, _state, ae_false);
+   ae_matrix_init_attach_to_x(ptr, new_ptr, _state, false);
    is_frozen_proxy = true;
 }
 
@@ -6930,17 +6930,17 @@ const boolean_2d_array &boolean_2d_array::operator=(const boolean_2d_array &rhs)
    return static_cast < const boolean_2d_array &>(assign(rhs));
 }
 
-const ae_bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
+const bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) const {
    return ptr->ptr.pp_bool[i][j];
 }
-ae_bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
+bool &boolean_2d_array::operator() (ae_int_t i, ae_int_t j) {
    return ptr->ptr.pp_bool[i][j];
 }
 
-const ae_bool *boolean_2d_array::operator[] (ae_int_t i) const {
+const bool *boolean_2d_array::operator[] (ae_int_t i) const {
    return ptr->ptr.pp_bool[i];
 }
-ae_bool *boolean_2d_array::operator[] (ae_int_t i) {
+bool *boolean_2d_array::operator[] (ae_int_t i) {
    return ptr->ptr.pp_bool[i];
 }
 
@@ -7351,7 +7351,7 @@ void str_matrix_create(const char *src, std::vector < std::vector < const char *
       _ALGLIB_CPP_EXCEPTION("Incorrect initializer for matrix");
 }
 
-ae_bool parse_bool_delim(const char *s, const char *delim) {
+bool parse_bool_delim(const char *s, const char *delim) {
    const char *p;
    char buf[8];
 
@@ -7362,7 +7362,7 @@ ae_bool parse_bool_delim(const char *s, const char *delim) {
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          _ALGLIB_CPP_EXCEPTION("Cannot parse value");
-      return ae_false;
+      return false;
    }
 // try to parse true
    p = "true";
@@ -7371,7 +7371,7 @@ ae_bool parse_bool_delim(const char *s, const char *delim) {
    if (my_stricmp(buf, p) == 0) {
       if (s[strlen(p)] == 0 || strchr(delim, s[strlen(p)]) == NULL)
          _ALGLIB_CPP_EXCEPTION("Cannot parse value");
-      return ae_true;
+      return true;
    }
 // error
    _ALGLIB_CPP_EXCEPTION("Cannot parse value");
@@ -8956,7 +8956,7 @@ void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_i
 }
 
 // Real GEMM kernel
-ae_bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
+bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double *_b, ae_int_t _b_stride, ae_int_t optypeb, double beta, double *_c, ae_int_t _c_stride) {
    int i;
    double *crow;
    double _abuf[alglib_r_block + alglib_simd_alignment];
@@ -8967,7 +8967,7 @@ ae_bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, d
    void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 
    if (m > alglib_r_block || n > alglib_r_block || k > alglib_r_block || m <= 0 || n <= 0 || k <= 0 || alpha == 0.0)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9007,11 +9007,11 @@ ae_bool _ialglib_rmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, d
          acol++;
       }
    }
-   return ae_true;
+   return true;
 }
 
 // Complex GEMM kernel
-ae_bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
+bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, ae_complex *_b, ae_int_t _b_stride, ae_int_t optypeb, ae_complex beta, ae_complex *_c, ae_int_t _c_stride) {
    const ae_complex *arow;
    ae_complex *crow;
    ae_int_t i;
@@ -9024,7 +9024,7 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alph
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
 
    if (m > alglib_c_block || n > alglib_c_block || k > alglib_c_block)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9063,11 +9063,11 @@ ae_bool _ialglib_cmatrixgemm(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alph
       cmv(n, k, b, abuf, crow, NULL, 1, alpha, beta);
       crow += _c_stride;
    }
-   return ae_true;
+   return true;
 }
 
 // complex TRSM kernel
-ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag;
    ae_int_t i;
@@ -9077,11 +9077,11 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   ae_bool uppera;
+   bool uppera;
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
 
    if (m > alglib_c_block || n > alglib_c_block)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9133,11 +9133,11 @@ ae_bool _ialglib_cmatrixrighttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 0, _x, _x_stride);
    }
-   return ae_true;
+   return true;
 }
 
 // real TRSM kernel
-ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, ae_bool isupper, ae_bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag;
    ae_int_t i;
@@ -9147,12 +9147,12 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   ae_bool uppera;
+   bool uppera;
    void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
    void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 
    if (m > alglib_r_block || n > alglib_r_block)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9191,11 +9191,11 @@ ae_bool _ialglib_rmatrixrighttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _
       }
       _ialglib_mcopyunblock(m, n, xbuf, 0, _x, _x_stride);
    }
-   return ae_true;
+   return true;
 }
 
 // complex TRSM kernel
-ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
+bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, ae_complex *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag, *arow;
    ae_int_t i;
@@ -9205,11 +9205,11 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   ae_bool uppera;
+   bool uppera;
    void (*cmv)(ae_int_t, ae_int_t, const double *, const double *, ae_complex *, double *, ae_int_t, ae_complex, ae_complex) = &_ialglib_cmv;
 
    if (m > alglib_c_block || n > alglib_c_block)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9262,11 +9262,11 @@ ae_bool _ialglib_cmatrixlefttrsm(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_
       }
       _ialglib_mcopyunblock_complex(m, n, xbuf, 1, _x, _x_stride);
    }
-   return ae_true;
+   return true;
 }
 
 // real TRSM kernel
-ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, ae_bool isupper, ae_bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
+bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, bool isupper, bool isunit, ae_int_t optype, double *_x, ae_int_t _x_stride) {
 // local buffers
    double *pdiag, *arow;
    ae_int_t i;
@@ -9276,12 +9276,12 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a
    double *const abuf = (double *)ae_align(_loc_abuf, alglib_simd_alignment);
    double *const xbuf = (double *)ae_align(_loc_xbuf, alglib_simd_alignment);
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
-   ae_bool uppera;
+   bool uppera;
    void (*rmv)(ae_int_t, ae_int_t, const double *, const double *, double *, ae_int_t, double, double) = &_ialglib_rmv;
    void (*mcopyblock)(ae_int_t, ae_int_t, const double *, ae_int_t, ae_int_t, double *) = &_ialglib_mcopyblock;
 
    if (m > alglib_r_block || n > alglib_r_block)
-      return ae_false;
+      return false;
 
 // Check for SSE2 support
 #ifdef AE_HAS_SSE2_INTRINSICS
@@ -9321,11 +9321,11 @@ ae_bool _ialglib_rmatrixlefttrsm(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a
       }
       _ialglib_mcopyunblock(m, n, xbuf, 1, _x, _x_stride);
    }
-   return ae_true;
+   return true;
 }
 
 // complex SYRK kernel
-ae_bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, ae_bool isupper) {
+bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, ae_complex *_c, ae_int_t _c_stride, bool isupper) {
 // local buffers
    double *arow, *crow;
    ae_complex c_alpha, c_beta;
@@ -9338,9 +9338,9 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_
    double *const tmpbuf = (double *)ae_align(_loc_tmpbuf, alglib_simd_alignment);
 
    if (n > alglib_c_block || k > alglib_c_block)
-      return ae_false;
+      return false;
    if (n == 0)
-      return ae_true;
+      return true;
 
 // copy A and C, task is transformed to "A*A^H"-form.
 // if beta==0, then C is filled by zeros (and not referenced)
@@ -9382,11 +9382,11 @@ ae_bool _ialglib_cmatrixherk(ae_int_t n, ae_int_t k, double alpha, ae_complex *_
 // copy back
    _ialglib_mcopyunblock_complex(n, n, cbuf, 0, _c, _c_stride);
 
-   return ae_true;
+   return true;
 }
 
 // real SYRK kernel
-ae_bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, ae_bool isupper) {
+bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, ae_int_t _a_stride, ae_int_t optypea, double beta, double *_c, ae_int_t _c_stride, bool isupper) {
 // local buffers
    double *arow, *crow;
    ae_int_t i;
@@ -9396,9 +9396,9 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, a
    double *const cbuf = (double *)ae_align(_loc_cbuf, alglib_simd_alignment);
 
    if (n > alglib_r_block || k > alglib_r_block)
-      return ae_false;
+      return false;
    if (n == 0)
-      return ae_true;
+      return true;
 
 // copy A and C, task is transformed to "A*A^T"-form.
 // if beta==0, then C is filled by zeros (and not referenced)
@@ -9434,11 +9434,11 @@ ae_bool _ialglib_rmatrixsyrk(ae_int_t n, ae_int_t k, double alpha, double *_a, a
 // copy back
    _ialglib_mcopyunblock(n, n, cbuf, 0, _c, _c_stride);
 
-   return ae_true;
+   return true;
 }
 
 // complex rank-1 kernel
-ae_bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
+bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _a_stride, ae_complex *_u, ae_complex *_v) {
 // Locals
    ae_complex *arow, *pu, *pv, *vtmp, *dst;
    ae_int_t n2 = n / 2;
@@ -9446,7 +9446,7 @@ ae_bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
 
 // Quick exit
    if (m <= 0 || n <= 0)
-      return ae_false;
+      return false;
 
 // update pairs of rows
    arow = _a;
@@ -9477,12 +9477,12 @@ ae_bool _ialglib_cmatrixrank1(ae_int_t m, ae_int_t n, ae_complex *_a, ae_int_t _
          dst[0].y += ux * vy + uy * vx;
       }
    }
-   return ae_true;
+   return true;
 }
 
 // real rank-1 kernel
 // deprecated version
-ae_bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
+bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double *_u, double *_v) {
 // Locals
    double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
    ae_int_t m2 = m / 2;
@@ -9493,7 +9493,7 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_st
 
 // Quick exit
    if (m <= 0 || n <= 0)
-      return ae_false;
+      return false;
 
 // update pairs of rows
    arow0 = _a;
@@ -9528,12 +9528,12 @@ ae_bool _ialglib_rmatrixrank1(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_st
       if (n % 2 != 0)
          dst0[0] += pu[0] * pv[0];
    }
-   return ae_true;
+   return true;
 }
 
 // real rank-1 kernel
 // deprecated version
-ae_bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
+bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stride, double alpha, double *_u, double *_v) {
 // Locals
    double *arow0, *arow1, *pu, *pv, *vtmp, *dst0, *dst1;
    ae_int_t m2 = m / 2;
@@ -9544,7 +9544,7 @@ ae_bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stri
 
 // Quick exit
    if (m <= 0 || n <= 0 || alpha == 0.0)
-      return ae_false;
+      return false;
 
 // update pairs of rows
    arow0 = _a;
@@ -9584,91 +9584,91 @@ ae_bool _ialglib_rmatrixger(ae_int_t m, ae_int_t n, double *_a, ae_int_t _a_stri
       if (n % 2 != 0)
          dst0[0] += au0 * pv[0];
    }
-   return ae_true;
+   return true;
 }
 
 // Interface functions for efficient kernels
-ae_bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0 || m == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_rmatrixgemm(m, n, k, alpha, _a->ptr.pp_double[ia] + ja, _a->stride, optypea, _b->ptr.pp_double[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_double[ic] + jc, _c->stride);
 }
 
-ae_bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *_c, ae_int_t ic, ae_int_t jc) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if ((alpha.x == 0.0 && alpha.y == 0) || k == 0 || n == 0 || m == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_cmatrixgemm(m, n, k, alpha, _a->ptr.pp_complex[ia] + ja, _a->stride, optypea, _b->ptr.pp_complex[ib] + jb, _b->stride, optypeb, beta, _c->ptr.pp_complex[ic] + jc, _c->stride);
 }
 
-ae_bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_cmatrixrighttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
 }
 
-ae_bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_rmatrixrighttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
 }
 
-ae_bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_cmatrixlefttrsm(m, n, &a->ptr.pp_complex[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_complex[i2][j2], x->stride);
 }
 
-ae_bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (m == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // handle with optimized ALGLIB kernel
    return _ialglib_rmatrixlefttrsm(m, n, &a->ptr.pp_double[i1][j1], a->stride, isupper, isunit, optype, &x->ptr.pp_double[i2][j2], x->stride);
 }
 
-ae_bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, ae_bool isupper) {
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // ALGLIB kernel
    return _ialglib_cmatrixherk(n, k, alpha, &a->ptr.pp_complex[ia][ja], a->stride, optypea, beta, &c->ptr.pp_complex[ic][jc], c->stride, isupper);
 }
 
-ae_bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, ae_bool isupper) {
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper) {
 // handle degenerate cases like zero matrices by ALGLIB - greatly simplifies passing data to ALGLIB kernel
    if (alpha == 0.0 || k == 0 || n == 0)
-      return ae_false;
+      return false;
 
 // ALGLIB kernel
    return _ialglib_rmatrixsyrk(n, k, alpha, &a->ptr.pp_double[ia][ja], a->stride, optypea, beta, &c->ptr.pp_double[ic][jc], c->stride, isupper);
 }
 
-ae_bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_cmatrixrank1(m, n, &a->ptr.pp_complex[ia][ja], a->stride, &u->ptr.p_complex[uoffs], &v->ptr.p_complex[voffs]);
 }
 
-ae_bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixrank1(m, n, &a->ptr.pp_double[ia][ja], a->stride, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
 }
 
-ae_bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs) {
    return _ialglib_rmatrixger(m, n, &a->ptr.pp_double[ia][ja], a->stride, alpha, &u->ptr.p_double[uoffs], &v->ptr.p_double[voffs]);
 }
 
@@ -10597,7 +10597,7 @@ void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 20.01.2020 by Bochkanov Sergey
-void bsetv(ae_int_t n, ae_bool v, BVector *x, ae_state *_state) {
+void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state) {
    ae_int_t j;
 
 // Try fast kernels.
@@ -11455,7 +11455,7 @@ void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix 
 //
 //   -- ALGLIB routine --
 //      (c) 07.09.2021 Bochkanov Sergey
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_bool isupper, ae_bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -11521,7 +11521,7 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_bool isupper, a
       }
       return;
    }
-   ae_assert(ae_false, "rTRSVX: unexpected operation type", _state);
+   ae_assert(false, "rTRSVX: unexpected operation type", _state);
 }
 
 // Fast rGEMM kernel with AVX2/FMA support
@@ -11529,9 +11529,9 @@ void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_bool isupper, a
 //   -- ALGLIB routine --
 //      19.09.2021
 //      Bochkanov Sergey
-ae_bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *_a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *_b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *_c, ae_int_t ic, ae_int_t jc, ae_state *_state) {
 #   if !defined(_ALGLIB_HAS_AVX2_INTRINSICS)
-   return ae_false;
+   return false;
 #   else
    const ae_int_t block_size = _ABLASF_BLOCK_SIZE;
    const ae_int_t micro_size = _ABLASF_MICRO_SIZE;
@@ -11545,7 +11545,7 @@ ae_bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha,
 
 // Determine CPU and kernel support
    if (m > block_size || n > block_size || k > block_size || m == 0 || n == 0 || !(cpu_id & CPU_AVX2))
-      return ae_false;
+      return false;
 #      if defined(_ALGLIB_HAS_FMA_INTRINSICS)
    if (cpu_id & CPU_FMA)
       ablasf_dotblk = ablasf_dotblkh_fma;
@@ -11603,7 +11603,7 @@ ae_bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha,
                c[out0 * stride_c + out1] *= beta;
       }
    }
-   return ae_true;
+   return true;
 #   endif
 }
 
@@ -11696,7 +11696,7 @@ void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector
 //   -- ALGLIB routine --
 //      20.09.2020
 //      Bochkanov Sergey
-ae_bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
    _ALGLIB_KERNEL_RETURN_AVX2_FMA(spchol_updatekernelabc4, (rowstorage->ptr.p_double, offss, twidth, offsu, uheight, urank, urowstride, uwidth, diagd->ptr.p_double, offsd, raw2smap->ptr.p_int, superrowidx->ptr.p_int, urbase, _state))
@@ -11733,10 +11733,10 @@ ae_bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t tw
    ae_int_t srccol1;
    ae_int_t srccol2;
    ae_int_t srccol3;
-   ae_bool result;
+   bool result;
 
 // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
-   result = ae_false;
+   result = false;
    if (twidth < 3 || twidth > 4) {
       return result;
    }
@@ -11908,7 +11908,7 @@ ae_bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t tw
          rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
       }
    }
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -11935,7 +11935,7 @@ ae_bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t tw
 //   -- ALGLIB routine --
 //      20.09.2020
 //      Bochkanov Sergey
-ae_bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t offsk;
@@ -11963,7 +11963,7 @@ ae_bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sh
    double uk1;
    double uk2;
    double uk3;
-   ae_bool result;
+   bool result;
 
 // Try fast kernels.
 // On success this macro will return, on failure to find kernel it will pass execution to the generic C implementation
@@ -12018,7 +12018,7 @@ ae_bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sh
          rowstorage->ptr.p_double[targetrow + 3] = rowstorage->ptr.p_double[targetrow + 3] - u30 * uk0 - u31 * uk1 - u32 * uk2 - u33 * uk3;
       }
    }
-   result = ae_true;
+   result = true;
    return result;
 }
 

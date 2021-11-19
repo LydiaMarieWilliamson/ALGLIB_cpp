@@ -943,9 +943,9 @@ void covm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix
 void pearsoncorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
 void spearmancorrm2(RMatrix *x, RMatrix *y, ae_int_t n, ae_int_t m1, ae_int_t m2, RMatrix *c, ae_state *_state);
 void rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-ae_bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+bool _trypexec_rankdata(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
 void rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
-ae_bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
+bool _trypexec_rankdatacentered(RMatrix *xy, ae_int_t npoints, ae_int_t nfeatures, ae_state *_state);
 double pearsoncorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
 double spearmanrankcorrelation(RVector *x, RVector *y, ae_int_t n, ae_state *_state);
 

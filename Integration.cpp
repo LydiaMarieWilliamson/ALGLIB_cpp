@@ -657,7 +657,7 @@ _autogkreport_owner::_autogkreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::autogkreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::autogkreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::autogkreport));
-   alglib_impl::_autogkreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_autogkreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -684,7 +684,7 @@ _autogkreport_owner::_autogkreport_owner(const _autogkreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: autogkreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::autogkreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::autogkreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::autogkreport));
-   alglib_impl::_autogkreport_init_copy(p_struct, const_cast < alglib_impl::autogkreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_autogkreport_init_copy(p_struct, const_cast < alglib_impl::autogkreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -708,7 +708,7 @@ _autogkreport_owner &_autogkreport_owner::operator=(const _autogkreport_owner &r
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: autogkreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_autogkreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::autogkreport));
-   alglib_impl::_autogkreport_init_copy(p_struct, const_cast < alglib_impl::autogkreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_autogkreport_init_copy(p_struct, const_cast < alglib_impl::autogkreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -772,7 +772,7 @@ _autogkstate_owner::_autogkstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::autogkstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::autogkstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::autogkstate));
-   alglib_impl::_autogkstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_autogkstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -799,7 +799,7 @@ _autogkstate_owner::_autogkstate_owner(const _autogkstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: autogkstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::autogkstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::autogkstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::autogkstate));
-   alglib_impl::_autogkstate_init_copy(p_struct, const_cast < alglib_impl::autogkstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_autogkstate_init_copy(p_struct, const_cast < alglib_impl::autogkstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -823,7 +823,7 @@ _autogkstate_owner &_autogkstate_owner::operator=(const _autogkstate_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: autogkstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_autogkstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::autogkstate));
-   alglib_impl::_autogkstate_init_copy(p_struct, const_cast < alglib_impl::autogkstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_autogkstate_init_copy(p_struct, const_cast < alglib_impl::autogkstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -1011,7 +1011,7 @@ bool autogkiteration(const autogkstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::autogkiteration(const_cast < alglib_impl::autogkstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::autogkiteration(const_cast < alglib_impl::autogkstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -1038,7 +1038,7 @@ void autogkintegrate(autogkstate &state, void (*func)(double x, double xminusa, 
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: unexpected error in 'autogkintegrate()'", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: unexpected error in 'autogkintegrate()'", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1086,7 +1086,7 @@ namespace alglib_impl {
 // === AUTOGK Package ===
 static ae_int_t autogk_maxsubintervals = 10000;
 static void autogk_autogkinternalprepare(double a, double b, double eps, double xwidth, autogkinternalstate *state, ae_state *_state);
-static ae_bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state);
+static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state);
 static void autogk_mheappop(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state);
 static void autogk_mheappush(RMatrix *heap, ae_int_t heapsize, ae_int_t heapwidth, ae_state *_state);
 static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newheapsize, ae_int_t heapwidth, ae_state *_state);
@@ -1140,9 +1140,9 @@ void gqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_int
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&d, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&e, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&d, 0, DT_REAL, _state, true);
+   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
 
    if (n < 1) {
       *info = -1;
@@ -1246,16 +1246,16 @@ void gqgenerategausslobattorec(RVector *alpha, RVector *beta, double mu0, double
    memset(&d, 0, sizeof(d));
    memset(&e, 0, sizeof(e));
    memset(&z, 0, sizeof(z));
-   ae_vector_init_copy(&_alpha, alpha, _state, ae_true);
+   ae_vector_init_copy(&_alpha, alpha, _state, true);
    alpha = &_alpha;
-   ae_vector_init_copy(&_beta, beta, _state, ae_true);
+   ae_vector_init_copy(&_beta, beta, _state, true);
    beta = &_beta;
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&d, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&e, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&d, 0, DT_REAL, _state, true);
+   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
 
    if (n <= 2) {
       *info = -1;
@@ -1396,16 +1396,16 @@ void gqgenerategaussradaurec(RVector *alpha, RVector *beta, double mu0, double a
    memset(&d, 0, sizeof(d));
    memset(&e, 0, sizeof(e));
    memset(&z, 0, sizeof(z));
-   ae_vector_init_copy(&_alpha, alpha, _state, ae_true);
+   ae_vector_init_copy(&_alpha, alpha, _state, true);
    alpha = &_alpha;
-   ae_vector_init_copy(&_beta, beta, _state, ae_true);
+   ae_vector_init_copy(&_beta, beta, _state, true);
    beta = &_beta;
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&d, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&e, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&z, 0, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&d, 0, DT_REAL, _state, true);
+   ae_vector_init(&e, 0, DT_REAL, _state, true);
+   ae_matrix_init(&z, 0, 0, DT_REAL, _state, true);
 
    if (n < 2) {
       *info = -1;
@@ -1489,8 +1489,8 @@ void gqgenerategausslegendre(ae_int_t n, ae_int_t *info, RVector *x, RVector *w,
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&alpha, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&beta, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&alpha, 0, DT_REAL, _state, true);
+   ae_vector_init(&beta, 0, DT_REAL, _state, true);
 
    if (n < 1) {
       *info = -1;
@@ -1564,8 +1564,8 @@ void gqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *info
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&a, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&a, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    if ((n < 1 || ae_fp_less_eq(alpha, (double)(-1))) || ae_fp_less_eq(beta, (double)(-1))) {
       *info = -1;
@@ -1647,8 +1647,8 @@ void gqgenerategausslaguerre(ae_int_t n, double alpha, ae_int_t *info, RVector *
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&a, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&a, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    if (n < 1 || ae_fp_less_eq(alpha, (double)(-1))) {
       *info = -1;
@@ -1720,8 +1720,8 @@ void gqgenerategausshermite(ae_int_t n, ae_int_t *info, RVector *x, RVector *w, 
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(w);
-   ae_vector_init(&a, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&a, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    if (n < 1) {
       *info = -1;
@@ -1823,19 +1823,19 @@ void gkqgeneraterec(RVector *alpha, RVector *beta, double mu0, ae_int_t n, ae_in
    memset(&s, 0, sizeof(s));
    memset(&xgtmp, 0, sizeof(xgtmp));
    memset(&wgtmp, 0, sizeof(wgtmp));
-   ae_vector_init_copy(&_alpha, alpha, _state, ae_true);
+   ae_vector_init_copy(&_alpha, alpha, _state, true);
    alpha = &_alpha;
-   ae_vector_init_copy(&_beta, beta, _state, ae_true);
+   ae_vector_init_copy(&_beta, beta, _state, true);
    beta = &_beta;
    *info = 0;
    ae_vector_clear(x);
    ae_vector_clear(wkronrod);
    ae_vector_clear(wgauss);
-   ae_vector_init(&ta, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&t, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&s, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&xgtmp, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&wgtmp, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&ta, 0, DT_REAL, _state, true);
+   ae_vector_init(&t, 0, DT_REAL, _state, true);
+   ae_vector_init(&s, 0, DT_REAL, _state, true);
+   ae_vector_init(&xgtmp, 0, DT_REAL, _state, true);
+   ae_vector_init(&wgtmp, 0, DT_REAL, _state, true);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -2051,8 +2051,8 @@ void gkqgenerategaussjacobi(ae_int_t n, double alpha, double beta, ae_int_t *inf
    ae_vector_clear(x);
    ae_vector_clear(wkronrod);
    ae_vector_clear(wgauss);
-   ae_vector_init(&a, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&a, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -2146,8 +2146,8 @@ void gkqlegendrecalc(ae_int_t n, ae_int_t *info, RVector *x, RVector *wkronrod, 
    ae_vector_clear(x);
    ae_vector_clear(wkronrod);
    ae_vector_clear(wgauss);
-   ae_vector_init(&alpha, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&beta, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&alpha, 0, DT_REAL, _state, true);
+   ae_vector_init(&beta, 0, DT_REAL, _state, true);
 
    if (n % 2 != 1 || n < 3) {
       *info = -1;
@@ -2217,8 +2217,8 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
    ae_vector_clear(wkronrod);
    ae_vector_clear(wgauss);
    *eps = 0;
-   ae_vector_init(&p1, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&p2, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&p1, 0, DT_INT, _state, true);
+   ae_vector_init(&p2, 0, DT_INT, _state, true);
 
 // these initializers are not really necessary,
 // but without them compiler complains about uninitialized locals
@@ -2632,7 +2632,7 @@ void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_sta
    state->a = a;
    state->b = b;
    state->xwidth = xwidth;
-   state->needf = ae_false;
+   state->needf = false;
    ae_vector_set_length(&state->rstate.ra, 10 + 1, _state);
    state->rstate.stage = -1;
 }
@@ -2681,7 +2681,7 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
    state->alpha = alpha;
    state->beta = beta;
    state->xwidth = 0.0;
-   state->needf = ae_false;
+   state->needf = false;
    ae_vector_set_length(&state->rstate.ra, 10 + 1, _state);
    state->rstate.stage = -1;
 }
@@ -2689,7 +2689,7 @@ void autogksingular(double a, double b, double alpha, double beta, autogkstate *
 //
 //   -- ALGLIB --
 //      Copyright 07.05.2009 by Bochkanov Sergey
-ae_bool autogkiteration(autogkstate *state, ae_state *_state) {
+bool autogkiteration(autogkstate *state, ae_state *_state) {
    double s;
    double tmp;
    double eps;
@@ -2701,7 +2701,7 @@ ae_bool autogkiteration(autogkstate *state, ae_state *_state) {
    double beta;
    double v1;
    double v2;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -2763,7 +2763,7 @@ ae_bool autogkiteration(autogkstate *state, ae_state *_state) {
    if (ae_fp_eq(a, b)) {
       state->terminationtype = 1;
       state->v = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
 // general case
@@ -2776,11 +2776,11 @@ lbl_5:
    state->x = x;
    state->xminusa = x - a;
    state->bminusx = b - x;
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needf = ae_false;
+   state->needf = false;
    state->nfev = state->nfev + 1;
    state->internalstate.f = state->f;
    goto lbl_5;
@@ -2788,7 +2788,7 @@ lbl_6:
    state->v = state->internalstate.r;
    state->terminationtype = state->internalstate.info;
    state->nintervals = state->internalstate.heapused;
-   result = ae_false;
+   result = false;
    return result;
 lbl_3:
 
@@ -2800,14 +2800,14 @@ lbl_3:
    if (ae_fp_less_eq(alpha, (double)(-1)) || ae_fp_less_eq(beta, (double)(-1))) {
       state->terminationtype = -1;
       state->v = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
 // special cases
    if (ae_fp_eq(a, b)) {
       state->terminationtype = 1;
       state->v = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
 // reduction to general form
@@ -2845,11 +2845,11 @@ lbl_9:
       state->xminusa = a + t - b;
       state->bminusx = -t;
    }
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needf = ae_false;
+   state->needf = false;
    if (ae_fp_neq(alpha, (double)(0))) {
       state->internalstate.f = state->f * ae_pow(x, -alpha / (1 + alpha), _state) / (1 + alpha);
    } else {
@@ -2881,11 +2881,11 @@ lbl_11:
       state->xminusa = -t;
       state->bminusx = a - (b - t);
    }
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needf = ae_false;
+   state->needf = false;
    if (ae_fp_neq(beta, (double)(0))) {
       state->internalstate.f = state->f * ae_pow(x, -beta / (1 + beta), _state) / (1 + beta);
    } else {
@@ -2900,15 +2900,15 @@ lbl_12:
 // final result
    state->v = s * (v1 + v2);
    state->terminationtype = 1;
-   result = ae_false;
+   result = false;
    return result;
 lbl_7:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ra.ptr.p_double[0] = s;
    state->rstate.ra.ptr.p_double[1] = tmp;
    state->rstate.ra.ptr.p_double[2] = eps;
@@ -2968,7 +2968,7 @@ static void autogk_autogkinternalprepare(double a, double b, double eps, double 
 }
 
 // Internal AutoGK subroutine
-static ae_bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state) {
+static bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_state *_state) {
    double c1;
    double c2;
    ae_int_t i;
@@ -2982,7 +2982,7 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_sta
    ae_int_t ns;
    double qeps;
    ae_int_t info;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -3039,7 +3039,7 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_sta
    if (info < 0) {
       state->info = -5;
       state->r = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
    ae_vector_set_length(&state->wr, state->n, _state);
@@ -3059,14 +3059,14 @@ static ae_bool autogk_autogkinternaliteration(autogkinternalstate *state, ae_sta
    if (ae_fp_eq(state->a, state->b)) {
       state->info = 1;
       state->r = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
 // test parameters
    if (ae_fp_less(state->eps, (double)(0)) || ae_fp_less(state->xwidth, (double)(0))) {
       state->info = -1;
       state->r = (double)(0);
-      result = ae_false;
+      result = false;
       return result;
    }
    state->info = 1;
@@ -3190,7 +3190,7 @@ lbl_4:
 
 // method iterations
 lbl_14:
-   if (ae_false) {
+   if (false) {
       goto lbl_15;
    }
 // additional memory if needed
@@ -3203,7 +3203,7 @@ lbl_14:
       for (j = 0; j <= state->heapused - 1; j++) {
          state->r = state->r + state->heap.ptr.pp_double[j][1];
       }
-      result = ae_false;
+      result = false;
       return result;
    }
 // Exclude interval with maximum absolute error
@@ -3267,12 +3267,12 @@ lbl_18:
    state->heapused = state->heapused + 1;
    goto lbl_14;
 lbl_15:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = i;
    state->rstate.ia.ptr.p_int[1] = j;
    state->rstate.ia.ptr.p_int[2] = ns;
@@ -3356,7 +3356,7 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
 
    ae_frame_make(_state, &_frame_block);
    memset(&tmp, 0, sizeof(tmp));
-   ae_matrix_init(&tmp, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&tmp, 0, 0, DT_REAL, _state, true);
 
    ae_matrix_set_length(&tmp, *heapsize, heapwidth, _state);
    for (i = 0; i <= *heapsize - 1; i++) {
@@ -3370,12 +3370,12 @@ static void autogk_mheapresize(RMatrix *heap, ae_int_t *heapsize, ae_int_t newhe
    ae_frame_leave(_state);
 }
 
-void _autogkreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _autogkreport_init(void *_p, ae_state *_state, bool make_automatic) {
    autogkreport *p = (autogkreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    autogkreport *dst = (autogkreport *) _dst;
    autogkreport *src = (autogkreport *) _src;
    dst->terminationtype = src->terminationtype;
@@ -3393,7 +3393,7 @@ void _autogkreport_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _autogkinternalstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic) {
    autogkinternalstate *p = (autogkinternalstate *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->heap, 0, 0, DT_REAL, _state, make_automatic);
@@ -3404,7 +3404,7 @@ void _autogkinternalstate_init(void *_p, ae_state *_state, ae_bool make_automati
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    autogkinternalstate *dst = (autogkinternalstate *) _dst;
    autogkinternalstate *src = (autogkinternalstate *) _src;
    dst->a = src->a;
@@ -3451,14 +3451,14 @@ void _autogkinternalstate_destroy(void *_p) {
    _rcommstate_destroy(&p->rstate);
 }
 
-void _autogkstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _autogkstate_init(void *_p, ae_state *_state, bool make_automatic) {
    autogkstate *p = (autogkstate *) _p;
    ae_touch_ptr((void *)p);
    _autogkinternalstate_init(&p->internalstate, _state, make_automatic);
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    autogkstate *dst = (autogkstate *) _dst;
    autogkstate *src = (autogkstate *) _src;
    dst->a = src->a;

@@ -199,7 +199,7 @@ _optguardreport_owner::_optguardreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::optguardreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardreport));
-   alglib_impl::_optguardreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_optguardreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -226,7 +226,7 @@ _optguardreport_owner::_optguardreport_owner(const _optguardreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::optguardreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardreport));
-   alglib_impl::_optguardreport_init_copy(p_struct, const_cast < alglib_impl::optguardreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardreport_init_copy(p_struct, const_cast < alglib_impl::optguardreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -250,7 +250,7 @@ _optguardreport_owner &_optguardreport_owner::operator=(const _optguardreport_ow
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_optguardreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::optguardreport));
-   alglib_impl::_optguardreport_init_copy(p_struct, const_cast < alglib_impl::optguardreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardreport_init_copy(p_struct, const_cast < alglib_impl::optguardreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -348,7 +348,7 @@ _optguardnonc0report_owner::_optguardnonc0report_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::optguardnonc0report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc0report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc0report));
-   alglib_impl::_optguardnonc0report_init(p_struct, &_state, ae_false);
+   alglib_impl::_optguardnonc0report_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -375,7 +375,7 @@ _optguardnonc0report_owner::_optguardnonc0report_owner(const _optguardnonc0repor
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc0report copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::optguardnonc0report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc0report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc0report));
-   alglib_impl::_optguardnonc0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc0report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc0report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -399,7 +399,7 @@ _optguardnonc0report_owner &_optguardnonc0report_owner::operator=(const _optguar
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc0report assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_optguardnonc0report_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc0report));
-   alglib_impl::_optguardnonc0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc0report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc0report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -500,7 +500,7 @@ _optguardnonc1test0report_owner::_optguardnonc1test0report_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::optguardnonc1test0report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc1test0report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test0report));
-   alglib_impl::_optguardnonc1test0report_init(p_struct, &_state, ae_false);
+   alglib_impl::_optguardnonc1test0report_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -527,7 +527,7 @@ _optguardnonc1test0report_owner::_optguardnonc1test0report_owner(const _optguard
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc1test0report copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::optguardnonc1test0report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc1test0report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test0report));
-   alglib_impl::_optguardnonc1test0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test0report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc1test0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test0report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -551,7 +551,7 @@ _optguardnonc1test0report_owner &_optguardnonc1test0report_owner::operator=(cons
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc1test0report assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_optguardnonc1test0report_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test0report));
-   alglib_impl::_optguardnonc1test0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test0report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc1test0report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test0report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -663,7 +663,7 @@ _optguardnonc1test1report_owner::_optguardnonc1test1report_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::optguardnonc1test1report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc1test1report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test1report));
-   alglib_impl::_optguardnonc1test1report_init(p_struct, &_state, ae_false);
+   alglib_impl::_optguardnonc1test1report_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -690,7 +690,7 @@ _optguardnonc1test1report_owner::_optguardnonc1test1report_owner(const _optguard
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc1test1report copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::optguardnonc1test1report *) alglib_impl::ae_malloc(sizeof(alglib_impl::optguardnonc1test1report), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test1report));
-   alglib_impl::_optguardnonc1test1report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test1report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc1test1report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test1report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -714,7 +714,7 @@ _optguardnonc1test1report_owner &_optguardnonc1test1report_owner::operator=(cons
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: optguardnonc1test1report assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_optguardnonc1test1report_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::optguardnonc1test1report));
-   alglib_impl::_optguardnonc1test1report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test1report * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_optguardnonc1test1report_init_copy(p_struct, const_cast < alglib_impl::optguardnonc1test1report * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -775,7 +775,7 @@ _minlbfgsstate_owner::_minlbfgsstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlbfgsstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlbfgsstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsstate));
-   alglib_impl::_minlbfgsstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlbfgsstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -802,7 +802,7 @@ _minlbfgsstate_owner::_minlbfgsstate_owner(const _minlbfgsstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlbfgsstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlbfgsstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlbfgsstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsstate));
-   alglib_impl::_minlbfgsstate_init_copy(p_struct, const_cast < alglib_impl::minlbfgsstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlbfgsstate_init_copy(p_struct, const_cast < alglib_impl::minlbfgsstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -826,7 +826,7 @@ _minlbfgsstate_owner &_minlbfgsstate_owner::operator=(const _minlbfgsstate_owner
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlbfgsstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlbfgsstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsstate));
-   alglib_impl::_minlbfgsstate_init_copy(p_struct, const_cast < alglib_impl::minlbfgsstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlbfgsstate_init_copy(p_struct, const_cast < alglib_impl::minlbfgsstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -905,7 +905,7 @@ _minlbfgsreport_owner::_minlbfgsreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlbfgsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlbfgsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsreport));
-   alglib_impl::_minlbfgsreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlbfgsreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -932,7 +932,7 @@ _minlbfgsreport_owner::_minlbfgsreport_owner(const _minlbfgsreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlbfgsreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlbfgsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlbfgsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsreport));
-   alglib_impl::_minlbfgsreport_init_copy(p_struct, const_cast < alglib_impl::minlbfgsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlbfgsreport_init_copy(p_struct, const_cast < alglib_impl::minlbfgsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -956,7 +956,7 @@ _minlbfgsreport_owner &_minlbfgsreport_owner::operator=(const _minlbfgsreport_ow
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlbfgsreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlbfgsreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlbfgsreport));
-   alglib_impl::_minlbfgsreport_init_copy(p_struct, const_cast < alglib_impl::minlbfgsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlbfgsreport_init_copy(p_struct, const_cast < alglib_impl::minlbfgsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -1600,7 +1600,7 @@ bool minlbfgsiteration(const minlbfgsstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minlbfgsiteration(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minlbfgsiteration(const_cast < alglib_impl::minlbfgsstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -1632,7 +1632,7 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*func)(const real_1d_array &x,
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -1664,7 +1664,7 @@ void minlbfgsoptimize(minlbfgsstate &state, void (*grad)(const real_1d_array &x,
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlbfgsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -2318,7 +2318,7 @@ _minbleicstate_owner::_minbleicstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minbleicstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbleicstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicstate));
-   alglib_impl::_minbleicstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minbleicstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2345,7 +2345,7 @@ _minbleicstate_owner::_minbleicstate_owner(const _minbleicstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbleicstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minbleicstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbleicstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicstate));
-   alglib_impl::_minbleicstate_init_copy(p_struct, const_cast < alglib_impl::minbleicstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbleicstate_init_copy(p_struct, const_cast < alglib_impl::minbleicstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2369,7 +2369,7 @@ _minbleicstate_owner &_minbleicstate_owner::operator=(const _minbleicstate_owner
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbleicstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minbleicstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicstate));
-   alglib_impl::_minbleicstate_init_copy(p_struct, const_cast < alglib_impl::minbleicstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbleicstate_init_copy(p_struct, const_cast < alglib_impl::minbleicstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -2458,7 +2458,7 @@ _minbleicreport_owner::_minbleicreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minbleicreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbleicreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicreport));
-   alglib_impl::_minbleicreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minbleicreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2485,7 +2485,7 @@ _minbleicreport_owner::_minbleicreport_owner(const _minbleicreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbleicreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minbleicreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbleicreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicreport));
-   alglib_impl::_minbleicreport_init_copy(p_struct, const_cast < alglib_impl::minbleicreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbleicreport_init_copy(p_struct, const_cast < alglib_impl::minbleicreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2509,7 +2509,7 @@ _minbleicreport_owner &_minbleicreport_owner::operator=(const _minbleicreport_ow
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbleicreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minbleicreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minbleicreport));
-   alglib_impl::_minbleicreport_init_copy(p_struct, const_cast < alglib_impl::minbleicreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbleicreport_init_copy(p_struct, const_cast < alglib_impl::minbleicreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -3293,7 +3293,7 @@ bool minbleiciteration(const minbleicstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minbleiciteration(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minbleiciteration(const_cast < alglib_impl::minbleicstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -3325,7 +3325,7 @@ void minbleicoptimize(minbleicstate &state, void (*func)(const real_1d_array &x,
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -3357,7 +3357,7 @@ void minbleicoptimize(minbleicstate &state, void (*grad)(const real_1d_array &x,
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbleicoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -4001,7 +4001,7 @@ _minqpstate_owner::_minqpstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minqpstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minqpstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minqpstate));
-   alglib_impl::_minqpstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minqpstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4028,7 +4028,7 @@ _minqpstate_owner::_minqpstate_owner(const _minqpstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minqpstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minqpstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minqpstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minqpstate));
-   alglib_impl::_minqpstate_init_copy(p_struct, const_cast < alglib_impl::minqpstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minqpstate_init_copy(p_struct, const_cast < alglib_impl::minqpstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4052,7 +4052,7 @@ _minqpstate_owner &_minqpstate_owner::operator=(const _minqpstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minqpstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minqpstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minqpstate));
-   alglib_impl::_minqpstate_init_copy(p_struct, const_cast < alglib_impl::minqpstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minqpstate_init_copy(p_struct, const_cast < alglib_impl::minqpstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -4187,7 +4187,7 @@ _minqpreport_owner::_minqpreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minqpreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minqpreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minqpreport));
-   alglib_impl::_minqpreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minqpreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4214,7 +4214,7 @@ _minqpreport_owner::_minqpreport_owner(const _minqpreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minqpreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minqpreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minqpreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minqpreport));
-   alglib_impl::_minqpreport_init_copy(p_struct, const_cast < alglib_impl::minqpreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minqpreport_init_copy(p_struct, const_cast < alglib_impl::minqpreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4238,7 +4238,7 @@ _minqpreport_owner &_minqpreport_owner::operator=(const _minqpreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minqpreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minqpreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minqpreport));
-   alglib_impl::_minqpreport_init_copy(p_struct, const_cast < alglib_impl::minqpreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minqpreport_init_copy(p_struct, const_cast < alglib_impl::minqpreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -6107,7 +6107,7 @@ _minlmstate_owner::_minlmstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlmstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlmstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlmstate));
-   alglib_impl::_minlmstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlmstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6134,7 +6134,7 @@ _minlmstate_owner::_minlmstate_owner(const _minlmstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlmstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlmstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlmstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlmstate));
-   alglib_impl::_minlmstate_init_copy(p_struct, const_cast < alglib_impl::minlmstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlmstate_init_copy(p_struct, const_cast < alglib_impl::minlmstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6158,7 +6158,7 @@ _minlmstate_owner &_minlmstate_owner::operator=(const _minlmstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlmstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlmstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlmstate));
-   alglib_impl::_minlmstate_init_copy(p_struct, const_cast < alglib_impl::minlmstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlmstate_init_copy(p_struct, const_cast < alglib_impl::minlmstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -6238,7 +6238,7 @@ _minlmreport_owner::_minlmreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlmreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlmreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlmreport));
-   alglib_impl::_minlmreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlmreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6265,7 +6265,7 @@ _minlmreport_owner::_minlmreport_owner(const _minlmreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlmreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlmreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlmreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlmreport));
-   alglib_impl::_minlmreport_init_copy(p_struct, const_cast < alglib_impl::minlmreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlmreport_init_copy(p_struct, const_cast < alglib_impl::minlmreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -6289,7 +6289,7 @@ _minlmreport_owner &_minlmreport_owner::operator=(const _minlmreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlmreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlmreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlmreport));
-   alglib_impl::_minlmreport_init_copy(p_struct, const_cast < alglib_impl::minlmreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlmreport_init_copy(p_struct, const_cast < alglib_impl::minlmreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -7216,7 +7216,7 @@ bool minlmiteration(const minlmstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minlmiteration(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minlmiteration(const_cast < alglib_impl::minlmstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -7248,7 +7248,7 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7285,7 +7285,7 @@ void minlmoptimize(minlmstate &state, void (*fvec)(const real_1d_array &x, real_
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7327,7 +7327,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7364,7 +7364,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7406,7 +7406,7 @@ void minlmoptimize(minlmstate &state, void (*func)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minlmoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -7871,7 +7871,7 @@ _mincgstate_owner::_mincgstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::mincgstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::mincgstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::mincgstate));
-   alglib_impl::_mincgstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_mincgstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -7898,7 +7898,7 @@ _mincgstate_owner::_mincgstate_owner(const _mincgstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: mincgstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::mincgstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::mincgstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::mincgstate));
-   alglib_impl::_mincgstate_init_copy(p_struct, const_cast < alglib_impl::mincgstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_mincgstate_init_copy(p_struct, const_cast < alglib_impl::mincgstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -7922,7 +7922,7 @@ _mincgstate_owner &_mincgstate_owner::operator=(const _mincgstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: mincgstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_mincgstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::mincgstate));
-   alglib_impl::_mincgstate_init_copy(p_struct, const_cast < alglib_impl::mincgstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_mincgstate_init_copy(p_struct, const_cast < alglib_impl::mincgstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -8001,7 +8001,7 @@ _mincgreport_owner::_mincgreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::mincgreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::mincgreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::mincgreport));
-   alglib_impl::_mincgreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_mincgreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -8028,7 +8028,7 @@ _mincgreport_owner::_mincgreport_owner(const _mincgreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: mincgreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::mincgreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::mincgreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::mincgreport));
-   alglib_impl::_mincgreport_init_copy(p_struct, const_cast < alglib_impl::mincgreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_mincgreport_init_copy(p_struct, const_cast < alglib_impl::mincgreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -8052,7 +8052,7 @@ _mincgreport_owner &_mincgreport_owner::operator=(const _mincgreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: mincgreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_mincgreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::mincgreport));
-   alglib_impl::_mincgreport_init_copy(p_struct, const_cast < alglib_impl::mincgreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_mincgreport_init_copy(p_struct, const_cast < alglib_impl::mincgreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -8698,7 +8698,7 @@ bool mincgiteration(const mincgstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::mincgiteration(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::mincgiteration(const_cast < alglib_impl::mincgstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -8730,7 +8730,7 @@ void mincgoptimize(mincgstate &state, void (*func)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -8762,7 +8762,7 @@ void mincgoptimize(mincgstate &state, void (*grad)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'mincgoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -9408,7 +9408,7 @@ _minlpstate_owner::_minlpstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlpstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlpstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlpstate));
-   alglib_impl::_minlpstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlpstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -9435,7 +9435,7 @@ _minlpstate_owner::_minlpstate_owner(const _minlpstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlpstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlpstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlpstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlpstate));
-   alglib_impl::_minlpstate_init_copy(p_struct, const_cast < alglib_impl::minlpstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlpstate_init_copy(p_struct, const_cast < alglib_impl::minlpstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -9459,7 +9459,7 @@ _minlpstate_owner &_minlpstate_owner::operator=(const _minlpstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlpstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlpstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlpstate));
-   alglib_impl::_minlpstate_init_copy(p_struct, const_cast < alglib_impl::minlpstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlpstate_init_copy(p_struct, const_cast < alglib_impl::minlpstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -9560,7 +9560,7 @@ _minlpreport_owner::_minlpreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minlpreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlpreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlpreport));
-   alglib_impl::_minlpreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minlpreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -9587,7 +9587,7 @@ _minlpreport_owner::_minlpreport_owner(const _minlpreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlpreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minlpreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minlpreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minlpreport));
-   alglib_impl::_minlpreport_init_copy(p_struct, const_cast < alglib_impl::minlpreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlpreport_init_copy(p_struct, const_cast < alglib_impl::minlpreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -9611,7 +9611,7 @@ _minlpreport_owner &_minlpreport_owner::operator=(const _minlpreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minlpreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minlpreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minlpreport));
-   alglib_impl::_minlpreport_init_copy(p_struct, const_cast < alglib_impl::minlpreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minlpreport_init_copy(p_struct, const_cast < alglib_impl::minlpreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -10600,7 +10600,7 @@ _minnlcstate_owner::_minnlcstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minnlcstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnlcstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcstate));
-   alglib_impl::_minnlcstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minnlcstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10627,7 +10627,7 @@ _minnlcstate_owner::_minnlcstate_owner(const _minnlcstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnlcstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minnlcstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnlcstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcstate));
-   alglib_impl::_minnlcstate_init_copy(p_struct, const_cast < alglib_impl::minnlcstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnlcstate_init_copy(p_struct, const_cast < alglib_impl::minnlcstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10651,7 +10651,7 @@ _minnlcstate_owner &_minnlcstate_owner::operator=(const _minnlcstate_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnlcstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minnlcstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcstate));
-   alglib_impl::_minnlcstate_init_copy(p_struct, const_cast < alglib_impl::minnlcstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnlcstate_init_copy(p_struct, const_cast < alglib_impl::minnlcstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -10756,7 +10756,7 @@ _minnlcreport_owner::_minnlcreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minnlcreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnlcreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcreport));
-   alglib_impl::_minnlcreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minnlcreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10783,7 +10783,7 @@ _minnlcreport_owner::_minnlcreport_owner(const _minnlcreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnlcreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minnlcreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnlcreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcreport));
-   alglib_impl::_minnlcreport_init_copy(p_struct, const_cast < alglib_impl::minnlcreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnlcreport_init_copy(p_struct, const_cast < alglib_impl::minnlcreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -10807,7 +10807,7 @@ _minnlcreport_owner &_minnlcreport_owner::operator=(const _minnlcreport_owner &r
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnlcreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minnlcreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minnlcreport));
-   alglib_impl::_minnlcreport_init_copy(p_struct, const_cast < alglib_impl::minnlcreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnlcreport_init_copy(p_struct, const_cast < alglib_impl::minnlcreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -12287,7 +12287,7 @@ bool minnlciteration(const minnlcstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minnlciteration(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minnlciteration(const_cast < alglib_impl::minnlcstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -12319,7 +12319,7 @@ void minnlcoptimize(minnlcstate &state, void (*fvec)(const real_1d_array &x, rea
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -12351,7 +12351,7 @@ void minnlcoptimize(minnlcstate &state, void (*jac)(const real_1d_array &x, real
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnlcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -13022,7 +13022,7 @@ _minnsstate_owner::_minnsstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minnsstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnsstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnsstate));
-   alglib_impl::_minnsstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minnsstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -13049,7 +13049,7 @@ _minnsstate_owner::_minnsstate_owner(const _minnsstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnsstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minnsstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnsstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnsstate));
-   alglib_impl::_minnsstate_init_copy(p_struct, const_cast < alglib_impl::minnsstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnsstate_init_copy(p_struct, const_cast < alglib_impl::minnsstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -13073,7 +13073,7 @@ _minnsstate_owner &_minnsstate_owner::operator=(const _minnsstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnsstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minnsstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minnsstate));
-   alglib_impl::_minnsstate_init_copy(p_struct, const_cast < alglib_impl::minnsstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnsstate_init_copy(p_struct, const_cast < alglib_impl::minnsstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -13155,7 +13155,7 @@ _minnsreport_owner::_minnsreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minnsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnsreport));
-   alglib_impl::_minnsreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minnsreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -13182,7 +13182,7 @@ _minnsreport_owner::_minnsreport_owner(const _minnsreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnsreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minnsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minnsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minnsreport));
-   alglib_impl::_minnsreport_init_copy(p_struct, const_cast < alglib_impl::minnsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnsreport_init_copy(p_struct, const_cast < alglib_impl::minnsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -13206,7 +13206,7 @@ _minnsreport_owner &_minnsreport_owner::operator=(const _minnsreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minnsreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minnsreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minnsreport));
-   alglib_impl::_minnsreport_init_copy(p_struct, const_cast < alglib_impl::minnsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minnsreport_init_copy(p_struct, const_cast < alglib_impl::minnsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -14131,7 +14131,7 @@ bool minnsiteration(const minnsstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minnsiteration(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minnsiteration(const_cast < alglib_impl::minnsstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -14163,7 +14163,7 @@ void minnsoptimize(minnsstate &state, void (*fvec)(const real_1d_array &x, real_
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -14195,7 +14195,7 @@ void minnsoptimize(minnsstate &state, void (*jac)(const real_1d_array &x, real_1
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minnsoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -14329,7 +14329,7 @@ _minasastate_owner::_minasastate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minasastate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minasastate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minasastate));
-   alglib_impl::_minasastate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minasastate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14356,7 +14356,7 @@ _minasastate_owner::_minasastate_owner(const _minasastate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minasastate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minasastate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minasastate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minasastate));
-   alglib_impl::_minasastate_init_copy(p_struct, const_cast < alglib_impl::minasastate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minasastate_init_copy(p_struct, const_cast < alglib_impl::minasastate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14380,7 +14380,7 @@ _minasastate_owner &_minasastate_owner::operator=(const _minasastate_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minasastate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minasastate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minasastate));
-   alglib_impl::_minasastate_init_copy(p_struct, const_cast < alglib_impl::minasastate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minasastate_init_copy(p_struct, const_cast < alglib_impl::minasastate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -14438,7 +14438,7 @@ _minasareport_owner::_minasareport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minasareport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minasareport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minasareport));
-   alglib_impl::_minasareport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minasareport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14465,7 +14465,7 @@ _minasareport_owner::_minasareport_owner(const _minasareport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minasareport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minasareport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minasareport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minasareport));
-   alglib_impl::_minasareport_init_copy(p_struct, const_cast < alglib_impl::minasareport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minasareport_init_copy(p_struct, const_cast < alglib_impl::minasareport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14489,7 +14489,7 @@ _minasareport_owner &_minasareport_owner::operator=(const _minasareport_owner &r
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minasareport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minasareport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minasareport));
-   alglib_impl::_minasareport_init_copy(p_struct, const_cast < alglib_impl::minasareport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minasareport_init_copy(p_struct, const_cast < alglib_impl::minasareport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -14791,7 +14791,7 @@ bool minasaiteration(const minasastate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minasaiteration(const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minasaiteration(const_cast < alglib_impl::minasastate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -14823,7 +14823,7 @@ void minasaoptimize(minasastate &state, void (*grad)(const real_1d_array &x, dou
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minasaoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minasaoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -14929,7 +14929,7 @@ _minbcstate_owner::_minbcstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minbcstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbcstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbcstate));
-   alglib_impl::_minbcstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_minbcstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14956,7 +14956,7 @@ _minbcstate_owner::_minbcstate_owner(const _minbcstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbcstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minbcstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbcstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbcstate));
-   alglib_impl::_minbcstate_init_copy(p_struct, const_cast < alglib_impl::minbcstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbcstate_init_copy(p_struct, const_cast < alglib_impl::minbcstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -14980,7 +14980,7 @@ _minbcstate_owner &_minbcstate_owner::operator=(const _minbcstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbcstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minbcstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minbcstate));
-   alglib_impl::_minbcstate_init_copy(p_struct, const_cast < alglib_impl::minbcstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbcstate_init_copy(p_struct, const_cast < alglib_impl::minbcstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -15058,7 +15058,7 @@ _minbcreport_owner::_minbcreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::minbcreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbcreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbcreport));
-   alglib_impl::_minbcreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_minbcreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -15085,7 +15085,7 @@ _minbcreport_owner::_minbcreport_owner(const _minbcreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbcreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::minbcreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::minbcreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::minbcreport));
-   alglib_impl::_minbcreport_init_copy(p_struct, const_cast < alglib_impl::minbcreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbcreport_init_copy(p_struct, const_cast < alglib_impl::minbcreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -15109,7 +15109,7 @@ _minbcreport_owner &_minbcreport_owner::operator=(const _minbcreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: minbcreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_minbcreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::minbcreport));
-   alglib_impl::_minbcreport_init_copy(p_struct, const_cast < alglib_impl::minbcreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_minbcreport_init_copy(p_struct, const_cast < alglib_impl::minbcreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -15755,7 +15755,7 @@ bool minbciteration(const minbcstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::minbciteration(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::minbciteration(const_cast < alglib_impl::minbcstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -15787,7 +15787,7 @@ void minbcoptimize(minbcstate &state, void (*func)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -15819,7 +15819,7 @@ void minbcoptimize(minbcstate &state, void (*grad)(const real_1d_array &x, doubl
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'minbcoptimize' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -16456,7 +16456,7 @@ _lptestproblem_owner::_lptestproblem_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::lptestproblem *) alglib_impl::ae_malloc(sizeof(alglib_impl::lptestproblem), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lptestproblem));
-   alglib_impl::_lptestproblem_init(p_struct, &_state, ae_false);
+   alglib_impl::_lptestproblem_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -16483,7 +16483,7 @@ _lptestproblem_owner::_lptestproblem_owner(const _lptestproblem_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lptestproblem copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::lptestproblem *) alglib_impl::ae_malloc(sizeof(alglib_impl::lptestproblem), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lptestproblem));
-   alglib_impl::_lptestproblem_init_copy(p_struct, const_cast < alglib_impl::lptestproblem * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lptestproblem_init_copy(p_struct, const_cast < alglib_impl::lptestproblem * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -16507,7 +16507,7 @@ _lptestproblem_owner &_lptestproblem_owner::operator=(const _lptestproblem_owner
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lptestproblem assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_lptestproblem_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::lptestproblem));
-   alglib_impl::_lptestproblem_init_copy(p_struct, const_cast < alglib_impl::lptestproblem * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lptestproblem_init_copy(p_struct, const_cast < alglib_impl::lptestproblem * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -16841,7 +16841,7 @@ static double optserv_ogminrating0 = 50.0;
 static double optserv_ogminrating1 = 50.0;
 static double optserv_feasibilityerror(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, RVector *tmp0, ae_state *_state);
 static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain, ae_int_t nslack, ae_int_t k, double *err, RVector *grad, RVector *tmp0, ae_state *_state);
-static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, ae_bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state);
+static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state);
 static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
 static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funcidx, ae_int_t stpidx, ae_int_t sortedcnt, ae_state *_state);
 
@@ -16851,7 +16851,7 @@ static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state);
 
 // === CQMODELS Package ===
 static ae_int_t cqmodels_newtonrefinementits = 3;
-static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state);
+static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state);
 static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tmp, ae_state *_state);
 
 // === LPQPSERV Package ===
@@ -16867,7 +16867,7 @@ static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_i
 static ae_int_t sactivesets_maxbasisage = 5;
 static double sactivesets_maxbasisdecay = 0.01;
 static double sactivesets_minnormseparation = 0.25;
-static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, ae_bool normalize, RVector *d, ae_state *_state);
+static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, bool normalize, RVector *d, ae_state *_state);
 static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RVector *h, ae_state *_state);
 
 // === QQPSOLVER Package ===
@@ -16876,10 +16876,10 @@ static double qqpsolver_regz = 1.0E-9;
 static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, RVector *d, double stp, RVector *tmp0, RVector *tmp1, ae_state *_state);
 static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g, ae_state *_state);
 static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d, RVector *g, double *d1, ae_int_t *d1est, double *d2, ae_int_t *d2est, RVector *tmp0, ae_state *_state);
-static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, ae_bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state);
-static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state);
-static ae_bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state);
-static ae_bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state);
+static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state);
+static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state);
+static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state);
+static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state);
 
 // === QPDENSEAULSOLVER Package ===
 static double qpdenseaulsolver_evictionlevel = -0.01;
@@ -16887,9 +16887,9 @@ static double qpdenseaulsolver_expansionratio = 0.20;
 static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *nulc, double rho, RMatrix *exa, RVector *exb, RVector *exbndl, RVector *exbndu, RMatrix *tmp2, ae_state *_state);
 static void qpdenseaulsolver_generateexinitialpoint(RVector *sclsftxc, ae_int_t nmain, ae_int_t nslack, RVector *exxc, ae_state *_state);
 static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector *sclsftb, ae_int_t nmain, RVector *sclsftbndl, BVector *sclsfthasbndl, RVector *sclsftbndu, BVector *sclsfthasbndu, RMatrix *sclsftcleic, ae_int_t sclsftnec, ae_int_t sclsftnic, RVector *exxc, RVector *nulcest, qpdenseaulbuffers *buffers, ae_state *_state);
-static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, ae_bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, ae_bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state);
-static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae_bool usecleic, RMatrix *tmp2, ae_state *_state);
-static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, ae_bool *allowwseviction, ae_state *_state);
+static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state);
+static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, bool usecleic, RMatrix *tmp2, ae_state *_state);
+static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, bool *allowwseviction, ae_state *_state);
 
 // === MINBLEIC Package ===
 static double minbleic_gtol = 0.4;
@@ -16936,11 +16936,11 @@ static void vipmsolver_multiplygeatx(vipmstate *state, double alpha, RVector *x,
 static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx, ae_state *_state);
 static void vipmsolver_vipmmultiply(vipmstate *state, RVector *x, RVector *y, RVector *hx, RVector *ax, RVector *aty, ae_state *_state);
 static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_state);
-static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state);
+static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state);
 static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy, ae_state *_state);
-static ae_bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state);
+static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state);
 static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, vipmvars *sol, ae_state *_state);
-static ae_bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, ae_bool isdampepslarge, ae_state *_state);
+static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, bool isdampepslarge, ae_state *_state);
 static void vipmsolver_vipmcomputesteplength(vipmstate *state, vipmvars *v0, vipmvars *vs, double stepdecay, double *alphap, double *alphad, ae_state *_state);
 static void vipmsolver_vipmperformstep(vipmstate *state, double alphap, double alphad, ae_state *_state);
 static void vipmsolver_computeerrors(vipmstate *state, double *errp2, double *errd2, double *errpinf, double *errdinf, double *egap, ae_state *_state);
@@ -16965,14 +16965,14 @@ static double minlm_lambdadown = 0.33;
 static double minlm_suspiciousnu = 16;
 static ae_int_t minlm_smallmodelage = 3;
 static ae_int_t minlm_additers = 5;
-static void minlm_lmprepare(ae_int_t n, ae_int_t m, ae_bool havegrad, minlmstate *state, ae_state *_state);
+static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *state, ae_state *_state);
 static void minlm_clearrequestfields(minlmstate *state, ae_state *_state);
-static ae_bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state);
+static bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state);
 static void minlm_decreaselambda(double *lambdav, double *nu, ae_state *_state);
 static ae_int_t minlm_checkdecrease(RMatrix *quadraticmodel, RVector *gbase, double fbase, ae_int_t n, RVector *deltax, double fnew, double *lambdav, double *nu, ae_state *_state);
-static ae_bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, ae_bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state);
+static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state);
 static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadraticmodel, RVector *gbase, double fbase, RVector *xbase, RVector *fibase, ae_int_t modelage, ae_state *_state);
-static ae_bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, ae_bool *deltaxready, RVector *deltaf, ae_bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state);
+static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, bool *deltaxready, RVector *deltaf, bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state);
 
 // === MINCG Package ===
 static ae_int_t mincg_rscountdownlen = 10;
@@ -17000,14 +17000,14 @@ static double nlcsqp_sqpsmallscale = 0.2;
 static ae_int_t nlcsqp_penaltymemlen = 5;
 static void nlcsqp_initqpsubsolver(minsqpstate *sstate, minsqpsubsolver *subsolver, ae_state *_state);
 static void nlcsqp_qpsubsolversetalgoipm(minsqpsubsolver *subsolver, ae_state *_state);
-static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
+static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
 static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h, ae_int_t nq, RVector *b, ae_int_t n, RVector *bndl, RVector *bndu, sparsematrix *a, ae_int_t m, RVector *al, RVector *au, double trustrad, ae_int_t *terminationtype, RVector *d, RVector *lagmult, ae_state *_state);
-static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state);
+static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state);
 static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RMatrix *abslagmemory, ae_int_t memlen, ae_state *_state);
-static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, ae_bool userterminationneeded, ae_state *_state);
-static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_bool *increasebigc, ae_int_t *status, ae_state *_state);
+static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state);
+static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, bool *increasebigc, ae_int_t *status, ae_state *_state);
 static void nlcsqp_sqpsendx(minsqpstate *state, RVector *xs, ae_state *_state);
-static ae_bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
+static bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
 static void nlcsqp_sqpcopystate(minsqpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
 static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minsqptmplagrangian *tmp, double *f, RVector *g, ae_state *_state);
 static double nlcsqp_meritfunction(minsqpstate *state, RVector *x, RVector *fi, RVector *lagmult, RVector *penalties, minsqptmpmerit *tmp, ae_state *_state);
@@ -17041,15 +17041,15 @@ static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state,
 static void reviseddualsimplex_subproblemhandlexnupdate(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
 static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t q, double alpharpiv, double *thetad, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state);
+static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_btranstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t r, dssvector *rhor, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_pivotrowstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, dssvector *alphar, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *rhor, ae_int_t q, RVector *alphaq, RVector *alphaqim, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsubproblem *s, dssvector *alphar, double delta, ae_int_t p, ae_int_t *q, double *alpharpiv, double *thetad, ZVector *possibleflips, ae_int_t *possibleflipscnt, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t p, ae_int_t q, ae_int_t r, double delta, double alphapiv, double thetap, double thetad, RVector *alphaq, RVector *alphaqim, dssvector *alphar, RVector *tau, ZVector *possiblealpharflips, ae_int_t possiblealpharflipscnt, dualsimplexsettings *settings, ae_state *_state);
-static ae_bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state);
+static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state);
 static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t i, ae_int_t k, dualsimplexsettings *settings, ae_state *_state);
-static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, ae_bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
+static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
 static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state);
 static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimplexsettings *settings, ae_state *_state);
@@ -17057,25 +17057,25 @@ static void reviseddualsimplex_solveboxonly(dualsimplexstate *state, ae_state *_
 static void reviseddualsimplex_setzeroxystats(dualsimplexstate *state, ae_state *_state);
 static void reviseddualsimplex_basisinit(ae_int_t ns, ae_int_t m, dualsimplexbasis *s, ae_state *_state);
 static void reviseddualsimplex_basisclearstats(dualsimplexbasis *s, ae_state *_state);
-static ae_bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
 static double reviseddualsimplex_basisminimumdiagonalelement(dualsimplexbasis *s, ae_state *_state);
 static void reviseddualsimplex_basisexportto(dualsimplexbasis *s0, dualsimplexbasis *s1, ae_state *_state);
-static ae_bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
+static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_basisfreshtrf(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
 static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix *at, ae_int_t p, ae_int_t q, RVector *alphaq, RVector *alphaqim, ae_int_t r, RVector *tau, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tmpx, ae_state *_state);
-static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, ae_bool needintermediate, RVector *tx, ae_state *_state);
+static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, bool needintermediate, RVector *tx, ae_state *_state);
 static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tx, ae_state *_state);
 static void reviseddualsimplex_computeanxn(dualsimplexstate *state, dualsimplexsubproblem *subproblem, RVector *x, RVector *y, ae_state *_state);
 static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector *y, RVector *r, ae_state *_state);
-static ae_bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
-static ae_bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
-static ae_bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
+static bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state);
 static void reviseddualsimplex_downgradestate(dualsimplexsubproblem *subproblem, ae_int_t s, ae_state *_state);
 static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, dualsimplexsubproblem *s, ae_state *_state);
-static ae_bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
+static bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state);
 static void reviseddualsimplex_pivottobwd(ZVector *p, ae_int_t m, ZVector *bwd, ae_state *_state);
 static void reviseddualsimplex_inversecyclicpermutation(ZVector *bwd, ae_int_t m, ae_int_t d, ZVector *tmpi, ae_state *_state);
 static void reviseddualsimplex_offloadbasiccomponents(dualsimplexsubproblem *s, dualsimplexbasis *basis, dualsimplexsettings *settings, ae_state *_state);
@@ -17117,14 +17117,14 @@ static double nlcslp_slpsmallscale = 0.2;
 static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolver, ae_int_t hessiantype, ae_state *_state);
 static void nlcslp_lpsubproblemrestart(minslpstate *sstate, minslpsubsolver *subsolver, ae_state *_state);
 static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state);
-static ae_bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state);
+static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state);
 static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, minslpsubsolver *subsolver, RVector *d, ae_state *_state);
-static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, ae_bool usecorrection, ae_state *_state);
-static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, ae_bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state);
+static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection, ae_state *_state);
+static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state);
 static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, RVector *meritlagmult, ae_state *_state);
-static ae_bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, ae_bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state);
+static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state);
 static void nlcslp_slpsendx(minslpstate *state, RVector *xs, ae_state *_state);
-static ae_bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
+static bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state);
 static void nlcslp_slpcopystate(minslpstate *state, RVector *x0, RVector *fi0, RMatrix *j0, RVector *x1, RVector *fi1, RMatrix *j1, ae_state *_state);
 static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad, RVector *fi, RMatrix *j, RVector *lagmult, minslptmplagrangian *tmp, double *f, RVector *g, double *lcerr, ae_int_t *lcidx, double *nlcerr, ae_int_t *nlcidx, ae_state *_state);
 static double nlcslp_meritfunction(minslpstate *state, RVector *x, RVector *fi, RVector *lagmult, double mu, minslptmpmerit *tmp, ae_state *_state);
@@ -17145,13 +17145,13 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
 static void minnlc_penaltybc(RVector *x, RVector *bndl, BVector *hasbndl, RVector *bndu, BVector *hasbndu, RVector *nubc, ae_int_t n, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
 static void minnlc_penaltylc(RVector *x, RMatrix *cleic, RVector *nulc, ae_int_t n, ae_int_t nec, ae_int_t nic, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
 static void minnlc_penaltynlc(RVector *fi, RMatrix *j, RVector *nunlc, ae_int_t n, ae_int_t ng, ae_int_t nh, double rho, double stabilizingpoint, double *f, RVector *g, ae_state *_state);
-static ae_bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state);
+static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state);
 static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl, RVector *scaledbndu, RVector *xu, ae_state *_state);
 
 // === MINNS Package ===
 static void minns_clearrequestfields(minnsstate *state, ae_state *_state);
 static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, minnsstate *state, ae_state *_state);
-static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state);
+static bool minns_agsiteration(minnsstate *state, ae_state *_state);
 static void minns_unscalepointbc(minnsstate *state, RVector *x, ae_state *_state);
 static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, ae_int_t *dbgncholesky, minnsqp *state, ae_state *_state);
 static void minns_qpcalculategradfunc(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae_int_t nvars, RVector *coeffs, RVector *g, double *f, RVector *tmp, ae_state *_state);
@@ -17170,7 +17170,7 @@ static double mincomp_asarho = 0.5;
 static double mincomp_asaboundedantigradnorm(minasastate *state, ae_state *_state);
 static double mincomp_asaginorm(minasastate *state, ae_state *_state);
 static double mincomp_asad1norm(minasastate *state, ae_state *_state);
-static ae_bool mincomp_asauisempty(minasastate *state, ae_state *_state);
+static bool mincomp_asauisempty(minasastate *state, ae_state *_state);
 static void mincomp_clearrequestfields(minasastate *state, ae_state *_state);
 
 // === MINBC Package ===
@@ -17193,16 +17193,16 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
 //      Copyright 19.11.2018 by Bochkanov Sergey
 void optguardinitinternal(optguardreport *rep, ae_int_t n, ae_int_t k, ae_state *_state) {
 
-   rep->nonc0suspected = ae_false;
-   rep->nonc0test0positive = ae_false;
+   rep->nonc0suspected = false;
+   rep->nonc0test0positive = false;
    rep->nonc0lipschitzc = (double)(0);
    rep->nonc0fidx = -1;
-   rep->nonc1suspected = ae_false;
-   rep->nonc1test0positive = ae_false;
-   rep->nonc1test1positive = ae_false;
+   rep->nonc1suspected = false;
+   rep->nonc1test0positive = false;
+   rep->nonc1test1positive = false;
    rep->nonc1lipschitzc = (double)(0);
    rep->nonc1fidx = -1;
-   rep->badgradsuspected = ae_false;
+   rep->badgradsuspected = false;
    rep->badgradfidx = -1;
    rep->badgradvidx = -1;
 }
@@ -17213,7 +17213,7 @@ void optguardinitinternal(optguardreport *rep, ae_int_t n, ae_int_t k, ae_state 
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-void optguardexportreport(optguardreport *srcrep, ae_int_t n, ae_int_t k, ae_bool badgradhasxj, optguardreport *dstrep, ae_state *_state) {
+void optguardexportreport(optguardreport *srcrep, ae_int_t n, ae_int_t k, bool badgradhasxj, optguardreport *dstrep, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
@@ -17362,14 +17362,14 @@ void smoothnessmonitorexportc1test1report(optguardnonc1test1report *srcrep, RVec
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-ae_bool optguardallclear(optguardreport *rep, ae_state *_state) {
-   ae_bool result;
+bool optguardallclear(optguardreport *rep, ae_state *_state) {
+   bool result;
 
    result = !((rep->badgradsuspected || rep->nonc0suspected) || rep->nonc1suspected);
    return result;
 }
 
-void _optguardreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _optguardreport_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardreport *p = (optguardreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->badgradxbase, 0, DT_REAL, _state, make_automatic);
@@ -17377,7 +17377,7 @@ void _optguardreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_matrix_init(&p->badgradnum, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _optguardreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardreport *dst = (optguardreport *) _dst;
    optguardreport *src = (optguardreport *) _src;
    dst->nonc0suspected = src->nonc0suspected;
@@ -17413,7 +17413,7 @@ void _optguardreport_destroy(void *_p) {
    ae_matrix_destroy(&p->badgradnum);
 }
 
-void _optguardnonc0report_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc0report *p = (optguardnonc0report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -17422,7 +17422,7 @@ void _optguardnonc0report_init(void *_p, ae_state *_state, ae_bool make_automati
    ae_vector_init(&p->f, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc0report_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc0report *dst = (optguardnonc0report *) _dst;
    optguardnonc0report *src = (optguardnonc0report *) _src;
    dst->positive = src->positive;
@@ -17455,7 +17455,7 @@ void _optguardnonc0report_destroy(void *_p) {
    ae_vector_destroy(&p->f);
 }
 
-void _optguardnonc1test0report_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc1test0report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test0report *p = (optguardnonc1test0report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -17464,7 +17464,7 @@ void _optguardnonc1test0report_init(void *_p, ae_state *_state, ae_bool make_aut
    ae_vector_init(&p->f, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc1test0report_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc1test0report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc1test0report *dst = (optguardnonc1test0report *) _dst;
    optguardnonc1test0report *src = (optguardnonc1test0report *) _src;
    dst->positive = src->positive;
@@ -17497,7 +17497,7 @@ void _optguardnonc1test0report_destroy(void *_p) {
    ae_vector_destroy(&p->f);
 }
 
-void _optguardnonc1test1report_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc1test1report_init(void *_p, ae_state *_state, bool make_automatic) {
    optguardnonc1test1report *p = (optguardnonc1test1report *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -17506,7 +17506,7 @@ void _optguardnonc1test1report_init(void *_p, ae_state *_state, ae_bool make_aut
    ae_vector_init(&p->g, 0, DT_REAL, _state, make_automatic);
 }
 
-void _optguardnonc1test1report_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _optguardnonc1test1report_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    optguardnonc1test1report *dst = (optguardnonc1test1report *) _dst;
    optguardnonc1test1report *src = (optguardnonc1test1report *) _src;
    dst->positive = src->positive;
@@ -17551,7 +17551,7 @@ void _optguardnonc1test1report_destroy(void *_p) {
 //
 //   -- ALGLIB --
 //      Copyright 7.11.2018 by Bochkanov Sergey
-void checkbcviolation(BVector *hasbndl, RVector *bndl, BVector *hasbndu, RVector *bndu, RVector *x, ae_int_t n, RVector *s, ae_bool nonunits, double *bcerr, ae_int_t *bcidx, ae_state *_state) {
+void checkbcviolation(BVector *hasbndl, RVector *bndl, BVector *hasbndu, RVector *bndu, RVector *x, ae_int_t n, RVector *s, bool nonunits, double *bcerr, ae_int_t *bcidx, ae_state *_state) {
    ae_int_t i;
    double vs;
    double ve;
@@ -17771,11 +17771,11 @@ void trimfunction(double *f, RVector *g, ae_int_t n, double threshold, ae_state 
 //
 //   -- ALGLIB --
 //      Copyright 10.01.2012 by Bochkanov Sergey
-ae_bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVector *bu, BVector *havebu, ae_int_t nmain, ae_int_t nslack, ae_state *_state) {
+bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVector *bu, BVector *havebu, ae_int_t nmain, ae_int_t nslack, ae_state *_state) {
    ae_int_t i;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
    for (i = 0; i <= nmain - 1; i++) {
       if ((havebl->ptr.p_bool[i] && havebu->ptr.p_bool[i]) && ae_fp_greater(bl->ptr.p_double[i], bu->ptr.p_double[i])) {
          return result;
@@ -17792,7 +17792,7 @@ ae_bool enforceboundaryconstraints(RVector *x, RVector *bl, BVector *havebl, RVe
          x->ptr.p_double[nmain + i] = (double)(0);
       }
    }
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -18003,7 +18003,7 @@ void calculatestepbound(RVector *x, RVector *d, double alpha, RVector *bndl, BVe
 //      Copyright 10.01.2012 by Bochkanov Sergey
 ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, ae_int_t variabletofreeze, double valuetofreeze, double steptaken, double maxsteplen, ae_state *_state) {
    ae_int_t i;
-   ae_bool wasactivated;
+   bool wasactivated;
    ae_int_t result;
 
    ae_assert(variabletofreeze < 0 || ae_fp_less_eq(steptaken, maxsteplen), "Assertion failed", _state);
@@ -18086,7 +18086,7 @@ ae_int_t postprocessboundedstep(RVector *x, RVector *xprev, RVector *bndl, BVect
 void filterdirection(RVector *d, RVector *x, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, RVector *s, ae_int_t nmain, ae_int_t nslack, double droptol, ae_state *_state) {
    ae_int_t i;
    double scalednorm;
-   ae_bool isactive;
+   bool isactive;
 
    scalednorm = 0.0;
    for (i = 0; i <= nmain + nslack - 1; i++) {
@@ -18142,18 +18142,18 @@ void filterdirection(RVector *d, RVector *x, RVector *bndl, BVector *havebndl, R
 //      Copyright 10.01.2012 by Bochkanov Sergey
 ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, ae_state *_state) {
    ae_int_t i;
-   ae_bool statuschanged;
+   bool statuschanged;
    ae_int_t result;
 
    result = 0;
    for (i = 0; i <= nmain - 1; i++) {
       if (ae_fp_neq(x->ptr.p_double[i], xprev->ptr.p_double[i])) {
-         statuschanged = ae_false;
+         statuschanged = false;
          if (havebndl->ptr.p_bool[i] && (ae_fp_eq(x->ptr.p_double[i], bndl->ptr.p_double[i]) || ae_fp_eq(xprev->ptr.p_double[i], bndl->ptr.p_double[i]))) {
-            statuschanged = ae_true;
+            statuschanged = true;
          }
          if (havebndu->ptr.p_bool[i] && (ae_fp_eq(x->ptr.p_double[i], bndu->ptr.p_double[i]) || ae_fp_eq(xprev->ptr.p_double[i], bndu->ptr.p_double[i]))) {
-            statuschanged = ae_true;
+            statuschanged = true;
          }
          if (statuschanged) {
             result = result + 1;
@@ -18204,7 +18204,7 @@ ae_int_t numberofchangedconstraints(RVector *x, RVector *xprev, RVector *bndl, B
 //
 //   -- ALGLIB --
 //      Copyright 20.01.2012 by Bochkanov Sergey
-ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, RMatrix *ce, ae_int_t k, double epsi, ae_int_t *qpits, ae_int_t *gpaits, ae_state *_state) {
+bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector *bndu, BVector *havebndu, ae_int_t nmain, ae_int_t nslack, RMatrix *ce, ae_int_t k, double epsi, ae_int_t *qpits, ae_int_t *gpaits, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _ce;
    ae_int_t i;
@@ -18237,9 +18237,9 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
    ae_int_t vartofreeze;
    double valtofreeze;
    double maxsteplen;
-   ae_bool werechangesinconstraints;
-   ae_bool stage1isover;
-   ae_bool converged;
+   bool werechangesinconstraints;
+   bool stage1isover;
+   bool converged;
    ae_vector activeconstraints;
    ae_vector tmpk;
    ae_vector colnorms;
@@ -18258,7 +18258,7 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
    double infeasibilityincreasetolerance;
    ae_matrix permce;
    ae_matrix q;
-   ae_bool result;
+   bool result;
 
    ae_frame_make(_state, &_frame_block);
    memset(&_ce, 0, sizeof(_ce));
@@ -18278,26 +18278,26 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
    memset(&buf, 0, sizeof(buf));
    memset(&permce, 0, sizeof(permce));
    memset(&q, 0, sizeof(q));
-   ae_matrix_init_copy(&_ce, ce, _state, ae_true);
+   ae_matrix_init_copy(&_ce, ce, _state, true);
    ce = &_ce;
    *qpits = 0;
    *gpaits = 0;
-   ae_vector_init(&permx, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&xn, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&xa, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&newtonstep, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&g, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&pg, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&tau, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&s, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&activeconstraints, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&tmpk, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&colnorms, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&p1, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&p2, 0, DT_INT, _state, ae_true);
-   _apbuffers_init(&buf, _state, ae_true);
-   ae_matrix_init(&permce, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&q, 0, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&permx, 0, DT_REAL, _state, true);
+   ae_vector_init(&xn, 0, DT_REAL, _state, true);
+   ae_vector_init(&xa, 0, DT_REAL, _state, true);
+   ae_vector_init(&newtonstep, 0, DT_REAL, _state, true);
+   ae_vector_init(&g, 0, DT_REAL, _state, true);
+   ae_vector_init(&pg, 0, DT_REAL, _state, true);
+   ae_vector_init(&tau, 0, DT_REAL, _state, true);
+   ae_vector_init(&s, 0, DT_REAL, _state, true);
+   ae_vector_init(&activeconstraints, 0, DT_REAL, _state, true);
+   ae_vector_init(&tmpk, 0, DT_REAL, _state, true);
+   ae_vector_init(&colnorms, 0, DT_REAL, _state, true);
+   ae_vector_init(&p1, 0, DT_INT, _state, true);
+   ae_vector_init(&p2, 0, DT_INT, _state, true);
+   _apbuffers_init(&buf, _state, true);
+   ae_matrix_init(&permce, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&q, 0, 0, DT_REAL, _state, true);
 
    maxitswithintolerance = 3;
    maxbadits = 3;
@@ -18308,14 +18308,14 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
 // Initial enforcement of the feasibility with respect to boundary constraints
 // NOTE: after this block we assume that boundary constraints are consistent.
    if (!enforceboundaryconstraints(x, bndl, havebndl, bndu, havebndu, nmain, nslack, _state)) {
-      result = ae_false;
+      result = false;
       ae_frame_leave(_state);
       return result;
    }
    if (k == 0) {
 
    // No linear constraints, we can exit right now
-      result = ae_true;
+      result = true;
       ae_frame_leave(_state);
       return result;
    }
@@ -18369,7 +18369,7 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
       infeasibilityincreasetolerance = ae_maxreal(rmaxabsv(nmain + nslack, x, _state), (double)(1), _state) * (1000 + nmain) * ae_machineepsilon;
 
    // Stage 0: check for exact convergence
-      converged = ae_true;
+      converged = true;
       feaserr = optserv_feasibilityerror(ce, x, nmain, nslack, k, &tmpk, _state);
       for (i = 0; i <= k - 1; i++) {
 
@@ -18596,8 +18596,8 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
                permce.ptr.pp_double[i][i] = permce.ptr.pp_double[i][i] + 10 * k * ae_machineepsilon * v;
             }
             rmatrixgemv(k, nfree, 1.0, &q, 0, 0, 0, &g, 0, 0.0, &tmpk, 0, _state);
-            rmatrixtrsv(k, &permce, 0, 0, ae_false, ae_false, 1, &tmpk, 0, _state);
-            rmatrixtrsv(k, &permce, 0, 0, ae_false, ae_false, 0, &tmpk, 0, _state);
+            rmatrixtrsv(k, &permce, 0, 0, false, false, 1, &tmpk, 0, _state);
+            rmatrixtrsv(k, &permce, 0, 0, false, false, 0, &tmpk, 0, _state);
             rmatrixgemv(nfree, k, -1.0, &q, 0, 0, 1, &tmpk, 0, 0.0, &newtonstep, 0, _state);
          } else {
 
@@ -18621,8 +18621,8 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
                permce.ptr.pp_double[i][i] = permce.ptr.pp_double[i][i] + vv;
             }
             ae_v_moveneg(&newtonstep.ptr.p_double[0], 1, &g.ptr.p_double[0], 1, ae_v_len(0, nfree - 1));
-            rmatrixtrsv(nfree, &permce, 0, 0, ae_true, ae_false, 1, &newtonstep, 0, _state);
-            rmatrixtrsv(nfree, &permce, 0, 0, ae_true, ae_false, 0, &newtonstep, 0, _state);
+            rmatrixtrsv(nfree, &permce, 0, 0, true, false, 1, &newtonstep, 0, _state);
+            rmatrixtrsv(nfree, &permce, 0, 0, true, false, 0, &newtonstep, 0, _state);
          }
 
       // Post-reordering of Newton step
@@ -18729,7 +18729,7 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
    // * XM = X+stp*(-PG) where stp=(grad(F(X)),PG)/(CE*PG,CE*PG).
    //   Here PG is a projected gradient, but in fact it can be arbitrary non-zero
    //   direction vector - formula for minimum of F along PG still will be correct.
-      werechangesinconstraints = ae_false;
+      werechangesinconstraints = false;
       for (gparuns = 1; gparuns <= k; gparuns++) {
 
       // calculate feasibility error and G
@@ -18769,7 +18769,7 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
       // Perform bounded step and post-process it
          calculatestepbound(x, &pg, -1.0, bndl, havebndl, bndu, havebndu, nmain, nslack, &vartofreeze, &valtofreeze, &maxsteplen, _state);
          if (vartofreeze >= 0 && ae_fp_eq(maxsteplen, (double)(0))) {
-            result = ae_false;
+            result = false;
             ae_frame_leave(_state);
             return result;
          }
@@ -18824,8 +18824,8 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
    // We just need a way to transfer control to the end of the function,
    // even a fake way which is never actually traversed.
       if (alwaysfalse(_state)) {
-         result = ae_false;
-         ae_assert(ae_false, "Assertion failed", _state);
+         result = false;
+         ae_assert(false, "Assertion failed", _state);
          break;
       }
    }
@@ -18854,11 +18854,11 @@ ae_bool findfeasiblepoint(RVector *x, RVector *bndl, BVector *havebndl, RVector 
 //
 //   -- ALGLIB --
 //      Copyright 29.05.2012 by Bochkanov Sergey
-ae_bool derivativecheck(double f0, double df0, double f1, double df1, double f, double df, double width, ae_state *_state) {
+bool derivativecheck(double f0, double df0, double f1, double df1, double f, double df, double width, ae_state *_state) {
    double s;
    double h;
    double dh;
-   ae_bool result;
+   bool result;
 
 // Rescale input data to [0,1]
    df = width * df;
@@ -18882,16 +18882,16 @@ ae_bool derivativecheck(double f0, double df0, double f1, double df1, double f, 
 // Check
    if (ae_fp_neq(s, (double)(0))) {
       if (ae_fp_greater(ae_fabs(h - f, _state) / s, 0.001) || ae_fp_greater(ae_fabs(dh - df, _state) / s, 0.001)) {
-         result = ae_false;
+         result = false;
          return result;
       }
    } else {
       if (ae_fp_neq(h - f, 0.0) || ae_fp_neq(dh - df, 0.0)) {
-         result = ae_false;
+         result = false;
          return result;
       }
    }
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -19127,7 +19127,7 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
    ae_int_t i;
    ae_int_t j;
    double v;
-   ae_bool b;
+   bool b;
 
 // Check inputs
    ae_assert(n > 0, "PrepareLowRankPreconditioner: N<=0", _state);
@@ -19197,9 +19197,9 @@ void preparelowrankpreconditioner(RVector *d, RVector *c, RMatrix *w, ae_int_t n
       }
    }
    rmatrixgemm(k, k, n, 1.0, &buf->bufw, 0, 0, 0, &buf->bufw, 0, 0, 1, 1.0, &buf->bufz, 0, 0, _state);
-   b = spdmatrixcholeskyrec(&buf->bufz, 0, k, ae_true, &buf->tmp, _state);
+   b = spdmatrixcholeskyrec(&buf->bufz, 0, k, true, &buf->tmp, _state);
    ae_assert(b, "PrepareLowRankPreconditioner: internal error (Cholesky failure)", _state);
-   rmatrixlefttrsm(k, n, &buf->bufz, 0, 0, ae_true, ae_false, 1, &buf->v, 0, 0, _state);
+   rmatrixlefttrsm(k, n, &buf->bufz, 0, 0, true, false, 1, &buf->v, 0, 0, _state);
    for (i = 0; i <= k - 1; i++) {
       for (j = 0; j <= n - 1; j++) {
          buf->v.ptr.pp_double[i][j] = buf->v.ptr.pp_double[i][j] * buf->d.ptr.p_double[j];
@@ -19246,14 +19246,14 @@ void applylowrankpreconditioner(RVector *s, precbuflowrank *buf, ae_state *_stat
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, ae_int_t k, ae_bool checksmoothness, ae_state *_state) {
+void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, ae_int_t k, bool checksmoothness, ae_state *_state) {
    ae_int_t i;
 
    monitor->n = n;
    monitor->k = k;
    monitor->checksmoothness = checksmoothness;
-   monitor->linesearchspoiled = ae_false;
-   monitor->linesearchstarted = ae_false;
+   monitor->linesearchspoiled = false;
+   monitor->linesearchstarted = false;
    monitor->enqueuedcnt = 0;
    monitor->sortedcnt = 0;
    rvectorsetlengthatleast(&monitor->s, n, _state);
@@ -19265,17 +19265,17 @@ void smoothnessmonitorinit(smoothnessmonitor *monitor, RVector *s, ae_int_t n, a
    optguardinitinternal(&monitor->rep, n, k, _state);
    monitor->nonc0strrating = 0.0;
    monitor->nonc0lngrating = -ae_maxrealnumber;
-   monitor->nonc0strrep.positive = ae_false;
-   monitor->nonc0lngrep.positive = ae_false;
+   monitor->nonc0strrep.positive = false;
+   monitor->nonc0lngrep.positive = false;
    monitor->nonc1test0strrating = 0.0;
    monitor->nonc1test0lngrating = -ae_maxrealnumber;
-   monitor->nonc1test0strrep.positive = ae_false;
-   monitor->nonc1test0lngrep.positive = ae_false;
+   monitor->nonc1test0strrep.positive = false;
+   monitor->nonc1test0lngrep.positive = false;
    monitor->nonc1test1strrating = 0.0;
    monitor->nonc1test1lngrating = -ae_maxrealnumber;
-   monitor->nonc1test1strrep.positive = ae_false;
-   monitor->nonc1test1lngrep.positive = ae_false;
-   monitor->badgradhasxj = ae_false;
+   monitor->nonc1test1strrep.positive = false;
+   monitor->nonc1test1lngrep.positive = false;
+   monitor->badgradhasxj = false;
    ae_vector_set_length(&monitor->rstateg0.ia, 4 + 1, _state);
    ae_vector_set_length(&monitor->rstateg0.ra, 3 + 1, _state);
    monitor->rstateg0.stage = -1;
@@ -19312,7 +19312,7 @@ void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RV
       }
    }
    if (!ae_isfinite(v, _state)) {
-      monitor->linesearchspoiled = ae_true;
+      monitor->linesearchspoiled = true;
       return;
    }
 // Finalize previous line search
@@ -19320,7 +19320,7 @@ void smoothnessmonitorstartlinesearch(smoothnessmonitor *monitor, RVector *x, RV
       smoothnessmonitorfinalizelinesearch(monitor, _state);
    }
 // Store initial point
-   monitor->linesearchstarted = ae_true;
+   monitor->linesearchstarted = true;
    monitor->enqueuedcnt = 1;
    rvectorgrowto(&monitor->enqueuedstp, monitor->enqueuedcnt, _state);
    rvectorgrowto(&monitor->enqueuedx, monitor->enqueuedcnt * n, _state);
@@ -19386,7 +19386,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
    double v;
    ae_int_t enqueuedcnt;
    ae_int_t sortedcnt;
-   ae_bool hasduplicates;
+   bool hasduplicates;
    ae_int_t funcidx;
    ae_int_t stpidx;
    double f0;
@@ -19426,7 +19426,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
       }
    }
    if (!ae_isfinite(v, _state)) {
-      monitor->linesearchspoiled = ae_true;
+      monitor->linesearchspoiled = true;
       return;
    }
 // Enqueue
@@ -19455,7 +19455,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
 
 // Update sorted representation: insert to the end, reorder
    sortedcnt = monitor->sortedcnt;
-   hasduplicates = ae_false;
+   hasduplicates = false;
    for (i = 0; i <= sortedcnt - 1; i++) {
       hasduplicates = hasduplicates || monitor->sortedstp.ptr.p_double[i] == stp;
    }
@@ -19516,12 +19516,12 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
             if (!(f1 < f0 + (noise0 + noise1) && f1 < f2)) {
                continue;
             }
-            optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.ptr.p_double[stpidx + 1] - monitor->sortedstp.ptr.p_double[stpidx + 0], monitor->sortedstp.ptr.p_double[stpidx + 2] - monitor->sortedstp.ptr.p_double[stpidx + 1], monitor->sortedstp.ptr.p_double[stpidx + 3] - monitor->sortedstp.ptr.p_double[stpidx + 2], ae_false, &rating, &lipschitz, _state);
+            optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.ptr.p_double[stpidx + 1] - monitor->sortedstp.ptr.p_double[stpidx + 0], monitor->sortedstp.ptr.p_double[stpidx + 2] - monitor->sortedstp.ptr.p_double[stpidx + 1], monitor->sortedstp.ptr.p_double[stpidx + 3] - monitor->sortedstp.ptr.p_double[stpidx + 2], false, &rating, &lipschitz, _state);
             if (rating > optserv_ogminrating0) {
 
             // Store to total report
-               monitor->rep.nonc0suspected = ae_true;
-               monitor->rep.nonc0test0positive = ae_true;
+               monitor->rep.nonc0suspected = true;
+               monitor->rep.nonc0test0positive = true;
                if (rating > monitor->nonc0currentrating) {
                   monitor->nonc0currentrating = rating;
                   monitor->rep.nonc0lipschitzc = lipschitz;
@@ -19530,7 +19530,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
             // Store to "strongest" report
                if (rating > monitor->nonc0strrating) {
                   monitor->nonc0strrating = rating;
-                  monitor->nonc0strrep.positive = ae_true;
+                  monitor->nonc0strrep.positive = true;
                   monitor->nonc0strrep.fidx = funcidx;
                   monitor->nonc0strrep.n = n;
                   monitor->nonc0strrep.cnt = sortedcnt;
@@ -19560,7 +19560,7 @@ void smoothnessmonitorenqueuepoint(smoothnessmonitor *monitor, RVector *d, doubl
                lengthrating = sortedcnt + ae_log(nrm, _state) / ae_log((double)(100), _state);
                if (lengthrating > monitor->nonc0lngrating) {
                   monitor->nonc0lngrating = lengthrating;
-                  monitor->nonc0lngrep.positive = ae_true;
+                  monitor->nonc0lngrep.positive = true;
                   monitor->nonc0lngrep.fidx = funcidx;
                   monitor->nonc0lngrep.n = n;
                   monitor->nonc0lngrep.cnt = sortedcnt;
@@ -19718,7 +19718,7 @@ void smoothnessmonitorstartprobing(smoothnessmonitor *monitor, double stpmax, ae
 //
 //   -- ALGLIB --
 //      Copyright 10.10.2019 by Bochkanov Sergey
-ae_bool smoothnessmonitorprobe(smoothnessmonitor *monitor, ae_state *_state) {
+bool smoothnessmonitorprobe(smoothnessmonitor *monitor, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t idx;
@@ -19726,7 +19726,7 @@ ae_bool smoothnessmonitorprobe(smoothnessmonitor *monitor, ae_state *_state) {
    double v;
    double v0;
    double v1;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -19836,12 +19836,12 @@ lbl_0:
    i = i + 1;
    goto lbl_1;
 lbl_3:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    monitor->probingrcomm.ia.ptr.p_int[0] = i;
    monitor->probingrcomm.ia.ptr.p_int[1] = j;
    monitor->probingrcomm.ia.ptr.p_int[2] = idx;
@@ -19912,16 +19912,16 @@ void smoothnessmonitortraceprobingresults(smoothnessmonitor *monitor, ae_state *
 //
 //   -- ALGLIB --
 //      Copyright 11.10.2019 by Bochkanov Sergey
-void smoothnessmonitortracestatus(smoothnessmonitor *monitor, ae_bool callersuggeststrace, ae_state *_state) {
-   ae_bool needreport;
-   ae_bool needxdreport;
-   ae_bool suspicionsraised;
+void smoothnessmonitortracestatus(smoothnessmonitor *monitor, bool callersuggeststrace, ae_state *_state) {
+   bool needreport;
+   bool needxdreport;
+   bool suspicionsraised;
    ae_int_t i;
    double slope;
 
 // Do we need trace report?
    suspicionsraised = (monitor->rep.nonc0suspected || monitor->rep.nonc1suspected) || monitor->rep.badgradsuspected;
-   needreport = ae_false;
+   needreport = false;
    needreport = needreport || callersuggeststrace;
    needreport = needreport || ae_is_trace_enabled("OPTGUARD.ALWAYS");
    needreport = needreport || (ae_is_trace_enabled("OPTGUARD") && suspicionsraised);
@@ -19981,10 +19981,10 @@ void smoothnessmonitortracestatus(smoothnessmonitor *monitor, ae_bool callersugg
       if (needxdreport) {
          ae_trace("*** > printing raw variables\n");
          ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.x0, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.d, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc0lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
          ae_trace("*** XK = ");
@@ -20030,10 +20030,10 @@ void smoothnessmonitortracestatus(smoothnessmonitor *monitor, ae_bool callersugg
       if (needxdreport) {
          ae_trace("*** > printing raw variables\n");
          ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.x0, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.d, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test0lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
          ae_trace("*** XK = ");
@@ -20080,10 +20080,10 @@ void smoothnessmonitortracestatus(smoothnessmonitor *monitor, ae_bool callersugg
       if (needxdreport) {
          ae_trace("*** > printing raw variables\n");
          ae_trace("*** XK = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.x0, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.x0, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** D  = ");
-         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.d, monitor->n, &monitor->s, ae_true, &monitor->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&monitor->nonc1test1lngrep.d, monitor->n, &monitor->s, true, &monitor->s, false, _state);
          ae_trace("\n");
          ae_trace("*** > printing scaled variables (values are divided by user-specified scales)\n");
          ae_trace("*** XK = ");
@@ -20125,7 +20125,7 @@ void smoothnessmonitorexportreport(smoothnessmonitor *monitor, optguardreport *r
 //
 //   -- ALGLIB --
 //      Copyright 06.12.2018 by Bochkanov Sergey
-ae_bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, ae_bool hasboxconstraints, double teststep, ae_state *_state) {
+bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *unscaledx0, RVector *s, RVector *bndl, RVector *bndu, bool hasboxconstraints, double teststep, ae_state *_state) {
    ae_int_t n;
    ae_int_t k;
    ae_int_t i;
@@ -20135,7 +20135,7 @@ ae_bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *
    double vp;
    double vm;
    double vc;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -20181,11 +20181,11 @@ ae_bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *
 // Routine body
    n = monitor->n;
    k = monitor->k;
-   monitor->needfij = ae_false;
+   monitor->needfij = false;
 
 // Quick exit
    if (((n <= 0 || k <= 0) || !ae_isfinite(teststep, _state)) || ae_fp_eq(teststep, (double)(0))) {
-      result = ae_false;
+      result = false;
       return result;
    }
    teststep = ae_fabs(teststep, _state);
@@ -20209,7 +20209,7 @@ ae_bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *
    rmatrixsetlengthatleast(&monitor->rep.badgradnum, k, n, _state);
 
 // Set XBase/Jacobian presence flag
-   monitor->badgradhasxj = ae_true;
+   monitor->badgradhasxj = true;
 
 // Determine reference point, compute function vector and user-supplied Jacobian
    for (i = 0; i <= n - 1; i++) {
@@ -20224,11 +20224,11 @@ ae_bool smoothnessmonitorcheckgradientatx0(smoothnessmonitor *monitor, RVector *
       monitor->rep.badgradxbase.ptr.p_double[i] = v;
       monitor->x.ptr.p_double[i] = v;
    }
-   monitor->needfij = ae_true;
+   monitor->needfij = true;
    monitor->rstateg0.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   monitor->needfij = ae_false;
+   monitor->needfij = false;
    for (i = 0; i <= k - 1; i++) {
       monitor->fbase.ptr.p_double[i] = monitor->fi.ptr.p_double[i];
       for (j = 0; j <= n - 1; j++) {
@@ -20267,11 +20267,11 @@ lbl_4:
       monitor->x.ptr.p_double[i] = monitor->xbase.ptr.p_double[i];
    }
    monitor->x.ptr.p_double[varidx] = vm;
-   monitor->needfij = ae_true;
+   monitor->needfij = true;
    monitor->rstateg0.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   monitor->needfij = ae_false;
+   monitor->needfij = false;
    for (i = 0; i <= k - 1; i++) {
       monitor->fm.ptr.p_double[i] = monitor->fi.ptr.p_double[i];
       monitor->jm.ptr.p_double[i] = monitor->j.ptr.pp_double[i][varidx];
@@ -20280,11 +20280,11 @@ lbl_1:
       monitor->x.ptr.p_double[i] = monitor->xbase.ptr.p_double[i];
    }
    monitor->x.ptr.p_double[varidx] = vc;
-   monitor->needfij = ae_true;
+   monitor->needfij = true;
    monitor->rstateg0.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   monitor->needfij = ae_false;
+   monitor->needfij = false;
    for (i = 0; i <= k - 1; i++) {
       monitor->fc.ptr.p_double[i] = monitor->fi.ptr.p_double[i];
       monitor->jc.ptr.p_double[i] = monitor->j.ptr.pp_double[i][varidx];
@@ -20293,11 +20293,11 @@ lbl_2:
       monitor->x.ptr.p_double[i] = monitor->xbase.ptr.p_double[i];
    }
    monitor->x.ptr.p_double[varidx] = vp;
-   monitor->needfij = ae_true;
+   monitor->needfij = true;
    monitor->rstateg0.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   monitor->needfij = ae_false;
+   monitor->needfij = false;
    for (i = 0; i <= k - 1; i++) {
       monitor->fp.ptr.p_double[i] = monitor->fi.ptr.p_double[i];
       monitor->jp.ptr.p_double[i] = monitor->j.ptr.pp_double[i][varidx];
@@ -20307,7 +20307,7 @@ lbl_3:
    for (i = 0; i <= k - 1; i++) {
       monitor->rep.badgradnum.ptr.pp_double[i][varidx] = (monitor->fp.ptr.p_double[i] - monitor->fm.ptr.p_double[i]) / (vp - vm);
       if (!derivativecheck(monitor->fm.ptr.p_double[i], monitor->jm.ptr.p_double[i] * s->ptr.p_double[varidx], monitor->fp.ptr.p_double[i], monitor->jp.ptr.p_double[i] * s->ptr.p_double[varidx], monitor->fc.ptr.p_double[i], monitor->jc.ptr.p_double[i] * s->ptr.p_double[varidx], (vp - vm) / s->ptr.p_double[varidx], _state)) {
-         monitor->rep.badgradsuspected = ae_true;
+         monitor->rep.badgradsuspected = true;
          monitor->rep.badgradfidx = i;
          monitor->rep.badgradvidx = varidx;
       }
@@ -20316,12 +20316,12 @@ lbl_5:
    varidx = varidx + 1;
    goto lbl_4;
 lbl_6:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    monitor->rstateg0.ia.ptr.p_int[0] = n;
    monitor->rstateg0.ia.ptr.p_int[1] = k;
    monitor->rstateg0.ia.ptr.p_int[2] = i;
@@ -20422,7 +20422,7 @@ static void optserv_feasibilityerrorgrad(RMatrix *ce, RVector *x, ae_int_t nmain
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, ae_bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state) {
+static void optserv_testc0continuity(double f0, double f1, double f2, double f3, double noise0, double noise1, double noise2, double noise3, double delta0, double delta1, double delta2, bool applyspecialcorrection, double *rating, double *lipschitz, ae_state *_state) {
    double lipschitz01;
    double lipschitz12;
    double lipschitz23;
@@ -20552,23 +20552,23 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
 
 // Test with C0 continuity tester. "Special correction" is
 // turned off for this test.
-   optserv_testc0continuity(d0, d1, d2, d3, newnoise0, newnoise1, newnoise2, newnoise3, newdelta0, newdelta1, newdelta2, ae_false, &rating, &lipschitz, _state);
+   optserv_testc0continuity(d0, d1, d2, d3, newnoise0, newnoise1, newnoise2, newnoise3, newdelta0, newdelta1, newdelta2, false, &rating, &lipschitz, _state);
 
 // Store results
    if (rating > optserv_ogminrating1) {
 
    // Store to total report
-      monitor->rep.nonc1test0positive = ae_true;
+      monitor->rep.nonc1test0positive = true;
       if (rating > monitor->nonc1currentrating) {
          monitor->nonc1currentrating = rating;
-         monitor->rep.nonc1suspected = ae_true;
+         monitor->rep.nonc1suspected = true;
          monitor->rep.nonc1lipschitzc = lipschitz;
          monitor->rep.nonc1fidx = funcidx;
       }
    // Store to "strongest" report
       if (rating > monitor->nonc1test0strrating) {
          monitor->nonc1test0strrating = rating;
-         monitor->nonc1test0strrep.positive = ae_true;
+         monitor->nonc1test0strrep.positive = true;
          monitor->nonc1test0strrep.fidx = funcidx;
          monitor->nonc1test0strrep.n = n;
          monitor->nonc1test0strrep.cnt = sortedcnt;
@@ -20598,7 +20598,7 @@ static void optserv_c1continuitytest0(smoothnessmonitor *monitor, ae_int_t funci
       lengthrating = sortedcnt + ae_log(nrm, _state) / ae_log((double)(100), _state);
       if (lengthrating > monitor->nonc1test0lngrating) {
          monitor->nonc1test0lngrating = lengthrating;
-         monitor->nonc1test0lngrep.positive = ae_true;
+         monitor->nonc1test0lngrep.positive = true;
          monitor->nonc1test0lngrep.fidx = funcidx;
          monitor->nonc1test0lngrep.n = n;
          monitor->nonc1test0lngrep.cnt = sortedcnt;
@@ -20662,23 +20662,23 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
       noise1 = optserv_ognoiselevelg * ae_maxreal(ae_fabs(f1, _state), 1.0, _state);
       noise2 = optserv_ognoiselevelg * ae_maxreal(ae_fabs(f2, _state), 1.0, _state);
       noise3 = optserv_ognoiselevelg * ae_maxreal(ae_fabs(f3, _state), 1.0, _state);
-      optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.ptr.p_double[stpidx + 1] - monitor->sortedstp.ptr.p_double[stpidx + 0], monitor->sortedstp.ptr.p_double[stpidx + 2] - monitor->sortedstp.ptr.p_double[stpidx + 1], monitor->sortedstp.ptr.p_double[stpidx + 3] - monitor->sortedstp.ptr.p_double[stpidx + 2], ae_false, &rating, &lipschitz, _state);
+      optserv_testc0continuity(f0, f1, f2, f3, noise0, noise1, noise2, noise3, monitor->sortedstp.ptr.p_double[stpidx + 1] - monitor->sortedstp.ptr.p_double[stpidx + 0], monitor->sortedstp.ptr.p_double[stpidx + 2] - monitor->sortedstp.ptr.p_double[stpidx + 1], monitor->sortedstp.ptr.p_double[stpidx + 3] - monitor->sortedstp.ptr.p_double[stpidx + 2], false, &rating, &lipschitz, _state);
 
    // Store results
       if (rating > optserv_ogminrating1) {
 
       // Store to total report
-         monitor->rep.nonc1test1positive = ae_true;
+         monitor->rep.nonc1test1positive = true;
          if (rating > monitor->nonc1currentrating) {
             monitor->nonc1currentrating = rating;
-            monitor->rep.nonc1suspected = ae_true;
+            monitor->rep.nonc1suspected = true;
             monitor->rep.nonc1lipschitzc = lipschitz;
             monitor->rep.nonc1fidx = funcidx;
          }
       // Store to "strongest" report
          if (rating > monitor->nonc1test1strrating) {
             monitor->nonc1test1strrating = rating;
-            monitor->nonc1test1strrep.positive = ae_true;
+            monitor->nonc1test1strrep.positive = true;
             monitor->nonc1test1strrep.fidx = funcidx;
             monitor->nonc1test1strrep.vidx = varidx;
             monitor->nonc1test1strrep.n = n;
@@ -20709,7 +20709,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
          lengthrating = sortedcnt + ae_log(nrm, _state) / ae_log((double)(100), _state);
          if (lengthrating > monitor->nonc1test1lngrating) {
             monitor->nonc1test1lngrating = lengthrating;
-            monitor->nonc1test1lngrep.positive = ae_true;
+            monitor->nonc1test1lngrep.positive = true;
             monitor->nonc1test1lngrep.fidx = funcidx;
             monitor->nonc1test1lngrep.vidx = varidx;
             monitor->nonc1test1lngrep.n = n;
@@ -20733,7 +20733,7 @@ static void optserv_c1continuitytest1(smoothnessmonitor *monitor, ae_int_t funci
    }
 }
 
-void _precbuflbfgs_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _precbuflbfgs_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflbfgs *p = (precbuflbfgs *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->norms, 0, DT_REAL, _state, make_automatic);
@@ -20745,7 +20745,7 @@ void _precbuflbfgs_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->bufb, 0, DT_INT, _state, make_automatic);
 }
 
-void _precbuflbfgs_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _precbuflbfgs_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    precbuflbfgs *dst = (precbuflbfgs *) _dst;
    precbuflbfgs *src = (precbuflbfgs *) _src;
    ae_vector_init_copy(&dst->norms, &src->norms, _state, make_automatic);
@@ -20781,7 +20781,7 @@ void _precbuflbfgs_destroy(void *_p) {
    ae_vector_destroy(&p->bufb);
 }
 
-void _precbuflowrank_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _precbuflowrank_init(void *_p, ae_state *_state, bool make_automatic) {
    precbuflowrank *p = (precbuflowrank *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -20792,7 +20792,7 @@ void _precbuflowrank_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->tmp, 0, DT_REAL, _state, make_automatic);
 }
 
-void _precbuflowrank_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _precbuflowrank_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    precbuflowrank *dst = (precbuflowrank *) _dst;
    precbuflowrank *src = (precbuflowrank *) _src;
    dst->n = src->n;
@@ -20827,7 +20827,7 @@ void _precbuflowrank_destroy(void *_p) {
    ae_vector_destroy(&p->tmp);
 }
 
-void _smoothnessmonitor_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _smoothnessmonitor_init(void *_p, ae_state *_state, bool make_automatic) {
    smoothnessmonitor *p = (smoothnessmonitor *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -20877,7 +20877,7 @@ void _smoothnessmonitor_init(void *_p, ae_state *_state, ae_bool make_automatic)
    ae_matrix_init(&p->j0, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _smoothnessmonitor_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _smoothnessmonitor_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    smoothnessmonitor *dst = (smoothnessmonitor *) _dst;
    smoothnessmonitor *src = (smoothnessmonitor *) _src;
    dst->n = src->n;
@@ -21234,7 +21234,7 @@ void minlbfgssetcond(minlbfgsstate *state, double epsg, double epsf, double epsx
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void minlbfgssetxrep(minlbfgsstate *state, ae_bool needxrep, ae_state *_state) {
+void minlbfgssetxrep(minlbfgsstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -21317,7 +21317,7 @@ void minlbfgssetscale(minlbfgsstate *state, RVector *s, ae_state *_state) {
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
 void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double diffstep, minlbfgsstate *state, ae_state *_state) {
-   ae_bool allocatemem;
+   bool allocatemem;
    ae_int_t i;
 
    ae_assert(n >= 1, "MinLBFGS: N too small!", _state);
@@ -21327,7 +21327,7 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
 // Initialize
    state->teststep = (double)(0);
    state->smoothnessguardlevel = 0;
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    state->diffstep = diffstep;
    state->n = n;
    state->m = m;
@@ -21355,7 +21355,7 @@ void minlbfgscreatex(ae_int_t n, ae_int_t m, RVector *x, ae_int_t flags, double 
    }
    state->prectype = 0;
    minlbfgssetcond(state, (double)(0), (double)(0), (double)(0), 0, _state);
-   minlbfgssetxrep(state, ae_false, _state);
+   minlbfgssetxrep(state, false, _state);
    minlbfgssetstpmax(state, (double)(0), _state);
    minlbfgsrestartfrom(state, x, _state);
 }
@@ -21397,7 +21397,7 @@ void minlbfgssetprecdefault(minlbfgsstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 13.10.2010 by Bochkanov Sergey
-void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, ae_bool isupper, ae_state *_state) {
+void minlbfgssetpreccholesky(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state) {
    ae_int_t i;
    double mx;
 
@@ -21577,7 +21577,7 @@ void minlbfgssetpreclowrankexact(minlbfgsstate *state, RVector *d, RVector *c, R
 //
 //   -- ALGLIB --
 //      Copyright 20.03.2009 by Bochkanov Sergey
-ae_bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
+bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -21586,7 +21586,7 @@ ae_bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
    ae_int_t mcinfo;
    double v;
    double vv;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -21668,7 +21668,7 @@ ae_bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
    m = state->m;
 
 // Init
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    state->repterminationtype = 0;
    state->repiterationscount = 0;
    state->repnfev = 0;
@@ -21686,17 +21686,17 @@ ae_bool minlbfgsiteration(minlbfgsstate *state, ae_state *_state) {
       goto lbl_15;
    }
 lbl_17:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, ae_false, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep, _state)) {
       goto lbl_18;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->smonitor.fi.ptr.p_double[0] = state->f;
    for (i = 0; i <= n - 1; i++) {
       state->smonitor.j.ptr.pp_double[0][i] = state->g.ptr.p_double[i];
@@ -21714,14 +21714,14 @@ lbl_15:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_19;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_20;
 lbl_19:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
@@ -21758,24 +21758,24 @@ lbl_6:
    goto lbl_21;
 lbl_23:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_20:
    trimprepare(state->f, &state->trimthreshold, _state);
    if (!state->xrep) {
       goto lbl_24;
    }
    minlbfgs_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_24:
    if (state->userterminationneeded) {
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->repnfev = 1;
@@ -21786,7 +21786,7 @@ lbl_24:
    }
    if (ae_fp_less_eq(ae_sqrt(v, _state), state->epsg)) {
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Choose initial step and direction.
@@ -21806,7 +21806,7 @@ lbl_24:
    if (state->prectype == 1) {
 
    // Cholesky preconditioner is used
-      fblscholeskysolve(&state->denseh, 1.0, n, ae_true, &state->d, &state->autobuf, _state);
+      fblscholeskysolve(&state->denseh, 1.0, n, true, &state->d, &state->autobuf, _state);
       state->stp = (double)(1);
    }
    if (state->prectype == 2) {
@@ -21840,7 +21840,7 @@ lbl_24:
 // Main cycle
    state->k = 0;
 lbl_26:
-   if (ae_false) {
+   if (false) {
       goto lbl_27;
    }
 // Main cycle: prepare to 1-D line search
@@ -21869,14 +21869,14 @@ lbl_28:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_30;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 8;
    goto lbl_rcomm;
 lbl_8:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_31;
 lbl_30:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 9;
    goto lbl_rcomm;
 lbl_9:
@@ -21913,7 +21913,7 @@ lbl_13:
    goto lbl_32;
 lbl_34:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_31:
    smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g, _state);
    trimfunction(&state->f, &state->g, n, state->trimthreshold, _state);
@@ -21927,7 +21927,7 @@ lbl_29:
    // Restore previous point and return.
       ae_v_move(&state->x.ptr.p_double[0], 1, &state->xp.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (!state->xrep) {
@@ -21935,11 +21935,11 @@ lbl_29:
    }
 // report
    minlbfgs_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 14;
    goto lbl_rcomm;
 lbl_14:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_35:
    state->repnfev = state->repnfev + state->nfev;
    state->repiterationscount = state->repiterationscount + 1;
@@ -21955,28 +21955,28 @@ lbl_35:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
 
    // Too many iterations
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(ae_sqrt(v, _state), state->epsg)) {
 
    // Gradient is small enough
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(state->fold - state->f, state->epsf * ae_maxreal(ae_fabs(state->fold, _state), ae_maxreal(ae_fabs(state->f, _state), 1.0, _state), _state))) {
 
    // F(k+1)-F(k) is small enough
       state->repterminationtype = 1;
-      result = ae_false;
+      result = false;
       return result;
    }
    v = (double)(0);
@@ -21987,7 +21987,7 @@ lbl_35:
 
    // X(k+1)-X(k) is small enough
       state->repterminationtype = 2;
-      result = ae_false;
+      result = false;
       return result;
    }
 // If Wolfe conditions are satisfied, we can update
@@ -22013,7 +22013,7 @@ lbl_35:
 
       // Rounding errors make further iterations impossible.
          state->repterminationtype = -2;
-         result = ae_false;
+         result = false;
          return result;
       }
       state->rho.ptr.p_double[state->p] = 1 / v;
@@ -22048,7 +22048,7 @@ lbl_35:
       if (state->prectype == 1) {
 
       // Cholesky preconditioner is used
-         fblscholeskysolve(&state->denseh, (double)(1), n, ae_true, &state->work, &state->autobuf, _state);
+         fblscholeskysolve(&state->denseh, (double)(1), n, true, &state->work, &state->autobuf, _state);
       }
       if (state->prectype == 2) {
 
@@ -22088,12 +22088,12 @@ lbl_35:
    }
    goto lbl_26;
 lbl_27:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = m;
    state->rstate.ia.ptr.p_int[2] = i;
@@ -22525,18 +22525,18 @@ void minlbfgsrestartfrom(minlbfgsstate *state, RVector *x, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void minlbfgsrequesttermination(minlbfgsstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void minlbfgs_clearrequestfields(minlbfgsstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfg = ae_false;
-   state->xupdated = ae_false;
+   state->needf = false;
+   state->needfg = false;
+   state->xupdated = false;
 }
 
-void _minlbfgsstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlbfgsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlbfgsstate *p = (minlbfgsstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -22565,7 +22565,7 @@ void _minlbfgsstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minlbfgsstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlbfgsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlbfgsstate *dst = (minlbfgsstate *) _dst;
    minlbfgsstate *src = (minlbfgsstate *) _src;
    dst->n = src->n;
@@ -22687,12 +22687,12 @@ void _minlbfgsstate_destroy(void *_p) {
    ae_vector_destroy(&p->lastscaleused);
 }
 
-void _minlbfgsreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlbfgsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlbfgsreport *p = (minlbfgsreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minlbfgsreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlbfgsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlbfgsreport *dst = (minlbfgsreport *) _dst;
    minlbfgsreport *src = (minlbfgsreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -22728,10 +22728,10 @@ void cqminit(ae_int_t n, convexquadraticmodel *s, ae_state *_state) {
    s->alpha = 0.0;
    s->tau = 0.0;
    s->theta = 0.0;
-   s->ismaintermchanged = ae_true;
-   s->issecondarytermchanged = ae_true;
-   s->islineartermchanged = ae_true;
-   s->isactivesetchanged = ae_true;
+   s->ismaintermchanged = true;
+   s->issecondarytermchanged = true;
+   s->islineartermchanged = true;
+   s->isactivesetchanged = true;
    bvectorsetlengthatleast(&s->activeset, n, _state);
    rvectorsetlengthatleast(&s->xc, n, _state);
    rvectorsetlengthatleast(&s->eb, n, _state);
@@ -22741,7 +22741,7 @@ void cqminit(ae_int_t n, convexquadraticmodel *s, ae_state *_state) {
    rvectorsetlengthatleast(&s->b, s->n, _state);
    rvectorsetlengthatleast(&s->tk1, s->n, _state);
    for (i = 0; i <= n - 1; i++) {
-      s->activeset.ptr.p_bool[i] = ae_false;
+      s->activeset.ptr.p_bool[i] = false;
       s->xc.ptr.p_double[i] = 0.0;
       s->b.ptr.p_double[i] = 0.0;
    }
@@ -22757,7 +22757,7 @@ void cqminit(ae_int_t n, convexquadraticmodel *s, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 12.06.2012 by Bochkanov Sergey
-void cqmseta(convexquadraticmodel *s, RMatrix *a, ae_bool isupper, double alpha, ae_state *_state) {
+void cqmseta(convexquadraticmodel *s, RMatrix *a, bool isupper, double alpha, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -22781,7 +22781,7 @@ void cqmseta(convexquadraticmodel *s, RMatrix *a, ae_bool isupper, double alpha,
          }
       }
    }
-   s->ismaintermchanged = ae_true;
+   s->ismaintermchanged = true;
 }
 
 // This subroutine changes main quadratic term of the model.
@@ -22854,7 +22854,7 @@ void cqmrewritedensediagonal(convexquadraticmodel *s, RVector *z, ae_state *_sta
    for (i = 0; i <= s->n - 1; i++) {
       s->a.ptr.pp_double[i][i] = z->ptr.p_double[i] / s->alpha;
    }
-   s->ismaintermchanged = ae_true;
+   s->ismaintermchanged = true;
 }
 
 // This subroutine changes diagonal quadratic term of the model.
@@ -22881,7 +22881,7 @@ void cqmsetd(convexquadraticmodel *s, RVector *d, double tau, ae_state *_state) 
          s->d.ptr.p_double[i] = d->ptr.p_double[i];
       }
    }
-   s->ismaintermchanged = ae_true;
+   s->ismaintermchanged = true;
 }
 
 // This subroutine drops main quadratic term A from the model. It is same  as
@@ -22897,7 +22897,7 @@ void cqmsetd(convexquadraticmodel *s, RVector *d, double tau, ae_state *_state) 
 void cqmdropa(convexquadraticmodel *s, ae_state *_state) {
 
    s->alpha = 0.0;
-   s->ismaintermchanged = ae_true;
+   s->ismaintermchanged = true;
 }
 
 // This subroutine changes linear term of the model
@@ -22912,7 +22912,7 @@ void cqmsetb(convexquadraticmodel *s, RVector *b, ae_state *_state) {
    for (i = 0; i <= s->n - 1; i++) {
       s->b.ptr.p_double[i] = b->ptr.p_double[i];
    }
-   s->islineartermchanged = ae_true;
+   s->islineartermchanged = true;
 }
 
 // This subroutine changes linear term of the model
@@ -22932,7 +22932,7 @@ void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double
    if (k == 0 || ae_fp_eq(theta, (double)(0))) {
       s->k = 0;
       s->theta = (double)(0);
-      s->issecondarytermchanged = ae_true;
+      s->issecondarytermchanged = true;
       return;
    }
 // General case: both Theta>0 and K>0
@@ -22949,7 +22949,7 @@ void cqmsetq(convexquadraticmodel *s, RMatrix *q, RVector *r, ae_int_t k, double
       }
       s->r.ptr.p_double[i] = r->ptr.p_double[i];
    }
-   s->issecondarytermchanged = ae_true;
+   s->issecondarytermchanged = true;
 }
 
 // This subroutine changes active set
@@ -23168,7 +23168,7 @@ double cqmxtadx2(convexquadraticmodel *s, RVector *x, RVector *tmp, ae_state *_s
 
 // main quadratic term
    if (ae_fp_greater(s->alpha, (double)(0))) {
-      result = result + s->alpha * 0.5 * rmatrixsyvmv(n, &s->a, 0, 0, ae_true, x, 0, tmp, _state);
+      result = result + s->alpha * 0.5 * rmatrixsyvmv(n, &s->a, 0, 0, true, x, 0, tmp, _state);
    }
    if (ae_fp_greater(s->tau, (double)(0))) {
       for (i = 0; i <= n - 1; i++) {
@@ -23197,7 +23197,7 @@ void cqmadx(convexquadraticmodel *s, RVector *x, RVector *y, ae_state *_state) {
       y->ptr.p_double[i] = (double)(0);
    }
    if (ae_fp_greater(s->alpha, (double)(0))) {
-      rmatrixsymv(n, s->alpha, &s->a, 0, 0, ae_true, x, 0, 1.0, y, 0, _state);
+      rmatrixsymv(n, s->alpha, &s->a, 0, 0, true, x, 0, 1.0, y, 0, _state);
    }
    if (ae_fp_greater(s->tau, (double)(0))) {
       for (i = 0; i <= n - 1; i++) {
@@ -23217,7 +23217,7 @@ void cqmadx(convexquadraticmodel *s, RVector *x, RVector *y, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 12.06.2012 by Bochkanov Sergey
-ae_bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state) {
+bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_state) {
    ae_int_t n;
    ae_int_t nfree;
    ae_int_t k;
@@ -23225,17 +23225,17 @@ ae_bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_st
    double v;
    ae_int_t cidx0;
    ae_int_t itidx;
-   ae_bool result;
+   bool result;
 
 // Rebuild internal structures
    if (!cqmodels_cqmrebuild(s, _state)) {
-      result = ae_false;
+      result = false;
       return result;
    }
    n = s->n;
    k = s->k;
    nfree = s->nfree;
-   result = ae_true;
+   result = true;
 
 // Calculate initial point for the iterative refinement:
 // * free components are set to zero
@@ -23289,7 +23289,7 @@ ae_bool cqmconstrainedoptimum(convexquadraticmodel *s, RVector *x, ae_state *_st
             v = ae_v_dotproduct(&s->eq.ptr.pp_double[i][0], 1, &s->tmp1.ptr.p_double[0], 1, ae_v_len(0, nfree - 1));
             s->tmp0.ptr.p_double[i] = v;
          }
-         fblscholeskysolve(&s->eccm, 1.0, k, ae_true, &s->tmp0, &s->tmp1, _state);
+         fblscholeskysolve(&s->eccm, 1.0, k, true, &s->tmp0, &s->tmp1, _state);
          for (i = 0; i <= nfree - 1; i++) {
             s->tmp1.ptr.p_double[i] = 0.0;
          }
@@ -23566,7 +23566,7 @@ double cqmdebugconstrainedevale(convexquadraticmodel *s, RVector *x, ae_state *_
 //
 //   -- ALGLIB --
 //      Copyright 10.05.2011 by Bochkanov Sergey
-static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
+static bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
    ae_int_t n;
    ae_int_t nfree;
    ae_int_t k;
@@ -23577,15 +23577,15 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
    ae_int_t cidx0;
    ae_int_t cidx1;
    double v;
-   ae_bool result;
+   bool result;
 
    if (ae_fp_eq(s->alpha, (double)(0)) && ae_fp_eq(s->tau, (double)(0))) {
 
    // Non-SPD model, quick exit
-      result = ae_false;
+      result = false;
       return result;
    }
-   result = ae_true;
+   result = true;
    n = s->n;
    k = s->k;
 
@@ -23866,8 +23866,8 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
                s->ecadense.ptr.pp_double[i][j] = s->tq2dense.ptr.pp_double[i][j];
             }
          }
-         if (!spdmatrixcholeskyrec(&s->ecadense, 0, nfree, ae_true, &s->tmp0, _state)) {
-            result = ae_false;
+         if (!spdmatrixcholeskyrec(&s->ecadense, 0, nfree, true, &s->tmp0, _state)) {
+            result = false;
             return result;
          }
       } else {
@@ -23876,7 +23876,7 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
          s->ecakind = 1;
          for (i = 0; i <= nfree - 1; i++) {
             if (ae_fp_less(s->tq2diag.ptr.p_double[i], (double)(0))) {
-               result = ae_false;
+               result = false;
                return result;
             }
             s->ecadiag.ptr.p_double[i] = ae_sqrt(s->tq2diag.ptr.p_double[i], _state);
@@ -23907,7 +23907,7 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
       rmatrixcopy(k, nfree, &s->eq, 0, 0, &s->tmp2, 0, 0, _state);
       ae_assert(s->ecakind == 0 || s->ecakind == 1, "CQMRebuild: unexpected ECAKind", _state);
       if (s->ecakind == 0) {
-         rmatrixrighttrsm(k, nfree, &s->ecadense, 0, 0, ae_true, ae_false, 0, &s->tmp2, 0, 0, _state);
+         rmatrixrighttrsm(k, nfree, &s->ecadense, 0, 0, true, false, 0, &s->tmp2, 0, 0, _state);
       }
       if (s->ecakind == 1) {
          for (i = 0; i <= k - 1; i++) {
@@ -23922,9 +23922,9 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
          }
          s->eccm.ptr.pp_double[i][i] = 1.0;
       }
-      rmatrixsyrk(k, nfree, 1.0, &s->tmp2, 0, 0, 0, 1.0, &s->eccm, 0, 0, ae_true, _state);
-      if (!spdmatrixcholeskyrec(&s->eccm, 0, k, ae_true, &s->tmp0, _state)) {
-         result = ae_false;
+      rmatrixsyrk(k, nfree, 1.0, &s->tmp2, 0, 0, 0, 1.0, &s->eccm, 0, 0, true, _state);
+      if (!spdmatrixcholeskyrec(&s->eccm, 0, k, true, &s->tmp0, _state)) {
+         result = false;
          return result;
       }
    }
@@ -23941,10 +23941,10 @@ static ae_bool cqmodels_cqmrebuild(convexquadraticmodel *s, ae_state *_state) {
    }
 
 // Change cache status - everything is cached
-   s->ismaintermchanged = ae_false;
-   s->issecondarytermchanged = ae_false;
-   s->islineartermchanged = ae_false;
-   s->isactivesetchanged = ae_false;
+   s->ismaintermchanged = false;
+   s->issecondarytermchanged = false;
+   s->islineartermchanged = false;
+   s->isactivesetchanged = false;
    return result;
 }
 
@@ -23971,7 +23971,7 @@ static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tm
    if (s->ecakind == 0) {
 
    // Dense ECA, use FBLSCholeskySolve() dense solver.
-      fblscholeskysolve(&s->ecadense, 1.0, s->nfree, ae_true, x, tmp, _state);
+      fblscholeskysolve(&s->ecadense, 1.0, s->nfree, true, x, tmp, _state);
    }
    if (s->ecakind == 1) {
 
@@ -23982,7 +23982,7 @@ static void cqmodels_cqmsolveea(convexquadraticmodel *s, RVector *x, RVector *tm
    }
 }
 
-void _convexquadraticmodel_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _convexquadraticmodel_init(void *_p, ae_state *_state, bool make_automatic) {
    convexquadraticmodel *p = (convexquadraticmodel *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->a, 0, 0, DT_REAL, _state, make_automatic);
@@ -24010,7 +24010,7 @@ void _convexquadraticmodel_init(void *_p, ae_state *_state, ae_bool make_automat
    ae_matrix_init(&p->tmp2, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _convexquadraticmodel_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _convexquadraticmodel_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    convexquadraticmodel *dst = (convexquadraticmodel *) _dst;
    convexquadraticmodel *src = (convexquadraticmodel *) _src;
    dst->n = src->n;
@@ -24129,8 +24129,8 @@ void _convexquadraticmodel_destroy(void *_p) {
 //      Copyright 01.11.2019 by Bochkanov Sergey
 void scaleshiftbcinplace(RVector *s, RVector *xorigin, RVector *bndl, RVector *bndu, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-   ae_bool hasbndl;
-   ae_bool hasbndu;
+   bool hasbndl;
+   bool hasbndu;
 
    for (i = 0; i <= n - 1; i++) {
       ae_assert(ae_isfinite(s->ptr.p_double[i], _state) && s->ptr.p_double[i] > 0.0, "ScaleShiftBC: S[i] is nonpositive", _state);
@@ -24290,7 +24290,7 @@ void scaleshiftmixedbrlcinplace(RVector *s, RVector *xorigin, ae_int_t n, sparse
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-void scaledenseqpinplace(RMatrix *densea, ae_bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal, RVector *s, ae_state *_state) {
+void scaledenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal, RVector *s, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t j0;
@@ -24378,7 +24378,7 @@ void scalesparseqpinplace(RVector *s, ae_int_t n, sparsematrix *sparsea, RVector
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int_t n, ae_int_t m, RVector *rownorms, ae_bool neednorms, ae_state *_state) {
+void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int_t n, ae_int_t m, RVector *rownorms, bool neednorms, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    double v;
@@ -24451,7 +24451,7 @@ void normalizedensebrlcinplace(RMatrix *densea, RVector *ab, RVector *ar, ae_int
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *ab, RVector *ar, ae_int_t n, ae_bool limitedamplification, RVector *rownorms, ae_bool neednorms, ae_state *_state) {
+void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix *densea, ae_int_t mdense, RVector *ab, RVector *ar, ae_int_t n, bool limitedamplification, RVector *rownorms, bool neednorms, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -24568,7 +24568,7 @@ void normalizemixedbrlcinplace(sparsematrix *sparsea, ae_int_t msparse, RMatrix 
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-double normalizedenseqpinplace(RMatrix *densea, ae_bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal, ae_state *_state) {
+double normalizedenseqpinplace(RMatrix *densea, bool isupper, ae_int_t nmain, RVector *denseb, ae_int_t ntotal, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t j0;
@@ -24637,7 +24637,7 @@ double normalizedenseqpinplace(RMatrix *densea, ae_bool isupper, ae_int_t nmain,
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-double normalizesparseqpinplace(sparsematrix *sparsea, ae_bool isupper, RVector *denseb, ae_int_t n, ae_state *_state) {
+double normalizesparseqpinplace(sparsematrix *sparsea, bool isupper, RVector *denseb, ae_int_t n, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t k0;
@@ -24797,7 +24797,7 @@ void snnlssetproblem(snnlssolver *s, RMatrix *a, RVector *b, ae_int_t ns, ae_int
    ae_v_move(&s->b.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0, nr - 1));
    bvectorsetlengthatleast(&s->nnc, ns + nd, _state);
    for (i = 0; i <= ns + nd - 1; i++) {
-      s->nnc.ptr.p_bool[i] = ae_true;
+      s->nnc.ptr.p_bool[i] = true;
    }
 }
 
@@ -24817,7 +24817,7 @@ void snnlsdropnnc(snnlssolver *s, ae_int_t idx, ae_state *_state) {
 
    ae_assert(idx >= 0, "SNNLSDropNNC: Idx<0", _state);
    ae_assert(idx < s->ns + s->nd, "SNNLSDropNNC: Idx>=NS+ND", _state);
-   s->nnc.ptr.p_bool[idx] = ae_false;
+   s->nnc.ptr.p_bool[idx] = false;
 }
 
 // This subroutine is used to solve NNLS problem.
@@ -24845,7 +24845,7 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
    ae_int_t ns;
    ae_int_t nd;
    ae_int_t nr;
-   ae_bool wasactivation;
+   bool wasactivation;
    double lambdav;
    double v0;
    double v1;
@@ -24855,7 +24855,7 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
    ae_int_t maxouterits;
    double xtol;
    double kicklength;
-   ae_bool kickneeded;
+   bool kickneeded;
    double f0;
    double f1;
    double dnrm;
@@ -24932,10 +24932,10 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
    // for all x[i]=0.0 we have d[i]=0.0
    //
    // NOTE: we do not increase outer iterations counter here
-      kickneeded = ae_false;
+      kickneeded = false;
       for (i = 0; i <= ns + nd - 1; i++) {
          if ((s->nnc.ptr.p_bool[i] && ae_fp_eq(x->ptr.p_double[i], 0.0)) && ae_fp_greater(s->d.ptr.p_double[i], 0.0)) {
-            kickneeded = ae_true;
+            kickneeded = true;
          }
       }
       if (kickneeded) {
@@ -25016,10 +25016,10 @@ void snnlssolve(snnlssolver *s, RVector *x, ae_state *_state) {
          if (ae_fp_eq(stp, stpmax) && actidx >= 0) {
             s->xn.ptr.p_double[actidx] = 0.0;
          }
-         wasactivation = ae_false;
+         wasactivation = false;
          for (i = 0; i <= ns + nd - 1; i++) {
             if (ae_fp_eq(s->xn.ptr.p_double[i], 0.0) && ae_fp_neq(x->ptr.p_double[i], 0.0)) {
-               wasactivation = ae_true;
+               wasactivation = true;
                snnls_trdfixvariable(&s->trdd, &s->trda, ns, nd, i, &s->tmpcholesky, _state);
             }
          }
@@ -25422,7 +25422,7 @@ static void snnls_trdfixvariable(RVector *trdd, RMatrix *trda, ae_int_t ns, ae_i
    }
 }
 
-void _snnlssolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _snnlssolver_init(void *_p, ae_state *_state, bool make_automatic) {
    snnlssolver *p = (snnlssolver *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
@@ -25451,7 +25451,7 @@ void _snnlssolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->rdtmprowmap, 0, DT_INT, _state, make_automatic);
 }
 
-void _snnlssolver_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _snnlssolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    snnlssolver *dst = (snnlssolver *) _dst;
    snnlssolver *src = (snnlssolver *) _src;
    dst->ns = src->ns;
@@ -25579,7 +25579,7 @@ void sasinit(ae_int_t n, sactiveset *s, ae_state *_state) {
    s->algostate = 0;
 
 // Constraints
-   s->constraintschanged = ae_true;
+   s->constraintschanged = true;
    s->nec = 0;
    s->nic = 0;
    rvectorsetlengthatleast(&s->bndl, n, _state);
@@ -25589,12 +25589,12 @@ void sasinit(ae_int_t n, sactiveset *s, ae_state *_state) {
    for (i = 0; i <= n - 1; i++) {
       s->bndl.ptr.p_double[i] = _state->v_neginf;
       s->bndu.ptr.p_double[i] = _state->v_posinf;
-      s->hasbndl.ptr.p_bool[i] = ae_false;
-      s->hasbndu.ptr.p_bool[i] = ae_false;
+      s->hasbndl.ptr.p_bool[i] = false;
+      s->hasbndu.ptr.p_bool[i] = false;
    }
 
 // current point, scale
-   s->hasxc = ae_false;
+   s->hasxc = false;
    rvectorsetlengthatleast(&s->xc, n, _state);
    rvectorsetlengthatleast(&s->s, n, _state);
    rvectorsetlengthatleast(&s->h, n, _state);
@@ -25703,7 +25703,7 @@ void sassetbc(sactiveset *state, RVector *bndl, RVector *bndu, ae_state *_state)
       state->bndu.ptr.p_double[i] = bndu->ptr.p_double[i];
       state->hasbndu.ptr.p_bool[i] = ae_isfinite(bndu->ptr.p_double[i], _state);
    }
-   state->constraintschanged = ae_true;
+   state->constraintschanged = true;
 }
 
 // This function sets linear constraints for SAS object.
@@ -25755,7 +25755,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
    if (k == 0) {
       state->nec = 0;
       state->nic = 0;
-      state->constraintschanged = ae_true;
+      state->constraintschanged = true;
       return;
    }
 // Equality constraints are stored first, in the upper
@@ -25785,7 +25785,7 @@ void sassetlc(sactiveset *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state *
    }
 
 // Mark state as changed
-   state->constraintschanged = ae_true;
+   state->constraintschanged = true;
 }
 
 // Another variation of SASSetLC(), which accepts  linear  constraints  using
@@ -25844,7 +25844,7 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae
    }
 
 // Mark state as changed
-   state->constraintschanged = ae_true;
+   state->constraintschanged = true;
 }
 
 // This subroutine turns on optimization mode:
@@ -25867,7 +25867,7 @@ void sassetlcx(sactiveset *state, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae
 //
 //   -- ALGLIB --
 //      Copyright 21.12.2012 by Bochkanov Sergey
-ae_bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
+bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
    ae_int_t n;
    ae_int_t nec;
    ae_int_t nic;
@@ -25879,10 +25879,10 @@ ae_bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
    double vv;
    double vc;
    double vx;
-   ae_bool result;
+   bool result;
 
    ae_assert(state->algostate == 0, "SASStartOptimization: already in optimization mode", _state);
-   result = ae_false;
+   result = false;
    n = state->n;
    nec = state->nec;
    nic = state->nic;
@@ -25905,7 +25905,7 @@ ae_bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
    // Try to use fast code for feasible initial point with modest
    // memory requirements.
       rvectorsetlengthatleast(&state->tmp0, n, _state);
-      state->feasinitpt = ae_true;
+      state->feasinitpt = true;
       for (i = 0; i <= n - 1; i++) {
          state->tmp0.ptr.p_double[i] = x->ptr.p_double[i];
          state->cstatus.ptr.p_int[i] = -1;
@@ -26017,14 +26017,14 @@ ae_bool sasstartoptimization(sactiveset *state, RVector *x, ae_state *_state) {
             continue;
          }
       }
-      state->feasinitpt = ae_true;
+      state->feasinitpt = true;
    }
 
 // Change state, allocate temporaries
-   result = ae_true;
+   result = true;
    state->algostate = 1;
-   state->basisisready = ae_false;
-   state->hasxc = ae_true;
+   state->basisisready = false;
+   state->hasxc = true;
    return result;
 }
 
@@ -26161,12 +26161,12 @@ void sasexploredirection(sactiveset *state, RVector *d, double *stpmax, ae_int_t
 //
 //   -- ALGLIB --
 //      Copyright 21.12.2012 by Bochkanov Sergey
-ae_int_t sasmoveto(sactiveset *state, RVector *xn, ae_bool needact, ae_int_t cidx, double cval, ae_state *_state) {
+ae_int_t sasmoveto(sactiveset *state, RVector *xn, bool needact, ae_int_t cidx, double cval, ae_state *_state) {
    ae_int_t n;
    ae_int_t nec;
    ae_int_t nic;
    ae_int_t i;
-   ae_bool wasactivation;
+   bool wasactivation;
    ae_int_t result;
 
    ae_assert(state->algostate == 1, "SASMoveTo: is not in optimization mode", _state);
@@ -26187,9 +26187,9 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, ae_bool needact, ae_int_t cid
 
 // Activate constraints
    bvectorsetlengthatleast(&state->mtnew, n + nec + nic, _state);
-   wasactivation = ae_false;
+   wasactivation = false;
    for (i = 0; i <= n + nec + nic - 1; i++) {
-      state->mtnew.ptr.p_bool[i] = ae_false;
+      state->mtnew.ptr.p_bool[i] = false;
    }
    if (needact) {
 
@@ -26203,8 +26203,8 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, ae_bool needact, ae_int_t cid
          state->xc.ptr.p_double[cidx] = cval;
       }
       state->cstatus.ptr.p_int[cidx] = 1;
-      state->mtnew.ptr.p_bool[cidx] = ae_true;
-      wasactivation = ae_true;
+      state->mtnew.ptr.p_bool[cidx] = true;
+      wasactivation = true;
    }
    for (i = 0; i <= n - 1; i++) {
 
@@ -26212,14 +26212,14 @@ ae_int_t sasmoveto(sactiveset *state, RVector *xn, ae_bool needact, ae_int_t cid
       if ((state->hasbndl.ptr.p_bool[i] && ae_fp_less_eq(state->xc.ptr.p_double[i], state->bndl.ptr.p_double[i])) && ae_fp_neq(state->xc.ptr.p_double[i], state->mtx.ptr.p_double[i])) {
          state->xc.ptr.p_double[i] = state->bndl.ptr.p_double[i];
          state->cstatus.ptr.p_int[i] = 1;
-         state->mtnew.ptr.p_bool[i] = ae_true;
-         wasactivation = ae_true;
+         state->mtnew.ptr.p_bool[i] = true;
+         wasactivation = true;
       }
       if ((state->hasbndu.ptr.p_bool[i] && ae_fp_greater_eq(state->xc.ptr.p_double[i], state->bndu.ptr.p_double[i])) && ae_fp_neq(state->xc.ptr.p_double[i], state->mtx.ptr.p_double[i])) {
          state->xc.ptr.p_double[i] = state->bndu.ptr.p_double[i];
          state->cstatus.ptr.p_int[i] = 1;
-         state->mtnew.ptr.p_bool[i] = ae_true;
-         wasactivation = ae_true;
+         state->mtnew.ptr.p_bool[i] = true;
+         wasactivation = true;
       }
    }
 
@@ -26298,9 +26298,9 @@ void sasimmediateactivation(sactiveset *state, ae_int_t cidx, double cval, ae_st
    state->cstatus.ptr.p_int[cidx] = 1;
    bvectorsetlengthatleast(&state->mtnew, state->n + state->nec + state->nic, _state);
    for (i = 0; i <= state->n + state->nec + state->nic - 1; i++) {
-      state->mtnew.ptr.p_bool[i] = ae_false;
+      state->mtnew.ptr.p_bool[i] = false;
    }
-   state->mtnew.ptr.p_bool[cidx] = ae_true;
+   state->mtnew.ptr.p_bool[cidx] = true;
    sasappendtobasis(state, &state->mtnew, _state);
 }
 
@@ -26327,7 +26327,7 @@ void sasconstraineddescent(sactiveset *state, RVector *g, RVector *d, ae_state *
 
    ae_assert(state->algostate == 1, "SASConstrainedDescent: is not in optimization mode", _state);
    sasrebuildbasis(state, _state);
-   sactivesets_constraineddescent(state, g, &state->unitdiagonal, &state->idensebatch, ae_true, d, _state);
+   sactivesets_constraineddescent(state, g, &state->unitdiagonal, &state->idensebatch, true, d, _state);
 }
 
 // This  subroutine  calculates  preconditioned  descent direction subject to
@@ -26354,7 +26354,7 @@ void sasconstraineddescentprec(sactiveset *state, RVector *g, RVector *d, ae_sta
 
    ae_assert(state->algostate == 1, "SASConstrainedDescentPrec: is not in optimization mode", _state);
    sasrebuildbasis(state, _state);
-   sactivesets_constraineddescent(state, g, &state->h, &state->pdensebatch, ae_true, d, _state);
+   sactivesets_constraineddescent(state, g, &state->h, &state->pdensebatch, true, d, _state);
 }
 
 // This subroutine calculates projection   of  direction  vector  to  current
@@ -26379,7 +26379,7 @@ void sasconstraineddirection(sactiveset *state, RVector *d, ae_state *_state) {
 
    ae_assert(state->algostate == 1, "SASConstrainedAntigradientPrec: is not in optimization mode", _state);
    sasrebuildbasis(state, _state);
-   sactivesets_constraineddescent(state, d, &state->unitdiagonal, &state->idensebatch, ae_false, &state->cdtmp, _state);
+   sactivesets_constraineddescent(state, d, &state->unitdiagonal, &state->idensebatch, false, &state->cdtmp, _state);
    for (i = 0; i <= state->n - 1; i++) {
       d->ptr.p_double[i] = -state->cdtmp.ptr.p_double[i];
    }
@@ -26407,7 +26407,7 @@ void sasconstraineddirectionprec(sactiveset *state, RVector *d, ae_state *_state
 
    ae_assert(state->algostate == 1, "SASConstrainedAntigradientPrec: is not in optimization mode", _state);
    sasrebuildbasis(state, _state);
-   sactivesets_constraineddescent(state, d, &state->h, &state->pdensebatch, ae_false, &state->cdtmp, _state);
+   sactivesets_constraineddescent(state, d, &state->h, &state->pdensebatch, false, &state->cdtmp, _state);
    for (i = 0; i <= state->n - 1; i++) {
       d->ptr.p_double[i] = -state->cdtmp.ptr.p_double[i];
    }
@@ -26741,7 +26741,7 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    ae_int_t nic;
    ae_int_t i;
    ae_int_t j;
-   ae_bool hasactivelin;
+   bool hasactivelin;
    ae_int_t candidatescnt;
    double v;
    double vv;
@@ -26768,15 +26768,15 @@ void sasrebuildbasis(sactiveset *state, ae_state *_state) {
    state->sparsebatchsize = 0;
    state->densebatchsize = 0;
    state->basisage = 0;
-   state->basisisready = ae_true;
+   state->basisisready = true;
 
 // Determine number of active boundary and non-boundary
 // constraints, move them to TmpBasis. Quick exit if no
 // non-boundary constraints were detected.
-   hasactivelin = ae_false;
+   hasactivelin = false;
    for (i = 0; i <= nec + nic - 1; i++) {
       if (state->cstatus.ptr.p_int[n + i] > 0) {
-         hasactivelin = ae_true;
+         hasactivelin = true;
       }
    }
    for (j = 0; j <= n - 1; j++) {
@@ -27053,7 +27053,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
       }
    }
    if (nact + state->basisage > sactivesets_maxbasisage) {
-      state->basisisready = ae_false;
+      state->basisisready = false;
       return;
    }
 // Resize basis matrices if needed
@@ -27106,7 +27106,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
 
          // Well, it is not expected. Let's just rebuild basis
          // from scratch and forget about this strange situation...
-            state->basisisready = ae_false;
+            state->basisisready = false;
             return;
          }
       // Orthogonalize Tmp0 w.r.t. sparse batch (box constraints stored in sparse storage).
@@ -27156,7 +27156,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
          projnorms = ae_sqrt(projnorms, _state);
          projnormi = ae_sqrt(projnormi, _state);
          if (ae_fp_less_eq(projnormp, sactivesets_maxbasisdecay * initnormp)) {
-            state->basisisready = ae_false;
+            state->basisisready = false;
             return;
 
          // Nearly zero row, skip
@@ -27201,7 +27201,7 @@ void sasappendtobasis(sactiveset *state, BVector *newentries, ae_state *_state) 
 //
 //   -- ALGLIB --
 //      Copyright 21.12.2012 by Bochkanov Sergey
-static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, ae_bool normalize, RVector *d, ae_state *_state) {
+static void sactivesets_constraineddescent(sactiveset *state, RVector *g, RVector *h, RMatrix *ha, bool normalize, RVector *d, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t n;
@@ -27294,7 +27294,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    n = state->n;
    nec = state->nec;
    nic = state->nic;
-   state->basisisready = ae_false;
+   state->basisisready = false;
 
 // Handle important special case - no linear constraints,
 // only boundary constraints are present
@@ -27361,7 +27361,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->rctmpconstraintidx.ptr.p_int[nactiveconstraints] = i;
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = 1.0;
-         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = ae_true;
+         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = true;
          nactiveconstraints = nactiveconstraints + 1;
          nactivebnd = nactivebnd + 1;
          continue;
@@ -27372,7 +27372,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->rctmpconstraintidx.ptr.p_int[nactiveconstraints] = i;
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = -1.0;
-         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = ae_false;
+         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = false;
          nactiveconstraints = nactiveconstraints + 1;
          nactivebnd = nactivebnd + 1;
          continue;
@@ -27383,7 +27383,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
          state->rctmpconstraintidx.ptr.p_int[nactiveconstraints] = i;
          state->cstatus.ptr.p_int[i] = 0;
          state->rctmps.ptr.p_double[i] = 1.0;
-         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = ae_false;
+         state->rctmpisequality.ptr.p_bool[nactiveconstraints] = false;
          nactiveconstraints = nactiveconstraints + 1;
          nactivebnd = nactivebnd + 1;
          continue;
@@ -27531,7 +27531,7 @@ static void sactivesets_reactivateconstraints(sactiveset *state, RVector *gc, RV
    sasrebuildbasis(state, _state);
 }
 
-void _sactiveset_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _sactiveset_init(void *_p, ae_state *_state, bool make_automatic) {
    sactiveset *p = (sactiveset *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
@@ -27576,7 +27576,7 @@ void _sactiveset_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->tmpci, 0, DT_REAL, _state, make_automatic);
 }
 
-void _sactiveset_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _sactiveset_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sactiveset *dst = (sactiveset *) _dst;
    sactiveset *src = (sactiveset *) _src;
    dst->n = src->n;
@@ -27736,8 +27736,8 @@ void qqploaddefaults(ae_int_t n, qqpsettings *s, ae_state *_state) {
    s->epsf = 0.0;
    s->epsx = 1.0E-6;
    s->maxouterits = 0;
-   s->cgphase = ae_true;
-   s->cnphase = ae_true;
+   s->cgphase = true;
+   s->cnphase = true;
    s->cgminits = 5;
    s->cgmaxits = ae_maxint(s->cgminits, ae_round(1 + 0.33 * n, _state), _state);
    s->sparsesolver = 0;
@@ -27852,7 +27852,7 @@ void qqppreallocategrowdense(qqpbuffers *sstate, ae_int_t nexpected, ae_int_t ng
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2011 by Bochkanov Sergey
-void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *denseac, ae_int_t akind, ae_bool isupper, RVector *bc, RVector *bndlc, RVector *bnduc, RVector *sc, RVector *xoriginc, ae_int_t nc, qqpsettings *settings, qqpbuffers *sstate, RVector *xs, ae_int_t *terminationtype, ae_state *_state) {
+void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *denseac, ae_int_t akind, bool isupper, RVector *bc, RVector *bndlc, RVector *bnduc, RVector *sc, RVector *xoriginc, ae_int_t nc, qqpsettings *settings, qqpbuffers *sstate, RVector *xs, ae_int_t *terminationtype, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    ae_int_t j;
@@ -27863,7 +27863,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    double d1;
    ae_int_t d1est;
    ae_int_t d2est;
-   ae_bool needact;
+   bool needact;
    double reststp;
    double fullstp;
    double stpmax;
@@ -27876,11 +27876,11 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
    ae_int_t newtcnt;
    ae_int_t sparsesolver;
    double beta;
-   ae_bool b;
+   bool b;
    double fprev;
    double fcur;
-   ae_bool problemsolved;
-   ae_bool isconstrained;
+   bool problemsolved;
+   bool isconstrained;
    double f0;
    double f1;
 
@@ -27983,7 +27983,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          sparsetransposesks(&sstate->sparsea, _state);
       }
       sstate->akind = 1;
-      sstate->sparseupper = ae_false;
+      sstate->sparseupper = false;
       sstate->absamax = (double)(0);
       sstate->absasum = (double)(0);
       sstate->absasum2 = (double)(0);
@@ -28114,8 +28114,8 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
 // For unconstrained problems - try to use fast approach which requires
 // just one unregularized Cholesky decomposition for solution. If it fails,
 // switch to general QQP code.
-   problemsolved = ae_false;
-   isconstrained = ae_false;
+   problemsolved = false;
+   isconstrained = false;
    for (i = 0; i <= n - 1; i++) {
       isconstrained = (isconstrained || sstate->havebndl.ptr.p_bool[i]) || sstate->havebndu.ptr.p_bool[i];
    }
@@ -28128,7 +28128,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
          }
       }
       inc(&sstate->repncholesky, _state);
-      if (spdmatrixcholeskyrec(&sstate->densez, 0, n, ae_true, &sstate->tmpcn, _state)) {
+      if (spdmatrixcholeskyrec(&sstate->densez, 0, n, true, &sstate->tmpcn, _state)) {
          ae_v_move(&sstate->xf.ptr.p_double[0], 1, &sstate->xs.ptr.p_double[0], 1, ae_v_len(0, n - 1));
          for (i = 0; i <= n - 1; i++) {
             sstate->dc.ptr.p_double[i] = (double)(0);
@@ -28140,7 +28140,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             for (i = 0; i <= n - 1; i++) {
                sstate->dc.ptr.p_double[i] = -sstate->gc.ptr.p_double[i];
             }
-            fblscholeskysolve(&sstate->densez, 1.0, n, ae_true, &sstate->dc, &sstate->tmpcn, _state);
+            fblscholeskysolve(&sstate->densez, 1.0, n, true, &sstate->dc, &sstate->tmpcn, _state);
             f1 = qqpsolver_projectedtargetfunction(sstate, &sstate->xf, &sstate->dc, 1.0, &sstate->tmpcn, &sstate->tmp1, _state);
             if (ae_fp_greater_eq(f1, f0)) {
                break;
@@ -28149,7 +28149,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             f0 = f1;
          }
          *terminationtype = 2;
-         problemsolved = ae_true;
+         problemsolved = true;
       }
    }
 // Attempt to solve problem with fast approach failed, use generic QQP
@@ -28249,7 +28249,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
             ae_v_moveneg(&sstate->dc.ptr.p_double[0], 1, &sstate->cgc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
             v = 0.0;
             vv = 0.0;
-            b = ae_false;
+            b = false;
             for (i = 0; i <= n - 1; i++) {
                v = v + sstate->cgc.ptr.p_double[i] * sstate->cgc.ptr.p_double[i];
                vv = vv + sstate->cgp.ptr.p_double[i] * sstate->cgp.ptr.p_double[i];
@@ -28349,7 +28349,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                reststp = stpmax;
                fullstp = stpmax;
                stp = reststp;
-               needact = ae_true;
+               needact = true;
                sstate->stpbuf.ptr.p_double[0] = 4 * reststp;
                stpcnt = 1;
             }
@@ -28499,7 +28499,7 @@ void qqpoptimize(convexquadraticmodel *cqmac, sparsematrix *sparseac, RMatrix *d
                sstate->stpbuf.ptr.p_double[1] = 1.00;
                sstate->stpbuf.ptr.p_double[2] = 0.25;
                stpcnt = 3;
-               qqpsolver_findbeststepandmove(sstate, &sstate->sas, &sstate->dc, stp, ae_true, cidx, cval, &sstate->stpbuf, stpcnt, &sstate->activated, &sstate->tmp0, &sstate->tmp1, _state);
+               qqpsolver_findbeststepandmove(sstate, &sstate->sas, &sstate->dc, stp, true, cidx, cval, &sstate->stpbuf, stpcnt, &sstate->activated, &sstate->tmp0, &sstate->tmp1, _state);
             }
          }
          if (*terminationtype != 0) {
@@ -28580,7 +28580,7 @@ static double qqpsolver_projectedtargetfunction(qqpbuffers *sstate, RVector *x, 
    if (sstate->akind == 0) {
 
    // Dense matrix A
-      result = result + 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, ae_true, tmp0, 0, tmp1, _state);
+      result = result + 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, true, tmp0, 0, tmp1, _state);
    } else {
 
    // sparse matrix A
@@ -28621,7 +28621,7 @@ static void qqpsolver_targetgradient(qqpbuffers *sstate, RVector *x, RVector *g,
    if (sstate->akind == 0) {
 
    // Dense matrix A
-      rmatrixsymv(n, 1.0, &sstate->densea, 0, 0, ae_true, x, 0, 0.0, g, 0, _state);
+      rmatrixsymv(n, 1.0, &sstate->densea, 0, 0, true, x, 0, 0.0, g, 0, _state);
    } else {
 
    // Sparse matrix A
@@ -28702,7 +28702,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
    if (sstate->akind == 0) {
 
    // Dense matrix A
-      *d2 = 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, ae_true, d, 0, tmp0, _state);
+      *d2 = 0.5 * rmatrixsyvmv(n, &sstate->densea, 0, 0, true, d, 0, tmp0, _state);
    } else {
 
    // Sparse matrix A
@@ -28772,7 +28772,7 @@ static void qqpsolver_quadraticmodel(qqpbuffers *sstate, RVector *x, RVector *d,
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2014 by Bochkanov Sergey
-static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, ae_bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state) {
+static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, RVector *d, double stp, bool needact, ae_int_t cidx, double cval, RVector *addsteps, ae_int_t addstepscnt, BVector *activated, RVector *tmp0, RVector *tmp1, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    ae_int_t k;
@@ -28838,16 +28838,16 @@ static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, R
 // Fill Activated array by information about activated constraints.
 // Perform step
    for (i = 0; i <= n - 1; i++) {
-      activated->ptr.p_bool[i] = ae_false;
+      activated->ptr.p_bool[i] = false;
       v = tmp0->ptr.p_double[i];
       if (ae_fp_eq(v, sas->xc.ptr.p_double[i])) {
          continue;
       }
       if (sstate->havebndl.ptr.p_bool[i] && ae_fp_eq(v, sstate->bndl.ptr.p_double[i])) {
-         activated->ptr.p_bool[i] = ae_true;
+         activated->ptr.p_bool[i] = true;
       }
       if (sstate->havebndu.ptr.p_bool[i] && ae_fp_eq(v, sstate->bndu.ptr.p_double[i])) {
-         activated->ptr.p_bool[i] = ae_true;
+         activated->ptr.p_bool[i] = true;
       }
    }
    sasmoveto(sas, tmp0, needact, cidx, cval, _state);
@@ -28903,19 +28903,19 @@ static void qqpsolver_findbeststepandmove(qqpbuffers *sstate, sactiveset *sas, R
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2014 by Bochkanov Sergey
-static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state) {
+static bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver, ae_int_t *ncholesky, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
    double v;
-   ae_bool b;
+   bool b;
    ae_int_t ridx0;
    ae_int_t ridx1;
    ae_int_t nfree;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
 
 // Fetch often used fields
    n = sstate->n;
@@ -28936,7 +28936,7 @@ static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver,
    for (i = 0; i <= n - 1; i++) {
       ae_assert(!sstate->havebndl.ptr.p_bool[i] || ae_fp_greater_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndl.ptr.p_double[i]), "CNewtonBuild: internal error", _state);
       ae_assert(!sstate->havebndu.ptr.p_bool[i] || ae_fp_less_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndu.ptr.p_double[i]), "CNewtonBuild: internal error", _state);
-      b = ae_false;
+      b = false;
       b = b || (sstate->havebndl.ptr.p_bool[i] && ae_fp_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndl.ptr.p_double[i]));
       b = b || (sstate->havebndu.ptr.p_bool[i] && ae_fp_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndu.ptr.p_double[i]));
       if (b) {
@@ -28989,7 +28989,7 @@ static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver,
          sstate->densez.ptr.pp_double[i][i] = sstate->densez.ptr.pp_double[i][i] + sstate->regdiag.ptr.p_double[i];
       }
       inc(ncholesky, _state);
-      if (!spdmatrixcholeskyrec(&sstate->densez, 0, nfree, ae_true, &sstate->tmpcn, _state)) {
+      if (!spdmatrixcholeskyrec(&sstate->densez, 0, nfree, true, &sstate->tmpcn, _state)) {
          return result;
       }
       for (i = nfree - 1; i >= 0; i--) {
@@ -29009,7 +29009,7 @@ static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver,
             sstate->densez.ptr.pp_double[k][j] = (double)(0);
          }
       }
-      result = ae_true;
+      result = true;
       return result;
    }
 // Constrained Newton matrix: sparse version
@@ -29048,11 +29048,11 @@ static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver,
       if (!sparsecholeskyskyline(&sstate->sparsecca, n, sstate->sparseupper, _state)) {
          return result;
       }
-      result = ae_true;
+      result = true;
       return result;
    }
 // Unexpected :)
-   ae_assert(ae_false, "CNewtonBuild: internal error", _state);
+   ae_assert(false, "CNewtonBuild: internal error", _state);
    return result;
 }
 
@@ -29099,18 +29099,18 @@ static ae_bool qqpsolver_cnewtonbuild(qqpbuffers *sstate, ae_int_t sparsesolver,
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2014 by Bochkanov Sergey
-static ae_bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state) {
+static bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings, ae_int_t *ncupdates, ae_state *_state) {
    ae_int_t n;
    ae_int_t nfree;
    ae_int_t ntofix;
-   ae_bool b;
+   bool b;
    ae_int_t ridx0;
    ae_int_t ridx1;
    ae_int_t i;
    ae_int_t k;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
 
 // Cholesky updates for sparse problems are not supported
    if (sstate->akind == 1) {
@@ -29132,7 +29132,7 @@ static ae_bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings
       i = sstate->yidx.ptr.p_int[k];
       ae_assert(!sstate->havebndl.ptr.p_bool[i] || ae_fp_greater_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndl.ptr.p_double[i]), "CNewtonUpdate: internal error", _state);
       ae_assert(!sstate->havebndu.ptr.p_bool[i] || ae_fp_less_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndu.ptr.p_double[i]), "CNewtonUpdate: internal error", _state);
-      b = ae_false;
+      b = false;
       b = b || (sstate->havebndl.ptr.p_bool[i] && ae_fp_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndl.ptr.p_double[i]));
       b = b || (sstate->havebndu.ptr.p_bool[i] && ae_fp_eq(sstate->sas.xc.ptr.p_double[i], sstate->bndu.ptr.p_double[i]));
       if (b) {
@@ -29161,22 +29161,22 @@ static ae_bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings
    // Update Cholesky matrix with SPDMatrixCholeskyUpdateFixBuf()
       bvectorsetlengthatleast(&sstate->tmpcnb, n, _state);
       for (i = 0; i <= n - 1; i++) {
-         sstate->tmpcnb.ptr.p_bool[i] = ae_false;
+         sstate->tmpcnb.ptr.p_bool[i] = false;
       }
       for (i = nfree - ntofix; i <= nfree - 1; i++) {
-         sstate->tmpcnb.ptr.p_bool[sstate->yidx.ptr.p_int[i]] = ae_true;
+         sstate->tmpcnb.ptr.p_bool[sstate->yidx.ptr.p_int[i]] = true;
       }
-      spdmatrixcholeskyupdatefixbuf(&sstate->densez, n, ae_true, &sstate->tmpcnb, &sstate->tmpcn, _state);
+      spdmatrixcholeskyupdatefixbuf(&sstate->densez, n, true, &sstate->tmpcnb, &sstate->tmpcn, _state);
 
    // Update information stored in State and exit
       sstate->nfree = nfree - ntofix;
       sstate->cnmodelage = sstate->cnmodelage + ntofix;
       *ncupdates = *ncupdates + ntofix;
-      result = ae_true;
+      result = true;
       return result;
    }
 // Unexpected :)
-   ae_assert(ae_false, "CNewtonUpdate: internal error", _state);
+   ae_assert(false, "CNewtonUpdate: internal error", _state);
    return result;
 }
 
@@ -29223,14 +29223,14 @@ static ae_bool qqpsolver_cnewtonupdate(qqpbuffers *sstate, qqpsettings *settings
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2014 by Bochkanov Sergey
-static ae_bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state) {
+static bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, RVector *gc, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
    ae_int_t nfree;
    double v;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
    n = sstate->n;
    nfree = sstate->nfree;
    for (i = nfree; i <= n - 1; i++) {
@@ -29247,8 +29247,8 @@ static ae_bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, 
 
    // Dense Newton step.
    // Use straightforward Cholesky solver.
-      fblscholeskysolve(&sstate->densez, 1.0, n, ae_true, gc, &sstate->tmpcn, _state);
-      result = ae_true;
+      fblscholeskysolve(&sstate->densez, 1.0, n, true, gc, &sstate->tmpcn, _state);
+      result = true;
       return result;
    }
    if (sstate->akind == 1) {
@@ -29257,25 +29257,25 @@ static ae_bool qqpsolver_cnewtonstep(qqpbuffers *sstate, qqpsettings *settings, 
    //
    // We have T*T' = L*L' = U'*U (depending on specific triangle stored in SparseCCA).
       if (sstate->sparseupper) {
-         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, ae_false, 1, gc, _state);
-         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, ae_false, 0, gc, _state);
+         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, false, 1, gc, _state);
+         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, false, 0, gc, _state);
       } else {
-         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, ae_false, 0, gc, _state);
-         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, ae_false, 1, gc, _state);
+         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, false, 0, gc, _state);
+         sparsetrsv(&sstate->sparsecca, sstate->sparseupper, false, 1, gc, _state);
       }
-      result = ae_true;
+      result = true;
       return result;
    }
-   ae_assert(ae_false, "CNewtonStep: internal error", _state);
+   ae_assert(false, "CNewtonStep: internal error", _state);
    return result;
 }
 
-void _qqpsettings_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qqpsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qqpsettings *p = (qqpsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qqpsettings_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qqpsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qqpsettings *dst = (qqpsettings *) _dst;
    qqpsettings *src = (qqpsettings *) _src;
    dst->epsg = src->epsg;
@@ -29300,7 +29300,7 @@ void _qqpsettings_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _qqpbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qqpbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qqpbuffers *p = (qqpbuffers *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->densea, 0, 0, DT_REAL, _state, make_automatic);
@@ -29334,7 +29334,7 @@ void _qqpbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _sparsebuffers_init(&p->sbuf, _state, make_automatic);
 }
 
-void _qqpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qqpbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qqpbuffers *dst = (qqpbuffers *) _dst;
    qqpbuffers *src = (qqpbuffers *) _src;
    dst->n = src->n;
@@ -29513,7 +29513,7 @@ void qpdenseaulloaddefaults(ae_int_t nmain, qpdenseaulsettings *s, ae_state *_st
 //
 //   -- ALGLIB --
 //      Copyright 2017 by Bochkanov Sergey
-void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, ae_bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nn, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, ae_bool renormlc, qpdenseaulsettings *settings, qpdenseaulbuffers *state, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state) {
+void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nn, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulsettings *settings, qpdenseaulbuffers *state, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -29537,8 +29537,8 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
    ae_int_t nicwork;
    ae_int_t kwork;
    ae_int_t nwork;
-   ae_bool allowwseviction;
-   ae_bool workingsetextended;
+   bool allowwseviction;
+   bool workingsetextended;
    double targetscale;
 
    *terminationtype = 0;
@@ -29689,8 +29689,8 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
          state->qqpsettingsuser.epsg = 0.0;
          state->qqpsettingsuser.epsf = 0.0;
          state->qqpsettingsuser.epsx = 0.01 * epsx;
-         state->qqpsettingsuser.cnphase = ae_true;
-         qqpoptimize(&state->dummycqm, &state->dummysparse, &state->exa, 2, ae_true, &state->exb, &state->exbndl, &state->exbndu, &state->exscale, &state->exxorigin, nwork, &state->qqpsettingsuser, &state->qqpbuf, &state->exxc, &k, _state);
+         state->qqpsettingsuser.cnphase = true;
+         qqpoptimize(&state->dummycqm, &state->dummysparse, &state->exa, 2, true, &state->exb, &state->exbndl, &state->exbndu, &state->exscale, &state->exxorigin, nwork, &state->qqpsettingsuser, &state->qqpbuf, &state->exxc, &k, _state);
          state->repncholesky = state->repncholesky + state->qqpbuf.repncholesky;
 
       // Evaluate violation of constraints
@@ -29711,7 +29711,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
       //
       // NOTE: we use selection sort algorithm because its O(NAdded*NWork) cost
       //       is still comparable to the cost of constraints evaluation
-         workingsetextended = ae_false;
+         workingsetextended = false;
          i = 0;
          while (ae_fp_less((double)(i), 1 + qpdenseaulsolver_expansionratio * nmain) && nicwork < nictotal) {
 
@@ -29737,7 +29737,7 @@ void qpdenseauloptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t
                inc(&nwork, _state);
                inc(&kwork, _state);
                inc(&i, _state);
-               workingsetextended = ae_true;
+               workingsetextended = true;
             } else {
                break;
             }
@@ -29987,7 +29987,7 @@ static void qpdenseaulsolver_generateexmodel(RMatrix *sclsfta, RVector *sclsftb,
       v = -nulc->ptr.p_double[i];
       ae_v_addd(&exb->ptr.p_double[0], 1, &tmp2->ptr.pp_double[i][0], 1, ae_v_len(0, ntotal - 1), v);
    }
-   rmatrixsyrk(ntotal, sclsftnec + sclsftnic, rho, tmp2, 0, 0, 2, 1.0, exa, 0, 0, ae_true, _state);
+   rmatrixsyrk(ntotal, sclsftnec + sclsftnic, rho, tmp2, 0, 0, 2, 1.0, exa, 0, 0, true, _state);
 }
 
 // This function generates initial point for  "extended"  box-constrained  QP
@@ -30048,7 +30048,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
    double lambdareg;
    double mxdiag;
    double v;
-   ae_bool isactive;
+   bool isactive;
 
    nslack = sclsftnic;
    ntotal = nmain + nslack;
@@ -30165,12 +30165,12 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 
    // Handle active "simple" equality constraints
       for (i = 0; i <= ntotal - 1; i++) {
-         isactive = ae_false;
+         isactive = false;
          if (i < nmain && ((sclsfthasbndl->ptr.p_bool[i] && ae_fp_eq(exxc->ptr.p_double[i], sclsftbndl->ptr.p_double[i])) || (sclsfthasbndu->ptr.p_bool[i] && ae_fp_eq(exxc->ptr.p_double[i], sclsftbndu->ptr.p_double[i])))) {
-            isactive = ae_true;
+            isactive = true;
          }
          if (i >= nmain && ae_fp_eq(exxc->ptr.p_double[i], 0.0)) {
-            isactive = ae_true;
+            isactive = true;
          }
          if (!isactive) {
             continue;
@@ -30191,7 +30191,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
          buffers->qrkkt.ptr.pp_double[i][nqrcols] = buffers->qrrightpart.ptr.p_double[i];
       }
       rmatrixqr(&buffers->qrkkt, nqrrows, nqrcols + 1, &buffers->qrtau, _state);
-      if (ae_fp_less_eq(rmatrixtrrcond1(&buffers->qrkkt, nqrcols, ae_true, ae_false, _state), 1000 * ae_machineepsilon)) {
+      if (ae_fp_less_eq(rmatrixtrrcond1(&buffers->qrkkt, nqrcols, true, false, _state), 1000 * ae_machineepsilon)) {
          lambdareg = coalesce(10 * lambdareg, 1.0E-13, _state);
          continue;
       }
@@ -30262,7 +30262,7 @@ static void qpdenseaulsolver_updatelagrangemultipliers(RMatrix *sclsfta, RVector
 //
 //   -- ALGLIB --
 //      Copyright 01.10.2017 by Bochkanov Sergey
-static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, ae_bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, ae_bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state) {
+static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t nmain, RMatrix *cleic, ae_int_t dnec, ae_int_t dnic, sparsematrix *scleic, ae_int_t snec, ae_int_t snic, bool renormlc, qpdenseaulbuffers *state, RVector *xs, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -30470,7 +30470,7 @@ static void qpdenseaulsolver_scaleshiftoriginalproblem(convexquadraticmodel *a, 
 //
 //   -- ALGLIB --
 //      Copyright 01.10.2017 by Bochkanov Sergey
-static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, ae_bool usecleic, RMatrix *tmp2, ae_state *_state) {
+static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, bool usecleic, RMatrix *tmp2, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    double anorm;
@@ -30545,12 +30545,12 @@ static double qpdenseaulsolver_normalizequadraticterm(RMatrix *a, RVector *b, ae
 //
 //   -- ALGLIB --
 //      Copyright 02.10.2017 by Bochkanov Sergey
-static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, ae_bool *allowwseviction, ae_state *_state) {
+static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *tmp0, RMatrix *tmp2, ae_int_t *nicwork, bool *allowwseviction, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
    *nicwork = 0;
-   *allowwseviction = ae_false;
+   *allowwseviction = false;
 
    rmatrixsetlengthatleast(tmp2, nmain, nmain, _state);
    rvectorsetlengthatleast(tmp0, nmain, _state);
@@ -30559,30 +30559,30 @@ static void qpdenseaulsolver_selectinitialworkingset(RMatrix *a, ae_int_t nmain,
          tmp2->ptr.pp_double[i][j] = a->ptr.pp_double[i][j];
       }
    }
-   if (!spdmatrixcholeskyrec(tmp2, 0, nmain, ae_true, tmp0, _state)) {
+   if (!spdmatrixcholeskyrec(tmp2, 0, nmain, true, tmp0, _state)) {
 
    // Matrix is indefinite.
    //
    // We have to select full working set, otherwise algorithm may fail
    // because problem with reduced working set can be unbounded from below.
       *nicwork = nic;
-      *allowwseviction = ae_false;
+      *allowwseviction = false;
    } else {
 
    // Positive definite matrix.
    //
    // We can select zero initial working set and expand it later.
       *nicwork = 0;
-      *allowwseviction = ae_true;
+      *allowwseviction = true;
    }
 }
 
-void _qpdenseaulsettings_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qpdenseaulsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qpdenseaulsettings *p = (qpdenseaulsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpdenseaulsettings_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qpdenseaulsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpdenseaulsettings *dst = (qpdenseaulsettings *) _dst;
    qpdenseaulsettings *src = (qpdenseaulsettings *) _src;
    dst->epsx = src->epsx;
@@ -30600,7 +30600,7 @@ void _qpdenseaulsettings_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _qpdenseaulbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qpdenseaulbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpdenseaulbuffers *p = (qpdenseaulbuffers *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->nulc, 0, DT_REAL, _state, make_automatic);
@@ -30641,7 +30641,7 @@ void _qpdenseaulbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic)
    ae_vector_init(&p->nicnact, 0, DT_INT, _state, make_automatic);
 }
 
-void _qpdenseaulbuffers_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qpdenseaulbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpdenseaulbuffers *dst = (qpdenseaulbuffers *) _dst;
    qpdenseaulbuffers *src = (qpdenseaulbuffers *) _src;
    ae_vector_init_copy(&dst->nulc, &src->nulc, _state, make_automatic);
@@ -30847,8 +30847,8 @@ void minbleiccreate(ae_int_t n, RVector *x, minbleicstate *state, ae_state *_sta
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
    _minbleicstate_clear(state);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
    ae_assert(n >= 1, "MinBLEICCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinBLEICCreate: Length(X)<N", _state);
@@ -30906,8 +30906,8 @@ void minbleiccreatef(ae_int_t n, RVector *x, double diffstep, minbleicstate *sta
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
    _minbleicstate_clear(state);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
    ae_assert(n >= 1, "MinBLEICCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinBLEICCreateF: Length(X)<N", _state);
@@ -31239,7 +31239,7 @@ void minbleicsetprecscale(minbleicstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-void minbleicsetxrep(minbleicstate *state, ae_bool needxrep, ae_state *_state) {
+void minbleicsetxrep(minbleicstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -31257,7 +31257,7 @@ void minbleicsetxrep(minbleicstate *state, ae_bool needxrep, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void minbleicsetdrep(minbleicstate *state, ae_bool needdrep, ae_state *_state) {
+void minbleicsetdrep(minbleicstate *state, bool needdrep, ae_state *_state) {
 
    state->drep = needdrep;
 }
@@ -31326,7 +31326,7 @@ void minbleicsetstpmax(minbleicstate *state, double stpmax, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
+bool minbleiciteration(minbleicstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -31334,14 +31334,14 @@ ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
    double v;
    double vv;
    double v0;
-   ae_bool b;
+   bool b;
    ae_int_t mcinfo;
    ae_int_t actstatus;
    ae_int_t itidx;
    double penalty;
    double ginit;
    double gdecay;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -31374,7 +31374,7 @@ ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
       mcinfo = 81;
       actstatus = 255;
       itidx = 74;
-      b = ae_false;
+      b = false;
       v = 809;
       vv = 205;
       v0 = -838;
@@ -31461,8 +31461,8 @@ ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
 
 // Init
    n = state->nmain;
-   state->steepestdescentstep = ae_false;
-   state->userterminationneeded = ae_false;
+   state->steepestdescentstep = false;
+   state->userterminationneeded = false;
    state->repterminationtype = 0;
    state->repinneriterationscount = 0;
    state->repouteriterationscount = 0;
@@ -31474,7 +31474,7 @@ ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
    state->repdebugdx = _state->v_nan;
    if (ae_fp_neq(state->stpmax, (double)(0)) && state->prectype != 0) {
       state->repterminationtype = -10;
-      result = ae_false;
+      result = false;
       return result;
    }
    rmatrixsetlengthatleast(&state->bufyk, m + 1, n, _state);
@@ -31494,17 +31494,17 @@ ae_bool minbleiciteration(minbleicstate *state, ae_state *_state) {
       goto lbl_22;
    }
 lbl_24:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, ae_true, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep, _state)) {
       goto lbl_25;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->smonitor.fi.ptr.p_double[0] = state->f;
    for (i = 0; i <= n - 1; i++) {
       state->smonitor.j.ptr.pp_double[0][i] = state->g.ptr.p_double[i];
@@ -31531,7 +31531,7 @@ lbl_22:
 // Start optimization
    if (!sasstartoptimization(&state->sas, &state->xstart, _state)) {
       state->repterminationtype = -3;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Main cycle of BLEIC-PG algorithm
@@ -31545,18 +31545,18 @@ lbl_22:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_26;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_27;
 lbl_26:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needf = ae_false;
+   state->needf = false;
 lbl_27:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold, _state);
@@ -31567,22 +31567,22 @@ lbl_27:
 // Report current point
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->sas.xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fc;
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_28:
    if (state->userterminationneeded) {
 
    // User requested termination
       sasstopoptimization(&state->sas, _state);
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 lbl_30:
-   if (ae_false) {
+   if (false) {
       goto lbl_31;
    }
 // Preparations
@@ -31597,16 +31597,16 @@ lbl_30:
       goto lbl_32;
    }
 // Analytic gradient
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_33;
 lbl_32:
 
 // Numerical differentiation
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
@@ -31617,7 +31617,7 @@ lbl_34:
       goto lbl_36;
    }
    v = state->x.ptr.p_double[i];
-   b = ae_false;
+   b = false;
    if (state->hasbndl.ptr.p_bool[i]) {
       b = b || ae_fp_less(v - state->diffstep * state->s.ptr.p_double[i], state->bndl.ptr.p_double[i]);
    }
@@ -31679,7 +31679,7 @@ lbl_38:
    goto lbl_34;
 lbl_36:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_33:
    state->fc = state->f;
    ae_v_move(&state->ugc.ptr.p_double[0], 1, &state->g.ptr.p_double[0], 1, ae_v_len(0, n - 1));
@@ -31697,7 +31697,7 @@ lbl_33:
    // Abnormal termination - infinities in function/gradient
       sasstopoptimization(&state->sas, _state);
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->userterminationneeded) {
@@ -31705,7 +31705,7 @@ lbl_33:
    // User requested termination
       sasstopoptimization(&state->sas, _state);
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // LBFGS stage:
@@ -31728,7 +31728,7 @@ lbl_33:
 //   but with all BFGS updates (Sk/Yk pairs) being dropped;
 //   it happens after changes in active set
    state->bufsize = 0;
-   state->steepestdescentstep = ae_true;
+   state->steepestdescentstep = true;
    itidx = -1;
 lbl_39:
    if (itidx >= n - 1) {
@@ -31847,13 +31847,13 @@ lbl_39:
       goto lbl_41;
    }
    minbleic_clearrequestfields(state, _state);
-   state->lsstart = ae_true;
+   state->lsstart = true;
    state->boundedstep = state->cidx >= 0;
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->sas.xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 12;
    goto lbl_rcomm;
 lbl_12:
-   state->lsstart = ae_false;
+   state->lsstart = false;
 lbl_41:
 
 // Minimize F(x+alpha*d)
@@ -31881,17 +31881,17 @@ lbl_43:
       goto lbl_45;
    }
 // Analytic gradient
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 13;
    goto lbl_rcomm;
 lbl_13:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->repnfev = state->repnfev + 1;
    goto lbl_46;
 lbl_45:
 
 // Numerical differentiation
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 14;
    goto lbl_rcomm;
 lbl_14:
@@ -31902,7 +31902,7 @@ lbl_47:
       goto lbl_49;
    }
    v = state->x.ptr.p_double[i];
-   b = ae_false;
+   b = false;
    if (state->hasbndl.ptr.p_bool[i]) {
       b = b || ae_fp_less(v - state->diffstep * state->s.ptr.p_double[i], state->bndl.ptr.p_double[i]);
    }
@@ -31966,7 +31966,7 @@ lbl_51:
    goto lbl_47;
 lbl_49:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_46:
 
 // Back to MCSRCH
@@ -32021,7 +32021,7 @@ lbl_44:
          v = v + ae_sqr(state->d.ptr.p_double[i] * state->curstpmax / state->s.ptr.p_double[i], _state);
       }
       v = ae_sqrt(v, _state);
-      b = ae_false;
+      b = false;
       if ((state->cidx >= 0 && ae_fp_less_eq(v, minbleic_maxnonmonotoniclen)) && state->nonmonotoniccnt > 0) {
 
       // We try to enforce non-monotonic step:
@@ -32042,7 +32042,7 @@ lbl_44:
          mcinfo = 5;
          ae_v_move(&state->xn.ptr.p_double[0], 1, &state->tmp0.ptr.p_double[0], 1, ae_v_len(0, n - 1));
          state->nonmonotoniccnt = state->nonmonotoniccnt - 1;
-         b = ae_true;
+         b = true;
       }
       if (!b) {
 
@@ -32084,11 +32084,11 @@ lbl_44:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->sas.xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minbleic_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 21;
    goto lbl_rcomm;
 lbl_21:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_52:
    state->repinneriterationscount = state->repinneriterationscount + 1;
    if (mcinfo == 1) {
@@ -32168,7 +32168,7 @@ lbl_52:
       goto lbl_40;
    }
 // Clear "steepest descent" flag.
-   state->steepestdescentstep = ae_false;
+   state->steepestdescentstep = false;
 
 // Smooth reset (LBFGS memory model is refreshed) or hard restart:
 // * LBFGS model is refreshed, if line search was performed with activation of constraints
@@ -32204,12 +32204,12 @@ lbl_40:
 lbl_31:
    sasstopoptimization(&state->sas, _state);
    state->repouteriterationscount = 1;
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = m;
    state->rstate.ia.ptr.p_int[2] = i;
@@ -32671,7 +32671,7 @@ void minbleicrestartfrom(minbleicstate *state, RVector *x, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void minbleicrequesttermination(minbleicstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // This subroutine finalizes internal structures after emergency  termination
@@ -32690,10 +32690,10 @@ void minbleicemergencytermination(minbleicstate *state, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forget to clear something)
 static void minbleic_clearrequestfields(minbleicstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfg = ae_false;
-   state->xupdated = ae_false;
-   state->lsstart = ae_false;
+   state->needf = false;
+   state->needfg = false;
+   state->xupdated = false;
+   state->lsstart = false;
 }
 
 // Internal initialization subroutine
@@ -32706,13 +32706,13 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
 // Initialize
    state->teststep = (double)(0);
    state->smoothnessguardlevel = 0;
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    state->nmain = n;
    state->diffstep = diffstep;
    sasinit(n, &state->sas, _state);
@@ -32736,17 +32736,17 @@ static void minbleic_minbleicinitinternal(ae_int_t n, RVector *x, double diffste
    ae_vector_set_length(&state->work, n, _state);
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
-      state->hasbndl.ptr.p_bool[i] = ae_false;
+      state->hasbndl.ptr.p_bool[i] = false;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->hasbndu.ptr.p_bool[i] = ae_false;
+      state->hasbndu.ptr.p_bool[i] = false;
       state->s.ptr.p_double[i] = 1.0;
       state->invs.ptr.p_double[i] = 1.0;
       state->lastscaleused.ptr.p_double[i] = 1.0;
    }
    minbleicsetlc(state, &c, &ct, 0, _state);
    minbleicsetcond(state, 0.0, 0.0, 0.0, 0, _state);
-   minbleicsetxrep(state, ae_false, _state);
-   minbleicsetdrep(state, ae_false, _state);
+   minbleicsetxrep(state, false, _state);
+   minbleicsetdrep(state, false, _state);
    minbleicsetstpmax(state, 0.0, _state);
    minbleicsetprecdefault(state, _state);
    minbleicrestartfrom(state, x, _state);
@@ -32782,7 +32782,7 @@ static void minbleic_updateestimateofgoodstep(double *estimate, double newstep, 
    *estimate = newstep;
 }
 
-void _minbleicstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minbleicstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbleicstate *p = (minbleicstate *) _p;
    ae_touch_ptr((void *)p);
    _sactiveset_init(&p->sas, _state, make_automatic);
@@ -32818,7 +32818,7 @@ void _minbleicstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minbleicstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbleicstate *dst = (minbleicstate *) _dst;
    minbleicstate *src = (minbleicstate *) _src;
    dst->nmain = src->nmain;
@@ -32985,12 +32985,12 @@ void _minbleicstate_destroy(void *_p) {
    ae_vector_destroy(&p->invs);
 }
 
-void _minbleicreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minbleicreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minbleicreport *p = (minbleicreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minbleicreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minbleicreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbleicreport *dst = (minbleicreport *) _dst;
    minbleicreport *src = (minbleicreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -33105,7 +33105,7 @@ void qpbleiccopysettings(qpbleicsettings *src, qpbleicsettings *dst, ae_state *_
 //
 //   -- ALGLIB --
 //      Copyright 14.05.2011 by Bochkanov Sergey
-void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, ae_bool sparseaupper, double absasum, double absasum2, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, qpbleicsettings *settings, qpbleicbuffers *sstate, ae_bool *firstcall, RVector *xs, ae_int_t *terminationtype, ae_state *_state) {
+void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t akind, bool sparseaupper, double absasum, double absasum2, RVector *b, RVector *bndl, RVector *bndu, RVector *s, RVector *xorigin, ae_int_t n, RMatrix *cleic, ae_int_t nec, ae_int_t nic, qpbleicsettings *settings, qpbleicbuffers *sstate, bool *firstcall, RVector *xs, ae_int_t *terminationtype, ae_state *_state) {
    ae_int_t i;
    double d2;
    double d1;
@@ -33129,7 +33129,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
 // Prepare solver object, if needed
    if (*firstcall) {
       minbleiccreate(n, xs, &sstate->solver, _state);
-      *firstcall = ae_false;
+      *firstcall = false;
    }
 // Prepare max(|B|)
    mb = 0.0;
@@ -33149,7 +33149,7 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
    }
    minbleicsetlc(&sstate->solver, cleic, &sstate->tmpi, nec + nic, _state);
    minbleicsetbc(&sstate->solver, bndl, bndu, _state);
-   minbleicsetdrep(&sstate->solver, ae_true, _state);
+   minbleicsetdrep(&sstate->solver, true, _state);
    minbleicsetcond(&sstate->solver, ae_minrealnumber, 0.0, 0.0, settings->maxits, _state);
    minbleicsetscale(&sstate->solver, s, _state);
    minbleicsetprecscale(&sstate->solver, _state);
@@ -33348,12 +33348,12 @@ void qpbleicoptimize(convexquadraticmodel *a, sparsematrix *sparsea, ae_int_t ak
    }
 }
 
-void _qpbleicsettings_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qpbleicsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    qpbleicsettings *p = (qpbleicsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _qpbleicsettings_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qpbleicsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpbleicsettings *dst = (qpbleicsettings *) _dst;
    qpbleicsettings *src = (qpbleicsettings *) _src;
    dst->epsg = src->epsg;
@@ -33372,7 +33372,7 @@ void _qpbleicsettings_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _qpbleicbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _qpbleicbuffers_init(void *_p, ae_state *_state, bool make_automatic) {
    qpbleicbuffers *p = (qpbleicbuffers *) _p;
    ae_touch_ptr((void *)p);
    _minbleicstate_init(&p->solver, _state, make_automatic);
@@ -33382,7 +33382,7 @@ void _qpbleicbuffers_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->tmpi, 0, DT_INT, _state, make_automatic);
 }
 
-void _qpbleicbuffers_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _qpbleicbuffers_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    qpbleicbuffers *dst = (qpbleicbuffers *) _dst;
    qpbleicbuffers *src = (qpbleicbuffers *) _src;
    _minbleicstate_init_copy(&dst->solver, &src->solver, _state, make_automatic);
@@ -33543,7 +33543,7 @@ void vipminitsparse(vipmstate *state, RVector *s, RVector *xorigin, ae_int_t n, 
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *sparseh, ae_int_t hkind, ae_bool isupper, RVector *c, ae_state *_state) {
+void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *sparseh, ae_int_t hkind, bool isupper, RVector *c, ae_state *_state) {
    ae_int_t nmain;
    ae_int_t n;
    ae_int_t i;
@@ -33563,9 +33563,9 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
    ae_assert(state->factorizationtype == 0 || state->factorizationtype == 1, "VIPMSetQuadraticLinear: unexpected factorization type", _state);
 
 // Set problem info, reset factorization flag
-   state->islinear = ae_false;
-   state->factorizationpresent = ae_false;
-   state->factorizationpoweredup = ae_false;
+   state->islinear = false;
+   state->factorizationpresent = false;
+   state->factorizationpoweredup = false;
 
 // Linear term
    rvectorsetlengthatleast(&state->c, n, _state);
@@ -33638,8 +33638,8 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          }
       }
       ae_assert(ae_isfinite(vv, _state), "VIPMSetQuadraticLinear: DenseH contains infinite or NaN values!", _state);
-      scaledenseqpinplace(&state->denseh, ae_false, nmain, &state->c, n, &state->scl, _state);
-      state->targetscale = normalizedenseqpinplace(&state->denseh, ae_false, nmain, &state->c, n, _state);
+      scaledenseqpinplace(&state->denseh, false, nmain, &state->c, n, &state->scl, _state);
+      state->targetscale = normalizedenseqpinplace(&state->denseh, false, nmain, &state->c, n, _state);
    }
    if (state->factorizationtype == 1) {
       ae_assert(nmain == n, "VIPMSetQuadraticLinear: critical integrity check failed, NMain!=N", _state);
@@ -33776,7 +33776,7 @@ void vipmsetquadraticlinear(vipmstate *state, RMatrix *denseh, sparsematrix *spa
          }
       }
       scalesparseqpinplace(&state->scl, n, &state->sparseh, &state->c, _state);
-      state->targetscale = normalizesparseqpinplace(&state->sparseh, ae_false, &state->c, n, _state);
+      state->targetscale = normalizesparseqpinplace(&state->sparseh, false, &state->c, n, _state);
    }
    ae_assert(state->hkind >= 0, "VIPMSetQuadraticLinear: integrity check failed", _state);
 }
@@ -33830,8 +33830,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
    ae_assert(cu->cnt >= mdense + msparse, "VIPMSetConstraints: CU is too short!", _state);
 
 // Reset factorization flag
-   state->factorizationpresent = ae_false;
-   state->factorizationpoweredup = ae_false;
+   state->factorizationpresent = false;
+   state->factorizationpoweredup = false;
 
 // Box constraints
    rvectorsetlengthatleast(&state->bndl, n, _state);
@@ -33891,14 +33891,14 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
                if (ae_fp_greater_eq(ae_fabs(cu->ptr.p_double[i], _state), ae_fabs(cl->ptr.p_double[i], _state))) {
                   state->b.ptr.p_double[i] = cl->ptr.p_double[i];
                   state->r.ptr.p_double[i] = cu->ptr.p_double[i] - cl->ptr.p_double[i];
-                  state->hasr.ptr.p_bool[i] = ae_true;
-                  state->aflips.ptr.p_bool[i] = ae_false;
+                  state->hasr.ptr.p_bool[i] = true;
+                  state->aflips.ptr.p_bool[i] = false;
                   vs = (double)(1);
                } else {
                   state->b.ptr.p_double[i] = -cu->ptr.p_double[i];
                   state->r.ptr.p_double[i] = cu->ptr.p_double[i] - cl->ptr.p_double[i];
-                  state->hasr.ptr.p_bool[i] = ae_true;
-                  state->aflips.ptr.p_bool[i] = ae_true;
+                  state->hasr.ptr.p_bool[i] = true;
+                  state->aflips.ptr.p_bool[i] = true;
                   vs = (double)(-1);
                }
             } else {
@@ -33908,8 +33908,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
             // One pair of slack variables added.
                state->b.ptr.p_double[i] = cl->ptr.p_double[i];
                state->r.ptr.p_double[i] = _state->v_posinf;
-               state->hasr.ptr.p_bool[i] = ae_false;
-               state->aflips.ptr.p_bool[i] = ae_false;
+               state->hasr.ptr.p_bool[i] = false;
+               state->aflips.ptr.p_bool[i] = false;
                vs = (double)(1);
             }
          } else {
@@ -33919,8 +33919,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
          // One pair of slack variables added.
             state->b.ptr.p_double[i] = -cu->ptr.p_double[i];
             state->r.ptr.p_double[i] = _state->v_posinf;
-            state->hasr.ptr.p_bool[i] = ae_false;
-            state->aflips.ptr.p_bool[i] = ae_true;
+            state->hasr.ptr.p_bool[i] = false;
+            state->aflips.ptr.p_bool[i] = true;
             vs = (double)(-1);
          }
       } else {
@@ -33929,8 +33929,8 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
       // Generate dummy formulation.
          state->b.ptr.p_double[i] = (double)(-1);
          state->r.ptr.p_double[i] = (double)(2);
-         state->hasr.ptr.p_bool[i] = ae_true;
-         state->aflips.ptr.p_bool[i] = ae_false;
+         state->hasr.ptr.p_bool[i] = true;
+         state->aflips.ptr.p_bool[i] = false;
          vs = (double)(0);
       }
 
@@ -33949,7 +33949,7 @@ void vipmsetconstraints(vipmstate *state, RVector *bndl, RVector *bndu, sparsema
       state->ascales.ptr.p_double[i] = vs;
    }
    scaleshiftmixedbrlcinplace(&state->scl, &state->xorigin, n, &state->sparseafull, msparse, &state->denseafull, mdense, &state->b, &state->r, _state);
-   normalizemixedbrlcinplace(&state->sparseafull, msparse, &state->denseafull, mdense, &state->b, &state->r, n, ae_true, &state->tmp0, ae_true, _state);
+   normalizemixedbrlcinplace(&state->sparseafull, msparse, &state->denseafull, mdense, &state->b, &state->r, n, true, &state->tmp0, true, _state);
    for (i = 0; i <= m - 1; i++) {
       state->ascales.ptr.p_double[i] = state->ascales.ptr.p_double[i] * state->tmp0.ptr.p_double[i];
    }
@@ -34079,7 +34079,7 @@ void vipmsetcond(vipmstate *state, double epsp, double epsd, double epsgap, ae_s
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state) {
+void vipmoptimize(vipmstate *state, bool dropbigbounds, RVector *xs, RVector *lagbc, RVector *laglc, ae_int_t *terminationtype, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -34123,7 +34123,7 @@ void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector 
    double bestegap;
    double besteprimal;
    double bestedual;
-   ae_bool loadbest;
+   bool loadbest;
 
    *terminationtype = 0;
 
@@ -34192,7 +34192,7 @@ void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector 
    y0nrm = ae_maxreal(y0nrm, rmaxabsv(n, &state->current.s, _state), _state);
 
 // Start iteration
-   loadbest = ae_true;
+   loadbest = true;
    primalstagnationcnt = 0;
    dualstagnationcnt = 0;
    *terminationtype = 7;
@@ -34312,13 +34312,13 @@ void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector 
             primalxscale = ae_maxreal(primalxscale, rmaxabsv(n, &state->current.x, _state), _state);
             for (i = 0; i <= n - 1; i++) {
                if ((state->hasbndl.ptr.p_bool[i] && state->hasgz.ptr.p_bool[i]) && ae_fp_greater(ae_fabs(state->bndl.ptr.p_double[i], _state), vipmsolver_bigconstrmag * primalxscale)) {
-                  state->hasgz.ptr.p_bool[i] = ae_false;
+                  state->hasgz.ptr.p_bool[i] = false;
                   state->current.g.ptr.p_double[i] = (double)(0);
                   state->current.z.ptr.p_double[i] = (double)(0);
                   inc(&droppedbounds, _state);
                }
                if ((state->hasbndu.ptr.p_bool[i] && state->hasts.ptr.p_bool[i]) && ae_fp_greater(ae_fabs(state->bndu.ptr.p_double[i], _state), vipmsolver_bigconstrmag * primalxscale)) {
-                  state->hasts.ptr.p_bool[i] = ae_false;
+                  state->hasts.ptr.p_bool[i] = false;
                   state->current.t.ptr.p_double[i] = (double)(0);
                   state->current.s.ptr.p_double[i] = (double)(0);
                   inc(&droppedbounds, _state);
@@ -34340,7 +34340,7 @@ void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector 
             for (i = 0; i <= m - 1; i++) {
                if (((state->hasr.ptr.p_bool[i] && state->haspq.ptr.p_bool[i]) && ae_fp_greater(ae_fabs(state->b.ptr.p_double[i] + state->r.ptr.p_double[i], _state), vipmsolver_bigconstrmag * primalxscale)) && ae_fp_less(ae_fabs(state->b.ptr.p_double[i], _state), vipmsolver_bigconstrmag * primalxscale)) {
                   ae_assert(state->haswv.ptr.p_bool[i] && state->haspq.ptr.p_bool[i], "VIPMOptimize: unexpected integrity check failure (4y64)", _state);
-                  state->haspq.ptr.p_bool[i] = ae_false;
+                  state->haspq.ptr.p_bool[i] = false;
                   state->current.p.ptr.p_double[i] = (double)(0);
                   state->current.q.ptr.p_double[i] = (double)(0);
                   inc(&droppedbounds, _state);
@@ -34416,7 +34416,7 @@ void vipmoptimize(vipmstate *state, ae_bool dropbigbounds, RVector *xs, RVector 
             ae_trace("> stopping criteria are met\n");
          }
          *terminationtype = 1;
-         loadbest = ae_false;
+         loadbest = false;
          break;
       }
       bady = vipmsolver_bigy;
@@ -34704,20 +34704,20 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
 // Problem metrics, settings and type
    state->n = n;
    state->nmain = nmain;
-   state->islinear = ae_true;
+   state->islinear = true;
    state->factorizationtype = ftype;
-   state->factorizationpresent = ae_false;
-   state->factorizationpoweredup = ae_false;
+   state->factorizationpresent = false;
+   state->factorizationpoweredup = false;
    vipmsetcond(state, 0.0, 0.0, 0.0, _state);
-   state->slacksforequalityconstraints = ae_true;
+   state->slacksforequalityconstraints = true;
 
 // Reports
    state->repiterationscount = 0;
    state->repncholesky = 0;
 
 // Trace
-   state->dotrace = ae_false;
-   state->dodetailedtrace = ae_false;
+   state->dotrace = false;
+   state->dodetailedtrace = false;
 
 // Scale and origin
    rvectorsetlengthatleast(&state->scl, n, _state);
@@ -34775,8 +34775,8 @@ static void vipmsolver_vipminit(vipmstate *state, RVector *s, RVector *xorigin, 
    bvectorsetlengthatleast(&state->hasbndl, n, _state);
    bvectorsetlengthatleast(&state->hasbndu, n, _state);
    for (i = 0; i <= n - 1; i++) {
-      state->hasbndl.ptr.p_bool[i] = ae_false;
-      state->hasbndu.ptr.p_bool[i] = ae_false;
+      state->hasbndl.ptr.p_bool[i] = false;
+      state->hasbndu.ptr.p_bool[i] = false;
       state->bndl.ptr.p_double[i] = _state->v_neginf;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
    }
@@ -34928,14 +34928,14 @@ static void vipmsolver_multiplyhx(vipmstate *state, RVector *x, RVector *hx, ae_
    rvectorsetlengthatleast(hx, n, _state);
    ae_assert(state->hkind == 0 || state->hkind == 1, "VIPMMultiplyHX: unexpected HKind", _state);
    if (state->hkind == 0) {
-      rmatrixsymv(nmain, 1.0, &state->denseh, 0, 0, ae_false, x, 0, 0.0, hx, 0, _state);
+      rmatrixsymv(nmain, 1.0, &state->denseh, 0, 0, false, x, 0, 0.0, hx, 0, _state);
       for (i = nmain; i <= n - 1; i++) {
          hx->ptr.p_double[i] = (double)(0);
       }
    }
    if (state->hkind == 1) {
       ae_assert(state->sparseh.n == n && state->sparseh.m == n, "VIPMMultiplyHX: sparse H has incorrect size", _state);
-      sparsesmv(&state->sparseh, ae_false, x, hx, _state);
+      sparsesmv(&state->sparseh, false, x, hx, _state);
    }
    for (i = 0; i <= n - 1; i++) {
       hx->ptr.p_double[i] = hx->ptr.p_double[i] + x->ptr.p_double[i] * state->diagr.ptr.p_double[i];
@@ -34985,7 +34985,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
    double initdualslack;
    double mu0;
    double mumin;
-   ae_bool success;
+   bool success;
 
    ae_assert(state->factorizationtype == 0 || state->factorizationtype == 1, "VIPMPowerUp: unexpected factorization type", _state);
    n = state->n;
@@ -34999,14 +34999,14 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
 // Compute diagonal regularization matrix R.
    bcopyallocv(n, &state->hasbndl, &state->hasgz, _state);
    bcopyallocv(n, &state->hasbndu, &state->hasts, _state);
-   bsetallocv(n, ae_false, &state->isfrozen, _state);
+   bsetallocv(n, false, &state->isfrozen, _state);
    rsetallocv(n, 0.0, &state->diagr, _state);
    vipmsolver_varsinitbyzero(&state->current, n, m, _state);
    for (i = 0; i <= n - 1; i++) {
       if ((state->hasbndl.ptr.p_bool[i] && state->hasbndu.ptr.p_bool[i]) && ae_fp_eq(state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i])) {
-         state->isfrozen.ptr.p_bool[i] = ae_true;
-         state->hasgz.ptr.p_bool[i] = ae_false;
-         state->hasts.ptr.p_bool[i] = ae_false;
+         state->isfrozen.ptr.p_bool[i] = true;
+         state->hasgz.ptr.p_bool[i] = false;
+         state->hasts.ptr.p_bool[i] = false;
          state->current.x.ptr.p_double[i] = state->bndl.ptr.p_double[i];
       }
       if (!state->hasbndl.ptr.p_bool[i] && !state->hasbndu.ptr.p_bool[i]) {
@@ -35110,10 +35110,10 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
       factldlt = 1;
       permauto = 0;
       if (!spsymmanalyze(&state->factsparsekkttmpl, factldlt, permauto, &state->ldltanalysis, _state)) {
-         ae_assert(ae_false, "VIPMPowerUp: critical integrity check failed, symbolically degenerate KKT system encountered", _state);
+         ae_assert(false, "VIPMPowerUp: critical integrity check failed, symbolically degenerate KKT system encountered", _state);
       }
    }
-   state->factorizationpoweredup = ae_true;
+   state->factorizationpoweredup = true;
 
 // Set up initial values of primal and dual variables X and Y by solving
 // modified KKT system which tries to enforce linear constraints (ignoring
@@ -35270,7 +35270,7 @@ static void vipmsolver_vipmpowerup(vipmstate *state, double regfree, ae_state *_
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state) {
+static bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector *d, double beta0, RVector *e, double alpha11, double beta11, double modeps, double dampeps, ae_state *_state) {
    ae_int_t n;
    ae_int_t nmain;
    ae_int_t nslack;
@@ -35293,7 +35293,7 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
    double badchol;
    double sumsq;
    double errsq;
-   ae_bool result;
+   bool result;
 
    ae_assert(ae_isfinite(alpha0, _state) && ae_fp_greater_eq(alpha0, (double)(0)), "VIPMFactorize: Alpha0 is infinite or negative", _state);
    ae_assert(ae_isfinite(alpha11, _state) && ae_fp_greater_eq(alpha11, (double)(0)), "VIPMFactorize: Alpha1 is infinite or negative", _state);
@@ -35307,9 +35307,9 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
    m = state->mdense + state->msparse;
    mdense = state->mdense;
    msparse = state->msparse;
-   state->factorizationpresent = ae_false;
+   state->factorizationpresent = false;
    badchol = 1.0E50;
-   result = ae_true;
+   result = true;
 
 // Dense NxN normal equations approach
    if (state->factorizationtype == 0) {
@@ -35457,7 +35457,7 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
                state->tmpr2.ptr.pp_double[i][j] = v * state->tmpr2.ptr.pp_double[i][j];
             }
          }
-         rmatrixsyrk(nmain, mdense, 1.0, &state->tmpr2, 0, 0, 2, 1.0, &state->factdensehaug, 0, 0, ae_false, _state);
+         rmatrixsyrk(nmain, mdense, 1.0, &state->tmpr2, 0, 0, 2, 1.0, &state->factdensehaug, 0, 0, false, _state);
       }
    // Zero out rows/cols of HWave corresponding to frozen variables, set up unit diagonal
       rsetallocv(nmain, 1.0, &state->tmp0, _state);
@@ -35480,8 +35480,8 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
       }
 
    // Compute Cholesky factorization of HWave
-      if (!spdmatrixcholesky(&state->factdensehaug, nmain, ae_false, _state)) {
-         result = ae_false;
+      if (!spdmatrixcholesky(&state->factdensehaug, nmain, false, _state)) {
+         result = false;
          return result;
       }
       v = (double)(0);
@@ -35489,10 +35489,10 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
          v = v + state->factdensehaug.ptr.pp_double[i][i];
       }
       if (!ae_isfinite(v, _state) || ae_fp_greater(v, badchol)) {
-         result = ae_false;
+         result = false;
          return result;
       }
-      state->factorizationpresent = ae_true;
+      state->factorizationpresent = true;
    }
 // Sparse (M+N)x(M+N) factorization
    if (state->factorizationtype == 1) {
@@ -35536,7 +35536,7 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
       spsymmreloaddiagonal(&state->ldltanalysis, &state->facttmpdiag, _state);
       spsymmsetmodificationstrategy(&state->ldltanalysis, 1, modeps, badchol, 0.0, 0.0, _state);
       if (!spsymmfactorize(&state->ldltanalysis, _state)) {
-         result = ae_false;
+         result = false;
          return result;
       }
       spsymmdiagerr(&state->ldltanalysis, &sumsq, &errsq, _state);
@@ -35544,10 +35544,10 @@ static ae_bool vipmsolver_vipmfactorize(vipmstate *state, double alpha0, RVector
          if (state->dotrace) {
             ae_trace("LDLT-diag-err= %0.3e (diagonal reproduction error)\n", (double)(ae_sqrt(errsq / (1 + sumsq), _state)));
          }
-         result = ae_false;
+         result = false;
          return result;
       }
-      state->factorizationpresent = ae_true;
+      state->factorizationpresent = true;
 
    // Trace
       if (state->dotrace) {
@@ -35649,8 +35649,8 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy,
       for (i = 0; i <= nmain - 1; i++) {
          deltaxy->ptr.p_double[i] = -deltaxy->ptr.p_double[i];
       }
-      rmatrixtrsv(nmain, &state->factdensehaug, 0, 0, ae_false, ae_false, 0, deltaxy, 0, _state);
-      rmatrixtrsv(nmain, &state->factdensehaug, 0, 0, ae_false, ae_false, 1, deltaxy, 0, _state);
+      rmatrixtrsv(nmain, &state->factdensehaug, 0, 0, false, false, 0, deltaxy, 0, _state);
+      rmatrixtrsv(nmain, &state->factdensehaug, 0, 0, false, false, 1, deltaxy, 0, _state);
       for (i = 0; i <= n - 1; i++) {
          if (state->isfrozen.ptr.p_bool[i]) {
             deltaxy->ptr.p_double[i] = (double)(0);
@@ -35688,7 +35688,7 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy,
       return;
    }
 //
-   ae_assert(ae_false, "VIPMSolve: integrity check failed - unexpected factorization", _state);
+   ae_assert(false, "VIPMSolve: integrity check failed - unexpected factorization", _state);
 }
 
 // Generates precomputed temporary  vectors  and  KKT  factorization  at  the
@@ -35786,11 +35786,11 @@ static void vipmsolver_solvereducedkktsystem(vipmstate *state, RVector *deltaxy,
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2020 by Bochkanov Sergey
-static ae_bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state) {
+static bool vipmsolver_vipmprecomputenewtonfactorization(vipmstate *state, vipmvars *v0, double regeps, double modeps, double dampeps, double dampfree, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
-   ae_bool result;
+   bool result;
 
    n = state->n;
    m = state->mdense + state->msparse;
@@ -35948,7 +35948,7 @@ static void vipmsolver_solvekktsystem(vipmstate *state, vipmrighthandside *rhs, 
 //
 //   -- ALGLIB --
 //      Copyright 01.11.2019 by Bochkanov Sergey
-static ae_bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, ae_bool isdampepslarge, ae_state *_state) {
+static bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v0, double muestimate, vipmvars *vdestimate, vipmvars *vdresult, double reg, bool isdampepslarge, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    double vrhsprim2;
@@ -35964,15 +35964,15 @@ static ae_bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v
    double badres;
    double verybadres;
    double residualgrowth;
-   ae_bool primaldestabilized;
-   ae_bool dualdestabilized;
-   ae_bool result;
+   bool primaldestabilized;
+   bool dualdestabilized;
+   bool result;
 
    n = state->n;
    m = state->mdense + state->msparse;
    badres = 1.01;
    verybadres = 1.0E3;
-   result = ae_true;
+   result = true;
 
 // Initial solver report
    if (state->dotrace) {
@@ -36015,14 +36015,14 @@ static ae_bool vipmsolver_vipmcomputestepdirection(vipmstate *state, vipmvars *v
       if (state->dotrace) {
          ae_trace("> primal/dual residual growth is too high, signaling presence of numerical errors\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_greater(residualgrowth, badres)) {
       if (state->dotrace) {
          ae_trace("> total residual is too high, signaling presence of numerical errors\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    return result;
@@ -36328,7 +36328,7 @@ static void vipmsolver_traceprogress(vipmstate *state, double mu, double muaff, 
       }
       ae_trace("--- printing raw data (prior to applying variable scales and shifting by XOrigin) ------------------\n");
       ae_trace("X (raw)         = ");
-      tracevectorunscaledunshiftedautoprec(&state->current.x, n, &state->scl, ae_true, &state->xorigin, ae_true, _state);
+      tracevectorunscaledunshiftedautoprec(&state->current.x, n, &state->scl, true, &state->xorigin, true, _state);
       ae_trace("\n");
       ae_trace("--- printing scaled data (after applying variable scales and shifting by XOrigin) ------------------\n");
       ae_trace("> reporting X, Lagrangian gradient\n");
@@ -36745,16 +36745,16 @@ static double vipmsolver_rhscompl2(vipmrighthandside *rhs, ae_int_t n, ae_int_t 
 //      Copyright 01.11.2020 by Bochkanov Sergey
 static double vipmsolver_minnz(RVector *x, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-   ae_bool nz;
+   bool nz;
    double result;
 
    result = (double)(0);
-   nz = ae_false;
+   nz = false;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_greater(x->ptr.p_double[i], (double)(0))) {
          if (!nz) {
             result = x->ptr.p_double[i];
-            nz = ae_true;
+            nz = true;
          } else {
             result = ae_minreal(result, x->ptr.p_double[i], _state);
          }
@@ -36775,16 +36775,16 @@ static double vipmsolver_minnz(RVector *x, ae_int_t n, ae_state *_state) {
 //      Copyright 01.11.2020 by Bochkanov Sergey
 static double vipmsolver_minprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-   ae_bool nz;
+   bool nz;
    double result;
 
    result = (double)(0);
-   nz = ae_false;
+   nz = false;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_greater(x->ptr.p_double[i], (double)(0)) && ae_fp_greater(y->ptr.p_double[i], (double)(0))) {
          if (!nz) {
             result = x->ptr.p_double[i] * y->ptr.p_double[i];
-            nz = ae_true;
+            nz = true;
          } else {
             result = ae_minreal(result, x->ptr.p_double[i] * y->ptr.p_double[i], _state);
          }
@@ -36805,16 +36805,16 @@ static double vipmsolver_minprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
 //      Copyright 01.11.2020 by Bochkanov Sergey
 static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state *_state) {
    ae_int_t i;
-   ae_bool nz;
+   bool nz;
    double result;
 
    result = (double)(0);
-   nz = ae_false;
+   nz = false;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_greater(x->ptr.p_double[i], (double)(0)) && ae_fp_greater(y->ptr.p_double[i], (double)(0))) {
          if (!nz) {
             result = x->ptr.p_double[i] * y->ptr.p_double[i];
-            nz = ae_true;
+            nz = true;
          } else {
             result = ae_maxreal(result, x->ptr.p_double[i] * y->ptr.p_double[i], _state);
          }
@@ -36823,7 +36823,7 @@ static double vipmsolver_maxprodnz(RVector *x, RVector *y, ae_int_t n, ae_state 
    return result;
 }
 
-void _vipmvars_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _vipmvars_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmvars *p = (vipmvars *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -36838,7 +36838,7 @@ void _vipmvars_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->q, 0, DT_REAL, _state, make_automatic);
 }
 
-void _vipmvars_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _vipmvars_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmvars *dst = (vipmvars *) _dst;
    vipmvars *src = (vipmvars *) _src;
    dst->n = src->n;
@@ -36885,7 +36885,7 @@ void _vipmvars_destroy(void *_p) {
    ae_vector_destroy(&p->q);
 }
 
-void _vipmrighthandside_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _vipmrighthandside_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmrighthandside *p = (vipmrighthandside *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sigma, 0, DT_REAL, _state, make_automatic);
@@ -36900,7 +36900,7 @@ void _vipmrighthandside_init(void *_p, ae_state *_state, ae_bool make_automatic)
    ae_vector_init(&p->gammaq, 0, DT_REAL, _state, make_automatic);
 }
 
-void _vipmrighthandside_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _vipmrighthandside_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmrighthandside *dst = (vipmrighthandside *) _dst;
    vipmrighthandside *src = (vipmrighthandside *) _src;
    ae_vector_init_copy(&dst->sigma, &src->sigma, _state, make_automatic);
@@ -36945,7 +36945,7 @@ void _vipmrighthandside_destroy(void *_p) {
    ae_vector_destroy(&p->gammaq);
 }
 
-void _vipmstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _vipmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    vipmstate *p = (vipmstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->scl, 0, DT_REAL, _state, make_automatic);
@@ -37028,7 +37028,7 @@ void _vipmstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _sparsematrix_init(&p->tmpsparse0, _state, make_automatic);
 }
 
-void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _vipmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    vipmstate *dst = (vipmstate *) _dst;
    vipmstate *src = (vipmstate *) _src;
    dst->slacksforequalityconstraints = src->slacksforequalityconstraints;
@@ -37368,7 +37368,7 @@ void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    state->absasum = (double)(1);
    state->absasum2 = (double)(1);
    state->akind = 0;
-   state->sparseaupper = ae_false;
+   state->sparseaupper = false;
    cqminit(n, &state->a, _state);
    ae_vector_set_length(&state->b, n, _state);
    ae_vector_set_length(&state->bndl, n, _state);
@@ -37383,8 +37383,8 @@ void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->havebndl.ptr.p_bool[i] = ae_false;
-      state->havebndu.ptr.p_bool[i] = ae_false;
+      state->havebndl.ptr.p_bool[i] = false;
+      state->havebndu.ptr.p_bool[i] = false;
       state->b.ptr.p_double[i] = 0.0;
       state->startx.ptr.p_double[i] = 0.0;
       state->xorigin.ptr.p_double[i] = 0.0;
@@ -37392,13 +37392,13 @@ void minqpcreate(ae_int_t n, minqpstate *state, ae_state *_state) {
       state->replagbc.ptr.p_double[i] = 0.0;
    }
    state->stype = 0;
-   state->havex = ae_false;
+   state->havex = false;
    minqpsetalgobleic(state, 0.0, 0.0, 0.0, 0, _state);
    qqploaddefaults(n, &state->qqpsettingsuser, _state);
    qpbleicloaddefaults(n, &state->qpbleicsettingsuser, _state);
    qpdenseaulloaddefaults(n, &state->qpdenseaulsettingsuser, _state);
-   state->qpbleicfirstcall = ae_true;
-   state->dbgskipconstraintnormalization = ae_false;
+   state->qpbleicfirstcall = true;
+   state->dbgskipconstraintnormalization = false;
    state->veps = 0.0;
 }
 
@@ -37447,7 +37447,7 @@ void minqpsetlinearterm(minqpstate *state, RVector *b, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 11.01.2011 by Bochkanov Sergey
-void minqpsetquadraticterm(minqpstate *state, RMatrix *a, ae_bool isupper, ae_state *_state) {
+void minqpsetquadraticterm(minqpstate *state, RMatrix *a, bool isupper, ae_state *_state) {
    ae_int_t n;
 
    n = state->n;
@@ -37487,7 +37487,7 @@ void minqpsetquadraticterm(minqpstate *state, RMatrix *a, ae_bool isupper, ae_st
 //
 //   -- ALGLIB --
 //      Copyright 11.01.2011 by Bochkanov Sergey
-void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, ae_bool isupper, ae_state *_state) {
+void minqpsetquadratictermsparse(minqpstate *state, sparsematrix *a, bool isupper, ae_state *_state) {
    ae_int_t n;
    ae_int_t t0;
    ae_int_t t1;
@@ -38124,7 +38124,7 @@ void minqpsetalgosparseipm(minqpstate *state, double eps, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 22.05.2014 by Bochkanov Sergey
-void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxouterits, ae_bool usenewton, ae_state *_state) {
+void minqpsetalgoquickqp(minqpstate *state, double epsg, double epsf, double epsx, ae_int_t maxouterits, bool usenewton, ae_state *_state) {
 
    ae_assert(ae_isfinite(epsg, _state), "MinQPSetAlgoQuickQP: EpsG is not finite number", _state);
    ae_assert(ae_fp_greater_eq(epsg, (double)(0)), "MinQPSetAlgoQuickQP: negative EpsG", _state);
@@ -38333,8 +38333,8 @@ void minqpsetlc(minqpstate *state, RMatrix *c, ZVector *ct, ae_int_t k, ae_state
    ae_frame_make(_state, &_frame_block);
    memset(&dummyc, 0, sizeof(dummyc));
    memset(&dummyct, 0, sizeof(dummyct));
-   _sparsematrix_init(&dummyc, _state, ae_true);
-   ae_vector_init(&dummyct, 0, DT_INT, _state, ae_true);
+   _sparsematrix_init(&dummyc, _state, true);
+   ae_vector_init(&dummyct, 0, DT_INT, _state, true);
 
    minqpsetlcmixed(state, &dummyc, &dummyct, 0, c, ct, k, _state);
    ae_frame_leave(_state);
@@ -38381,8 +38381,8 @@ void minqpsetlcsparse(minqpstate *state, sparsematrix *c, ZVector *ct, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&dummyc, 0, sizeof(dummyc));
    memset(&dummyct, 0, sizeof(dummyct));
-   ae_matrix_init(&dummyc, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&dummyct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&dummyc, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&dummyct, 0, DT_INT, _state, true);
 
    minqpsetlcmixed(state, c, ct, k, &dummyc, &dummyct, 0, _state);
    ae_frame_leave(_state);
@@ -38468,15 +38468,15 @@ void minqpsetlcmixed(minqpstate *state, sparsematrix *sparsec, ZVector *sparsect
    memset(&v2, 0, sizeof(v2));
    memset(&eidx, 0, sizeof(eidx));
    memset(&eval, 0, sizeof(eval));
-   ae_vector_init(&srcidx, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&dstidx, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&s, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&rs, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&eoffs, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&roffs, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&v2, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&eidx, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&eval, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&srcidx, 0, DT_INT, _state, true);
+   ae_vector_init(&dstidx, 0, DT_INT, _state, true);
+   ae_vector_init(&s, 0, DT_REAL, _state, true);
+   ae_vector_init(&rs, 0, DT_INT, _state, true);
+   ae_vector_init(&eoffs, 0, DT_INT, _state, true);
+   ae_vector_init(&roffs, 0, DT_INT, _state, true);
+   ae_vector_init(&v2, 0, DT_REAL, _state, true);
+   ae_vector_init(&eidx, 0, DT_INT, _state, true);
+   ae_vector_init(&eval, 0, DT_REAL, _state, true);
 
    n = state->n;
 
@@ -39205,7 +39205,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
                   state->effectives.ptr.p_double[i] = sparseget(&state->sparsea, i, i, _state);
                }
             } else {
-               ae_assert(ae_false, "MinQPOptimize: integrity check failed", _state);
+               ae_assert(false, "MinQPOptimize: integrity check failed", _state);
             }
          }
          for (i = 0; i <= n - 1; i++) {
@@ -39216,7 +39216,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
             state->effectives.ptr.p_double[i] = 1 / ae_sqrt(state->effectives.ptr.p_double[i], _state);
          }
       } else {
-         ae_assert(ae_false, "MinQPOptimize: integrity check failed", _state);
+         ae_assert(false, "MinQPOptimize: integrity check failed", _state);
       }
    }
 
@@ -39334,7 +39334,7 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
          state->repncholesky = state->qpdenseaulbuf.repncholesky;
          return;
       }
-      ae_assert(ae_false, "MinQPOptimize: integrity check failed - unknown solver", _state);
+      ae_assert(false, "MinQPOptimize: integrity check failed - unknown solver", _state);
    }
 // QuickQP solver
    if (state->algokind == 3) {
@@ -39378,14 +39378,14 @@ void minqpoptimize(minqpstate *state, ae_state *_state) {
       vipmsetquadraticlinear(&state->vsolver, &state->tmpr2, &state->sparsea, state->akind, state->sparseaupper, &state->b, _state);
       vipmsetconstraints(&state->vsolver, &state->wrkbndl, &state->wrkbndu, &state->wrksparsec, state->msparse, &state->wrkdensec, state->mdense, &state->wrkcl, &state->wrkcu, _state);
       vipmsetcond(&state->vsolver, state->veps, state->veps, state->veps, _state);
-      vipmoptimize(&state->vsolver, ae_true, &state->xs, &state->replagbc, &state->replaglc, &state->repterminationtype, _state);
+      vipmoptimize(&state->vsolver, true, &state->xs, &state->replagbc, &state->replaglc, &state->repterminationtype, _state);
       state->repinneriterationscount = state->vsolver.repiterationscount;
       state->repouteriterationscount = state->repinneriterationscount;
       state->repncholesky = state->vsolver.repncholesky;
       return;
    }
 // Integrity check failed - unknown solver
-   ae_assert(ae_false, "MinQPOptimize: integrity check failed - unknown solver", _state);
+   ae_assert(false, "MinQPOptimize: integrity check failed - unknown solver", _state);
 }
 
 // QP solver results
@@ -39483,7 +39483,7 @@ void minqpsetlineartermfast(minqpstate *state, RVector *b, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 11.01.2011 by Bochkanov Sergey
-void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, ae_bool isupper, double s, ae_state *_state) {
+void minqpsetquadratictermfast(minqpstate *state, RMatrix *a, bool isupper, double s, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t n;
@@ -39546,7 +39546,7 @@ void minqpsetstartingpointfast(minqpstate *state, RVector *x, ae_state *_state) 
 
    n = state->n;
    ae_v_move(&state->startx.ptr.p_double[0], 1, &x->ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   state->havex = ae_true;
+   state->havex = true;
 }
 
 // Fast version of MinQPSetOrigin(), which doesn't check its arguments.
@@ -39561,7 +39561,7 @@ void minqpsetoriginfast(minqpstate *state, RVector *xorigin, ae_state *_state) {
    ae_v_move(&state->xorigin.ptr.p_double[0], 1, &xorigin->ptr.p_double[0], 1, ae_v_len(0, n - 1));
 }
 
-void _minqpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpstate *p = (minqpstate *) _p;
    ae_touch_ptr((void *)p);
    _qqpsettings_init(&p->qqpsettingsuser, _state, make_automatic);
@@ -39605,7 +39605,7 @@ void _minqpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _vipmstate_init(&p->vsolver, _state, make_automatic);
 }
 
-void _minqpstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minqpstate *dst = (minqpstate *) _dst;
    minqpstate *src = (minqpstate *) _src;
    dst->n = src->n;
@@ -39756,14 +39756,14 @@ void _minqpstate_destroy(void *_p) {
    _vipmstate_destroy(&p->vsolver);
 }
 
-void _minqpreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minqpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minqpreport *p = (minqpreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->laglc, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minqpreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minqpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minqpreport *dst = (minqpreport *) _dst;
    minqpreport *src = (minqpreport *) _src;
    dst->inneriterationscount = src->inneriterationscount;
@@ -39863,15 +39863,15 @@ void minlmcreatevj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
    state->n = n;
    state->m = m;
    state->algomode = 1;
-   state->hasf = ae_false;
-   state->hasfi = ae_true;
-   state->hasg = ae_false;
+   state->hasf = false;
+   state->hasfi = true;
+   state->hasg = false;
 
 // second stage of initialization
-   minlm_lmprepare(n, m, ae_false, state, _state);
+   minlm_lmprepare(n, m, false, state, _state);
    minlmsetacctype(state, 0, _state);
    minlmsetcond(state, (double)(0), 0, _state);
-   minlmsetxrep(state, ae_false, _state);
+   minlmsetxrep(state, false, _state);
    minlmsetstpmax(state, (double)(0), _state);
    minlmrestartfrom(state, x, _state);
 }
@@ -39951,16 +39951,16 @@ void minlmcreatev(ae_int_t n, ae_int_t m, RVector *x, double diffstep, minlmstat
    state->n = n;
    state->m = m;
    state->algomode = 0;
-   state->hasf = ae_false;
-   state->hasfi = ae_true;
-   state->hasg = ae_false;
+   state->hasf = false;
+   state->hasfi = true;
+   state->hasg = false;
    state->diffstep = diffstep;
 
 // Second stage of initialization
-   minlm_lmprepare(n, m, ae_false, state, _state);
+   minlm_lmprepare(n, m, false, state, _state);
    minlmsetacctype(state, 1, _state);
    minlmsetcond(state, (double)(0), 0, _state);
-   minlmsetxrep(state, ae_false, _state);
+   minlmsetxrep(state, false, _state);
    minlmsetstpmax(state, (double)(0), _state);
    minlmrestartfrom(state, x, _state);
 }
@@ -40038,15 +40038,15 @@ void minlmcreatefgh(ae_int_t n, RVector *x, minlmstate *state, ae_state *_state)
    state->n = n;
    state->m = 0;
    state->algomode = 2;
-   state->hasf = ae_true;
-   state->hasfi = ae_false;
-   state->hasg = ae_true;
+   state->hasf = true;
+   state->hasfi = false;
+   state->hasg = true;
 
 // init2
-   minlm_lmprepare(n, 0, ae_true, state, _state);
+   minlm_lmprepare(n, 0, true, state, _state);
    minlmsetacctype(state, 2, _state);
    minlmsetcond(state, (double)(0), 0, _state);
-   minlmsetxrep(state, ae_false, _state);
+   minlmsetxrep(state, false, _state);
    minlmsetstpmax(state, (double)(0), _state);
    minlmrestartfrom(state, x, _state);
 }
@@ -40102,7 +40102,7 @@ void minlmsetcond(minlmstate *state, double epsx, ae_int_t maxits, ae_state *_st
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void minlmsetxrep(minlmstate *state, ae_bool needxrep, ae_state *_state) {
+void minlmsetxrep(minlmstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -40351,7 +40351,7 @@ void minlmsetacctype(minlmstate *state, ae_int_t acctype, ae_state *_state) {
    }
    if (acctype == 0) {
       state->maxmodelage = 0;
-      state->makeadditers = ae_false;
+      state->makeadditers = false;
       return;
    }
    if (acctype == 1) {
@@ -40361,7 +40361,7 @@ void minlmsetacctype(minlmstate *state, ae_int_t acctype, ae_state *_state) {
       } else {
          state->maxmodelage = minlm_smallmodelage;
       }
-      state->makeadditers = ae_false;
+      state->makeadditers = false;
       return;
    }
 }
@@ -40383,10 +40383,10 @@ void minlmsetacctype(minlmstate *state, ae_int_t acctype, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 10.03.2009 by Bochkanov Sergey
-ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
+bool minlmiteration(minlmstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
-   ae_bool bflag;
+   bool bflag;
    ae_int_t iflag;
    double v;
    double s;
@@ -40394,7 +40394,7 @@ ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
    double fnew;
    ae_int_t i;
    ae_int_t k;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -40421,7 +40421,7 @@ ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
       iflag = -919;
       i = -909;
       k = 81;
-      bflag = ae_true;
+      bflag = true;
       v = 74;
       s = -788;
       t = 809;
@@ -40523,9 +40523,9 @@ ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
    state->repngrad = 0;
    state->repnhess = 0;
    state->repncholesky = 0;
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    if (m > 0) {
-      smoothnessmonitorinit(&state->smonitor, &state->s, n, m, ae_false, _state);
+      smoothnessmonitorinit(&state->smonitor, &state->s, n, m, false, _state);
    }
    for (i = 0; i <= n - 1; i++) {
       state->lastscaleused.ptr.p_double[i] = state->s.ptr.p_double[i];
@@ -40534,7 +40534,7 @@ ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
 // Prepare LM step finder and enforce/check feasibility of constraints
    if (!minlm_minlmstepfinderinit(&state->finderstate, n, m, state->maxmodelage, state->hasfi, &state->xbase, &state->bndl, &state->bndu, &state->cleic, state->nec, state->nic, &state->s, state->stpmax, state->epsx, _state)) {
       state->repterminationtype = -3;
-      result = ae_false;
+      result = false;
       return result;
    }
 // set constraints for obsolete QP solver
@@ -40547,17 +40547,17 @@ ae_bool minlmiteration(minlmstate *state, ae_state *_state) {
    }
    ae_assert(m > 0, "MinLM: integrity check failed", _state);
 lbl_30:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->bndl, &state->bndu, ae_true, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->bndl, &state->bndu, true, state->teststep, _state)) {
       goto lbl_31;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    for (i = 0; i <= m - 1; i++) {
       state->smonitor.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -40583,45 +40583,45 @@ lbl_28:
    if (!state->hasf) {
       goto lbl_34;
    }
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needf = ae_false;
+   state->needf = false;
    goto lbl_35;
 lbl_34:
    ae_assert(state->hasfi, "MinLM: internal error 2!", _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfi = ae_false;
+   state->needfi = false;
    v = ae_v_dotproduct(&state->fi.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    state->f = v;
 lbl_35:
    state->repnfunc = state->repnfunc + 1;
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_32:
    if (state->userterminationneeded) {
 
    // User requested termination
       ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Prepare control variables
    state->nu = (double)(1);
    state->lambdav = -ae_maxrealnumber;
    state->modelage = state->maxmodelage + 1;
-   state->deltaxready = ae_false;
-   state->deltafready = ae_false;
+   state->deltaxready = false;
+   state->deltafready = false;
    if (state->algomode == 2) {
       goto lbl_36;
    }
@@ -40634,7 +40634,7 @@ lbl_32:
 // * we decide that stopping conditions are too stringent
 //   and break from cycle
 lbl_38:
-   if (ae_false) {
+   if (false) {
       goto lbl_39;
    }
 // First, we have to prepare quadratic model for our function.
@@ -40685,7 +40685,7 @@ lbl_44:
    }
    state->xm1 = state->x.ptr.p_double[k];
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
@@ -40701,7 +40701,7 @@ lbl_4:
    }
    state->xp1 = state->x.ptr.p_double[k];
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
@@ -40724,11 +40724,11 @@ lbl_46:
 // Calculate F(XBase)
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 6;
    goto lbl_rcomm;
 lbl_6:
-   state->needfi = ae_false;
+   state->needfi = false;
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
 
@@ -40740,11 +40740,11 @@ lbl_42:
 // Obtain f[] and Jacobian
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->needfij = ae_false;
+   state->needfij = false;
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
 
@@ -40790,8 +40790,8 @@ lbl_41:
    v = ae_v_dotproduct(&state->fi.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    state->fbase = v;
    ae_v_move(&state->fibase.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
-   state->deltaxready = ae_false;
-   state->deltafready = ae_false;
+   state->deltaxready = false;
+   state->deltafready = false;
 
 // Perform integrity check (presense of NAN/INF)
    v = state->fbase;
@@ -40802,7 +40802,7 @@ lbl_41:
 
    // Break!
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // If Lambda is not initialized, initialize it using quadratic model
@@ -40845,11 +40845,11 @@ lbl_47:
    }
    ae_assert(state->hasfi, "MinLM: internal error 2!", _state);
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->finderstate.x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 8;
    goto lbl_rcomm;
 lbl_8:
-   state->needfi = ae_false;
+   state->needfi = false;
    ae_v_move(&state->finderstate.fi.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    goto lbl_47;
 lbl_49:
@@ -40858,15 +40858,15 @@ lbl_49:
    }
    ae_assert(state->hasf, "MinLM: internal error 2!", _state);
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->finderstate.x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 9;
    goto lbl_rcomm;
 lbl_9:
-   state->needf = ae_false;
+   state->needf = false;
    state->finderstate.f = state->f;
    goto lbl_47;
 lbl_51:
-   ae_assert(ae_false, "MinLM: internal error 2!", _state);
+   ae_assert(false, "MinLM: internal error 2!", _state);
    goto lbl_47;
 lbl_48:
    if (state->userterminationneeded) {
@@ -40874,14 +40874,14 @@ lbl_48:
    // User requested termination
       ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->nu = (double)(1);
    ae_assert(((iflag >= -3 && iflag <= 0) || iflag == -8) || iflag > 0, "MinLM: internal integrity check failed!", _state);
    if (iflag == -3) {
       state->repterminationtype = -3;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (iflag == -2) {
@@ -40899,13 +40899,13 @@ lbl_48:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 10;
    goto lbl_rcomm;
 lbl_10:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_55:
-   result = ae_false;
+   result = false;
    return result;
 lbl_53:
    if (!(iflag == -8 || iflag > 0)) {
@@ -40921,13 +40921,13 @@ lbl_53:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 11;
    goto lbl_rcomm;
 lbl_11:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_59:
-   result = ae_false;
+   result = false;
    return result;
 lbl_57:
    state->f = fnew;
@@ -40949,13 +40949,13 @@ lbl_57:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 12;
    goto lbl_rcomm;
 lbl_12:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_63:
-   result = ae_false;
+   result = false;
    return result;
 lbl_61:
 
@@ -40974,11 +40974,11 @@ lbl_61:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 13;
    goto lbl_rcomm;
 lbl_13:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_65:
    state->repiterationscount = state->repiterationscount + 1;
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
@@ -40993,13 +40993,13 @@ lbl_65:
 // Report: XBase contains new point, F contains function value at new point
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 14;
    goto lbl_rcomm;
 lbl_14:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_69:
-   result = ae_false;
+   result = false;
    return result;
 lbl_67:
    state->modelage = state->modelage + 1;
@@ -41014,11 +41014,11 @@ lbl_39:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 15;
    goto lbl_rcomm;
 lbl_15:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_71:
    goto lbl_37;
 lbl_36:
@@ -41036,11 +41036,11 @@ lbl_36:
 
    // FGH solver does not support general linear constraints
       state->repterminationtype = -5;
-      result = ae_false;
+      result = false;
       return result;
    }
 lbl_73:
-   if (ae_false) {
+   if (false) {
       goto lbl_74;
    }
 // First, we have to prepare quadratic model for our function.
@@ -41063,7 +41063,7 @@ lbl_73:
 //
 // We also clear DeltaXReady/DeltaFReady flags
 // after initialization is done.
-   bflag = ae_false;
+   bflag = false;
    if (!(state->algomode == 0 || state->algomode == 1)) {
       goto lbl_75;
    }
@@ -41095,7 +41095,7 @@ lbl_81:
    }
    state->xm1 = state->x.ptr.p_double[k];
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 16;
    goto lbl_rcomm;
 lbl_16:
@@ -41111,7 +41111,7 @@ lbl_16:
    }
    state->xp1 = state->x.ptr.p_double[k];
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 17;
    goto lbl_rcomm;
 lbl_17:
@@ -41134,11 +41134,11 @@ lbl_83:
 // Calculate F(XBase)
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 18;
    goto lbl_rcomm;
 lbl_18:
-   state->needfi = ae_false;
+   state->needfi = false;
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
 
@@ -41150,11 +41150,11 @@ lbl_79:
 // Obtain f[] and Jacobian
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 19;
    goto lbl_rcomm;
 lbl_19:
-   state->needfij = ae_false;
+   state->needfij = false;
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
 
@@ -41212,7 +41212,7 @@ lbl_78:
    ae_v_move(&state->fibase.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
 
 // set control variables
-   bflag = ae_true;
+   bflag = true;
 lbl_75:
    if (state->algomode != 2) {
       goto lbl_84;
@@ -41222,11 +41222,11 @@ lbl_75:
 // Obtain F, G, H
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->needfgh = ae_true;
+   state->needfgh = true;
    state->rstate.stage = 20;
    goto lbl_rcomm;
 lbl_20:
-   state->needfgh = ae_false;
+   state->needfgh = false;
    state->repnfunc = state->repnfunc + 1;
    state->repngrad = state->repngrad + 1;
    state->repnhess = state->repnhess + 1;
@@ -41235,12 +41235,12 @@ lbl_20:
    state->fbase = state->f;
 
 // set control variables
-   bflag = ae_true;
+   bflag = true;
    state->modelage = 0;
 lbl_84:
    ae_assert(bflag, "MinLM: internal integrity check failed!", _state);
-   state->deltaxready = ae_false;
-   state->deltafready = ae_false;
+   state->deltaxready = false;
+   state->deltafready = false;
 
 // Perform integrity check (presense of NAN/INF)
    v = state->fbase;
@@ -41251,7 +41251,7 @@ lbl_84:
 
    // Break!
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // If Lambda is not initialized, initialize it using quadratic model
@@ -41280,7 +41280,7 @@ lbl_84:
 // State.Nu can have any value on enter, but after exit it is set to 1.0
    iflag = -99;
 lbl_86:
-   if (ae_false) {
+   if (false) {
       goto lbl_87;
    }
 // Do we need model update?
@@ -41294,11 +41294,11 @@ lbl_86:
 //
 // We use BFlag variable to indicate that we have to increase Lambda.
 // If it is False, we will try to increase Lambda and move to new iteration.
-   bflag = ae_true;
+   bflag = true;
    minqpsetstartingpointfast(&state->qpstate, &state->xbase, _state);
    minqpsetoriginfast(&state->qpstate, &state->xbase, _state);
    minqpsetlineartermfast(&state->qpstate, &state->gbase, _state);
-   minqpsetquadratictermfast(&state->qpstate, &state->quadraticmodel, ae_true, 0.0, _state);
+   minqpsetquadratictermfast(&state->qpstate, &state->quadraticmodel, true, 0.0, _state);
    for (i = 0; i <= n - 1; i++) {
       state->tmp0.ptr.p_double[i] = state->quadraticmodel.ptr.pp_double[i][i] + state->lambdav / ae_sqr(state->s.ptr.p_double[i], _state);
    }
@@ -41313,10 +41313,10 @@ lbl_86:
       if (ae_isfinite(v, _state)) {
          v = ae_sqrt(v, _state);
          if (ae_fp_greater(state->stpmax, (double)(0)) && ae_fp_greater(v, state->stpmax)) {
-            bflag = ae_false;
+            bflag = false;
          }
       } else {
-         bflag = ae_false;
+         bflag = false;
       }
    } else {
 
@@ -41326,7 +41326,7 @@ lbl_86:
          iflag = -3;
          goto lbl_87;
       }
-      bflag = ae_false;
+      bflag = false;
    }
    if (!bflag) {
 
@@ -41356,7 +41356,7 @@ lbl_86:
    ae_v_move(&state->deltax.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_add(&state->deltax.ptr.p_double[0], 1, &state->xdir.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_sub(&state->deltax.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   state->deltaxready = ae_true;
+   state->deltaxready = true;
    v = 0.0;
    for (i = 0; i <= n - 1; i++) {
       v = v + ae_sqr(state->deltax.ptr.p_double[i] / state->s.ptr.p_double[i], _state);
@@ -41377,13 +41377,13 @@ lbl_86:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 21;
    goto lbl_rcomm;
 lbl_21:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_92:
-   result = ae_false;
+   result = false;
    return result;
    goto lbl_91;
 lbl_90:
@@ -41409,30 +41409,30 @@ lbl_88:
    if (!state->hasfi) {
       goto lbl_94;
    }
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 22;
    goto lbl_rcomm;
 lbl_22:
-   state->needfi = ae_false;
+   state->needfi = false;
    v = ae_v_dotproduct(&state->fi.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    state->f = v;
    ae_v_move(&state->deltaf.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    ae_v_sub(&state->deltaf.ptr.p_double[0], 1, &state->fibase.ptr.p_double[0], 1, ae_v_len(0, m - 1));
-   state->deltafready = ae_true;
+   state->deltafready = true;
    goto lbl_95;
 lbl_94:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 23;
    goto lbl_rcomm;
 lbl_23:
-   state->needf = ae_false;
+   state->needf = false;
 lbl_95:
    state->repnfunc = state->repnfunc + 1;
    if (!ae_isfinite(state->f, _state)) {
 
    // Integrity check failed, break!
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_greater_eq(state->f, state->fbase)) {
@@ -41454,14 +41454,14 @@ lbl_87:
    // User requested termination
       ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->nu = (double)(1);
    ae_assert(iflag >= -3 && iflag <= 0, "MinLM: internal integrity check failed!", _state);
    if (iflag == -3) {
       state->repterminationtype = -3;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (iflag == -2) {
@@ -41502,13 +41502,13 @@ lbl_87:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 24;
    goto lbl_rcomm;
 lbl_24:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_100:
-   result = ae_false;
+   result = false;
    return result;
 lbl_98:
 lbl_96:
@@ -41530,11 +41530,11 @@ lbl_96:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 25;
    goto lbl_rcomm;
 lbl_25:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_102:
    state->repiterationscount = state->repiterationscount + 1;
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
@@ -41549,13 +41549,13 @@ lbl_102:
 // Report: XBase contains new point, F contains function value at new point
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 26;
    goto lbl_rcomm;
 lbl_26:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_106:
-   result = ae_false;
+   result = false;
    return result;
 lbl_104:
    state->modelage = state->modelage + 1;
@@ -41570,19 +41570,19 @@ lbl_74:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fbase;
    minlm_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 27;
    goto lbl_rcomm;
 lbl_27:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_108:
 lbl_37:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = m;
    state->rstate.ia.ptr.p_int[2] = iflag;
@@ -41805,7 +41805,7 @@ void minlmrestartfrom(minlmstate *state, RVector *x, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void minlmrequesttermination(minlmstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // This is obsolete function.
@@ -41854,15 +41854,15 @@ void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
    state->n = n;
    state->m = m;
    state->algomode = 1;
-   state->hasf = ae_true;
-   state->hasfi = ae_false;
-   state->hasg = ae_false;
+   state->hasf = true;
+   state->hasfi = false;
+   state->hasg = false;
 
 // init 2
-   minlm_lmprepare(n, m, ae_true, state, _state);
+   minlm_lmprepare(n, m, true, state, _state);
    minlmsetacctype(state, 0, _state);
    minlmsetcond(state, (double)(0), 0, _state);
-   minlmsetxrep(state, ae_false, _state);
+   minlmsetxrep(state, false, _state);
    minlmsetstpmax(state, (double)(0), _state);
    minlmrestartfrom(state, x, _state);
 }
@@ -41870,10 +41870,10 @@ void minlmcreatefj(ae_int_t n, ae_int_t m, RVector *x, minlmstate *state, ae_sta
 // Prepare internal structures (except for RComm).
 //
 // Note: M must be zero for FGH mode, non-zero for V/VJ/FJ/FGJ mode.
-static void minlm_lmprepare(ae_int_t n, ae_int_t m, ae_bool havegrad, minlmstate *state, ae_state *_state) {
+static void minlm_lmprepare(ae_int_t n, ae_int_t m, bool havegrad, minlmstate *state, ae_state *_state) {
    ae_int_t i;
 
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    if (n <= 0 || m < 0) {
       return;
    }
@@ -41911,7 +41911,7 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, ae_bool havegrad, minlmstate
 
 // Prepare internal QP solver
    minqpcreate(n, &state->qpstate, _state);
-   minqpsetalgoquickqp(&state->qpstate, 0.0, 0.0, coalesce(0.01 * state->epsx, 1.0E-12, _state), 10, ae_true, _state);
+   minqpsetalgoquickqp(&state->qpstate, 0.0, 0.0, coalesce(0.01 * state->epsx, 1.0E-12, _state), 10, true, _state);
 
 // Prepare boundary constraints
    ae_vector_set_length(&state->bndl, n, _state);
@@ -41920,9 +41920,9 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, ae_bool havegrad, minlmstate
    ae_vector_set_length(&state->havebndu, n, _state);
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
-      state->havebndl.ptr.p_bool[i] = ae_false;
+      state->havebndl.ptr.p_bool[i] = false;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->havebndu.ptr.p_bool[i] = ae_false;
+      state->havebndu.ptr.p_bool[i] = false;
    }
 
 // Prepare scaling matrix
@@ -41941,23 +41941,23 @@ static void minlm_lmprepare(ae_int_t n, ae_int_t m, ae_bool havegrad, minlmstate
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void minlm_clearrequestfields(minlmstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfg = ae_false;
-   state->needfgh = ae_false;
-   state->needfij = ae_false;
-   state->needfi = ae_false;
-   state->xupdated = ae_false;
+   state->needf = false;
+   state->needfg = false;
+   state->needfgh = false;
+   state->needfij = false;
+   state->needfi = false;
+   state->xupdated = false;
 }
 
 // Increases lambda, returns False when there is a danger of overflow
-static ae_bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state) {
+static bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_state) {
    double lnlambda;
    double lnnu;
    double lnlambdaup;
    double lnmax;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
    lnlambda = ae_log(*lambdav, _state);
    lnlambdaup = ae_log(minlm_lambdaup, _state);
    lnnu = ae_log(*nu, _state);
@@ -41970,7 +41970,7 @@ static ae_bool minlm_increaselambda(double *lambdav, double *nu, ae_state *_stat
    }
    *lambdav = *lambdav * minlm_lambdaup * (*nu);
    *nu = *nu * 2;
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -42055,9 +42055,9 @@ static ae_int_t minlm_checkdecrease(RMatrix *quadraticmodel, RVector *gbase, dou
 //     True for successful initialization
 //     False for inconsistent constraints; you should not use step finder if
 //     it returned False.
-static ae_bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, ae_bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state) {
+static bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_int_t m, ae_int_t maxmodelage, bool hasfi, RVector *xbase, RVector *bndl, RVector *bndu, RMatrix *cleic, ae_int_t nec, ae_int_t nic, RVector *s, double stpmax, double epsx, ae_state *_state) {
    ae_int_t i;
-   ae_bool result;
+   bool result;
 
    state->n = n;
    state->m = m;
@@ -42099,7 +42099,7 @@ static ae_bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_
    }
    minqpcreate(n, &state->qpstate, _state);
    if (nec + nic == 0) {
-      minqpsetalgoquickqp(&state->qpstate, 0.0, 0.0, coalesce(0.01 * epsx, 1.0E-12, _state), 10, ae_true, _state);
+      minqpsetalgoquickqp(&state->qpstate, 0.0, 0.0, coalesce(0.01 * epsx, 1.0E-12, _state), 10, true, _state);
    } else {
       minqpsetalgodenseaul(&state->qpstate, coalesce(0.01 * epsx, 1.0E-12, _state), (double)(100), 10, _state);
    }
@@ -42110,10 +42110,10 @@ static ae_bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_
 // Check feasibility of constraints:
 // * check/enforce box constraints (straightforward)
 // * prepare QP subproblem which return us a feasible point
-   result = ae_true;
+   result = true;
    for (i = 0; i <= n - 1; i++) {
       if ((state->havebndl.ptr.p_bool[i] && state->havebndu.ptr.p_bool[i]) && ae_fp_greater(state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i])) {
-         result = ae_false;
+         result = false;
          return result;
       }
       if (state->havebndl.ptr.p_bool[i] && ae_fp_less(xbase->ptr.p_double[i], state->bndl.ptr.p_double[i])) {
@@ -42137,7 +42137,7 @@ static ae_bool minlm_minlmstepfinderinit(minlmstepfinder *state, ae_int_t n, ae_
       minqpsetstartingpointfast(&state->qpstate, xbase, _state);
       minqpsetoriginfast(&state->qpstate, xbase, _state);
       minqpsetlineartermfast(&state->qpstate, &state->tmp0, _state);
-      minqpsetquadratictermsparse(&state->qpstate, &state->tmpsp, ae_true, _state);
+      minqpsetquadratictermsparse(&state->qpstate, &state->tmpsp, true, _state);
       minqpoptimize(&state->qpstate, _state);
       minqpresultsbuf(&state->qpstate, xbase, &state->qprep, _state);
    }
@@ -42168,7 +42168,7 @@ static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadrati
    minqpsetstartingpointfast(&state->qpstate, xbase, _state);
    minqpsetoriginfast(&state->qpstate, xbase, _state);
    minqpsetlineartermfast(&state->qpstate, gbase, _state);
-   minqpsetquadratictermfast(&state->qpstate, quadraticmodel, ae_true, 0.0, _state);
+   minqpsetquadratictermfast(&state->qpstate, quadraticmodel, true, 0.0, _state);
 }
 
 // This function runs LM step search session.
@@ -42189,13 +42189,13 @@ static void minlm_minlmstepfinderstart(minlmstepfinder *state, RMatrix *quadrati
 // //
 // // State.Nu can have any value on enter, but after exit it is set to 1.0
 // //
-static ae_bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, ae_bool *deltaxready, RVector *deltaf, ae_bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state) {
+static bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *lambdav, double *nu, RVector *xnew, RVector *deltax, bool *deltaxready, RVector *deltaf, bool *deltafready, ae_int_t *iflag, double *fnew, ae_int_t *ncholesky, ae_state *_state) {
    ae_int_t i;
-   ae_bool bflag;
+   bool bflag;
    double v;
    ae_int_t n;
    ae_int_t m;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -42215,7 +42215,7 @@ static ae_bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *la
       i = -838;
       n = 939;
       m = -526;
-      bflag = ae_true;
+      bflag = true;
       v = -541;
    }
    if (state->rstate.stage == 0) {
@@ -42229,11 +42229,11 @@ static ae_bool minlm_minlmstepfinderiteration(minlmstepfinder *state, double *la
    n = state->n;
    m = state->m;
 lbl_2:
-   if (ae_false) {
+   if (false) {
       goto lbl_3;
    }
-   *deltaxready = ae_false;
-   *deltafready = ae_false;
+   *deltaxready = false;
+   *deltafready = false;
 
 // Do we need model update?
    if (state->modelage > 0 && ae_fp_greater_eq(*nu, minlm_suspiciousnu)) {
@@ -42246,7 +42246,7 @@ lbl_2:
 //
 // We use BFlag variable to indicate that we have to increase Lambda.
 // If it is False, we will try to increase Lambda and move to new iteration.
-   bflag = ae_true;
+   bflag = true;
    for (i = 0; i <= n - 1; i++) {
       state->tmp0.ptr.p_double[i] = state->modeldiag.ptr.p_double[i] + *lambdav / ae_sqr(state->s.ptr.p_double[i], _state);
    }
@@ -42279,10 +42279,10 @@ lbl_2:
    if (ae_isfinite(v, _state)) {
       v = ae_sqrt(v, _state);
       if (ae_fp_greater(state->stpmax, (double)(0)) && ae_fp_greater(v, state->stpmax)) {
-         bflag = ae_false;
+         bflag = false;
       }
    } else {
-      bflag = ae_false;
+      bflag = false;
    }
    if (!bflag) {
 
@@ -42311,7 +42311,7 @@ lbl_2:
 // for fresh models only (ModelAge=0)
    ae_v_move(&deltax->ptr.p_double[0], 1, &xnew->ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_sub(&deltax->ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   *deltaxready = ae_true;
+   *deltaxready = true;
    v = 0.0;
    for (i = 0; i <= n - 1; i++) {
       v = v + ae_sqr(deltax->ptr.p_double[i] / state->s.ptr.p_double[i], _state);
@@ -42340,28 +42340,28 @@ lbl_2:
 // We prefer (a) because we may need Fi vector for additional
 // iterations
    ae_v_move(&state->x.ptr.p_double[0], 1, &xnew->ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   state->needf = ae_false;
-   state->needfi = ae_false;
+   state->needf = false;
+   state->needfi = false;
    if (!state->hasfi) {
       goto lbl_4;
    }
-   state->needfi = ae_true;
+   state->needfi = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfi = ae_false;
+   state->needfi = false;
    v = ae_v_dotproduct(&state->fi.ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    *fnew = v;
    ae_v_move(&deltaf->ptr.p_double[0], 1, &state->fi.ptr.p_double[0], 1, ae_v_len(0, m - 1));
    ae_v_sub(&deltaf->ptr.p_double[0], 1, &state->fibase.ptr.p_double[0], 1, ae_v_len(0, m - 1));
-   *deltafready = ae_true;
+   *deltafready = true;
    goto lbl_5;
 lbl_4:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needf = ae_false;
+   state->needf = false;
    *fnew = state->f;
 lbl_5:
    if (!ae_isfinite(*fnew, _state)) {
@@ -42386,12 +42386,12 @@ lbl_5:
 lbl_3:
    *nu = (double)(1);
    ae_assert(((*iflag >= -3 && *iflag <= 0) || *iflag == -8) || *iflag > 0, "MinLM: internal integrity check failed!", _state);
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = i;
    state->rstate.ia.ptr.p_int[1] = n;
    state->rstate.ia.ptr.p_int[2] = m;
@@ -42400,7 +42400,7 @@ lbl_rcomm:
    return result;
 }
 
-void _minlmstepfinder_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlmstepfinder_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstepfinder *p = (minlmstepfinder *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -42423,7 +42423,7 @@ void _minlmstepfinder_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _sparsematrix_init(&p->tmpsp, _state, make_automatic);
 }
 
-void _minlmstepfinder_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlmstepfinder_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmstepfinder *dst = (minlmstepfinder *) _dst;
    minlmstepfinder *src = (minlmstepfinder *) _src;
    dst->n = src->n;
@@ -42505,7 +42505,7 @@ void _minlmstepfinder_destroy(void *_p) {
    _sparsematrix_destroy(&p->tmpsp);
 }
 
-void _minlmstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlmstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmstate *p = (minlmstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -42545,7 +42545,7 @@ void _minlmstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _minlmstepfinder_init(&p->finderstate, _state, make_automatic);
 }
 
-void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlmstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmstate *dst = (minlmstate *) _dst;
    minlmstate *src = (minlmstate *) _src;
    dst->n = src->n;
@@ -42706,12 +42706,12 @@ void _minlmstate_destroy(void *_p) {
    _minlmstepfinder_destroy(&p->finderstate);
 }
 
-void _minlmreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlmreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlmreport *p = (minlmreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minlmreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlmreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlmreport *dst = (minlmreport *) _dst;
    minlmreport *src = (minlmreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -42935,7 +42935,7 @@ void mincgsetscale(mincgstate *state, RVector *s, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void mincgsetxrep(mincgstate *state, ae_bool needxrep, ae_state *_state) {
+void mincgsetxrep(mincgstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -42953,7 +42953,7 @@ void mincgsetxrep(mincgstate *state, ae_bool needxrep, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void mincgsetdrep(mincgstate *state, ae_bool needdrep, ae_state *_state) {
+void mincgsetdrep(mincgstate *state, bool needdrep, ae_state *_state) {
 
    state->drep = needdrep;
 }
@@ -43077,7 +43077,7 @@ double mincglastgoodstep(mincgstate *state, ae_state *_state) {
 void mincgsetprecdefault(mincgstate *state, ae_state *_state) {
 
    state->prectype = 0;
-   state->innerresetneeded = ae_true;
+   state->innerresetneeded = true;
 }
 
 // Modification  of  the  preconditioner:  diagonal of approximate Hessian is
@@ -43133,7 +43133,7 @@ void mincgsetprecdiag(mincgstate *state, RVector *d, ae_state *_state) {
 void mincgsetprecscale(mincgstate *state, ae_state *_state) {
 
    state->prectype = 3;
-   state->innerresetneeded = ae_true;
+   state->innerresetneeded = true;
 }
 
 // NOTES:
@@ -43170,13 +43170,13 @@ void mincgsetprecscale(mincgstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 20.04.2009 by Bochkanov Sergey
-ae_bool mincgiteration(mincgstate *state, ae_state *_state) {
+bool mincgiteration(mincgstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    double betak;
    double v;
    double vv;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -43257,8 +43257,8 @@ ae_bool mincgiteration(mincgstate *state, ae_state *_state) {
 
 // Prepare
    n = state->n;
-   state->terminationneeded = ae_false;
-   state->userterminationneeded = ae_false;
+   state->terminationneeded = false;
+   state->userterminationneeded = false;
    state->repterminationtype = 0;
    state->repiterationscount = 0;
    state->repnfev = 0;
@@ -43276,17 +43276,17 @@ ae_bool mincgiteration(mincgstate *state, ae_state *_state) {
       goto lbl_18;
    }
 lbl_20:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, ae_false, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xbase, &state->s, &state->s, &state->s, false, state->teststep, _state)) {
       goto lbl_21;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->smonitor.fi.ptr.p_double[0] = state->f;
    for (i = 0; i <= n - 1; i++) {
       state->smonitor.j.ptr.pp_double[0][i] = state->g.ptr.p_double[i];
@@ -43311,14 +43311,14 @@ lbl_18:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_22;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_23;
 lbl_22:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
@@ -43355,18 +43355,18 @@ lbl_6:
    goto lbl_24;
 lbl_26:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_23:
    if (!state->drep) {
       goto lbl_27;
    }
 // Report algorithm powerup (if needed)
    mincg_clearrequestfields(state, _state);
-   state->algpowerup = ae_true;
+   state->algpowerup = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->algpowerup = ae_false;
+   state->algpowerup = false;
 lbl_27:
    trimprepare(state->f, &state->trimthreshold, _state);
    ae_v_moveneg(&state->dk.ptr.p_double[0], 1, &state->g.ptr.p_double[0], 1, ae_v_len(0, n - 1));
@@ -43375,11 +43375,11 @@ lbl_27:
       goto lbl_29;
    }
    mincg_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 8;
    goto lbl_rcomm;
 lbl_8:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_29:
    if (state->terminationneeded || state->userterminationneeded) {
 
@@ -43388,7 +43388,7 @@ lbl_29:
    // In this location rules for both of methods are same, thus only one exit point is needed.
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->xk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    v = (double)(0);
@@ -43398,7 +43398,7 @@ lbl_29:
    if (ae_fp_less_eq(ae_sqrt(v, _state), state->epsg)) {
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->xk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->repnfev = 1;
@@ -43426,15 +43426,15 @@ lbl_29:
 // Main cycle
    state->rstimer = mincg_rscountdownlen;
 lbl_31:
-   if (ae_false) {
+   if (false) {
       goto lbl_32;
    }
 // * clear reset flag
 // * clear termination flag
 // * store G[k] for later calculation of Y[k]
 // * prepare starting point and direction and step length for line search
-   state->innerresetneeded = ae_false;
-   state->terminationneeded = ae_false;
+   state->innerresetneeded = false;
+   state->terminationneeded = false;
    ae_v_moveneg(&state->yk.ptr.p_double[0], 1, &state->g.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_move(&state->d.ptr.p_double[0], 1, &state->dk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
@@ -43452,16 +43452,16 @@ lbl_31:
       goto lbl_33;
    }
    mincg_clearrequestfields(state, _state);
-   state->lsstart = ae_true;
+   state->lsstart = true;
    state->rstate.stage = 9;
    goto lbl_rcomm;
 lbl_9:
-   state->lsstart = ae_false;
+   state->lsstart = false;
 lbl_33:
    if (state->terminationneeded) {
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Minimization along D
@@ -43480,14 +43480,14 @@ lbl_35:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_37;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 10;
    goto lbl_rcomm;
 lbl_10:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_38;
 lbl_37:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 11;
    goto lbl_rcomm;
 lbl_11:
@@ -43524,7 +43524,7 @@ lbl_15:
    goto lbl_39;
 lbl_41:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_38:
    smoothnessmonitorenqueuepoint1u(&state->smonitor, &state->s, &state->invs, &state->d, state->stp, &state->x, state->f, &state->g, _state);
    trimfunction(&state->f, &state->g, n, state->trimthreshold, _state);
@@ -43543,7 +43543,7 @@ lbl_36:
    if (state->userterminationneeded) {
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->xk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (!state->drep) {
@@ -43551,27 +43551,27 @@ lbl_36:
    }
 // Report end of line search (if needed)
    mincg_clearrequestfields(state, _state);
-   state->lsend = ae_true;
+   state->lsend = true;
    state->rstate.stage = 16;
    goto lbl_rcomm;
 lbl_16:
-   state->lsend = ae_false;
+   state->lsend = false;
 lbl_42:
    ae_v_move(&state->xn.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    if (!state->xrep) {
       goto lbl_44;
    }
    mincg_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 17;
    goto lbl_rcomm;
 lbl_17:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_44:
    if (state->terminationneeded) {
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Line search is finished.
@@ -43664,7 +43664,7 @@ lbl_44:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->repnfev = state->repnfev + state->nfev;
@@ -43673,14 +43673,14 @@ lbl_44:
 
    // Too many iterations
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(ae_sqrt(v, _state), state->epsg)) {
 
    // Gradient is small enough
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (!state->innerresetneeded) {
@@ -43690,14 +43690,14 @@ lbl_44:
 
       // F(k+1)-F(k) is small enough
          state->repterminationtype = 1;
-         result = ae_false;
+         result = false;
          return result;
       }
       if (ae_fp_less_eq(state->lastscaledstep, state->epsx)) {
 
       // X(k+1)-X(k) is small enough
          state->repterminationtype = 2;
-         result = ae_false;
+         result = false;
          return result;
       }
    }
@@ -43705,7 +43705,7 @@ lbl_44:
 
    // Too many subsequent restarts
       state->repterminationtype = 7;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Shift Xk/Dk, update other information
@@ -43715,12 +43715,12 @@ lbl_44:
    state->k = state->k + 1;
    goto lbl_31;
 lbl_32:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = i;
    state->rstate.ra.ptr.p_double[0] = betak;
@@ -44148,7 +44148,7 @@ void mincgrestartfrom(mincgstate *state, RVector *x, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void mincgrequesttermination(mincgstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // Faster version of MinCGSetPrecDiag(), for time-critical parts of code,
@@ -44163,7 +44163,7 @@ void mincgsetprecdiagfast(mincgstate *state, RVector *d, ae_state *_state) {
    rvectorsetlengthatleast(&state->diaghl2, state->n, _state);
    state->prectype = 2;
    state->vcnt = 0;
-   state->innerresetneeded = ae_true;
+   state->innerresetneeded = true;
    for (i = 0; i <= state->n - 1; i++) {
       state->diagh.ptr.p_double[i] = d->ptr.p_double[i];
       state->diaghl2.ptr.p_double[i] = 0.0;
@@ -44210,7 +44210,7 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
 
    ae_frame_make(_state, &_frame_block);
    memset(&b, 0, sizeof(b));
-   ae_matrix_init(&b, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&b, 0, 0, DT_REAL, _state, true);
 
    if (vcnt == 0) {
       mincgsetprecdiagfast(state, d1, _state);
@@ -44224,7 +44224,7 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
    rmatrixsetlengthatleast(&state->vcorr, vcnt, n, _state);
    state->prectype = 2;
    state->vcnt = vcnt;
-   state->innerresetneeded = ae_true;
+   state->innerresetneeded = true;
    for (i = 0; i <= n - 1; i++) {
       state->diagh.ptr.p_double[i] = d1->ptr.p_double[i];
       state->diaghl2.ptr.p_double[i] = 0.0;
@@ -44239,7 +44239,7 @@ void mincgsetpreclowrankfast(mincgstate *state, RVector *d1, RVector *c, RMatrix
       }
       b.ptr.pp_double[i][i] = b.ptr.pp_double[i][i] + 1.0 / c->ptr.p_double[i];
    }
-   if (!spdmatrixcholeskyrec(&b, 0, vcnt, ae_true, &state->work0, _state)) {
+   if (!spdmatrixcholeskyrec(&b, 0, vcnt, true, &state->work0, _state)) {
       state->vcnt = 0;
       ae_frame_leave(_state);
       return;
@@ -44278,12 +44278,12 @@ void mincgsetprecvarpart(mincgstate *state, RVector *d2, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void mincg_clearrequestfields(mincgstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfg = ae_false;
-   state->xupdated = ae_false;
-   state->lsstart = ae_false;
-   state->lsend = ae_false;
-   state->algpowerup = ae_false;
+   state->needf = false;
+   state->needfg = false;
+   state->xupdated = false;
+   state->lsstart = false;
+   state->lsend = false;
+   state->algpowerup = false;
 }
 
 // This function calculates preconditioned product H^(-1)*x and stores result
@@ -44396,13 +44396,13 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
 // Initialize
    state->teststep = (double)(0);
    state->smoothnessguardlevel = 0;
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    state->n = n;
    state->diffstep = diffstep;
    state->lastgoodstep = (double)(0);
    mincgsetcond(state, (double)(0), (double)(0), (double)(0), 0, _state);
-   mincgsetxrep(state, ae_false, _state);
-   mincgsetdrep(state, ae_false, _state);
+   mincgsetxrep(state, false, _state);
+   mincgsetdrep(state, false, _state);
    mincgsetstpmax(state, (double)(0), _state);
    mincgsetcgtype(state, -1, _state);
    mincgsetprecdefault(state, _state);
@@ -44427,7 +44427,7 @@ static void mincg_mincginitinternal(ae_int_t n, double diffstep, mincgstate *sta
    }
 }
 
-void _mincgstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _mincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    mincgstate *p = (mincgstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->diagh, 0, DT_REAL, _state, make_automatic);
@@ -44452,7 +44452,7 @@ void _mincgstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _mincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    mincgstate *dst = (mincgstate *) _dst;
    mincgstate *src = (mincgstate *) _src;
    dst->n = src->n;
@@ -44574,12 +44574,12 @@ void _mincgstate_destroy(void *_p) {
    ae_vector_destroy(&p->lastscaleused);
 }
 
-void _mincgreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _mincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
    mincgreport *p = (mincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _mincgreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _mincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    mincgreport *dst = (mincgreport *) _dst;
    mincgreport *src = (mincgreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -44615,8 +44615,8 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    ae_vector_set_length(&state->rstate.ba, 3 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 6 + 1, _state);
    state->rstate.stage = -1;
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfij = false;
+   state->xupdated = false;
    ae_vector_set_length(&state->x, n, _state);
    ae_vector_set_length(&state->fi, 1 + nlec + nlic, _state);
    ae_matrix_set_length(&state->j, 1 + nlec + nlic, n, _state);
@@ -44732,7 +44732,7 @@ void minsqpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 //
 //   -- ALGLIB --
 //      Copyright 05.03.2018 by Bochkanov Sergey
-ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool userterminationneeded, ae_state *_state) {
+bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -44750,11 +44750,11 @@ ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool
    double setscaleto;
    double prevtrustrad;
    ae_int_t subiterationidx;
-   ae_bool trustradstagnated;
-   ae_bool dotrace;
-   ae_bool dodetailedtrace;
-   ae_bool increasebigc;
-   ae_bool result;
+   bool trustradstagnated;
+   bool dotrace;
+   bool dodetailedtrace;
+   bool increasebigc;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -44797,10 +44797,10 @@ ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool
       j = -788;
       status = 809;
       subiterationidx = 205;
-      trustradstagnated = ae_false;
-      dotrace = ae_true;
-      dodetailedtrace = ae_false;
-      increasebigc = ae_true;
+      trustradstagnated = false;
+      dotrace = true;
+      dodetailedtrace = false;
+      increasebigc = true;
       v = -541;
       vv = -698;
       mx = -900;
@@ -44829,8 +44829,8 @@ ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool
    dodetailedtrace = dotrace && ae_is_trace_enabled("SQP.DETAILED");
 
 // Prepare rcomm interface
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfij = false;
+   state->xupdated = false;
 
 // Initialize algorithm data:
 // * Lagrangian and "Big C" estimates
@@ -44846,7 +44846,7 @@ ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool
       state->fscales.ptr.p_double[i] = 1.0;
       state->tracegamma.ptr.p_double[i] = 0.0;
    }
-   state->haslagmult = ae_false;
+   state->haslagmult = false;
 
 // Avoid spurious warnings about possibly uninitialized vars
    status = 0;
@@ -44854,11 +44854,11 @@ ae_bool minsqpiteration(minsqpstate *state, smoothnessmonitor *smonitor, ae_bool
 // Evaluate function vector and Jacobian at Step0X, send first location report.
 // Compute initial violation of constraints.
    nlcsqp_sqpsendx(state, &state->step0x, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &state->step0fi, &state->step0j, _state)) {
 
    // Failed to retrieve function/Jaconian, infinities detected!
@@ -44866,17 +44866,17 @@ lbl_0:
          state->stepkx.ptr.p_double[i] = state->step0x.ptr.p_double[i];
       }
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcsqp_sqpcopystate(state, &state->step0x, &state->step0fi, &state->step0j, &state->stepkx, &state->stepkfi, &state->stepkj, _state);
    nlcsqp_sqpsendx(state, &state->stepkx, _state);
    state->f = state->stepkfi.ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
 
@@ -44891,7 +44891,7 @@ lbl_1:
    state->bigc = (double)(500);
    nlcsqp_initqpsubsolver(state, &state->subsolver, _state);
 lbl_3:
-   if (ae_false) {
+   if (false) {
       goto lbl_4;
    }
 // Before beginning new outer iteration:
@@ -44940,7 +44940,7 @@ lbl_3:
       if (dodetailedtrace) {
          ae_trace("> printing raw data (prior to applying variable and function scales)\n");
          ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, ae_true, &state->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, true, &state->s, false, _state);
          ae_trace("\n");
          ae_trace("> printing scaled data (after applying variable and function scales)\n");
          ae_trace("X (scaled)    = ");
@@ -45010,7 +45010,7 @@ lbl_6:
       goto lbl_4;
    }
    ae_assert(status > 0, "MinSQPIteration: integrity check failed", _state);
-   state->haslagmult = ae_true;
+   state->haslagmult = true;
    for (i = nlcsqp_penaltymemlen - 1; i >= 1; i--) {
       rcopyrr(nec + nic + nlec + nlic, &state->abslagmemory, i - 1, &state->abslagmemory, i, _state);
    }
@@ -45032,7 +45032,7 @@ lbl_6:
    for (i = 0; i <= n - 1; i++) {
       deltamax = ae_maxreal(deltamax, ae_fabs(state->step0x.ptr.p_double[i] - state->stepkx.ptr.p_double[i], _state) / state->trustrad, _state);
    }
-   trustradstagnated = ae_false;
+   trustradstagnated = false;
    inc(&state->trustradstagnationcnt, _state);
    prevtrustrad = state->trustrad;
    if (ae_fp_less_eq(deltamax, nlcsqp_sqpdeltadecrease)) {
@@ -45047,7 +45047,7 @@ lbl_6:
    if (state->trustradstagnationcnt >= nlcsqp_trustradstagnationlimit) {
       state->trustrad = 0.5 * state->trustrad;
       state->trustradstagnationcnt = 0;
-      trustradstagnated = ae_true;
+      trustradstagnated = true;
    }
 // Trace
    if (dotrace) {
@@ -45100,12 +45100,12 @@ lbl_6:
    goto lbl_3;
 lbl_4:
    smoothnessmonitortracestatus(smonitor, dotrace, _state);
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = nslack;
    state->rstate.ia.ptr.p_int[2] = nec;
@@ -45251,7 +45251,7 @@ static void nlcsqp_qpsubsolversetalgoipm(minsqpsubsolver *subsolver, ae_state *_
 //
 //   -- ALGLIB --
 //      Copyright 05.03.2018 by Bochkanov Sergey
-static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state) {
+static bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubsolver *subsolver, RVector *x0, RVector *g0, RVector *x1, RVector *g1, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
    double shs;
@@ -45272,7 +45272,7 @@ static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubso
    double eigold;
    double eignew;
    double eigcorrection;
-   ae_bool result;
+   bool result;
 
 // Algorithm parameters
    reg = 100 * ae_sqrt(ae_machineepsilon, _state);
@@ -45280,7 +45280,7 @@ static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubso
    growth = 100.0;
 
 // Proceed
-   result = ae_false;
+   result = false;
    n = sstate->n;
    rvectorsetlengthatleast(&subsolver->tmp0, n, _state);
    rawsy = (double)(0);
@@ -45314,7 +45314,7 @@ static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubso
       subsolver->sk.ptr.p_double[i] = sk;
       subsolver->yk.ptr.p_double[i] = yk;
    }
-   shs = rmatrixsyvmv(n, &subsolver->h, 0, 0, ae_true, &subsolver->sk, 0, &subsolver->tmp0, _state);
+   shs = rmatrixsyvmv(n, &subsolver->h, 0, 0, true, &subsolver->sk, 0, &subsolver->tmp0, _state);
    rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, &subsolver->sk, 0, 0.0, &subsolver->tmp0, 0, _state);
    mxhs = (double)(0);
    for (i = 0; i <= n - 1; i++) {
@@ -45367,7 +45367,7 @@ static ae_bool nlcsqp_qpsubproblemupdatehessian(minsqpstate *sstate, minsqpsubso
 // Update Hessian
    rmatrixger(n, n, &subsolver->h, 0, 0, -1 / shs, &subsolver->tmp0, 0, &subsolver->tmp0, 0, _state);
    rmatrixger(n, n, &subsolver->h, 0, 0, eigcorrection * (1 / sy), &subsolver->yk, 0, &subsolver->yk, 0, _state);
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -45422,9 +45422,9 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
       subsolver->tmp1.ptr.p_double[i] = 0.0;
    }
    vipminitdensewithslacks(&subsolver->ipmsolver, &subsolver->tmp0, &subsolver->tmp1, nq, n, _state);
-   vipmsetquadraticlinear(&subsolver->ipmsolver, h, &subsolver->sparsedummy, 0, ae_true, b, _state);
+   vipmsetquadraticlinear(&subsolver->ipmsolver, h, &subsolver->sparsedummy, 0, true, b, _state);
    vipmsetconstraints(&subsolver->ipmsolver, bndl, bndu, a, m, &subsolver->densedummy, 0, al, au, _state);
-   vipmoptimize(&subsolver->ipmsolver, ae_false, &subsolver->tmp0, &subsolver->tmp1, &subsolver->tmp2, terminationtype, _state);
+   vipmoptimize(&subsolver->ipmsolver, false, &subsolver->tmp0, &subsolver->tmp1, &subsolver->tmp2, terminationtype, _state);
    if (*terminationtype <= 0) {
       return;
    }
@@ -45441,7 +45441,7 @@ static void nlcsqp_fassolve(minsqpsubsolver *subsolver, RVector *d0, RMatrix *h,
 //
 //   -- ALGLIB --
 //      Copyright 05.03.2018 by Bochkanov Sergey
-static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state) {
+static bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, RVector *d, RVector *lagmult, ae_int_t *terminationtype, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -45464,7 +45464,7 @@ static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *sub
    ae_int_t nnz;
    ae_int_t j0;
    ae_int_t j1;
-   ae_bool result;
+   bool result;
 
    *terminationtype = 0;
 
@@ -45488,7 +45488,7 @@ static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *sub
    rvectorsetlengthatleast(&subsolver->d0, nslack, _state);
 
 // Prepare default solution: all zeros
-   result = ae_true;
+   result = true;
    *terminationtype = 0;
    for (i = 0; i <= nslack - 1; i++) {
       d->ptr.p_double[i] = 0.0;
@@ -45742,9 +45742,9 @@ static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *sub
          subsolver->tmp1.ptr.p_double[i] = 0.0;
       }
       vipminitdensewithslacks(&subsolver->ipmsolver, &subsolver->tmp0, &subsolver->tmp1, n, nslack, _state);
-      vipmsetquadraticlinear(&subsolver->ipmsolver, &subsolver->h, &subsolver->sparsedummy, 0, ae_true, &subsolver->curb, _state);
+      vipmsetquadraticlinear(&subsolver->ipmsolver, &subsolver->h, &subsolver->sparsedummy, 0, true, &subsolver->curb, _state);
       vipmsetconstraints(&subsolver->ipmsolver, &subsolver->curbndl, &subsolver->curbndu, &subsolver->sparseefflc, subsolver->sparseefflc.m, &subsolver->densedummy, 0, &subsolver->cural, &subsolver->curau, _state);
-      vipmoptimize(&subsolver->ipmsolver, ae_false, &subsolver->tmp0, &subsolver->tmp1, &subsolver->tmp2, terminationtype, _state);
+      vipmoptimize(&subsolver->ipmsolver, false, &subsolver->tmp0, &subsolver->tmp1, &subsolver->tmp2, terminationtype, _state);
       for (i = 0; i <= nslack - 1; i++) {
          d->ptr.p_double[i] = subsolver->tmp0.ptr.p_double[i];
       }
@@ -45760,13 +45760,13 @@ static ae_bool nlcsqp_qpsubproblemsolve(minsqpstate *state, minsqpsubsolver *sub
       if (*terminationtype <= 0) {
 
       // QP solver failed due to numerical errors; exit
-         result = ae_false;
+         result = false;
          return result;
       }
       return result;
    }
 // Unexpected
-   ae_assert(ae_false, "SQP: unexpected subsolver type", _state);
+   ae_assert(false, "SQP: unexpected subsolver type", _state);
    return result;
 }
 
@@ -45853,7 +45853,7 @@ static void nlcsqp_meritphaseinit(minsqpmeritphasestate *meritstate, RVector *cu
 //
 //   -- ALGLIB --
 //      Copyright 05.02.2019 by Bochkanov Sergey
-static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, ae_bool userterminationneeded, ae_state *_state) {
+static bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasestate *meritstate, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -45871,12 +45871,12 @@ static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasest
    double localstp;
    double stepklagval;
    double stepknlagval;
-   ae_bool hessianupdateperformed;
-   ae_bool dotrace;
-   ae_bool doprobing;
-   ae_bool dotracexd;
+   bool hessianupdateperformed;
+   bool dotrace;
+   bool doprobing;
+   bool dotracexd;
    double stp;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -45918,10 +45918,10 @@ static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasest
       nlic = -722;
       i = -413;
       j = -461;
-      hessianupdateperformed = ae_true;
-      dotrace = ae_true;
-      doprobing = ae_false;
-      dotracexd = ae_false;
+      hessianupdateperformed = true;
+      dotrace = true;
+      doprobing = false;
+      dotracexd = false;
       v = 306;
       vv = -1011;
       mx = 951;
@@ -45963,7 +45963,7 @@ static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasest
    }
 // Default decision is to continue algorithm
    meritstate->status = 1;
-   meritstate->increasebigc = ae_false;
+   meritstate->increasebigc = false;
    stp = (double)(0);
 
 // Determine step direction using initial quadratic model.
@@ -45972,7 +45972,7 @@ static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasest
       if (dotrace) {
          ae_trace("> [WARNING] QP subproblem failed with TerminationType=%0d\n", (int)(j));
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (dotrace) {
@@ -45992,11 +45992,11 @@ static ae_bool nlcsqp_meritphaseiteration(minsqpstate *state, minsqpmeritphasest
       meritstate->stepkxn.ptr.p_double[i] = meritstate->stepkx.ptr.p_double[i] + localstp * meritstate->d.ptr.p_double[i];
    }
    nlcsqp_sqpsendx(state, &meritstate->stepkxn, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    meritstate->rmeritphasestate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfin, &meritstate->stepkjn, _state)) {
 
    // Failed to retrieve func/Jac, infinities detected
@@ -46005,7 +46005,7 @@ lbl_0:
       if (dotrace) {
          ae_trace("[ERROR] infinities in target/constraints are detected\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    f1 = nlcsqp_meritfunction(state, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->lagmult, &meritstate->penalties, &meritstate->tmpmerit, _state);
@@ -46036,7 +46036,7 @@ lbl_0:
       if (dotrace) {
          ae_trace("> [WARNING] second-order QP subproblem failed\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (dotrace) {
@@ -46052,18 +46052,18 @@ lbl_0:
    f1 = f0;
    smoothnessmonitorstartlinesearch(smonitor, &meritstate->stepkx, &meritstate->stepkfi, &meritstate->stepkj, _state);
 lbl_6:
-   if (ae_false) {
+   if (false) {
       goto lbl_7;
    }
    for (i = 0; i <= n - 1; i++) {
       meritstate->stepkxn.ptr.p_double[i] = meritstate->stepkx.ptr.p_double[i] + localstp * meritstate->d.ptr.p_double[i];
    }
    nlcsqp_sqpsendx(state, &meritstate->stepkxn, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    meritstate->rmeritphasestate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfin, &meritstate->stepkjn, _state)) {
 
    // Failed to retrieve func/Jac, infinities detected
@@ -46072,7 +46072,7 @@ lbl_1:
       if (dotrace) {
          ae_trace("[ERROR] infinities in target/constraints are detected\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    smoothnessmonitorenqueuepoint(smonitor, &meritstate->d, localstp, &meritstate->stepkxn, &meritstate->stepkfin, &meritstate->stepkjn, _state);
@@ -46112,7 +46112,7 @@ lbl_4:
       if (dotrace) {
          ae_trace("> user requested termination\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcsqp_lagrangianfg(state, &meritstate->stepkx, state->trustrad, &meritstate->stepkfi, &meritstate->stepkj, &meritstate->lagmult, &meritstate->tmplagrangianfg, &stepklagval, &meritstate->stepklaggrad, _state);
@@ -46178,11 +46178,11 @@ lbl_12:
       }
    }
    nlcsqp_sqpsendx(state, &meritstate->stepkxc, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    meritstate->rmeritphasestate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcsqp_sqpretrievefij(state, &meritstate->stepkfic, &meritstate->stepkjc, _state)) {
       goto lbl_13;
    }
@@ -46282,7 +46282,7 @@ lbl_10:
 lbl_8:
 
 // Perform Hessian update
-   hessianupdateperformed = ae_false;
+   hessianupdateperformed = false;
    if (ae_fp_greater(localstp, (double)(0))) {
       hessianupdateperformed = nlcsqp_qpsubproblemupdatehessian(state, &state->subsolver, &meritstate->stepkx, &meritstate->stepklaggrad, &meritstate->stepkxn, &meritstate->stepknlaggrad, _state);
    }
@@ -46312,22 +46312,22 @@ lbl_8:
 // Report one more inner iteration
    nlcsqp_sqpsendx(state, &meritstate->stepkx, _state);
    state->f = meritstate->stepkfi.ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    meritstate->rmeritphasestate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 
 // Update constraint violations
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &meritstate->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&meritstate->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
 lbl_14:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    meritstate->rmeritphasestate.ia.ptr.p_int[0] = n;
    meritstate->rmeritphasestate.ia.ptr.p_int[1] = nslack;
    meritstate->rmeritphasestate.ia.ptr.p_int[2] = nec;
@@ -46371,7 +46371,7 @@ lbl_rcomm:
 //
 //   -- ALGLIB --
 //      Copyright 05.02.2019 by Bochkanov Sergey
-static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_bool *increasebigc, ae_int_t *status, ae_state *_state) {
+static void nlcsqp_meritphaseresults(minsqpmeritphasestate *meritstate, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, bool *increasebigc, ae_int_t *status, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
@@ -46414,7 +46414,7 @@ static void nlcsqp_sqpsendx(minsqpstate *state, RVector *xs, ae_state *_state) {
 // Retrieves F-vector and scaled Jacobian, copies them to FiS and JS.
 //
 // Returns True on success, False on failure (when F or J are not finite numbers).
-static ae_bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state) {
+static bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *js, ae_state *_state) {
    ae_int_t nlec;
    ae_int_t nlic;
    ae_int_t n;
@@ -46422,7 +46422,7 @@ static ae_bool nlcsqp_sqpretrievefij(minsqpstate *state, RVector *fis, RMatrix *
    ae_int_t j;
    double v;
    double vv;
-   ae_bool result;
+   bool result;
 
    n = state->n;
    nlec = state->nlec;
@@ -46479,7 +46479,7 @@ static void nlcsqp_lagrangianfg(minsqpstate *state, RVector *x, double trustrad,
    double vlag;
    double vact;
    double vd;
-   ae_bool usesparsegemv;
+   bool usesparsegemv;
 
    *f = 0;
 
@@ -46654,7 +46654,7 @@ static void nlcsqp_meritfunctionandrawlagrangian(minsqpstate *state, RVector *x,
    }
 }
 
-void _minsqpsubsolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minsqpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpsubsolver *p = (minsqpsubsolver *) _p;
    ae_touch_ptr((void *)p);
    _vipmstate_init(&p->ipmsolver, _state, make_automatic);
@@ -46683,7 +46683,7 @@ void _minsqpsubsolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->activeidx, 0, DT_INT, _state, make_automatic);
 }
 
-void _minsqpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minsqpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpsubsolver *dst = (minsqpsubsolver *) _dst;
    minsqpsubsolver *src = (minsqpsubsolver *) _src;
    dst->algokind = src->algokind;
@@ -46772,14 +46772,14 @@ void _minsqpsubsolver_destroy(void *_p) {
    ae_vector_destroy(&p->activeidx);
 }
 
-void _minsqptmplagrangian_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minsqptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmplagrangian *p = (minsqptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minsqptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minsqptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqptmplagrangian *dst = (minsqptmplagrangian *) _dst;
    minsqptmplagrangian *src = (minsqptmplagrangian *) _src;
    ae_vector_init_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
@@ -46800,13 +46800,13 @@ void _minsqptmplagrangian_destroy(void *_p) {
    ae_vector_destroy(&p->sclagtmp1);
 }
 
-void _minsqptmpmerit_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minsqptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqptmpmerit *p = (minsqptmpmerit *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minsqptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minsqptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqptmpmerit *dst = (minsqptmpmerit *) _dst;
    minsqptmpmerit *src = (minsqptmpmerit *) _src;
    ae_vector_init_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
@@ -46824,7 +46824,7 @@ void _minsqptmpmerit_destroy(void *_p) {
    ae_vector_destroy(&p->mftmp0);
 }
 
-void _minsqpmeritphasestate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minsqpmeritphasestate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpmeritphasestate *p = (minsqpmeritphasestate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -46848,7 +46848,7 @@ void _minsqpmeritphasestate_init(void *_p, ae_state *_state, ae_bool make_automa
    _rcommstate_init(&p->rmeritphasestate, _state, make_automatic);
 }
 
-void _minsqpmeritphasestate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minsqpmeritphasestate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpmeritphasestate *dst = (minsqpmeritphasestate *) _dst;
    minsqpmeritphasestate *src = (minsqpmeritphasestate *) _src;
    dst->n = src->n;
@@ -46927,7 +46927,7 @@ void _minsqpmeritphasestate_destroy(void *_p) {
    _rcommstate_destroy(&p->rmeritphasestate);
 }
 
-void _minsqpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minsqpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minsqpstate *p = (minsqpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -46959,7 +46959,7 @@ void _minsqpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minsqpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minsqpstate *dst = (minsqpstate *) _dst;
    minsqpstate *src = (minsqpstate *) _src;
    dst->n = src->n;
@@ -47259,7 +47259,7 @@ void presolvebwd(presolveinfo *info, RVector *x, ZVector *stats, RVector *lagbc,
    }
 }
 
-void _presolveinfo_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _presolveinfo_init(void *_p, ae_state *_state, bool make_automatic) {
    presolveinfo *p = (presolveinfo *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawbndl, 0, DT_REAL, _state, make_automatic);
@@ -47274,7 +47274,7 @@ void _presolveinfo_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->au, 0, DT_REAL, _state, make_automatic);
 }
 
-void _presolveinfo_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _presolveinfo_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    presolveinfo *dst = (presolveinfo *) _dst;
    presolveinfo *src = (presolveinfo *) _src;
    dst->newn = src->newn;
@@ -47368,9 +47368,9 @@ void dssinit(ae_int_t n, dualsimplexstate *s, ae_state *_state) {
       s->repx.ptr.p_double[i] = 0.0;
       s->repstats.ptr.p_int[i] = 1;
    }
-   s->dotrace = ae_false;
-   s->dodetailedtrace = ae_false;
-   s->dotimers = ae_false;
+   s->dotrace = false;
+   s->dodetailedtrace = false;
+   s->dotimers = false;
 }
 
 // This function specifies LP problem
@@ -47405,9 +47405,9 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
    ae_int_t ns;
    ae_int_t j0;
    ae_int_t j1;
-   ae_bool processed;
+   bool processed;
    ae_int_t oldm;
-   ae_bool basisinitialized;
+   bool basisinitialized;
    double v;
 
    ns = state->primary.ns;
@@ -47501,10 +47501,10 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
 // * perform integrity check for array sizes
 // * manually append new items
 // * update DIdx/UIdx
-   processed = ae_false;
+   processed = false;
    state->primary.m = k;
    if (akind == 0) {
-      ae_assert(ae_false, "DSSSetProblem: does not support dense inputs yet", _state);
+      ae_assert(false, "DSSSetProblem: does not support dense inputs yet", _state);
    }
    if (akind == 1) {
 
@@ -47564,7 +47564,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
       state->at.m = state->at.m + k;
       sparseinitduidx(&state->at, _state);
       sparsecopytransposecrsbuf(&state->at, &state->a, _state);
-      processed = ae_true;
+      processed = true;
    }
    ae_assert(processed, "DSSSetProblem: integrity check failed (akind)", _state);
 
@@ -47605,7 +47605,7 @@ void dsssetproblem(dualsimplexstate *state, RVector *c, RVector *bndl, RVector *
 //
 // NOTE: current version does not support basis shrinkage, only
 //       growing basis can be reused.
-   basisinitialized = ae_false;
+   basisinitialized = false;
    if (basisinittype == 2) {
 
    // Import basis from one proposed by caller
@@ -48022,7 +48022,7 @@ static void reviseddualsimplex_subprobleminferinitialxn(dualsimplexstate *state,
          s->xa.ptr.p_double[i] = 0.0;
          continue;
       }
-      ae_assert(ae_false, "SubproblemInferInitialXN: integrity check failed (infeasible constraint)", _state);
+      ae_assert(false, "SubproblemInferInitialXN: integrity check failed (infeasible constraint)", _state);
    }
    s->state = reviseddualsimplex_ssvalidxn;
 }
@@ -48091,7 +48091,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
    ae_int_t ii;
    ae_int_t i;
    ae_int_t j;
-   ae_bool flipped;
+   bool flipped;
    double v;
    double dj;
    double xj;
@@ -48100,7 +48100,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
 
    ae_frame_make(_state, &_frame_block);
    memset(&dummy, 0, sizeof(dummy));
-   ae_vector_init(&dummy, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&dummy, 0, DT_REAL, _state, true);
 
    nn = s->ns;
    m = s->m;
@@ -48124,7 +48124,7 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
 
 // Perform flips for dual-infeasible boxed variables
    result = (double)(0);
-   flipped = ae_false;
+   flipped = false;
    for (ii = 0; ii <= nn - 1; ii++) {
       j = state->basis.nidx.ptr.p_int[ii];
       bndt = s->bndt.ptr.p_int[j];
@@ -48135,12 +48135,12 @@ static double reviseddualsimplex_initialdualfeasibilitycorrection(dualsimplexsta
          xj = s->xa.ptr.p_double[j];
          if (xj == s->bndl.ptr.p_double[j] && dj < 0) {
             s->xa.ptr.p_double[j] = s->bndu.ptr.p_double[j];
-            flipped = ae_true;
+            flipped = true;
             continue;
          }
          if (xj == s->bndu.ptr.p_double[j] && dj > 0) {
             s->xa.ptr.p_double[j] = s->bndl.ptr.p_double[j];
-            flipped = ae_true;
+            flipped = true;
             continue;
          }
          continue;
@@ -48269,7 +48269,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
    // Done
       return;
    }
-   ae_assert(ae_false, "Shifting: unexpected shifting type", _state);
+   ae_assert(false, "Shifting: unexpected shifting type", _state);
 }
 
 // This function performs pricing step
@@ -48292,7 +48292,7 @@ static void reviseddualsimplex_shifting(dualsimplexstate *state, dualsimplexsubp
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, ae_bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state) {
+static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexsubproblem *s, bool phase1pricing, ae_int_t *p, ae_int_t *r, double *delta, dualsimplexsettings *settings, ae_state *_state) {
    ae_int_t m;
    ae_int_t i;
    ae_int_t bi;
@@ -48305,9 +48305,9 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
    double vtest;
    double invw;
    ae_int_t bndt;
-   ae_bool hasboth;
-   ae_bool hasl;
-   ae_bool hasu;
+   bool hasboth;
+   bool hasl;
+   bool hasu;
    ae_int_t t0;
 
    *p = 0;
@@ -48456,7 +48456,7 @@ static void reviseddualsimplex_pricingstep(dualsimplexstate *state, dualsimplexs
    // Done
       return;
    }
-   ae_assert(ae_false, "PricingStep: unknown pricing type", _state);
+   ae_assert(false, "PricingStep: unknown pricing type", _state);
 }
 
 // This function performs BTran step
@@ -48651,7 +48651,7 @@ static void reviseddualsimplex_ftranstep(dualsimplexstate *state, dualsimplexsub
    for (j = j0; j <= j1; j++) {
       state->ftrantmp0.ptr.p_double[state->at.idx.ptr.p_int[j]] = state->at.vals.ptr.p_double[j];
    }
-   reviseddualsimplex_basissolvex(&state->basis, &state->ftrantmp0, alphaq, alphaqim, ae_true, &state->ftrantmp1, _state);
+   reviseddualsimplex_basissolvex(&state->basis, &state->ftrantmp0, alphaq, alphaqim, true, &state->ftrantmp1, _state);
    ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "FTran: unexpected Settings.Pricing", _state);
    if (settings->pricing == 1) {
       reviseddualsimplex_basissolve(&state->basis, &rhor->dense, tau, &state->ftrantmp1, _state);
@@ -48887,7 +48887,7 @@ static void reviseddualsimplex_ratiotest(dualsimplexstate *state, dualsimplexsub
       return;
    }
 // Unknown test type
-   ae_assert(ae_false, "RatioTest: integrity check failed, unknown test type", _state);
+   ae_assert(false, "RatioTest: integrity check failed, unknown test type", _state);
 }
 
 // This function performs update of XB, XN, D and Z during final step of revised
@@ -48937,7 +48937,7 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
    ae_int_t k1;
    double bndl;
    double bndu;
-   ae_bool flipped;
+   bool flipped;
    double flip;
    double dj;
    ae_int_t dir;
@@ -48983,14 +48983,14 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
       dj = s->d.ptr.p_double[j];
       bndl = s->bndl.ptr.p_double[j];
       bndu = s->bndu.ptr.p_double[j];
-      flipped = ae_false;
+      flipped = false;
       if (s->xa.ptr.p_double[j] == bndl && dj < 0) {
          flip = bndu - bndl;
-         flipped = ae_true;
+         flipped = true;
       } else {
          if (s->xa.ptr.p_double[j] == bndu && dj > 0) {
             flip = bndl - bndu;
-            flipped = ae_true;
+            flipped = true;
          }
       }
       if (flipped) {
@@ -49069,15 +49069,15 @@ static void reviseddualsimplex_updatestep(dualsimplexstate *state, dualsimplexsu
 //
 //   -- ALGLIB --
 //      Copyright 24.01.2019 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state) {
+static bool reviseddualsimplex_refactorizationrequired(dualsimplexstate *state, dualsimplexsubproblem *s, ae_int_t q, double alpharpiv, ae_int_t r, double alphaqpiv, ae_state *_state) {
    ae_int_t m;
    ae_int_t i;
    double mx;
    double v;
-   ae_bool result;
+   bool result;
 
    m = s->m;
-   result = ae_false;
+   result = false;
 
 // Quick exit
    if (state->basis.trfage <= reviseddualsimplex_safetrfage) {
@@ -49141,7 +49141,7 @@ static void reviseddualsimplex_cacheboundinfo(dualsimplexsubproblem *s, ae_int_t
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, ae_bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state) {
+static void reviseddualsimplex_solvesubproblemdual(dualsimplexstate *state, dualsimplexsubproblem *s, bool isphase1, dualsimplexsettings *settings, ae_int_t *info, ae_state *_state) {
    ae_int_t nx;
    ae_int_t m;
    ae_int_t i;
@@ -49290,7 +49290,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
    ae_int_t r;
    ae_int_t dir;
    double lim;
-   ae_bool haslim;
+   bool haslim;
    double thetap;
    double xbnd;
    double flip;
@@ -49338,7 +49338,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
       vmax = (double)(0);
       dir = 0;
       lim = ae_maxrealnumber;
-      haslim = ae_false;
+      haslim = false;
       flip = (double)(0);
       canddir = 0;
       for (i = 0; i <= nn - 1; i++) {
@@ -49366,7 +49366,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
                vmax = v;
                dir = canddir;
                lim = candlim;
-               haslim = ae_true;
+               haslim = true;
                flip = candflip;
                q = j;
             }
@@ -49390,7 +49390,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
             vmax = v;
             dir = canddir;
             lim = ae_maxrealnumber;
-            haslim = ae_false;
+            haslim = false;
             q = j;
          }
          continue;
@@ -49422,7 +49422,7 @@ static void reviseddualsimplex_solvesubproblemprimal(dualsimplexstate *state, du
       for (j = j0; j <= j1; j++) {
          state->tmp0.ptr.p_double[state->at.idx.ptr.p_int[j]] = state->at.vals.ptr.p_double[j];
       }
-      reviseddualsimplex_basissolvex(&state->basis, &state->tmp0, &state->alphaq, &state->alphaqim, ae_true, &state->tmp2, _state);
+      reviseddualsimplex_basissolvex(&state->basis, &state->tmp0, &state->alphaq, &state->alphaqim, true, &state->tmp2, _state);
       vp = settings->pivottol;
       p = -1;
       r = -1;
@@ -49586,7 +49586,7 @@ static void reviseddualsimplex_invokephase1(dualsimplexstate *state, dualsimplex
    if (state->dotrace) {
       ae_trace("> phase 1 dual feasibility correction done\ndualErr = %0.3e\n", (double)(dualerr));
    }
-   reviseddualsimplex_solvesubproblemdual(state, &state->phase1, ae_true, settings, &state->repterminationtype, _state);
+   reviseddualsimplex_solvesubproblemdual(state, &state->phase1, true, settings, &state->repterminationtype, _state);
    ae_assert(state->repterminationtype > 0, "DualSimplexSolver: unexpected failure of phase #1", _state);
    state->repterminationtype = 1;
 
@@ -49628,7 +49628,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
 
    ae_frame_make(_state, &_frame_block);
    memset(&rs, 0, sizeof(rs));
-   _hqrndstate_init(&rs, _state, ae_true);
+   _hqrndstate_init(&rs, _state, true);
 
    nx = state->primary.ns + state->primary.m;
    m = state->primary.m;
@@ -49712,7 +49712,7 @@ static void reviseddualsimplex_dssoptimizewrk(dualsimplexstate *state, dualsimpl
    if (state->dotimers) {
       t0 = ae_tickcount();
    }
-   reviseddualsimplex_solvesubproblemdual(state, &state->primary, ae_false, settings, &state->repterminationtype, _state);
+   reviseddualsimplex_solvesubproblemdual(state, &state->primary, false, settings, &state->repterminationtype, _state);
    if (state->dotimers) {
       state->repphase2time = ae_tickcount() - t0;
    }
@@ -49900,20 +49900,20 @@ static void reviseddualsimplex_basisinit(ae_int_t ns, ae_int_t m, dualsimplexbas
    bvectorgrowto(&s->isbasic, ns + m, _state);
    for (i = 0; i <= ns - 1; i++) {
       s->nidx.ptr.p_int[i] = i;
-      s->isbasic.ptr.p_bool[i] = ae_false;
+      s->isbasic.ptr.p_bool[i] = false;
    }
    for (i = 0; i <= m - 1; i++) {
       s->idx.ptr.p_int[i] = ns + i;
-      s->isbasic.ptr.p_bool[ns + i] = ae_true;
+      s->isbasic.ptr.p_bool[ns + i] = true;
    }
    s->trftype = 3;
    s->trfage = 0;
-   s->isvalidtrf = ae_false;
+   s->isvalidtrf = false;
    rvectorsetlengthatleast(&s->dseweights, m, _state);
    for (i = 0; i <= m - 1; i++) {
       s->dseweights.ptr.p_double[i] = 1.0;
    }
-   s->dsevalid = ae_false;
+   s->dsevalid = false;
    reviseddualsimplex_basisclearstats(s, _state);
 }
 
@@ -49960,22 +49960,22 @@ static void reviseddualsimplex_basisclearstats(dualsimplexbasis *s, ae_state *_s
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state) {
+static bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t newm, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state) {
    ae_int_t ns;
    ae_int_t oldm;
    ae_int_t i;
    double oldminu;
    double newminu;
-   ae_bool result;
+   bool result;
 
    ns = s->ns;
    oldm = s->m;
-   result = ae_false;
+   result = false;
 
 // Quick exit strategies
    if (newm == 0) {
       reviseddualsimplex_basisinit(ns, 0, s, _state);
-      result = ae_true;
+      result = true;
       return result;
    }
 // Same size or larger
@@ -49991,7 +49991,7 @@ static ae_bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t n
       bvectorgrowto(&s->isbasic, ns + newm, _state);
       for (i = oldm; i <= newm - 1; i++) {
          s->idx.ptr.p_int[i] = ns + i;
-         s->isbasic.ptr.p_bool[ns + i] = ae_true;
+         s->isbasic.ptr.p_bool[ns + i] = true;
       }
 
    // DSE weights are invalid and filled by 1.0
@@ -49999,16 +49999,16 @@ static ae_bool reviseddualsimplex_basistryresize(dualsimplexbasis *s, ae_int_t n
       for (i = 0; i <= newm - 1; i++) {
          s->dseweights.ptr.p_double[i] = 1.0;
       }
-      s->dsevalid = ae_false;
+      s->dsevalid = false;
 
    // Invalidate TRF.
    // Try to refactorize.
-      s->isvalidtrf = ae_false;
+      s->isvalidtrf = false;
       newminu = reviseddualsimplex_basisfreshtrfunsafe(s, at, settings, _state);
       result = ae_fp_greater_eq(newminu, reviseddualsimplex_maxudecay * oldminu);
       return result;
    }
-   ae_assert(ae_false, "BasisTryResize: unexpected branch", _state);
+   ae_assert(false, "BasisTryResize: unexpected branch", _state);
    return result;
 }
 
@@ -50065,9 +50065,9 @@ static void reviseddualsimplex_basisexportto(dualsimplexbasis *s0, dualsimplexba
    copyintegerarray(&s0->idx, &s1->idx, _state);
    copyintegerarray(&s0->nidx, &s1->nidx, _state);
    copybooleanarray(&s0->isbasic, &s1->isbasic, _state);
-   s1->isvalidtrf = ae_false;
+   s1->isvalidtrf = false;
    s1->trftype = -1;
-   s1->dsevalid = ae_false;
+   s1->dsevalid = false;
    if (s0->m > 0) {
       ae_assert(s0->isvalidtrf, "BasisExport: valid factorization is required for source basis", _state);
       s1->eminu = reviseddualsimplex_basisminimumdiagonalelement(s0, _state);
@@ -50091,10 +50091,10 @@ static void reviseddualsimplex_basisexportto(dualsimplexbasis *s0, dualsimplexba
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state) {
+static bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, dualsimplexbasis *s1, sparsematrix *at, dualsimplexsettings *settings, ae_state *_state) {
    ae_int_t i;
    double newminu;
-   ae_bool result;
+   bool result;
 
    ae_assert(s0->ns == s1->ns, "BasisImportFrom: structural variable counts do not match", _state);
    reviseddualsimplex_basisclearstats(s0, _state);
@@ -50108,16 +50108,16 @@ static ae_bool reviseddualsimplex_basistryimportfrom(dualsimplexbasis *s0, duals
    for (i = 0; i <= s0->m + s0->ns - 1; i++) {
       s0->isbasic.ptr.p_bool[i] = s1->isbasic.ptr.p_bool[i];
    }
-   s0->isvalidtrf = ae_false;
+   s0->isvalidtrf = false;
    rvectorsetlengthatleast(&s0->dseweights, s1->m, _state);
    for (i = 0; i <= s1->m - 1; i++) {
       s0->dseweights.ptr.p_double[i] = 1.0;
    }
-   s0->dsevalid = ae_false;
+   s0->dsevalid = false;
    newminu = reviseddualsimplex_basisfreshtrfunsafe(s0, at, settings, _state);
    result = ae_fp_greater_eq(newminu, reviseddualsimplex_maxudecay * s1->eminu);
    if (!result) {
-      s0->isvalidtrf = ae_false;
+      s0->isvalidtrf = false;
       s0->trftype = -1;
    }
    return result;
@@ -50174,7 +50174,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
 // Compare TRF type with one required by settings, invalidation and refresh otherwise
    if (s->trftype != settings->trftype) {
       s->trftype = settings->trftype;
-      s->isvalidtrf = ae_false;
+      s->isvalidtrf = false;
       result = reviseddualsimplex_basisfreshtrfunsafe(s, at, settings, _state);
       return result;
    }
@@ -50204,7 +50204,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       }
       rmatrixlu(&s->denselu, m, m, &s->tmpi, _state);
       reviseddualsimplex_pivottobwd(&s->tmpi, m, &s->rowpermbwd, _state);
-      s->isvalidtrf = ae_true;
+      s->isvalidtrf = true;
       s->trfage = 0;
       s->statfact = s->statfact + 1;
       s->statoffdiag = s->statoffdiag + ae_sqr((double)(m - 1), _state);
@@ -50439,7 +50439,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
          }
       }
       sparsecopytransposecrsbuf(&s->sparseu, &s->sparseut, _state);
-      s->isvalidtrf = ae_true;
+      s->isvalidtrf = true;
       s->trfage = 0;
       s->statfact = s->statfact + 1;
       s->statoffdiag = s->statoffdiag + (s->sparsel.ridx.ptr.p_int[m] - m) + (s->sparseu.ridx.ptr.p_int[m] - m);
@@ -50447,7 +50447,7 @@ static double reviseddualsimplex_basisfreshtrfunsafe(dualsimplexbasis *s, sparse
       return result;
    }
 //
-   ae_assert(ae_false, "BasisFreshTrf: unexpected TRF type", _state);
+   ae_assert(false, "BasisFreshTrf: unexpected TRF type", _state);
    return result;
 }
 
@@ -50501,7 +50501,7 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
             s->dseweights.ptr.p_double[i] = 1.0;
          }
       }
-      s->dsevalid = ae_true;
+      s->dsevalid = true;
       return;
    }
 // Compute weights from scratch
@@ -50509,10 +50509,10 @@ static void reviseddualsimplex_basisrequestweights(dualsimplexbasis *s, dualsimp
       for (i = 0; i <= m - 1; i++) {
          s->dseweights.ptr.p_double[i] = 1.0;
       }
-      s->dsevalid = ae_true;
+      s->dsevalid = true;
       return;
    }
-   ae_assert(ae_false, "BasisRequestWeights: unexpected pricing type", _state);
+   ae_assert(false, "BasisRequestWeights: unexpected pricing type", _state);
 }
 
 // This function updates triangular factorization by adding Q  to  basis  and
@@ -50534,7 +50534,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
    ae_int_t nn;
    ae_int_t i;
    ae_int_t j;
-   ae_bool processed;
+   bool processed;
    double invaq;
    ae_int_t dstoffs;
    ae_int_t srcoffs;
@@ -50550,8 +50550,8 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
 // Update index tables
 //
 // TODO: better code!!!!!!!!!!!!!!!!!!!!!!!
-   s->isbasic.ptr.p_bool[p] = ae_false;
-   s->isbasic.ptr.p_bool[q] = ae_true;
+   s->isbasic.ptr.p_bool[p] = false;
+   s->isbasic.ptr.p_bool[q] = true;
    for (i = 0; i <= m - 1; i++) {
       if (s->idx.ptr.p_int[i] == p) {
          s->idx.ptr.p_int[i] = q;
@@ -50569,10 +50569,10 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
    if (((s->trftype != settings->trftype || s->trftype == 0) || !s->isvalidtrf) || s->trfage >= settings->maxtrfage) {
 
    // Complete refresh is needed for factorization
-      s->isvalidtrf = ae_false;
+      s->isvalidtrf = false;
       reviseddualsimplex_basisfreshtrf(s, at, settings, _state);
    } else {
-      processed = ae_false;
+      processed = false;
       if ((s->trftype == 0 || s->trftype == 1) || s->trftype == 2) {
 
       // Dense/sparse factorizations with dense PFI
@@ -50591,7 +50591,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          inc(&s->trfage, _state);
          s->statupdt = s->statupdt + 1;
          s->statoffdiag = s->statoffdiag + ae_sqr((double)(m - 1), _state);
-         processed = ae_true;
+         processed = true;
       }
       if (s->trftype == 3) {
 
@@ -50628,7 +50628,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          for (i = idxd + 1; i <= m - 1; i++) {
             j = s->sparsel.ridx.ptr.p_int[i + 1] - 1;
             if (s->sparsel.idx.ptr.p_int[j] != i || s->sparsel.vals.ptr.p_double[j] != 1) {
-               ae_assert(ae_false, "UpdateTrf: integrity check failed for sparse L", _state);
+               ae_assert(false, "UpdateTrf: integrity check failed for sparse L", _state);
             }
             dstoffs = s->sparsel.ridx.ptr.p_int[i - 1];
             srcoffs = s->sparsel.ridx.ptr.p_int[i];
@@ -50719,21 +50719,21 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          inc(&s->trfage, _state);
          s->statupdt = s->statupdt + 1;
          s->statoffdiag = s->statoffdiag + (s->sparsel.ridx.ptr.p_int[m] - m) + (s->sparseu.ridx.ptr.p_int[m] - m);
-         processed = ae_true;
+         processed = true;
       }
       ae_assert(processed, "BasisUpdateTrf: unexpected TRF type", _state);
    }
 
 // Update pricing weights
    ae_assert((settings->pricing == -1 || settings->pricing == 0) || settings->pricing == 1, "BasisUpdateTrf: unexpected Settings.Pricing", _state);
-   processed = ae_false;
+   processed = false;
    if (settings->pricing == -1) {
 
    // Weights are recomputed from scratch at every step.
    // VERY, VERY time consuming, used only for debug purposes.
-      s->dsevalid = ae_false;
+      s->dsevalid = false;
       reviseddualsimplex_basisrequestweights(s, settings, _state);
-      processed = ae_true;
+      processed = true;
    }
    if (settings->pricing == 0) {
 
@@ -50742,9 +50742,9 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
          for (i = 0; i <= m - 1; i++) {
             s->dseweights.ptr.p_double[i] = 1.0;
          }
-         s->dsevalid = ae_true;
+         s->dsevalid = true;
       }
-      processed = ae_true;
+      processed = true;
    }
    if (settings->pricing == 1) {
 
@@ -50764,7 +50764,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
       // No prior values, compute from scratch (usually it is done only once)
          reviseddualsimplex_basisrequestweights(s, settings, _state);
       }
-      processed = ae_true;
+      processed = true;
    }
    ae_assert(processed, "BasisUpdateTrf: unexpected pricing type", _state);
 }
@@ -50778,7 +50778,7 @@ static void reviseddualsimplex_basisupdatetrf(dualsimplexbasis *s, sparsematrix 
 //      Copyright 19.07.2018 by Bochkanov Sergey
 static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVector *x, RVector *tmpx, ae_state *_state) {
 
-   reviseddualsimplex_basissolvex(s, r, x, x, ae_false, tmpx, _state);
+   reviseddualsimplex_basissolvex(s, r, x, x, false, tmpx, _state);
 }
 
 // This function computes solution to B*x=r. It  also   additionally  outputs
@@ -50793,7 +50793,7 @@ static void reviseddualsimplex_basissolve(dualsimplexbasis *s, RVector *r, RVect
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, ae_bool needintermediate, RVector *tx, ae_state *_state) {
+static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVector *x, RVector *xim, bool needintermediate, RVector *tx, ae_state *_state) {
    ae_int_t m;
    ae_int_t i;
    ae_int_t d;
@@ -50801,11 +50801,11 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
    double v;
    double vd;
    double vv;
-   ae_bool processed;
+   bool processed;
 
    ae_assert(s->isvalidtrf, "BasisSolve: integrity check failed", _state);
    m = s->m;
-   processed = ae_false;
+   processed = false;
    rvectorsetlengthatleast(tx, m, _state);
 
 // Dense/sparse factorizations with dense PFI
@@ -50820,13 +50820,13 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
       if (s->trftype == 0 || s->trftype == 1) {
 
       // Dense TRF
-         rmatrixtrsv(m, &s->denselu, 0, 0, ae_true, ae_false, 1, x, 0, _state);
-         rmatrixtrsv(m, &s->denselu, 0, 0, ae_false, ae_true, 1, x, 0, _state);
+         rmatrixtrsv(m, &s->denselu, 0, 0, true, false, 1, x, 0, _state);
+         rmatrixtrsv(m, &s->denselu, 0, 0, false, true, 1, x, 0, _state);
       } else {
 
       // Sparse TRF
-         sparsetrsv(&s->sparseu, ae_true, ae_false, 1, x, _state);
-         sparsetrsv(&s->sparsel, ae_false, ae_false, 1, x, _state);
+         sparsetrsv(&s->sparseu, true, false, 1, x, _state);
+         sparsetrsv(&s->sparsel, false, false, 1, x, _state);
       }
       for (i = 0; i <= m - 1; i++) {
          tx->ptr.p_double[s->rowpermbwd.ptr.p_int[i]] = x->ptr.p_double[i];
@@ -50841,7 +50841,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
          }
          x->ptr.p_double[s->rk.ptr.p_int[k]] = x->ptr.p_double[s->rk.ptr.p_int[k]] - v;
       }
-      processed = ae_true;
+      processed = true;
    }
 // Sparse factorization with Forest-Tomlin update
 //
@@ -50851,7 +50851,7 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
       for (i = 0; i <= m - 1; i++) {
          x->ptr.p_double[i] = r->ptr.p_double[s->colpermbwd.ptr.p_int[i]];
       }
-      sparsetrsv(&s->sparseu, ae_true, ae_false, 1, x, _state);
+      sparsetrsv(&s->sparseu, true, false, 1, x, _state);
       for (k = 0; k <= s->trfage - 1; k++) {
 
       // The code below is an amalgamation of two parts:
@@ -50883,14 +50883,14 @@ static void reviseddualsimplex_basissolvex(dualsimplexbasis *s, RVector *r, RVec
             xim->ptr.p_double[i] = x->ptr.p_double[i];
          }
       }
-      sparsetrsv(&s->sparsel, ae_false, ae_false, 1, x, _state);
+      sparsetrsv(&s->sparsel, false, false, 1, x, _state);
       for (i = 0; i <= m - 1; i++) {
          tx->ptr.p_double[s->rowpermbwd.ptr.p_int[i]] = x->ptr.p_double[i];
       }
       for (i = 0; i <= m - 1; i++) {
          x->ptr.p_double[i] = tx->ptr.p_double[i];
       }
-      processed = ae_true;
+      processed = true;
    }
 // Integrity check
    ae_assert(processed, "BasisSolve: unsupported TRF type", _state);
@@ -50915,11 +50915,11 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
    ae_int_t k;
    double v;
    double vm;
-   ae_bool processed;
+   bool processed;
 
    ae_assert(s->isvalidtrf, "BasisSolveT: integrity check failed", _state);
    m = s->m;
-   processed = ae_false;
+   processed = false;
    rvectorsetlengthatleast(tx, m, _state);
 
 // Dense factorizations
@@ -50945,13 +50945,13 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
       if (s->trftype == 0 || s->trftype == 1) {
 
       // Dense TRF
-         rmatrixtrsv(m, &s->denselu, 0, 0, ae_false, ae_true, 0, x, 0, _state);
-         rmatrixtrsv(m, &s->denselu, 0, 0, ae_true, ae_false, 0, x, 0, _state);
+         rmatrixtrsv(m, &s->denselu, 0, 0, false, true, 0, x, 0, _state);
+         rmatrixtrsv(m, &s->denselu, 0, 0, true, false, 0, x, 0, _state);
       } else {
 
       // Sparse TRF
-         sparsetrsv(&s->sparsel, ae_false, ae_false, 0, x, _state);
-         sparsetrsv(&s->sparseu, ae_true, ae_false, 0, x, _state);
+         sparsetrsv(&s->sparsel, false, false, 0, x, _state);
+         sparsetrsv(&s->sparseu, true, false, 0, x, _state);
       }
       for (i = 0; i <= m - 1; i++) {
          tx->ptr.p_double[s->colpermbwd.ptr.p_int[i]] = x->ptr.p_double[i];
@@ -50959,7 +50959,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
       for (i = 0; i <= m - 1; i++) {
          x->ptr.p_double[i] = tx->ptr.p_double[i];
       }
-      processed = ae_true;
+      processed = true;
    }
 // Sparse factorization with Forest-Tomlin update
    if (s->trftype == 3) {
@@ -50973,7 +50973,7 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
       for (i = 0; i <= m - 1; i++) {
          x->ptr.p_double[i] = tx->ptr.p_double[i];
       }
-      sparsetrsv(&s->sparsel, ae_false, ae_false, 0, x, _state);
+      sparsetrsv(&s->sparsel, false, false, 0, x, _state);
       for (k = s->trfage - 1; k >= 0; k--) {
 
       // The code below is an amalgamation of two parts:
@@ -51007,14 +51007,14 @@ static void reviseddualsimplex_basissolvet(dualsimplexbasis *s, RVector *r, RVec
          }
          x->ptr.p_double[d] = v;
       }
-      sparsetrsv(&s->sparseut, ae_false, ae_false, 1, x, _state);
+      sparsetrsv(&s->sparseut, false, false, 1, x, _state);
       for (i = 0; i <= m - 1; i++) {
          tx->ptr.p_double[s->colpermbwd.ptr.p_int[i]] = x->ptr.p_double[i];
       }
       for (i = 0; i <= m - 1; i++) {
          x->ptr.p_double[i] = tx->ptr.p_double[i];
       }
-      processed = ae_true;
+      processed = true;
    }
 // Integrity check
    ae_assert(processed, "BasisSolveT: unsupported TRF type", _state);
@@ -51108,21 +51108,21 @@ static void reviseddualsimplex_computeantv(dualsimplexstate *state, RVector *y, 
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
+static bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
    ae_int_t k;
-   ae_bool result;
+   bool result;
 
    k = subproblem->bndt.ptr.p_int[i];
-   result = ae_false;
+   result = false;
    if ((k == 0 || k == 1) || k == 3) {
-      result = ae_true;
+      result = true;
       return result;
    }
    if (k == 2 || k == 4) {
-      result = ae_false;
+      result = false;
       return result;
    }
-   ae_assert(ae_false, "HasBndL: integrity check failed", _state);
+   ae_assert(false, "HasBndL: integrity check failed", _state);
    return result;
 }
 
@@ -51130,21 +51130,21 @@ static ae_bool reviseddualsimplex_hasbndl(dualsimplexsubproblem *subproblem, ae_
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
+static bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
    ae_int_t k;
-   ae_bool result;
+   bool result;
 
    k = subproblem->bndt.ptr.p_int[i];
-   result = ae_false;
+   result = false;
    if ((k == 0 || k == 2) || k == 3) {
-      result = ae_true;
+      result = true;
       return result;
    }
    if (k == 1 || k == 4) {
-      result = ae_false;
+      result = false;
       return result;
    }
-   ae_assert(ae_false, "HasBndL: integrity check failed", _state);
+   ae_assert(false, "HasBndL: integrity check failed", _state);
    return result;
 }
 
@@ -51152,21 +51152,21 @@ static ae_bool reviseddualsimplex_hasbndu(dualsimplexsubproblem *subproblem, ae_
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
+static bool reviseddualsimplex_isfree(dualsimplexsubproblem *subproblem, ae_int_t i, ae_state *_state) {
    ae_int_t k;
-   ae_bool result;
+   bool result;
 
    k = subproblem->bndt.ptr.p_int[i];
-   result = ae_false;
+   result = false;
    if (((k == 0 || k == 1) || k == 2) || k == 3) {
-      result = ae_false;
+      result = false;
       return result;
    }
    if (k == 4) {
-      result = ae_true;
+      result = true;
       return result;
    }
-   ae_assert(ae_false, "IsFree: integrity check failed", _state);
+   ae_assert(false, "IsFree: integrity check failed", _state);
    return result;
 }
 
@@ -51210,7 +51210,7 @@ static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, d
             result = ae_maxreal(result, s->d.ptr.p_double[j], _state);
             continue;
          }
-         ae_assert(ae_false, "DualFeasibilityError: integrity check failed", _state);
+         ae_assert(false, "DualFeasibilityError: integrity check failed", _state);
       }
       if (bndt == reviseddualsimplex_cclower) {
          ae_assert(s->xa.ptr.p_double[j] == s->bndl.ptr.p_double[j], "DualFeasibilityError: integrity check failed", _state);
@@ -51226,7 +51226,7 @@ static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, d
          result = ae_maxreal(result, ae_fabs(s->d.ptr.p_double[j], _state), _state);
          continue;
       }
-      ae_assert(ae_false, "DSSOptimize: integrity check failed (infeasible constraint)", _state);
+      ae_assert(false, "DSSOptimize: integrity check failed (infeasible constraint)", _state);
    }
    return result;
 }
@@ -51236,8 +51236,8 @@ static double reviseddualsimplex_dualfeasibilityerror(dualsimplexstate *state, d
 //
 //   -- ALGLIB --
 //      Copyright 19.07.2018 by Bochkanov Sergey
-static ae_bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state) {
-   ae_bool result;
+static bool reviseddualsimplex_isdualfeasible(dualsimplexstate *state, dualsimplexsubproblem *s, dualsimplexsettings *settings, ae_state *_state) {
+   bool result;
 
    result = ae_fp_less_eq(reviseddualsimplex_dualfeasibilityerror(state, s, _state), settings->dtolabs);
    return result;
@@ -51554,12 +51554,12 @@ static void reviseddualsimplex_updateavgcounter(double v, double *acc, ae_int_t 
    *cnt = *cnt + 1;
 }
 
-void _dualsimplexsettings_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexsettings_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexsettings *p = (dualsimplexsettings *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _dualsimplexsettings_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexsettings_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexsettings *dst = (dualsimplexsettings *) _dst;
    dualsimplexsettings *src = (dualsimplexsettings *) _src;
    dst->pivottol = src->pivottol;
@@ -51584,7 +51584,7 @@ void _dualsimplexsettings_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _dssvector_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _dssvector_init(void *_p, ae_state *_state, bool make_automatic) {
    dssvector *p = (dssvector *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
@@ -51592,7 +51592,7 @@ void _dssvector_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->dense, 0, DT_REAL, _state, make_automatic);
 }
 
-void _dssvector_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _dssvector_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dssvector *dst = (dssvector *) _dst;
    dssvector *src = (dssvector *) _src;
    dst->n = src->n;
@@ -51618,7 +51618,7 @@ void _dssvector_destroy(void *_p) {
    ae_vector_destroy(&p->dense);
 }
 
-void _dualsimplexbasis_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexbasis_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexbasis *p = (dualsimplexbasis *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->idx, 0, DT_INT, _state, make_automatic);
@@ -51652,7 +51652,7 @@ void _dualsimplexbasis_init(void *_p, ae_state *_state, ae_bool make_automatic) 
    _sparsematrix_init(&p->sparseludbg, _state, make_automatic);
 }
 
-void _dualsimplexbasis_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexbasis_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexbasis *dst = (dualsimplexbasis *) _dst;
    dualsimplexbasis *src = (dualsimplexbasis *) _src;
    dst->ns = src->ns;
@@ -51764,7 +51764,7 @@ void _dualsimplexbasis_destroy(void *_p) {
    _sparsematrix_destroy(&p->sparseludbg);
 }
 
-void _dualsimplexsubproblem_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexsubproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexsubproblem *p = (dualsimplexsubproblem *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rawc, 0, DT_REAL, _state, make_automatic);
@@ -51782,7 +51782,7 @@ void _dualsimplexsubproblem_init(void *_p, ae_state *_state, ae_bool make_automa
    ae_vector_init(&p->effc, 0, DT_REAL, _state, make_automatic);
 }
 
-void _dualsimplexsubproblem_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexsubproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexsubproblem *dst = (dualsimplexsubproblem *) _dst;
    dualsimplexsubproblem *src = (dualsimplexsubproblem *) _src;
    dst->ns = src->ns;
@@ -51839,7 +51839,7 @@ void _dualsimplexsubproblem_destroy(void *_p) {
    ae_vector_destroy(&p->effc);
 }
 
-void _dualsimplexstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexstate_init(void *_p, ae_state *_state, bool make_automatic) {
    dualsimplexstate *p = (dualsimplexstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rowscales, 0, DT_REAL, _state, make_automatic);
@@ -51878,7 +51878,7 @@ void _dualsimplexstate_init(void *_p, ae_state *_state, ae_bool make_automatic) 
    ae_vector_init(&p->harrisset, 0, DT_INT, _state, make_automatic);
 }
 
-void _dualsimplexstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _dualsimplexstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    dualsimplexstate *dst = (dualsimplexstate *) _dst;
    dualsimplexstate *src = (dualsimplexstate *) _src;
    ae_vector_init_copy(&dst->rowscales, &src->rowscales, _state, make_automatic);
@@ -52434,8 +52434,8 @@ void minlpsetlc(minlpstate *state, RMatrix *a, ZVector *ct, ae_int_t k, ae_state
    ae_frame_make(_state, &_frame_block);
    memset(&al, 0, sizeof(al));
    memset(&au, 0, sizeof(au));
-   ae_vector_init(&al, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&au, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&al, 0, DT_REAL, _state, true);
+   ae_vector_init(&au, 0, DT_REAL, _state, true);
 
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC: K<0", _state);
@@ -52515,7 +52515,7 @@ void minlpsetlc2dense(minlpstate *state, RMatrix *a, RVector *al, RVector *au, a
 
    ae_frame_make(_state, &_frame_block);
    memset(&nrs, 0, sizeof(nrs));
-   ae_vector_init(&nrs, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&nrs, 0, DT_INT, _state, true);
 
    n = state->n;
    ae_assert(k >= 0, "MinLPSetLC2Dense: K<0", _state);
@@ -52815,30 +52815,30 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
    dualsimplexsettings settings;
    ae_matrix dummy;
    dualsimplexbasis dummybasis;
-   ae_bool badconstr;
+   bool badconstr;
 
    ae_frame_make(_state, &_frame_block);
    memset(&settings, 0, sizeof(settings));
    memset(&dummy, 0, sizeof(dummy));
    memset(&dummybasis, 0, sizeof(dummybasis));
-   _dualsimplexsettings_init(&settings, _state, ae_true);
-   ae_matrix_init(&dummy, 0, 0, DT_REAL, _state, ae_true);
-   _dualsimplexbasis_init(&dummybasis, _state, ae_true);
+   _dualsimplexsettings_init(&settings, _state, true);
+   ae_matrix_init(&dummy, 0, 0, DT_REAL, _state, true);
+   _dualsimplexbasis_init(&dummybasis, _state, true);
 
    n = state->n;
    m = state->m;
    minlp_clearreportfields(state, _state);
 
 // Most basic check for correctness of constraints
-   badconstr = ae_false;
+   badconstr = false;
    for (i = 0; i <= n - 1; i++) {
       if ((ae_isfinite(state->bndl.ptr.p_double[i], _state) && ae_isfinite(state->bndu.ptr.p_double[i], _state)) && ae_fp_greater(state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i])) {
-         badconstr = ae_true;
+         badconstr = true;
       }
    }
    for (i = 0; i <= m - 1; i++) {
       if ((ae_isfinite(state->al.ptr.p_double[i], _state) && ae_isfinite(state->au.ptr.p_double[i], _state)) && ae_fp_greater(state->al.ptr.p_double[i], state->au.ptr.p_double[i])) {
-         badconstr = ae_true;
+         badconstr = true;
       }
    }
    if (badconstr) {
@@ -52923,10 +52923,10 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
          }
          sparseconverttocrs(&state->ipmquadratic, _state);
          vipminitsparse(&state->ipm, &state->units, &state->zeroorigin, state->presolver.newn, _state);
-         vipmsetquadraticlinear(&state->ipm, &dummy, &state->ipmquadratic, 1, ae_false, &state->presolver.c, _state);
+         vipmsetquadraticlinear(&state->ipm, &dummy, &state->ipmquadratic, 1, false, &state->presolver.c, _state);
          vipmsetconstraints(&state->ipm, &state->presolver.bndl, &state->presolver.bndu, &state->presolver.sparsea, state->presolver.newm, &dummy, 0, &state->presolver.al, &state->presolver.au, _state);
          vipmsetcond(&state->ipm, state->ipmeps, state->ipmeps, state->ipmeps, _state);
-         vipmoptimize(&state->ipm, ae_true, &state->xs, &state->lagbc, &state->laglc, &state->repterminationtype, _state);
+         vipmoptimize(&state->ipm, true, &state->xs, &state->lagbc, &state->laglc, &state->repterminationtype, _state);
 
       // Export results, convert from presolve
          isetallocv(state->presolver.newn + state->presolver.newm, 0, &state->cs, _state);
@@ -52971,7 +52971,7 @@ void minlpoptimize(minlpstate *state, ae_state *_state) {
       return;
    }
 // Integrity check failed - unknown solver
-   ae_assert(ae_false, "MinQPOptimize: integrity check failed - unknown solver", _state);
+   ae_assert(false, "MinQPOptimize: integrity check failed - unknown solver", _state);
    ae_frame_leave(_state);
 }
 
@@ -53062,7 +53062,7 @@ static void minlp_clearreportfields(minlpstate *state, ae_state *_state) {
    state->repm = 0;
 }
 
-void _minlpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpstate *p = (minlpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -53088,7 +53088,7 @@ void _minlpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _sparsematrix_init(&p->ipmquadratic, _state, make_automatic);
 }
 
-void _minlpstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlpstate *dst = (minlpstate *) _dst;
    minlpstate *src = (minlpstate *) _src;
    dst->n = src->n;
@@ -53180,7 +53180,7 @@ void _minlpstate_destroy(void *_p) {
    _sparsematrix_destroy(&p->ipmquadratic);
 }
 
-void _minlpreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minlpreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minlpreport *p = (minlpreport *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->lagbc, 0, DT_REAL, _state, make_automatic);
@@ -53189,7 +53189,7 @@ void _minlpreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->stats, 0, DT_INT, _state, make_automatic);
 }
 
-void _minlpreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minlpreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minlpreport *dst = (minlpreport *) _dst;
    minlpreport *src = (minlpreport *) _src;
    dst->f = src->f;
@@ -53243,8 +53243,8 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
    ae_vector_set_length(&state->rstate.ba, 2 + 1, _state);
    ae_vector_set_length(&state->rstate.ra, 11 + 1, _state);
    state->rstate.stage = -1;
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfij = false;
+   state->xupdated = false;
    ae_vector_set_length(&state->x, n, _state);
    ae_vector_set_length(&state->fi, 1 + nlec + nlic, _state);
    ae_matrix_set_length(&state->j, 1 + nlec + nlic, n, _state);
@@ -53367,7 +53367,7 @@ void minslpinitbuf(RVector *bndl, RVector *bndu, RVector *s, RVector *x0, ae_int
 //
 //   -- ALGLIB --
 //      Copyright 05.03.2018 by Bochkanov Sergey
-ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool userterminationneeded, ae_state *_state) {
+bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, bool userterminationneeded, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -53380,7 +53380,7 @@ ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool
    double v;
    double vv;
    double mx;
-   ae_bool lpstagesuccess;
+   bool lpstagesuccess;
    double gammamax;
    double f1;
    double f2;
@@ -53391,9 +53391,9 @@ ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool
    double setscaleto;
    double prevtrustrad;
    double mu;
-   ae_bool dotrace;
-   ae_bool dodetailedtrace;
-   ae_bool result;
+   bool dotrace;
+   bool dodetailedtrace;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -53440,9 +53440,9 @@ ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool
       j = -788;
       innerk = 809;
       status = 205;
-      lpstagesuccess = ae_false;
-      dotrace = ae_true;
-      dodetailedtrace = ae_false;
+      lpstagesuccess = false;
+      dotrace = true;
+      dodetailedtrace = false;
       v = 763;
       vv = -541;
       mx = -698;
@@ -53482,8 +53482,8 @@ ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool
    dodetailedtrace = dotrace && ae_is_trace_enabled("SLP.DETAILED");
 
 // Prepare rcomm interface
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfij = false;
+   state->xupdated = false;
 
 // Initialize algorithm data:
 // * Lagrangian and "Big C" estimates
@@ -53512,11 +53512,11 @@ ae_bool minslpiteration(minslpstate *state, smoothnessmonitor *smonitor, ae_bool
 // Evaluate function vector and Jacobian at Step0X, send first location report.
 // Compute initial violation of constraints.
    nlcslp_slpsendx(state, &state->step0x, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state->step0fi, &state->step0j, _state)) {
 
    // Failed to retrieve function/Jaconian, infinities detected!
@@ -53524,17 +53524,17 @@ lbl_0:
          state->stepkx.ptr.p_double[i] = state->step0x.ptr.p_double[i];
       }
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcslp_slpcopystate(state, &state->step0x, &state->step0fi, &state->step0j, &state->stepkx, &state->stepkfi, &state->stepkj, _state);
    nlcslp_slpsendx(state, &state->stepkx, _state);
    state->f = state->stepkfi.ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
 
@@ -53547,7 +53547,7 @@ lbl_1:
 // Perform outer (NLC) iterations
    nlcslp_initlpsubsolver(state, &state->subsolver, state->hessiantype, _state);
 lbl_5:
-   if (ae_false) {
+   if (false) {
       goto lbl_6;
    }
 // Before beginning new outer iteration:
@@ -53598,7 +53598,7 @@ lbl_5:
       if (dodetailedtrace) {
          ae_trace("> printing raw data (prior to applying variable and function scales)\n");
          ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, ae_true, &state->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&state->step0x, n, &state->s, true, &state->s, false, _state);
          ae_trace("\n");
          ae_trace("> printing scaled data (after applying variable and function scales)\n");
          ae_trace("X (scaled)    = ");
@@ -53639,7 +53639,7 @@ lbl_5:
 //       The idea (explained in more details in the Phase13Iteration() body)
 //       is to perform one look-ahead step and use updated constraint values
 //       back at the initial point.
-   nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, ae_true, _state);
+   nlcslp_phase13init(&state->state13, n, nec, nic, nlec, nlic, true, _state);
 lbl_7:
    if (!nlcslp_phase13iteration(state, &state->state13, smonitor, userterminationneeded, &state->stepkx, &state->stepkfi, &state->stepkj, &state->meritlagmult, &status, &stp, _state)) {
       goto lbl_8;
@@ -53729,11 +53729,11 @@ lbl_12:
    inc(&state->repinneriterationscount, _state);
    nlcslp_slpsendx(state, &state->stepkx, _state);
    state->f = state->stepkfi.ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->xupdated = ae_false;
+   state->xupdated = false;
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->stepkx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(&state->stepkfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
    goto lbl_14;
@@ -53814,12 +53814,12 @@ lbl_10:
    goto lbl_5;
 lbl_6:
    smoothnessmonitortracestatus(smonitor, dotrace, _state);
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = nslack;
    state->rstate.ia.ptr.p_int[2] = nec;
@@ -53904,7 +53904,7 @@ static void nlcslp_initlpsubsolver(minslpstate *sstate, minslpsubsolver *subsolv
    rvectorsetlengthatleast(&subsolver->yk, n, _state);
 
 // Initial state
-   subsolver->basispresent = ae_false;
+   subsolver->basispresent = false;
    subsolver->curdcnt = 0;
    subsolver->hessiantype = hessiantype;
    if (hessiantype == 1 || hessiantype == 2) {
@@ -54021,7 +54021,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
       // * step length is large enough
       // * |Yk| is large enough when compared with |G|
       // * (Sk,Yk) is large enough when compared with |S| and |G|
-         vv = rmatrixsyvmv(n, &subsolver->h, 0, 0, ae_true, &subsolver->sk, 0, &subsolver->tmp0, _state);
+         vv = rmatrixsyvmv(n, &subsolver->h, 0, 0, true, &subsolver->sk, 0, &subsolver->tmp0, _state);
          rmatrixgemv(n, n, 1.0, &subsolver->h, 0, 0, 0, &subsolver->sk, 0, 0.0, &subsolver->tmp0, 0, _state);
          rmatrixger(n, n, &subsolver->h, 0, 0, 1 / v, &subsolver->yk, 0, &subsolver->yk, 0, _state);
          rmatrixger(n, n, &subsolver->h, 0, 0, -1 / vv, &subsolver->tmp0, 0, &subsolver->tmp0, 0, _state);
@@ -54037,7 +54037,7 @@ static void nlcslp_lpsubproblemupdatehessian(minslpstate *sstate, minslpsubsolve
 //
 //   -- ALGLIB --
 //      Copyright 05.03.2018 by Bochkanov Sergey
-static ae_bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state) {
+static bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *subsolver, RVector *x, RVector *fi, RMatrix *jac, ae_int_t innerk, RVector *d, RVector *lagmult, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -54061,7 +54061,7 @@ static ae_bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *sub
    ae_int_t nnz;
    ae_int_t j0;
    ae_int_t j1;
-   ae_bool result;
+   bool result;
 
    n = state->n;
    nec = state->nec;
@@ -54082,7 +54082,7 @@ static ae_bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *sub
    rvectorgrowto(&subsolver->curau, lccnt + subsolver->curdcnt, _state);
 
 // Prepare default solution: all zeros
-   result = ae_true;
+   result = true;
    for (i = 0; i <= nslack - 1; i++) {
       d->ptr.p_double[i] = 0.0;
    }
@@ -54358,14 +54358,14 @@ static ae_bool nlcslp_lpsubproblemsolve(minslpstate *state, minslpsubsolver *sub
    if (subsolver->dss.repterminationtype <= 0) {
 
    // LP solver failed due to numerical errors; exit
-      result = ae_false;
+      result = false;
       return result;
    }
    if (innerk == 1) {
 
    // Store basis
       dssexportbasis(&subsolver->dss, &subsolver->lastbasis, _state);
-      subsolver->basispresent = ae_true;
+      subsolver->basispresent = true;
    }
 // Extract direction D[] and Lagrange multipliers
    for (i = 0; i <= nslack - 1; i++) {
@@ -54430,7 +54430,7 @@ static void nlcslp_lpsubproblemappendconjugacyconstraint(minslpstate *state, min
 //
 //   -- ALGLIB --
 //      Copyright 05.02.2019 by Bochkanov Sergey
-static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, ae_bool usecorrection, ae_state *_state) {
+static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t nec, ae_int_t nic, ae_int_t nlec, ae_int_t nlic, bool usecorrection, ae_state *_state) {
    ae_int_t nslack;
 
    nslack = n + 2 * (nec + nlec) + (nic + nlic);
@@ -54485,7 +54485,7 @@ static void nlcslp_phase13init(minslpphase13state *state13, ae_int_t n, ae_int_t
 //
 //   -- ALGLIB --
 //      Copyright 05.02.2019 by Bochkanov Sergey
-static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, ae_bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state) {
+static bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *state13, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, ae_int_t *status, double *stp, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -54502,10 +54502,10 @@ static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *s
    double nu;
    double localstp;
    double mu;
-   ae_bool dotrace;
-   ae_bool doprobing;
-   ae_bool dotracexd;
-   ae_bool result;
+   bool dotrace;
+   bool doprobing;
+   bool dotracexd;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -54545,9 +54545,9 @@ static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *s
       innerk = 922;
       i = -154;
       j = 306;
-      dotrace = ae_true;
-      doprobing = ae_true;
-      dotracexd = ae_true;
+      dotrace = true;
+      doprobing = true;
+      dotracexd = true;
       v = 88;
       mx = -861;
       f0 = -678;
@@ -54608,7 +54608,7 @@ static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *s
          if (dotrace) {
             ae_trace("> stopping condition met: too many phase #1 LP failures\n");
          }
-         result = ae_false;
+         result = false;
          return result;
       }
    // Can not solve LP subproblem, decrease trust radius
@@ -54625,7 +54625,7 @@ static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *s
       } else {
          *status = -1;
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state13->d, _state);
@@ -54646,11 +54646,11 @@ static ae_bool nlcslp_phase13iteration(minslpstate *state, minslpphase13state *s
       state13->stepkxc.ptr.p_double[i] = curx->ptr.p_double[i] + state13->d.ptr.p_double[i];
    }
    nlcslp_slpsendx(state, &state13->stepkxc, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state13->rphase13state.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc, _state)) {
 
    // Failed to retrieve func/Jac, infinities detected
@@ -54659,7 +54659,7 @@ lbl_0:
       if (dotrace) {
          ae_trace("[ERROR] infinities in target/constraints are detected\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
 // Move back to point CurX[], restore original linearization of the target
@@ -54716,18 +54716,18 @@ lbl_4:
    f1 = f0;
    smoothnessmonitorstartlinesearch(smonitor, curx, curfi, curj, _state);
 lbl_6:
-   if (ae_false) {
+   if (false) {
       goto lbl_7;
    }
    for (i = 0; i <= n - 1; i++) {
       state13->stepkxn.ptr.p_double[i] = curx->ptr.p_double[i] + localstp * state13->d.ptr.p_double[i];
    }
    nlcslp_slpsendx(state, &state13->stepkxn, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state13->rphase13state.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state13->stepkfin, &state13->stepkjn, _state)) {
 
    // Failed to retrieve func/Jac, infinities detected
@@ -54736,7 +54736,7 @@ lbl_1:
       if (dotrace) {
          ae_trace("[ERROR] infinities in target/constraints are detected\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    smoothnessmonitorenqueuepoint(smonitor, &state13->d, localstp, &state13->stepkxn, &state13->stepkfin, &state13->stepkjn, _state);
@@ -54775,7 +54775,7 @@ lbl_7:
       if (dotrace) {
          ae_trace("> user requested termination\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
 // Trace
@@ -54800,11 +54800,11 @@ lbl_12:
       }
    }
    nlcslp_slpsendx(state, &state13->stepkxc, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state13->rphase13state.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state13->stepkfic, &state13->stepkjc, _state)) {
       goto lbl_13;
    }
@@ -54856,22 +54856,22 @@ lbl_8:
    inc(&state->repinneriterationscount, _state);
    nlcslp_slpsendx(state, curx, _state);
    state->f = curfi->ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state13->rphase13state.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 
 // Update constraint violations
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, curx, n, &state->replcerr, &state->replcidx, _state);
    unscaleandchecknlcviolation(curfi, &state->fscales, nlec, nlic, &state->repnlcerr, &state->repnlcidx, _state);
 lbl_14:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state13->rphase13state.ia.ptr.p_int[0] = n;
    state13->rphase13state.ia.ptr.p_int[1] = nslack;
    state13->rphase13state.ia.ptr.p_int[2] = nec;
@@ -54973,7 +54973,7 @@ static void nlcslp_phase2init(minslpphase2state *state2, ae_int_t n, ae_int_t ne
 //
 //   -- ALGLIB --
 //      Copyright 05.02.2019 by Bochkanov Sergey
-static ae_bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, ae_bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state) {
+static bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *state2, smoothnessmonitor *smonitor, bool userterminationneeded, RVector *curx, RVector *curfi, RMatrix *curj, RVector *lagmult, double *gammamax, ae_int_t *status, ae_state *_state) {
    ae_int_t n;
    ae_int_t nslack;
    ae_int_t nec;
@@ -54997,10 +54997,10 @@ static ae_bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *sta
    double f0;
    double f1;
    double mu;
-   ae_bool dotrace;
-   ae_bool doprobing;
-   ae_bool dotracexd;
-   ae_bool result;
+   bool dotrace;
+   bool doprobing;
+   bool dotracexd;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -55051,9 +55051,9 @@ static ae_bool nlcslp_phase2iteration(minslpstate *state, minslpphase2state *sta
       j = 84;
       innerk = 529;
       nondescentcnt = 14;
-      dotrace = ae_false;
-      doprobing = ae_false;
-      dotracexd = ae_true;
+      dotrace = false;
+      doprobing = false;
+      dotracexd = true;
       stp = 289;
       v = 317;
       vv = 476;
@@ -55130,7 +55130,7 @@ lbl_3:
             ae_trace("> LP subproblem is overconstrained (happens after too many iterations), time to stop\n");
          }
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    mx = (double)(0);
@@ -55151,7 +55151,7 @@ lbl_3:
       if (dotrace) {
          ae_trace("> stopping CG-like iterations\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcslp_lpsubproblemappendconjugacyconstraint(state, &state->subsolver, &state2->d, _state);
@@ -55195,7 +55195,7 @@ lbl_3:
             ae_trace("> too many nondescent steps, stopping CG-like iterations\n");
          }
          *status = 1;
-         result = ae_false;
+         result = false;
          return result;
       }
       goto lbl_4;
@@ -55211,11 +55211,11 @@ lbl_6:
       goto lbl_7;
    }
    nlcslp_slpsendx(state, &state2->stepkxn, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state2->rphase2state.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state2->stepkfin, &state2->stepkjn, _state)) {
 
    // Failed to retrieve func/Jac, infinities detected
@@ -55224,7 +55224,7 @@ lbl_0:
       if (dotrace) {
          ae_trace("[ERROR] infinities in target/constraints are detected\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    smoothnessmonitorenqueuepoint(smonitor, &state2->d, stp, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, _state);
@@ -55267,7 +55267,7 @@ lbl_7:
             ae_trace("> line search failed miserably for unknown reason, proceeding further\n");
          }
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (mcinfo == 1) {
@@ -55308,11 +55308,11 @@ lbl_12:
       }
    }
    nlcslp_slpsendx(state, &state2->stepkxc, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state2->rphase2state.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfij = ae_false;
+   state->needfij = false;
    if (!nlcslp_slpretrievefij(state, &state2->stepkfic, &state2->stepkjc, _state)) {
       goto lbl_13;
    }
@@ -55369,7 +55369,7 @@ lbl_8:
       if (dotrace) {
          ae_trace("# user requested termination\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    nlcslp_slpcopystate(state, &state2->stepkxn, &state2->stepkfin, &state2->stepkjn, curx, curfi, curj, _state);
@@ -55380,11 +55380,11 @@ lbl_8:
    inc(&state->repinneriterationscount, _state);
    nlcslp_slpsendx(state, curx, _state);
    state->f = curfi->ptr.p_double[0] * state->fscales.ptr.p_double[0];
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state2->rphase2state.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 
 // Terminate inner LP subiterations
    if (state->maxits > 0 && state->repinneriterationscount >= state->maxits) {
@@ -55394,7 +55394,7 @@ lbl_2:
       if (dotrace) {
          ae_trace("# stopping criteria met (MaxIts iterations performed)\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_greater_eq(stp, nlcslp_slpstpclosetoone)) {
@@ -55409,7 +55409,7 @@ lbl_2:
       if (dotrace) {
          ae_trace("> step is close to 1, stopping iterations\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if ((mcinfo != 1 && mcinfo != 3) && mcinfo != 5) {
@@ -55421,19 +55421,19 @@ lbl_2:
       if (dotrace) {
          ae_trace("> line search ended with bad MCINFO, no more CG-like iterations\n");
       }
-      result = ae_false;
+      result = false;
       return result;
    }
 lbl_4:
    innerk = innerk + 1;
    goto lbl_3;
 lbl_5:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state2->rphase2state.ia.ptr.p_int[0] = n;
    state2->rphase2state.ia.ptr.p_int[1] = nslack;
    state2->rphase2state.ia.ptr.p_int[2] = nec;
@@ -55485,7 +55485,7 @@ static void nlcslp_slpsendx(minslpstate *state, RVector *xs, ae_state *_state) {
 // Retrieves F-vector and scaled Jacobian, copies them to FiS and JS.
 //
 // Returns True on success, False on failure (when F or J are not finite numbers).
-static ae_bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state) {
+static bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *js, ae_state *_state) {
    ae_int_t nlec;
    ae_int_t nlic;
    ae_int_t n;
@@ -55493,7 +55493,7 @@ static ae_bool nlcslp_slpretrievefij(minslpstate *state, RVector *fis, RMatrix *
    ae_int_t j;
    double v;
    double vv;
-   ae_bool result;
+   bool result;
 
    n = state->n;
    nlec = state->nlec;
@@ -55551,7 +55551,7 @@ static void nlcslp_lagrangianfg(minslpstate *state, RVector *x, double trustrad,
    double vact;
    double vd;
    double vviolate;
-   ae_bool usesparsegemv;
+   bool usesparsegemv;
    double dampingfactor;
 
    *f = 0;
@@ -55769,7 +55769,7 @@ static void nlcslp_meritfunctionandrawlagrangian(minslpstate *state, RVector *x,
    }
 }
 
-void _minslpsubsolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslpsubsolver_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpsubsolver *p = (minslpsubsolver *) _p;
    ae_touch_ptr((void *)p);
    _presolveinfo_init(&p->presolver, _state, make_automatic);
@@ -55798,7 +55798,7 @@ void _minslpsubsolver_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->cs, 0, DT_INT, _state, make_automatic);
 }
 
-void _minslpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslpsubsolver_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpsubsolver *dst = (minslpsubsolver *) _dst;
    minslpsubsolver *src = (minslpsubsolver *) _src;
    _presolveinfo_init_copy(&dst->presolver, &src->presolver, _state, make_automatic);
@@ -55888,14 +55888,14 @@ void _minslpsubsolver_destroy(void *_p) {
    ae_vector_destroy(&p->cs);
 }
 
-void _minslptmplagrangian_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslptmplagrangian_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmplagrangian *p = (minslptmplagrangian *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->sclagtmp0, 0, DT_REAL, _state, make_automatic);
    ae_vector_init(&p->sclagtmp1, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minslptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslptmplagrangian_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslptmplagrangian *dst = (minslptmplagrangian *) _dst;
    minslptmplagrangian *src = (minslptmplagrangian *) _src;
    ae_vector_init_copy(&dst->sclagtmp0, &src->sclagtmp0, _state, make_automatic);
@@ -55916,13 +55916,13 @@ void _minslptmplagrangian_destroy(void *_p) {
    ae_vector_destroy(&p->sclagtmp1);
 }
 
-void _minslptmpmerit_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslptmpmerit_init(void *_p, ae_state *_state, bool make_automatic) {
    minslptmpmerit *p = (minslptmpmerit *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->mftmp0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minslptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslptmpmerit_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslptmpmerit *dst = (minslptmpmerit *) _dst;
    minslptmpmerit *src = (minslptmpmerit *) _src;
    ae_vector_init_copy(&dst->mftmp0, &src->mftmp0, _state, make_automatic);
@@ -55940,7 +55940,7 @@ void _minslptmpmerit_destroy(void *_p) {
    ae_vector_destroy(&p->mftmp0);
 }
 
-void _minslpphase13state_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslpphase13state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase13state *p = (minslpphase13state *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->d, 0, DT_REAL, _state, make_automatic);
@@ -55956,7 +55956,7 @@ void _minslpphase13state_init(void *_p, ae_state *_state, ae_bool make_automatic
    _rcommstate_init(&p->rphase13state, _state, make_automatic);
 }
 
-void _minslpphase13state_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslpphase13state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpphase13state *dst = (minslpphase13state *) _dst;
    minslpphase13state *src = (minslpphase13state *) _src;
    dst->usecorrection = src->usecorrection;
@@ -56005,7 +56005,7 @@ void _minslpphase13state_destroy(void *_p) {
    _rcommstate_destroy(&p->rphase13state);
 }
 
-void _minslpphase2state_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslpphase2state_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpphase2state *p = (minslpphase2state *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->stepkxn, 0, DT_REAL, _state, make_automatic);
@@ -56026,7 +56026,7 @@ void _minslpphase2state_init(void *_p, ae_state *_state, ae_bool make_automatic)
    _rcommstate_init(&p->rphase2state, _state, make_automatic);
 }
 
-void _minslpphase2state_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslpphase2state_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpphase2state *dst = (minslpphase2state *) _dst;
    minslpphase2state *src = (minslpphase2state *) _src;
    ae_vector_init_copy(&dst->stepkxn, &src->stepkxn, _state, make_automatic);
@@ -56093,7 +56093,7 @@ void _minslpphase2state_destroy(void *_p) {
    _rcommstate_destroy(&p->rphase2state);
 }
 
-void _minslpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minslpstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minslpstate *p = (minslpstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -56127,7 +56127,7 @@ void _minslpstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minslpstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minslpstate *dst = (minslpstate *) _dst;
    minslpstate *src = (minslpstate *) _src;
    dst->n = src->n;
@@ -57295,7 +57295,7 @@ void minnlcsetalgosqp(minnlcstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-void minnlcsetxrep(minnlcstate *state, ae_bool needxrep, ae_state *_state) {
+void minnlcsetxrep(minnlcstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -57331,7 +57331,7 @@ void minnlcsetxrep(minnlcstate *state, ae_bool needxrep, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 06.06.2014 by Bochkanov Sergey
-ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
+bool minnlciteration(minnlcstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
    ae_int_t n;
@@ -57339,8 +57339,8 @@ ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
    ae_int_t nh;
    double vleft;
    double vright;
-   ae_bool b;
-   ae_bool result;
+   bool b;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -57365,7 +57365,7 @@ ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
       n = -919;
       ng = -909;
       nh = 81;
-      b = ae_true;
+      b = true;
       vleft = 74;
       vright = -788;
    }
@@ -57447,7 +57447,7 @@ ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
 // Routine body
 
 // Init
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    state->repterminationtype = 0;
    state->repinneriterationscount = 0;
    state->repouteriterationscount = 0;
@@ -57479,7 +57479,7 @@ ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
             state->repterminationtype = -3;
             state->repbcerr = state->bndl.ptr.p_double[i] - state->bndu.ptr.p_double[i];
             state->repbcidx = i;
-            result = ae_false;
+            result = false;
             return result;
          }
       }
@@ -57490,17 +57490,17 @@ ae_bool minnlciteration(minnlcstate *state, ae_state *_state) {
       goto lbl_25;
    }
 lbl_27:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, ae_true, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xstart, &state->s, &state->bndl, &state->bndu, true, state->teststep, _state)) {
       goto lbl_28;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    for (i = 0; i <= ng + nh; i++) {
       state->smonitor.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -57535,8 +57535,8 @@ lbl_31:
    if (!(ae_fp_neq(state->diffstep, (double)(0)) && state->needfij)) {
       goto lbl_33;
    }
-   state->needfij = ae_false;
-   state->needfi = ae_true;
+   state->needfij = false;
+   state->needfi = true;
    ae_v_move(&state->xbase.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    k = 0;
 lbl_35:
@@ -57579,8 +57579,8 @@ lbl_37:
 lbl_5:
 
 // Restore previous values of fields and continue
-   state->needfi = ae_false;
-   state->needfij = ae_true;
+   state->needfi = false;
+   state->needfij = true;
    goto lbl_31;
 lbl_33:
 
@@ -57590,7 +57590,7 @@ lbl_33:
 lbl_6:
    goto lbl_31;
 lbl_32:
-   result = ae_false;
+   result = false;
    return result;
 lbl_29:
 
@@ -57621,11 +57621,11 @@ lbl_40:
    }
 // Analytic Jacobian is provided
    minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->needfij = ae_false;
+   state->needfij = false;
    for (i = 0; i <= ng + nh; i++) {
       state->slpsolverstate.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -57636,8 +57636,8 @@ lbl_7:
 lbl_44:
 
 // Numerical differentiation
-   state->needfij = ae_false;
-   state->needfi = ae_true;
+   state->needfij = false;
+   state->needfi = true;
    minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xbase, _state);
    k = 0;
 lbl_46:
@@ -57720,8 +57720,8 @@ lbl_48:
    state->rstate.stage = 14;
    goto lbl_rcomm;
 lbl_14:
-   state->needfi = ae_false;
-   state->needfij = ae_true;
+   state->needfi = false;
+   state->needfij = true;
    for (i = 0; i <= ng + nh; i++) {
       state->slpsolverstate.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -57741,11 +57741,11 @@ lbl_42:
    }
    minnlc_unscale(state, &state->slpsolverstate.x, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->x, _state);
    state->f = state->slpsolverstate.f;
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 15;
    goto lbl_rcomm;
 lbl_15:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_53:
    goto lbl_40;
 lbl_51:
@@ -57762,7 +57762,7 @@ lbl_41:
    state->repnlcerr = state->slpsolverstate.repnlcerr;
    state->repnlcidx = state->slpsolverstate.repnlcidx;
    minnlc_unscale(state, &state->slpsolverstate.stepkx, &state->slpsolverstate.scaledbndl, &state->slpsolverstate.scaledbndu, &state->xc, _state);
-   result = ae_false;
+   result = false;
    return result;
 lbl_38:
 
@@ -57793,11 +57793,11 @@ lbl_57:
    }
 // Analytic Jacobian is provided
    minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstate.stage = 16;
    goto lbl_rcomm;
 lbl_16:
-   state->needfij = ae_false;
+   state->needfij = false;
    for (i = 0; i <= ng + nh; i++) {
       state->sqpsolverstate.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -57808,8 +57808,8 @@ lbl_16:
 lbl_61:
 
 // Numerical differentiation
-   state->needfij = ae_false;
-   state->needfi = ae_true;
+   state->needfij = false;
+   state->needfi = true;
    minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xbase, _state);
    k = 0;
 lbl_63:
@@ -57892,8 +57892,8 @@ lbl_65:
    state->rstate.stage = 23;
    goto lbl_rcomm;
 lbl_23:
-   state->needfi = ae_false;
-   state->needfij = ae_true;
+   state->needfi = false;
+   state->needfij = true;
    for (i = 0; i <= ng + nh; i++) {
       state->sqpsolverstate.fi.ptr.p_double[i] = state->fi.ptr.p_double[i];
       for (k = 0; k <= n - 1; k++) {
@@ -57913,11 +57913,11 @@ lbl_59:
    }
    minnlc_unscale(state, &state->sqpsolverstate.x, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->x, _state);
    state->f = state->sqpsolverstate.f;
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 24;
    goto lbl_rcomm;
 lbl_24:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_70:
    goto lbl_57;
 lbl_68:
@@ -57934,15 +57934,15 @@ lbl_58:
    state->repnlcerr = state->sqpsolverstate.repnlcerr;
    state->repnlcidx = state->sqpsolverstate.repnlcidx;
    minnlc_unscale(state, &state->sqpsolverstate.stepkx, &state->sqpsolverstate.scaledbndl, &state->sqpsolverstate.scaledbndu, &state->xc, _state);
-   result = ae_false;
+   result = false;
    return result;
 lbl_55:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = i;
    state->rstate.ia.ptr.p_int[1] = k;
    state->rstate.ia.ptr.p_int[2] = n;
@@ -58390,7 +58390,7 @@ void minnlcresultsbuf(minnlcstate *state, RVector *x, minnlcreport *rep, ae_stat
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void minnlcrequesttermination(minnlcstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // This subroutine restarts algorithm from new point.
@@ -58559,9 +58559,9 @@ void minnlcinequalityshiftfunction(double alpha, double *f, double *df, double *
 // Clears request fileds (to be sure that we don't forget to clear something)
 static void minnlc_clearrequestfields(minnlcstate *state, ae_state *_state) {
 
-   state->needfi = ae_false;
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfi = false;
+   state->needfij = false;
+   state->xupdated = false;
 }
 
 // Internal initialization subroutine.
@@ -58575,8 +58575,8 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
 // Default params
    state->stabilizingpoint = -2.0;
@@ -58585,12 +58585,12 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
 // Smoothness monitor, default init
    state->teststep = (double)(0);
    state->smoothnessguardlevel = 0;
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
 
 // Initialize other params
    state->n = n;
    state->diffstep = diffstep;
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    ae_vector_set_length(&state->bndl, n, _state);
    ae_vector_set_length(&state->hasbndl, n, _state);
    ae_vector_set_length(&state->bndu, n, _state);
@@ -58602,9 +58602,9 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    ae_vector_set_length(&state->x, n, _state);
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
-      state->hasbndl.ptr.p_bool[i] = ae_false;
+      state->hasbndl.ptr.p_bool[i] = false;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->hasbndu.ptr.p_bool[i] = ae_false;
+      state->hasbndu.ptr.p_bool[i] = false;
       state->s.ptr.p_double[i] = 1.0;
       state->lastscaleused.ptr.p_double[i] = 1.0;
       state->xstart.ptr.p_double[i] = x->ptr.p_double[i];
@@ -58613,7 +58613,7 @@ static void minnlc_minnlcinitinternal(ae_int_t n, RVector *x, double diffstep, m
    minnlcsetlc(state, &c, &ct, 0, _state);
    minnlcsetnlc(state, 0, 0, _state);
    minnlcsetcond(state, 0.0, 0, _state);
-   minnlcsetxrep(state, ae_false, _state);
+   minnlcsetxrep(state, false, _state);
    minnlcsetalgosqp(state, _state);
    minnlcsetprecexactrobust(state, 0, _state);
    minnlcsetstpmax(state, 0.0, _state);
@@ -58665,7 +58665,7 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
    double p;
    double dp;
    double d2p;
-   ae_bool bflag;
+   bool bflag;
 
    ae_assert(ae_fp_greater(rho, (double)(0)), "MinNLC: integrity check failed", _state);
    rvectorsetlengthatleast(bufd, n, _state);
@@ -58781,12 +58781,12 @@ static void minnlc_updatepreconditioner(ae_int_t prectype, ae_int_t updatefreq, 
                bufw->ptr.pp_double[i][j] = bufw->ptr.pp_double[i][j] * v;
             }
          }
-         rmatrixsyrk(n, nec + nic + ng + nh, 1.0, bufw, 0, 0, 2, 1.0, bufz, 0, 0, ae_true, _state);
+         rmatrixsyrk(n, nec + nic + ng + nh, 1.0, bufw, 0, 0, 2, 1.0, bufz, 0, 0, true, _state);
       }
    // Evaluate Cholesky decomposition, set preconditioner
-      bflag = spdmatrixcholeskyrec(bufz, 0, n, ae_true, bufd, _state);
+      bflag = spdmatrixcholeskyrec(bufz, 0, n, true, bufd, _state);
       ae_assert(bflag, "MinNLC: updatepreconditioner() failure, Cholesky failed", _state);
-      minlbfgssetpreccholesky(auloptimizer, bufz, ae_true, _state);
+      minlbfgssetpreccholesky(auloptimizer, bufz, true, _state);
    }
    inc(preccounter, _state);
 }
@@ -58972,7 +58972,7 @@ static void minnlc_penaltynlc(RVector *fi, RMatrix *j, RVector *nunlc, ae_int_t 
 //
 //   -- ALGLIB --
 //      Copyright 06.06.2014 by Bochkanov Sergey
-static ae_bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state) {
+static bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonitor, ae_state *_state) {
    ae_int_t n;
    ae_int_t nec;
    ae_int_t nic;
@@ -58990,7 +58990,7 @@ static ae_bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonit
    double v0;
    double v1;
    double v2;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -59125,7 +59125,7 @@ static ae_bool minnlc_auliteration(minnlcstate *state, smoothnessmonitor *smonit
       state->nunlc.ptr.p_double[ng + i] = state->initialinequalitymultiplier;
    }
    state->gammak = minnlc_initgamma;
-   state->xkpresent = ae_false;
+   state->xkpresent = false;
    ae_assert(state->aulitscnt > 0, "MinNLC: integrity check failed", _state);
    minnlc_clearpreconditioner(&state->auloptimizer, _state);
    outerit = 0;
@@ -59147,7 +59147,7 @@ lbl_3:
 //       LBFGS optimizer. AUL optimizer checks for NAN/INF only
 //       when we update Lagrange multipliers.
    preccounter = 0;
-   minlbfgssetxrep(&state->auloptimizer, ae_true, _state);
+   minlbfgssetxrep(&state->auloptimizer, true, _state);
    minlbfgsrestartfrom(&state->auloptimizer, &state->xc, _state);
 lbl_6:
    if (!minlbfgsiteration(&state->auloptimizer, _state)) {
@@ -59160,11 +59160,11 @@ lbl_6:
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->auloptimizer.x.ptr.p_double[i] * state->s.ptr.p_double[i];
    }
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstateaul.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    for (i = 0; i <= ng + nh; i++) {
       for (j = 0; j <= n - 1; j++) {
          state->j.ptr.pp_double[i][j] = state->j.ptr.pp_double[i][j] * state->s.ptr.p_double[j];
@@ -59209,11 +59209,11 @@ lbl_8:
       state->x.ptr.p_double[i] = state->auloptimizer.x.ptr.p_double[i] * state->s.ptr.p_double[i];
    }
    state->f = state->auloptimizer.f;
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstateaul.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_12:
 
 // Send information to OptGuard monitor
@@ -59225,7 +59225,7 @@ lbl_12:
       minlbfgsrequesttermination(&state->auloptimizer, _state);
    }
 // Update constraints violation
-   checkbcviolation(&state->hasbndl, &state->scaledbndl, &state->hasbndu, &state->scaledbndu, &state->auloptimizer.x, n, &state->s, ae_false, &state->repbcerr, &state->repbcidx, _state);
+   checkbcviolation(&state->hasbndl, &state->scaledbndl, &state->hasbndu, &state->scaledbndu, &state->auloptimizer.x, n, &state->s, false, &state->repbcerr, &state->repbcidx, _state);
    checklcviolation(&state->scaledcleic, &state->lcsrcidx, nec, nic, &state->auloptimizer.x, n, &state->replcerr, &state->replcidx, _state);
    checknlcviolation(&state->fi, ng, nh, &state->repnlcerr, &state->repnlcidx, _state);
 
@@ -59266,14 +59266,14 @@ lbl_12:
    // Beginning of the first line search, XK is not yet initialized.
       ae_v_move(&state->xk.ptr.p_double[0], 1, &state->xk1.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       ae_v_move(&state->gk.ptr.p_double[0], 1, &state->gk1.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-      state->xkpresent = ae_true;
+      state->xkpresent = true;
    }
 
 // Update preconsitioner using current GammaK
    minnlc_updatepreconditioner(state->prectype, state->updatefreq, &preccounter, &state->auloptimizer, &state->auloptimizer.x, state->rho, state->gammak, &state->scaledbndl, &state->hasbndl, &state->scaledbndu, &state->hasbndu, &state->nubc, &state->scaledcleic, &state->nulc, &state->fi, &state->j, &state->nunlc, &state->bufd, &state->bufc, &state->bufw, &state->bufz, &state->tmp0, n, nec, nic, ng, nh, _state);
    goto lbl_6;
 lbl_10:
-   ae_assert(ae_false, "MinNLC: integrity check failed", _state);
+   ae_assert(false, "MinNLC: integrity check failed", _state);
    goto lbl_6;
 lbl_7:
    minlbfgsresultsbuf(&state->auloptimizer, &state->xc, &state->aulreport, _state);
@@ -59293,11 +59293,11 @@ lbl_7:
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->xc.ptr.p_double[i] * state->s.ptr.p_double[i];
    }
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstateaul.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfij = ae_false;
+   state->needfij = false;
    v = 0.0;
    for (i = 0; i <= ng + nh; i++) {
       v = 0.1 * v + state->fi.ptr.p_double[i];
@@ -59309,7 +59309,7 @@ lbl_2:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    for (i = 0; i <= ng + nh; i++) {
@@ -59380,12 +59380,12 @@ lbl_5:
    for (i = 0; i <= n - 1; i++) {
       state->xc.ptr.p_double[i] = state->xc.ptr.p_double[i] * state->s.ptr.p_double[i];
    }
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstateaul.ia.ptr.p_int[0] = n;
    state->rstateaul.ia.ptr.p_int[1] = nec;
    state->rstateaul.ia.ptr.p_int[2] = nic;
@@ -59433,7 +59433,7 @@ static void minnlc_unscale(minnlcstate *state, RVector *xs, RVector *scaledbndl,
    }
 }
 
-void _minnlcstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minnlcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnlcstate *p = (minnlcstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -59483,7 +59483,7 @@ void _minnlcstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->lastscaleused, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minnlcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnlcstate *dst = (minnlcstate *) _dst;
    minnlcstate *src = (minnlcstate *) _src;
    dst->stabilizingpoint = src->stabilizingpoint;
@@ -59670,12 +59670,12 @@ void _minnlcstate_destroy(void *_p) {
    ae_vector_destroy(&p->lastscaleused);
 }
 
-void _minnlcreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minnlcreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minnlcreport *p = (minnlcreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minnlcreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minnlcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnlcreport *dst = (minnlcreport *) _dst;
    minnlcreport *src = (minnlcreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -60250,7 +60250,7 @@ void minnssetalgoags(minnsstate *state, double radius, double penalty, ae_state 
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-void minnssetxrep(minnsstate *state, ae_bool needxrep, ae_state *_state) {
+void minnssetxrep(minnsstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -60279,7 +60279,7 @@ void minnssetxrep(minnsstate *state, ae_bool needxrep, ae_state *_state) {
 //      Copyright 18.05.2015 by Bochkanov Sergey
 void minnsrequesttermination(minnsstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 //
@@ -60313,7 +60313,7 @@ void minnsrequesttermination(minnsstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 18.05.2015 by Bochkanov Sergey
-ae_bool minnsiteration(minnsstate *state, ae_state *_state) {
+bool minnsiteration(minnsstate *state, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -60325,7 +60325,7 @@ ae_bool minnsiteration(minnsstate *state, ae_state *_state) {
    double v;
    double xp;
    double xm;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -60383,7 +60383,7 @@ ae_bool minnsiteration(minnsstate *state, ae_state *_state) {
    state->repnfev = 0;
    state->repvaridx = 0;
    state->repfuncidx = 0;
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    state->dbgncholesky = 0;
    n = state->n;
    nec = state->nec;
@@ -60421,8 +60421,8 @@ lbl_6:
    if (!(ae_fp_neq(state->diffstep, (double)(0)) && state->needfij)) {
       goto lbl_8;
    }
-   state->needfij = ae_false;
-   state->needfi = ae_true;
+   state->needfij = false;
+   state->needfi = true;
    ae_v_move(&state->xbase.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 0;
    goto lbl_rcomm;
@@ -60476,8 +60476,8 @@ lbl_12:
 // Restore previous values of fields and continue
    rcopyv(n, &state->xscaled, &state->x, _state);
    rcopyv(1 + ng + nh, &state->fbase, &state->fi, _state);
-   state->needfi = ae_false;
-   state->needfij = ae_true;
+   state->needfi = false;
+   state->needfij = true;
    goto lbl_9;
 lbl_8:
 
@@ -60521,15 +60521,15 @@ lbl_9:
    goto lbl_6;
    goto lbl_6;
 lbl_7:
-   result = ae_false;
+   result = false;
    return result;
 lbl_4:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = i;
    state->rstate.ia.ptr.p_int[1] = j;
    state->rstate.ia.ptr.p_int[2] = k;
@@ -60642,9 +60642,9 @@ void minnsrestartfrom(minnsstate *state, RVector *x, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forget to clear something)
 static void minns_clearrequestfields(minnsstate *state, ae_state *_state) {
 
-   state->needfi = ae_false;
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needfi = false;
+   state->needfij = false;
+   state->xupdated = false;
 }
 
 // Internal initialization subroutine.
@@ -60658,8 +60658,8 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
    state->agsinitstp = 0.2;
    state->agsstattold = ae_sqrt(ae_machineepsilon, _state);
@@ -60694,9 +60694,9 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_vector_set_length(&state->x, n, _state);
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
-      state->hasbndl.ptr.p_bool[i] = ae_false;
+      state->hasbndl.ptr.p_bool[i] = false;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->hasbndu.ptr.p_bool[i] = ae_false;
+      state->hasbndu.ptr.p_bool[i] = false;
       state->s.ptr.p_double[i] = 1.0;
       state->xstart.ptr.p_double[i] = x->ptr.p_double[i];
       state->xc.ptr.p_double[i] = x->ptr.p_double[i];
@@ -60704,7 +60704,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
    minnssetlc(state, &c, &ct, 0, _state);
    minnssetnlc(state, 0, 0, _state);
    minnssetcond(state, 0.0, 0, _state);
-   minnssetxrep(state, ae_false, _state);
+   minnssetxrep(state, false, _state);
    minnssetalgoags(state, 0.1, 1000.0, _state);
    minnsrestartfrom(state, x, _state);
    ae_frame_leave(_state);
@@ -60721,7 +60721,7 @@ static void minns_minnsinitinternal(ae_int_t n, RVector *x, double diffstep, min
 //
 //   -- ALGLIB --
 //      Copyright 06.06.2015 by Bochkanov Sergey
-static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
+static bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t nec;
    ae_int_t nic;
@@ -60743,17 +60743,17 @@ static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    ae_int_t cursamplesize;
    double v0;
    double v1;
-   ae_bool b;
-   ae_bool alphadecreased;
+   bool b;
+   bool alphadecreased;
    ae_int_t shortstepscnt;
    ae_int_t backtrackits;
    ae_int_t maxbacktrackits;
-   ae_bool fullsample;
+   bool fullsample;
    double currentf0;
-   ae_bool dotrace;
-   ae_bool dodetailedtrace;
-   ae_bool dotracesample;
-   ae_bool result;
+   bool dotrace;
+   bool dodetailedtrace;
+   bool dotracesample;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -60810,12 +60810,12 @@ static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
       shortstepscnt = 487;
       backtrackits = -115;
       maxbacktrackits = 886;
-      b = ae_false;
-      alphadecreased = ae_false;
-      fullsample = ae_true;
-      dotrace = ae_true;
-      dodetailedtrace = ae_true;
-      dotracesample = ae_true;
+      b = false;
+      alphadecreased = false;
+      fullsample = true;
+      dotrace = true;
+      dodetailedtrace = true;
+      dotracesample = true;
       radius0 = 922;
       radius = -154;
       alpha = 306;
@@ -60863,7 +60863,7 @@ static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
          ae_trace("> inconsistent parameters detected, stopping\n\n");
       }
       state->repterminationtype = -1;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Allocate arrays.
@@ -60903,7 +60903,7 @@ static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
             ae_trace("> inconsistent box constraints detected, stopping\n\n");
          }
          state->repterminationtype = -3;
-         result = ae_false;
+         result = false;
          return result;
       }
       if (state->hasbndl.ptr.p_bool[i]) {
@@ -60974,10 +60974,10 @@ static ae_bool minns_agsiteration(minnsstate *state, ae_state *_state) {
    cursamplesize = 1;
    radiusdecays = 0;
    shortstepscnt = 0;
-   fullsample = ae_false;
+   fullsample = false;
    state->rholinear = 0.0;
 lbl_4:
-   if (ae_false) {
+   if (false) {
       goto lbl_5;
    }
    if (dotrace) {
@@ -60996,11 +60996,11 @@ lbl_4:
    ae_v_move(&state->samplex.ptr.pp_double[0][0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minns_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstateags.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfij = ae_false;
+   state->needfij = false;
    currentf0 = state->rawf;
    state->replcerr = 0.0;
    for (i = 0; i <= nec + nic - 1; i++) {
@@ -61029,11 +61029,11 @@ lbl_0:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = currentf0;
    minns_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstateags.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_6:
    if (state->userterminationneeded) {
 
@@ -61072,7 +61072,7 @@ lbl_6:
       if (dodetailedtrace) {
          ae_trace("> printing raw data (prior to applying variable and function scales)\n");
          ae_trace("X (raw)       = ");
-         tracevectorunscaledunshiftedautoprec(&state->xc, n, &state->s, ae_true, &state->s, ae_false, _state);
+         tracevectorunscaledunshiftedautoprec(&state->xc, n, &state->s, true, &state->s, false, _state);
          ae_trace("\n");
          ae_trace("> printing scaled data (after applying variable and function scales)\n");
          ae_trace("X (scaled)    = ");
@@ -61198,11 +61198,11 @@ lbl_8:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->samplex.ptr.pp_double[i][0], 1, ae_v_len(0, n - 1));
    minns_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstateags.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfij = ae_false;
+   state->needfij = false;
    state->samplef.ptr.p_double[i] = state->meritf;
    rcopyvr(n, &state->meritg, &state->samplegm, i, _state);
    k = k + 1;
@@ -61370,7 +61370,7 @@ lbl_10:
    }
    ae_assert(ae_fp_greater(dnrminf, (double)(0)), "MinNS: integrity error (2752)", _state);
    alpha = recommendedstep / dnrminf;
-   alphadecreased = ae_false;
+   alphadecreased = false;
    backtrackits = 0;
    if (fullsample) {
       maxbacktrackits = state->agsmaxbacktrack;
@@ -61378,7 +61378,7 @@ lbl_10:
       maxbacktrackits = state->agsmaxbacktracknonfull;
    }
 lbl_11:
-   if (ae_false) {
+   if (false) {
       goto lbl_12;
    }
 // Prepare XN and evaluate merit function at XN
@@ -61388,11 +61388,11 @@ lbl_11:
    ae_v_move(&state->samplex.ptr.pp_double[maxsamplesize][0], 1, &state->xn.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xn.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minns_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    state->rstateags.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->needfij = ae_false;
+   state->needfij = false;
    state->samplef.ptr.p_double[maxsamplesize] = state->meritf;
    rcopyvr(n, &state->meritg, &state->samplegm, maxsamplesize, _state);
 
@@ -61403,7 +61403,7 @@ lbl_3:
    }
 // Decrease Alpha
    alpha = alpha * state->agsalphadecay;
-   alphadecreased = ae_true;
+   alphadecreased = true;
 
 // Update and check iterations counter.
    inc(&backtrackits, _state);
@@ -61412,7 +61412,7 @@ lbl_3:
    // Too many backtracking searches performed without success.
    // Terminate iterations.
       alpha = 0.0;
-      alphadecreased = ae_true;
+      alphadecreased = true;
       ae_v_move(&state->xn.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
       goto lbl_12;
    }
@@ -61458,12 +61458,12 @@ lbl_5:
 
 // Convert back from scaled to unscaled representation
    minns_unscalepointbc(state, &state->xc, _state);
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstateags.ia.ptr.p_int[0] = n;
    state->rstateags.ia.ptr.p_int[1] = nec;
    state->rstateags.ia.ptr.p_int[2] = nic;
@@ -61557,12 +61557,12 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    double stpmax;
    ae_int_t actidx;
    double dtol;
-   ae_bool kickneeded;
+   bool kickneeded;
    double kicklength;
    double lambdav;
    double maxdiag;
-   ae_bool wasactivation;
-   ae_bool werechanges;
+   bool wasactivation;
+   bool werechanges;
    ae_int_t termcnt;
 
    n = nsample;
@@ -61589,7 +61589,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          state->rk.ptr.pp_double[i][j] = sampleg->ptr.pp_double[i][j] / ae_sqrt(diagh->ptr.p_double[j], _state);
       }
    }
-   rmatrixsyrk(nsample, nvars, 1.0, &state->rk, 0, 0, 0, 0.0, &state->uh, 0, 0, ae_true, _state);
+   rmatrixsyrk(nsample, nvars, 1.0, &state->rk, 0, 0, 0, 0.0, &state->uh, 0, 0, true, _state);
    maxdiag = 0.0;
    for (i = 0; i <= nsample - 1; i++) {
       maxdiag = ae_maxreal(maxdiag, state->uh.ptr.pp_double[i][i], _state);
@@ -61700,10 +61700,10 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // If we need kick stage, we make a kick - and restart iteration.
    // If not, after this block we can rely on the fact that
    // for all x[i]=0.0 we have d[i]=0.0
-      kickneeded = ae_false;
+      kickneeded = false;
       for (i = 0; i <= n - 1; i++) {
          if (ae_fp_eq(state->xc.ptr.p_double[i], 0.0) && ae_fp_greater(state->d.ptr.p_double[i], 0.0)) {
-            kickneeded = ae_true;
+            kickneeded = true;
          }
       }
       if (kickneeded) {
@@ -61747,7 +61747,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
             }
          }
          inc(dbgncholesky, _state);
-         if (!spdmatrixcholeskyrec(&state->ch, 0, n, ae_true, &state->tmp0, _state)) {
+         if (!spdmatrixcholeskyrec(&state->ch, 0, n, true, &state->tmp0, _state)) {
 
          // Cholesky decomposition failed.
          // Increase LambdaV and repeat iteration.
@@ -61853,7 +61853,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          if (ae_fp_eq(stp, stpmax) && actidx >= 0) {
             state->xn.ptr.p_double[actidx] = 0.0;
          }
-         wasactivation = ae_false;
+         wasactivation = false;
          for (i = 0; i <= n - 1; i++) {
             state->tmpb.ptr.p_bool[i] = ae_fp_eq(state->xn.ptr.p_double[i], 0.0) && ae_fp_neq(state->xc.ptr.p_double[i], 0.0);
             wasactivation = wasactivation || state->tmpb.ptr.p_bool[i];
@@ -61865,7 +61865,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
          if (ae_fp_less_eq(dnrm, dtol)) {
             break;
          }
-         spdmatrixcholeskyupdatefixbuf(&state->ch, n, ae_true, &state->tmpb, &state->tmp0, _state);
+         spdmatrixcholeskyupdatefixbuf(&state->ch, n, true, &state->tmpb, &state->tmp0, _state);
       }
 
    // Compare status of boundary constraints - if nothing changed during
@@ -61873,7 +61873,7 @@ static void minns_solveqp(RMatrix *sampleg, RVector *diagh, ae_int_t nsample, ae
    // to zero.
    //
    // When TermCnt is large enough, we terminate algorithm.
-      werechanges = ae_false;
+      werechanges = false;
       for (i = 0; i <= n - 1; i++) {
          werechanges = werechanges || ae_sign(state->x0.ptr.p_double[i], _state) != ae_sign(state->xc.ptr.p_double[i], _state);
       }
@@ -62007,7 +62007,7 @@ static void minns_qpsolveut(RMatrix *a, ae_int_t n, RVector *x, ae_state *_state
    }
 }
 
-void _minnsqp_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minnsqp_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsqp *p = (minnsqp *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->xc, 0, DT_REAL, _state, make_automatic);
@@ -62029,7 +62029,7 @@ void _minnsqp_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _snnlssolver_init(&p->nnls, _state, make_automatic);
 }
 
-void _minnsqp_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minnsqp_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsqp *dst = (minnsqp *) _dst;
    minnsqp *src = (minnsqp *) _src;
    dst->fc = src->fc;
@@ -62097,7 +62097,7 @@ void _minnsqp_destroy(void *_p) {
    _snnlssolver_destroy(&p->nnls);
 }
 
-void _minnsstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minnsstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsstate *p = (minnsstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -62141,7 +62141,7 @@ void _minnsstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->xscaled, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minnsstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsstate *dst = (minnsstate *) _dst;
    minnsstate *src = (minnsstate *) _src;
    dst->solvertype = src->solvertype;
@@ -62318,12 +62318,12 @@ void _minnsstate_destroy(void *_p) {
    ae_vector_destroy(&p->xscaled);
 }
 
-void _minnsreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minnsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minnsreport *p = (minnsreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minnsreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minnsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minnsreport *dst = (minnsreport *) _dst;
    minnsreport *src = (minnsreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -62360,7 +62360,7 @@ void minlbfgssetdefaultpreconditioner(minlbfgsstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 13.10.2010 by Bochkanov Sergey
-void minlbfgssetcholeskypreconditioner(minlbfgsstate *state, RMatrix *p, ae_bool isupper, ae_state *_state) {
+void minlbfgssetcholeskypreconditioner(minlbfgsstate *state, RMatrix *p, bool isupper, ae_state *_state) {
 
    minlbfgssetpreccholesky(state, p, isupper, _state);
 }
@@ -62409,7 +62409,7 @@ void minasacreate(ae_int_t n, RVector *x, RVector *bndl, RVector *bndu, minasast
 // Initialize
    state->n = n;
    minasasetcond(state, (double)(0), (double)(0), (double)(0), 0, _state);
-   minasasetxrep(state, ae_false, _state);
+   minasasetxrep(state, false, _state);
    minasasetstpmax(state, (double)(0), _state);
    minasasetalgorithm(state, -1, _state);
    ae_vector_set_length(&state->bndl, n, _state);
@@ -62457,7 +62457,7 @@ void minasasetcond(minasastate *state, double epsg, double epsf, double epsx, ae
 //
 //   -- ALGLIB --
 //      Copyright 02.04.2010 by Bochkanov Sergey
-void minasasetxrep(minasastate *state, ae_bool needxrep, ae_state *_state) {
+void minasasetxrep(minasastate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -62491,17 +62491,17 @@ void minasasetstpmax(minasastate *state, double stpmax, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 20.03.2009 by Bochkanov Sergey
-ae_bool minasaiteration(minasastate *state, ae_state *_state) {
+bool minasaiteration(minasastate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    double betak;
    double v;
    double vv;
    ae_int_t mcinfo;
-   ae_bool b;
-   ae_bool stepfound;
+   bool b;
+   bool stepfound;
    ae_int_t diffcnt;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -62526,8 +62526,8 @@ ae_bool minasaiteration(minasastate *state, ae_state *_state) {
       i = -58;
       mcinfo = -919;
       diffcnt = -909;
-      b = ae_true;
-      stepfound = ae_true;
+      b = true;
+      stepfound = true;
       betak = 74;
       v = -788;
       vv = 809;
@@ -62599,25 +62599,25 @@ ae_bool minasaiteration(minasastate *state, ae_state *_state) {
 
 // Calculate F/G, initialize algorithm
    mincomp_clearrequestfields(state, _state);
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfg = ae_false;
+   state->needfg = false;
    if (!state->xrep) {
       goto lbl_15;
    }
 // progress report
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_15:
    if (ae_fp_less_eq(mincomp_asaboundedantigradnorm(state, _state), state->epsg)) {
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    state->repnfev = state->repnfev + 1;
@@ -62629,7 +62629,7 @@ lbl_15:
 // * State.XK, State.F and State.G store current X/F/G
 // * State.AK stores current set of active constraints
 lbl_17:
-   if (ae_false) {
+   if (false) {
       goto lbl_18;
    }
 // GPA algorithm
@@ -62639,7 +62639,7 @@ lbl_17:
    state->k = 0;
    state->acount = 0;
 lbl_21:
-   if (ae_false) {
+   if (false) {
       goto lbl_22;
    }
 // Determine Dk = proj(xk - gk)-xk
@@ -62672,16 +62672,16 @@ lbl_21:
       state->x.ptr.p_double[i] = boundval(state->xk.ptr.p_double[i] - state->g.ptr.p_double[i], state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i], _state);
    }
    mincomp_clearrequestfields(state, _state);
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->repnfev = state->repnfev + 1;
    stepfound = ae_fp_less_eq(state->f, state->finit + mincomp_gpaftol * state->dginit);
    goto lbl_24;
 lbl_23:
-   stepfound = ae_false;
+   stepfound = false;
 lbl_24:
    if (!stepfound) {
       goto lbl_25;
@@ -62701,18 +62701,18 @@ lbl_25:
       state->stp = ae_minreal(state->stp, state->stpmax, _state);
    }
 lbl_27:
-   if (ae_false) {
+   if (false) {
       goto lbl_28;
    }
    v = state->stp;
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xk.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_addd(&state->x.ptr.p_double[0], 1, &state->d.ptr.p_double[0], 1, ae_v_len(0, n - 1), v);
    mincomp_clearrequestfields(state, _state);
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->repnfev = state->repnfev + 1;
    if (ae_fp_less_eq(state->stp, mincomp_stpmin)) {
       goto lbl_28;
@@ -62731,11 +62731,11 @@ lbl_26:
    }
 // progress report
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_29:
 
 // Calculate new set of active constraints.
@@ -62768,13 +62768,13 @@ lbl_29:
       goto lbl_33;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_33:
-   result = ae_false;
+   result = false;
    return result;
 lbl_31:
    if (ae_fp_greater(mincomp_asaboundedantigradnorm(state, _state), state->epsg)) {
@@ -62786,13 +62786,13 @@ lbl_31:
       goto lbl_37;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 6;
    goto lbl_rcomm;
 lbl_6:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_37:
-   result = ae_false;
+   result = false;
    return result;
 lbl_35:
    v = ae_v_dotproduct(&state->d.ptr.p_double[0], 1, &state->d.ptr.p_double[0], 1, ae_v_len(0, n - 1));
@@ -62806,13 +62806,13 @@ lbl_35:
       goto lbl_41;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_41:
-   result = ae_false;
+   result = false;
    return result;
 lbl_39:
    if (ae_fp_greater(state->finit - state->f, state->epsf * ae_maxreal(ae_fabs(state->finit, _state), ae_maxreal(ae_fabs(state->f, _state), 1.0, _state), _state))) {
@@ -62824,13 +62824,13 @@ lbl_39:
       goto lbl_45;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 8;
    goto lbl_rcomm;
 lbl_8:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_45:
-   result = ae_false;
+   result = false;
    return result;
 lbl_43:
 
@@ -62863,10 +62863,10 @@ lbl_19:
    }
 // first, check that there are non-active constraints.
 // move to GPA algorithm, if all constraints are active
-   b = ae_true;
+   b = true;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_neq(state->ak.ptr.p_double[i], (double)(0))) {
-         b = ae_false;
+         b = false;
          break;
       }
    }
@@ -62882,7 +62882,7 @@ lbl_19:
       state->gc.ptr.p_double[i] = state->g.ptr.p_double[i] * state->ak.ptr.p_double[i];
    }
 lbl_49:
-   if (ae_false) {
+   if (false) {
       goto lbl_50;
    }
 // Store G[k] for later calculation of Y[k]
@@ -62920,11 +62920,11 @@ lbl_51:
 
 // RComm
    mincomp_clearrequestfields(state, _state);
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 9;
    goto lbl_rcomm;
 lbl_9:
-   state->needfg = ae_false;
+   state->needfg = false;
 
 // postprocess data: zero components of G corresponding to
 // the active constraints
@@ -62964,11 +62964,11 @@ lbl_52:
    }
 // progress report
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 10;
    goto lbl_rcomm;
 lbl_10:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_53:
 
 // Update info about step length
@@ -62985,13 +62985,13 @@ lbl_53:
       goto lbl_57;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 11;
    goto lbl_rcomm;
 lbl_11:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_57:
-   result = ae_false;
+   result = false;
    return result;
 lbl_55:
    if (!(state->repiterationscount >= state->maxits && state->maxits > 0)) {
@@ -63003,13 +63003,13 @@ lbl_55:
       goto lbl_61;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 12;
    goto lbl_rcomm;
 lbl_12:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_61:
-   result = ae_false;
+   result = false;
    return result;
 lbl_59:
    if (!(ae_fp_greater_eq(mincomp_asaginorm(state, _state), state->mu * mincomp_asad1norm(state, _state)) && diffcnt == 0)) {
@@ -63038,13 +63038,13 @@ lbl_59:
       goto lbl_67;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 13;
    goto lbl_rcomm;
 lbl_13:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_67:
-   result = ae_false;
+   result = false;
    return result;
 lbl_65:
    if (ae_fp_greater(state->laststep, state->epsx)) {
@@ -63056,13 +63056,13 @@ lbl_65:
       goto lbl_71;
    }
    mincomp_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 14;
    goto lbl_rcomm;
 lbl_14:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_71:
-   result = ae_false;
+   result = false;
    return result;
 lbl_69:
 lbl_63:
@@ -63123,12 +63123,12 @@ lbl_50:
 lbl_47:
    goto lbl_17;
 lbl_18:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = i;
    state->rstate.ia.ptr.p_int[2] = mcinfo;
@@ -63289,20 +63289,20 @@ static double mincomp_asad1norm(minasastate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 20.03.2009 by Bochkanov Sergey
-static ae_bool mincomp_asauisempty(minasastate *state, ae_state *_state) {
+static bool mincomp_asauisempty(minasastate *state, ae_state *_state) {
    ae_int_t i;
    double d;
    double d2;
    double d32;
-   ae_bool result;
+   bool result;
 
    d = mincomp_asad1norm(state, _state);
    d2 = ae_sqrt(d, _state);
    d32 = d * d2;
-   result = ae_true;
+   result = true;
    for (i = 0; i <= state->n - 1; i++) {
       if (ae_fp_greater_eq(ae_fabs(state->g.ptr.p_double[i], _state), d2) && ae_fp_greater_eq(ae_minreal(state->x.ptr.p_double[i] - state->bndl.ptr.p_double[i], state->bndu.ptr.p_double[i] - state->x.ptr.p_double[i], _state), d32)) {
-         result = ae_false;
+         result = false;
          return result;
       }
    }
@@ -63312,11 +63312,11 @@ static ae_bool mincomp_asauisempty(minasastate *state, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void mincomp_clearrequestfields(minasastate *state, ae_state *_state) {
 
-   state->needfg = ae_false;
-   state->xupdated = ae_false;
+   state->needfg = false;
+   state->xupdated = false;
 }
 
-void _minasastate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minasastate_init(void *_p, ae_state *_state, bool make_automatic) {
    minasastate *p = (minasastate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->bndl, 0, DT_REAL, _state, make_automatic);
@@ -63337,7 +63337,7 @@ void _minasastate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _linminstate_init(&p->lstate, _state, make_automatic);
 }
 
-void _minasastate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minasastate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minasastate *dst = (minasastate *) _dst;
    minasastate *src = (minasastate *) _src;
    dst->n = src->n;
@@ -63428,12 +63428,12 @@ void _minasastate_destroy(void *_p) {
    _linminstate_destroy(&p->lstate);
 }
 
-void _minasareport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minasareport_init(void *_p, ae_state *_state, bool make_automatic) {
    minasareport *p = (minasareport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minasareport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minasareport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minasareport *dst = (minasareport *) _dst;
    minasareport *src = (minasareport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -63521,8 +63521,8 @@ void minbccreate(ae_int_t n, RVector *x, minbcstate *state, ae_state *_state) {
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
    _minbcstate_clear(state);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
    ae_assert(n >= 1, "MinBCCreate: N<1", _state);
    ae_assert(x->cnt >= n, "MinBCCreate: Length(X)<N", _state);
@@ -63580,8 +63580,8 @@ void minbccreatef(ae_int_t n, RVector *x, double diffstep, minbcstate *state, ae
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
    _minbcstate_clear(state);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
    ae_assert(n >= 1, "MinBCCreateF: N<1", _state);
    ae_assert(x->cnt >= n, "MinBCCreateF: Length(X)<N", _state);
@@ -63803,7 +63803,7 @@ void minbcsetprecscale(minbcstate *state, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-void minbcsetxrep(minbcstate *state, ae_bool needxrep, ae_state *_state) {
+void minbcsetxrep(minbcstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -63864,7 +63864,7 @@ void minbcsetstpmax(minbcstate *state, double stpmax, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 28.11.2010 by Bochkanov Sergey
-ae_bool minbciteration(minbcstate *state, ae_state *_state) {
+bool minbciteration(minbcstate *state, ae_state *_state) {
    ae_int_t freezeidx;
    double freezeval;
    double scaleddnorm;
@@ -63875,14 +63875,14 @@ ae_bool minbciteration(minbcstate *state, ae_state *_state) {
    double v;
    double vv;
    double v0;
-   ae_bool b;
+   bool b;
    ae_int_t mcinfo;
    ae_int_t itidx;
    double ginit;
    double gdecay;
-   ae_bool activationstatus;
+   bool activationstatus;
    double activationstep;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -63918,8 +63918,8 @@ ae_bool minbciteration(minbcstate *state, ae_state *_state) {
       j = 81;
       mcinfo = 255;
       itidx = 74;
-      b = ae_false;
-      activationstatus = ae_true;
+      b = false;
+      activationstatus = true;
       freezeval = 205;
       scaleddnorm = -838;
       v = 939;
@@ -64039,10 +64039,10 @@ ae_bool minbciteration(minbcstate *state, ae_state *_state) {
 
    // Inconsistent constraints
       state->repterminationtype = -3;
-      result = ae_false;
+      result = false;
       return result;
    }
-   state->userterminationneeded = ae_false;
+   state->userterminationneeded = false;
    state->repterminationtype = 0;
    state->repiterationscount = 0;
    state->repnfev = 0;
@@ -64078,17 +64078,17 @@ ae_bool minbciteration(minbcstate *state, ae_state *_state) {
       goto lbl_30;
    }
 lbl_32:
-   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xc, &state->s, &state->bndl, &state->bndu, ae_true, state->teststep, _state)) {
+   if (!smoothnessmonitorcheckgradientatx0(&state->smonitor, &state->xc, &state->s, &state->bndl, &state->bndu, true, state->teststep, _state)) {
       goto lbl_33;
    }
    for (i = 0; i <= n - 1; i++) {
       state->x.ptr.p_double[i] = state->smonitor.x.ptr.p_double[i];
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->smonitor.fi.ptr.p_double[0] = state->f;
    for (i = 0; i <= n - 1; i++) {
       state->smonitor.j.ptr.pp_double[0][i] = state->g.ptr.p_double[i];
@@ -64106,18 +64106,18 @@ lbl_30:
    if (ae_fp_neq(state->diffstep, (double)(0))) {
       goto lbl_34;
    }
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_35;
 lbl_34:
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needf = ae_false;
+   state->needf = false;
 lbl_35:
    state->fc = state->f;
    trimprepare(state->f, &state->trimthreshold, _state);
@@ -64128,21 +64128,21 @@ lbl_35:
 // Report current point
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->f = state->fc;
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_36:
    if (state->userterminationneeded) {
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 lbl_38:
-   if (ae_false) {
+   if (false) {
       goto lbl_39;
    }
 // Steepest descent phase
@@ -64157,16 +64157,16 @@ lbl_38:
       goto lbl_40;
    }
 // Analytic gradient
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->needfg = ae_false;
+   state->needfg = false;
    goto lbl_41;
 lbl_40:
 
 // Numerical differentiation
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
@@ -64177,7 +64177,7 @@ lbl_42:
       goto lbl_44;
    }
    v = state->x.ptr.p_double[i];
-   b = ae_false;
+   b = false;
    if (state->hasbndl.ptr.p_bool[i]) {
       b = b || ae_fp_less(v - state->diffstep * state->s.ptr.p_double[i], state->bndl.ptr.p_double[i]);
    }
@@ -64239,7 +64239,7 @@ lbl_46:
    goto lbl_42;
 lbl_44:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_41:
    state->fc = state->f;
    ae_v_move(&state->ugc.ptr.p_double[0], 1, &state->g.ptr.p_double[0], 1, ae_v_len(0, n - 1));
@@ -64254,14 +64254,14 @@ lbl_41:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->userterminationneeded) {
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(ginit, state->epsg)) {
@@ -64269,7 +64269,7 @@ lbl_41:
    // Gradient is small enough.
    // Optimization is terminated
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    for (i = 0; i <= n - 1; i++) {
@@ -64323,17 +64323,17 @@ lbl_47:
       goto lbl_49;
    }
 // Analytic gradient
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 12;
    goto lbl_rcomm;
 lbl_12:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->repnfev = state->repnfev + 1;
    goto lbl_50;
 lbl_49:
 
 // Numerical differentiation
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 13;
    goto lbl_rcomm;
 lbl_13:
@@ -64344,7 +64344,7 @@ lbl_51:
       goto lbl_53;
    }
    v = state->x.ptr.p_double[i];
-   b = ae_false;
+   b = false;
    if (state->hasbndl.ptr.p_bool[i]) {
       b = b || ae_fp_less(v - state->diffstep * state->s.ptr.p_double[i], state->bndl.ptr.p_double[i]);
    }
@@ -64408,7 +64408,7 @@ lbl_55:
    goto lbl_51;
 lbl_53:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_50:
 
 // Back to MCSRCH
@@ -64434,7 +64434,7 @@ lbl_48:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (mcinfo != 1 && mcinfo != 5) {
@@ -64474,7 +64474,7 @@ lbl_48:
       // Numerical properties of the function does not allow
       // us to solve problem. Algorithm is terminated
          state->repterminationtype = 7;
-         result = ae_false;
+         result = false;
          return result;
       }
    }
@@ -64482,7 +64482,7 @@ lbl_48:
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    ae_assert(mcinfo != 5 || ae_fp_eq(state->stp, state->curstpmax), "MinBC: integrity check failed", _state);
@@ -64498,11 +64498,11 @@ lbl_48:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minbc_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 20;
    goto lbl_rcomm;
 lbl_20:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_56:
    state->repiterationscount = state->repiterationscount + 1;
    if (mcinfo == 1) {
@@ -64515,14 +64515,14 @@ lbl_56:
 
       // Step is small enough
          state->repterminationtype = 2;
-         result = ae_false;
+         result = false;
          return result;
       }
       if (ae_fp_less_eq(ae_fabs(state->fp - state->fc, _state), state->epsf * ae_maxreal(ae_fabs(state->fc, _state), ae_maxreal(ae_fabs(state->fp, _state), 1.0, _state), _state))) {
 
       // Function change is small enough
          state->repterminationtype = 1;
-         result = ae_false;
+         result = false;
          return result;
       }
    }
@@ -64530,7 +64530,7 @@ lbl_56:
 
    // Iteration counter exceeded limit
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
 // LBFGS stage:
@@ -64596,7 +64596,7 @@ lbl_58:
       ae_v_addd(&state->work.ptr.p_double[0], 1, &state->bufsk.ptr.pp_double[i][0], 1, ae_v_len(0, n - 1), vv);
    }
    ae_v_moveneg(&state->d.ptr.p_double[0], 1, &state->work.ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   b = ae_false;
+   b = false;
    for (i = 0; i <= n - 1; i++) {
       b = b || ((state->hasbndl.ptr.p_bool[i] && ae_fp_eq(state->xc.ptr.p_double[i], state->bndl.ptr.p_double[i])) && ae_fp_neq(state->d.ptr.p_double[i], (double)(0)));
       b = b || ((state->hasbndu.ptr.p_bool[i] && ae_fp_eq(state->xc.ptr.p_double[i], state->bndu.ptr.p_double[i])) && ae_fp_neq(state->d.ptr.p_double[i], (double)(0)));
@@ -64652,17 +64652,17 @@ lbl_61:
       goto lbl_63;
    }
 // Analytic gradient
-   state->needfg = ae_true;
+   state->needfg = true;
    state->rstate.stage = 21;
    goto lbl_rcomm;
 lbl_21:
-   state->needfg = ae_false;
+   state->needfg = false;
    state->repnfev = state->repnfev + 1;
    goto lbl_64;
 lbl_63:
 
 // Numerical differentiation
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 22;
    goto lbl_rcomm;
 lbl_22:
@@ -64673,7 +64673,7 @@ lbl_65:
       goto lbl_67;
    }
    v = state->x.ptr.p_double[i];
-   b = ae_false;
+   b = false;
    if (state->hasbndl.ptr.p_bool[i]) {
       b = b || ae_fp_less(v - state->diffstep * state->s.ptr.p_double[i], state->bndl.ptr.p_double[i]);
    }
@@ -64737,7 +64737,7 @@ lbl_69:
    goto lbl_65;
 lbl_67:
    state->f = state->fbase;
-   state->needf = ae_false;
+   state->needf = false;
 lbl_64:
 
 // Back to MCSRCH
@@ -64782,14 +64782,14 @@ lbl_62:
 
    // Abnormal termination - infinities in function/gradient
       state->repterminationtype = -8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->userterminationneeded) {
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (mcinfo != 1) {
@@ -64803,13 +64803,13 @@ lbl_62:
 // * report current point and update iterations counter
 // * push new pair SK/YK to LBFGS buffer
 // * update length of the good step
-   activationstatus = ae_false;
+   activationstatus = false;
    for (i = 0; i <= n - 1; i++) {
       if ((state->hasbndl.ptr.p_bool[i] && ae_fp_eq(state->xn.ptr.p_double[i], state->bndl.ptr.p_double[i])) && ae_fp_neq(state->xn.ptr.p_double[i], state->xc.ptr.p_double[i])) {
-         activationstatus = ae_true;
+         activationstatus = true;
       }
       if ((state->hasbndu.ptr.p_bool[i] && ae_fp_eq(state->xn.ptr.p_double[i], state->bndu.ptr.p_double[i])) && ae_fp_neq(state->xn.ptr.p_double[i], state->xc.ptr.p_double[i])) {
-         activationstatus = ae_true;
+         activationstatus = true;
       }
    }
    state->fp = state->fc;
@@ -64823,11 +64823,11 @@ lbl_62:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xc.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    minbc_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 29;
    goto lbl_rcomm;
 lbl_29:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_70:
    state->repiterationscount = state->repiterationscount + 1;
    if (state->bufsize == m) {
@@ -64871,7 +64871,7 @@ lbl_70:
 // Check MaxIts-based stopping condition.
    if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Smooth reset (LBFGS memory model is refreshed) or hard restart:
@@ -64898,12 +64898,12 @@ lbl_60:
    gdecay = ae_maxreal(gdecay * minbc_decaycorrection, minbc_mindecay, _state);
    goto lbl_38;
 lbl_39:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = freezeidx;
    state->rstate.ia.ptr.p_int[1] = n;
    state->rstate.ia.ptr.p_int[2] = m;
@@ -65357,15 +65357,15 @@ void minbcrestartfrom(minbcstate *state, RVector *x, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void minbcrequesttermination(minbcstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // Clears request fileds (to be sure that we don't forget to clear something)
 static void minbc_clearrequestfields(minbcstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfg = ae_false;
-   state->xupdated = ae_false;
+   state->needf = false;
+   state->needfg = false;
+   state->xupdated = false;
 }
 
 // Internal initialization subroutine.
@@ -65378,13 +65378,13 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    ae_frame_make(_state, &_frame_block);
    memset(&c, 0, sizeof(c));
    memset(&ct, 0, sizeof(ct));
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ct, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&ct, 0, DT_INT, _state, true);
 
 // Initialize
    state->teststep = (double)(0);
    state->smoothnessguardlevel = 0;
-   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, ae_false, _state);
+   smoothnessmonitorinit(&state->smonitor, &state->s, 0, 0, false, _state);
    state->nmain = n;
    state->diffstep = diffstep;
    rvectorsetlengthatleast(&state->bndl, n, _state);
@@ -65408,15 +65408,15 @@ static void minbc_minbcinitinternal(ae_int_t n, RVector *x, double diffstep, min
    rvectorsetlengthatleast(&state->work, n, _state);
    for (i = 0; i <= n - 1; i++) {
       state->bndl.ptr.p_double[i] = _state->v_neginf;
-      state->hasbndl.ptr.p_bool[i] = ae_false;
+      state->hasbndl.ptr.p_bool[i] = false;
       state->bndu.ptr.p_double[i] = _state->v_posinf;
-      state->hasbndu.ptr.p_bool[i] = ae_false;
+      state->hasbndu.ptr.p_bool[i] = false;
       state->s.ptr.p_double[i] = 1.0;
       state->invs.ptr.p_double[i] = 1.0;
       state->lastscaleused.ptr.p_double[i] = 1.0;
    }
    minbcsetcond(state, 0.0, 0.0, 0.0, 0, _state);
-   minbcsetxrep(state, ae_false, _state);
+   minbcsetxrep(state, false, _state);
    minbcsetstpmax(state, 0.0, _state);
    minbcsetprecdefault(state, _state);
    minbcrestartfrom(state, x, _state);
@@ -65452,7 +65452,7 @@ static void minbc_updateestimateofgoodstep(double *estimate, double newstep, ae_
    *estimate = newstep;
 }
 
-void _minbcstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minbcstate_init(void *_p, ae_state *_state, bool make_automatic) {
    minbcstate *p = (minbcstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -65486,7 +65486,7 @@ void _minbcstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->invs, 0, DT_REAL, _state, make_automatic);
 }
 
-void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minbcstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbcstate *dst = (minbcstate *) _dst;
    minbcstate *src = (minbcstate *) _src;
    dst->nmain = src->nmain;
@@ -65628,12 +65628,12 @@ void _minbcstate_destroy(void *_p) {
    ae_vector_destroy(&p->invs);
 }
 
-void _minbcreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _minbcreport_init(void *_p, ae_state *_state, bool make_automatic) {
    minbcreport *p = (minbcreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _minbcreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _minbcreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    minbcreport *dst = (minbcreport *) _dst;
    minbcreport *src = (minbcreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -65659,7 +65659,7 @@ void _minbcreport_destroy(void *_p) {
 //
 //   -- ALGLIB --
 //      Copyright 20.07.2021 by Bochkanov Sergey
-void lptestproblemcreate(ae_int_t n, ae_bool hasknowntarget, double targetf, lptestproblem *p, ae_state *_state) {
+void lptestproblemcreate(ae_int_t n, bool hasknowntarget, double targetf, lptestproblem *p, ae_state *_state) {
 
    _lptestproblem_clear(p);
 
@@ -65834,7 +65834,7 @@ void xdbgminlpcreatefromtestproblem(lptestproblem *p, minlpstate *state, ae_stat
    minlpsetlc2(state, &p->a, &p->al, &p->au, p->m, _state);
 }
 
-void _lptestproblem_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _lptestproblem_init(void *_p, ae_state *_state, bool make_automatic) {
    lptestproblem *p = (lptestproblem *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->s, 0, DT_REAL, _state, make_automatic);
@@ -65846,7 +65846,7 @@ void _lptestproblem_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->au, 0, DT_REAL, _state, make_automatic);
 }
 
-void _lptestproblem_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _lptestproblem_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lptestproblem *dst = (lptestproblem *) _dst;
    lptestproblem *src = (lptestproblem *) _src;
    dst->n = src->n;

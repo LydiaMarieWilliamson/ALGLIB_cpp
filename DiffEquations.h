@@ -26,12 +26,12 @@ typedef struct {
    double xscale;
    double h;
    double eps;
-   ae_bool fraceps;
+   bool fraceps;
    ae_vector yc;
    ae_vector escale;
    ae_vector xg;
    ae_int_t solvertype;
-   ae_bool needdy;
+   bool needdy;
    double x;
    ae_vector y;
    ae_vector dy;
@@ -74,7 +74,7 @@ public:
    odesolverstate(const odesolverstate &rhs);
    odesolverstate &operator=(const odesolverstate &rhs);
    virtual ~odesolverstate();
-   ae_bool &needdy;
+   bool &needdy;
    real_1d_array y;
    real_1d_array dy;
    double &x;
@@ -198,14 +198,14 @@ void odesolverresults(const odesolverstate &state, ae_int_t &m, real_1d_array &x
 namespace alglib_impl {
 // === ODESOLVER Package ===
 void odesolverrkck(RVector *y, ae_int_t n, RVector *x, ae_int_t m, double eps, double h, odesolverstate *state, ae_state *_state);
-ae_bool odesolveriteration(odesolverstate *state, ae_state *_state);
+bool odesolveriteration(odesolverstate *state, ae_state *_state);
 void odesolverresults(odesolverstate *state, ae_int_t *m, RVector *xtbl, RMatrix *ytbl, odesolverreport *rep, ae_state *_state);
-void _odesolverstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
-void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _odesolverstate_init(void *_p, ae_state *_state, bool make_automatic);
+void _odesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _odesolverstate_clear(void *_p);
 void _odesolverstate_destroy(void *_p);
-void _odesolverreport_init(void *_p, ae_state *_state, ae_bool make_automatic);
-void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _odesolverreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _odesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _odesolverreport_clear(void *_p);
 void _odesolverreport_destroy(void *_p);
 } // end of namespace alglib_impl

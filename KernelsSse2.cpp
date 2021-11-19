@@ -247,7 +247,7 @@ void icopyv_sse2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__res
    }
 }
 
-void bcopyv_sse2(const ae_int_t n, const ae_bool *__restrict x, ae_bool *__restrict y, ae_state *__restrict _state) {
+void bcopyv_sse2(const ae_int_t n, const bool *__restrict x, bool *__restrict y, ae_state *__restrict _state) {
    const ae_int_t tail = n & 15;
    const ae_int_t even = n - tail;
    __m128i *__restrict pDest = (__m128i *) y;
@@ -320,7 +320,7 @@ void isetv_sse2(const ae_int_t n, const ae_int_t v, ae_int_t *__restrict x, ae_s
    memmove(pDest + i, &sse2v, tail);
 }
 
-void bsetv_sse2(const ae_int_t n, const ae_bool v, ae_bool *__restrict x, ae_state *__restrict _state) {
+void bsetv_sse2(const ae_int_t n, const bool v, bool *__restrict x, ae_state *__restrict _state) {
    const ae_int_t tail = n & 15;
    const ae_int_t even = n - tail;
    __m128i *__restrict pDest = (__m128i *) x;

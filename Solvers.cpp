@@ -66,7 +66,7 @@ _polynomialsolverreport_owner::_polynomialsolverreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::polynomialsolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::polynomialsolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::polynomialsolverreport));
-   alglib_impl::_polynomialsolverreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_polynomialsolverreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -93,7 +93,7 @@ _polynomialsolverreport_owner::_polynomialsolverreport_owner(const _polynomialso
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: polynomialsolverreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::polynomialsolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::polynomialsolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::polynomialsolverreport));
-   alglib_impl::_polynomialsolverreport_init_copy(p_struct, const_cast < alglib_impl::polynomialsolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_polynomialsolverreport_init_copy(p_struct, const_cast < alglib_impl::polynomialsolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -117,7 +117,7 @@ _polynomialsolverreport_owner &_polynomialsolverreport_owner::operator=(const _p
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: polynomialsolverreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_polynomialsolverreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::polynomialsolverreport));
-   alglib_impl::_polynomialsolverreport_init_copy(p_struct, const_cast < alglib_impl::polynomialsolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_polynomialsolverreport_init_copy(p_struct, const_cast < alglib_impl::polynomialsolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -234,7 +234,7 @@ _densesolverreport_owner::_densesolverreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::densesolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::densesolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverreport));
-   alglib_impl::_densesolverreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_densesolverreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -261,7 +261,7 @@ _densesolverreport_owner::_densesolverreport_owner(const _densesolverreport_owne
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: densesolverreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::densesolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::densesolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverreport));
-   alglib_impl::_densesolverreport_init_copy(p_struct, const_cast < alglib_impl::densesolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_densesolverreport_init_copy(p_struct, const_cast < alglib_impl::densesolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -285,7 +285,7 @@ _densesolverreport_owner &_densesolverreport_owner::operator=(const _densesolver
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: densesolverreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_densesolverreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverreport));
-   alglib_impl::_densesolverreport_init_copy(p_struct, const_cast < alglib_impl::densesolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_densesolverreport_init_copy(p_struct, const_cast < alglib_impl::densesolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -343,7 +343,7 @@ _densesolverlsreport_owner::_densesolverlsreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::densesolverlsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::densesolverlsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverlsreport));
-   alglib_impl::_densesolverlsreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_densesolverlsreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -370,7 +370,7 @@ _densesolverlsreport_owner::_densesolverlsreport_owner(const _densesolverlsrepor
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: densesolverlsreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::densesolverlsreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::densesolverlsreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverlsreport));
-   alglib_impl::_densesolverlsreport_init_copy(p_struct, const_cast < alglib_impl::densesolverlsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_densesolverlsreport_init_copy(p_struct, const_cast < alglib_impl::densesolverlsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -394,7 +394,7 @@ _densesolverlsreport_owner &_densesolverlsreport_owner::operator=(const _denseso
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: densesolverlsreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_densesolverlsreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::densesolverlsreport));
-   alglib_impl::_densesolverlsreport_init_copy(p_struct, const_cast < alglib_impl::densesolverlsreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_densesolverlsreport_init_copy(p_struct, const_cast < alglib_impl::densesolverlsreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -2648,7 +2648,7 @@ _sparsesolverreport_owner::_sparsesolverreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::sparsesolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::sparsesolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverreport));
-   alglib_impl::_sparsesolverreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_sparsesolverreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2675,7 +2675,7 @@ _sparsesolverreport_owner::_sparsesolverreport_owner(const _sparsesolverreport_o
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: sparsesolverreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::sparsesolverreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::sparsesolverreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverreport));
-   alglib_impl::_sparsesolverreport_init_copy(p_struct, const_cast < alglib_impl::sparsesolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_sparsesolverreport_init_copy(p_struct, const_cast < alglib_impl::sparsesolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -2699,7 +2699,7 @@ _sparsesolverreport_owner &_sparsesolverreport_owner::operator=(const _sparsesol
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: sparsesolverreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_sparsesolverreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverreport));
-   alglib_impl::_sparsesolverreport_init_copy(p_struct, const_cast < alglib_impl::sparsesolverreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_sparsesolverreport_init_copy(p_struct, const_cast < alglib_impl::sparsesolverreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -2975,7 +2975,7 @@ _sparsesolverstate_owner::_sparsesolverstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::sparsesolverstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::sparsesolverstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverstate));
-   alglib_impl::_sparsesolverstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_sparsesolverstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -3002,7 +3002,7 @@ _sparsesolverstate_owner::_sparsesolverstate_owner(const _sparsesolverstate_owne
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: sparsesolverstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::sparsesolverstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::sparsesolverstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverstate));
-   alglib_impl::_sparsesolverstate_init_copy(p_struct, const_cast < alglib_impl::sparsesolverstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_sparsesolverstate_init_copy(p_struct, const_cast < alglib_impl::sparsesolverstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -3026,7 +3026,7 @@ _sparsesolverstate_owner &_sparsesolverstate_owner::operator=(const _sparsesolve
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: sparsesolverstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_sparsesolverstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::sparsesolverstate));
-   alglib_impl::_sparsesolverstate_init_copy(p_struct, const_cast < alglib_impl::sparsesolverstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_sparsesolverstate_init_copy(p_struct, const_cast < alglib_impl::sparsesolverstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -3648,7 +3648,7 @@ bool sparsesolverooccontinue(const sparsesolverstate &state, const xparams _xpar
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::sparsesolverooccontinue(const_cast < alglib_impl::sparsesolverstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::sparsesolverooccontinue(const_cast < alglib_impl::sparsesolverstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -3962,7 +3962,7 @@ _lincgstate_owner::_lincgstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::lincgstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::lincgstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lincgstate));
-   alglib_impl::_lincgstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_lincgstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -3989,7 +3989,7 @@ _lincgstate_owner::_lincgstate_owner(const _lincgstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lincgstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::lincgstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::lincgstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lincgstate));
-   alglib_impl::_lincgstate_init_copy(p_struct, const_cast < alglib_impl::lincgstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lincgstate_init_copy(p_struct, const_cast < alglib_impl::lincgstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4013,7 +4013,7 @@ _lincgstate_owner &_lincgstate_owner::operator=(const _lincgstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lincgstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_lincgstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::lincgstate));
-   alglib_impl::_lincgstate_init_copy(p_struct, const_cast < alglib_impl::lincgstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lincgstate_init_copy(p_struct, const_cast < alglib_impl::lincgstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -4071,7 +4071,7 @@ _lincgreport_owner::_lincgreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::lincgreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::lincgreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lincgreport));
-   alglib_impl::_lincgreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_lincgreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4098,7 +4098,7 @@ _lincgreport_owner::_lincgreport_owner(const _lincgreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lincgreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::lincgreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::lincgreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::lincgreport));
-   alglib_impl::_lincgreport_init_copy(p_struct, const_cast < alglib_impl::lincgreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lincgreport_init_copy(p_struct, const_cast < alglib_impl::lincgreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4122,7 +4122,7 @@ _lincgreport_owner &_lincgreport_owner::operator=(const _lincgreport_owner &rhs)
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: lincgreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_lincgreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::lincgreport));
-   alglib_impl::_lincgreport_init_copy(p_struct, const_cast < alglib_impl::lincgreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_lincgreport_init_copy(p_struct, const_cast < alglib_impl::lincgreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -4535,7 +4535,7 @@ _linlsqrstate_owner::_linlsqrstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::linlsqrstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::linlsqrstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrstate));
-   alglib_impl::_linlsqrstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_linlsqrstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4562,7 +4562,7 @@ _linlsqrstate_owner::_linlsqrstate_owner(const _linlsqrstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: linlsqrstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::linlsqrstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::linlsqrstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrstate));
-   alglib_impl::_linlsqrstate_init_copy(p_struct, const_cast < alglib_impl::linlsqrstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_linlsqrstate_init_copy(p_struct, const_cast < alglib_impl::linlsqrstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4586,7 +4586,7 @@ _linlsqrstate_owner &_linlsqrstate_owner::operator=(const _linlsqrstate_owner &r
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: linlsqrstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_linlsqrstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrstate));
-   alglib_impl::_linlsqrstate_init_copy(p_struct, const_cast < alglib_impl::linlsqrstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_linlsqrstate_init_copy(p_struct, const_cast < alglib_impl::linlsqrstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -4644,7 +4644,7 @@ _linlsqrreport_owner::_linlsqrreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::linlsqrreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::linlsqrreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrreport));
-   alglib_impl::_linlsqrreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_linlsqrreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4671,7 +4671,7 @@ _linlsqrreport_owner::_linlsqrreport_owner(const _linlsqrreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: linlsqrreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::linlsqrreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::linlsqrreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrreport));
-   alglib_impl::_linlsqrreport_init_copy(p_struct, const_cast < alglib_impl::linlsqrreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_linlsqrreport_init_copy(p_struct, const_cast < alglib_impl::linlsqrreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -4695,7 +4695,7 @@ _linlsqrreport_owner &_linlsqrreport_owner::operator=(const _linlsqrreport_owner
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: linlsqrreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_linlsqrreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::linlsqrreport));
-   alglib_impl::_linlsqrreport_init_copy(p_struct, const_cast < alglib_impl::linlsqrreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_linlsqrreport_init_copy(p_struct, const_cast < alglib_impl::linlsqrreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -5151,7 +5151,7 @@ _nleqstate_owner::_nleqstate_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::nleqstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::nleqstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::nleqstate));
-   alglib_impl::_nleqstate_init(p_struct, &_state, ae_false);
+   alglib_impl::_nleqstate_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -5178,7 +5178,7 @@ _nleqstate_owner::_nleqstate_owner(const _nleqstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: nleqstate copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::nleqstate *) alglib_impl::ae_malloc(sizeof(alglib_impl::nleqstate), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::nleqstate));
-   alglib_impl::_nleqstate_init_copy(p_struct, const_cast < alglib_impl::nleqstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_nleqstate_init_copy(p_struct, const_cast < alglib_impl::nleqstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -5202,7 +5202,7 @@ _nleqstate_owner &_nleqstate_owner::operator=(const _nleqstate_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: nleqstate assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_nleqstate_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::nleqstate));
-   alglib_impl::_nleqstate_init_copy(p_struct, const_cast < alglib_impl::nleqstate * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_nleqstate_init_copy(p_struct, const_cast < alglib_impl::nleqstate * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -5260,7 +5260,7 @@ _nleqreport_owner::_nleqreport_owner() {
    p_struct = NULL;
    p_struct = (alglib_impl::nleqreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::nleqreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::nleqreport));
-   alglib_impl::_nleqreport_init(p_struct, &_state, ae_false);
+   alglib_impl::_nleqreport_init(p_struct, &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -5287,7 +5287,7 @@ _nleqreport_owner::_nleqreport_owner(const _nleqreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: nleqreport copy constructor failure (source is not initialized)", &_state);
    p_struct = (alglib_impl::nleqreport *) alglib_impl::ae_malloc(sizeof(alglib_impl::nleqreport), &_state);
    memset(p_struct, 0, sizeof(alglib_impl::nleqreport));
-   alglib_impl::_nleqreport_init_copy(p_struct, const_cast < alglib_impl::nleqreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_nleqreport_init_copy(p_struct, const_cast < alglib_impl::nleqreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
 }
 
@@ -5311,7 +5311,7 @@ _nleqreport_owner &_nleqreport_owner::operator=(const _nleqreport_owner &rhs) {
    alglib_impl::ae_assert(rhs.p_struct != NULL, "ALGLIB: nleqreport assignment constructor failure (source is not initialized)", &_state);
    alglib_impl::_nleqreport_destroy(p_struct);
    memset(p_struct, 0, sizeof(alglib_impl::nleqreport));
-   alglib_impl::_nleqreport_init_copy(p_struct, const_cast < alglib_impl::nleqreport * >(rhs.p_struct), &_state, ae_false);
+   alglib_impl::_nleqreport_init_copy(p_struct, const_cast < alglib_impl::nleqreport * >(rhs.p_struct), &_state, false);
    ae_state_clear(&_state);
    return *this;
 }
@@ -5643,7 +5643,7 @@ bool nleqiteration(const nleqstate &state, const xparams _xparams) {
    ae_state_set_break_jump(&_alglib_env_state, &_break_jump);
    if (_xparams.flags != 0x0)
       ae_state_set_flags(&_alglib_env_state, _xparams.flags);
-   ae_bool result = alglib_impl::nleqiteration(const_cast < alglib_impl::nleqstate * >(state.c_ptr()), &_alglib_env_state);
+   bool result = alglib_impl::nleqiteration(const_cast < alglib_impl::nleqstate * >(state.c_ptr()), &_alglib_env_state);
    alglib_impl::ae_state_clear(&_alglib_env_state);
    return *(reinterpret_cast < bool *>(&result));
 }
@@ -5680,7 +5680,7 @@ void nleqsolve(nleqstate &state, void (*func)(const real_1d_array &x, double &fu
          continue;
       }
       goto lbl_no_callback;
-      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(ae_false, "ALGLIB: error in 'nleqsolve' (some derivatives were not provided?)", &_alglib_env_state);
+      _ALGLIB_CALLBACK_EXCEPTION_GUARD_END lbl_no_callback:alglib_impl::ae_assert(false, "ALGLIB: error in 'nleqsolve' (some derivatives were not provided?)", &_alglib_env_state);
    }
    alglib_impl::ae_state_clear(&_alglib_env_state);
 }
@@ -5798,21 +5798,21 @@ namespace alglib_impl {
 // === POLYNOMIALSOLVER Package ===
 
 // === DIRECTDENSESOLVERS Package ===
-static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, ae_bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
-static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix *a, ae_bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
-static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, ae_bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state);
-static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix *a, ae_bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state);
+static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
+static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state);
+static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state);
+static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state);
 static ae_int_t directdensesolvers_densesolverrfsmax(ae_int_t n, double r1, double rinf, ae_state *_state);
 static ae_int_t directdensesolvers_densesolverrfsmaxv2(ae_int_t n, double r2, ae_state *_state);
 static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *xb, ae_state *_state);
-static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *xb, ae_state *_state);
+static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *xb, ae_state *_state);
 static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *xb, ae_state *_state);
-static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *xb, ae_state *_state);
+static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb, ae_state *_state);
 
 // === DIRECTSPARSESOLVERS Package ===
 
 // === ITERATIVESPARSE Package ===
-static ae_bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_state *_state);
+static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_state *_state);
 static void iterativesparse_clearrequestfields(sparsesolverstate *state, ae_state *_state);
 static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state *_state);
 
@@ -5828,7 +5828,7 @@ static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state);
 
 // === NLEQ Package ===
 static void nleq_clearrequestfields(nleqstate *state, ae_state *_state);
-static ae_bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae_state *_state);
+static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae_state *_state);
 static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, ae_state *_state);
 
 // === POLYNOMIALSOLVER Package ===
@@ -5880,7 +5880,7 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_vector wi;
    ae_int_t i;
    ae_int_t j;
-   ae_bool status;
+   bool status;
    ae_int_t nz;
    ae_int_t ne;
    ae_complex v;
@@ -5893,15 +5893,15 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    memset(&vr, 0, sizeof(vr));
    memset(&wr, 0, sizeof(wr));
    memset(&wi, 0, sizeof(wi));
-   ae_vector_init_copy(&_a, a, _state, ae_true);
+   ae_vector_init_copy(&_a, a, _state, true);
    a = &_a;
    ae_vector_clear(x);
    _polynomialsolverreport_clear(rep);
-   ae_matrix_init(&c, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&vl, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&vr, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&wr, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&wi, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&c, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&vl, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&vr, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&wr, 0, DT_REAL, _state, true);
+   ae_vector_init(&wi, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0, "PolynomialSolve: N<=0", _state);
    ae_assert(a->cnt >= n + 1, "PolynomialSolve: Length(A)<N+1", _state);
@@ -5964,12 +5964,12 @@ void polynomialsolve(RVector *a, ae_int_t n, CVector *x, polynomialsolverreport 
    ae_frame_leave(_state);
 }
 
-void _polynomialsolverreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _polynomialsolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    polynomialsolverreport *p = (polynomialsolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _polynomialsolverreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _polynomialsolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    polynomialsolverreport *dst = (polynomialsolverreport *) _dst;
    polynomialsolverreport *src = (polynomialsolverreport *) _src;
    dst->maxerr = src->maxerr;
@@ -6043,8 +6043,8 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -6053,7 +6053,7 @@ void rmatrixsolve(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, densesolve
    }
    ae_matrix_set_length(&bm, n, 1, _state);
    ae_v_move(&bm.ptr.pp_double[0][0], bm.stride, &b->ptr.p_double[0], 1, ae_v_len(0, n - 1));
-   rmatrixsolvem(a, n, &bm, 1, ae_true, info, rep, &xm, _state);
+   rmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
    ae_v_move(&x->ptr.p_double[0], 1, &xm.ptr.pp_double[0][0], xm.stride, ae_v_len(0, n - 1));
    ae_frame_leave(_state);
@@ -6100,10 +6100,10 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -6182,7 +6182,7 @@ void rmatrixsolvefast(RMatrix *a, ae_int_t n, RVector *b, ae_int_t *info, ae_sta
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
+void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix da;
    ae_matrix emptya;
@@ -6196,9 +6196,9 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_bool rfs, 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&da, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -6215,9 +6215,9 @@ void rmatrixsolvem(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_bool rfs, 
    }
    rmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
-      directdensesolvers_rmatrixlusolveinternal(&da, &p, n, a, ae_true, b, m, info, rep, x, _state);
+      directdensesolvers_rmatrixlusolveinternal(&da, &p, n, a, true, b, m, info, rep, x, _state);
    } else {
-      directdensesolvers_rmatrixlusolveinternal(&da, &p, n, &emptya, ae_false, b, m, info, rep, x, _state);
+      directdensesolvers_rmatrixlusolveinternal(&da, &p, n, &emptya, false, b, m, info, rep, x, _state);
    }
    ae_frame_leave(_state);
 }
@@ -6272,10 +6272,10 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
@@ -6307,8 +6307,8 @@ void rmatrixsolvemfast(RMatrix *a, ae_int_t n, RMatrix *b, ae_int_t m, ae_int_t 
          }
       }
    }
-   rmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_true, 0, b, 0, 0, _state);
-   rmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+   rmatrixlefttrsm(n, m, a, 0, 0, false, true, 0, b, 0, 0, _state);
+   rmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0, _state);
    *info = 1;
    ae_frame_leave(_state);
 }
@@ -6376,8 +6376,8 @@ void rmatrixlusolve(RMatrix *lua, ZVector *p, ae_int_t n, RVector *b, ae_int_t *
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -6508,7 +6508,7 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -6517,7 +6517,7 @@ void rmatrixlusolvem(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_int_t 
       return;
    }
 // solve
-   directdensesolvers_rmatrixlusolveinternal(lua, p, n, &emptya, ae_false, b, m, info, rep, x, _state);
+   directdensesolvers_rmatrixlusolveinternal(lua, p, n, &emptya, false, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -6587,8 +6587,8 @@ void rmatrixlusolvemfast(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *b, ae_in
          }
       }
    }
-   rmatrixlefttrsm(n, m, lua, 0, 0, ae_false, ae_true, 0, b, 0, 0, _state);
-   rmatrixlefttrsm(n, m, lua, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+   rmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, b, 0, 0, _state);
+   rmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, b, 0, 0, _state);
    *info = 1;
 }
 
@@ -6637,8 +6637,8 @@ void rmatrixmixedsolve(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RVector
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -6699,7 +6699,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
       return;
    }
 // solve
-   directdensesolvers_rmatrixlusolveinternal(lua, p, n, a, ae_true, b, m, info, rep, x, _state);
+   directdensesolvers_rmatrixlusolveinternal(lua, p, n, a, true, b, m, info, rep, x, _state);
 }
 
 // Complex dense solver for A*X=B with N*N  complex  matrix  A,  N*M  complex
@@ -6756,7 +6756,7 @@ void rmatrixmixedsolvem(RMatrix *a, RMatrix *lua, ZVector *p, ae_int_t n, RMatri
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
+void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, bool rfs, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix da;
    ae_matrix emptya;
@@ -6770,9 +6770,9 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_bool rfs, 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -6788,9 +6788,9 @@ void cmatrixsolvem(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_bool rfs, 
    }
    cmatrixlu(&da, n, n, &p, _state);
    if (rfs) {
-      directdensesolvers_cmatrixlusolveinternal(&da, &p, n, a, ae_true, b, m, info, rep, x, _state);
+      directdensesolvers_cmatrixlusolveinternal(&da, &p, n, a, true, b, m, info, rep, x, _state);
    } else {
-      directdensesolvers_cmatrixlusolveinternal(&da, &p, n, &emptya, ae_false, b, m, info, rep, x, _state);
+      directdensesolvers_cmatrixlusolveinternal(&da, &p, n, &emptya, false, b, m, info, rep, x, _state);
    }
    ae_frame_leave(_state);
 }
@@ -6834,10 +6834,10 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
 // Check for exact degeneracy
    if (n <= 0 || m <= 0) {
@@ -6869,8 +6869,8 @@ void cmatrixsolvemfast(CMatrix *a, ae_int_t n, CMatrix *b, ae_int_t m, ae_int_t 
          }
       }
    }
-   cmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_true, 0, b, 0, 0, _state);
-   cmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+   cmatrixlefttrsm(n, m, a, 0, 0, false, true, 0, b, 0, 0, _state);
+   cmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0, _state);
    *info = 1;
    ae_frame_leave(_state);
 }
@@ -6931,8 +6931,8 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -6941,7 +6941,7 @@ void cmatrixsolve(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, densesolve
    }
    ae_matrix_set_length(&bm, n, 1, _state);
    ae_v_cmove(&bm.ptr.pp_complex[0][0], bm.stride, &b->ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
-   cmatrixsolvem(a, n, &bm, 1, ae_true, info, rep, &xm, _state);
+   cmatrixsolvem(a, n, &bm, 1, true, info, rep, &xm, _state);
    ae_vector_set_length(x, n, _state);
    ae_v_cmove(&x->ptr.p_complex[0], 1, &xm.ptr.pp_complex[0][0], xm.stride, "N", ae_v_len(0, n - 1));
    ae_frame_leave(_state);
@@ -6981,10 +6981,10 @@ void cmatrixsolvefast(CMatrix *a, ae_int_t n, CVector *b, ae_int_t *info, ae_sta
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
    memset(&p, 0, sizeof(p));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -7065,7 +7065,7 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -7074,7 +7074,7 @@ void cmatrixlusolvem(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_int_t 
       return;
    }
 // solve
-   directdensesolvers_cmatrixlusolveinternal(lua, p, n, &emptya, ae_false, b, m, info, rep, x, _state);
+   directdensesolvers_cmatrixlusolveinternal(lua, p, n, &emptya, false, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -7140,8 +7140,8 @@ void cmatrixlusolvemfast(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *b, ae_in
          }
       }
    }
-   cmatrixlefttrsm(n, m, lua, 0, 0, ae_false, ae_true, 0, b, 0, 0, _state);
-   cmatrixlefttrsm(n, m, lua, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+   cmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, b, 0, 0, _state);
+   cmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, b, 0, 0, _state);
    *info = 1;
 }
 
@@ -7206,8 +7206,8 @@ void cmatrixlusolve(CMatrix *lua, ZVector *p, ae_int_t n, CVector *b, ae_int_t *
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -7321,7 +7321,7 @@ void cmatrixmixedsolvem(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CMatri
       return;
    }
 // solve
-   directdensesolvers_cmatrixlusolveinternal(lua, p, n, a, ae_true, b, m, info, rep, x, _state);
+   directdensesolvers_cmatrixlusolveinternal(lua, p, n, a, true, b, m, info, rep, x, _state);
 }
 
 // Dense solver. Same as RMatrixMixedSolve(), but for complex matrices.
@@ -7365,8 +7365,8 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -7432,7 +7432,7 @@ void cmatrixmixedsolve(CMatrix *a, CMatrix *lua, ZVector *p, ae_int_t n, CVector
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void spdmatrixsolvem(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
+void spdmatrixsolvem(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix da;
    ae_int_t i;
@@ -7445,7 +7445,7 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&da, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&da, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -7481,7 +7481,7 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int
       return;
    }
    *info = 1;
-   directdensesolvers_spdmatrixcholeskysolveinternal(&da, n, isupper, a, ae_true, b, m, info, rep, x, _state);
+   directdensesolvers_spdmatrixcholeskysolveinternal(&da, n, isupper, a, true, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -7511,7 +7511,7 @@ void spdmatrixsolvem(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
-void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
+void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _a;
    ae_int_t i;
@@ -7519,7 +7519,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -7540,11 +7540,11 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae
       return;
    }
    if (isupper) {
-      rmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 1, b, 0, 0, _state);
-      rmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, a, 0, 0, true, false, 1, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0, _state);
    } else {
-      rmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_false, 0, b, 0, 0, _state);
-      rmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_false, 1, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, a, 0, 0, false, false, 0, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, a, 0, 0, false, false, 1, b, 0, 0, _state);
    }
    ae_frame_leave(_state);
 }
@@ -7600,7 +7600,7 @@ void spdmatrixsolvemfast(RMatrix *a, ae_int_t n, ae_bool isupper, RMatrix *b, ae
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void spdmatrixsolve(RMatrix *a, ae_int_t n, ae_bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
+void spdmatrixsolve(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix bm;
    ae_matrix xm;
@@ -7611,8 +7611,8 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, ae_bool isupper, RVector *b, ae_int_
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -7653,14 +7653,14 @@ void spdmatrixsolve(RMatrix *a, ae_int_t n, ae_bool isupper, RVector *b, ae_int_
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
-void spdmatrixsolvefast(RMatrix *a, ae_int_t n, ae_bool isupper, RVector *b, ae_int_t *info, ae_state *_state) {
+void spdmatrixsolvefast(RMatrix *a, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _a;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -7737,7 +7737,7 @@ void spdmatrixsolvefast(RMatrix *a, ae_int_t n, ae_bool isupper, RVector *b, ae_
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
+void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix emptya;
 
@@ -7746,7 +7746,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&emptya, 0, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -7755,7 +7755,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix 
       return;
    }
 // solve
-   directdensesolvers_spdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, ae_false, b, m, info, rep, x, _state);
+   directdensesolvers_spdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, false, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -7789,7 +7789,7 @@ void spdmatrixcholeskysolvem(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix 
 //
 //   -- ALGLIB --
 //      Copyright 18.03.2015 by Bochkanov Sergey
-void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
+void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -7813,11 +7813,11 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, ae_bool isupper, RMat
       }
    }
    if (isupper) {
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 1, b, 0, 0, _state);
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 1, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, b, 0, 0, _state);
    } else {
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 0, b, 0, 0, _state);
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 1, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, b, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 1, b, 0, 0, _state);
    }
 }
 
@@ -7873,7 +7873,7 @@ void spdmatrixcholeskysolvemfast(RMatrix *cha, ae_int_t n, ae_bool isupper, RMat
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
+void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, densesolverreport *rep, RVector *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix bm;
    ae_matrix xm;
@@ -7884,8 +7884,8 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_REAL, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -7928,7 +7928,7 @@ void spdmatrixcholeskysolve(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *b, ae_int_t *info, ae_state *_state) {
+void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, bool isupper, RVector *b, ae_int_t *info, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
 
@@ -7995,7 +7995,7 @@ void spdmatrixcholeskysolvefast(RMatrix *cha, ae_int_t n, ae_bool isupper, RVect
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void hpdmatrixsolvem(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
+void hpdmatrixsolvem(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix da;
    ae_int_t i;
@@ -8008,7 +8008,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&da, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -8043,7 +8043,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int
       return;
    }
    *info = 1;
-   directdensesolvers_hpdmatrixcholeskysolveinternal(&da, n, isupper, a, ae_true, b, m, info, rep, x, _state);
+   directdensesolvers_hpdmatrixcholeskysolveinternal(&da, n, isupper, a, true, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -8074,7 +8074,7 @@ void hpdmatrixsolvem(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
-void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
+void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _a;
    ae_int_t i;
@@ -8082,7 +8082,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -8103,11 +8103,11 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae
       return;
    }
    if (isupper) {
-      cmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 2, b, 0, 0, _state);
-      cmatrixlefttrsm(n, m, a, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, a, 0, 0, true, false, 2, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, a, 0, 0, true, false, 0, b, 0, 0, _state);
    } else {
-      cmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_false, 0, b, 0, 0, _state);
-      cmatrixlefttrsm(n, m, a, 0, 0, ae_false, ae_false, 2, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, a, 0, 0, false, false, 0, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, a, 0, 0, false, false, 2, b, 0, 0, _state);
    }
    ae_frame_leave(_state);
 }
@@ -8156,7 +8156,7 @@ void hpdmatrixsolvemfast(CMatrix *a, ae_int_t n, ae_bool isupper, CMatrix *b, ae
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void hpdmatrixsolve(CMatrix *a, ae_int_t n, ae_bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
+void hpdmatrixsolve(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix bm;
    ae_matrix xm;
@@ -8167,8 +8167,8 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, ae_bool isupper, CVector *b, ae_int_
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -8211,14 +8211,14 @@ void hpdmatrixsolve(CMatrix *a, ae_int_t n, ae_bool isupper, CVector *b, ae_int_
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
-void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, ae_bool isupper, CVector *b, ae_int_t *info, ae_state *_state) {
+void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix _a;
    ae_int_t i;
 
    ae_frame_make(_state, &_frame_block);
    memset(&_a, 0, sizeof(_a));
-   ae_matrix_init_copy(&_a, a, _state, ae_true);
+   ae_matrix_init_copy(&_a, a, _state, true);
    a = &_a;
    *info = 0;
 
@@ -8296,7 +8296,7 @@ void hpdmatrixsolvefast(CMatrix *a, ae_int_t n, ae_bool isupper, CVector *b, ae_
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
+void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix emptya;
 
@@ -8305,7 +8305,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&emptya, 0, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -8316,7 +8316,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix 
 // 1. scale matrix, max(|U[i,j]|)
 // 2. factorize scaled matrix
 // 3. solve
-   directdensesolvers_hpdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, ae_false, b, m, info, rep, x, _state);
+   directdensesolvers_hpdmatrixcholeskysolveinternal(cha, n, isupper, &emptya, false, b, m, info, rep, x, _state);
    ae_frame_leave(_state);
 }
 
@@ -8349,7 +8349,7 @@ void hpdmatrixcholeskysolvem(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix 
 //
 //   -- ALGLIB --
 //      Copyright 18.03.2015 by Bochkanov Sergey
-void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
+void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *b, ae_int_t m, ae_int_t *info, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
    ae_int_t k;
@@ -8373,11 +8373,11 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, ae_bool isupper, CMat
       }
    }
    if (isupper) {
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 2, b, 0, 0, _state);
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 0, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 2, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, b, 0, 0, _state);
    } else {
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 0, b, 0, 0, _state);
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 2, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, b, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 2, b, 0, 0, _state);
    }
 }
 
@@ -8433,7 +8433,7 @@ void hpdmatrixcholeskysolvemfast(CMatrix *cha, ae_int_t n, ae_bool isupper, CMat
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
+void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, densesolverreport *rep, CVector *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_matrix bm;
    ae_matrix xm;
@@ -8444,8 +8444,8 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *
    *info = 0;
    _densesolverreport_clear(rep);
    ae_vector_clear(x);
-   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, ae_true);
-   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, ae_true);
+   ae_matrix_init(&bm, 0, 0, DT_COMPLEX, _state, true);
+   ae_matrix_init(&xm, 0, 0, DT_COMPLEX, _state, true);
 
    if (n <= 0) {
       *info = -1;
@@ -8488,7 +8488,7 @@ void hpdmatrixcholeskysolve(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *
 //
 //   -- ALGLIB --
 //      Copyright 18.03.2015 by Bochkanov Sergey
-void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *b, ae_int_t *info, ae_state *_state) {
+void hpdmatrixcholeskysolvefast(CMatrix *cha, ae_int_t n, bool isupper, CVector *b, ae_int_t *info, ae_state *_state) {
    ae_int_t i;
    ae_int_t k;
 
@@ -8573,12 +8573,12 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    ae_int_t kernelidx;
    double v;
    double verr;
-   ae_bool svdfailed;
-   ae_bool zeroa;
+   bool svdfailed;
+   bool zeroa;
    ae_int_t rfs;
    ae_int_t nrfs;
-   ae_bool terminatenexttime;
-   ae_bool smallerr;
+   bool terminatenexttime;
+   bool smallerr;
 
    ae_frame_make(_state, &_frame_block);
    memset(&sv, 0, sizeof(sv));
@@ -8595,17 +8595,17 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    *info = 0;
    _densesolverlsreport_clear(rep);
    ae_vector_clear(x);
-   ae_vector_init(&sv, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&u, 0, 0, DT_REAL, _state, ae_true);
-   ae_matrix_init(&vt, 0, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&rp, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&utb, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&sutb, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&tmp, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&ta, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&w, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&sv, 0, DT_REAL, _state, true);
+   ae_matrix_init(&u, 0, 0, DT_REAL, _state, true);
+   ae_matrix_init(&vt, 0, 0, DT_REAL, _state, true);
+   ae_vector_init(&rp, 0, DT_REAL, _state, true);
+   ae_vector_init(&utb, 0, DT_REAL, _state, true);
+   ae_vector_init(&sutb, 0, DT_REAL, _state, true);
+   ae_vector_init(&tmp, 0, DT_REAL, _state, true);
+   ae_vector_init(&ta, 0, DT_REAL, _state, true);
+   ae_vector_init(&tx, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&w, 0, DT_REAL, _state, true);
 
    if ((nrows <= 0 || ncols <= 0) || ae_fp_less(threshold, (double)(0))) {
       *info = -1;
@@ -8682,7 +8682,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
    }
    rep->k = ncols - kernelidx;
    nrfs = directdensesolvers_densesolverrfsmaxv2(ncols, rep->r2, _state);
-   terminatenexttime = ae_false;
+   terminatenexttime = false;
    ae_vector_set_length(&rp, nrows, _state);
    for (rfs = 0; rfs <= nrfs; rfs++) {
       if (terminatenexttime) {
@@ -8692,7 +8692,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
       if (rfs == 0) {
          ae_v_move(&rp.ptr.p_double[0], 1, &b->ptr.p_double[0], 1, ae_v_len(0, nrows - 1));
       } else {
-         smallerr = ae_true;
+         smallerr = true;
          for (i = 0; i <= nrows - 1; i++) {
             ae_v_move(&ta.ptr.p_double[0], 1, &a->ptr.pp_double[i][0], 1, ae_v_len(0, ncols - 1));
             ta.ptr.p_double[ncols] = (double)(-1);
@@ -8703,7 +8703,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
             smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
          }
          if (smallerr) {
-            terminatenexttime = ae_true;
+            terminatenexttime = true;
          }
       }
 
@@ -8748,7 +8748,7 @@ void rmatrixsolvels(RMatrix *a, ae_int_t nrows, ae_int_t ncols, RVector *b, doub
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, ae_bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
+static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, ae_int_t n, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -8764,8 +8764,8 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    double v;
    double verr;
    double mxb;
-   ae_bool smallerr;
-   ae_bool terminatenexttime;
+   bool smallerr;
+   bool terminatenexttime;
 
    ae_frame_make(_state, &_frame_block);
    memset(&xc, 0, sizeof(xc));
@@ -8777,12 +8777,12 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_vector_init(&xc, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&y, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&bc, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&xa, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&xb, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&tx, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&xc, 0, DT_REAL, _state, true);
+   ae_vector_init(&y, 0, DT_REAL, _state, true);
+   ae_vector_init(&bc, 0, DT_REAL, _state, true);
+   ae_vector_init(&xa, 0, DT_REAL, _state, true);
+   ae_vector_init(&xb, 0, DT_REAL, _state, true);
+   ae_vector_init(&tx, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -8840,20 +8840,20 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
          }
       }
    }
-   rmatrixlefttrsm(n, m, lua, 0, 0, ae_false, ae_true, 0, x, 0, 0, _state);
-   rmatrixlefttrsm(n, m, lua, 0, 0, ae_true, ae_false, 0, x, 0, 0, _state);
+   rmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, x, 0, 0, _state);
+   rmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, x, 0, 0, _state);
 
 // Second stage: iterative refinement
    if (havea) {
       for (k = 0; k <= m - 1; k++) {
          nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf, _state);
-         terminatenexttime = ae_false;
+         terminatenexttime = false;
          for (rfs = 0; rfs <= nrfs - 1; rfs++) {
             if (terminatenexttime) {
                break;
             }
          // generate right part
-            smallerr = ae_true;
+            smallerr = true;
             ae_v_move(&xb.ptr.p_double[0], 1, &x->ptr.pp_double[0][k], x->stride, ae_v_len(0, n - 1));
             for (i = 0; i <= n - 1; i++) {
                ae_v_move(&xa.ptr.p_double[0], 1, &a->ptr.pp_double[i][0], 1, ae_v_len(0, n - 1));
@@ -8864,7 +8864,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
                smallerr = smallerr && ae_fp_less(ae_fabs(v, _state), 4 * verr);
             }
             if (smallerr) {
-               terminatenexttime = ae_true;
+               terminatenexttime = true;
             }
          // solve and update
             directdensesolvers_rbasiclusolve(lua, p, n, &y, _state);
@@ -8879,7 +8879,7 @@ static void directdensesolvers_rmatrixlusolveinternal(RMatrix *lua, ZVector *p, 
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, ae_bool isupper, RMatrix *a, ae_bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
+static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_int_t n, bool isupper, RMatrix *a, bool havea, RMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, RMatrix *x, ae_state *_state) {
    ae_int_t i;
    ae_int_t j;
 
@@ -8917,11 +8917,11 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
       }
    }
    if (isupper) {
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 1, x, 0, 0, _state);
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 0, x, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 1, x, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0, _state);
    } else {
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 0, x, 0, 0, _state);
-      rmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 1, x, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0, _state);
+      rmatrixlefttrsm(n, m, cha, 0, 0, false, false, 1, x, 0, 0, _state);
    }
 }
 
@@ -8929,7 +8929,7 @@ static void directdensesolvers_spdmatrixcholeskysolveinternal(RMatrix *cha, ae_i
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, ae_bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
+static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, ae_int_t n, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -8945,8 +8945,8 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    ae_vector tmpbuf;
    ae_complex v;
    double verr;
-   ae_bool smallerr;
-   ae_bool terminatenexttime;
+   bool smallerr;
+   bool terminatenexttime;
 
    ae_frame_make(_state, &_frame_block);
    memset(&xc, 0, sizeof(xc));
@@ -8959,13 +8959,13 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_vector_init(&xc, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&y, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&bc, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&xa, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&xb, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&tx, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&tmpbuf, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&xa, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&xb, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&tx, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&tmpbuf, 0, DT_REAL, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -9021,8 +9021,8 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
          }
       }
    }
-   cmatrixlefttrsm(n, m, lua, 0, 0, ae_false, ae_true, 0, x, 0, 0, _state);
-   cmatrixlefttrsm(n, m, lua, 0, 0, ae_true, ae_false, 0, x, 0, 0, _state);
+   cmatrixlefttrsm(n, m, lua, 0, 0, false, true, 0, x, 0, 0, _state);
+   cmatrixlefttrsm(n, m, lua, 0, 0, true, false, 0, x, 0, 0, _state);
 
 // solve
    for (k = 0; k <= m - 1; k++) {
@@ -9039,13 +9039,13 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
    // 2. last iteration decreased error to the lower limit
       if (havea) {
          nrfs = directdensesolvers_densesolverrfsmax(n, rep->r1, rep->rinf, _state);
-         terminatenexttime = ae_false;
+         terminatenexttime = false;
          for (rfs = 0; rfs <= nrfs - 1; rfs++) {
             if (terminatenexttime) {
                break;
             }
          // generate right part
-            smallerr = ae_true;
+            smallerr = true;
             ae_v_cmove(&xb.ptr.p_complex[0], 1, &xc.ptr.p_complex[0], 1, "N", ae_v_len(0, n - 1));
             for (i = 0; i <= n - 1; i++) {
                ae_v_cmove(&xa.ptr.p_complex[0], 1, &a->ptr.pp_complex[i][0], 1, "N", ae_v_len(0, n - 1));
@@ -9056,7 +9056,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
                smallerr = smallerr && ae_fp_less(ae_c_abs(v, _state), 4 * verr);
             }
             if (smallerr) {
-               terminatenexttime = ae_true;
+               terminatenexttime = true;
             }
          // solve and update
             directdensesolvers_cbasiclusolve(lua, p, n, &y, _state);
@@ -9074,7 +9074,7 @@ static void directdensesolvers_cmatrixlusolveinternal(CMatrix *lua, ZVector *p, 
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, ae_bool isupper, CMatrix *a, ae_bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
+static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_int_t n, bool isupper, CMatrix *a, bool havea, CMatrix *b, ae_int_t m, ae_int_t *info, densesolverreport *rep, CMatrix *x, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -9095,12 +9095,12 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
    *info = 0;
    _densesolverreport_clear(rep);
    ae_matrix_clear(x);
-   ae_vector_init(&xc, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&y, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&bc, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&xa, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&xb, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&tx, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&xc, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&y, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&bc, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&xa, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&xb, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&tx, 0, DT_COMPLEX, _state, true);
 
 // prepare: check inputs, allocate space...
    if (n <= 0 || m <= 0) {
@@ -9140,11 +9140,11 @@ static void directdensesolvers_hpdmatrixcholeskysolveinternal(CMatrix *cha, ae_i
       }
    }
    if (isupper) {
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 2, x, 0, 0, _state);
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_true, ae_false, 0, x, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 2, x, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, true, false, 0, x, 0, 0, _state);
    } else {
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 0, x, 0, 0, _state);
-      cmatrixlefttrsm(n, m, cha, 0, 0, ae_false, ae_false, 2, x, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 0, x, 0, 0, _state);
+      cmatrixlefttrsm(n, m, cha, 0, 0, false, false, 2, x, 0, 0, _state);
    }
    ae_frame_leave(_state);
 }
@@ -9216,7 +9216,7 @@ static void directdensesolvers_rbasiclusolve(RMatrix *lua, ZVector *p, ae_int_t 
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, ae_bool isupper, RVector *xb, ae_state *_state) {
+static void directdensesolvers_spdbasiccholeskysolve(RMatrix *cha, ae_int_t n, bool isupper, RVector *xb, ae_state *_state) {
    ae_int_t i;
    double v;
 
@@ -9300,7 +9300,7 @@ static void directdensesolvers_cbasiclusolve(CMatrix *lua, ZVector *p, ae_int_t 
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
-static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, ae_bool isupper, CVector *xb, ae_state *_state) {
+static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, bool isupper, CVector *xb, ae_state *_state) {
    ae_int_t i;
    ae_complex v;
 
@@ -9346,12 +9346,12 @@ static void directdensesolvers_hpdbasiccholeskysolve(CMatrix *cha, ae_int_t n, a
    }
 }
 
-void _densesolverreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _densesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    densesolverreport *p = (densesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _densesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _densesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    densesolverreport *dst = (densesolverreport *) _dst;
    densesolverreport *src = (densesolverreport *) _src;
    dst->r1 = src->r1;
@@ -9368,13 +9368,13 @@ void _densesolverreport_destroy(void *_p) {
    ae_touch_ptr((void *)p);
 }
 
-void _densesolverlsreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _densesolverlsreport_init(void *_p, ae_state *_state, bool make_automatic) {
    densesolverlsreport *p = (densesolverlsreport *) _p;
    ae_touch_ptr((void *)p);
    ae_matrix_init(&p->cx, 0, 0, DT_REAL, _state, make_automatic);
 }
 
-void _densesolverlsreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _densesolverlsreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    densesolverlsreport *dst = (densesolverlsreport *) _dst;
    densesolverlsreport *src = (densesolverlsreport *) _src;
    dst->r2 = src->r2;
@@ -9419,7 +9419,7 @@ void _densesolverlsreport_destroy(void *_p) {
 //
 //   -- ALGLIB --
 //      Copyright 26.12.2017 by Bochkanov Sergey
-void sparsespdsolvesks(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
+void sparsespdsolvesks(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    sparsematrix a2;
@@ -9429,7 +9429,7 @@ void sparsespdsolvesks(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x,
    memset(&a2, 0, sizeof(a2));
    ae_vector_clear(x);
    _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, ae_true);
+   _sparsematrix_init(&a2, _state, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDSolveSKS: N<=0", _state);
@@ -9452,11 +9452,11 @@ void sparsespdsolvesks(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x,
       x->ptr.p_double[i] = b->ptr.p_double[i];
    }
    if (isupper) {
-      sparsetrsv(&a2, isupper, ae_false, 1, x, _state);
-      sparsetrsv(&a2, isupper, ae_false, 0, x, _state);
+      sparsetrsv(&a2, isupper, false, 1, x, _state);
+      sparsetrsv(&a2, isupper, false, 0, x, _state);
    } else {
-      sparsetrsv(&a2, isupper, ae_false, 0, x, _state);
-      sparsetrsv(&a2, isupper, ae_false, 1, x, _state);
+      sparsetrsv(&a2, isupper, false, 0, x, _state);
+      sparsetrsv(&a2, isupper, false, 1, x, _state);
    }
    rep->terminationtype = 1;
    ae_frame_leave(_state);
@@ -9485,7 +9485,7 @@ void sparsespdsolvesks(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x,
 //
 //   -- ALGLIB --
 //      Copyright 26.12.2017 by Bochkanov Sergey
-void sparsespdsolve(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
+void sparsespdsolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -9499,8 +9499,8 @@ void sparsespdsolve(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sp
    memset(&p, 0, sizeof(p));
    ae_vector_clear(x);
    _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, ae_true);
-   ae_vector_init(&p, 0, DT_INT, _state, ae_true);
+   _sparsematrix_init(&a2, _state, true);
+   ae_vector_init(&p, 0, DT_INT, _state, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSPDSolve: N<=0", _state);
@@ -9524,11 +9524,11 @@ void sparsespdsolve(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sp
       x->ptr.p_double[j] = v;
    }
    if (isupper) {
-      sparsetrsv(&a2, isupper, ae_false, 1, x, _state);
-      sparsetrsv(&a2, isupper, ae_false, 0, x, _state);
+      sparsetrsv(&a2, isupper, false, 1, x, _state);
+      sparsetrsv(&a2, isupper, false, 0, x, _state);
    } else {
-      sparsetrsv(&a2, isupper, ae_false, 0, x, _state);
-      sparsetrsv(&a2, isupper, ae_false, 1, x, _state);
+      sparsetrsv(&a2, isupper, false, 0, x, _state);
+      sparsetrsv(&a2, isupper, false, 1, x, _state);
    }
    for (i = n - 1; i >= 0; i--) {
       j = p.ptr.p_int[i];
@@ -9563,7 +9563,7 @@ void sparsespdsolve(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sp
 //
 //   -- ALGLIB --
 //      Copyright 26.12.2017 by Bochkanov Sergey
-void sparsespdcholeskysolve(sparsematrix *a, ae_bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
+void sparsespdcholeskysolve(sparsematrix *a, bool isupper, RVector *b, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_int_t i;
    ae_int_t n;
 
@@ -9592,11 +9592,11 @@ void sparsespdcholeskysolve(sparsematrix *a, ae_bool isupper, RVector *b, RVecto
       x->ptr.p_double[i] = b->ptr.p_double[i];
    }
    if (isupper) {
-      sparsetrsv(a, isupper, ae_false, 1, x, _state);
-      sparsetrsv(a, isupper, ae_false, 0, x, _state);
+      sparsetrsv(a, isupper, false, 1, x, _state);
+      sparsetrsv(a, isupper, false, 0, x, _state);
    } else {
-      sparsetrsv(a, isupper, ae_false, 0, x, _state);
-      sparsetrsv(a, isupper, ae_false, 1, x, _state);
+      sparsetrsv(a, isupper, false, 0, x, _state);
+      sparsetrsv(a, isupper, false, 1, x, _state);
    }
    rep->terminationtype = 1;
 }
@@ -9638,9 +9638,9 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
    memset(&pivq, 0, sizeof(pivq));
    ae_vector_clear(x);
    _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&a2, _state, ae_true);
-   ae_vector_init(&pivp, 0, DT_INT, _state, ae_true);
-   ae_vector_init(&pivq, 0, DT_INT, _state, ae_true);
+   _sparsematrix_init(&a2, _state, true);
+   ae_vector_init(&pivp, 0, DT_INT, _state, true);
+   ae_vector_init(&pivq, 0, DT_INT, _state, true);
 
    n = sparsegetnrows(a, _state);
    ae_assert(n > 0, "SparseSolve: N<=0", _state);
@@ -9668,8 +9668,8 @@ void sparsesolve(sparsematrix *a, RVector *b, RVector *x, sparsesolverreport *re
       x->ptr.p_double[i] = x->ptr.p_double[j];
       x->ptr.p_double[j] = v;
    }
-   sparsetrsv(&a2, ae_false, ae_true, 0, x, _state);
-   sparsetrsv(&a2, ae_true, ae_false, 0, x, _state);
+   sparsetrsv(&a2, false, true, 0, x, _state);
+   sparsetrsv(&a2, true, false, 0, x, _state);
    for (i = n - 1; i >= 0; i--) {
       j = pivq.ptr.p_int[i];
       v = x->ptr.p_double[i];
@@ -9746,8 +9746,8 @@ void sparselusolve(sparsematrix *a, ZVector *p, ZVector *q, RVector *b, RVector 
       x->ptr.p_double[i] = x->ptr.p_double[j];
       x->ptr.p_double[j] = v;
    }
-   sparsetrsv(a, ae_false, ae_true, 0, x, _state);
-   sparsetrsv(a, ae_true, ae_false, 0, x, _state);
+   sparsetrsv(a, false, true, 0, x, _state);
+   sparsetrsv(a, true, false, 0, x, _state);
    for (i = n - 1; i >= 0; i--) {
       j = q->ptr.p_int[i];
       v = x->ptr.p_double[i];
@@ -9769,12 +9769,12 @@ void initsparsesolverreport(sparsesolverreport *rep, ae_state *_state) {
    rep->r2 = (double)(0);
 }
 
-void _sparsesolverreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _sparsesolverreport_init(void *_p, ae_state *_state, bool make_automatic) {
    sparsesolverreport *p = (sparsesolverreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _sparsesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _sparsesolverreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sparsesolverreport *dst = (sparsesolverreport *) _dst;
    sparsesolverreport *src = (sparsesolverreport *) _src;
    dst->terminationtype = src->terminationtype;
@@ -9849,7 +9849,7 @@ void _sparsesolverreport_destroy(void *_p) {
 //
 //   -- ALGLIB --
 //      Copyright 25.09.2021 by Bochkanov Sergey
-void sparsesolvesymmetricgmres(sparsematrix *a, ae_bool isupper, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep, ae_state *_state) {
+void sparsesolvesymmetricgmres(sparsematrix *a, bool isupper, RVector *b, ae_int_t k, double epsf, ae_int_t maxits, RVector *x, sparsesolverreport *rep, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t n;
    sparsematrix convbuf;
@@ -9860,8 +9860,8 @@ void sparsesolvesymmetricgmres(sparsematrix *a, ae_bool isupper, RVector *b, ae_
    memset(&solver, 0, sizeof(solver));
    ae_vector_clear(x);
    _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&convbuf, _state, ae_true);
-   _sparsesolverstate_init(&solver, _state, ae_true);
+   _sparsematrix_init(&convbuf, _state, true);
+   _sparsesolverstate_init(&solver, _state, true);
 
    n = sparsegetnrows(a, _state);
 
@@ -9950,8 +9950,8 @@ void sparsesolvegmres(sparsematrix *a, RVector *b, ae_int_t k, double epsf, ae_i
    memset(&solver, 0, sizeof(solver));
    ae_vector_clear(x);
    _sparsesolverreport_clear(rep);
-   _sparsematrix_init(&convbuf, _state, ae_true);
-   _sparsesolverstate_init(&solver, _state, ae_true);
+   _sparsematrix_init(&convbuf, _state, true);
+   _sparsesolverstate_init(&solver, _state, true);
 
    n = sparsegetnrows(a, _state);
 
@@ -10048,8 +10048,8 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) 
 
    ae_assert(n >= 1, "SparseSolverCreate: N<=0", _state);
    state->n = n;
-   state->running = ae_false;
-   state->userterminationneeded = ae_false;
+   state->running = false;
+   state->userterminationneeded = false;
    rsetallocv(state->n, 0.0, &state->x0, _state);
    rsetallocv(state->n, 0.0, &state->x, _state);
    rsetallocv(state->n, 0.0, &state->ax, _state);
@@ -10057,7 +10057,7 @@ void sparsesolvercreate(ae_int_t n, sparsesolverstate *state, ae_state *_state) 
    rsetallocv(state->n, 0.0, &state->b, _state);
    rsetallocv(state->n, 0.0, &state->wrkb, _state);
    state->reply1 = 0.0;
-   sparsesolversetxrep(state, ae_false, _state);
+   sparsesolversetxrep(state, false, _state);
    sparsesolversetcond(state, 0.0, 0, _state);
    sparsesolversetalgogmres(state, 0, _state);
    iterativesparse_clearrequestfields(state, _state);
@@ -10175,7 +10175,7 @@ void sparsesolversetcond(sparsesolverstate *state, double epsf, ae_int_t maxits,
 //
 //   -- ALGLIB --
 //      Copyright 25.09.2021 by Bochkanov Sergey
-void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, ae_bool isupper, RVector *b, ae_state *_state) {
+void sparsesolversolvesymmetric(sparsesolverstate *state, sparsematrix *a, bool isupper, RVector *b, ae_state *_state) {
    ae_int_t n;
 
    n = state->n;
@@ -10319,7 +10319,7 @@ void sparsesolverresults(sparsesolverstate *state, RVector *x, sparsesolverrepor
 //
 //   -- ALGLIB --
 //      Copyright 01.10.2021 by Bochkanov Sergey
-void sparsesolversetxrep(sparsesolverstate *state, ae_bool needxrep, ae_state *_state) {
+void sparsesolversetxrep(sparsesolverstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -10349,8 +10349,8 @@ void sparsesolveroocstart(sparsesolverstate *state, RVector *b, ae_state *_state
    state->rstate.stage = -1;
    iterativesparse_clearrequestfields(state, _state);
    iterativesparse_clearreportfields(state, _state);
-   state->running = ae_true;
-   state->userterminationneeded = ae_false;
+   state->running = true;
+   state->userterminationneeded = false;
    rcopyv(state->n, b, &state->b, _state);
 }
 
@@ -10369,8 +10369,8 @@ void sparsesolveroocstart(sparsesolverstate *state, RVector *b, ae_state *_state
 //
 //   -- ALGLIB --
 //      Copyright 24.09.2021 by Bochkanov Sergey
-ae_bool sparsesolverooccontinue(sparsesolverstate *state, ae_state *_state) {
-   ae_bool result;
+bool sparsesolverooccontinue(sparsesolverstate *state, ae_state *_state) {
+   bool result;
 
    ae_assert(state->running, "SparseSolverContinue: the solver is not running", _state);
    result = iterativesparse_sparsesolveriteration(state, _state);
@@ -10586,19 +10586,19 @@ void sparsesolveroocstop(sparsesolverstate *state, RVector *x, sparsesolverrepor
 //      Copyright 01.10.2021 by Bochkanov Sergey
 void sparsesolverrequesttermination(sparsesolverstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // Reverse communication sparse iteration subroutine
 //
 //   -- ALGLIB --
 //      Copyright 14.11.2011 by Bochkanov Sergey
-static ae_bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_state *_state) {
+static bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, ae_state *_state) {
    ae_int_t outeridx;
    double res;
    double prevres;
    double res0;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -10635,7 +10635,7 @@ static ae_bool iterativesparse_sparsesolveriteration(sparsesolverstate *state, a
       goto lbl_4;
    }
 // Routine body
-   state->running = ae_true;
+   state->running = true;
    iterativesparse_clearrequestfields(state, _state);
    iterativesparse_clearreportfields(state, _state);
 
@@ -10713,7 +10713,7 @@ lbl_2:
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    goto lbl_13;
@@ -10762,22 +10762,22 @@ lbl_15:
 
    // User requested termination
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
    outeridx = outeridx + 1;
    goto lbl_11;
 lbl_12:
-   result = ae_false;
+   result = false;
    return result;
 lbl_5:
-   ae_assert(ae_false, "SparseSolverIteration: integrity check failed (unexpected algo)", _state);
-   result = ae_false;
+   ae_assert(false, "SparseSolverIteration: integrity check failed (unexpected algo)", _state);
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = outeridx;
    state->rstate.ra.ptr.p_double[0] = res;
    state->rstate.ra.ptr.p_double[1] = prevres;
@@ -10800,7 +10800,7 @@ static void iterativesparse_clearreportfields(sparsesolverstate *state, ae_state
    state->repr2 = (double)(0);
 }
 
-void _sparsesolverstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _sparsesolverstate_init(void *_p, ae_state *_state, bool make_automatic) {
    sparsesolverstate *p = (sparsesolverstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x0, 0, DT_REAL, _state, make_automatic);
@@ -10814,7 +10814,7 @@ void _sparsesolverstate_init(void *_p, ae_state *_state, ae_bool make_automatic)
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _sparsesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _sparsesolverstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    sparsesolverstate *dst = (sparsesolverstate *) _dst;
    sparsesolverstate *src = (sparsesolverstate *) _src;
    dst->n = src->n;
@@ -10907,8 +10907,8 @@ void lincgcreate(ae_int_t n, lincgstate *state, ae_state *_state) {
    state->itsbeforerupdate = 10;
    state->epsf = lincg_defaultprecision;
    state->maxits = 0;
-   state->xrep = ae_false;
-   state->running = ae_false;
+   state->xrep = false;
+   state->running = false;
 
 // * allocate arrays
 // * set RX to NAN (just for the case user calls Results() without
@@ -11043,12 +11043,12 @@ void lincgsetcond(lincgstate *state, double epsf, ae_int_t maxits, ae_state *_st
 //
 //   -- ALGLIB --
 //      Copyright 14.11.2011 by Bochkanov Sergey
-ae_bool lincgiteration(lincgstate *state, ae_state *_state) {
+bool lincgiteration(lincgstate *state, ae_state *_state) {
    ae_int_t i;
    double uvar;
    double bnorm;
    double v;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -11095,7 +11095,7 @@ ae_bool lincgiteration(lincgstate *state, ae_state *_state) {
    }
 // Routine body
    ae_assert(state->b.cnt > 0, "LinCGIteration: B is not initialized (you must initialize B by LinCGSetB() call", _state);
-   state->running = ae_true;
+   state->running = true;
    state->repnmv = 0;
    lincg_clearrfields(state, _state);
    lincg_updateitersdata(state, _state);
@@ -11105,11 +11105,11 @@ ae_bool lincgiteration(lincgstate *state, ae_state *_state) {
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
-   state->needvmv = ae_true;
+   state->needvmv = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needvmv = ae_false;
+   state->needvmv = false;
    bnorm = (double)(0);
    state->r2 = (double)(0);
    state->meritfunction = (double)(0);
@@ -11127,33 +11127,33 @@ lbl_0:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_8:
 
 // Is x0 a solution?
    if (!ae_isfinite(state->r2, _state) || ae_fp_less_eq(ae_sqrt(state->r2, _state), state->epsf * bnorm)) {
-      state->running = ae_false;
+      state->running = false;
       if (ae_isfinite(state->r2, _state)) {
          state->repterminationtype = 1;
       } else {
          state->repterminationtype = -4;
       }
-      result = ae_false;
+      result = false;
       return result;
    }
 // Calculate Z and P
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->r.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
-   state->needprec = ae_true;
+   state->needprec = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needprec = ae_false;
+   state->needprec = false;
    for (i = 0; i <= state->n - 1; i++) {
       state->z.ptr.p_double[i] = state->pv.ptr.p_double[i];
       state->p.ptr.p_double[i] = state->z.ptr.p_double[i];
@@ -11162,7 +11162,7 @@ lbl_2:
 // Other iterations(1..N)
    state->repiterationscount = 0;
 lbl_10:
-   if (ae_false) {
+   if (false) {
       goto lbl_11;
    }
    state->repiterationscount = state->repiterationscount + 1;
@@ -11171,22 +11171,22 @@ lbl_10:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->p.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
-   state->needvmv = ae_true;
+   state->needvmv = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->needvmv = ae_false;
+   state->needvmv = false;
    if (!ae_isfinite(state->vmv, _state) || ae_fp_less_eq(state->vmv, (double)(0))) {
 
    // a) Overflow when calculating VMV
    // b) non-positive VMV (non-SPD matrix)
-      state->running = ae_false;
+      state->running = false;
       if (ae_isfinite(state->vmv, _state)) {
          state->repterminationtype = -5;
       } else {
          state->repterminationtype = -4;
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    state->alpha = (double)(0);
@@ -11197,9 +11197,9 @@ lbl_3:
    if (!ae_isfinite(state->alpha, _state)) {
 
    // Overflow when calculating Alpha
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = -4;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Next step toward solution
@@ -11226,11 +11226,11 @@ lbl_12:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->cx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
-   state->needmv = ae_true;
+   state->needmv = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->needmv = ae_false;
+   state->needmv = false;
    for (i = 0; i <= state->n - 1; i++) {
       state->cr.ptr.p_double[i] = state->b.ptr.p_double[i] - state->mv.ptr.p_double[i];
       state->x.ptr.p_double[i] = state->cr.ptr.p_double[i];
@@ -11247,9 +11247,9 @@ lbl_4:
    }
    for (i = 0; i <= state->n - 1; i++) {
       if (!ae_isfinite(state->rx.ptr.p_double[i], _state)) {
-         state->running = ae_false;
+         state->running = false;
          state->repterminationtype = -4;
-         result = ae_false;
+         result = false;
          return result;
       }
    }
@@ -11260,15 +11260,15 @@ lbl_4:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_16:
-   state->running = ae_false;
+   state->running = false;
    state->repterminationtype = 7;
-   result = ae_false;
+   result = false;
    return result;
 lbl_14:
    state->meritfunction = v;
@@ -11289,39 +11289,39 @@ lbl_13:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    lincg_clearrfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 6;
    goto lbl_rcomm;
 lbl_6:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_18:
 
 // stopping criterion
 // achieved the required precision
    if (!ae_isfinite(state->r2, _state) || ae_fp_less_eq(ae_sqrt(state->r2, _state), state->epsf * bnorm)) {
-      state->running = ae_false;
+      state->running = false;
       if (ae_isfinite(state->r2, _state)) {
          state->repterminationtype = 1;
       } else {
          state->repterminationtype = -4;
       }
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->repiterationscount >= state->maxits && state->maxits > 0) {
       for (i = 0; i <= state->n - 1; i++) {
          if (!ae_isfinite(state->rx.ptr.p_double[i], _state)) {
-            state->running = ae_false;
+            state->running = false;
             state->repterminationtype = -4;
-            result = ae_false;
+            result = false;
             return result;
          }
       }
 
    // if X is finite number
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->cr.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
@@ -11329,11 +11329,11 @@ lbl_18:
 // prepere of parameters for next iteration
    state->repnmv = state->repnmv + 1;
    lincg_clearrfields(state, _state);
-   state->needprec = ae_true;
+   state->needprec = true;
    state->rstate.stage = 7;
    goto lbl_rcomm;
 lbl_7:
-   state->needprec = ae_false;
+   state->needprec = false;
    ae_v_move(&state->cz.ptr.p_double[0], 1, &state->pv.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    if (state->repiterationscount % state->itsbeforerestart != 0) {
       state->beta = (double)(0);
@@ -11345,9 +11345,9 @@ lbl_7:
 
    // check that UVar is't INF or is't zero
       if (!ae_isfinite(uvar, _state) || ae_fp_eq(uvar, (double)(0))) {
-         state->running = ae_false;
+         state->running = false;
          state->repterminationtype = -4;
-         result = ae_false;
+         result = false;
          return result;
       }
    // calculate .BETA
@@ -11355,9 +11355,9 @@ lbl_7:
 
    // check that .BETA neither INF nor NaN
       if (!ae_isfinite(state->beta, _state)) {
-         state->running = ae_false;
+         state->running = false;
          state->repterminationtype = -1;
-         result = ae_false;
+         result = false;
          return result;
       }
       for (i = 0; i <= state->n - 1; i++) {
@@ -11376,12 +11376,12 @@ lbl_7:
    }
    goto lbl_10;
 lbl_11:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = i;
    state->rstate.ra.ptr.p_double[0] = uvar;
    state->rstate.ra.ptr.p_double[1] = bnorm;
@@ -11414,7 +11414,7 @@ lbl_rcomm:
 //
 //   -- ALGLIB --
 //      Copyright 14.11.2011 by Bochkanov Sergey
-void lincgsolvesparse(lincgstate *state, sparsematrix *a, ae_bool isupper, RVector *b, ae_state *_state) {
+void lincgsolvesparse(lincgstate *state, sparsematrix *a, bool isupper, RVector *b, ae_state *_state) {
    ae_int_t n;
    ae_int_t i;
    double v;
@@ -11555,7 +11555,7 @@ void lincgsetrupdatefreq(lincgstate *state, ae_int_t freq, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 14.11.2011 by Bochkanov Sergey
-void lincgsetxrep(lincgstate *state, ae_bool needxrep, ae_state *_state) {
+void lincgsetxrep(lincgstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -11575,12 +11575,12 @@ void lincgrestart(lincgstate *state, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void lincg_clearrfields(lincgstate *state, ae_state *_state) {
 
-   state->xupdated = ae_false;
-   state->needmv = ae_false;
-   state->needmtv = ae_false;
-   state->needmv2 = ae_false;
-   state->needvmv = ae_false;
-   state->needprec = ae_false;
+   state->xupdated = false;
+   state->needmv = false;
+   state->needmtv = false;
+   state->needmv2 = false;
+   state->needvmv = false;
+   state->needprec = false;
 }
 
 // Clears request fileds (to be sure that we don't forgot to clear something)
@@ -11591,7 +11591,7 @@ static void lincg_updateitersdata(lincgstate *state, ae_state *_state) {
    state->repterminationtype = 0;
 }
 
-void _lincgstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _lincgstate_init(void *_p, ae_state *_state, bool make_automatic) {
    lincgstate *p = (lincgstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->rx, 0, DT_REAL, _state, make_automatic);
@@ -11610,7 +11610,7 @@ void _lincgstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _lincgstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _lincgstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lincgstate *dst = (lincgstate *) _dst;
    lincgstate *src = (lincgstate *) _src;
    ae_vector_init_copy(&dst->rx, &src->rx, _state, make_automatic);
@@ -11689,12 +11689,12 @@ void _lincgstate_destroy(void *_p) {
    _rcommstate_destroy(&p->rstate);
 }
 
-void _lincgreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _lincgreport_init(void *_p, ae_state *_state, bool make_automatic) {
    lincgreport *p = (lincgreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _lincgreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _lincgreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    lincgreport *dst = (lincgreport *) _dst;
    lincgreport *src = (lincgreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -11775,8 +11775,8 @@ void linlsqrcreatebuf(ae_int_t m, ae_int_t n, linlsqrstate *state, ae_state *_st
    state->epsc = 1 / ae_sqrt(ae_machineepsilon, _state);
    state->maxits = 0;
    state->lambdai = (double)(0);
-   state->xrep = ae_false;
-   state->running = ae_false;
+   state->xrep = false;
+   state->running = false;
    state->repiterationscount = 0;
 
 // * allocate arrays
@@ -11882,11 +11882,11 @@ void linlsqrsetlambdai(linlsqrstate *state, double lambdai, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 30.11.2011 by Bochkanov Sergey
-ae_bool linlsqriteration(linlsqrstate *state, ae_state *_state) {
+bool linlsqriteration(linlsqrstate *state, ae_state *_state) {
    ae_int_t summn;
    double bnorm;
    ae_int_t i;
-   ae_bool result;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -11930,8 +11930,8 @@ ae_bool linlsqriteration(linlsqrstate *state, ae_state *_state) {
    ae_assert(state->b.cnt > 0, "LinLSQRIteration: using non-allocated array B", _state);
    summn = state->m + state->n;
    bnorm = ae_sqrt(state->bnorm2, _state);
-   state->userterminationneeded = ae_false;
-   state->running = ae_true;
+   state->userterminationneeded = false;
+   state->running = true;
    state->repnmv = 0;
    state->repiterationscount = 0;
    state->r2 = state->bnorm2;
@@ -11949,11 +11949,11 @@ lbl_7:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->nes.x.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
-   state->needmv = ae_true;
+   state->needmv = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needmv = ae_false;
+   state->needmv = false;
    ae_v_move(&state->nes.mv.ptr.p_double[0], 1, &state->mv.ptr.p_double[0], 1, ae_v_len(0, state->m - 1));
    goto lbl_7;
 lbl_9:
@@ -11965,11 +11965,11 @@ lbl_9:
 // matrix-vector multiplication
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
-   state->needmtv = ae_true;
+   state->needmtv = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->needmtv = ae_false;
+   state->needmtv = false;
    ae_v_move(&state->nes.mtv.ptr.p_double[0], 1, &state->mtv.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    goto lbl_7;
 lbl_11:
@@ -11988,11 +11988,11 @@ lbl_8:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    linlsqr_clearrfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_13:
 
 // LSQR, Step 0.
@@ -12026,9 +12026,9 @@ lbl_13:
    if (ae_fp_eq(state->betai, (double)(0))) {
 
    // Zero right part
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 1;
-      result = ae_false;
+      result = false;
       return result;
    }
    for (i = 0; i <= summn - 1; i++) {
@@ -12041,11 +12041,11 @@ lbl_13:
    }
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
-   state->needmtv = ae_true;
+   state->needmtv = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->needmtv = ae_false;
+   state->needmtv = false;
    for (i = 0; i <= state->n - 1; i++) {
       state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->ui.ptr.p_double[state->m + i];
    }
@@ -12057,9 +12057,9 @@ lbl_3:
    if (ae_fp_eq(state->alphai, (double)(0))) {
 
    // Orthogonality stopping criterion is met
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    for (i = 0; i <= state->n - 1; i++) {
@@ -12075,7 +12075,7 @@ lbl_3:
 
 // Steps I=1, 2, ...
 lbl_15:
-   if (ae_false) {
+   if (false) {
       goto lbl_16;
    }
 // At I-th step State.RepIterationsCount=I.
@@ -12095,11 +12095,11 @@ lbl_15:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->vi.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
-   state->needmv = ae_true;
+   state->needmv = true;
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->needmv = ae_false;
+   state->needmv = false;
    for (i = 0; i <= state->n - 1; i++) {
       state->mv.ptr.p_double[state->m + i] = state->lambdai * state->vi.ptr.p_double[i];
    }
@@ -12117,11 +12117,11 @@ lbl_4:
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->uip1.ptr.p_double[0], 1, ae_v_len(0, state->m - 1));
    state->repnmv = state->repnmv + 1;
    linlsqr_clearrfields(state, _state);
-   state->needmtv = ae_true;
+   state->needmtv = true;
    state->rstate.stage = 5;
    goto lbl_rcomm;
 lbl_5:
-   state->needmtv = ae_false;
+   state->needmtv = false;
    for (i = 0; i <= state->n - 1; i++) {
       state->mtv.ptr.p_double[i] = state->mtv.ptr.p_double[i] + state->lambdai * state->uip1.ptr.p_double[state->m + i];
    }
@@ -12161,9 +12161,9 @@ lbl_5:
       state->dnorm = state->dnorm + state->d.ptr.p_double[i] * state->d.ptr.p_double[i];
    }
    if (ae_fp_greater_eq(ae_sqrt(state->dnorm, _state) * state->anorm, state->epsc)) {
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 7;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Update x, output report
@@ -12175,11 +12175,11 @@ lbl_5:
    }
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->rx.ptr.p_double[0], 1, ae_v_len(0, state->n - 1));
    linlsqr_clearrfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 6;
    goto lbl_rcomm;
 lbl_6:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_17:
 
 // Check stopping criteria
@@ -12189,33 +12189,33 @@ lbl_17:
    if (state->maxits > 0 && state->repiterationscount >= state->maxits) {
 
    // Achieved required number of iterations
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 5;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(state->phibarip1, state->epsb * bnorm)) {
 
    // ||Rk||<=EpsB*||B||, here ||Rk||=PhiBar
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 1;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (ae_fp_less_eq(state->alphaip1 * ae_fabs(state->ci, _state) / state->anorm, state->epsa)) {
 
    // ||A^T*Rk||/(||A||*||Rk||)<=EpsA, here ||A^T*Rk||=PhiBar*Alpha[i+1]*|.C|
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 4;
-      result = ae_false;
+      result = false;
       return result;
    }
    if (state->userterminationneeded) {
 
    // User requested termination
-      state->running = ae_false;
+      state->running = false;
       state->repterminationtype = 8;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Update omega
@@ -12237,12 +12237,12 @@ lbl_17:
    state->rhobari = state->rhobarip1;
    goto lbl_15;
 lbl_16:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = summn;
    state->rstate.ia.ptr.p_int[1] = i;
    state->rstate.ra.ptr.p_double[0] = bnorm;
@@ -12424,7 +12424,7 @@ void linlsqrresults(linlsqrstate *state, RVector *x, linlsqrreport *rep, ae_stat
 //
 //   -- ALGLIB --
 //      Copyright 30.11.2011 by Bochkanov Sergey
-void linlsqrsetxrep(linlsqrstate *state, ae_bool needxrep, ae_state *_state) {
+void linlsqrsetxrep(linlsqrstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -12487,21 +12487,21 @@ ae_int_t linlsqrpeekiterationscount(linlsqrstate *s, ae_state *_state) {
 //      Copyright 08.10.2014 by Bochkanov Sergey
 void linlsqrrequesttermination(linlsqrstate *state, ae_state *_state) {
 
-   state->userterminationneeded = ae_true;
+   state->userterminationneeded = true;
 }
 
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void linlsqr_clearrfields(linlsqrstate *state, ae_state *_state) {
 
-   state->xupdated = ae_false;
-   state->needmv = ae_false;
-   state->needmtv = ae_false;
-   state->needmv2 = ae_false;
-   state->needvmv = ae_false;
-   state->needprec = ae_false;
+   state->xupdated = false;
+   state->needmv = false;
+   state->needmtv = false;
+   state->needmv2 = false;
+   state->needvmv = false;
+   state->needprec = false;
 }
 
-void _linlsqrstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _linlsqrstate_init(void *_p, ae_state *_state, bool make_automatic) {
    linlsqrstate *p = (linlsqrstate *) _p;
    ae_touch_ptr((void *)p);
    _normestimatorstate_init(&p->nes, _state, make_automatic);
@@ -12522,7 +12522,7 @@ void _linlsqrstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    _rcommstate_init(&p->rstate, _state, make_automatic);
 }
 
-void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _linlsqrstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    linlsqrstate *dst = (linlsqrstate *) _dst;
    linlsqrstate *src = (linlsqrstate *) _src;
    _normestimatorstate_init_copy(&dst->nes, &src->nes, _state, make_automatic);
@@ -12622,12 +12622,12 @@ void _linlsqrstate_destroy(void *_p) {
    _rcommstate_destroy(&p->rstate);
 }
 
-void _linlsqrreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _linlsqrreport_init(void *_p, ae_state *_state, bool make_automatic) {
    linlsqrreport *p = (linlsqrreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _linlsqrreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _linlsqrreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    linlsqrreport *dst = (linlsqrreport *) _dst;
    linlsqrreport *src = (linlsqrreport *) _src;
    dst->iterationscount = src->iterationscount;
@@ -12727,7 +12727,7 @@ void nleqcreatelm(ae_int_t n, ae_int_t m, RVector *x, nleqstate *state, ae_state
    state->n = n;
    state->m = m;
    nleqsetcond(state, (double)(0), 0, _state);
-   nleqsetxrep(state, ae_false, _state);
+   nleqsetxrep(state, false, _state);
    nleqsetstpmax(state, (double)(0), _state);
    ae_vector_set_length(&state->x, n, _state);
    ae_vector_set_length(&state->xbase, n, _state);
@@ -12778,7 +12778,7 @@ void nleqsetcond(nleqstate *state, double epsf, ae_int_t maxits, ae_state *_stat
 //
 //   -- ALGLIB --
 //      Copyright 20.08.2010 by Bochkanov Sergey
-void nleqsetxrep(nleqstate *state, ae_bool needxrep, ae_state *_state) {
+void nleqsetxrep(nleqstate *state, bool needxrep, ae_state *_state) {
 
    state->xrep = needxrep;
 }
@@ -12808,7 +12808,7 @@ void nleqsetstpmax(nleqstate *state, double stpmax, ae_state *_state) {
 //
 //   -- ALGLIB --
 //      Copyright 20.03.2009 by Bochkanov Sergey
-ae_bool nleqiteration(nleqstate *state, ae_state *_state) {
+bool nleqiteration(nleqstate *state, ae_state *_state) {
    ae_int_t n;
    ae_int_t m;
    ae_int_t i;
@@ -12818,8 +12818,8 @@ ae_bool nleqiteration(nleqstate *state, ae_state *_state) {
    double rho;
    double mu;
    double stepnorm;
-   ae_bool b;
-   ae_bool result;
+   bool b;
+   bool result;
 
 // Reverse communication preparations
 // I know it looks ugly, but it works the same way
@@ -12844,7 +12844,7 @@ ae_bool nleqiteration(nleqstate *state, ae_state *_state) {
       n = 359;
       m = -58;
       i = -919;
-      b = ae_true;
+      b = true;
       lambdaup = 81;
       lambdadown = 255;
       lambdav = 74;
@@ -12879,11 +12879,11 @@ ae_bool nleqiteration(nleqstate *state, ae_state *_state) {
 
 // Calculate F/G, initialize algorithm
    nleq_clearrequestfields(state, _state);
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 0;
    goto lbl_rcomm;
 lbl_0:
-   state->needf = ae_false;
+   state->needf = false;
    state->repnfunc = state->repnfunc + 1;
    ae_v_move(&state->xbase.ptr.p_double[0], 1, &state->x.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->fbase = state->f;
@@ -12893,15 +12893,15 @@ lbl_0:
    }
 // progress report
    nleq_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->rstate.stage = 1;
    goto lbl_rcomm;
 lbl_1:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_5:
    if (ae_fp_less_eq(state->f, ae_sqr(state->epsf, _state))) {
       state->repterminationtype = 1;
-      result = ae_false;
+      result = false;
       return result;
    }
 // Main cycle
@@ -12910,7 +12910,7 @@ lbl_5:
    lambdav = 0.001;
    rho = (double)(1);
 lbl_7:
-   if (ae_false) {
+   if (false) {
       goto lbl_8;
    }
 // Get Jacobian;
@@ -12918,12 +12918,12 @@ lbl_7:
 // with current point and State.FBase filled with function value
 // at XBase
    nleq_clearrequestfields(state, _state);
-   state->needfij = ae_true;
+   state->needfij = true;
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 2;
    goto lbl_rcomm;
 lbl_2:
-   state->needfij = ae_false;
+   state->needfij = false;
    state->repnfunc = state->repnfunc + 1;
    state->repnjac = state->repnjac + 1;
    rmatrixmv(n, m, &state->j, 0, 0, 1, &state->fi, 0, &state->rightpart, 0, _state);
@@ -12931,7 +12931,7 @@ lbl_2:
 
 // Inner cycle: find good lambda
 lbl_9:
-   if (ae_false) {
+   if (false) {
       goto lbl_10;
    }
 // Solve (J^T*J + (Lambda+Mu)*I)*y = J^T*F
@@ -12965,10 +12965,10 @@ lbl_9:
 // * lambda is so large
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    ae_v_addd(&state->x.ptr.p_double[0], 1, &state->candstep.ptr.p_double[0], 1, ae_v_len(0, n - 1), stepnorm);
-   b = ae_true;
+   b = true;
    for (i = 0; i <= n - 1; i++) {
       if (ae_fp_neq(state->x.ptr.p_double[i], state->xbase.ptr.p_double[i])) {
-         b = ae_false;
+         b = false;
          break;
       }
    }
@@ -12981,11 +12981,11 @@ lbl_9:
       goto lbl_10;
    }
    nleq_clearrequestfields(state, _state);
-   state->needf = ae_true;
+   state->needf = true;
    state->rstate.stage = 3;
    goto lbl_rcomm;
 lbl_3:
-   state->needf = ae_false;
+   state->needf = false;
    state->repnfunc = state->repnfunc + 1;
    if (ae_fp_less(state->f, state->fbase)) {
 
@@ -13016,13 +13016,13 @@ lbl_10:
       goto lbl_11;
    }
    nleq_clearrequestfields(state, _state);
-   state->xupdated = ae_true;
+   state->xupdated = true;
    state->f = state->fbase;
    ae_v_move(&state->x.ptr.p_double[0], 1, &state->xbase.ptr.p_double[0], 1, ae_v_len(0, n - 1));
    state->rstate.stage = 4;
    goto lbl_rcomm;
 lbl_4:
-   state->xupdated = ae_false;
+   state->xupdated = false;
 lbl_11:
 
 // Test stopping conditions on F, step (zero/non-zero) and MaxIts;
@@ -13042,12 +13042,12 @@ lbl_11:
 // Now, iteration is finally over
    goto lbl_7;
 lbl_8:
-   result = ae_false;
+   result = false;
    return result;
 
 // Saving state
 lbl_rcomm:
-   result = ae_true;
+   result = true;
    state->rstate.ia.ptr.p_int[0] = n;
    state->rstate.ia.ptr.p_int[1] = m;
    state->rstate.ia.ptr.p_int[2] = i;
@@ -13143,20 +13143,20 @@ void nleqrestartfrom(nleqstate *state, RVector *x, ae_state *_state) {
 // Clears request fileds (to be sure that we don't forgot to clear something)
 static void nleq_clearrequestfields(nleqstate *state, ae_state *_state) {
 
-   state->needf = ae_false;
-   state->needfij = ae_false;
-   state->xupdated = ae_false;
+   state->needf = false;
+   state->needfij = false;
+   state->xupdated = false;
 }
 
 // Increases lambda, returns False when there is a danger of overflow
-static ae_bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae_state *_state) {
+static bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup, ae_state *_state) {
    double lnlambda;
    double lnnu;
    double lnlambdaup;
    double lnmax;
-   ae_bool result;
+   bool result;
 
-   result = ae_false;
+   result = false;
    lnlambda = ae_log(*lambdav, _state);
    lnlambdaup = ae_log(lambdaup, _state);
    lnnu = ae_log(*nu, _state);
@@ -13169,7 +13169,7 @@ static ae_bool nleq_increaselambda(double *lambdav, double *nu, double lambdaup,
    }
    *lambdav = *lambdav * lambdaup * (*nu);
    *nu = *nu * 2;
-   result = ae_true;
+   result = true;
    return result;
 }
 
@@ -13184,7 +13184,7 @@ static void nleq_decreaselambda(double *lambdav, double *nu, double lambdadown, 
    }
 }
 
-void _nleqstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _nleqstate_init(void *_p, ae_state *_state, bool make_automatic) {
    nleqstate *p = (nleqstate *) _p;
    ae_touch_ptr((void *)p);
    ae_vector_init(&p->x, 0, DT_REAL, _state, make_automatic);
@@ -13197,7 +13197,7 @@ void _nleqstate_init(void *_p, ae_state *_state, ae_bool make_automatic) {
    ae_vector_init(&p->cgbuf, 0, DT_REAL, _state, make_automatic);
 }
 
-void _nleqstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _nleqstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    nleqstate *dst = (nleqstate *) _dst;
    nleqstate *src = (nleqstate *) _src;
    dst->n = src->n;
@@ -13252,12 +13252,12 @@ void _nleqstate_destroy(void *_p) {
    ae_vector_destroy(&p->cgbuf);
 }
 
-void _nleqreport_init(void *_p, ae_state *_state, ae_bool make_automatic) {
+void _nleqreport_init(void *_p, ae_state *_state, bool make_automatic) {
    nleqreport *p = (nleqreport *) _p;
    ae_touch_ptr((void *)p);
 }
 
-void _nleqreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic) {
+void _nleqreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic) {
    nleqreport *dst = (nleqreport *) _dst;
    nleqreport *src = (nleqreport *) _src;
    dst->iterationscount = src->iterationscount;

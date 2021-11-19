@@ -63,7 +63,7 @@ typedef struct {
    double x;
    double xminusa;
    double bminusx;
-   ae_bool needf;
+   bool needf;
    double f;
    ae_int_t wrappermode;
    autogkinternalstate internalstate;
@@ -138,7 +138,7 @@ public:
    autogkstate(const autogkstate &rhs);
    autogkstate &operator=(const autogkstate &rhs);
    virtual ~autogkstate();
-   ae_bool &needf;
+   bool &needf;
    double &x;
    double &xminusa;
    double &bminusx;
@@ -658,18 +658,18 @@ void gkqlegendretbl(ae_int_t n, RVector *x, RVector *wkronrod, RVector *wgauss, 
 void autogksmooth(double a, double b, autogkstate *state, ae_state *_state);
 void autogksmoothw(double a, double b, double xwidth, autogkstate *state, ae_state *_state);
 void autogksingular(double a, double b, double alpha, double beta, autogkstate *state, ae_state *_state);
-ae_bool autogkiteration(autogkstate *state, ae_state *_state);
+bool autogkiteration(autogkstate *state, ae_state *_state);
 void autogkresults(autogkstate *state, double *v, autogkreport *rep, ae_state *_state);
-void _autogkreport_init(void *_p, ae_state *_state, ae_bool make_automatic);
-void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkreport_init(void *_p, ae_state *_state, bool make_automatic);
+void _autogkreport_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _autogkreport_clear(void *_p);
 void _autogkreport_destroy(void *_p);
-void _autogkinternalstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
-void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkinternalstate_init(void *_p, ae_state *_state, bool make_automatic);
+void _autogkinternalstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _autogkinternalstate_clear(void *_p);
 void _autogkinternalstate_destroy(void *_p);
-void _autogkstate_init(void *_p, ae_state *_state, ae_bool make_automatic);
-void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, ae_bool make_automatic);
+void _autogkstate_init(void *_p, ae_state *_state, bool make_automatic);
+void _autogkstate_init_copy(void *_dst, void *_src, ae_state *_state, bool make_automatic);
 void _autogkstate_clear(void *_p);
 void _autogkstate_destroy(void *_p);
 } // end of namespace alglib_impl

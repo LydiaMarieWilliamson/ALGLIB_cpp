@@ -224,7 +224,7 @@ void icopyv_avx2(const ae_int_t n, const ae_int_t *__restrict x, ae_int_t *__res
    }
 }
 
-void bcopyv_avx2(const ae_int_t n, const ae_bool *__restrict x, ae_bool *__restrict y, ae_state *__restrict _state) {
+void bcopyv_avx2(const ae_int_t n, const bool *__restrict x, bool *__restrict y, ae_state *__restrict _state) {
    const ae_int_t tail = n & 31;
    const ae_int_t even = n - tail;
    __m256i *__restrict pDest = (__m256i *) y;
@@ -320,7 +320,7 @@ void isetv_avx2(const ae_int_t n, const ae_int_t v, ae_int_t *__restrict x, ae_s
    memmove(pDest + i, &avx2v, tail);
 }
 
-void bsetv_avx2(const ae_int_t n, const ae_bool v, ae_bool *__restrict x, ae_state *__restrict _state) {
+void bsetv_avx2(const ae_int_t n, const bool v, bool *__restrict x, ae_state *__restrict _state) {
    const ae_int_t tail = n & 31;
    const ae_int_t even = n - tail;
    __m256i *__restrict pDest = (__m256i *) x;
@@ -1308,20 +1308,20 @@ void ablasf_daxpby_avx2(ae_int_t n, double alpha, const double *src, double beta
    }
 }
 
-ae_bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t targetcol;
 
 // Filter out unsupported combinations (ones that are too sparse for the non-SIMD code)
    if (twidth < 3 || twidth > 4) {
-      return ae_false;
+      return false;
    }
    if (uwidth < 1 || uwidth > 4) {
-      return ae_false;
+      return false;
    }
    if (urank > 4) {
-      return ae_false;
+      return false;
    }
 // Shift input arrays to the beginning of the working area.
 // Prepare SIMD masks
@@ -1389,10 +1389,10 @@ ae_bool spchol_updatekernelabc4_avx2(double *rowstorage, ae_int_t offss, ae_int_
                      _mm256_mul_pd(_mm256_broadcast_sd(update_row + 2), u_0123_2)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 1), u_0123_1)), _mm256_mul_pd(_mm256_broadcast_sd(update_row + 0), u_0123_0)));
       }
    }
-   return ae_true;
+   return true;
 }
 
-ae_bool spchol_updatekernel4444_avx2(double *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
+bool spchol_updatekernel4444_avx2(double *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, double *diagd, ae_int_t offsd, ae_int_t *raw2smap, ae_int_t *superrowidx, ae_int_t urbase, ae_state *_state) {
    ae_int_t k;
    ae_int_t targetrow;
    ae_int_t offsk;
@@ -1452,7 +1452,7 @@ ae_bool spchol_updatekernel4444_avx2(double *rowstorage, ae_int_t offss, ae_int_
          _mm256_store_pd(rowstorage + targetrow, target);
       }
    }
-   return ae_true;
+   return true;
 }
 
 // ALGLIB_NO_FAST_KERNELS, _ALGLIB_HAS_AVX2_INTRINSICS

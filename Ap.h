@@ -209,8 +209,10 @@ namespace alglib_impl {
 #   include <iostream>
 #endif
 
-// define ae_int32_t, ae_int64_t, ae_int_t, ae_bool, ae_complex, ae_error_type and ae_datatype
-
+// Define ae_int32_t, ae_int64_t, ae_uint64_t, ae_int_t, complex, ae_error_type and ae_datatype.
+// A boolean type was also originally (and unnecessarily) defined.
+// For C (as of 2011): one needs only to include <stdbool.h> to define "bool", "false" and "true".
+// For C++: it is already a part of the language.
 #if defined(AE_INT32_T)
 typedef AE_INT32_T ae_int32_t;
 #endif
@@ -258,16 +260,6 @@ typedef unsigned long long ae_uint64_t;
 
 #if !defined(AE_INT_T)
 typedef ptrdiff_t ae_int_t;
-#endif
-
-#if !defined(AE_USE_CPP_BOOL)
-#   define ae_bool char
-#   define ae_true 1
-#   define ae_false 0
-#else
-#   define ae_bool bool
-#   define ae_true true
-#   define ae_false false
 #endif
 
 typedef double Real; // Used in the Kernel*.{cpp,h} files.
@@ -530,9 +522,9 @@ typedef struct ae_vector {
    ae_datatype datatype;
 
 // If ptr points to memory owned and managed by ae_vector itself,
-// this field is ae_false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is ae_true.
-   ae_bool is_attached;
+// this field is false. If vector was attached to x_vector structure
+// with ae_vector_init_attach_to_x(), this field is true.
+   bool is_attached;
 
 // ae_dyn_block structure which manages data in ptr. This structure
 // is responsible for automatic deletion of object when its frame
@@ -543,7 +535,7 @@ typedef struct ae_vector {
 // User usually works with this field.
    union {
       void *p_ptr;
-      ae_bool *p_bool;
+      bool *p_bool;
       unsigned char *p_ubyte;
       ae_int_t *p_int;
       double *p_double;
@@ -558,15 +550,15 @@ typedef struct ae_matrix {
    ae_datatype datatype;
 
 // If ptr points to memory owned and managed by ae_vector itself,
-// this field is ae_false. If vector was attached to x_vector structure
-// with ae_vector_init_attach_to_x(), this field is ae_true.
-   ae_bool is_attached;
+// this field is false. If vector was attached to x_vector structure
+// with ae_vector_init_attach_to_x(), this field is true.
+   bool is_attached;
 
    ae_dyn_block data;
    union {
       void *p_ptr;
       void **pp_void;
-      ae_bool **pp_bool;
+      bool **pp_bool;
       ae_int_t **pp_int;
       double **pp_double;
       ae_complex **pp_complex;
@@ -585,11 +577,11 @@ typedef struct ae_smart_ptr {
    void *ptr;
 
 // whether smart pointer owns ptr
-   ae_bool is_owner;
+   bool is_owner;
 
 // whether object pointed by ptr is dynamic - clearing such object requires BOTH
 // calling destructor function AND calling ae_free for memory occupied by object.
-   ae_bool is_dynamic;
+   bool is_dynamic;
 
 // destructor function for pointer; clears all dynamically allocated memory
    void (*destroy)(void *);
@@ -623,7 +615,7 @@ typedef struct {
 // Whether we have eternal lock object (used by thread pool) or
 // transient lock. Eternal locks are allocated without using ae_dyn_block
 // structure and do not allow deallocation.
-   ae_bool eternal;
+   bool eternal;
 } ae_lock;
 
 // Shared pool: data structure used to provide thread-safe access to pool  of
@@ -660,10 +652,10 @@ typedef struct ae_shared_pool {
    ae_int_t size_of_object;
 
 // initializer function; accepts pointer to malloc'ed object, initializes its fields
-   void (*init)(void *dst, ae_state *state, ae_bool make_automatic);
+   void (*init)(void *dst, ae_state *state, bool make_automatic);
 
 // copy constructor; accepts pointer to malloc'ed, but not initialized object
-   void (*init_copy)(void *dst, void *src, ae_state *state, ae_bool make_automatic);
+   void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic);
 
 // destructor function;
    void (*destroy)(void *ptr);
@@ -679,14 +671,14 @@ void ae_set_global_threading(ae_uint64_t flg_value);
 ae_uint64_t ae_get_global_threading();
 
 // Debugging and tracing functions
-void ae_set_error_flag(ae_bool *p_flag, ae_bool cond, const char *filename, int lineno, const char *xdesc);
+void ae_set_error_flag(bool *p_flag, bool cond, const char *filename, int lineno, const char *xdesc);
 const char *ae_get_last_error_file();
 int ae_get_last_error_line();
 const char *ae_get_last_error_xdesc();
 
 void ae_trace_file(const char *tags, const char *filename);
 void ae_trace_disable();
-ae_bool ae_is_trace_enabled(const char *tag);
+bool ae_is_trace_enabled(const char *tag);
 void ae_trace(const char *printf_fmt, ...);
 
 int ae_tickcount();
@@ -710,7 +702,7 @@ void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free);
 void *ae_malloc(size_t size, ae_state *state);
 void ae_free(void *p);
 ae_int_t ae_sizeof(ae_datatype datatype);
-ae_bool ae_check_zeros(const void *ptr, ae_int_t n);
+bool ae_check_zeros(const void *ptr, ae_int_t n);
 void ae_touch_ptr(void *p);
 
 void ae_state_init(ae_state *state);
@@ -724,49 +716,49 @@ void ae_frame_make(ae_state *state, ae_frame *tmp);
 void ae_frame_leave(ae_state *state);
 
 void ae_db_attach(ae_dyn_block *block, ae_state *state);
-void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, ae_bool make_automatic);
+void ae_db_init(ae_dyn_block *block, ae_int_t size, ae_state *state, bool make_automatic);
 void ae_db_realloc(ae_dyn_block *block, ae_int_t size, ae_state *state);
 void ae_db_free(ae_dyn_block *block);
 void ae_db_swap(ae_dyn_block *block1, ae_dyn_block *block2);
 
-void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, ae_bool make_automatic);
-void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, ae_bool make_automatic);
-void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic);
-void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, ae_bool make_automatic);
+void ae_vector_init(ae_vector *dst, ae_int_t size, ae_datatype datatype, ae_state *state, bool make_automatic);
+void ae_vector_init_copy(ae_vector *dst, ae_vector *src, ae_state *state, bool make_automatic);
+void ae_vector_init_from_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
+void ae_vector_init_attach_to_x(ae_vector *dst, x_vector *src, ae_state *state, bool make_automatic);
 void ae_vector_set_length(ae_vector *dst, ae_int_t newsize, ae_state *state);
 void ae_vector_resize(ae_vector *dst, ae_int_t newsize, ae_state *state);
 void ae_vector_clear(ae_vector *dst);
 void ae_vector_destroy(ae_vector *dst);
 void ae_swap_vectors(ae_vector *vec1, ae_vector *vec2);
 
-void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, ae_bool make_automatic);
-void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, ae_bool make_automatic);
-void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic);
-void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, ae_bool make_automatic);
+void ae_matrix_init(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_datatype datatype, ae_state *state, bool make_automatic);
+void ae_matrix_init_copy(ae_matrix *dst, ae_matrix *src, ae_state *state, bool make_automatic);
+void ae_matrix_init_from_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
+void ae_matrix_init_attach_to_x(ae_matrix *dst, x_matrix *src, ae_state *state, bool make_automatic);
 void ae_matrix_set_length(ae_matrix *dst, ae_int_t rows, ae_int_t cols, ae_state *state);
 void ae_matrix_clear(ae_matrix *dst);
 void ae_matrix_destroy(ae_matrix *dst);
 void ae_swap_matrices(ae_matrix *mat1, ae_matrix *mat2);
 
-void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, ae_bool make_automatic);
+void ae_smart_ptr_init(ae_smart_ptr *dst, void **subscriber, ae_state *state, bool make_automatic);
 void ae_smart_ptr_clear(void *_dst); // accepts ae_smart_ptr*
 void ae_smart_ptr_destroy(void *_dst);
-void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, ae_bool is_owner, ae_bool is_dynamic, void (*destroy)(void *));
+void ae_smart_ptr_assign(ae_smart_ptr *dst, void *new_ptr, bool is_owner, bool is_dynamic, void (*destroy)(void *));
 void ae_smart_ptr_release(ae_smart_ptr *dst);
 
 void ae_yield();
-void ae_init_lock(ae_lock *lock, ae_state *state, ae_bool make_automatic);
+void ae_init_lock(ae_lock *lock, ae_state *state, bool make_automatic);
 void ae_init_lock_eternal(ae_lock *lock);
 void ae_acquire_lock(ae_lock *lock);
 void ae_release_lock(ae_lock *lock);
 void ae_free_lock(ae_lock *lock);
 
-void ae_shared_pool_init(void *_dst, ae_state *state, ae_bool make_automatic);
-void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, ae_bool make_automatic);
+void ae_shared_pool_init(void *_dst, ae_state *state, bool make_automatic);
+void ae_shared_pool_init_copy(void *_dst, void *_src, ae_state *state, bool make_automatic);
 void ae_shared_pool_clear(void *dst);
 void ae_shared_pool_destroy(void *dst);
-ae_bool ae_shared_pool_is_initialized(void *_dst);
-void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, ae_bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, ae_bool make_automatic), void (*destroy)(void *ptr), ae_state *state);
+bool ae_shared_pool_is_initialized(void *_dst);
+void ae_shared_pool_set_seed(ae_shared_pool *dst, void *seed_object, ae_int_t size_of_object, void (*init)(void *dst, ae_state *state, bool make_automatic), void (*init_copy)(void *dst, void *src, ae_state *state, bool make_automatic), void (*destroy)(void *ptr), ae_state *state);
 void ae_shared_pool_retrieve(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_recycle(ae_shared_pool *pool, ae_smart_ptr *pptr, ae_state *state);
 void ae_shared_pool_clear_recycled(ae_shared_pool *pool, ae_state *state);
@@ -781,14 +773,14 @@ void ae_x_attach_to_matrix(x_matrix *dst, ae_matrix *src);
 
 void x_vector_clear(x_vector *dst);
 
-ae_bool x_is_symmetric(x_matrix *a);
-ae_bool x_is_hermitian(x_matrix *a);
-ae_bool x_force_symmetric(x_matrix *a);
-ae_bool x_force_hermitian(x_matrix *a);
-ae_bool ae_is_symmetric(ae_matrix *a);
-ae_bool ae_is_hermitian(ae_matrix *a);
-ae_bool ae_force_symmetric(ae_matrix *a);
-ae_bool ae_force_hermitian(ae_matrix *a);
+bool x_is_symmetric(x_matrix *a);
+bool x_is_hermitian(x_matrix *a);
+bool x_force_symmetric(x_matrix *a);
+bool x_force_hermitian(x_matrix *a);
+bool ae_is_symmetric(ae_matrix *a);
+bool ae_is_hermitian(ae_matrix *a);
+bool ae_force_symmetric(ae_matrix *a);
+bool ae_force_hermitian(ae_matrix *a);
 
 void ae_serializer_init(ae_serializer *serializer);
 void ae_serializer_clear(ae_serializer *serializer);
@@ -809,12 +801,12 @@ void ae_serializer_ustart_str(ae_serializer *serializer, const char *buf);
 void ae_serializer_sstart_stream(ae_serializer *serializer, ae_stream_writer writer, ae_int_t aux);
 void ae_serializer_ustart_stream(ae_serializer *serializer, ae_stream_reader reader, ae_int_t aux);
 
-void ae_serializer_serialize_bool(ae_serializer *serializer, ae_bool v, ae_state *state);
+void ae_serializer_serialize_bool(ae_serializer *serializer, bool v, ae_state *state);
 void ae_serializer_serialize_int(ae_serializer *serializer, ae_int_t v, ae_state *state);
 void ae_serializer_serialize_int64(ae_serializer *serializer, ae_int64_t v, ae_state *state);
 void ae_serializer_serialize_double(ae_serializer *serializer, double v, ae_state *state);
 void ae_serializer_serialize_byte_array(ae_serializer *serializer, ae_vector *bytes, ae_state *state);
-void ae_serializer_unserialize_bool(ae_serializer *serializer, ae_bool *v, ae_state *state);
+void ae_serializer_unserialize_bool(ae_serializer *serializer, bool *v, ae_state *state);
 void ae_serializer_unserialize_int(ae_serializer *serializer, ae_int_t *v, ae_state *state);
 void ae_serializer_unserialize_int64(ae_serializer *serializer, ae_int64_t *v, ae_state *state);
 void ae_serializer_unserialize_double(ae_serializer *serializer, double *v, ae_state *state);
@@ -823,32 +815,32 @@ void ae_serializer_unserialize_byte_array(ae_serializer *serializer, ae_vector *
 void ae_serializer_stop(ae_serializer *serializer, ae_state *state);
 
 // Service functions
-void ae_assert(ae_bool cond, const char *msg, ae_state *state);
+void ae_assert(bool cond, const char *msg, ae_state *state);
 ae_int_t ae_cpuid();
 
 // Real math functions:
 // * IEEE-compliant floating point comparisons
 // * standard functions
-ae_bool ae_fp_eq(double v1, double v2);
-ae_bool ae_fp_neq(double v1, double v2);
-ae_bool ae_fp_less(double v1, double v2);
-ae_bool ae_fp_less_eq(double v1, double v2);
-ae_bool ae_fp_greater(double v1, double v2);
-ae_bool ae_fp_greater_eq(double v1, double v2);
+bool ae_fp_eq(double v1, double v2);
+bool ae_fp_neq(double v1, double v2);
+bool ae_fp_less(double v1, double v2);
+bool ae_fp_less_eq(double v1, double v2);
+bool ae_fp_greater(double v1, double v2);
+bool ae_fp_greater_eq(double v1, double v2);
 
-ae_bool ae_isfinite_stateless(double x, ae_int_t endianness);
-ae_bool ae_isnan_stateless(double x, ae_int_t endianness);
-ae_bool ae_isinf_stateless(double x, ae_int_t endianness);
-ae_bool ae_isposinf_stateless(double x, ae_int_t endianness);
-ae_bool ae_isneginf_stateless(double x, ae_int_t endianness);
+bool ae_isfinite_stateless(double x, ae_int_t endianness);
+bool ae_isnan_stateless(double x, ae_int_t endianness);
+bool ae_isinf_stateless(double x, ae_int_t endianness);
+bool ae_isposinf_stateless(double x, ae_int_t endianness);
+bool ae_isneginf_stateless(double x, ae_int_t endianness);
 
 ae_int_t ae_get_endianness();
 
-ae_bool ae_isfinite(double x, ae_state *state);
-ae_bool ae_isnan(double x, ae_state *state);
-ae_bool ae_isinf(double x, ae_state *state);
-ae_bool ae_isposinf(double x, ae_state *state);
-ae_bool ae_isneginf(double x, ae_state *state);
+bool ae_isfinite(double x, ae_state *state);
+bool ae_isnan(double x, ae_state *state);
+bool ae_isinf(double x, ae_state *state);
+bool ae_isposinf(double x, ae_state *state);
+bool ae_isneginf(double x, ae_state *state);
 
 double ae_fabs(double x, ae_state *state);
 ae_int_t ae_iabs(ae_int_t x, ae_state *state);
@@ -890,14 +882,14 @@ ae_complex ae_complex_from_i(ae_int_t v);
 ae_complex ae_complex_from_d(double v);
 
 ae_complex ae_c_neg(ae_complex lhs);
-ae_bool ae_c_eq(ae_complex lhs, ae_complex rhs);
-ae_bool ae_c_neq(ae_complex lhs, ae_complex rhs);
+bool ae_c_eq(ae_complex lhs, ae_complex rhs);
+bool ae_c_neq(ae_complex lhs, ae_complex rhs);
 ae_complex ae_c_add(ae_complex lhs, ae_complex rhs);
 ae_complex ae_c_mul(ae_complex lhs, ae_complex rhs);
 ae_complex ae_c_sub(ae_complex lhs, ae_complex rhs);
 ae_complex ae_c_div(ae_complex lhs, ae_complex rhs);
-ae_bool ae_c_eq_d(ae_complex lhs, double rhs);
-ae_bool ae_c_neq_d(ae_complex lhs, double rhs);
+bool ae_c_eq_d(ae_complex lhs, double rhs);
+bool ae_c_neq_d(ae_complex lhs, double rhs);
 ae_complex ae_c_add_d(ae_complex lhs, double rhs);
 ae_complex ae_c_mul_d(ae_complex lhs, double rhs);
 ae_complex ae_c_sub_d(ae_complex lhs, double rhs);
@@ -957,8 +949,8 @@ typedef struct rcommstate {
    ae_vector ra;
    ae_vector ca;
 } rcommstate;
-void _rcommstate_init(rcommstate *p, ae_state *_state, ae_bool make_automatic);
-void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, ae_bool make_automatic);
+void _rcommstate_init(rcommstate *p, ae_state *_state, bool make_automatic);
+void _rcommstate_init_copy(rcommstate *dst, rcommstate *src, ae_state *_state, bool make_automatic);
 void _rcommstate_clear(rcommstate *p);
 void _rcommstate_destroy(rcommstate *p);
 
@@ -969,18 +961,18 @@ void _rcommstate_destroy(rcommstate *p);
 // _alloc_counter_total is only incremented by 1.
 extern ae_int_t _alloc_counter;
 extern ae_int_t _alloc_counter_total;
-extern ae_bool _use_alloc_counter;
+extern bool _use_alloc_counter;
 
 // Malloc debugging:
 //
-// * _force_malloc_failure - set this flag to ae_true in  order  to  enforce
+// * _force_malloc_failure - set this flag to true in  order  to  enforce
 //   failure of ALGLIB malloc(). Useful to debug handling of  errors  during
 //   memory allocation. As long as this flag is set, ALGLIB malloc will fail.
 // * _malloc_failure_after - set it to non-zero value in  order  to  enforce
 //   malloc failure as soon as _alloc_counter_total increases above value of
 //   this variable. This value has no effect if  _use_alloc_counter  is  not
 //   set.
-extern ae_bool _force_malloc_failure;
+extern bool _force_malloc_failure;
 extern ae_int_t _malloc_failure_after;
 
 // Trace file descriptor (to be used by ALGLIB code which sends messages  to
@@ -1418,11 +1410,11 @@ public:
    const boolean_1d_array &operator=(const boolean_1d_array &rhs);
    virtual ~boolean_1d_array();
 
-   const ae_bool &operator() (ae_int_t i) const;
-   ae_bool &operator() (ae_int_t i);
+   const bool &operator() (ae_int_t i) const;
+   bool &operator() (ae_int_t i);
 
-   const ae_bool &operator[] (ae_int_t i) const;
-   ae_bool &operator[] (ae_int_t i);
+   const bool &operator[] (ae_int_t i) const;
+   bool &operator[] (ae_int_t i);
 
 //
 // This function allocates array[iLen] and copies data
@@ -1434,8 +1426,8 @@ public:
 //
 // This function returns pointer to internal memory
 //
-   ae_bool *getcontent();
-   const ae_bool *getcontent() const;
+   bool *getcontent();
+   const bool *getcontent() const;
 
 #if !defined(AE_NO_EXCEPTIONS)
    boolean_1d_array(const char *s);
@@ -1680,11 +1672,11 @@ public:
 
    const boolean_2d_array &operator=(const boolean_2d_array &rhs);
 
-   const ae_bool &operator() (ae_int_t i, ae_int_t j) const;
-   ae_bool &operator() (ae_int_t i, ae_int_t j);
+   const bool &operator() (ae_int_t i, ae_int_t j) const;
+   bool &operator() (ae_int_t i, ae_int_t j);
 
-   const ae_bool *operator[] (ae_int_t i) const;
-   ae_bool *operator[] (ae_int_t i);
+   const bool *operator[] (ae_int_t i) const;
+   bool *operator[] (ae_int_t i);
 
 //
 // This function allocates array[irows,icols] and copies data
@@ -1954,17 +1946,17 @@ void _ialglib_mcopyunblock(ae_int_t m, ae_int_t n, const double *a, ae_int_t op,
 void _ialglib_mcopyblock_complex(ae_int_t m, ae_int_t n, const ae_complex *a, ae_int_t op, ae_int_t stride, double *b);
 void _ialglib_mcopyunblock_complex(ae_int_t m, ae_int_t n, const double *a, ae_int_t op, ae_complex *b, ae_int_t stride);
 
-ae_bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-ae_bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
-ae_bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-ae_bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-ae_bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-ae_bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, ae_bool isupper, ae_bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
-ae_bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, ae_bool isupper);
-ae_bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, ae_bool isupper);
-ae_bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-ae_bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
-ae_bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_rmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixgemmf(ae_int_t m, ae_int_t n, ae_int_t k, ae_complex alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, ae_matrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, ae_complex beta, ae_matrix *c, ae_int_t ic, ae_int_t jc);
+bool _ialglib_i_cmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixrighttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_rmatrixlefttrsmf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t i1, ae_int_t j1, bool isupper, bool isunit, ae_int_t optype, ae_matrix *x, ae_int_t i2, ae_int_t j2);
+bool _ialglib_i_cmatrixherkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_rmatrixsyrkf(ae_int_t n, ae_int_t k, double alpha, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, double beta, ae_matrix *c, ae_int_t ic, ae_int_t jc, bool isupper);
+bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
+bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 
 #if !defined(ALGLIB_NO_FAST_KERNELS)
 
@@ -2001,7 +1993,7 @@ void rsetr(ae_int_t n, double v, RMatrix *a, ae_int_t i, ae_state *_state);
 void rsetvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
 void rsetm(ae_int_t m, ae_int_t n, double v, RMatrix *a, ae_state *_state);
 void isetv(ae_int_t n, ae_int_t v, ZVector *x, ae_state *_state);
-void bsetv(ae_int_t n, ae_bool v, BVector *x, ae_state *_state);
+void bsetv(ae_int_t n, bool v, BVector *x, ae_state *_state);
 void rmulv(ae_int_t n, double v, RVector *x, ae_state *_state);
 void rmulr(ae_int_t n, double v, RMatrix *x, ae_int_t rowidx, ae_state *_state);
 void rmulvx(ae_int_t n, double v, RVector *x, ae_int_t offsx, ae_state *_state);
@@ -2029,15 +2021,15 @@ void icopyvx(ae_int_t n, ZVector *x, ae_int_t offsx, ZVector *y, ae_int_t offsy,
 void rgemv(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t opa, RVector *x, double beta, RVector *y, ae_state *_state);
 void rgemvx(ae_int_t m, ae_int_t n, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t opa, RVector *x, ae_int_t ix, double beta, RVector *y, ae_int_t iy, ae_state *_state);
 void rger(ae_int_t m, ae_int_t n, double alpha, RVector *u, RVector *v, RMatrix *a, ae_state *_state);
-void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_bool isupper, ae_bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
+void rtrsvx(ae_int_t n, RMatrix *a, ae_int_t ia, ae_int_t ja, bool isupper, bool isunit, ae_int_t optype, RVector *x, ae_int_t ix, ae_state *_state);
 
-ae_bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
+bool ablasf_rgemm32basecase(ae_int_t m, ae_int_t n, ae_int_t k, double alpha, RMatrix *a, ae_int_t ia, ae_int_t ja, ae_int_t optypea, RMatrix *b, ae_int_t ib, ae_int_t jb, ae_int_t optypeb, double beta, RMatrix *c, ae_int_t ic, ae_int_t jc, ae_state *_state);
 
 // Sparse supernodal Cholesky kernels
 ae_int_t spchol_spsymmgetmaxsimd(ae_state *_state);
 void spchol_propagatefwd(RVector *x, ae_int_t cols0, ae_int_t blocksize, ZVector *superrowidx, ae_int_t rbase, ae_int_t offdiagsize, RVector *rowstorage, ae_int_t offss, ae_int_t sstride, RVector *simdbuf, ae_int_t simdwidth, ae_state *_state);
-ae_bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
-ae_bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+bool spchol_updatekernelabc4(RVector *rowstorage, ae_int_t offss, ae_int_t twidth, ae_int_t offsu, ae_int_t uheight, ae_int_t urank, ae_int_t urowstride, ae_int_t uwidth, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
+bool spchol_updatekernel4444(RVector *rowstorage, ae_int_t offss, ae_int_t sheight, ae_int_t offsu, ae_int_t uheight, RVector *diagd, ae_int_t offsd, ZVector *raw2smap, ZVector *superrowidx, ae_int_t urbase, ae_state *_state);
 
 // ALGLIB_NO_FAST_KERNELS
 #endif

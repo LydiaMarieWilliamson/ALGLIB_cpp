@@ -1062,8 +1062,8 @@ void fftc1d(CVector *a, ae_int_t n, ae_state *_state) {
    ae_frame_make(_state, &_frame_block);
    memset(&plan, 0, sizeof(plan));
    memset(&buf, 0, sizeof(buf));
-   _fasttransformplan_init(&plan, _state, ae_true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
+   _fasttransformplan_init(&plan, _state, true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0, "FFTC1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTC1D: Length(A)<N!", _state);
@@ -1174,8 +1174,8 @@ void fftr1d(RVector *a, ae_int_t n, CVector *f, ae_state *_state) {
    memset(&buf, 0, sizeof(buf));
    memset(&plan, 0, sizeof(plan));
    ae_vector_clear(f);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
 
    ae_assert(n > 0, "FFTR1D: incorrect N!", _state);
    ae_assert(a->cnt >= n, "FFTR1D: Length(A)<N!", _state);
@@ -1282,8 +1282,8 @@ void fftr1dinv(CVector *f, ae_int_t n, RVector *a, ae_state *_state) {
    memset(&h, 0, sizeof(h));
    memset(&fh, 0, sizeof(fh));
    ae_vector_clear(a);
-   ae_vector_init(&h, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&fh, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&h, 0, DT_REAL, _state, true);
+   ae_vector_init(&fh, 0, DT_COMPLEX, _state, true);
 
    ae_assert(n > 0, "FFTR1DInv: incorrect N!", _state);
    ae_assert(f->cnt >= ae_ifloor((double)n / (double)2, _state) + 1, "FFTR1DInv: Length(F)<Floor(N/2)+1!", _state);
@@ -1451,7 +1451,7 @@ void fhtr1d(RVector *a, ae_int_t n, ae_state *_state) {
 
    ae_frame_make(_state, &_frame_block);
    memset(&fa, 0, sizeof(fa));
-   ae_vector_init(&fa, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&fa, 0, DT_COMPLEX, _state, true);
 
    ae_assert(n > 0, "FHTR1D: incorrect N!", _state);
 
@@ -1542,7 +1542,7 @@ void convc1d(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_stat
       convc1d(b, n, a, m, r, _state);
       return;
    }
-   convc1dx(a, m, b, n, ae_false, -1, 0, r, _state);
+   convc1dx(a, m, b, n, false, -1, 0, r, _state);
 }
 
 // 1-dimensional complex non-circular deconvolution (inverse of ConvC1D()).
@@ -1586,9 +1586,9 @@ void convc1dinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector *r, ae_s
    memset(&buf2, 0, sizeof(buf2));
    memset(&plan, 0, sizeof(plan));
    ae_vector_clear(r);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
 
    ae_assert((n > 0 && m > 0) && n <= m, "ConvC1DInv: incorrect N or M!", _state);
    p = ftbasefindsmooth(m, _state);
@@ -1668,7 +1668,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
    ae_frame_make(_state, &_frame_block);
    memset(&buf, 0, sizeof(buf));
    ae_vector_clear(c);
-   ae_vector_init(&buf, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_COMPLEX, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -1690,7 +1690,7 @@ void convc1dcircular(CVector *s, ae_int_t m, CVector *r, ae_int_t n, CVector *c,
       ae_frame_leave(_state);
       return;
    }
-   convc1dx(s, m, r, n, ae_true, -1, 0, c, _state);
+   convc1dx(s, m, r, n, true, -1, 0, c, _state);
    ae_frame_leave(_state);
 }
 
@@ -1739,10 +1739,10 @@ void convc1dcircularinv(CVector *a, ae_int_t m, CVector *b, ae_int_t n, CVector 
    memset(&cbuf, 0, sizeof(cbuf));
    memset(&plan, 0, sizeof(plan));
    ae_vector_clear(r);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircularInv: incorrect N or M!", _state);
 
@@ -1833,7 +1833,7 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
       convr1d(b, n, a, m, r, _state);
       return;
    }
-   convr1dx(a, m, b, n, ae_false, -1, 0, r, _state);
+   convr1dx(a, m, b, n, false, -1, 0, r, _state);
 }
 
 // 1-dimensional real deconvolution (inverse of ConvC1D()).
@@ -1878,10 +1878,10 @@ void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_s
    memset(&buf3, 0, sizeof(buf3));
    memset(&plan, 0, sizeof(plan));
    ae_vector_clear(r);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
 
    ae_assert((n > 0 && m > 0) && n <= m, "ConvR1DInv: incorrect N or M!", _state);
    p = ftbasefindsmootheven(m, _state);
@@ -1946,7 +1946,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
    ae_frame_make(_state, &_frame_block);
    memset(&buf, 0, sizeof(buf));
    ae_vector_clear(c);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -1969,7 +1969,7 @@ void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c,
       return;
    }
 // reduce to usual convolution
-   convr1dx(s, m, r, n, ae_true, -1, 0, c, _state);
+   convr1dx(s, m, r, n, true, -1, 0, c, _state);
    ae_frame_leave(_state);
 }
 
@@ -2021,12 +2021,12 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
    memset(&cbuf2, 0, sizeof(cbuf2));
    memset(&plan, 0, sizeof(plan));
    ae_vector_clear(r);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&cbuf2, 0, DT_COMPLEX, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
+   ae_vector_init(&cbuf, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&cbuf2, 0, DT_COMPLEX, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvR1DCircularInv: incorrect N or M!", _state);
 
@@ -2118,7 +2118,7 @@ void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector 
 //
 //   -- ALGLIB --
 //      Copyright 21.07.2009 by Bochkanov Sergey
-void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, ae_bool circular, ae_int_t alg, ae_int_t q, CVector *r, ae_state *_state) {
+void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r, ae_state *_state) {
    ae_frame _frame_block;
    ae_int_t i;
    ae_int_t j;
@@ -2150,10 +2150,10 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, ae_bool circular, 
    memset(&buf, 0, sizeof(buf));
    memset(&buf2, 0, sizeof(buf2));
    ae_vector_clear(r);
-   ae_vector_init(&bbuf, 0, DT_COMPLEX, _state, ae_true);
-   _fasttransformplan_init(&plan, _state, ae_true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&bbuf, 0, DT_COMPLEX, _state, true);
+   _fasttransformplan_init(&plan, _state, true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
@@ -2483,7 +2483,7 @@ void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, ae_bool circular, 
 //
 //   -- ALGLIB --
 //      Copyright 21.07.2009 by Bochkanov Sergey
-void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, ae_bool circular, ae_int_t alg, ae_int_t q, RVector *r, ae_state *_state) {
+void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r, ae_state *_state) {
    ae_frame _frame_block;
    double v;
    ae_int_t i;
@@ -2514,10 +2514,10 @@ void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, ae_bool circular, 
    memset(&buf2, 0, sizeof(buf2));
    memset(&buf3, 0, sizeof(buf3));
    ae_vector_clear(r);
-   _fasttransformplan_init(&plan, _state, ae_true);
-   ae_vector_init(&buf, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf2, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&buf3, 0, DT_REAL, _state, ae_true);
+   _fasttransformplan_init(&plan, _state, true);
+   ae_vector_init(&buf, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf2, 0, DT_REAL, _state, true);
+   ae_vector_init(&buf3, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DX: incorrect N or M!", _state);
    ae_assert(n <= m, "ConvC1DX: N<M assumption is false!", _state);
@@ -2841,8 +2841,8 @@ void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector 
    memset(&p, 0, sizeof(p));
    memset(&b, 0, sizeof(b));
    ae_vector_clear(r);
-   ae_vector_init(&p, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&b, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&p, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&b, 0, DT_COMPLEX, _state, true);
 
    ae_assert(n > 0 && m > 0, "CorrC1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
@@ -2896,8 +2896,8 @@ void corrc1dcircular(CVector *signal, ae_int_t m, CVector *pattern, ae_int_t n, 
    memset(&p, 0, sizeof(p));
    memset(&b, 0, sizeof(b));
    ae_vector_clear(c);
-   ae_vector_init(&p, 0, DT_COMPLEX, _state, ae_true);
-   ae_vector_init(&b, 0, DT_COMPLEX, _state, ae_true);
+   ae_vector_init(&p, 0, DT_COMPLEX, _state, true);
+   ae_vector_init(&b, 0, DT_COMPLEX, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 
@@ -2977,8 +2977,8 @@ void corrr1d(RVector *signal, ae_int_t n, RVector *pattern, ae_int_t m, RVector 
    memset(&p, 0, sizeof(p));
    memset(&b, 0, sizeof(b));
    ae_vector_clear(r);
-   ae_vector_init(&p, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&p, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0 && m > 0, "CorrR1D: incorrect N or M!", _state);
    ae_vector_set_length(&p, m, _state);
@@ -3032,8 +3032,8 @@ void corrr1dcircular(RVector *signal, ae_int_t m, RVector *pattern, ae_int_t n, 
    memset(&p, 0, sizeof(p));
    memset(&b, 0, sizeof(b));
    ae_vector_clear(c);
-   ae_vector_init(&p, 0, DT_REAL, _state, ae_true);
-   ae_vector_init(&b, 0, DT_REAL, _state, ae_true);
+   ae_vector_init(&p, 0, DT_REAL, _state, true);
+   ae_vector_init(&b, 0, DT_REAL, _state, true);
 
    ae_assert(n > 0 && m > 0, "ConvC1DCircular: incorrect N or M!", _state);
 

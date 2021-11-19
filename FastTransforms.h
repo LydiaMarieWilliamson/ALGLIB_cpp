@@ -541,8 +541,8 @@ void convr1d(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_stat
 void convr1dinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state);
 void convr1dcircular(RVector *s, ae_int_t m, RVector *r, ae_int_t n, RVector *c, ae_state *_state);
 void convr1dcircularinv(RVector *a, ae_int_t m, RVector *b, ae_int_t n, RVector *r, ae_state *_state);
-void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, ae_bool circular, ae_int_t alg, ae_int_t q, CVector *r, ae_state *_state);
-void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, ae_bool circular, ae_int_t alg, ae_int_t q, RVector *r, ae_state *_state);
+void convc1dx(CVector *a, ae_int_t m, CVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, CVector *r, ae_state *_state);
+void convr1dx(RVector *a, ae_int_t m, RVector *b, ae_int_t n, bool circular, ae_int_t alg, ae_int_t q, RVector *r, ae_state *_state);
 
 // === CORR Package ===
 void corrc1d(CVector *signal, ae_int_t n, CVector *pattern, ae_int_t m, CVector *r, ae_state *_state);

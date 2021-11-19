@@ -28,7 +28,7 @@ int main() {
 
 #ifdef AE_USE_ALLOC_COUNTER
    printf("Allocation counter activated...\n");
-   alglib_impl::_use_alloc_counter = ae_true;
+   alglib_impl::_use_alloc_counter = true;
    if (alglib_impl::_alloc_counter != 0) {
       printf("FAILURE: alloc_counter is non-zero on start!\n");
       return 1;
