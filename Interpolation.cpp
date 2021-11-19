@@ -1102,17 +1102,6 @@ void idwcreatecalcbuffer(const idwmodel &s, idwcalcbuffer &buf, const xparams _x
 //   * idwbuildersetalgotextbookmodshepard()-textbook modified Shepard algorithm
 // * finally, model construction is performed with idwfit() function.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     NX  -   dimensionality of the argument, NX>=1
 //     NY  -   dimensionality of the function being modeled, NY>=1;
@@ -5378,30 +5367,6 @@ void lstfitpiecewiselinearrdp(const real_1d_array &x, const real_1d_array &y, co
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
 void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
@@ -5461,30 +5426,6 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
@@ -5584,30 +5525,6 @@ void polynomialfit(const real_1d_array &x, const real_1d_array &y, const ae_int_
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
 void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &p, polynomialfitreport &rep, const xparams _xparams) {
@@ -5704,30 +5621,6 @@ void polynomialfitwc(const real_1d_array &x, const real_1d_array &y, const real_
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
@@ -6515,30 +6408,6 @@ void logisticfit45x(const real_1d_array &x, const real_1d_array &y, const ae_int
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, barycentricinterpolant &b, barycentricfitreport &rep, const xparams _xparams) {
@@ -6591,30 +6460,6 @@ void barycentricfitfloaterhormannwc(const real_1d_array &x, const real_1d_array 
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -6732,30 +6577,6 @@ void barycentricfitfloaterhormann(const real_1d_array &x, const real_1d_array &y
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
@@ -6871,30 +6692,6 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  WHEN  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -7023,30 +6820,6 @@ void spline1dfitcubicwc(const real_1d_array &x, const real_1d_array &y, const re
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const real_1d_array &w, const ae_int_t n, const real_1d_array &xc, const real_1d_array &yc, const integer_1d_array &dc, const ae_int_t k, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
@@ -7169,30 +6942,6 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
@@ -7226,30 +6975,6 @@ void spline1dfithermitewc(const real_1d_array &x, const real_1d_array &y, const 
 // rich Spline1DFitCubicWC().  See  Spline1DFitCubicWC() for more information
 // about subroutine parameters (we don't duplicate it here because of length)
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
@@ -7277,30 +7002,6 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
 // This subroutine is "lightweight" alternative for more complex and feature-
 // rich Spline1DFitCubicWC().  See  Spline1DFitCubicWC() for more information
 // about subroutine parameters (we don't duplicate it here because of length)
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -7332,30 +7033,6 @@ void spline1dfitcubic(const real_1d_array &x, const real_1d_array &y, const ae_i
 // more information about subroutine parameters (we don't duplicate  it  here
 // because of length).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae_int_t n, const ae_int_t m, ae_int_t &info, spline1dinterpolant &s, spline1dfitreport &rep, const xparams _xparams) {
@@ -7384,30 +7061,6 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
 // rich Spline1DFitHermiteWC().  See Spline1DFitHermiteWC()  description  for
 // more information about subroutine parameters (we don't duplicate  it  here
 // because of length).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -7508,30 +7161,6 @@ void spline1dfithermite(const real_1d_array &x, const real_1d_array &y, const ae
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
 void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
@@ -7629,30 +7258,6 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
@@ -7771,30 +7376,6 @@ void lsfitlinearw(const real_1d_array &y, const real_1d_array &w, const real_2d_
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
 void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
@@ -7909,30 +7490,6 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
 #if !defined(AE_NO_EXCEPTIONS)
@@ -8033,30 +7590,6 @@ void lsfitlinearwc(const real_1d_array &y, const real_1d_array &w, const real_2d
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
 void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_int_t n, const ae_int_t m, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
@@ -8149,30 +7682,6 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, const ae_
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
@@ -8287,30 +7796,6 @@ void lsfitlinear(const real_1d_array &y, const real_2d_array &fmatrix, ae_int_t 
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
 void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const real_2d_array &cmatrix, const ae_int_t n, const ae_int_t m, const ae_int_t k, ae_int_t &info, real_1d_array &c, lsfitreport &rep, const xparams _xparams) {
@@ -8420,30 +7905,6 @@ void lsfitlinearc(const real_1d_array &y, const real_2d_array &fmatrix, const re
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
@@ -12149,19 +11610,6 @@ void spline2dunpack(const spline2dinterpolant &c, ae_int_t &m, ae_int_t &n, real
 // * spline2dbuildersetgrid() to tell how many nodes you need
 // * spline2dfit() to perform fit
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     D   -   positive number, number of Y-components: D=1 for simple scalar
 //             fit, D>1 for vector-valued spline fitting.
@@ -12491,19 +11939,6 @@ void spline2dbuildersetgrid(const spline2dbuilder &state, const ae_int_t kx, con
 //   model becoming more global, which somewhat  reduces  efficiency  of  the
 //   parallel code.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S       -   spline 2D builder object
 //     NLayers -   number of layers in the model:
@@ -12576,19 +12011,6 @@ void spline2dbuildersetalgofastddm(const spline2dbuilder &state, const ae_int_t 
 // * serial running time: O(K^4+NPoints)
 // * parallelism potential: limited. You may get some sublinear gain when
 //   working with large grids (K's in 256..512 range)
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     S       -   spline 2D builder object
@@ -12666,19 +12088,6 @@ void spline2dbuildersetalgonaivells(const spline2dbuilder &state, const double l
 
 // This function fits bicubic spline to current dataset, using current  area/
 // grid and current LLS solver.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     State   -   spline 2D builder object
@@ -15347,17 +14756,6 @@ void rbfgridcalc2(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0,
 // * model is not initialized
 // * NX<>2
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
@@ -15431,17 +14829,6 @@ void rbfgridcalc2v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
 // This function returns 0.0 when:
 // * model is not initialized
 // * NX<>2
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
@@ -15523,17 +14910,6 @@ void rbfgridcalc2vsubset(const rbfmodel &s, const real_1d_array &x0, const ae_in
 // * model is not initialized
 // * NX<>3
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
@@ -15613,17 +14989,6 @@ void rbfgridcalc3v(const rbfmodel &s, const real_1d_array &x0, const ae_int_t n0
 // This function returns 0.0 when:
 // * model is not initialized
 // * NX<>3
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
@@ -16734,17 +16099,6 @@ void idwcreatecalcbuffer(idwmodel *s, idwcalcbuffer *buf, ae_state *_state) {
 //   * idwbuildersetalgotextbookshepard()  - textbook Shepard algorithm
 //   * idwbuildersetalgotextbookmodshepard()-textbook modified Shepard algorithm
 // * finally, model construction is performed with idwfit() function.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     NX  -   dimensionality of the argument, NX>=1
@@ -23857,30 +23211,6 @@ void lstfitpiecewiselinearrdp(RVector *x, RVector *y, ae_int_t n, double eps, RV
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
 void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *info, barycentricinterpolant *p, polynomialfitreport *rep, ae_state *_state) {
@@ -23992,30 +23322,6 @@ void polynomialfit(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *inf
 // Our final recommendation is to use constraints  WHEN  AND  ONLY  when  you
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 10.12.2009 by Bochkanov Sergey
@@ -25375,30 +24681,6 @@ void logisticfit45x(RVector *x, RVector *y, ae_int_t n, double cnstrleft, double
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, barycentricinterpolant *b, barycentricfitreport *rep, ae_state *_state) {
@@ -25508,30 +24790,6 @@ void barycentricfitfloaterhormannwc(RVector *x, RVector *y, RVector *w, ae_int_t
 //             * AvgRelError   average relative error on the non-zero Y
 //             * MaxError      maximum error
 //                             NON-WEIGHTED ERRORS ARE CALCULATED
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -25664,30 +24922,6 @@ void barycentricfitfloaterhormann(RVector *x, RVector *y, ae_int_t n, ae_int_t m
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
@@ -25818,30 +25052,6 @@ void spline1dfitcubicwc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector 
 // can't solve your task without them. Anything beyond  special  cases  given
 // above is not guaranteed and may result in inconsistency.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
 void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVector *xc, RVector *yc, ZVector *dc, ae_int_t k, ae_int_t m, ae_int_t *info, spline1dinterpolant *s, spline1dfitreport *rep, ae_state *_state) {
@@ -25878,30 +25088,6 @@ void spline1dfithermitewc(RVector *x, RVector *y, RVector *w, ae_int_t n, RVecto
 // This subroutine is "lightweight" alternative for more complex and feature-
 // rich Spline1DFitCubicWC().  See  Spline1DFitCubicWC() for more information
 // about subroutine parameters (we don't duplicate it here because of length)
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -25946,30 +25132,6 @@ void spline1dfitcubic(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t *
 // rich Spline1DFitHermiteWC().  See Spline1DFitHermiteWC()  description  for
 // more information about subroutine parameters (we don't duplicate  it  here
 // because of length).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB PROJECT --
 //      Copyright 18.08.2009 by Bochkanov Sergey
@@ -26085,30 +25247,6 @@ void spline1dfithermite(RVector *x, RVector *y, ae_int_t n, ae_int_t m, ae_int_t
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
 void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
@@ -26220,30 +25358,6 @@ void lsfitlinearw(RVector *y, RVector *w, RMatrix *fmatrix, ae_int_t n, ae_int_t
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
@@ -26432,30 +25546,6 @@ void lsfitlinearwc(RVector *y, RVector *w, RMatrix *fmatrix, RMatrix *cmatrix, a
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 17.08.2009 by Bochkanov Sergey
 void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t *info, RVector *c, lsfitreport *rep, ae_state *_state) {
@@ -26572,30 +25662,6 @@ void lsfitlinear(RVector *y, RMatrix *fmatrix, ae_int_t n, ae_int_t m, ae_int_t 
 // NOTE:       covariance matrix is estimated using  correction  for  degrees
 //             of freedom (covariances are divided by N-M instead of dividing
 //             by N).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 07.09.2009 by Bochkanov Sergey
@@ -35973,19 +35039,6 @@ void spline2dunpack(spline2dinterpolant *c, ae_int_t *m, ae_int_t *n, RMatrix *t
 // * spline2dbuildersetgrid() to tell how many nodes you need
 // * spline2dfit() to perform fit
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     D   -   positive number, number of Y-components: D=1 for simple scalar
 //             fit, D>1 for vector-valued spline fitting.
@@ -36235,19 +35288,6 @@ void spline2dbuildersetgrid(spline2dbuilder *state, ae_int_t kx, ae_int_t ky, ae
 //   model becoming more global, which somewhat  reduces  efficiency  of  the
 //   parallel code.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S       -   spline 2D builder object
 //     NLayers -   number of layers in the model:
@@ -36310,19 +35350,6 @@ void spline2dbuildersetalgofastddm(spline2dbuilder *state, ae_int_t nlayers, dou
 // * parallelism potential: limited. You may get some sublinear gain when
 //   working with large grids (K's in 256..512 range)
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S       -   spline 2D builder object
 //     LambdaNS-   non-negative value:
@@ -36375,19 +35402,6 @@ void spline2dbuildersetalgonaivells(spline2dbuilder *state, double lambdans, ae_
 
 // This function fits bicubic spline to current dataset, using current  area/
 // grid and current LLS solver.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     State   -   spline 2D builder object
@@ -44996,17 +44010,6 @@ void rbfgridcalc2(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t n
 // * model is not initialized
 // * NX<>2
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
 //       processed serially.
@@ -45086,17 +44089,6 @@ void rbfgridcalc2v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 // This function returns 0.0 when:
 // * model is not initialized
 // * NX<>2
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
@@ -45178,17 +44170,6 @@ void rbfgridcalc2vsubset(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_
 // This function returns 0.0 when:
 // * model is not initialized
 // * NX<>3
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still
@@ -45281,17 +44262,6 @@ void rbfgridcalc3v(rbfmodel *s, RVector *x0, ae_int_t n0, RVector *x1, ae_int_t 
 // This function returns 0.0 when:
 // * model is not initialized
 // * NX<>3
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // NOTE: Parallel  processing  is  implemented only for modern (hierarchical)
 //       RBFs. Legacy version 1 RBFs (created  by  QNN  or  RBF-ML) are still

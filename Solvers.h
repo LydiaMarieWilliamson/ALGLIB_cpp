@@ -588,30 +588,6 @@ void polynomialsolve(const real_1d_array &a, const ae_int_t n, complex_1d_array 
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = alglib::xdefault);
@@ -644,30 +620,6 @@ void rmatrixsolve(const real_2d_array &a, const ae_int_t n, const real_1d_array 
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 16.03.2015 by Bochkanov Sergey
@@ -727,30 +679,6 @@ void rmatrixsolvefast(const real_2d_array &a, const ae_int_t n, const real_1d_ar
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -790,30 +718,6 @@ void rmatrixsolvem(const real_2d_array &a, const ae_int_t n, const real_2d_array
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
@@ -957,30 +861,6 @@ void rmatrixlusolvefast(const real_2d_array &lua, const integer_1d_array &p, con
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1013,30 +893,6 @@ void rmatrixlusolvem(const real_2d_array &lua, const integer_1d_array &p, const 
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 18.03.2015 by Bochkanov Sergey
@@ -1166,30 +1022,6 @@ void rmatrixmixedsolvem(const real_2d_array &a, const real_2d_array &lua, const 
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, const bool rfs, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1218,30 +1050,6 @@ void cmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const complex_2d
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 16.03.2015 by Bochkanov Sergey
@@ -1290,30 +1098,6 @@ void cmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const comple
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1339,30 +1123,6 @@ void cmatrixsolve(const complex_2d_array &a, const ae_int_t n, const complex_1d_
 //     B       -   array[N]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
@@ -1415,30 +1175,6 @@ void cmatrixsolvefast(const complex_2d_array &a, const ae_int_t n, const complex
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, const ae_int_t n, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1467,30 +1203,6 @@ void cmatrixlusolvem(const complex_2d_array &lua, const integer_1d_array &p, con
 //     B       -   array[N,M]:
 //                 * info>0    =>  overwritten by solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
@@ -1697,30 +1409,6 @@ void cmatrixmixedsolve(const complex_2d_array &a, const complex_2d_array &lua, c
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, real_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1748,30 +1436,6 @@ void spdmatrixsolvem(const real_2d_array &a, const ae_int_t n, const bool isuppe
 //     B       -   array[N,M], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
@@ -1826,30 +1490,6 @@ void spdmatrixsolvemfast(const real_2d_array &a, const ae_int_t n, const bool is
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper, const real_1d_array &b, ae_int_t &info, densesolverreport &rep, real_1d_array &x, const xparams _xparams = alglib::xdefault);
@@ -1877,30 +1517,6 @@ void spdmatrixsolve(const real_2d_array &a, const ae_int_t n, const bool isupper
 //     B       -   array[N], it contains:
 //                 * info>0    =>  solution
 //                 * info=-3   =>  filled by zeros
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
@@ -2121,30 +1737,6 @@ void spdmatrixcholeskysolvefast(const real_2d_array &cha, const ae_int_t n, cons
 //     Rep     -   same as in RMatrixSolve
 //     X       -   same as in RMatrixSolve
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_2d_array &b, const ae_int_t m, ae_int_t &info, densesolverreport &rep, complex_2d_array &x, const xparams _xparams = alglib::xdefault);
@@ -2173,30 +1765,6 @@ void hpdmatrixsolvem(const complex_2d_array &a, const ae_int_t n, const bool isu
 //     B       -   array[0..N-1]:
 //                 * overwritten by solution
 //                 * zeros, if problem was not solved
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
@@ -2244,30 +1812,6 @@ void hpdmatrixsolvemfast(const complex_2d_array &a, const ae_int_t n, const bool
 //     Rep     -   same as in RMatrixSolve
 //     X       -   same as in RMatrixSolve
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 27.01.2010 by Bochkanov Sergey
 void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isupper, const complex_1d_array &b, ae_int_t &info, densesolverreport &rep, complex_1d_array &x, const xparams _xparams = alglib::xdefault);
@@ -2297,30 +1841,6 @@ void hpdmatrixsolve(const complex_2d_array &a, const ae_int_t n, const bool isup
 //                 * overwritten by solution
 //                 * zeros, if A is exactly singular (diagonal of its LU
 //                   decomposition has exact zeros).
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 17.03.2015 by Bochkanov Sergey
@@ -2539,30 +2059,6 @@ void hpdmatrixcholeskysolvefast(const complex_2d_array &cha, const ae_int_t n, c
 // * K         dim(Null(A))
 // * CX        array[0..N-1,0..K-1], kernel of A.
 //             Columns of CX store such vectors that A*CX[i]=0.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 24.08.2009 by Bochkanov Sergey

@@ -259,19 +259,6 @@ double spearmancorr2(const real_1d_array &x, const real_1d_array &y, const xpara
 
 // Covariance matrix
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
@@ -292,19 +279,6 @@ void covm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, real_2d_ar
 void covm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = alglib::xdefault);
 
 // Pearson product-moment correlation matrix
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     X   -   array[N,M], sample matrix:
@@ -327,19 +301,6 @@ void pearsoncorrm(const real_2d_array &x, real_2d_array &c, const xparams _xpara
 
 // Spearman's rank correlation matrix
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     X   -   array[N,M], sample matrix:
 //             * J-th column corresponds to J-th variable
@@ -360,19 +321,6 @@ void spearmancorrm(const real_2d_array &x, const ae_int_t n, const ae_int_t m, r
 void spearmancorrm(const real_2d_array &x, real_2d_array &c, const xparams _xparams = alglib::xdefault);
 
 // Cross-covariance matrix
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     X   -   array[N,M1], sample matrix:
@@ -401,19 +349,6 @@ void covm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, con
 
 // Pearson product-moment cross-correlation matrix
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     X   -   array[N,M1], sample matrix:
 //             * J-th column corresponds to J-th variable
@@ -440,19 +375,6 @@ void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, const ae_int_
 void pearsoncorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_array &c, const xparams _xparams = alglib::xdefault);
 
 // Spearman's rank cross-correlation matrix
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     X   -   array[N,M1], sample matrix:
@@ -486,17 +408,6 @@ void spearmancorrm2(const real_2d_array &x, const real_2d_array &y, real_2d_arra
 // * ranking starts from 0, ends at NFeatures-1
 // * sum of within-row values is equal to (NFeatures-1)*NFeatures/2
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     XY      -   array[NPoints,NFeatures], dataset
 //     NPoints -   number of points
@@ -519,17 +430,6 @@ void rankdata(real_2d_array &xy, const xparams _xparams = alglib::xdefault);
 //   of within-row values is equal to 0.0.
 // * centering is performed by subtracting mean from each row, i.e it changes
 //   mean value, but does NOT change higher moments
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     XY      -   array[NPoints,NFeatures], dataset

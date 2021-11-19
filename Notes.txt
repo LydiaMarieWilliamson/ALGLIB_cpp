@@ -145,6 +145,83 @@ MLPTRAIN: APSERV TSORT BASICSTATOPS ABLASF ABLASMKL ABLAS BASESTAT BDSS HPCCORES
 DATACOMP: APSERV TSORT ABLASF ABLASMKL ABLAS HQRND BLAS BASICSTATOPS BASESTAT CLUSTERING
 ALGLIBBASICS:
 
+A5. ALGLIB Commercial and Free Versions: Notes
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+For those who wish to use the improvements provided by the Commercial version of ALGLIB,
+the following is a list of the routines in ALGLIB that have been provided with enhancements there;
+along with the corresponding notifications.
+
+Multi-threading support for ALGLIB++, in place of that provided by the commercial version, is currently being developed.
+In addition, some enhancements, which have been made available for the free edition of ALGLIB, are inherited by ALGLIB++.
+
+There are 6 groups of routines (labeled A, B, C, D, E and F), based on which parts of which notifications apply to them.
+
+A5.1. ALGLIB Commercial and Free Notifications
+──────────────────────────────────────────────
+ABCDEF	│ COMMERCIAL EDITION OF ALGLIB:
+ABCDEF	│ 
+AB――――	│ Commercial version of ALGLIB includes one important improvement of this function, which can be used from C++ and C#:
+――CDEF	│ Commercial Edition of ALGLIB includes following important improvements of this function:
+AB――――	│ ∙ Intel MKL support (lightweight Intel MKL is shipped with ALGLIB)
+――CDEF	│ ∙ high-performance native backend with same C# interface (C# version)
+―――DEF	│ ∙ multithreading support (C++ and C# versions)
+――C―EF	│ ∙ hardware vendor (Intel) implementations of linear algebra primitives (C++ and C# versions, x86/x64 platform)
+ABCDEF	│ 
+AB――――	│ Intel MKL gives approximately constant (with respect to number of worker threads)
+AB――――	│ acceleration factor which depends on CPU being used,
+AB────	│ problem size and "baseline" ALGLIB edition which is used for comparison.
+AB――――	│ 
+A―――――	│ Generally, commercial ALGLIB is several times faster than open-source generic C edition,
+A―――――	│ and many times faster than open-source C# edition.
+A―――――	│ 
+AB――――	│ Multithreaded acceleration is NOT supported for this function.
+ABCDEF	│ 
+ABCDEF	│ We recommend you to read 'Working with commercial version' section of ALGLIB Reference Manual
+ABCDEF	│ in order to find out how to use performance-related features provided by commercial edition of ALGLIB.
+
+―――――F	│ FREE EDITION OF ALGLIB:
+―――――F	│
+―――――F	│ Free Edition of ALGLIB supports following important features for this function:
+―――――F	│ ∙ C++ version: x64 SIMD support using C++ intrinsics
+―――――F	│ ∙ C# version: x64 SIMD support using NET5/NetCore hardware intrinsics
+―――――F	│ We recommend you to read 'Compiling ALGLIB' section of the ALGLIB Reference Manual
+―――――F	│ in order to find out how to activate SIMD support in ALGLIB.
+
+A5.2. ALGLIB Commercial Support and Free Enhancements by Routine
+────────────────────────────────────────────────────────────────
+The routines, by group, are:
+A:	rmatrixbdsvd,
+B:	rmatrixschur,
+C:	hmatrixevd, hmatrixtd, hmatrixtdunpackq,
+	rmatrixbd, rmatrixbdmultiplybyq, rmatrixbdunpackq, rmatrixevd, rmatrixhessenberg, rmatrixhessenbergunpackq, rmatrixsvd,
+	smatrixevd, smatrixevdr, smatrixtd, smatrixtdevd, smatrixtdunpackq,
+D:	dfbuilderbuildrandomforest, idwbuildercreate, knnbuilderbuildknnmodel,
+	mlpallerrorssparsesubset, mlpallerrorssubset,
+	mlpavgce, mlpavgcesparse, mlpavgerror, mlpavgerrorsparse, mlpavgrelerror, mlpavgrelerrorsparse,
+	mlpclserror, mlpcontinuetraining, mlperror, mlperrorsparse, mlperrorsparsesubset, mlperrorsubset,
+	mlpgradbatch, mlpgradbatchsparse, mlpgradbatchsparsesubset, mlpgradbatchsubset,
+	mlpkfoldcv, mlprelclserror, mlprelclserrorsparse, mlprmserror, mlprmserrorsparse, mlptrainensemblees, mlptrainnetwork,
+	rankdata, rankdatacentered,
+	rbfgridcalc2v, rbfgridcalc2vsubset, rbfgridcalc3v, rbfgridcalc3vsubset,
+E:	covm2, covm, pearsoncorrm2, pearsoncorrm, spearmancorrm2, spearmancorrm,
+spline2dbuildercreate, spline2dbuildersetalgoblocklls, spline2dbuildersetalgofastddm, spline2dfit,
+F:	barycentricfitfloaterhormann, barycentricfitfloaterhormannwc,
+	clusterizergetdistances, clusterizerrunahc, clusterizerrunkmeans,
+	cmatrixgemm, cmatrixherk, cmatrixinverse, cmatrixlefttrsm, cmatrixlq, cmatrixlqunpackq,
+	cmatrixlu, cmatrixluinverse, cmatrixlusolvem, cmatrixlusolvemfast, cmatrixqr, cmatrixqrunpackq,
+	cmatrixrighttrsm, cmatrixsolve, cmatrixsolvefast, cmatrixsolvem, cmatrixsolvemfast, cmatrixtrinverse,
+	eigsubspacesolvedenses,
+	fisherlda, fisherldan,
+	hpdmatrixcholesky, hpdmatrixcholeskyinverse, hpdmatrixinverse, hpdmatrixsolve, hpdmatrixsolvefast, hpdmatrixsolvem, hpdmatrixsolvemfast,
+	lsfitlinearc, lsfitlinear, lsfitlinearwc, lsfitlinearw,
+	pcabuildbasis, pcatruncatedsubspace, pcatruncatedsubspacesparse,
+	polynomialfit, polynomialfitwc,
+	rmatrixgemm, rmatrixinverse, rmatrixlefttrsm, rmatrixlq, rmatrixlqunpackq,
+	rmatrixlu, rmatrixluinverse, rmatrixlusolvem, rmatrixlusolvemfast, rmatrixqr, rmatrixqrunpackq, rmatrixrighttrsm,
+	rmatrixsolve, rmatrixsolvefast, rmatrixsolvels, rmatrixsolvem, rmatrixsolvemfast, rmatrixsyrk, rmatrixtrinverse,
+	spdmatrixcholesky, spdmatrixcholeskyinverse, spdmatrixinverse, spdmatrixsolve, spdmatrixsolvefast, spdmatrixsolvem, spdmatrixsolvemfast,
+	spline1dfitcubic, spline1dfitcubicwc, spline1dfithermite, spline1dfithermitewc
+
 A6. ALGLIB ⇒ ALGLIB++ Revision Sequence
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 A6.2. Test Stages

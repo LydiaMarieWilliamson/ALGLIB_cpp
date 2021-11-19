@@ -1423,30 +1423,6 @@ public:
 //     V           -   array[0..NVars-1,0..NVars-1]
 //                     matrix, whose columns store basis vectors.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 25.08.2008 by Bochkanov Sergey
 void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_t nvars, ae_int_t &info, real_1d_array &s2, real_2d_array &v, const xparams _xparams = alglib::xdefault);
@@ -1491,30 +1467,6 @@ void pcabuildbasis(const real_2d_array &x, const ae_int_t npoints, const ae_int_
 // NOTE: passing eps=0 and maxits=0 results in small eps  being  selected  as
 // stopping condition. Exact value of automatically selected eps is  version-
 // -dependent.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 10.01.2017 by Bochkanov Sergey
@@ -1567,30 +1519,6 @@ void pcatruncatedsubspace(const real_2d_array &x, const ae_int_t npoints, const 
 //       prevents eternal loops (possible when inputs are degenerate and  too
 //       stringent stopping criteria are specified). In  current  version  it
 //       is 50+2*NVars.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 10.01.2017 by Bochkanov Sergey
@@ -2087,17 +2015,6 @@ void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, re
 
 // Error of the neural network on dataset.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2130,17 +2047,6 @@ void mlpprocessi(const multilayerperceptron &network, const real_1d_array &x, re
 double mlperror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // Error of the neural network on dataset given by sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network
@@ -2188,17 +2094,6 @@ double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, c
 
 // Classification error of the neural network on dataset.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2231,17 +2126,6 @@ double mlperrorn(const multilayerperceptron &network, const real_2d_array &xy, c
 ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // Relative classification error on the test set.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2276,17 +2160,6 @@ ae_int_t mlpclserror(const multilayerperceptron &network, const real_2d_array &x
 double mlprelclserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // Relative classification error on the test set given by sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2323,17 +2196,6 @@ double mlprelclserrorsparse(const multilayerperceptron &network, const sparsemat
 
 // Average cross-entropy  (in bits  per element) on the test set.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2368,17 +2230,6 @@ double mlpavgce(const multilayerperceptron &network, const real_2d_array &xy, co
 
 // Average  cross-entropy  (in bits  per element)  on the  test set  given by
 // sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2418,17 +2269,6 @@ double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &x
 
 // RMS error on the test set given.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2463,17 +2303,6 @@ double mlpavgcesparse(const multilayerperceptron &network, const sparsematrix &x
 double mlprmserror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // RMS error on the test set given by sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2514,17 +2343,6 @@ double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix
 
 // Average absolute error on the test set.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2558,17 +2376,6 @@ double mlprmserrorsparse(const multilayerperceptron &network, const sparsematrix
 double mlpavgerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // Average absolute error on the test set given by sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2608,17 +2415,6 @@ double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix
 
 // Average relative error on the test set.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network     -   neural network;
 //     XY          -   training  set,  see  below  for  information  on   the
@@ -2653,17 +2449,6 @@ double mlpavgerrorsparse(const multilayerperceptron &network, const sparsematrix
 double mlpavgrelerror(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t npoints, const xparams _xparams = alglib::xdefault);
 
 // Average relative error on the test set given by sparse matrix.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network     -   neural network;
@@ -2743,17 +2528,6 @@ void mlpgradn(const multilayerperceptron &network, const real_1d_array &x, const
 
 // Batch gradient calculation for a set of inputs/outputs
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
 //     XY      -   original dataset in dense format; one sample = one row:
@@ -2779,17 +2553,6 @@ void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, 
 // Batch gradient calculation for a set  of inputs/outputs  given  by  sparse
 // matrices
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
 //     XY      -   original dataset in sparse format; one sample = one row:
@@ -2814,17 +2577,6 @@ void mlpgradbatch(const multilayerperceptron &network, const real_2d_array &xy, 
 void mlpgradbatchsparse(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t ssize, double &e, real_1d_array &grad, const xparams _xparams = alglib::xdefault);
 
 // Batch gradient calculation for a subset of dataset
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
@@ -2864,17 +2616,6 @@ void mlpgradbatchsubset(const multilayerperceptron &network, const real_2d_array
 
 // Batch gradient calculation for a set of inputs/outputs  for  a  subset  of
 // dataset given by set of indexes.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
@@ -2965,17 +2706,6 @@ void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &x
 
 // Calculation of all types of errors on subset of dataset.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
 //     XY      -   original dataset; one sample = one row;
@@ -2998,17 +2728,6 @@ void mlphessianbatch(const multilayerperceptron &network, const real_2d_array &x
 void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep, const xparams _xparams = alglib::xdefault);
 
 // Calculation of all types of errors on subset of dataset.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network -   network initialized with one of the network creation funcs
@@ -3034,17 +2753,6 @@ void mlpallerrorssubset(const multilayerperceptron &network, const real_2d_array
 void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsematrix &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, modelerrors &rep, const xparams _xparams = alglib::xdefault);
 
 // Error of the neural network on subset of dataset.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network   -     neural network;
@@ -3085,17 +2793,6 @@ void mlpallerrorssparsesubset(const multilayerperceptron &network, const sparsem
 double mlperrorsubset(const multilayerperceptron &network, const real_2d_array &xy, const ae_int_t setsize, const integer_1d_array &subset, const ae_int_t subsetsize, const xparams _xparams = alglib::xdefault);
 
 // Error of the neural network on subset of sparse dataset.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     Network   -     neural network;
@@ -3582,30 +3279,6 @@ void clusterizersetseed(const clusterizerstate &s, const ae_int_t seed, const xp
 //         For example, problem with 10000 points  would require 800M of RAM,
 //         even when working in a 1-dimensional space.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 10.07.2012 by Bochkanov Sergey
 void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep, const xparams _xparams = alglib::xdefault);
@@ -3652,30 +3325,6 @@ void clusterizerrunahc(const clusterizerstate &s, ahcreport &rep, const xparams 
 //         algorithm may return different values. If you  need  deterministic
 //         behavior, use ClusterizerSetSeed() function.
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 10.07.2012 by Bochkanov Sergey
 void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansreport &rep, const xparams _xparams = alglib::xdefault);
@@ -3716,30 +3365,6 @@ void clusterizerrunkmeans(const clusterizerstate &s, const ae_int_t k, kmeansrep
 //        distance functions are computed using optimized linear algebra kernels,
 //        while Chebyshev and city block distance functions are computed using
 //        simple nested loops with two branches at each iteration.
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 10.07.2012 by Bochkanov Sergey
@@ -4375,17 +4000,6 @@ double dfbuilderpeekprogress(const decisionforestbuilder &s, const xparams _xpar
 //   subsampling
 // * dfbuildersetrandomvars() - to control number of variables randomly chosen
 //   for decision rule creation
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     S           -   decision forest builder object
@@ -6034,30 +5648,6 @@ void ssaforecastavgsequence(const ssamodel &s, const real_1d_array &data, const 
 //                           but task has been solved.
 //     W           -   linear combination coefficients, array[0..NVars-1]
 //
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 //   -- ALGLIB --
 //      Copyright 31.05.2008 by Bochkanov Sergey
 void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t nvars, const ae_int_t nclasses, ae_int_t &info, real_1d_array &w, const xparams _xparams = alglib::xdefault);
@@ -6092,30 +5682,6 @@ void fisherlda(const real_2d_array &xy, const ae_int_t npoints, const ae_int_t n
 //     W           -   basis, array[0..NVars-1,0..NVars-1]
 //                     columns of matrix stores basis vectors, sorted by
 //                     quality of training set separation (in descending order)
-//
-//   ! FREE EDITION OF ALGLIB:
-//   !
-//   ! Free Edition of ALGLIB supports following important features for  this
-//   ! function:
-//   ! * C++ version: x64 SIMD support using C++ intrinsics
-//   ! * C#  version: x64 SIMD support using NET5/NetCore hardware intrinsics
-//   !
-//   ! We  recommend  you  to  read  'Compiling ALGLIB' section of the ALGLIB
-//   ! Reference Manual in order  to  find  out  how to activate SIMD support
-//   ! in ALGLIB.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   ! * hardware vendor (Intel) implementations of linear algebra primitives
-//   !   (C++ and C# versions, x86/x64 platform)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 //   -- ALGLIB --
 //      Copyright 31.05.2008 by Bochkanov Sergey
@@ -7039,17 +6605,6 @@ void knnbuildersetnorm(const knnbuilder &s, const ae_int_t nrmtype, const xparam
 //
 // An ALGLIB implementation of kd-trees is used to perform k-nn searches.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S       -   KNN builder object
 //     K       -   number of neighbors to search for, K>=1
@@ -7530,17 +7085,6 @@ void mlpkfoldcvlm(const multilayerperceptron &network, const real_2d_array &xy, 
 // This function estimates generalization error using cross-validation on the
 // current dataset with current training settings.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S           -   trainer object
 //     Network     -   neural network. It must have same number of inputs and
@@ -7752,17 +7296,6 @@ void mlpsetalgobatch(const mlptrainer &s, const xparams _xparams = alglib::xdefa
 //
 // Training is performed using current training algorithm.
 //
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
-//
 // INPUT PARAMETERS:
 //     S           -   trainer object
 //     Network     -   neural network. It must have same number of inputs and
@@ -7843,17 +7376,6 @@ void mlpstarttraining(const mlptrainer &s, const multilayerperceptron &network, 
 // IMPORTANT: this is an "expert" version of the MLPTrain() function.  We  do
 //            not recommend you to use it unless you are pretty sure that you
 //            need ability to monitor training progress.
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // This function performs step-by-step training of the neural  network.  Here
 // "step-by-step" means that training starts  with  MLPStartTraining()  call,
@@ -7995,17 +7517,6 @@ void mlpetraines(const mlpensemble &ensemble, const real_2d_array &xy, const ae_
 // current dataset and early stopping training algorithm. Each early stopping
 // round performs NRestarts  random  restarts  (thus,  EnsembleSize*NRestarts
 // training rounds is performed in total).
-//
-//   ! COMMERCIAL EDITION OF ALGLIB:
-//   !
-//   ! Commercial Edition of ALGLIB includes following important improvements
-//   ! of this function:
-//   ! * high-performance native backend with same C# interface (C# version)
-//   ! * multithreading support (C++ and C# versions)
-//   !
-//   ! We recommend you to read 'Working with commercial version' section  of
-//   ! ALGLIB Reference Manual in order to find out how to  use  performance-
-//   ! related features provided by commercial edition of ALGLIB.
 //
 // INPUT PARAMETERS:
 //     S           -   trainer object;
