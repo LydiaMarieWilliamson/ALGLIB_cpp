@@ -1930,40 +1930,7 @@ namespace alglib {
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-class _optguardreport_owner {
-public:
-   _optguardreport_owner();
-   _optguardreport_owner(const _optguardreport_owner &rhs);
-   _optguardreport_owner &operator=(const _optguardreport_owner &rhs);
-   virtual ~_optguardreport_owner();
-   alglib_impl::optguardreport *c_ptr();
-   alglib_impl::optguardreport *c_ptr() const;
-protected:
-   alglib_impl::optguardreport *p_struct;
-};
-class optguardreport: public _optguardreport_owner {
-public:
-   optguardreport();
-   optguardreport(const optguardreport &rhs);
-   optguardreport &operator=(const optguardreport &rhs);
-   virtual ~optguardreport();
-   bool &nonc0suspected;
-   bool &nonc0test0positive;
-   ae_int_t &nonc0fidx;
-   double &nonc0lipschitzc;
-   bool &nonc1suspected;
-   bool &nonc1test0positive;
-   bool &nonc1test1positive;
-   ae_int_t &nonc1fidx;
-   double &nonc1lipschitzc;
-   bool &badgradsuspected;
-   ae_int_t &badgradfidx;
-   ae_int_t &badgradvidx;
-   real_1d_array badgradxbase;
-   real_2d_array badgraduser;
-   real_2d_array badgradnum;
-
-};
+DecClass(optguardreport, bool &nonc0suspected; bool &nonc0test0positive; ae_int_t &nonc0fidx; double &nonc0lipschitzc; bool &nonc1suspected; bool &nonc1test0positive; bool &nonc1test1positive; ae_int_t &nonc1fidx; double &nonc1lipschitzc; bool &badgradsuspected; ae_int_t &badgradfidx; ae_int_t &badgradvidx; real_1d_array badgradxbase; real_2d_array badgraduser; real_2d_array badgradnum;);
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C0
 // continuity violation.
@@ -2006,35 +1973,7 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-class _optguardnonc0report_owner {
-public:
-   _optguardnonc0report_owner();
-   _optguardnonc0report_owner(const _optguardnonc0report_owner &rhs);
-   _optguardnonc0report_owner &operator=(const _optguardnonc0report_owner &rhs);
-   virtual ~_optguardnonc0report_owner();
-   alglib_impl::optguardnonc0report *c_ptr();
-   alglib_impl::optguardnonc0report *c_ptr() const;
-protected:
-   alglib_impl::optguardnonc0report *p_struct;
-};
-class optguardnonc0report: public _optguardnonc0report_owner {
-public:
-   optguardnonc0report();
-   optguardnonc0report(const optguardnonc0report &rhs);
-   optguardnonc0report &operator=(const optguardnonc0report &rhs);
-   virtual ~optguardnonc0report();
-   bool &positive;
-   ae_int_t &fidx;
-   real_1d_array x0;
-   real_1d_array d;
-   ae_int_t &n;
-   real_1d_array stp;
-   real_1d_array f;
-   ae_int_t &cnt;
-   ae_int_t &stpidxa;
-   ae_int_t &stpidxb;
-
-};
+DecClass(optguardnonc0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #0 (OptGuard  has several tests
@@ -2080,35 +2019,7 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-class _optguardnonc1test0report_owner {
-public:
-   _optguardnonc1test0report_owner();
-   _optguardnonc1test0report_owner(const _optguardnonc1test0report_owner &rhs);
-   _optguardnonc1test0report_owner &operator=(const _optguardnonc1test0report_owner &rhs);
-   virtual ~_optguardnonc1test0report_owner();
-   alglib_impl::optguardnonc1test0report *c_ptr();
-   alglib_impl::optguardnonc1test0report *c_ptr() const;
-protected:
-   alglib_impl::optguardnonc1test0report *p_struct;
-};
-class optguardnonc1test0report: public _optguardnonc1test0report_owner {
-public:
-   optguardnonc1test0report();
-   optguardnonc1test0report(const optguardnonc1test0report &rhs);
-   optguardnonc1test0report &operator=(const optguardnonc1test0report &rhs);
-   virtual ~optguardnonc1test0report();
-   bool &positive;
-   ae_int_t &fidx;
-   real_1d_array x0;
-   real_1d_array d;
-   ae_int_t &n;
-   real_1d_array stp;
-   real_1d_array f;
-   ae_int_t &cnt;
-   ae_int_t &stpidxa;
-   ae_int_t &stpidxb;
-
-};
+DecClass(optguardnonc1test0report, bool &positive; ae_int_t &fidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array f; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
 // This  structure  is  used  for  detailed   reporting  about  suspected  C1
 // continuity violation as flagged by C1 test #1 (OptGuard  has several tests
@@ -2165,66 +2076,13 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 19.11.2018 by Bochkanov Sergey
-class _optguardnonc1test1report_owner {
-public:
-   _optguardnonc1test1report_owner();
-   _optguardnonc1test1report_owner(const _optguardnonc1test1report_owner &rhs);
-   _optguardnonc1test1report_owner &operator=(const _optguardnonc1test1report_owner &rhs);
-   virtual ~_optguardnonc1test1report_owner();
-   alglib_impl::optguardnonc1test1report *c_ptr();
-   alglib_impl::optguardnonc1test1report *c_ptr() const;
-protected:
-   alglib_impl::optguardnonc1test1report *p_struct;
-};
-class optguardnonc1test1report: public _optguardnonc1test1report_owner {
-public:
-   optguardnonc1test1report();
-   optguardnonc1test1report(const optguardnonc1test1report &rhs);
-   optguardnonc1test1report &operator=(const optguardnonc1test1report &rhs);
-   virtual ~optguardnonc1test1report();
-   bool &positive;
-   ae_int_t &fidx;
-   ae_int_t &vidx;
-   real_1d_array x0;
-   real_1d_array d;
-   ae_int_t &n;
-   real_1d_array stp;
-   real_1d_array g;
-   ae_int_t &cnt;
-   ae_int_t &stpidxa;
-   ae_int_t &stpidxb;
-
-};
+DecClass(optguardnonc1test1report, bool &positive; ae_int_t &fidx; ae_int_t &vidx; real_1d_array x0; real_1d_array d; ae_int_t &n; real_1d_array stp; real_1d_array g; ae_int_t &cnt; ae_int_t &stpidxa; ae_int_t &stpidxb;);
 
 // === OPTSERV Package ===
 
 // === MINLBFGS Package ===
 //
-class _minlbfgsstate_owner {
-public:
-   _minlbfgsstate_owner();
-   _minlbfgsstate_owner(const _minlbfgsstate_owner &rhs);
-   _minlbfgsstate_owner &operator=(const _minlbfgsstate_owner &rhs);
-   virtual ~_minlbfgsstate_owner();
-   alglib_impl::minlbfgsstate *c_ptr();
-   alglib_impl::minlbfgsstate *c_ptr() const;
-protected:
-   alglib_impl::minlbfgsstate *p_struct;
-};
-class minlbfgsstate: public _minlbfgsstate_owner {
-public:
-   minlbfgsstate();
-   minlbfgsstate(const minlbfgsstate &rhs);
-   minlbfgsstate &operator=(const minlbfgsstate &rhs);
-   virtual ~minlbfgsstate();
-   bool &needf;
-   bool &needfg;
-   bool &xupdated;
-   double &f;
-   real_1d_array g;
-   real_1d_array x;
-
-};
+DecClass(minlbfgsstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -2248,28 +2106,7 @@ public:
 //         request was submitted.
 //
 // Other fields of this structure are not documented and should not be used!
-class _minlbfgsreport_owner {
-public:
-   _minlbfgsreport_owner();
-   _minlbfgsreport_owner(const _minlbfgsreport_owner &rhs);
-   _minlbfgsreport_owner &operator=(const _minlbfgsreport_owner &rhs);
-   virtual ~_minlbfgsreport_owner();
-   alglib_impl::minlbfgsreport *c_ptr();
-   alglib_impl::minlbfgsreport *c_ptr() const;
-protected:
-   alglib_impl::minlbfgsreport *p_struct;
-};
-class minlbfgsreport: public _minlbfgsreport_owner {
-public:
-   minlbfgsreport();
-   minlbfgsreport(const minlbfgsreport &rhs);
-   minlbfgsreport &operator=(const minlbfgsreport &rhs);
-   virtual ~minlbfgsreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-
-};
+DecClass(minlbfgsreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // === CQMODELS Package ===
 
@@ -2287,31 +2124,7 @@ public:
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinBLEIC subpackage to work with this
 // object
-class _minbleicstate_owner {
-public:
-   _minbleicstate_owner();
-   _minbleicstate_owner(const _minbleicstate_owner &rhs);
-   _minbleicstate_owner &operator=(const _minbleicstate_owner &rhs);
-   virtual ~_minbleicstate_owner();
-   alglib_impl::minbleicstate *c_ptr();
-   alglib_impl::minbleicstate *c_ptr() const;
-protected:
-   alglib_impl::minbleicstate *p_struct;
-};
-class minbleicstate: public _minbleicstate_owner {
-public:
-   minbleicstate();
-   minbleicstate(const minbleicstate &rhs);
-   minbleicstate &operator=(const minbleicstate &rhs);
-   virtual ~minbleicstate();
-   bool &needf;
-   bool &needfg;
-   bool &xupdated;
-   double &f;
-   real_1d_array g;
-   real_1d_array x;
-
-};
+DecClass(minbleicstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 
 // This structure stores optimization report:
 // * IterationsCount           number of iterations
@@ -2345,37 +2158,7 @@ public:
 //                             to the feasible set
 // * DebugFF                   f, calculated at the final point
 // * DebugDX                   |X_start-X_final|
-class _minbleicreport_owner {
-public:
-   _minbleicreport_owner();
-   _minbleicreport_owner(const _minbleicreport_owner &rhs);
-   _minbleicreport_owner &operator=(const _minbleicreport_owner &rhs);
-   virtual ~_minbleicreport_owner();
-   alglib_impl::minbleicreport *c_ptr();
-   alglib_impl::minbleicreport *c_ptr() const;
-protected:
-   alglib_impl::minbleicreport *p_struct;
-};
-class minbleicreport: public _minbleicreport_owner {
-public:
-   minbleicreport();
-   minbleicreport(const minbleicreport &rhs);
-   minbleicreport &operator=(const minbleicreport &rhs);
-   virtual ~minbleicreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &varidx;
-   ae_int_t &terminationtype;
-   double &debugeqerr;
-   double &debugfs;
-   double &debugff;
-   double &debugdx;
-   ae_int_t &debugfeasqpits;
-   ae_int_t &debugfeasgpaits;
-   ae_int_t &inneriterationscount;
-   ae_int_t &outeriterationscount;
-
-};
+DecClass(minbleicreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varidx; ae_int_t &terminationtype; double &debugeqerr; double &debugfs; double &debugff; double &debugdx; ae_int_t &debugfeasqpits; ae_int_t &debugfeasgpaits; ae_int_t &inneriterationscount; ae_int_t &outeriterationscount;);
 
 // === QPBLEICSOLVER Package ===
 
@@ -2385,25 +2168,7 @@ public:
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinQP subpackage to work with this
 // object
-class _minqpstate_owner {
-public:
-   _minqpstate_owner();
-   _minqpstate_owner(const _minqpstate_owner &rhs);
-   _minqpstate_owner &operator=(const _minqpstate_owner &rhs);
-   virtual ~_minqpstate_owner();
-   alglib_impl::minqpstate *c_ptr();
-   alglib_impl::minqpstate *c_ptr() const;
-protected:
-   alglib_impl::minqpstate *p_struct;
-};
-class minqpstate: public _minqpstate_owner {
-public:
-   minqpstate();
-   minqpstate(const minqpstate &rhs);
-   minqpstate &operator=(const minqpstate &rhs);
-   virtual ~minqpstate();
-
-};
+DecClass(minqpstate, EndD);
 
 // This structure stores optimization report:
 // * InnerIterationsCount      number of inner iterations
@@ -2483,32 +2248,7 @@ public:
 // NOTE: methods  from  IPM  family  may  also  return  meaningful   Lagrange
 //       multipliers  on  completion   with   code   -2   (infeasibility   or
 //       unboundedness  detected).
-class _minqpreport_owner {
-public:
-   _minqpreport_owner();
-   _minqpreport_owner(const _minqpreport_owner &rhs);
-   _minqpreport_owner &operator=(const _minqpreport_owner &rhs);
-   virtual ~_minqpreport_owner();
-   alglib_impl::minqpreport *c_ptr();
-   alglib_impl::minqpreport *c_ptr() const;
-protected:
-   alglib_impl::minqpreport *p_struct;
-};
-class minqpreport: public _minqpreport_owner {
-public:
-   minqpreport();
-   minqpreport(const minqpreport &rhs);
-   minqpreport &operator=(const minqpreport &rhs);
-   virtual ~minqpreport();
-   ae_int_t &inneriterationscount;
-   ae_int_t &outeriterationscount;
-   ae_int_t &nmv;
-   ae_int_t &ncholesky;
-   ae_int_t &terminationtype;
-   real_1d_array lagbc;
-   real_1d_array laglc;
-
-};
+DecClass(minqpreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nmv; ae_int_t &ncholesky; ae_int_t &terminationtype; real_1d_array lagbc; real_1d_array laglc;);
 
 // === MINLM Package ===
 // Levenberg-Marquardt optimizer.
@@ -2516,37 +2256,7 @@ public:
 // This structure should be created using one of the MinLMCreate???()
 // functions. You should not access its fields directly; use ALGLIB functions
 // to work with it.
-class _minlmstate_owner {
-public:
-   _minlmstate_owner();
-   _minlmstate_owner(const _minlmstate_owner &rhs);
-   _minlmstate_owner &operator=(const _minlmstate_owner &rhs);
-   virtual ~_minlmstate_owner();
-   alglib_impl::minlmstate *c_ptr();
-   alglib_impl::minlmstate *c_ptr() const;
-protected:
-   alglib_impl::minlmstate *p_struct;
-};
-class minlmstate: public _minlmstate_owner {
-public:
-   minlmstate();
-   minlmstate(const minlmstate &rhs);
-   minlmstate &operator=(const minlmstate &rhs);
-   virtual ~minlmstate();
-   bool &needf;
-   bool &needfg;
-   bool &needfgh;
-   bool &needfi;
-   bool &needfij;
-   bool &xupdated;
-   double &f;
-   real_1d_array fi;
-   real_1d_array g;
-   real_2d_array h;
-   real_2d_array j;
-   real_1d_array x;
-
-};
+DecClass(minlmstate, bool &needf; bool &needfg; bool &needfgh; bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_1d_array g; real_2d_array h; real_2d_array j; real_1d_array x;);
 
 // Optimization report, filled by MinLMResults() function
 //
@@ -2571,62 +2281,13 @@ public:
 // * NGrad, number of gradient calculations
 // * NHess, number of Hessian calculations
 // * NCholesky, number of Cholesky decomposition calculations
-class _minlmreport_owner {
-public:
-   _minlmreport_owner();
-   _minlmreport_owner(const _minlmreport_owner &rhs);
-   _minlmreport_owner &operator=(const _minlmreport_owner &rhs);
-   virtual ~_minlmreport_owner();
-   alglib_impl::minlmreport *c_ptr();
-   alglib_impl::minlmreport *c_ptr() const;
-protected:
-   alglib_impl::minlmreport *p_struct;
-};
-class minlmreport: public _minlmreport_owner {
-public:
-   minlmreport();
-   minlmreport(const minlmreport &rhs);
-   minlmreport &operator=(const minlmreport &rhs);
-   virtual ~minlmreport();
-   ae_int_t &iterationscount;
-   ae_int_t &terminationtype;
-   ae_int_t &nfunc;
-   ae_int_t &njac;
-   ae_int_t &ngrad;
-   ae_int_t &nhess;
-   ae_int_t &ncholesky;
-
-};
+DecClass(minlmreport, ae_int_t &iterationscount; ae_int_t &terminationtype; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
 
 // === MINCG Package ===
 // This object stores state of the nonlinear CG optimizer.
 //
 // You should use ALGLIB functions to work with this object.
-class _mincgstate_owner {
-public:
-   _mincgstate_owner();
-   _mincgstate_owner(const _mincgstate_owner &rhs);
-   _mincgstate_owner &operator=(const _mincgstate_owner &rhs);
-   virtual ~_mincgstate_owner();
-   alglib_impl::mincgstate *c_ptr();
-   alglib_impl::mincgstate *c_ptr() const;
-protected:
-   alglib_impl::mincgstate *p_struct;
-};
-class mincgstate: public _mincgstate_owner {
-public:
-   mincgstate();
-   mincgstate(const mincgstate &rhs);
-   mincgstate &operator=(const mincgstate &rhs);
-   virtual ~mincgstate();
-   bool &needf;
-   bool &needfg;
-   bool &xupdated;
-   double &f;
-   real_1d_array g;
-   real_1d_array x;
-
-};
+DecClass(mincgstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -2650,28 +2311,7 @@ public:
 //         submitted.
 //
 // Other fields of this structure are not documented and should not be used!
-class _mincgreport_owner {
-public:
-   _mincgreport_owner();
-   _mincgreport_owner(const _mincgreport_owner &rhs);
-   _mincgreport_owner &operator=(const _mincgreport_owner &rhs);
-   virtual ~_mincgreport_owner();
-   alglib_impl::mincgreport *c_ptr();
-   alglib_impl::mincgreport *c_ptr() const;
-protected:
-   alglib_impl::mincgreport *p_struct;
-};
-class mincgreport: public _mincgreport_owner {
-public:
-   mincgreport();
-   mincgreport(const mincgreport &rhs);
-   mincgreport &operator=(const mincgreport &rhs);
-   virtual ~mincgreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-
-};
+DecClass(mincgreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // === NLCSQP Package ===
 
@@ -2683,25 +2323,7 @@ public:
 // This object stores linear solver state.
 // You should use functions provided by MinLP subpackage to work with this
 // object
-class _minlpstate_owner {
-public:
-   _minlpstate_owner();
-   _minlpstate_owner(const _minlpstate_owner &rhs);
-   _minlpstate_owner &operator=(const _minlpstate_owner &rhs);
-   virtual ~_minlpstate_owner();
-   alglib_impl::minlpstate *c_ptr();
-   alglib_impl::minlpstate *c_ptr() const;
-protected:
-   alglib_impl::minlpstate *p_struct;
-};
-class minlpstate: public _minlpstate_owner {
-public:
-   minlpstate();
-   minlpstate(const minlpstate &rhs);
-   minlpstate &operator=(const minlpstate &rhs);
-   virtual ~minlpstate();
-
-};
+DecClass(minlpstate, EndD);
 
 // This structure stores optimization report:
 // * f                         target function value
@@ -2747,35 +2369,7 @@ public:
 // * C is a cost vector (linear term)
 // * Ei is a vector with 1.0 at position I and 0 in other positions
 // * Ai is an I-th row of linear constraint matrix
-class _minlpreport_owner {
-public:
-   _minlpreport_owner();
-   _minlpreport_owner(const _minlpreport_owner &rhs);
-   _minlpreport_owner &operator=(const _minlpreport_owner &rhs);
-   virtual ~_minlpreport_owner();
-   alglib_impl::minlpreport *c_ptr();
-   alglib_impl::minlpreport *c_ptr() const;
-protected:
-   alglib_impl::minlpreport *p_struct;
-};
-class minlpreport: public _minlpreport_owner {
-public:
-   minlpreport();
-   minlpreport(const minlpreport &rhs);
-   minlpreport &operator=(const minlpreport &rhs);
-   virtual ~minlpreport();
-   double &f;
-   real_1d_array lagbc;
-   real_1d_array laglc;
-   real_1d_array y;
-   integer_1d_array stats;
-   double &primalerror;
-   double &dualerror;
-   double &slackerror;
-   ae_int_t &iterationscount;
-   ae_int_t &terminationtype;
-
-};
+DecClass(minlpreport, double &f; real_1d_array lagbc; real_1d_array laglc; real_1d_array y; integer_1d_array stats; double &primalerror; double &dualerror; double &slackerror; ae_int_t &iterationscount; ae_int_t &terminationtype;);
 
 // === NLCSLP Package ===
 
@@ -2783,32 +2377,7 @@ public:
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinNLC subpackage to work  with  this
 // object
-class _minnlcstate_owner {
-public:
-   _minnlcstate_owner();
-   _minnlcstate_owner(const _minnlcstate_owner &rhs);
-   _minnlcstate_owner &operator=(const _minnlcstate_owner &rhs);
-   virtual ~_minnlcstate_owner();
-   alglib_impl::minnlcstate *c_ptr();
-   alglib_impl::minnlcstate *c_ptr() const;
-protected:
-   alglib_impl::minnlcstate *p_struct;
-};
-class minnlcstate: public _minnlcstate_owner {
-public:
-   minnlcstate();
-   minnlcstate(const minnlcstate &rhs);
-   minnlcstate &operator=(const minnlcstate &rhs);
-   virtual ~minnlcstate();
-   bool &needfi;
-   bool &needfij;
-   bool &xupdated;
-   double &f;
-   real_1d_array fi;
-   real_2d_array j;
-   real_1d_array x;
-
-};
+DecClass(minnlcstate, bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 
 // These fields store optimization report:
 // * iterationscount           total number of inner iterations
@@ -2858,66 +2427,13 @@ public:
 //         last accepted point is returned
 //
 // Other fields of this structure are not documented and should not be used!
-class _minnlcreport_owner {
-public:
-   _minnlcreport_owner();
-   _minnlcreport_owner(const _minnlcreport_owner &rhs);
-   _minnlcreport_owner &operator=(const _minnlcreport_owner &rhs);
-   virtual ~_minnlcreport_owner();
-   alglib_impl::minnlcreport *c_ptr();
-   alglib_impl::minnlcreport *c_ptr() const;
-protected:
-   alglib_impl::minnlcreport *p_struct;
-};
-class minnlcreport: public _minnlcreport_owner {
-public:
-   minnlcreport();
-   minnlcreport(const minnlcreport &rhs);
-   minnlcreport &operator=(const minnlcreport &rhs);
-   virtual ~minnlcreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-   double &bcerr;
-   ae_int_t &bcidx;
-   double &lcerr;
-   ae_int_t &lcidx;
-   double &nlcerr;
-   ae_int_t &nlcidx;
-   ae_int_t &dbgphase0its;
-
-};
+DecClass(minnlcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype; double &bcerr; ae_int_t &bcidx; double &lcerr; ae_int_t &lcidx; double &nlcerr; ae_int_t &nlcidx; ae_int_t &dbgphase0its;);
 
 // === MINNS Package ===
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinNS subpackage to work  with  this
 // object
-class _minnsstate_owner {
-public:
-   _minnsstate_owner();
-   _minnsstate_owner(const _minnsstate_owner &rhs);
-   _minnsstate_owner &operator=(const _minnsstate_owner &rhs);
-   virtual ~_minnsstate_owner();
-   alglib_impl::minnsstate *c_ptr();
-   alglib_impl::minnsstate *c_ptr() const;
-protected:
-   alglib_impl::minnsstate *p_struct;
-};
-class minnsstate: public _minnsstate_owner {
-public:
-   minnsstate();
-   minnsstate(const minnsstate &rhs);
-   minnsstate &operator=(const minnsstate &rhs);
-   virtual ~minnsstate();
-   bool &needfi;
-   bool &needfij;
-   bool &xupdated;
-   double &f;
-   real_1d_array fi;
-   real_2d_array j;
-   real_1d_array x;
-
-};
+DecClass(minnsstate, bool &needfi; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 
 // This structure stores optimization report:
 // * IterationsCount           total number of inner iterations
@@ -2944,115 +2460,20 @@ public:
 //    8    User requested termination via MinNSRequestTermination()
 //
 // Other fields of this structure are not documented and should not be used!
-class _minnsreport_owner {
-public:
-   _minnsreport_owner();
-   _minnsreport_owner(const _minnsreport_owner &rhs);
-   _minnsreport_owner &operator=(const _minnsreport_owner &rhs);
-   virtual ~_minnsreport_owner();
-   alglib_impl::minnsreport *c_ptr();
-   alglib_impl::minnsreport *c_ptr() const;
-protected:
-   alglib_impl::minnsreport *p_struct;
-};
-class minnsreport: public _minnsreport_owner {
-public:
-   minnsreport();
-   minnsreport(const minnsreport &rhs);
-   minnsreport &operator=(const minnsreport &rhs);
-   virtual ~minnsreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   double &cerr;
-   double &lcerr;
-   double &nlcerr;
-   ae_int_t &terminationtype;
-   ae_int_t &varidx;
-   ae_int_t &funcidx;
-
-};
+DecClass(minnsreport, ae_int_t &iterationscount; ae_int_t &nfev; double &cerr; double &lcerr; double &nlcerr; ae_int_t &terminationtype; ae_int_t &varidx; ae_int_t &funcidx;);
 
 // === MINCOMP Package ===
 //
-class _minasastate_owner {
-public:
-   _minasastate_owner();
-   _minasastate_owner(const _minasastate_owner &rhs);
-   _minasastate_owner &operator=(const _minasastate_owner &rhs);
-   virtual ~_minasastate_owner();
-   alglib_impl::minasastate *c_ptr();
-   alglib_impl::minasastate *c_ptr() const;
-protected:
-   alglib_impl::minasastate *p_struct;
-};
-class minasastate: public _minasastate_owner {
-public:
-   minasastate();
-   minasastate(const minasastate &rhs);
-   minasastate &operator=(const minasastate &rhs);
-   virtual ~minasastate();
-   bool &needfg;
-   bool &xupdated;
-   double &f;
-   real_1d_array g;
-   real_1d_array x;
-
-};
+DecClass(minasastate, bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 
 //
-class _minasareport_owner {
-public:
-   _minasareport_owner();
-   _minasareport_owner(const _minasareport_owner &rhs);
-   _minasareport_owner &operator=(const _minasareport_owner &rhs);
-   virtual ~_minasareport_owner();
-   alglib_impl::minasareport *c_ptr();
-   alglib_impl::minasareport *c_ptr() const;
-protected:
-   alglib_impl::minasareport *p_struct;
-};
-class minasareport: public _minasareport_owner {
-public:
-   minasareport();
-   minasareport(const minasareport &rhs);
-   minasareport &operator=(const minasareport &rhs);
-   virtual ~minasareport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-   ae_int_t &activeconstraints;
-
-};
+DecClass(minasareport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &terminationtype; ae_int_t &activeconstraints;);
 
 // === MINBC Package ===
 // This object stores nonlinear optimizer state.
 // You should use functions provided by MinBC subpackage to work with this
 // object
-class _minbcstate_owner {
-public:
-   _minbcstate_owner();
-   _minbcstate_owner(const _minbcstate_owner &rhs);
-   _minbcstate_owner &operator=(const _minbcstate_owner &rhs);
-   virtual ~_minbcstate_owner();
-   alglib_impl::minbcstate *c_ptr();
-   alglib_impl::minbcstate *c_ptr() const;
-protected:
-   alglib_impl::minbcstate *p_struct;
-};
-class minbcstate: public _minbcstate_owner {
-public:
-   minbcstate();
-   minbcstate(const minbcstate &rhs);
-   minbcstate &operator=(const minbcstate &rhs);
-   virtual ~minbcstate();
-   bool &needf;
-   bool &needfg;
-   bool &xupdated;
-   double &f;
-   real_1d_array g;
-   real_1d_array x;
-
-};
+DecClass(minbcstate, bool &needf; bool &needfg; bool &xupdated; double &f; real_1d_array g; real_1d_array x;);
 
 // This structure stores optimization report:
 // * iterationscount           number of iterations
@@ -3075,52 +2496,12 @@ public:
 //    8    terminated by user who called minbcrequesttermination(). X contains
 //         point which was "current accepted" when  termination  request  was
 //         submitted.
-class _minbcreport_owner {
-public:
-   _minbcreport_owner();
-   _minbcreport_owner(const _minbcreport_owner &rhs);
-   _minbcreport_owner &operator=(const _minbcreport_owner &rhs);
-   virtual ~_minbcreport_owner();
-   alglib_impl::minbcreport *c_ptr();
-   alglib_impl::minbcreport *c_ptr() const;
-protected:
-   alglib_impl::minbcreport *p_struct;
-};
-class minbcreport: public _minbcreport_owner {
-public:
-   minbcreport();
-   minbcreport(const minbcreport &rhs);
-   minbcreport &operator=(const minbcreport &rhs);
-   virtual ~minbcreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfev;
-   ae_int_t &varidx;
-   ae_int_t &terminationtype;
-
-};
+DecClass(minbcreport, ae_int_t &iterationscount; ae_int_t &nfev; ae_int_t &varidx; ae_int_t &terminationtype;);
 
 // === OPTS Package ===
 // This is a test problem class  intended  for  internal  performance  tests.
 // Never use it directly in your projects.
-class _lptestproblem_owner {
-public:
-   _lptestproblem_owner();
-   _lptestproblem_owner(const _lptestproblem_owner &rhs);
-   _lptestproblem_owner &operator=(const _lptestproblem_owner &rhs);
-   virtual ~_lptestproblem_owner();
-   alglib_impl::lptestproblem *c_ptr();
-   alglib_impl::lptestproblem *c_ptr() const;
-protected:
-   alglib_impl::lptestproblem *p_struct;
-};
-class lptestproblem: public _lptestproblem_owner {
-public:
-   lptestproblem();
-   lptestproblem(const lptestproblem &rhs);
-   lptestproblem &operator=(const lptestproblem &rhs);
-   virtual ~lptestproblem();
-
-};
+DecClass(lptestproblem, EndD);
 
 // === OPTGUARDAPI Package ===
 

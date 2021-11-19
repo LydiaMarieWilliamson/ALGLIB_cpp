@@ -237,6 +237,7 @@ A6.3. Test Results
 39	7752 1.0x 12049 1.0x 11769 1.0x 9037 1.0x 1635461545 (617b29a9) 85
 39	7874 0.9x 10310 1.1x 12199 1.0x 9635 1.0x 1635576384 (617cea40) 86
 39	6712 1.2x 12347 1.0x 12052 0.9x 9104 1.0x 1637111328 (61945620) 91
+39	7813 0.9x 11629 0.9x  9527 1.0x 9296 1.0x 1637355701 (619810b5) 88
 
 A6.4. The Most Recent Test Run
 ──────────────────────────────
@@ -293,19 +294,19 @@ Issues:
 * issue 813                   OK
 * issue 824                   OK
 Performance:
-* RGEMM-SEQ-16   (MFLOPS)   6712
-* RGEMM-MTN-16              1.2x
-* RGEMM-SEQ-32   (MFLOPS)  12347
-* RGEMM-MTN-32              1.0x
-* RGEMM-SEQ-64   (MFLOPS)  12052
-* RGEMM-MTN-64              0.9x
-* RGEMM-SEQ-1024 (MFLOPS)   9104
+* RGEMM-SEQ-16   (MFLOPS)   7813
+* RGEMM-MTN-16              0.9x
+* RGEMM-SEQ-32   (MFLOPS)  11629
+* RGEMM-MTN-32              0.9x
+* RGEMM-SEQ-64   (MFLOPS)   9527
+* RGEMM-MTN-64              1.0x
+* RGEMM-SEQ-1024 (MFLOPS)   9296
 * RGEMM-MTN-1024            1.0x
 Allocation counter checked... OK
 echo "TestC: Internal Routines"
 TestC: Internal Routines
 ./TestC
-SEED: 1637111328
+SEED: 1637355701
 COMPILER: GCC
 HARDWARE: 64-bit
 HARDWARE: little-endian
@@ -405,4 +406,4 @@ mcpd                             OK
 knn                              OK
 mlptrain                         OK
 alglibbasics                     OK
-Done in 91 seconds
+Done in 88 seconds

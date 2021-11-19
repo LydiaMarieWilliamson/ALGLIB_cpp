@@ -414,25 +414,7 @@ namespace alglib {
 //     SparseGetRow                            +           +
 //     SparseGetCompressedRow                  +           +
 //     sparse-dense linear algebra             +           +
-class _sparsematrix_owner {
-public:
-   _sparsematrix_owner();
-   _sparsematrix_owner(const _sparsematrix_owner &rhs);
-   _sparsematrix_owner &operator=(const _sparsematrix_owner &rhs);
-   virtual ~_sparsematrix_owner();
-   alglib_impl::sparsematrix *c_ptr();
-   alglib_impl::sparsematrix *c_ptr() const;
-protected:
-   alglib_impl::sparsematrix *p_struct;
-};
-class sparsematrix: public _sparsematrix_owner {
-public:
-   sparsematrix();
-   sparsematrix(const sparsematrix &rhs);
-   sparsematrix &operator=(const sparsematrix &rhs);
-   virtual ~sparsematrix();
-
-};
+DecClass(sparsematrix, EndD);
 
 // Temporary buffers for sparse matrix operations.
 //
@@ -440,25 +422,7 @@ public:
 // It allows to reuse memory during repeated sparse  factorizations.  You  do
 // not have to call some initialization function - simply passing an instance
 // to factorization function is enough.
-class _sparsebuffers_owner {
-public:
-   _sparsebuffers_owner();
-   _sparsebuffers_owner(const _sparsebuffers_owner &rhs);
-   _sparsebuffers_owner &operator=(const _sparsebuffers_owner &rhs);
-   virtual ~_sparsebuffers_owner();
-   alglib_impl::sparsebuffers *c_ptr();
-   alglib_impl::sparsebuffers *c_ptr() const;
-protected:
-   alglib_impl::sparsebuffers *p_struct;
-};
-class sparsebuffers: public _sparsebuffers_owner {
-public:
-   sparsebuffers();
-   sparsebuffers(const sparsebuffers &rhs);
-   sparsebuffers &operator=(const sparsebuffers &rhs);
-   virtual ~sparsebuffers();
-
-};
+DecClass(sparsebuffers, EndD);
 
 // === HSSCHUR Package ===
 
@@ -466,49 +430,12 @@ public:
 // This object stores state of the subspace iteration algorithm.
 //
 // You should use ALGLIB functions to work with this object.
-class _eigsubspacestate_owner {
-public:
-   _eigsubspacestate_owner();
-   _eigsubspacestate_owner(const _eigsubspacestate_owner &rhs);
-   _eigsubspacestate_owner &operator=(const _eigsubspacestate_owner &rhs);
-   virtual ~_eigsubspacestate_owner();
-   alglib_impl::eigsubspacestate *c_ptr();
-   alglib_impl::eigsubspacestate *c_ptr() const;
-protected:
-   alglib_impl::eigsubspacestate *p_struct;
-};
-class eigsubspacestate: public _eigsubspacestate_owner {
-public:
-   eigsubspacestate();
-   eigsubspacestate(const eigsubspacestate &rhs);
-   eigsubspacestate &operator=(const eigsubspacestate &rhs);
-   virtual ~eigsubspacestate();
-
-};
+DecClass(eigsubspacestate, EndD);
 
 // This object stores state of the subspace iteration algorithm.
 //
 // You should use ALGLIB functions to work with this object.
-class _eigsubspacereport_owner {
-public:
-   _eigsubspacereport_owner();
-   _eigsubspacereport_owner(const _eigsubspacereport_owner &rhs);
-   _eigsubspacereport_owner &operator=(const _eigsubspacereport_owner &rhs);
-   virtual ~_eigsubspacereport_owner();
-   alglib_impl::eigsubspacereport *c_ptr();
-   alglib_impl::eigsubspacereport *c_ptr() const;
-protected:
-   alglib_impl::eigsubspacereport *p_struct;
-};
-class eigsubspacereport: public _eigsubspacereport_owner {
-public:
-   eigsubspacereport();
-   eigsubspacereport(const eigsubspacereport &rhs);
-   eigsubspacereport &operator=(const eigsubspacereport &rhs);
-   virtual ~eigsubspacereport();
-   ae_int_t &iterationscount;
-
-};
+DecClass(eigsubspacereport, ae_int_t &iterationscount;);
 
 // === DLU Package ===
 
@@ -522,25 +449,7 @@ public:
 // An analysis of the sparse matrix decomposition, performed prior to  actual
 // numerical factorization. You should not directly  access  fields  of  this
 // object - use appropriate ALGLIB functions to work with this object.
-class _sparsedecompositionanalysis_owner {
-public:
-   _sparsedecompositionanalysis_owner();
-   _sparsedecompositionanalysis_owner(const _sparsedecompositionanalysis_owner &rhs);
-   _sparsedecompositionanalysis_owner &operator=(const _sparsedecompositionanalysis_owner &rhs);
-   virtual ~_sparsedecompositionanalysis_owner();
-   alglib_impl::sparsedecompositionanalysis *c_ptr();
-   alglib_impl::sparsedecompositionanalysis *c_ptr() const;
-protected:
-   alglib_impl::sparsedecompositionanalysis *p_struct;
-};
-class sparsedecompositionanalysis: public _sparsedecompositionanalysis_owner {
-public:
-   sparsedecompositionanalysis();
-   sparsedecompositionanalysis(const sparsedecompositionanalysis &rhs);
-   sparsedecompositionanalysis &operator=(const sparsedecompositionanalysis &rhs);
-   virtual ~sparsedecompositionanalysis();
-
-};
+DecClass(sparsedecompositionanalysis, EndD);
 
 // === BDSVD Package ===
 
@@ -554,51 +463,13 @@ public:
 // This object stores state of the iterative norm estimation algorithm.
 //
 // You should use ALGLIB functions to work with this object.
-class _normestimatorstate_owner {
-public:
-   _normestimatorstate_owner();
-   _normestimatorstate_owner(const _normestimatorstate_owner &rhs);
-   _normestimatorstate_owner &operator=(const _normestimatorstate_owner &rhs);
-   virtual ~_normestimatorstate_owner();
-   alglib_impl::normestimatorstate *c_ptr();
-   alglib_impl::normestimatorstate *c_ptr() const;
-protected:
-   alglib_impl::normestimatorstate *p_struct;
-};
-class normestimatorstate: public _normestimatorstate_owner {
-public:
-   normestimatorstate();
-   normestimatorstate(const normestimatorstate &rhs);
-   normestimatorstate &operator=(const normestimatorstate &rhs);
-   virtual ~normestimatorstate();
-
-};
+DecClass(normestimatorstate, EndD);
 
 // === MATINV Package ===
 // Matrix inverse report:
 // * R1    reciprocal of condition number in 1-norm
 // * RInf  reciprocal of condition number in inf-norm
-class _matinvreport_owner {
-public:
-   _matinvreport_owner();
-   _matinvreport_owner(const _matinvreport_owner &rhs);
-   _matinvreport_owner &operator=(const _matinvreport_owner &rhs);
-   virtual ~_matinvreport_owner();
-   alglib_impl::matinvreport *c_ptr();
-   alglib_impl::matinvreport *c_ptr() const;
-protected:
-   alglib_impl::matinvreport *p_struct;
-};
-class matinvreport: public _matinvreport_owner {
-public:
-   matinvreport();
-   matinvreport(const matinvreport &rhs);
-   matinvreport &operator=(const matinvreport &rhs);
-   virtual ~matinvreport();
-   double &r1;
-   double &rinf;
-
-};
+DecClass(matinvreport, double &r1; double &rinf;);
 
 // === INVERSEUPDATE Package ===
 

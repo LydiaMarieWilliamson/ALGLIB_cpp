@@ -220,75 +220,14 @@ typedef struct {
 namespace alglib {
 // === POLYNOMIALSOLVER Package ===
 //
-class _polynomialsolverreport_owner {
-public:
-   _polynomialsolverreport_owner();
-   _polynomialsolverreport_owner(const _polynomialsolverreport_owner &rhs);
-   _polynomialsolverreport_owner &operator=(const _polynomialsolverreport_owner &rhs);
-   virtual ~_polynomialsolverreport_owner();
-   alglib_impl::polynomialsolverreport *c_ptr();
-   alglib_impl::polynomialsolverreport *c_ptr() const;
-protected:
-   alglib_impl::polynomialsolverreport *p_struct;
-};
-class polynomialsolverreport: public _polynomialsolverreport_owner {
-public:
-   polynomialsolverreport();
-   polynomialsolverreport(const polynomialsolverreport &rhs);
-   polynomialsolverreport &operator=(const polynomialsolverreport &rhs);
-   virtual ~polynomialsolverreport();
-   double &maxerr;
-
-};
+DecClass(polynomialsolverreport, double &maxerr;);
 
 // === DIRECTDENSESOLVERS Package ===
 //
-class _densesolverreport_owner {
-public:
-   _densesolverreport_owner();
-   _densesolverreport_owner(const _densesolverreport_owner &rhs);
-   _densesolverreport_owner &operator=(const _densesolverreport_owner &rhs);
-   virtual ~_densesolverreport_owner();
-   alglib_impl::densesolverreport *c_ptr();
-   alglib_impl::densesolverreport *c_ptr() const;
-protected:
-   alglib_impl::densesolverreport *p_struct;
-};
-class densesolverreport: public _densesolverreport_owner {
-public:
-   densesolverreport();
-   densesolverreport(const densesolverreport &rhs);
-   densesolverreport &operator=(const densesolverreport &rhs);
-   virtual ~densesolverreport();
-   double &r1;
-   double &rinf;
-
-};
+DecClass(densesolverreport, double &r1; double &rinf;);
 
 //
-class _densesolverlsreport_owner {
-public:
-   _densesolverlsreport_owner();
-   _densesolverlsreport_owner(const _densesolverlsreport_owner &rhs);
-   _densesolverlsreport_owner &operator=(const _densesolverlsreport_owner &rhs);
-   virtual ~_densesolverlsreport_owner();
-   alglib_impl::densesolverlsreport *c_ptr();
-   alglib_impl::densesolverlsreport *c_ptr() const;
-protected:
-   alglib_impl::densesolverlsreport *p_struct;
-};
-class densesolverlsreport: public _densesolverlsreport_owner {
-public:
-   densesolverlsreport();
-   densesolverlsreport(const densesolverlsreport &rhs);
-   densesolverlsreport &operator=(const densesolverlsreport &rhs);
-   virtual ~densesolverlsreport();
-   double &r2;
-   real_2d_array cx;
-   ae_int_t &n;
-   ae_int_t &k;
-
-};
+DecClass(densesolverlsreport, double &r2; real_2d_array cx; ae_int_t &n; ae_int_t &k;);
 
 // === DIRECTSPARSESOLVERS Package ===
 // This structure is a sparse solver report (both direct and iterative solvers
@@ -301,206 +240,40 @@ public:
 // * NMV - number of matrix-vector products performed (0 for direct solvers)
 // * IterationsCount - inner iterations count (0 for direct solvers)
 // * R2 - squared residual
-class _sparsesolverreport_owner {
-public:
-   _sparsesolverreport_owner();
-   _sparsesolverreport_owner(const _sparsesolverreport_owner &rhs);
-   _sparsesolverreport_owner &operator=(const _sparsesolverreport_owner &rhs);
-   virtual ~_sparsesolverreport_owner();
-   alglib_impl::sparsesolverreport *c_ptr();
-   alglib_impl::sparsesolverreport *c_ptr() const;
-protected:
-   alglib_impl::sparsesolverreport *p_struct;
-};
-class sparsesolverreport: public _sparsesolverreport_owner {
-public:
-   sparsesolverreport();
-   sparsesolverreport(const sparsesolverreport &rhs);
-   sparsesolverreport &operator=(const sparsesolverreport &rhs);
-   virtual ~sparsesolverreport();
-   ae_int_t &terminationtype;
-   ae_int_t &nmv;
-   ae_int_t &iterationscount;
-   double &r2;
-
-};
+DecClass(sparsesolverreport, ae_int_t &terminationtype; ae_int_t &nmv; ae_int_t &iterationscount; double &r2;);
 
 // === ITERATIVESPARSE Package ===
 // This object stores state of the sparse linear solver object.
 //
 // You should use ALGLIB functions to work with this object.
 // Never try to access its fields directly!
-class _sparsesolverstate_owner {
-public:
-   _sparsesolverstate_owner();
-   _sparsesolverstate_owner(const _sparsesolverstate_owner &rhs);
-   _sparsesolverstate_owner &operator=(const _sparsesolverstate_owner &rhs);
-   virtual ~_sparsesolverstate_owner();
-   alglib_impl::sparsesolverstate *c_ptr();
-   alglib_impl::sparsesolverstate *c_ptr() const;
-protected:
-   alglib_impl::sparsesolverstate *p_struct;
-};
-class sparsesolverstate: public _sparsesolverstate_owner {
-public:
-   sparsesolverstate();
-   sparsesolverstate(const sparsesolverstate &rhs);
-   sparsesolverstate &operator=(const sparsesolverstate &rhs);
-   virtual ~sparsesolverstate();
-
-};
+DecClass(sparsesolverstate, EndD);
 
 // === LINCG Package ===
 // This object stores state of the linear CG method.
 //
 // You should use ALGLIB functions to work with this object.
 // Never try to access its fields directly!
-class _lincgstate_owner {
-public:
-   _lincgstate_owner();
-   _lincgstate_owner(const _lincgstate_owner &rhs);
-   _lincgstate_owner &operator=(const _lincgstate_owner &rhs);
-   virtual ~_lincgstate_owner();
-   alglib_impl::lincgstate *c_ptr();
-   alglib_impl::lincgstate *c_ptr() const;
-protected:
-   alglib_impl::lincgstate *p_struct;
-};
-class lincgstate: public _lincgstate_owner {
-public:
-   lincgstate();
-   lincgstate(const lincgstate &rhs);
-   lincgstate &operator=(const lincgstate &rhs);
-   virtual ~lincgstate();
-
-};
+DecClass(lincgstate, EndD);
 
 //
-class _lincgreport_owner {
-public:
-   _lincgreport_owner();
-   _lincgreport_owner(const _lincgreport_owner &rhs);
-   _lincgreport_owner &operator=(const _lincgreport_owner &rhs);
-   virtual ~_lincgreport_owner();
-   alglib_impl::lincgreport *c_ptr();
-   alglib_impl::lincgreport *c_ptr() const;
-protected:
-   alglib_impl::lincgreport *p_struct;
-};
-class lincgreport: public _lincgreport_owner {
-public:
-   lincgreport();
-   lincgreport(const lincgreport &rhs);
-   lincgreport &operator=(const lincgreport &rhs);
-   virtual ~lincgreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nmv;
-   ae_int_t &terminationtype;
-   double &r2;
-
-};
+DecClass(lincgreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype; double &r2;);
 
 // === LINLSQR Package ===
 // This object stores state of the LinLSQR method.
 //
 // You should use ALGLIB functions to work with this object.
-class _linlsqrstate_owner {
-public:
-   _linlsqrstate_owner();
-   _linlsqrstate_owner(const _linlsqrstate_owner &rhs);
-   _linlsqrstate_owner &operator=(const _linlsqrstate_owner &rhs);
-   virtual ~_linlsqrstate_owner();
-   alglib_impl::linlsqrstate *c_ptr();
-   alglib_impl::linlsqrstate *c_ptr() const;
-protected:
-   alglib_impl::linlsqrstate *p_struct;
-};
-class linlsqrstate: public _linlsqrstate_owner {
-public:
-   linlsqrstate();
-   linlsqrstate(const linlsqrstate &rhs);
-   linlsqrstate &operator=(const linlsqrstate &rhs);
-   virtual ~linlsqrstate();
-
-};
+DecClass(linlsqrstate, EndD);
 
 //
-class _linlsqrreport_owner {
-public:
-   _linlsqrreport_owner();
-   _linlsqrreport_owner(const _linlsqrreport_owner &rhs);
-   _linlsqrreport_owner &operator=(const _linlsqrreport_owner &rhs);
-   virtual ~_linlsqrreport_owner();
-   alglib_impl::linlsqrreport *c_ptr();
-   alglib_impl::linlsqrreport *c_ptr() const;
-protected:
-   alglib_impl::linlsqrreport *p_struct;
-};
-class linlsqrreport: public _linlsqrreport_owner {
-public:
-   linlsqrreport();
-   linlsqrreport(const linlsqrreport &rhs);
-   linlsqrreport &operator=(const linlsqrreport &rhs);
-   virtual ~linlsqrreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nmv;
-   ae_int_t &terminationtype;
-
-};
+DecClass(linlsqrreport, ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
 // === NLEQ Package ===
 //
-class _nleqstate_owner {
-public:
-   _nleqstate_owner();
-   _nleqstate_owner(const _nleqstate_owner &rhs);
-   _nleqstate_owner &operator=(const _nleqstate_owner &rhs);
-   virtual ~_nleqstate_owner();
-   alglib_impl::nleqstate *c_ptr();
-   alglib_impl::nleqstate *c_ptr() const;
-protected:
-   alglib_impl::nleqstate *p_struct;
-};
-class nleqstate: public _nleqstate_owner {
-public:
-   nleqstate();
-   nleqstate(const nleqstate &rhs);
-   nleqstate &operator=(const nleqstate &rhs);
-   virtual ~nleqstate();
-   bool &needf;
-   bool &needfij;
-   bool &xupdated;
-   double &f;
-   real_1d_array fi;
-   real_2d_array j;
-   real_1d_array x;
-
-};
+DecClass(nleqstate, bool &needf; bool &needfij; bool &xupdated; double &f; real_1d_array fi; real_2d_array j; real_1d_array x;);
 
 //
-class _nleqreport_owner {
-public:
-   _nleqreport_owner();
-   _nleqreport_owner(const _nleqreport_owner &rhs);
-   _nleqreport_owner &operator=(const _nleqreport_owner &rhs);
-   virtual ~_nleqreport_owner();
-   alglib_impl::nleqreport *c_ptr();
-   alglib_impl::nleqreport *c_ptr() const;
-protected:
-   alglib_impl::nleqreport *p_struct;
-};
-class nleqreport: public _nleqreport_owner {
-public:
-   nleqreport();
-   nleqreport(const nleqreport &rhs);
-   nleqreport &operator=(const nleqreport &rhs);
-   virtual ~nleqreport();
-   ae_int_t &iterationscount;
-   ae_int_t &nfunc;
-   ae_int_t &njac;
-   ae_int_t &terminationtype;
-
-};
+DecClass(nleqreport, ae_int_t &iterationscount; ae_int_t &nfunc; ae_int_t &njac; ae_int_t &terminationtype;);
 
 // === POLYNOMIALSOLVER Package ===
 // Polynomial root finding.

@@ -1104,9 +1104,6 @@ extern FILE *alglib_trace_file;
 namespace alglib {
 typedef alglib_impl::ae_int_t ae_int_t;
 
-// Class forwards
-class complex;
-
 ae_int_t vlen(ae_int_t n1, ae_int_t n2);
 
 // Exception class.
@@ -1121,7 +1118,85 @@ public:
    static void make_assertion(bool bClause, const char *p_msg);
 private:
 };
+#   define ThrowErrorMsg(Q, X)	throw ap_error((Q).error_msg)
+#else
+#   define ThrowErrorMsg(Q, X)	set_error_flag((Q).error_msg); return X
 #endif
+
+#define TryX(Q)		jmp_buf BreakAt; if (!setjmp(BreakAt)) alglib_impl::ae_state_set_break_jump(&(Q), &BreakAt); else
+#define TryCatch(Q, X)	TryX(Q) { ThrowErrorMsg(Q, X); }
+
+#define EndD		
+#define AndD		,
+#define DecVal(X)	X(Obj->X)
+#define DecVar(X)	X(&Obj->X)
+#define DecComplex(X)	X(*(complex *)&Obj->X)
+
+#define DecClass(Type, Pars) \
+struct Type##I { \
+   Type##I(); \
+   Type##I(const Type##I &A); \
+   Type##I &operator=(const Type##I &A); \
+   virtual ~Type##I(); \
+   alglib_impl::Type *c_ptr(); \
+   alglib_impl::Type *c_ptr() const; \
+protected: \
+   alglib_impl::Type *Obj; \
+}; \
+struct Type: public Type##I { \
+   Type(); \
+   Type(const Type &A); \
+   Type &operator=(const Type &A); \
+   virtual ~Type(); \
+   Pars \
+};
+
+#define DefClass(Type, Vars) \
+Type##I::Type##I() { \
+   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   TryX(Q) { \
+      if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), alglib_impl::ae_free(Obj), Obj = NULL; \
+      ThrowErrorMsg(Q, ); \
+   } \
+   Obj = NULL, Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init(Obj, &Q, false); \
+   ae_state_clear(&Q); \
+} \
+Type##I::Type##I(const Type##I &A) { \
+   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   TryX(Q) { \
+      if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), alglib_impl::ae_free(Obj), Obj = NULL; \
+      ThrowErrorMsg(Q, ); \
+   } \
+   Obj = NULL; \
+   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " copy constructor failure (source is not initialized)", &Q); \
+   Obj = (alglib_impl::Type *)alglib_impl::ae_malloc(sizeof *Obj, &Q); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   ae_state_clear(&Q); \
+} \
+Type##I &Type##I::operator=(const Type##I &A) { \
+   if (this == &A) return *this; \
+   alglib_impl::ae_state Q; alglib_impl::ae_state_init(&Q); \
+   TryCatch(Q, *this); \
+   alglib_impl::ae_assert(Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (destination is not initialized)", &Q); \
+   alglib_impl::ae_assert(A.Obj != NULL, "ALGLIB++: " #Type " assignment constructor failure (source is not initialized)", &Q); \
+   alglib_impl::_##Type##_destroy(Obj); \
+   memset(Obj, 0, sizeof *Obj), alglib_impl::_##Type##_init_copy(Obj, const_cast < alglib_impl::Type * >(A.Obj), &Q, false); \
+   ae_state_clear(&Q); \
+   return *this; \
+} \
+Type##I::~Type##I() { \
+   if (Obj != NULL) alglib_impl::_##Type##_destroy(Obj), ae_free(Obj); \
+} \
+alglib_impl::Type *Type##I::c_ptr() { return Obj; } \
+alglib_impl::Type *Type##I::c_ptr() const { return const_cast<alglib_impl::Type *>(Obj); } \
+Type::Type():Type##I() Vars { } \
+Type::Type(const Type &A):Type##I(A) Vars { } \
+Type &Type::operator=(const Type &A) { \
+   if (this != &A) Type##I::operator=(A); \
+   return *this; \
+} \
+Type::~Type() { }
 
 // Complex number with double precision.
 class complex {

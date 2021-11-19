@@ -524,73 +524,14 @@ namespace alglib {
 //
 // NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 //         errors in prediction of posterior probabilities
-class _modelerrors_owner {
-public:
-   _modelerrors_owner();
-   _modelerrors_owner(const _modelerrors_owner &rhs);
-   _modelerrors_owner &operator=(const _modelerrors_owner &rhs);
-   virtual ~_modelerrors_owner();
-   alglib_impl::modelerrors *c_ptr();
-   alglib_impl::modelerrors *c_ptr() const;
-protected:
-   alglib_impl::modelerrors *p_struct;
-};
-class modelerrors: public _modelerrors_owner {
-public:
-   modelerrors();
-   modelerrors(const modelerrors &rhs);
-   modelerrors &operator=(const modelerrors &rhs);
-   virtual ~modelerrors();
-   double &relclserror;
-   double &avgce;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-
-};
+DecClass(modelerrors, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 
 //
-class _multilayerperceptron_owner {
-public:
-   _multilayerperceptron_owner();
-   _multilayerperceptron_owner(const _multilayerperceptron_owner &rhs);
-   _multilayerperceptron_owner &operator=(const _multilayerperceptron_owner &rhs);
-   virtual ~_multilayerperceptron_owner();
-   alglib_impl::multilayerperceptron *c_ptr();
-   alglib_impl::multilayerperceptron *c_ptr() const;
-protected:
-   alglib_impl::multilayerperceptron *p_struct;
-};
-class multilayerperceptron: public _multilayerperceptron_owner {
-public:
-   multilayerperceptron();
-   multilayerperceptron(const multilayerperceptron &rhs);
-   multilayerperceptron &operator=(const multilayerperceptron &rhs);
-   virtual ~multilayerperceptron();
-
-};
+DecClass(multilayerperceptron, EndD);
 
 // === MLPE Package ===
 // Neural networks ensemble
-class _mlpensemble_owner {
-public:
-   _mlpensemble_owner();
-   _mlpensemble_owner(const _mlpensemble_owner &rhs);
-   _mlpensemble_owner &operator=(const _mlpensemble_owner &rhs);
-   virtual ~_mlpensemble_owner();
-   alglib_impl::mlpensemble *c_ptr();
-   alglib_impl::mlpensemble *c_ptr() const;
-protected:
-   alglib_impl::mlpensemble *p_struct;
-};
-class mlpensemble: public _mlpensemble_owner {
-public:
-   mlpensemble();
-   mlpensemble(const mlpensemble &rhs);
-   mlpensemble &operator=(const mlpensemble &rhs);
-   virtual ~mlpensemble();
-
-};
+DecClass(mlpensemble, EndD);
 
 // === CLUSTERING Package ===
 // This structure is a clusterization engine.
@@ -600,25 +541,7 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 10.07.2012 by Bochkanov Sergey
-class _clusterizerstate_owner {
-public:
-   _clusterizerstate_owner();
-   _clusterizerstate_owner(const _clusterizerstate_owner &rhs);
-   _clusterizerstate_owner &operator=(const _clusterizerstate_owner &rhs);
-   virtual ~_clusterizerstate_owner();
-   alglib_impl::clusterizerstate *c_ptr();
-   alglib_impl::clusterizerstate *c_ptr() const;
-protected:
-   alglib_impl::clusterizerstate *p_struct;
-};
-class clusterizerstate: public _clusterizerstate_owner {
-public:
-   clusterizerstate();
-   clusterizerstate(const clusterizerstate &rhs);
-   clusterizerstate &operator=(const clusterizerstate &rhs);
-   virtual ~clusterizerstate();
-
-};
+DecClass(clusterizerstate, EndD);
 
 // This structure  is used to store results of the agglomerative hierarchical
 // clustering (AHC).
@@ -720,32 +643,7 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 10.07.2012 by Bochkanov Sergey
-class _ahcreport_owner {
-public:
-   _ahcreport_owner();
-   _ahcreport_owner(const _ahcreport_owner &rhs);
-   _ahcreport_owner &operator=(const _ahcreport_owner &rhs);
-   virtual ~_ahcreport_owner();
-   alglib_impl::ahcreport *c_ptr();
-   alglib_impl::ahcreport *c_ptr() const;
-protected:
-   alglib_impl::ahcreport *p_struct;
-};
-class ahcreport: public _ahcreport_owner {
-public:
-   ahcreport();
-   ahcreport(const ahcreport &rhs);
-   ahcreport &operator=(const ahcreport &rhs);
-   virtual ~ahcreport();
-   ae_int_t &terminationtype;
-   ae_int_t &npoints;
-   integer_1d_array p;
-   integer_2d_array z;
-   integer_2d_array pz;
-   integer_2d_array pm;
-   real_1d_array mergedist;
-
-};
+DecClass(ahcreport, ae_int_t &terminationtype; ae_int_t &npoints; integer_1d_array p; integer_2d_array z; integer_2d_array pz; integer_2d_array pm; real_1d_array mergedist;);
 
 // This  structure   is  used  to  store  results of the  k-means  clustering
 // algorithm.
@@ -781,103 +679,23 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 27.11.2012 by Bochkanov Sergey
-class _kmeansreport_owner {
-public:
-   _kmeansreport_owner();
-   _kmeansreport_owner(const _kmeansreport_owner &rhs);
-   _kmeansreport_owner &operator=(const _kmeansreport_owner &rhs);
-   virtual ~_kmeansreport_owner();
-   alglib_impl::kmeansreport *c_ptr();
-   alglib_impl::kmeansreport *c_ptr() const;
-protected:
-   alglib_impl::kmeansreport *p_struct;
-};
-class kmeansreport: public _kmeansreport_owner {
-public:
-   kmeansreport();
-   kmeansreport(const kmeansreport &rhs);
-   kmeansreport &operator=(const kmeansreport &rhs);
-   virtual ~kmeansreport();
-   ae_int_t &npoints;
-   ae_int_t &nfeatures;
-   ae_int_t &terminationtype;
-   ae_int_t &iterationscount;
-   double &energy;
-   ae_int_t &k;
-   real_2d_array c;
-   integer_1d_array cidx;
-
-};
+DecClass(kmeansreport, ae_int_t &npoints; ae_int_t &nfeatures; ae_int_t &terminationtype; ae_int_t &iterationscount; double &energy; ae_int_t &k; real_2d_array c; integer_1d_array cidx;);
 
 // === DFOREST Package ===
 // A random forest (decision forest) builder object.
 //
 // Used to store dataset and specify decision forest training algorithm settings.
-class _decisionforestbuilder_owner {
-public:
-   _decisionforestbuilder_owner();
-   _decisionforestbuilder_owner(const _decisionforestbuilder_owner &rhs);
-   _decisionforestbuilder_owner &operator=(const _decisionforestbuilder_owner &rhs);
-   virtual ~_decisionforestbuilder_owner();
-   alglib_impl::decisionforestbuilder *c_ptr();
-   alglib_impl::decisionforestbuilder *c_ptr() const;
-protected:
-   alglib_impl::decisionforestbuilder *p_struct;
-};
-class decisionforestbuilder: public _decisionforestbuilder_owner {
-public:
-   decisionforestbuilder();
-   decisionforestbuilder(const decisionforestbuilder &rhs);
-   decisionforestbuilder &operator=(const decisionforestbuilder &rhs);
-   virtual ~decisionforestbuilder();
-
-};
+DecClass(decisionforestbuilder, EndD);
 
 // Buffer object which is used to perform  various  requests  (usually  model
 // inference) in the multithreaded mode (multiple threads working  with  same
 // DF object).
 //
 // This object should be created with DFCreateBuffer().
-class _decisionforestbuffer_owner {
-public:
-   _decisionforestbuffer_owner();
-   _decisionforestbuffer_owner(const _decisionforestbuffer_owner &rhs);
-   _decisionforestbuffer_owner &operator=(const _decisionforestbuffer_owner &rhs);
-   virtual ~_decisionforestbuffer_owner();
-   alglib_impl::decisionforestbuffer *c_ptr();
-   alglib_impl::decisionforestbuffer *c_ptr() const;
-protected:
-   alglib_impl::decisionforestbuffer *p_struct;
-};
-class decisionforestbuffer: public _decisionforestbuffer_owner {
-public:
-   decisionforestbuffer();
-   decisionforestbuffer(const decisionforestbuffer &rhs);
-   decisionforestbuffer &operator=(const decisionforestbuffer &rhs);
-   virtual ~decisionforestbuffer();
-
-};
+DecClass(decisionforestbuffer, EndD);
 
 // Decision forest (random forest) model.
-class _decisionforest_owner {
-public:
-   _decisionforest_owner();
-   _decisionforest_owner(const _decisionforest_owner &rhs);
-   _decisionforest_owner &operator=(const _decisionforest_owner &rhs);
-   virtual ~_decisionforest_owner();
-   alglib_impl::decisionforest *c_ptr();
-   alglib_impl::decisionforest *c_ptr() const;
-protected:
-   alglib_impl::decisionforest *p_struct;
-};
-class decisionforest: public _decisionforest_owner {
-public:
-   decisionforest();
-   decisionforest(const decisionforest &rhs);
-   decisionforest &operator=(const decisionforest &rhs);
-   virtual ~decisionforest();
-
-};
+DecClass(decisionforest, EndD);
 
 // Decision forest training report.
 //
@@ -951,59 +769,11 @@ public:
 // More information on variable importance ratings can be found  in  comments
 // on the dfbuildersetimportancegini() and dfbuildersetimportancepermutation()
 // functions.
-class _dfreport_owner {
-public:
-   _dfreport_owner();
-   _dfreport_owner(const _dfreport_owner &rhs);
-   _dfreport_owner &operator=(const _dfreport_owner &rhs);
-   virtual ~_dfreport_owner();
-   alglib_impl::dfreport *c_ptr();
-   alglib_impl::dfreport *c_ptr() const;
-protected:
-   alglib_impl::dfreport *p_struct;
-};
-class dfreport: public _dfreport_owner {
-public:
-   dfreport();
-   dfreport(const dfreport &rhs);
-   dfreport &operator=(const dfreport &rhs);
-   virtual ~dfreport();
-   double &relclserror;
-   double &avgce;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &oobrelclserror;
-   double &oobavgce;
-   double &oobrmserror;
-   double &oobavgerror;
-   double &oobavgrelerror;
-   integer_1d_array topvars;
-   real_1d_array varimportances;
-
-};
+DecClass(dfreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; double &oobrelclserror; double &oobavgce; double &oobrmserror; double &oobavgerror; double &oobavgrelerror; integer_1d_array topvars; real_1d_array varimportances;);
 
 // === LINREG Package ===
 //
-class _linearmodel_owner {
-public:
-   _linearmodel_owner();
-   _linearmodel_owner(const _linearmodel_owner &rhs);
-   _linearmodel_owner &operator=(const _linearmodel_owner &rhs);
-   virtual ~_linearmodel_owner();
-   alglib_impl::linearmodel *c_ptr();
-   alglib_impl::linearmodel *c_ptr() const;
-protected:
-   alglib_impl::linearmodel *p_struct;
-};
-class linearmodel: public _linearmodel_owner {
-public:
-   linearmodel();
-   linearmodel(const linearmodel &rhs);
-   linearmodel &operator=(const linearmodel &rhs);
-   virtual ~linearmodel();
-
-};
+DecClass(linearmodel, EndD);
 
 // LRReport structure contains additional information about linear model:
 // * C             -   covariation matrix,  array[0..NVars,0..NVars].
@@ -1020,34 +790,7 @@ public:
 //
 // All other fields of the structure are intended for internal use and should
 // not be used outside ALGLIB.
-class _lrreport_owner {
-public:
-   _lrreport_owner();
-   _lrreport_owner(const _lrreport_owner &rhs);
-   _lrreport_owner &operator=(const _lrreport_owner &rhs);
-   virtual ~_lrreport_owner();
-   alglib_impl::lrreport *c_ptr();
-   alglib_impl::lrreport *c_ptr() const;
-protected:
-   alglib_impl::lrreport *p_struct;
-};
-class lrreport: public _lrreport_owner {
-public:
-   lrreport();
-   lrreport(const lrreport &rhs);
-   lrreport &operator=(const lrreport &rhs);
-   virtual ~lrreport();
-   real_2d_array c;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &cvrmserror;
-   double &cvavgerror;
-   double &cvavgrelerror;
-   ae_int_t &ncvdefects;
-   integer_1d_array cvdefects;
-
-};
+DecClass(lrreport, real_2d_array c; double &rmserror; double &avgerror; double &avgrelerror; double &cvrmserror; double &cvavgerror; double &cvavgrelerror; ae_int_t &ncvdefects; integer_1d_array cvdefects;);
 
 // === FILTERS Package ===
 
@@ -1055,25 +798,7 @@ public:
 // This object stores state of the SSA model.
 //
 // You should use ALGLIB functions to work with this object.
-class _ssamodel_owner {
-public:
-   _ssamodel_owner();
-   _ssamodel_owner(const _ssamodel_owner &rhs);
-   _ssamodel_owner &operator=(const _ssamodel_owner &rhs);
-   virtual ~_ssamodel_owner();
-   alglib_impl::ssamodel *c_ptr();
-   alglib_impl::ssamodel *c_ptr() const;
-protected:
-   alglib_impl::ssamodel *p_struct;
-};
-class ssamodel: public _ssamodel_owner {
-public:
-   ssamodel();
-   ssamodel(const ssamodel &rhs);
-   ssamodel &operator=(const ssamodel &rhs);
-   virtual ~ssamodel();
-
-};
+DecClass(ssamodel, EndD);
 
 // === LDA Package ===
 
@@ -1084,25 +809,7 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 23.05.2010 by Bochkanov Sergey
-class _mcpdstate_owner {
-public:
-   _mcpdstate_owner();
-   _mcpdstate_owner(const _mcpdstate_owner &rhs);
-   _mcpdstate_owner &operator=(const _mcpdstate_owner &rhs);
-   virtual ~_mcpdstate_owner();
-   alglib_impl::mcpdstate *c_ptr();
-   alglib_impl::mcpdstate *c_ptr() const;
-protected:
-   alglib_impl::mcpdstate *p_struct;
-};
-class mcpdstate: public _mcpdstate_owner {
-public:
-   mcpdstate();
-   mcpdstate(const mcpdstate &rhs);
-   mcpdstate &operator=(const mcpdstate &rhs);
-   virtual ~mcpdstate();
-
-};
+DecClass(mcpdstate, EndD);
 
 // This structure is a MCPD training report:
 //     InnerIterationsCount    -   number of inner iterations of the
@@ -1117,76 +824,16 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 23.05.2010 by Bochkanov Sergey
-class _mcpdreport_owner {
-public:
-   _mcpdreport_owner();
-   _mcpdreport_owner(const _mcpdreport_owner &rhs);
-   _mcpdreport_owner &operator=(const _mcpdreport_owner &rhs);
-   virtual ~_mcpdreport_owner();
-   alglib_impl::mcpdreport *c_ptr();
-   alglib_impl::mcpdreport *c_ptr() const;
-protected:
-   alglib_impl::mcpdreport *p_struct;
-};
-class mcpdreport: public _mcpdreport_owner {
-public:
-   mcpdreport();
-   mcpdreport(const mcpdreport &rhs);
-   mcpdreport &operator=(const mcpdreport &rhs);
-   virtual ~mcpdreport();
-   ae_int_t &inneriterationscount;
-   ae_int_t &outeriterationscount;
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-
-};
+DecClass(mcpdreport, ae_int_t &inneriterationscount; ae_int_t &outeriterationscount; ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // === LOGIT Package ===
 //
-class _logitmodel_owner {
-public:
-   _logitmodel_owner();
-   _logitmodel_owner(const _logitmodel_owner &rhs);
-   _logitmodel_owner &operator=(const _logitmodel_owner &rhs);
-   virtual ~_logitmodel_owner();
-   alglib_impl::logitmodel *c_ptr();
-   alglib_impl::logitmodel *c_ptr() const;
-protected:
-   alglib_impl::logitmodel *p_struct;
-};
-class logitmodel: public _logitmodel_owner {
-public:
-   logitmodel();
-   logitmodel(const logitmodel &rhs);
-   logitmodel &operator=(const logitmodel &rhs);
-   virtual ~logitmodel();
-
-};
+DecClass(logitmodel, EndD);
 
 // MNLReport structure contains information about training process:
 // * NGrad     -   number of gradient calculations
 // * NHess     -   number of Hessian calculations
-class _mnlreport_owner {
-public:
-   _mnlreport_owner();
-   _mnlreport_owner(const _mnlreport_owner &rhs);
-   _mnlreport_owner &operator=(const _mnlreport_owner &rhs);
-   virtual ~_mnlreport_owner();
-   alglib_impl::mnlreport *c_ptr();
-   alglib_impl::mnlreport *c_ptr() const;
-protected:
-   alglib_impl::mnlreport *p_struct;
-};
-class mnlreport: public _mnlreport_owner {
-public:
-   mnlreport();
-   mnlreport(const mnlreport &rhs);
-   mnlreport &operator=(const mnlreport &rhs);
-   virtual ~mnlreport();
-   ae_int_t &ngrad;
-   ae_int_t &nhess;
-
-};
+DecClass(mnlreport, ae_int_t &ngrad; ae_int_t &nhess;);
 
 // === KNN Package ===
 // Buffer object which is used to perform  various  requests  (usually  model
@@ -1194,68 +841,14 @@ public:
 // KNN object).
 //
 // This object should be created with KNNCreateBuffer().
-class _knnbuffer_owner {
-public:
-   _knnbuffer_owner();
-   _knnbuffer_owner(const _knnbuffer_owner &rhs);
-   _knnbuffer_owner &operator=(const _knnbuffer_owner &rhs);
-   virtual ~_knnbuffer_owner();
-   alglib_impl::knnbuffer *c_ptr();
-   alglib_impl::knnbuffer *c_ptr() const;
-protected:
-   alglib_impl::knnbuffer *p_struct;
-};
-class knnbuffer: public _knnbuffer_owner {
-public:
-   knnbuffer();
-   knnbuffer(const knnbuffer &rhs);
-   knnbuffer &operator=(const knnbuffer &rhs);
-   virtual ~knnbuffer();
-
-};
+DecClass(knnbuffer, EndD);
 
 // A KNN builder object; this object encapsulates  dataset  and  all  related
 // settings, it is used to create an actual instance of KNN model.
-class _knnbuilder_owner {
-public:
-   _knnbuilder_owner();
-   _knnbuilder_owner(const _knnbuilder_owner &rhs);
-   _knnbuilder_owner &operator=(const _knnbuilder_owner &rhs);
-   virtual ~_knnbuilder_owner();
-   alglib_impl::knnbuilder *c_ptr();
-   alglib_impl::knnbuilder *c_ptr() const;
-protected:
-   alglib_impl::knnbuilder *p_struct;
-};
-class knnbuilder: public _knnbuilder_owner {
-public:
-   knnbuilder();
-   knnbuilder(const knnbuilder &rhs);
-   knnbuilder &operator=(const knnbuilder &rhs);
-   virtual ~knnbuilder();
-
-};
+DecClass(knnbuilder, EndD);
 
 // KNN model, can be used for classification or regression
-class _knnmodel_owner {
-public:
-   _knnmodel_owner();
-   _knnmodel_owner(const _knnmodel_owner &rhs);
-   _knnmodel_owner &operator=(const _knnmodel_owner &rhs);
-   virtual ~_knnmodel_owner();
-   alglib_impl::knnmodel *c_ptr();
-   alglib_impl::knnmodel *c_ptr() const;
-protected:
-   alglib_impl::knnmodel *p_struct;
-};
-class knnmodel: public _knnmodel_owner {
-public:
-   knnmodel();
-   knnmodel(const knnmodel &rhs);
-   knnmodel &operator=(const knnmodel &rhs);
-   virtual ~knnmodel();
-
-};
+DecClass(knnmodel, EndD);
 
 // KNN training report.
 //
@@ -1271,30 +864,7 @@ public:
 //
 // For regression problems:
 // * RELCLS and AVGCE errors are zero
-class _knnreport_owner {
-public:
-   _knnreport_owner();
-   _knnreport_owner(const _knnreport_owner &rhs);
-   _knnreport_owner &operator=(const _knnreport_owner &rhs);
-   virtual ~_knnreport_owner();
-   alglib_impl::knnreport *c_ptr();
-   alglib_impl::knnreport *c_ptr() const;
-protected:
-   alglib_impl::knnreport *p_struct;
-};
-class knnreport: public _knnreport_owner {
-public:
-   knnreport();
-   knnreport(const knnreport &rhs);
-   knnreport &operator=(const knnreport &rhs);
-   virtual ~knnreport();
-   double &relclserror;
-   double &avgce;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-
-};
+DecClass(knnreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 
 // === MLPTRAIN Package ===
 // Training report:
@@ -1311,83 +881,16 @@ public:
 //
 // NOTE 2: on classification problems  RMSError/AvgError/AvgRelError  contain
 //         errors in prediction of posterior probabilities
-class _mlpreport_owner {
-public:
-   _mlpreport_owner();
-   _mlpreport_owner(const _mlpreport_owner &rhs);
-   _mlpreport_owner &operator=(const _mlpreport_owner &rhs);
-   virtual ~_mlpreport_owner();
-   alglib_impl::mlpreport *c_ptr();
-   alglib_impl::mlpreport *c_ptr() const;
-protected:
-   alglib_impl::mlpreport *p_struct;
-};
-class mlpreport: public _mlpreport_owner {
-public:
-   mlpreport();
-   mlpreport(const mlpreport &rhs);
-   mlpreport &operator=(const mlpreport &rhs);
-   virtual ~mlpreport();
-   double &relclserror;
-   double &avgce;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   ae_int_t &ngrad;
-   ae_int_t &nhess;
-   ae_int_t &ncholesky;
-
-};
+DecClass(mlpreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror; ae_int_t &ngrad; ae_int_t &nhess; ae_int_t &ncholesky;);
 
 // Cross-validation estimates of generalization error
-class _mlpcvreport_owner {
-public:
-   _mlpcvreport_owner();
-   _mlpcvreport_owner(const _mlpcvreport_owner &rhs);
-   _mlpcvreport_owner &operator=(const _mlpcvreport_owner &rhs);
-   virtual ~_mlpcvreport_owner();
-   alglib_impl::mlpcvreport *c_ptr();
-   alglib_impl::mlpcvreport *c_ptr() const;
-protected:
-   alglib_impl::mlpcvreport *p_struct;
-};
-class mlpcvreport: public _mlpcvreport_owner {
-public:
-   mlpcvreport();
-   mlpcvreport(const mlpcvreport &rhs);
-   mlpcvreport &operator=(const mlpcvreport &rhs);
-   virtual ~mlpcvreport();
-   double &relclserror;
-   double &avgce;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-
-};
+DecClass(mlpcvreport, double &relclserror; double &avgce; double &rmserror; double &avgerror; double &avgrelerror;);
 
 // Trainer object for neural network.
 //
 // You should not try to access fields of this object directly -  use  ALGLIB
 // functions to work with this object.
-class _mlptrainer_owner {
-public:
-   _mlptrainer_owner();
-   _mlptrainer_owner(const _mlptrainer_owner &rhs);
-   _mlptrainer_owner &operator=(const _mlptrainer_owner &rhs);
-   virtual ~_mlptrainer_owner();
-   alglib_impl::mlptrainer *c_ptr();
-   alglib_impl::mlptrainer *c_ptr() const;
-protected:
-   alglib_impl::mlptrainer *p_struct;
-};
-class mlptrainer: public _mlptrainer_owner {
-public:
-   mlptrainer();
-   mlptrainer(const mlptrainer &rhs);
-   mlptrainer &operator=(const mlptrainer &rhs);
-   virtual ~mlptrainer();
-
-};
+DecClass(mlptrainer, EndD);
 
 // === DATACOMP Package ===
 

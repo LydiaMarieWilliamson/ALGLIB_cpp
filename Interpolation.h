@@ -456,121 +456,27 @@ typedef struct {
 namespace alglib {
 // === RATINT Package ===
 // Barycentric interpolant.
-class _barycentricinterpolant_owner {
-public:
-   _barycentricinterpolant_owner();
-   _barycentricinterpolant_owner(const _barycentricinterpolant_owner &rhs);
-   _barycentricinterpolant_owner &operator=(const _barycentricinterpolant_owner &rhs);
-   virtual ~_barycentricinterpolant_owner();
-   alglib_impl::barycentricinterpolant *c_ptr();
-   alglib_impl::barycentricinterpolant *c_ptr() const;
-protected:
-   alglib_impl::barycentricinterpolant *p_struct;
-};
-class barycentricinterpolant: public _barycentricinterpolant_owner {
-public:
-   barycentricinterpolant();
-   barycentricinterpolant(const barycentricinterpolant &rhs);
-   barycentricinterpolant &operator=(const barycentricinterpolant &rhs);
-   virtual ~barycentricinterpolant();
-
-};
+DecClass(barycentricinterpolant, EndD);
 
 // === IDW Package ===
 // Buffer  object  which  is  used  to  perform  evaluation  requests  in  the
 // multithreaded mode (multiple threads working with same IDW object).
 //
 // This object should be created with idwcreatecalcbuffer().
-class _idwcalcbuffer_owner {
-public:
-   _idwcalcbuffer_owner();
-   _idwcalcbuffer_owner(const _idwcalcbuffer_owner &rhs);
-   _idwcalcbuffer_owner &operator=(const _idwcalcbuffer_owner &rhs);
-   virtual ~_idwcalcbuffer_owner();
-   alglib_impl::idwcalcbuffer *c_ptr();
-   alglib_impl::idwcalcbuffer *c_ptr() const;
-protected:
-   alglib_impl::idwcalcbuffer *p_struct;
-};
-class idwcalcbuffer: public _idwcalcbuffer_owner {
-public:
-   idwcalcbuffer();
-   idwcalcbuffer(const idwcalcbuffer &rhs);
-   idwcalcbuffer &operator=(const idwcalcbuffer &rhs);
-   virtual ~idwcalcbuffer();
-
-};
+DecClass(idwcalcbuffer, EndD);
 
 // IDW (Inverse Distance Weighting) model object.
-class _idwmodel_owner {
-public:
-   _idwmodel_owner();
-   _idwmodel_owner(const _idwmodel_owner &rhs);
-   _idwmodel_owner &operator=(const _idwmodel_owner &rhs);
-   virtual ~_idwmodel_owner();
-   alglib_impl::idwmodel *c_ptr();
-   alglib_impl::idwmodel *c_ptr() const;
-protected:
-   alglib_impl::idwmodel *p_struct;
-};
-class idwmodel: public _idwmodel_owner {
-public:
-   idwmodel();
-   idwmodel(const idwmodel &rhs);
-   idwmodel &operator=(const idwmodel &rhs);
-   virtual ~idwmodel();
-
-};
+DecClass(idwmodel, EndD);
 
 // Builder object used to generate IDW (Inverse Distance Weighting) model.
-class _idwbuilder_owner {
-public:
-   _idwbuilder_owner();
-   _idwbuilder_owner(const _idwbuilder_owner &rhs);
-   _idwbuilder_owner &operator=(const _idwbuilder_owner &rhs);
-   virtual ~_idwbuilder_owner();
-   alglib_impl::idwbuilder *c_ptr();
-   alglib_impl::idwbuilder *c_ptr() const;
-protected:
-   alglib_impl::idwbuilder *p_struct;
-};
-class idwbuilder: public _idwbuilder_owner {
-public:
-   idwbuilder();
-   idwbuilder(const idwbuilder &rhs);
-   idwbuilder &operator=(const idwbuilder &rhs);
-   virtual ~idwbuilder();
-
-};
+DecClass(idwbuilder, EndD);
 
 // IDW fitting report:
 //     rmserror        RMS error
 //     avgerror        average error
 //     maxerror        maximum error
 //     r2              coefficient of determination,  R-squared, 1-RSS/TSS
-class _idwreport_owner {
-public:
-   _idwreport_owner();
-   _idwreport_owner(const _idwreport_owner &rhs);
-   _idwreport_owner &operator=(const _idwreport_owner &rhs);
-   virtual ~_idwreport_owner();
-   alglib_impl::idwreport *c_ptr();
-   alglib_impl::idwreport *c_ptr() const;
-protected:
-   alglib_impl::idwreport *p_struct;
-};
-class idwreport: public _idwreport_owner {
-public:
-   idwreport();
-   idwreport(const idwreport &rhs);
-   idwreport &operator=(const idwreport &rhs);
-   virtual ~idwreport();
-   double &rmserror;
-   double &avgerror;
-   double &maxerror;
-   double &r2;
-
-};
+DecClass(idwreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
 
 // === INTFITSERV Package ===
 
@@ -578,25 +484,7 @@ public:
 
 // === SPLINE1D Package ===
 // 1-dimensional spline interpolant
-class _spline1dinterpolant_owner {
-public:
-   _spline1dinterpolant_owner();
-   _spline1dinterpolant_owner(const _spline1dinterpolant_owner &rhs);
-   _spline1dinterpolant_owner &operator=(const _spline1dinterpolant_owner &rhs);
-   virtual ~_spline1dinterpolant_owner();
-   alglib_impl::spline1dinterpolant *c_ptr();
-   alglib_impl::spline1dinterpolant *c_ptr() const;
-protected:
-   alglib_impl::spline1dinterpolant *p_struct;
-};
-class spline1dinterpolant: public _spline1dinterpolant_owner {
-public:
-   spline1dinterpolant();
-   spline1dinterpolant(const spline1dinterpolant &rhs);
-   spline1dinterpolant &operator=(const spline1dinterpolant &rhs);
-   virtual ~spline1dinterpolant();
-
-};
+DecClass(spline1dinterpolant, EndD);
 
 // Spline fitting report:
 //     RMSError        RMS error
@@ -607,30 +495,7 @@ public:
 // Fields  below are  filled  by   obsolete    functions   (Spline1DFitCubic,
 // Spline1DFitHermite). Modern fitting functions do NOT fill these fields:
 //     TaskRCond       reciprocal of task's condition number
-class _spline1dfitreport_owner {
-public:
-   _spline1dfitreport_owner();
-   _spline1dfitreport_owner(const _spline1dfitreport_owner &rhs);
-   _spline1dfitreport_owner &operator=(const _spline1dfitreport_owner &rhs);
-   virtual ~_spline1dfitreport_owner();
-   alglib_impl::spline1dfitreport *c_ptr();
-   alglib_impl::spline1dfitreport *c_ptr() const;
-protected:
-   alglib_impl::spline1dfitreport *p_struct;
-};
-class spline1dfitreport: public _spline1dfitreport_owner {
-public:
-   spline1dfitreport();
-   spline1dfitreport(const spline1dfitreport &rhs);
-   spline1dfitreport &operator=(const spline1dfitreport &rhs);
-   virtual ~spline1dfitreport();
-   double &taskrcond;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &maxerror;
-
-};
+DecClass(spline1dfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
 
 // === LSFIT Package ===
 // Polynomial fitting report:
@@ -639,30 +504,7 @@ public:
 //     AvgError        average error
 //     AvgRelError     average relative error (for non-zero Y[I])
 //     MaxError        maximum error
-class _polynomialfitreport_owner {
-public:
-   _polynomialfitreport_owner();
-   _polynomialfitreport_owner(const _polynomialfitreport_owner &rhs);
-   _polynomialfitreport_owner &operator=(const _polynomialfitreport_owner &rhs);
-   virtual ~_polynomialfitreport_owner();
-   alglib_impl::polynomialfitreport *c_ptr();
-   alglib_impl::polynomialfitreport *c_ptr() const;
-protected:
-   alglib_impl::polynomialfitreport *p_struct;
-};
-class polynomialfitreport: public _polynomialfitreport_owner {
-public:
-   polynomialfitreport();
-   polynomialfitreport(const polynomialfitreport &rhs);
-   polynomialfitreport &operator=(const polynomialfitreport &rhs);
-   virtual ~polynomialfitreport();
-   double &taskrcond;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &maxerror;
-
-};
+DecClass(polynomialfitreport, double &taskrcond; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
 
 // Barycentric fitting report:
 //     RMSError        RMS error
@@ -670,31 +512,7 @@ public:
 //     AvgRelError     average relative error (for non-zero Y[I])
 //     MaxError        maximum error
 //     TaskRCond       reciprocal of task's condition number
-class _barycentricfitreport_owner {
-public:
-   _barycentricfitreport_owner();
-   _barycentricfitreport_owner(const _barycentricfitreport_owner &rhs);
-   _barycentricfitreport_owner &operator=(const _barycentricfitreport_owner &rhs);
-   virtual ~_barycentricfitreport_owner();
-   alglib_impl::barycentricfitreport *c_ptr();
-   alglib_impl::barycentricfitreport *c_ptr() const;
-protected:
-   alglib_impl::barycentricfitreport *p_struct;
-};
-class barycentricfitreport: public _barycentricfitreport_owner {
-public:
-   barycentricfitreport();
-   barycentricfitreport(const barycentricfitreport &rhs);
-   barycentricfitreport &operator=(const barycentricfitreport &rhs);
-   virtual ~barycentricfitreport();
-   double &taskrcond;
-   ae_int_t &dbest;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &maxerror;
-
-};
+DecClass(barycentricfitreport, double &taskrcond; ae_int_t &dbest; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror;);
 
 // Least squares fitting report. This structure contains informational fields
 // which are set by fitting functions provided by this unit.
@@ -726,71 +544,13 @@ public:
 //                     some solvers.
 //     R2              coefficient of determination (non-weighted, non-adjusted),
 //                     filled by some solvers.
-class _lsfitreport_owner {
-public:
-   _lsfitreport_owner();
-   _lsfitreport_owner(const _lsfitreport_owner &rhs);
-   _lsfitreport_owner &operator=(const _lsfitreport_owner &rhs);
-   virtual ~_lsfitreport_owner();
-   alglib_impl::lsfitreport *c_ptr();
-   alglib_impl::lsfitreport *c_ptr() const;
-protected:
-   alglib_impl::lsfitreport *p_struct;
-};
-class lsfitreport: public _lsfitreport_owner {
-public:
-   lsfitreport();
-   lsfitreport(const lsfitreport &rhs);
-   lsfitreport &operator=(const lsfitreport &rhs);
-   virtual ~lsfitreport();
-   double &taskrcond;
-   ae_int_t &iterationscount;
-   ae_int_t &varidx;
-   double &rmserror;
-   double &avgerror;
-   double &avgrelerror;
-   double &maxerror;
-   double &wrmserror;
-   real_2d_array covpar;
-   real_1d_array errpar;
-   real_1d_array errcurve;
-   real_1d_array noise;
-   double &r2;
-
-};
+DecClass(lsfitreport, double &taskrcond; ae_int_t &iterationscount; ae_int_t &varidx; double &rmserror; double &avgerror; double &avgrelerror; double &maxerror; double &wrmserror; real_2d_array covpar; real_1d_array errpar; real_1d_array errcurve; real_1d_array noise; double &r2;);
 
 // Nonlinear fitter.
 //
 // You should use ALGLIB functions to work with fitter.
 // Never try to access its fields directly!
-class _lsfitstate_owner {
-public:
-   _lsfitstate_owner();
-   _lsfitstate_owner(const _lsfitstate_owner &rhs);
-   _lsfitstate_owner &operator=(const _lsfitstate_owner &rhs);
-   virtual ~_lsfitstate_owner();
-   alglib_impl::lsfitstate *c_ptr();
-   alglib_impl::lsfitstate *c_ptr() const;
-protected:
-   alglib_impl::lsfitstate *p_struct;
-};
-class lsfitstate: public _lsfitstate_owner {
-public:
-   lsfitstate();
-   lsfitstate(const lsfitstate &rhs);
-   lsfitstate &operator=(const lsfitstate &rhs);
-   virtual ~lsfitstate();
-   bool &needf;
-   bool &needfg;
-   bool &needfgh;
-   bool &xupdated;
-   real_1d_array c;
-   double &f;
-   real_1d_array g;
-   real_2d_array h;
-   real_1d_array x;
-
-};
+DecClass(lsfitstate, bool &needf; bool &needfg; bool &needfgh; bool &xupdated; real_1d_array c; double &f; real_1d_array g; real_2d_array h; real_1d_array x;);
 
 // === FITSPHERE Package ===
 
@@ -799,147 +559,35 @@ public:
 //
 // You should not try to access its members directly - use PSpline2XXXXXXXX()
 // functions instead.
-class _pspline2interpolant_owner {
-public:
-   _pspline2interpolant_owner();
-   _pspline2interpolant_owner(const _pspline2interpolant_owner &rhs);
-   _pspline2interpolant_owner &operator=(const _pspline2interpolant_owner &rhs);
-   virtual ~_pspline2interpolant_owner();
-   alglib_impl::pspline2interpolant *c_ptr();
-   alglib_impl::pspline2interpolant *c_ptr() const;
-protected:
-   alglib_impl::pspline2interpolant *p_struct;
-};
-class pspline2interpolant: public _pspline2interpolant_owner {
-public:
-   pspline2interpolant();
-   pspline2interpolant(const pspline2interpolant &rhs);
-   pspline2interpolant &operator=(const pspline2interpolant &rhs);
-   virtual ~pspline2interpolant();
-
-};
+DecClass(pspline2interpolant, EndD);
 
 // Parametric spline inteprolant: 3-dimensional curve.
 //
 // You should not try to access its members directly - use PSpline3XXXXXXXX()
 // functions instead.
-class _pspline3interpolant_owner {
-public:
-   _pspline3interpolant_owner();
-   _pspline3interpolant_owner(const _pspline3interpolant_owner &rhs);
-   _pspline3interpolant_owner &operator=(const _pspline3interpolant_owner &rhs);
-   virtual ~_pspline3interpolant_owner();
-   alglib_impl::pspline3interpolant *c_ptr();
-   alglib_impl::pspline3interpolant *c_ptr() const;
-protected:
-   alglib_impl::pspline3interpolant *p_struct;
-};
-class pspline3interpolant: public _pspline3interpolant_owner {
-public:
-   pspline3interpolant();
-   pspline3interpolant(const pspline3interpolant &rhs);
-   pspline3interpolant &operator=(const pspline3interpolant &rhs);
-   virtual ~pspline3interpolant();
-
-};
+DecClass(pspline3interpolant, EndD);
 
 // === RBFV1 Package ===
 
 // === SPLINE2D Package ===
 // 2-dimensional spline inteprolant
-class _spline2dinterpolant_owner {
-public:
-   _spline2dinterpolant_owner();
-   _spline2dinterpolant_owner(const _spline2dinterpolant_owner &rhs);
-   _spline2dinterpolant_owner &operator=(const _spline2dinterpolant_owner &rhs);
-   virtual ~_spline2dinterpolant_owner();
-   alglib_impl::spline2dinterpolant *c_ptr();
-   alglib_impl::spline2dinterpolant *c_ptr() const;
-protected:
-   alglib_impl::spline2dinterpolant *p_struct;
-};
-class spline2dinterpolant: public _spline2dinterpolant_owner {
-public:
-   spline2dinterpolant();
-   spline2dinterpolant(const spline2dinterpolant &rhs);
-   spline2dinterpolant &operator=(const spline2dinterpolant &rhs);
-   virtual ~spline2dinterpolant();
-
-};
+DecClass(spline2dinterpolant, EndD);
 
 // Nonlinear least squares solver used to fit 2D splines to data
-class _spline2dbuilder_owner {
-public:
-   _spline2dbuilder_owner();
-   _spline2dbuilder_owner(const _spline2dbuilder_owner &rhs);
-   _spline2dbuilder_owner &operator=(const _spline2dbuilder_owner &rhs);
-   virtual ~_spline2dbuilder_owner();
-   alglib_impl::spline2dbuilder *c_ptr();
-   alglib_impl::spline2dbuilder *c_ptr() const;
-protected:
-   alglib_impl::spline2dbuilder *p_struct;
-};
-class spline2dbuilder: public _spline2dbuilder_owner {
-public:
-   spline2dbuilder();
-   spline2dbuilder(const spline2dbuilder &rhs);
-   spline2dbuilder &operator=(const spline2dbuilder &rhs);
-   virtual ~spline2dbuilder();
-
-};
+DecClass(spline2dbuilder, EndD);
 
 // Spline 2D fitting report:
 //     rmserror        RMS error
 //     avgerror        average error
 //     maxerror        maximum error
 //     r2              coefficient of determination,  R-squared, 1-RSS/TSS
-class _spline2dfitreport_owner {
-public:
-   _spline2dfitreport_owner();
-   _spline2dfitreport_owner(const _spline2dfitreport_owner &rhs);
-   _spline2dfitreport_owner &operator=(const _spline2dfitreport_owner &rhs);
-   virtual ~_spline2dfitreport_owner();
-   alglib_impl::spline2dfitreport *c_ptr();
-   alglib_impl::spline2dfitreport *c_ptr() const;
-protected:
-   alglib_impl::spline2dfitreport *p_struct;
-};
-class spline2dfitreport: public _spline2dfitreport_owner {
-public:
-   spline2dfitreport();
-   spline2dfitreport(const spline2dfitreport &rhs);
-   spline2dfitreport &operator=(const spline2dfitreport &rhs);
-   virtual ~spline2dfitreport();
-   double &rmserror;
-   double &avgerror;
-   double &maxerror;
-   double &r2;
-
-};
+DecClass(spline2dfitreport, double &rmserror; double &avgerror; double &maxerror; double &r2;);
 
 // === RBFV2 Package ===
 
 // === SPLINE3D Package ===
 // 3-dimensional spline inteprolant
-class _spline3dinterpolant_owner {
-public:
-   _spline3dinterpolant_owner();
-   _spline3dinterpolant_owner(const _spline3dinterpolant_owner &rhs);
-   _spline3dinterpolant_owner &operator=(const _spline3dinterpolant_owner &rhs);
-   virtual ~_spline3dinterpolant_owner();
-   alglib_impl::spline3dinterpolant *c_ptr();
-   alglib_impl::spline3dinterpolant *c_ptr() const;
-protected:
-   alglib_impl::spline3dinterpolant *p_struct;
-};
-class spline3dinterpolant: public _spline3dinterpolant_owner {
-public:
-   spline3dinterpolant();
-   spline3dinterpolant(const spline3dinterpolant &rhs);
-   spline3dinterpolant &operator=(const spline3dinterpolant &rhs);
-   virtual ~spline3dinterpolant();
-
-};
+DecClass(spline3dinterpolant, EndD);
 
 // === INTCOMP Package ===
 
@@ -948,49 +596,13 @@ public:
 // multithreaded mode (multiple threads working with same KD-tree object).
 //
 // This object should be created with KDTreeCreateBuffer().
-class _rbfcalcbuffer_owner {
-public:
-   _rbfcalcbuffer_owner();
-   _rbfcalcbuffer_owner(const _rbfcalcbuffer_owner &rhs);
-   _rbfcalcbuffer_owner &operator=(const _rbfcalcbuffer_owner &rhs);
-   virtual ~_rbfcalcbuffer_owner();
-   alglib_impl::rbfcalcbuffer *c_ptr();
-   alglib_impl::rbfcalcbuffer *c_ptr() const;
-protected:
-   alglib_impl::rbfcalcbuffer *p_struct;
-};
-class rbfcalcbuffer: public _rbfcalcbuffer_owner {
-public:
-   rbfcalcbuffer();
-   rbfcalcbuffer(const rbfcalcbuffer &rhs);
-   rbfcalcbuffer &operator=(const rbfcalcbuffer &rhs);
-   virtual ~rbfcalcbuffer();
-
-};
+DecClass(rbfcalcbuffer, EndD);
 
 // RBF model.
 //
 // Never try to directly work with fields of this object - always use  ALGLIB
 // functions to use this object.
-class _rbfmodel_owner {
-public:
-   _rbfmodel_owner();
-   _rbfmodel_owner(const _rbfmodel_owner &rhs);
-   _rbfmodel_owner &operator=(const _rbfmodel_owner &rhs);
-   virtual ~_rbfmodel_owner();
-   alglib_impl::rbfmodel *c_ptr();
-   alglib_impl::rbfmodel *c_ptr() const;
-protected:
-   alglib_impl::rbfmodel *p_struct;
-};
-class rbfmodel: public _rbfmodel_owner {
-public:
-   rbfmodel();
-   rbfmodel(const rbfmodel &rhs);
-   rbfmodel &operator=(const rbfmodel &rhs);
-   virtual ~rbfmodel();
-
-};
+DecClass(rbfmodel, EndD);
 
 // RBF solution report:
 // * TerminationType   -   termination type, positive values - success,
@@ -999,33 +611,7 @@ public:
 // Fields which are set by modern RBF solvers (hierarchical):
 // * RMSError          -   root-mean-square error; NAN for old solvers (ML, QNN)
 // * MaxError          -   maximum error; NAN for old solvers (ML, QNN)
-class _rbfreport_owner {
-public:
-   _rbfreport_owner();
-   _rbfreport_owner(const _rbfreport_owner &rhs);
-   _rbfreport_owner &operator=(const _rbfreport_owner &rhs);
-   virtual ~_rbfreport_owner();
-   alglib_impl::rbfreport *c_ptr();
-   alglib_impl::rbfreport *c_ptr() const;
-protected:
-   alglib_impl::rbfreport *p_struct;
-};
-class rbfreport: public _rbfreport_owner {
-public:
-   rbfreport();
-   rbfreport(const rbfreport &rhs);
-   rbfreport &operator=(const rbfreport &rhs);
-   virtual ~rbfreport();
-   double &rmserror;
-   double &maxerror;
-   ae_int_t &arows;
-   ae_int_t &acols;
-   ae_int_t &annz;
-   ae_int_t &iterationscount;
-   ae_int_t &nmv;
-   ae_int_t &terminationtype;
-
-};
+DecClass(rbfreport, double &rmserror; double &maxerror; ae_int_t &arows; ae_int_t &acols; ae_int_t &annz; ae_int_t &iterationscount; ae_int_t &nmv; ae_int_t &terminationtype;);
 
 // === RATINT Package ===
 // Rational interpolation using barycentric formula

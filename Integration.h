@@ -91,28 +91,7 @@ namespace alglib {
 // * Rep.NFEV countains number of function calculations
 // * Rep.NIntervals contains number of intervals [a,b]
 //   was partitioned into.
-class _autogkreport_owner {
-public:
-   _autogkreport_owner();
-   _autogkreport_owner(const _autogkreport_owner &rhs);
-   _autogkreport_owner &operator=(const _autogkreport_owner &rhs);
-   virtual ~_autogkreport_owner();
-   alglib_impl::autogkreport *c_ptr();
-   alglib_impl::autogkreport *c_ptr() const;
-protected:
-   alglib_impl::autogkreport *p_struct;
-};
-class autogkreport: public _autogkreport_owner {
-public:
-   autogkreport();
-   autogkreport(const autogkreport &rhs);
-   autogkreport &operator=(const autogkreport &rhs);
-   virtual ~autogkreport();
-   ae_int_t &terminationtype;
-   ae_int_t &nfev;
-   ae_int_t &nintervals;
-
-};
+DecClass(autogkreport, ae_int_t &terminationtype; ae_int_t &nfev; ae_int_t &nintervals;);
 
 // This structure stores state of the integration algorithm.
 //
@@ -121,30 +100,7 @@ public:
 // * autogksmooth()/AutoGKSmoothW()/... to create objects
 // * autogkintegrate() to begin integration
 // * autogkresults() to get results
-class _autogkstate_owner {
-public:
-   _autogkstate_owner();
-   _autogkstate_owner(const _autogkstate_owner &rhs);
-   _autogkstate_owner &operator=(const _autogkstate_owner &rhs);
-   virtual ~_autogkstate_owner();
-   alglib_impl::autogkstate *c_ptr();
-   alglib_impl::autogkstate *c_ptr() const;
-protected:
-   alglib_impl::autogkstate *p_struct;
-};
-class autogkstate: public _autogkstate_owner {
-public:
-   autogkstate();
-   autogkstate(const autogkstate &rhs);
-   autogkstate &operator=(const autogkstate &rhs);
-   virtual ~autogkstate();
-   bool &needf;
-   double &x;
-   double &xminusa;
-   double &bminusx;
-   double &f;
-
-};
+DecClass(autogkstate, bool &needf; double &x; double &xminusa; double &bminusx; double &f;);
 
 // === GQ Package ===
 // Computation of nodes and weights for a Gauss quadrature formula

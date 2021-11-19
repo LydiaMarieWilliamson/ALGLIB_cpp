@@ -57,52 +57,10 @@ typedef struct {
 namespace alglib {
 // === ODESOLVER Package ===
 //
-class _odesolverstate_owner {
-public:
-   _odesolverstate_owner();
-   _odesolverstate_owner(const _odesolverstate_owner &rhs);
-   _odesolverstate_owner &operator=(const _odesolverstate_owner &rhs);
-   virtual ~_odesolverstate_owner();
-   alglib_impl::odesolverstate *c_ptr();
-   alglib_impl::odesolverstate *c_ptr() const;
-protected:
-   alglib_impl::odesolverstate *p_struct;
-};
-class odesolverstate: public _odesolverstate_owner {
-public:
-   odesolverstate();
-   odesolverstate(const odesolverstate &rhs);
-   odesolverstate &operator=(const odesolverstate &rhs);
-   virtual ~odesolverstate();
-   bool &needdy;
-   real_1d_array y;
-   real_1d_array dy;
-   double &x;
-
-};
+DecClass(odesolverstate, bool &needdy; real_1d_array y; real_1d_array dy; double &x;);
 
 //
-class _odesolverreport_owner {
-public:
-   _odesolverreport_owner();
-   _odesolverreport_owner(const _odesolverreport_owner &rhs);
-   _odesolverreport_owner &operator=(const _odesolverreport_owner &rhs);
-   virtual ~_odesolverreport_owner();
-   alglib_impl::odesolverreport *c_ptr();
-   alglib_impl::odesolverreport *c_ptr() const;
-protected:
-   alglib_impl::odesolverreport *p_struct;
-};
-class odesolverreport: public _odesolverreport_owner {
-public:
-   odesolverreport();
-   odesolverreport(const odesolverreport &rhs);
-   odesolverreport &operator=(const odesolverreport &rhs);
-   virtual ~odesolverreport();
-   ae_int_t &nfev;
-   ae_int_t &terminationtype;
-
-};
+DecClass(odesolverreport, ae_int_t &nfev; ae_int_t &terminationtype;);
 
 // === ODESOLVER Package ===
 // Cash-Karp adaptive ODE solver.

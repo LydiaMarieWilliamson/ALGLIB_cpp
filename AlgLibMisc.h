@@ -77,25 +77,7 @@ namespace alglib {
 //     V           -   precomputed value
 //     MagicV      -   'magic' value used to determine whether State structure
 //                     was correctly initialized.
-class _hqrndstate_owner {
-public:
-   _hqrndstate_owner();
-   _hqrndstate_owner(const _hqrndstate_owner &rhs);
-   _hqrndstate_owner &operator=(const _hqrndstate_owner &rhs);
-   virtual ~_hqrndstate_owner();
-   alglib_impl::hqrndstate *c_ptr();
-   alglib_impl::hqrndstate *c_ptr() const;
-protected:
-   alglib_impl::hqrndstate *p_struct;
-};
-class hqrndstate: public _hqrndstate_owner {
-public:
-   hqrndstate();
-   hqrndstate(const hqrndstate &rhs);
-   hqrndstate &operator=(const hqrndstate &rhs);
-   virtual ~hqrndstate();
-
-};
+DecClass(hqrndstate, EndD);
 
 // === XDEBUG Package ===
 // This is a debug class intended for testing ALGLIB interface generator.
@@ -103,74 +85,17 @@ public:
 //
 //   -- ALGLIB --
 //      Copyright 20.07.2021 by Bochkanov Sergey
-class _xdebugrecord1_owner {
-public:
-   _xdebugrecord1_owner();
-   _xdebugrecord1_owner(const _xdebugrecord1_owner &rhs);
-   _xdebugrecord1_owner &operator=(const _xdebugrecord1_owner &rhs);
-   virtual ~_xdebugrecord1_owner();
-   alglib_impl::xdebugrecord1 *c_ptr();
-   alglib_impl::xdebugrecord1 *c_ptr() const;
-protected:
-   alglib_impl::xdebugrecord1 *p_struct;
-};
-class xdebugrecord1: public _xdebugrecord1_owner {
-public:
-   xdebugrecord1();
-   xdebugrecord1(const xdebugrecord1 &rhs);
-   xdebugrecord1 &operator=(const xdebugrecord1 &rhs);
-   virtual ~xdebugrecord1();
-   ae_int_t &i;
-   complex &c;
-   real_1d_array a;
-
-};
+DecClass(xdebugrecord1, ae_int_t &i; complex &c; real_1d_array a;);
 
 // === NEARESTNEIGHBOR Package ===
 // Buffer object which is used to perform nearest neighbor  requests  in  the
 // multithreaded mode (multiple threads working with same KD-tree object).
 //
 // This object should be created with KDTreeCreateRequestBuffer().
-class _kdtreerequestbuffer_owner {
-public:
-   _kdtreerequestbuffer_owner();
-   _kdtreerequestbuffer_owner(const _kdtreerequestbuffer_owner &rhs);
-   _kdtreerequestbuffer_owner &operator=(const _kdtreerequestbuffer_owner &rhs);
-   virtual ~_kdtreerequestbuffer_owner();
-   alglib_impl::kdtreerequestbuffer *c_ptr();
-   alglib_impl::kdtreerequestbuffer *c_ptr() const;
-protected:
-   alglib_impl::kdtreerequestbuffer *p_struct;
-};
-class kdtreerequestbuffer: public _kdtreerequestbuffer_owner {
-public:
-   kdtreerequestbuffer();
-   kdtreerequestbuffer(const kdtreerequestbuffer &rhs);
-   kdtreerequestbuffer &operator=(const kdtreerequestbuffer &rhs);
-   virtual ~kdtreerequestbuffer();
-
-};
+DecClass(kdtreerequestbuffer, EndD);
 
 // KD-tree object.
-class _kdtree_owner {
-public:
-   _kdtree_owner();
-   _kdtree_owner(const _kdtree_owner &rhs);
-   _kdtree_owner &operator=(const _kdtree_owner &rhs);
-   virtual ~_kdtree_owner();
-   alglib_impl::kdtree *c_ptr();
-   alglib_impl::kdtree *c_ptr() const;
-protected:
-   alglib_impl::kdtree *p_struct;
-};
-class kdtree: public _kdtree_owner {
-public:
-   kdtree();
-   kdtree(const kdtree &rhs);
-   kdtree &operator=(const kdtree &rhs);
-   virtual ~kdtree();
-
-};
+DecClass(kdtree, EndD);
 
 // === HQRND Package ===
 // HQRNDState  initialization  with  random  values  which come from standard
