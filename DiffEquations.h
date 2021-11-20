@@ -14,7 +14,6 @@
 #ifndef OnceOnlyDiffEquations_h
 #define OnceOnlyDiffEquations_h
 
-#include "Ap.h"
 #include "AlgLibInternal.h"
 
 // Declarations for the computational core: datatypes.

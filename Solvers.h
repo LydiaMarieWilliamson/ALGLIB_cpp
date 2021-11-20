@@ -14,9 +14,6 @@
 #ifndef OnceOnlySolvers_h
 #define OnceOnlySolvers_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
-#include "AlgLibMisc.h"
 #include "LinAlg.h"
 
 // Declarations for the computational core: datatypes.

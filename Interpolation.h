@@ -14,14 +14,8 @@
 #ifndef OnceOnlyInterpolation_h
 #define OnceOnlyInterpolation_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
-#include "AlgLibMisc.h"
-#include "LinAlg.h"
-#include "Solvers.h"
-#include "Optimization.h"
-#include "SpecialFunctions.h"
 #include "Integration.h"
+#include "Optimization.h"
 
 // Declarations for the computational core: datatypes.
 namespace alglib_impl {

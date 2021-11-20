@@ -14,10 +14,6 @@
 #ifndef OnceOnlyOptimization_h
 #define OnceOnlyOptimization_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
-#include "LinAlg.h"
-#include "AlgLibMisc.h"
 #include "Solvers.h"
 
 // Declarations for the computational core: datatypes.

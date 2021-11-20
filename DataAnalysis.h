@@ -14,14 +14,8 @@
 #ifndef OnceOnlyDataAnalysis_h
 #define OnceOnlyDataAnalysis_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
-#include "AlgLibMisc.h"
-#include "LinAlg.h"
 #include "Statistics.h"
-#include "SpecialFunctions.h"
 #include "Optimization.h"
-#include "Solvers.h"
 
 // Declarations for the computational core: datatypes.
 namespace alglib_impl {

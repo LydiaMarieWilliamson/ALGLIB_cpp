@@ -14,8 +14,6 @@
 #ifndef OnceOnlyLinAlg_h
 #define OnceOnlyLinAlg_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
 #include "AlgLibMisc.h"
 
 // Declarations for the computational core: datatypes.

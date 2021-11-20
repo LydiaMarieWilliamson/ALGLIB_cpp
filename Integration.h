@@ -14,9 +14,6 @@
 #ifndef OnceOnlyIntegration_h
 #define OnceOnlyIntegration_h
 
-#include "Ap.h"
-#include "AlgLibInternal.h"
-#include "AlgLibMisc.h"
 #include "LinAlg.h"
 #include "SpecialFunctions.h"
 
