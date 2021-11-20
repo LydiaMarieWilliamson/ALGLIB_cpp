@@ -22,10 +22,10 @@
 #include <iostream>
 #include <math.h>
 
-#if defined(__CODEGEARC__)
+#if defined __CODEGEARC__
 #   include <list>
 #   include <vector>
-#elif defined(__BORLANDC__)
+#elif defined __BORLANDC__
 #   include <list.h>
 #   include <vector.h>
 #else
@@ -43,10 +43,10 @@
 #define AE_WINDOWS                    1
 #define AE_POSIX                      2
 #define AE_LINUX                    304
-#if !defined(AE_OS)
+#if !defined AE_OS
 #   define AE_OS AE_UNKNOWN
 #endif
-#if AE_OS==AE_LINUX
+#if AE_OS == AE_LINUX
 #   undef AE_OS
 #   define AE_OS AE_POSIX
 #   define _ALGLIB_USE_LINUX_EXTENSIONS
@@ -56,41 +56,38 @@
 #define AE_PARALLEL                 100
 #define AE_SERIAL                   101
 #define AE_SERIAL_UNSAFE            102
-#if !defined(AE_THREADING)
+#if !defined AE_THREADING
 #   define AE_THREADING AE_PARALLEL
 #endif
 
 // malloc types for AE_MALLOC
 #define AE_STDLIB_MALLOC            200
 #define AE_BASIC_STATIC_MALLOC      201
-#if !defined(AE_MALLOC)
+#if !defined AE_MALLOC
 #   define AE_MALLOC AE_STDLIB_MALLOC
 #endif
 
 #define AE_LOCK_ALIGNMENT 16
 
-// automatically determine compiler
-#define AE_MSVC 1
-#define AE_GNUC 2
-#define AE_SUNC 3
-#define AE_COMPILER AE_UNKNOWN
-#ifdef __GNUC__
-#   undef AE_COMPILER
+// The compiler type.
+#define AE_OTHERC	0 // Unknown to ALGLIB++.
+#define AE_MSVC		1 // MSVC.
+#define AE_GNUC		2 // GCC/CLANG/ICC.
+#define AE_SUNC		3 // Sun studio.
+#if defined __GNUC__
 #   define AE_COMPILER AE_GNUC
-#endif
-#if defined(__SUNPRO_C)||defined(__SUNPRO_CC)
-#   undef AE_COMPILER
+#elif defined __SUNPRO_C || defined __SUNPRO_CC
 #   define AE_COMPILER AE_SUNC
-#endif
-#ifdef _MSC_VER
-#   undef AE_COMPILER
+#elif defined _MSC_VER
 #   define AE_COMPILER AE_MSVC
+#else
+#   define AE_COMPILER AE_OTHERC
 #endif
 
 // compiler-specific definitions
-#if AE_COMPILER==AE_MSVC
+#if AE_COMPILER == AE_MSVC
 #   define ALIGNED __declspec(align(8))
-#elif AE_COMPILER==AE_GNUC
+#elif AE_COMPILER == AE_GNUC
 #   define ALIGNED __attribute__((aligned(8)))
 #else
 #   define ALIGNED
@@ -113,90 +110,47 @@
 #include <math.h>
 #include <stddef.h>
 
-#if defined(AE_HAVE_STDINT)
+#if defined AE_HAVE_STDINT
 #   include <stdint.h>
 #endif
 
 // Intel SIMD intrinsics
-//
-// Preprocessor directives below:
-// - include headers for SSE2/AVX2/AVX2+FMA3 intrinsics
-// - defines _ALGLIB_HAS_SSE2_INTRINSICS, _ALGLIB_HAS_AVX2_INTRINSICS and _ALGLIB_HAS_FMA_INTRINSICS definitions
-//
+// The preprocessor directives below:
+// -	include headers for SSE2/AVX2/AVX2+FMA3 intrinsics,
+// -	define _ALGLIB_HAS_SSE2_INTRINSICS, _ALGLIB_HAS_AVX2_INTRINSICS and _ALGLIB_HAS_FMA_INTRINSICS definitions.
 // These actions are performed when we have:
-// - x86 architecture definition (AE_CPU==AE_INTEL)
-// - compiler which supports intrinsics
-//
-// Presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU
-// actually supports these intrinsics - such things should be determined
-// at runtime with ae_cpuid() call. It means that we are working under
-// Intel and out compiler can issue SIMD-capable code.
-//
-#if defined(AE_CPU)
-#   if AE_CPU==AE_INTEL
-   // Intel definitions
-#      if AE_COMPILER==AE_MSVC
-        // MSVC is detected.
-        // We assume that compiler supports all instruction sets
-        // unless something is explicitly turned off.
-#         if !defined(AE_NO_SSE2)
-#            include <emmintrin.h>
-#            define AE_HAS_SSE2_INTRINSICS
-#            define _ALGLIB_HAS_SSE2_INTRINSICS
-#            if !defined(AE_NO_AVX2)
-#               include <intrin.h>
-#               define _ALGLIB_HAS_AVX2_INTRINSICS
-#               if !defined(AE_NO_FMA)
-#                  define _ALGLIB_HAS_FMA_INTRINSICS
-#               endif
-#            endif
-#         endif
-#      elif AE_COMPILER==AE_GNUC
-        // GCC/CLANG/ICC is detected.
-        // We assume that compiler supports all instruction sets
-        // unless something is explicitly turned off.
-#         if !defined(AE_NO_SSE2)
-#            include <xmmintrin.h>
-#            define AE_HAS_SSE2_INTRINSICS
-#            define _ALGLIB_HAS_SSE2_INTRINSICS
-#            if !defined(AE_NO_AVX2)
-#               include <immintrin.h>
-#               define _ALGLIB_HAS_AVX2_INTRINSICS
-#               if !defined(AE_NO_FMA)
-#                  define _ALGLIB_HAS_FMA_INTRINSICS
-#               endif
-#            endif
-#         endif
-#      elif AE_COMPILER==AE_SUNC
-        // Sun studio
-#         include <xmmintrin.h>
-#         include <emmintrin.h>
-#         define AE_HAS_SSE2_INTRINSICS
-#         define _ALGLIB_HAS_SSE2_INTRINSICS
-#         include <immintrin.h>
-#         define _ALGLIB_HAS_AVX2_INTRINSICS
-#         define _ALGLIB_HAS_FMA_INTRINSICS
-#      else
-        // Unknown compiler
-#         if !defined(AE_NO_SSE2)
-#            include <immintrin.h>
-#            define AE_HAS_SSE2_INTRINSICS
-#            define _ALGLIB_HAS_SSE2_INTRINSICS
-#            if !defined(AE_NO_AVX2)
-#               define _ALGLIB_HAS_AVX2_INTRINSICS
-#               if !defined(AE_NO_FMA)
-#                  define _ALGLIB_HAS_FMA_INTRINSICS
-#               endif
-#            endif
-#         endif
-#      endif
-
-   // Intel integrity checks
-#      if defined(_ALGLIB_INTEGRITY_CHECKS_ONCE)
-#         if defined(_ALGLIB_FAIL_WITHOUT_FMA_INTRINSICS) && !defined(_ALGLIB_HAS_FMA_INTRINSICS)
-#            error ALGLIB was requested to fail without FMA intrinsics
-#         endif
-#      endif
+// -	an x86 architecture definition AE_CPU == AE_INTEL,
+// -	a compiler which supports intrinsics.
+// The presence of _ALGLIB_HAS_???_INTRINSICS does NOT mean that our CPU actually supports these intrinsics -
+// such things should be determined at runtime with ae_cpuid().
+// It means that we are working under Intel and out compiler can issue SIMD-capable code.
+#if defined AE_CPU && AE_CPU == AE_INTEL // Intel definitions
+// Other than Sun studio, we only assume that the compiler supports all instruction sets if something is not explicitly turned off.
+#   if AE_COMPILER == AE_GNUC && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
+#      include <xmmintrin.h>
+#   endif
+#   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
+#      include <emmintrin.h>
+#   endif
+#   if !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
+#      define AE_HAS_SSE2_INTRINSICS
+#      define _ALGLIB_HAS_SSE2_INTRINSICS
+#   endif
+#   if (AE_COMPILER == AE_GNUC && !defined AE_NO_AVX2 || AE_COMPILER == AE_OTHERC) && !defined AE_NO_SSE2 || AE_COMPILER == AE_SUNC
+#      include <immintrin.h> //(@) Oriignally preceded the #defines *HAS_SSE2_INTRINSICS for AE_OTHER.
+#   endif
+#   if AE_COMPILER == AE_MSVC && !defined AE_NO_SSE2 && !defined AE_NO_AVX2
+#      include <intrin.h>
+#   endif
+#   if !defined AE_NO_SSE2 && !defined AE_NO_AVX2 || AE_COMPILER == AE_SUNC
+#      define _ALGLIB_HAS_AVX2_INTRINSICS
+#   endif
+#   if !defined AE_NO_SSE2 && !defined AE_NO_AVX2 && !defined AE_NO_FMA || AE_COMPILER == AE_SUNC
+#      define _ALGLIB_HAS_FMA_INTRINSICS
+#   endif
+// Intel integrity checks.
+#   if defined _ALGLIB_INTEGRITY_CHECKS_ONCE && defined _ALGLIB_FAIL_WITHOUT_FMA_INTRINSICS && !defined _ALGLIB_HAS_FMA_INTRINSICS
+#      error ALGLIB was requested to fail without FMA intrinsics
 #   endif
 #endif
 
@@ -213,52 +167,52 @@ namespace alglib_impl {
 // A boolean type was also originally (and unnecessarily) defined.
 // For C (as of 2011): one needs only to include <stdbool.h> to define "bool", "false" and "true".
 // For C++: it is already a part of the language.
-#if defined(AE_INT32_T)
+#if defined AE_INT32_T
 typedef AE_INT32_T ae_int32_t;
 #endif
-#if defined(AE_HAVE_STDINT) && !defined(AE_INT32_T)
+#if defined AE_HAVE_STDINT && !defined AE_INT32_T
 typedef int32_t ae_int32_t;
 #endif
-#if !defined(AE_HAVE_STDINT) && !defined(AE_INT32_T)
-#   if AE_COMPILER==AE_MSVC
+#if !defined AE_HAVE_STDINT && !defined AE_INT32_T
+#   if AE_COMPILER == AE_MSVC
 typedef __int32 ae_int32_t;
 #   endif
-#   if (AE_COMPILER==AE_GNUC) || (AE_COMPILER==AE_SUNC) || (AE_COMPILER==AE_UNKNOWN)
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
 typedef int ae_int32_t;
 #   endif
 #endif
 
-#if defined(AE_INT64_T)
+#if defined AE_INT64_T
 typedef AE_INT64_T ae_int64_t;
 #endif
-#if defined(AE_HAVE_STDINT) && !defined(AE_INT64_T)
+#if defined AE_HAVE_STDINT && !defined AE_INT64_T
 typedef int64_t ae_int64_t;
 #endif
-#if !defined(AE_HAVE_STDINT) && !defined(AE_INT64_T)
-#   if AE_COMPILER==AE_MSVC
+#if !defined AE_HAVE_STDINT && !defined AE_INT64_T
+#   if AE_COMPILER == AE_MSVC
 typedef __int64 ae_int64_t;
 #   endif
-#   if (AE_COMPILER==AE_GNUC) || (AE_COMPILER==AE_SUNC) || (AE_COMPILER==AE_UNKNOWN)
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
 typedef signed long long ae_int64_t;
 #   endif
 #endif
 
-#if defined(AE_UINT64_T)
+#if defined AE_UINT64_T
 typedef AE_UINT64_T ae_uint64_t;
 #endif
-#if defined(AE_HAVE_STDINT) && !defined(AE_UINT64_T)
+#if defined AE_HAVE_STDINT && !defined AE_UINT64_T
 typedef uint64_t ae_uint64_t;
 #endif
-#if !defined(AE_HAVE_STDINT) && !defined(AE_UINT64_T)
-#   if AE_COMPILER==AE_MSVC
+#if !defined AE_HAVE_STDINT && !defined AE_UINT64_T
+#   if AE_COMPILER == AE_MSVC
 typedef unsigned __int64 ae_uint64_t;
 #   endif
-#   if (AE_COMPILER==AE_GNUC) || (AE_COMPILER==AE_SUNC) || (AE_COMPILER==AE_UNKNOWN)
+#   if AE_COMPILER == AE_GNUC || AE_COMPILER == AE_SUNC || AE_COMPILER == AE_UNKNOWN
 typedef unsigned long long ae_uint64_t;
 #   endif
 #endif
 
-#if !defined(AE_INT_T)
+#if !defined AE_INT_T
 typedef ptrdiff_t ae_int_t;
 #endif
 
@@ -515,7 +469,7 @@ typedef struct {
 } ae_serializer;
 
 typedef struct ae_vector {
-// Number of elements in array, cnt>=0
+// Number of elements in array, cnt >= 0
    ae_int_t cnt;
 
 // Either DT_BOOL/DT_BYTE, DT_INT, DT_REAL or DT_COMPLEX
@@ -694,7 +648,7 @@ void *aligned_malloc(size_t size, size_t alignment);
 void *aligned_extract_ptr(void *block);
 void aligned_free(void *block);
 void *eternal_malloc(size_t size);
-#if AE_MALLOC==AE_BASIC_STATIC_MALLOC
+#if AE_MALLOC == AE_BASIC_STATIC_MALLOC
 void set_memory_pool(void *ptr, size_t size);
 void memory_pool_stats(ae_int_t *bytes_used, ae_int_t *bytes_free);
 #endif
@@ -993,25 +947,25 @@ extern FILE *alglib_trace_file;
 
 // Internal macros, defined only when _ALGLIB_IMPL_DEFINES is defined before
 // inclusion of this header file
-#if defined(_ALGLIB_IMPL_DEFINES)
+#if defined _ALGLIB_IMPL_DEFINES
 #   define _ALGLIB_SIMD_ALIGNMENT_DOUBLES 8
 #   define _ALGLIB_SIMD_ALIGNMENT_BYTES   (_ALGLIB_SIMD_ALIGNMENT_DOUBLES*8)
    // SIMD kernel dispatchers
-#   if defined(_ALGLIB_HAS_SSE2_INTRINSICS)
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS
 #      define _ALGLIB_KKK_VOID_SSE2(fname,params)   if( cached_cpuid&CPU_SSE2 ) { fname##_sse2 params; return; }
 #      define _ALGLIB_KKK_RETURN_SSE2(fname,params) if( cached_cpuid&CPU_SSE2 ) { return fname##_sse2 params; }
 #   else
 #      define _ALGLIB_KKK_VOID_SSE2(fname,params)
 #      define _ALGLIB_KKK_RETURN_SSE2(fname,params)
 #   endif
-#   if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
 #      define _ALGLIB_KKK_VOID_AVX2(fname,params)   if( cached_cpuid&CPU_AVX2 ) { fname##_avx2 params; return; }
 #      define _ALGLIB_KKK_RETURN_AVX2(fname,params) if( cached_cpuid&CPU_AVX2 ) { return fname##_avx2 params; }
 #   else
 #      define _ALGLIB_KKK_VOID_AVX2(fname,params)
 #      define _ALGLIB_KKK_RETURN_AVX2(fname,params)
 #   endif
-#   if defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#   if defined _ALGLIB_HAS_FMA_INTRINSICS
 #      define _ALGLIB_KKK_VOID_FMA(fname,params)    if( cached_cpuid&CPU_FMA )  { fname##_fma params; return; }
 #      define _ALGLIB_KKK_RETURN_FMA(fname,params)  if( cached_cpuid&CPU_FMA )  { return fname##_fma params; }
 #   else
@@ -1019,7 +973,7 @@ extern FILE *alglib_trace_file;
 #      define _ALGLIB_KKK_RETURN_FMA(fname,params)
 #   endif
 
-#   if defined(_ALGLIB_HAS_SSE2_INTRINSICS) || defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || defined _ALGLIB_HAS_AVX2_INTRINSICS
 #      define _ALGLIB_KERNEL_VOID_SSE2_AVX2(fname,params) \
         {\
             ae_int_t cached_cpuid = ae_cpuid();\
@@ -1037,7 +991,7 @@ extern FILE *alglib_trace_file;
 #      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2(fname,params) {}
 #   endif
 
-#   if defined(_ALGLIB_HAS_SSE2_INTRINSICS) || defined(_ALGLIB_HAS_AVX2_INTRINSICS) || defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#   if defined _ALGLIB_HAS_SSE2_INTRINSICS || defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
 #      define _ALGLIB_KERNEL_VOID_SSE2_AVX2_FMA(fname,params) \
         {\
             ae_int_t cached_cpuid = ae_cpuid();\
@@ -1057,7 +1011,7 @@ extern FILE *alglib_trace_file;
 #      define _ALGLIB_KERNEL_RETURN_SSE2_AVX2_FMA(fname,params) {}
 #   endif
 
-#   if defined(_ALGLIB_HAS_AVX2_INTRINSICS) || defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
 #      define _ALGLIB_KERNEL_VOID_AVX2_FMA(fname,params) \
         {\
             ae_int_t cached_cpuid = ae_cpuid();\
@@ -1075,7 +1029,7 @@ extern FILE *alglib_trace_file;
 #      define _ALGLIB_KERNEL_RETURN_AVX2_FMA(fname,params) {}
 #   endif
 
-#   if defined(_ALGLIB_HAS_AVX2_INTRINSICS)
+#   if defined _ALGLIB_HAS_AVX2_INTRINSICS
 #      define _ALGLIB_KERNEL_VOID_AVX2(fname,params) \
         {\
             ae_int_t cached_cpuid = ae_cpuid();\
@@ -1107,7 +1061,7 @@ typedef alglib_impl::ae_int_t ae_int_t;
 ae_int_t vlen(ae_int_t n1, ae_int_t n2);
 
 // Exception class.
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 class ap_error {
 public:
    std::string msg;
@@ -1221,7 +1175,7 @@ public:
    alglib_impl::ae_complex *c_ptr();
    const alglib_impl::ae_complex *c_ptr() const;
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    std::string tostring(int dps) const;
 #endif
 
@@ -1404,7 +1358,7 @@ private:
    ae_vector_wrapper(const ae_vector_wrapper &rhs);
    const ae_vector_wrapper &operator=(const ae_vector_wrapper &rhs);
 protected:
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 //
 // Copies array given by string into current object. Additional
 // parameter DATATYPE contains information about type of the data
@@ -1448,9 +1402,9 @@ protected:
 
 //
 // Pointer to ae_vector structure:
-// * ptr==&inner_vec means that wrapper object owns ae_vector structure and
+// * ptr == &inner_vec means that wrapper object owns ae_vector structure and
 //   is responsible for proper deallocation of its memory
-// * ptr!=&inner_vec means that wrapper object works with someone's other
+// * ptr != &inner_vec means that wrapper object works with someone's other
 //   ae_vector record and is not responsible for its memory; in this case
 //   inner_vec is assumed to be uninitialized.
 //
@@ -1458,7 +1412,7 @@ protected:
 
 //
 // Inner ae_vector record.
-// Ignored for ptr!=&inner_rec.
+// Ignored for ptr != &inner_rec.
 //
    alglib_impl::ae_vector inner_vec;
 
@@ -1466,11 +1420,11 @@ protected:
 // Whether this wrapper object is frozen proxy (you may read array, may
 // modify its value, but can not deallocate its memory or resize it) or not.
 //
-// If is_frozen_proxy==true and if:
-// * ptr==&inner_vec, it means that wrapper works with its own ae_vector
+// If is_frozen_proxy == true and if:
+// * ptr == &inner_vec, it means that wrapper works with its own ae_vector
 //   structure, but this structure points to externally allocated memory.
 //   This memory is NOT owned by ae_vector object.
-// * ptr!=&inner_vec, it means that wrapper works with externally allocated
+// * ptr != &inner_vec, it means that wrapper works with externally allocated
 //   and managed ae_vector structure. Both memory pointed by ae_vector and
 //   ae_vector structure itself are not owned by wrapper object.
 //
@@ -1504,7 +1458,7 @@ public:
    bool *getcontent();
    const bool *getcontent() const;
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    boolean_1d_array(const char *s);
    std::string tostring() const;
 #endif
@@ -1537,7 +1491,7 @@ public:
    ae_int_t *getcontent();
    const ae_int_t *getcontent() const;
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    integer_1d_array(const char *s);
    std::string tostring() const;
 #endif
@@ -1582,7 +1536,7 @@ public:
    double *getcontent();
    const double *getcontent() const;
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    real_1d_array(const char *s);
    std::string tostring(int dps) const;
 #endif
@@ -1611,7 +1565,7 @@ public:
    complex *getcontent();
    const complex *getcontent() const;
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    complex_1d_array(const char *s);
    std::string tostring(int dps) const;
 #endif
@@ -1621,7 +1575,7 @@ class ae_matrix_wrapper {
 public:
 //
 // Creates object attached to external ae_vector structure, with additional
-// check for matching datatypes (e_ptr->datatype==datatype is required).
+// check for matching datatypes (e_ptr->datatype == datatype is required).
 //
    ae_matrix_wrapper(alglib_impl::ae_matrix *e_ptr, alglib_impl::ae_datatype datatype);
 
@@ -1632,7 +1586,7 @@ public:
 
 //
 // Creates copy of rhs, with additional check for matching datatypes
-// (rhs.datatype==datatype is required).
+// (rhs.datatype == datatype is required).
 //
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs, alglib_impl::ae_datatype datatype);
 
@@ -1654,7 +1608,7 @@ private:
    ae_matrix_wrapper(const ae_matrix_wrapper &rhs);
    const ae_matrix_wrapper &operator=(const ae_matrix_wrapper &rhs);
 protected:
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 //
 // Copies array given by string into current object. Additional
 // parameter DATATYPE contains information about type of the data
@@ -1689,7 +1643,7 @@ protected:
 // This function initializes matrix and allocates own memory storage.
 //
 // NOTE: initial state of wrapper object is assumed to be uninitialized;
-//       if ptr!=NULL on entry, it is considered critical error (abort is called).
+//       if ptr != NULL on entry, it is considered critical error (abort is called).
 //
    void init(ae_int_t rows, ae_int_t cols, alglib_impl::ae_datatype datatype, alglib_impl::ae_state *_state);
 
@@ -1709,9 +1663,9 @@ protected:
 
 //
 // Pointer to ae_matrix structure:
-// * ptr==&inner_mat means that wrapper object owns ae_matrix structure and
+// * ptr == &inner_mat means that wrapper object owns ae_matrix structure and
 //   is responsible for proper deallocation of its memory
-// * ptr!=&inner_mat means that wrapper object works with someone's other
+// * ptr != &inner_mat means that wrapper object works with someone's other
 //   ae_matrix record and is not responsible for its memory; in this case
 //   inner_mat is assumed to be uninitialized.
 //
@@ -1719,7 +1673,7 @@ protected:
 
 //
 // Inner ae_matrix record.
-// Ignored for ptr!=&inner_mat.
+// Ignored for ptr != &inner_mat.
 //
    alglib_impl::ae_matrix inner_mat;
 
@@ -1727,11 +1681,11 @@ protected:
 // Whether this wrapper object is frozen proxy (you may read array, may
 // modify its value, but can not deallocate its memory or resize it) or not.
 //
-// If is_frozen_proxy==true and if:
-// * ptr==&inner_vec, it means that wrapper works with its own ae_vector
+// If is_frozen_proxy == true and if:
+// * ptr == &inner_vec, it means that wrapper works with its own ae_vector
 //   structure, but this structure points to externally allocated memory.
 //   This memory is NOT owned by ae_vector object.
-// * ptr!=&inner_vec, it means that wrapper works with externally allocated
+// * ptr != &inner_vec, it means that wrapper works with externally allocated
 //   and managed ae_vector structure. Both memory pointed by ae_vector and
 //   ae_vector structure itself are not owned by wrapper object.
 //
@@ -1760,7 +1714,7 @@ public:
 //
    void setcontent(ae_int_t irows, ae_int_t icols, const bool *pContent);
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    boolean_2d_array(const char *s);
    std::string tostring() const;
 #endif
@@ -1788,7 +1742,7 @@ public:
 //
    void setcontent(ae_int_t irows, ae_int_t icols, const ae_int_t *pContent);
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    integer_2d_array(const char *s);
    std::string tostring() const;
 #endif
@@ -1829,7 +1783,7 @@ public:
 //
    void attach_to_ptr(ae_int_t irows, ae_int_t icols, double *pContent);
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    real_2d_array(const char *s);
    std::string tostring(int dps) const;
 #endif
@@ -1857,7 +1811,7 @@ public:
 //
    void setcontent(ae_int_t irows, ae_int_t icols, const complex *pContent);
 
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
    complex_2d_array(const char *s);
    std::string tostring(int dps) const;
 #endif
@@ -1903,7 +1857,7 @@ public:
 // * skip_first_row=true, only one row in file - empty array is returned
 // * field contents is not recognized by atof() - field value is replaced
 //   by 0.0
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 void read_csv(const char *filename, char separator, int flags, real_2d_array &out);
 #endif
 
@@ -1972,7 +1926,7 @@ bool fp_isinf(double x);
 bool fp_isfinite(double x);
 
 // Exception handling macros
-#if !defined(AE_NO_EXCEPTIONS)
+#if !defined AE_NO_EXCEPTIONS
 ///////////////////////////////////////
 // exception-based code
 //////////////////////////////
@@ -1986,10 +1940,10 @@ bool fp_isfinite(double x);
 // Exception-free version
 //////////////////////////////
 //(@) The following restriction is unnecessary.
-// #   if AE_OS!=AE_UNKNOWN
+// #   if AE_OS != AE_UNKNOWN
 // #      error Exception-free mode can not be combined with AE_OS definition
 // #   endif
-#   if AE_THREADING!=AE_SERIAL_UNSAFE
+#   if AE_THREADING != AE_SERIAL_UNSAFE
 #      error Exception-free mode is thread-unsafe; define AE_THREADING=AE_SERIAL_UNSAFE to prove that you know it
 #   endif
 #   define _ALGLIB_CALLBACK_EXCEPTION_GUARD_BEGIN
@@ -2033,19 +1987,19 @@ bool _ialglib_i_cmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia,
 bool _ialglib_i_rmatrixrank1f(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 bool _ialglib_i_rmatrixgerf(ae_int_t m, ae_int_t n, ae_matrix *a, ae_int_t ia, ae_int_t ja, double alpha, ae_vector *u, ae_int_t uoffs, ae_vector *v, ae_int_t voffs);
 
-#if !defined(ALGLIB_NO_FAST_KERNELS)
+#if !defined ALGLIB_NO_FAST_KERNELS
 
-#   if defined(_ALGLIB_IMPL_DEFINES)
+#   if defined _ALGLIB_IMPL_DEFINES
    // Arrays shorter than that will be processed with generic C implementation
-#      if !defined(_ABLASF_KERNEL_SIZE1)
+#      if !defined _ABLASF_KERNEL_SIZE1
 #         define _ABLASF_KERNEL_SIZE1 16
 #      endif
-#      if !defined(_ABLASF_KERNEL_SIZE2)
+#      if !defined _ABLASF_KERNEL_SIZE2
 #         define _ABLASF_KERNEL_SIZE2 16
 #      endif
 #      define _ABLASF_BLOCK_SIZE 32
 #      define _ABLASF_MICRO_SIZE  2
-#      if defined(_ALGLIB_HAS_AVX2_INTRINSICS) || defined(_ALGLIB_HAS_FMA_INTRINSICS)
+#      if defined _ALGLIB_HAS_AVX2_INTRINSICS || defined _ALGLIB_HAS_FMA_INTRINSICS
 #         define ULOAD256PD(x) _mm256_loadu_pd((const double*)(&x))
 #      endif
 #   endif
