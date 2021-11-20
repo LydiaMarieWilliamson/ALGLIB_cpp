@@ -12,13 +12,15 @@ X=
 #X=.exe
 O=.o
 #O=.obj
-Mods=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
+#ModA=Ap KernelsAvx2 KernelsFma KernelsSse2
+ModA=Ap
+Mods=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics DiffEquations FastTransforms
 Objs=$(Mods:%=%$O)
-ModX=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics
+ModX=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions DataAnalysis Statistics
 ObjX=$(ModX:%=%$O)
-ModY=Ap AlgLibInternal AlgLibMisc LinAlg
+ModY=${ModA} AlgLibInternal AlgLibMisc LinAlg
 ObjY=$(ModY:%=%$O)
-ModZ=Ap AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions
+ModZ=${ModA} AlgLibInternal AlgLibMisc LinAlg Solvers Optimization Integration Interpolation SpecialFunctions
 SrcZ=$(ModZ:%=%.cpp)
 
 all: test
@@ -38,6 +40,12 @@ Integration$O: Integration.cpp
 	${Cpp} ${CcOpt} -c $^ -o $@
 Interpolation$O: Interpolation.cpp
 	${Cpp} ${CcOpt} -c $^ -o $@
+#KernelsSse2$O: KernelsSse2.cpp
+#	${Cpp} ${CcOpt} -c $^ -o $@
+#KernelsAvx2$O: KernelsAvx2.cpp
+#	${Cpp} ${CcOpt} -c $^ -o $@
+#KernelsFma$O: KernelsFma.cpp
+#	${Cpp} ${CcOpt} -c $^ -o $@
 LinAlg$O: LinAlg.cpp
 	${Cpp} ${CcOpt} -c $^ -o $@
 Optimization$O: Optimization.cpp
@@ -92,13 +100,21 @@ DiffEquations.cpp: DiffEquations.h
 FastTransforms.cpp: FastTransforms.h
 Integration.cpp: Integration.h
 Interpolation.cpp: Interpolation.h
+#KernelsAvx2.cpp: KerrnelsAvx2.h
+#KernelsFma.cpp: KernelsFma.h
+#KernelsSse2.cpp: KernelsSse2.h
 LinAlg.cpp: LinAlg.h
 Optimization.cpp: Optimization.h
 Solvers.cpp: Solvers.h
 SpecialFunctions.cpp: SpecialFunctions.h
 Statistics.cpp: Statistics.h
+TestC.cpp TestI.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
+TestX.cpp:	DataAnalysis.h Interpolation.h
+TestY.cpp:	LinAlg.h
+TestZ.cpp:	Interpolation.h
 
 ## Header - Header dependencies:
+## KernelsAvx2, KernelsFma, KernelsSse2 -> Ap
 ## Optimization -> Solvers -> LinAlg -> AlgLibMisc -> AlgLibInternal -> Ap
 ## DiffEquations, FastTransforms -> AlgLibInternal
 ## SpecialFunctions -> AlgLibMisc
@@ -111,6 +127,7 @@ Statistics.cpp: Statistics.h
 ## TestY -> LinAlg
 ## TestZ -> Interpolation
 AlgLibInternal.h:	Ap.h
+#KernelsAvx2.h KernelsFma.h KernelsSse2.h: Ap.h
 AlgLibMisc.h DiffEquations.h FastTransforms.h:	AlgLibInternal.h
 LinAlg.h SpecialFunctions.h:	AlgLibMisc.h
 Integration.h Statistics.h Solvers.h:	LinAlg.h
@@ -119,7 +136,3 @@ Optimization.h:		Solvers.h
 DataAnalysis.h Interpolation.h:	Optimization.h
 DataAnalysis.h:		Statistics.h
 Interpolation.h:	Integration.h
-TestC.cpp TestI.cpp:	DataAnalysis.h DiffEquations.h FastTransforms.h Interpolation.h
-TestX.cpp:	DataAnalysis.h Interpolation.h
-TestY.cpp:	LinAlg.h
-TestZ.cpp:	Interpolation.h
